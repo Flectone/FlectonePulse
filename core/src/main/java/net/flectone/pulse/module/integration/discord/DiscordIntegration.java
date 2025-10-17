@@ -30,6 +30,7 @@ import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -72,23 +73,27 @@ public class DiscordIntegration implements FIntegration {
         if (integrationChannel.isEmpty()) return;
 
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageName);
-        if (messageChannelEmbed == null) return;
+        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed());
 
         String skin = skinService.getSkin(sender);
-        UnaryOperator<String> replaceString = s -> Strings.CS.replace(
-                discordString.apply(s),
+
+        UnaryOperator<String> replaceSkin = s -> Strings.CS.replace(
+                s,
                 "<skin>",
                 skin
         );
 
+        UnaryOperator<String> replaceString = s -> discordString.andThen(replaceSkin).apply(s);
+
+        Localization.Integration.Discord.Embed messageEmbed = messageChannelEmbed.getEmbed();
+
         EmbedCreateSpec embed = null;
-        if (messageChannelEmbed.getEmbed().isEnable()) {
-            embed = createEmbed(messageChannelEmbed, replaceString);
+        if (messageEmbed != null) {
+            embed = createEmbed(messageEmbed, replaceSkin, replaceString);
         }
 
-        Localization.Integration.Discord.Webhook messageWebhook = messageChannelEmbed.getWebhook();
-        if (messageWebhook.isEnable()) {
+        String webhookAvatar = messageChannelEmbed.getWebhookAvatar();
+        if (StringUtils.isNotEmpty(webhookAvatar)) {
             long channelID = Snowflake.of(integrationChannel).asLong();
 
             WebhookData webhookData = channelWebhooks.get(channelID);
@@ -100,14 +105,13 @@ public class DiscordIntegration implements FIntegration {
                 channelWebhooks.put(channelID, webhookData);
             }
 
-            String avatarURL = replaceString.apply(messageWebhook.getAvatar());
             String username = sender.getName();
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
                     .allowedMentions(AllowedMentionsData.builder().build())
                     .username(username)
-                    .avatarUrl(avatarURL)
-                    .content(replaceString.apply(messageWebhook.getContent()));
+                    .avatarUrl(replaceSkin.apply(webhookAvatar))
+                    .content(replaceString.apply(messageChannelEmbed.getContent()));
 
             if (embed != null) {
                 webhookBuilder.addEmbed(embed.asRequest());
@@ -148,45 +152,45 @@ public class DiscordIntegration implements FIntegration {
                 .block();
     }
 
-    private EmbedCreateSpec createEmbed(Localization.Integration.Discord.ChannelEmbed localizationChannel,
+    private EmbedCreateSpec createEmbed(Localization.Integration.Discord.Embed embed,
+                                        UnaryOperator<String> replaceSkin,
                                         UnaryOperator<String> discordString) {
-        Localization.Integration.Discord.Embed embed = localizationChannel.getEmbed();
-        if (!embed.isEnable()) return null;
-
         EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder();
 
-        if (!embed.getColor().isEmpty()) {
+        if (StringUtils.isNotEmpty(embed.getColor())) {
             Color color = Color.decode(embed.getColor());
             embedBuilder.color(discord4j.rest.util.Color.of(color.getRGB()));
         }
 
-        if (!embed.getTitle().isEmpty()) {
+        if (StringUtils.isNotEmpty(embed.getTitle())) {
             embedBuilder.title(discordString.apply(embed.getTitle()));
         }
 
-        if (!embed.getUrl().isEmpty()) {
-            embedBuilder.url(discordString.apply(embed.getUrl()));
+        if (StringUtils.isNotEmpty(embed.getUrl())) {
+            embedBuilder.url(replaceSkin.apply(embed.getUrl()));
         }
 
         Localization.Integration.Discord.Embed.Author author = embed.getAuthor();
-        if (!author.getName().isEmpty() || !author.getUrl().isEmpty() || !author.getIconUrl().isEmpty()) {
+        if (StringUtils.isNotEmpty(author.getName())
+                || StringUtils.isNotEmpty(author.getUrl())
+                || StringUtils.isNotEmpty(author.getIconUrl())) {
             embedBuilder.author(
                     discordString.apply(author.getName()),
-                    discordString.apply(author.getUrl()),
-                    discordString.apply(author.getIconUrl())
+                    replaceSkin.apply(author.getUrl()),
+                    replaceSkin.apply(author.getIconUrl())
             );
         }
 
-        if (!embed.getDescription().isEmpty()) {
+        if (StringUtils.isNotEmpty(embed.getDescription())) {
             embedBuilder.description(discordString.apply(embed.getDescription()));
         }
 
-        if (!embed.getThumbnail().isEmpty()) {
+        if (StringUtils.isNotEmpty(embed.getThumbnail())) {
             embedBuilder.thumbnail(discordString.apply(embed.getThumbnail()));
         }
 
-        if (!embed.getImage().isEmpty()) {
-            embedBuilder.image(discordString.apply(embed.getImage()));
+        if (StringUtils.isNotEmpty(embed.getImage())) {
+            embedBuilder.image(replaceSkin.apply(embed.getImage()));
         }
 
         if (embed.isTimestamp()) {
@@ -194,17 +198,19 @@ public class DiscordIntegration implements FIntegration {
         }
 
         Localization.Integration.Discord.Embed.Footer footer = embed.getFooter();
-        if (!footer.getText().isEmpty() || !footer.getIconUrl().isEmpty()) {
+        if (StringUtils.isNotEmpty(footer.getText()) || StringUtils.isNotEmpty(footer.getIconUrl())) {
             embedBuilder.footer(
                     discordString.apply(footer.getText()),
-                    discordString.apply(footer.getIconUrl())
+                    replaceSkin.apply(footer.getIconUrl())
             );
         }
 
-        for (Localization.Integration.Discord.Embed.Field field : embed.getFields()) {
-            if (field.getName().isEmpty() && field.getValue().isEmpty() && !field.isInline()) continue;
+        if (embed.getFields() != null && !embed.getFields().isEmpty()) {
+            for (Localization.Integration.Discord.Embed.Field field : embed.getFields()) {
+                if (StringUtils.isEmpty(field.getName()) || StringUtils.isEmpty(field.getValue())) continue;
 
-            embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
+                embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
+            }
         }
 
         return embedBuilder.build();

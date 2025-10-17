@@ -57,8 +57,7 @@ public class TelegramIntegration implements FIntegration {
         if (channels.isEmpty()) return;
 
         Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
-        String message = localization.getMessageChannel().get(messageName);
-        if (message == null) return;
+        String message = localization.getMessageChannel().getOrDefault(messageName, "<final_message>");
         if (message.isEmpty()) return;
 
         message = telegramString.apply(message);

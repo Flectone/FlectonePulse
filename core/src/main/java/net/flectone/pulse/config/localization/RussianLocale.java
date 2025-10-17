@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.constant.MessageType;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -411,23 +410,6 @@ public class RussianLocale implements Locale {
             put("CHAT_GLOBAL", new Localization.Integration.Discord.ChannelEmbed());
         }};
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").webhook.enable = false;
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").webhook.avatar = "https://mc-heads.net/avatar/<skin>/32.png";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").webhook.content = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.enable = false;
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.color = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.title = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.url = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.author.name = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.author.url = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.author.iconUrl = "https://mc-heads.net/avatar/<skin>/16.png";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.description = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.thumbnail = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.fields = new ArrayList<>(List.of(new Localization.Integration.Discord.Embed.Field("", "", false)));
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.image = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.timestamp = true;
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.footer.text = "";
-        localization.integration.discord.messageChannel.get("CHAT_GLOBAL").embed.footer.iconUrl = "https://mc-heads.net/avatar/<skin>/16.png";
 
         localization.integration.telegram.forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{

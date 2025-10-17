@@ -81,8 +81,7 @@ public class TwitchIntegration implements FIntegration {
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        String message = fileResolver.getLocalization().getIntegration().getTwitch().getMessageChannel().get(messageName);
-        if (message == null) return;
+        String message = fileResolver.getLocalization().getIntegration().getTwitch().getMessageChannel().getOrDefault(messageName, "<final_message>");
         if (message.isEmpty()) return;
 
         message = twitchString.apply(message);

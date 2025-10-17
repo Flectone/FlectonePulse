@@ -771,24 +771,17 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
             @Getter
             @NoArgsConstructor
+            @AllArgsConstructor
             public final static class ChannelEmbed {
                 String content;
-                Webhook webhook = new Webhook();
-                Embed embed = new Embed();
+                String webhookAvatar;
+                Embed embed;
             }
 
             @Getter
             @NoArgsConstructor
-            public static final class Webhook {
-                boolean enable;
-                String avatar;
-                String content;
-            }
-
-            @Getter
-            @NoArgsConstructor
+            @AllArgsConstructor
             public static final class Embed {
-                boolean enable;
                 String color;
                 String title;
                 String url;
@@ -805,6 +798,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
                 @Getter
                 @NoArgsConstructor
+                @AllArgsConstructor
                 public static final class Author {
                     String name;
                     String url;
@@ -813,6 +807,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
                 @Getter
                 @NoArgsConstructor
+                @AllArgsConstructor
                 public static final class Footer {
                     String text;
                     String iconUrl;
