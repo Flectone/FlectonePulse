@@ -19,7 +19,6 @@ import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -62,16 +61,8 @@ public class ProxySender {
 
             output.writeUTF(tag.toProxyTag());
             output.writeUTF(metadataUUID.toString());
-
-            Set<String> clusters = fileResolver.getConfig().getProxy().getClusters();
-            output.writeInt(clusters.size());
-            for (String cluster : clusters) {
-                output.writeUTF(cluster);
-            }
-
-            output.writeBoolean(isPlayer);
-            output.writeUTF(gson.toJson(sender));
-
+            output.writeAsJson(fileResolver.getConfig().getProxy().getClusters());
+            output.writeAsJson(sender);
             outputConsumer.accept(output);
 
             message = byteStream.toByteArray();

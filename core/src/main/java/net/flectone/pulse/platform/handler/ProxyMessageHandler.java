@@ -1,6 +1,8 @@
 package net.flectone.pulse.platform.handler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -61,17 +63,24 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
+import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -112,13 +121,12 @@ public class ProxyMessageHandler {
 
     private void handleTaggedMessage(DataInputStream input, MessageType tag) throws IOException {
         UUID metadataUUID = UUID.fromString(input.readUTF());
-        int clustersCount = input.readInt();
-        Set<String> proxyClusters = readClusters(input, clustersCount);
+        Set<String> proxyClusters = gson.fromJson(input.readUTF(), new TypeToken<Set<String>>() {}.getType());
 
-        boolean isPlayer = input.readBoolean();
+        Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
+        if (optionalFEntity.isEmpty()) return;
 
-        FEntity fEntity = gson.fromJson(input.readUTF(), isPlayer ? FPlayer.class : FEntity.class);
-
+        FEntity fEntity = optionalFEntity.get();
         if (handleModerationInvalidation(tag, fEntity)) {
             return;
         }
@@ -160,6 +168,7 @@ public class ProxyMessageHandler {
             case JOIN -> handleJoin(input, fEntity, metadataUUID);
             case QUIT -> handleQuit(input, fEntity, metadataUUID);
             case AFK -> handleAfk(input, fEntity, metadataUUID);
+            case VANILLA -> handleVanilla(input, fEntity, metadataUUID);
         }
     }
 
@@ -179,15 +188,6 @@ public class ProxyMessageHandler {
             }
             default -> false;
         };
-    }
-
-    private Set<String> readClusters(DataInputStream input, int clustersCount) throws IOException {
-        Set<String> clusters = HashSet.newHashSet(clustersCount);
-        for (int i = 0; i < clustersCount; i++) {
-            clusters.add(input.readUTF());
-        }
-
-        return clusters;
     }
 
     private void handleAnonCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
