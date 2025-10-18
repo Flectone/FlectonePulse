@@ -82,10 +82,10 @@ public class ScoreboardModule extends AbstractModule {
     }
 
     @Async
-    public void create(FPlayer fPlayer, boolean reload) {
+    public void create(FPlayer fPlayer, boolean skipCacheTeam) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        if (!reload) {
+        if (!skipCacheTeam) {
             uuidTeamMap.values().forEach(cacheTeam ->
                     packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
             );
@@ -95,6 +95,10 @@ public class ScoreboardModule extends AbstractModule {
         sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
 
         uuidTeamMap.put(fPlayer.getUuid(), team);
+    }
+
+    public boolean hasTeam(FPlayer fPlayer) {
+        return uuidTeamMap.containsKey(fPlayer.getUuid());
     }
 
     @Async
