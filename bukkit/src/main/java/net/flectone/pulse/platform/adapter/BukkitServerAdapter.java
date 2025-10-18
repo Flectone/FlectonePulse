@@ -282,17 +282,17 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         int amount = itemStack.getAmount();
 
-        try {
-            // it's not really working full
-            // data components are not displayed
-            // waiting for PacketEvents to implement this https://github.com/retrooper/packetevents/pull/1277
-            if (reflectionResolver.isPaper()) {
-                HoverEvent.ShowItem showItem = HoverEvent.ShowItem.showItem(key, amount, PaperItemStackUtil.getDataComponents(itemStack));
-                return component.hoverEvent(HoverEvent.showItem(showItem));
-            }
-        } catch (Exception ignored) {
-            // ignore incorrect hover
-        }
+//        try {
+//            // it's not really working full
+//            // data components are not displayed
+//            // waiting for PacketEvents to implement this https://github.com/retrooper/packetevents/pull/1277
+//            if (reflectionResolver.isPaper()) {
+//                HoverEvent.ShowItem showItem = HoverEvent.ShowItem.showItem(key, amount, PaperItemStackUtil.getDataComponents(itemStack));
+//                return component.hoverEvent(HoverEvent.showItem(showItem));
+//            }
+//        } catch (Exception ignored) {
+//            // ignore incorrect hover
+//        }
 
         return component.hoverEvent(HoverEvent.showItem(key, amount));
     }
