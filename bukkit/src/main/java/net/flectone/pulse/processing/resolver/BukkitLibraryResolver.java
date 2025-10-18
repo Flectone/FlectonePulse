@@ -35,6 +35,20 @@ public class BukkitLibraryResolver extends LibraryResolver {
 
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-ansi")
+                .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build()
+                )
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
                 .artifactId("adventure-text-minimessage")
                 .version(BuildConfig.ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
