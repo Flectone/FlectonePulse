@@ -86,7 +86,7 @@ public final class Config extends YamlFile {
 
         private boolean velocity = false;
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#redis")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy#redis")
         private Redis redis = new Redis();
 
         @Getter
