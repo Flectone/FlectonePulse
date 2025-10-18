@@ -17,6 +17,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -45,7 +48,10 @@ import java.util.Locale;
 public class FabricServerAdapter implements PlatformServerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
+    private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final @Named("projectPath") Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
@@ -80,7 +86,14 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return 0;
 
-        return minecraftServer.getCurrentPlayerCount();
+        return playerlistnameModuleProvider.get().isProxyMode()
+                ? (int) fPlayerServiceProvider.get().findOnlineFPlayers().stream()
+                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .count()
+                : (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
+                    .filter(fPlayer -> !fPlayer.isUnknown())
+                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .count();
     }
 
     @Override
