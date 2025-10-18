@@ -26,28 +26,28 @@ public final class Config extends YamlFile {
     @JsonPropertyDescription(" Don't change it if you don't know what it is")
     private String version = BuildConfig.PROJECT_VERSION;
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#language")
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/language/")
     private Language language = new Language();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#database")
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/database/")
     private Database database = new Database();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#proxy")
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy/")
     private Proxy proxy = new Proxy();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#command")
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/command/")
     private Command command = new Command();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#module")
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module/")
     private Module module = new Module();
 
-    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/#editor")
+    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/editor/")
     private Editor editor = new Editor();
 
-    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/#logger")
+    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger/")
     private Logger logger = new Logger();
 
-    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/#cache")
+    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/cache/")
     private Cache cache = new Cache();
 
     @JsonPropertyDescription("Help us improve FlectonePulse! This collects basic, anonymous data like server version and module usage. \nNo personal data, No IPs, No player names. \nThis helps us understand what features matter most and focus development where it's needed. \nYou can see the public stats here: https://flectone.net/pulse/metrics/ \nThanks for supporting the project! ❤️")
