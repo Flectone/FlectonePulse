@@ -63,6 +63,7 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -112,11 +113,19 @@ public class ProxyMessageHandler {
     }
 
     private void handleSystemOnline(DataInputStream input) throws IOException {
-        fPlayerService.invalidateOffline(UUID.fromString(input.readUTF()));
+        UUID uuid = UUID.fromString(input.readUTF());
+
+        fPlayerService.invalidateOffline(uuid);
+
+        injector.getInstance(PlayerlistnameModule.class).add(uuid);
     }
 
     private void handleSystemOffline(DataInputStream input) throws IOException {
-        fPlayerService.invalidateOnline(UUID.fromString(input.readUTF()));
+        UUID uuid = UUID.fromString(input.readUTF());
+
+        fPlayerService.invalidateOnline(uuid);
+
+        injector.getInstance(PlayerlistnameModule.class).remove(uuid);
     }
 
     private void handleTaggedMessage(DataInputStream input, MessageType tag) throws IOException {

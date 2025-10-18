@@ -694,6 +694,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @Getter
         public static final class Playerlistname implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
+            private boolean proxyMode = true;
             private Ticker ticker = new Ticker(true, 100);
         }
     }
