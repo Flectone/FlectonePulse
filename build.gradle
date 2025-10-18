@@ -4,10 +4,15 @@ plugins {
     id 'com.github.gmazzo.buildconfig' version '5.7.0'
     id 'xyz.wagyourtail.jvmdowngrader' version '1.3.3'
     id 'com.vanniktech.maven.publish' version "0.34.0"
+    id 'io.freefair.lombok' version "9.0.0"
 }
 
 group = "net.flectone.pulse"
 version = project_version
+
+repositories {
+    mavenCentral()
+}
 
 subprojects {
     apply plugin: 'java'
@@ -15,6 +20,7 @@ subprojects {
     apply plugin: 'com.gradleup.shadow'
     apply plugin: 'xyz.wagyourtail.jvmdowngrader'
     apply plugin: 'com.vanniktech.maven.publish'
+    apply plugin: 'io.freefair.lombok'
 
     compileJava.options.encoding = 'UTF-8'
 
@@ -79,10 +85,6 @@ subprojects {
     downgradeJar {
         quiet = true
         downgradeTo = JavaVersion.VERSION_17
-    }
-
-    tasks.withType(Javadoc).configureEach {
-        enabled = false
     }
 
     tasks.register("buildFinalJar", Jar) {
