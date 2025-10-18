@@ -19,7 +19,6 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
