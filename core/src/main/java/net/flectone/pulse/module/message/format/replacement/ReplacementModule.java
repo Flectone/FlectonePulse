@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
+    private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
 
     private final @Named("replacementMessage") Cache<String, String> messageCache;
     private final @Named("replacementImage") Cache<String, Component> imageCache;
@@ -58,7 +59,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SkinService skinService;
     private final UrlFormatter urlFormatter;
-    private final MiniMessage defaultMiniMessage;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
