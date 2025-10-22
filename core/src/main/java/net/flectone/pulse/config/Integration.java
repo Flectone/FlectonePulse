@@ -142,12 +142,12 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
                 private String url = "https://flectone.net/pulse/";
             }
         }
+    }
 
-        @Getter
-        public static final class ChannelInfo {
-            private boolean enable = false;
-            private Ticker ticker = new Ticker(true, 1200);
-        }
+    @Getter
+    public static final class ChannelInfo {
+        private boolean enable = false;
+        private Ticker ticker = new Ticker(true, 1200);
     }
 
     @Getter

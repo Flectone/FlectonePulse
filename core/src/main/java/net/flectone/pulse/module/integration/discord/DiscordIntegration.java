@@ -238,7 +238,7 @@ public class DiscordIntegration implements FIntegration {
             gateway.updatePresence(ClientPresence.of(Status.valueOf(presence.getStatus()), clientActivity)).block();
         }
 
-        Integration.Discord.ChannelInfo channelInfo = config().getChannelInfo();
+        Integration.ChannelInfo channelInfo = config().getChannelInfo();
 
         if (channelInfo.isEnable() && channelInfo.getTicker().isEnable()) {
             long period = channelInfo.getTicker().getPeriod();
