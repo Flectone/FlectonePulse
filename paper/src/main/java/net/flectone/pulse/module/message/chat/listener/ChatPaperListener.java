@@ -44,6 +44,6 @@ public class ChatPaperListener implements Listener {
             event.viewers().clear();
         };
 
-        chatModule.send(fPlayer, format, cancelRunnable, successConsumer);
+        chatModule.handleChatEvent(fPlayer, format, cancelRunnable, successConsumer);
     }
 }

@@ -106,7 +106,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         return fileResolver.getLocalization(sender).getMessage().getChat();
     }
 
-    public void send(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
+    public void handleChatEvent(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
         if (muteSender.sendIfMuted(fPlayer)) {
             cancelEvent.run();
             return;
@@ -119,9 +119,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         Pair<String, Message.Chat.Type> playerChat = getPlayerChat(fPlayer, eventMessage);
 
-        String chatName = playerChat.first();
         Message.Chat.Type chatType = playerChat.second();
-
         if (chatType == null || !chatType.isEnable()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
@@ -133,7 +131,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        if (cooldownSender.sendIfCooldown(fPlayer, cooldownMap.get(chatName))) {
+        if (cooldownSender.sendIfCooldown(fPlayer, cooldownMap.get(playerChat.first()))) {
             cancelEvent.run();
             return;
         }
@@ -154,13 +152,21 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
+        successEvent.accept(finalMessage, playerChat.second().isCancel());
+
+        sendMessage(fPlayer, eventMessage, finalMessage, playerChat);
+    }
+
+    @Async
+    public void sendMessage(FPlayer fPlayer, String eventMessage, String finalMessage, Pair<String, Message.Chat.Type> playerChat) {
+        String chatName = playerChat.first();
         ChatMetadata<Localization.Message.Chat> chatMetadata = ChatMetadata.<Localization.Message.Chat>builder()
                 .sender(fPlayer)
                 .format(localization -> localization.getTypes().get(chatName))
                 .chatName(chatName)
                 .chatType(playerChat.second())
                 .destination(playerChat.second().getDestination())
-                .range(chatRange)
+                .range(playerChat.second().getRange())
                 .message(finalMessage)
                 .sound(soundMap.get(chatName))
                 .filter(permissionFilter(chatName))
@@ -174,8 +180,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         List<FPlayer> receivers = createReceivers(messageType(), chatMetadata);
 
         sendMessage(receivers, chatMetadata);
-
-        successEvent.accept(finalMessage, playerChat.second().isCancel());
 
         // send null receiver message
         checkReceiversLater(fPlayer, receivers, playerChat);

@@ -36,6 +36,6 @@ public class ChatPacketListener implements PacketListener {
 
     @Async
     public void asyncSend(FPlayer fPlayer, String message) {
-        chatModule.send(fPlayer, message, () -> {}, (string, value) -> {});
+        chatModule.handleChatEvent(fPlayer, message, () -> {}, (string, value) -> {});
     }
 }

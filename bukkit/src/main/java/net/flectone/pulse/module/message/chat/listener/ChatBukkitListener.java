@@ -40,6 +40,6 @@ public class ChatBukkitListener implements Listener {
             event.getRecipients().clear();
         };
 
-        chatModule.send(fPlayer, event.getMessage(), cancelRunnable, successConsumer);
+        chatModule.handleChatEvent(fPlayer, event.getMessage(), cancelRunnable, successConsumer);
     }
 }
