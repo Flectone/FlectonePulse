@@ -6,8 +6,8 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
@@ -17,7 +17,9 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 import java.util.List;
@@ -53,6 +55,14 @@ public class MessageListener extends EventListener {
 
         Message message = update.getMessage();
 
+        // delete telegram bot notification
+        if (isNewChatNameMessage(message)) {
+            String chatId = getChatId(message);
+            if (localization().getInfoChannel().containsKey(chatId)) {
+                deleteMessage(chatId, message.getMessageId());
+            }
+        }
+
         String text = message.getText();
         if (text == null) return;
 
@@ -62,11 +72,7 @@ public class MessageListener extends EventListener {
         String chat = message.getChat().getTitle();
         if (chat == null) return;
 
-        String chatID = String.valueOf(message.getChatId());
-
-        if (message.isTopicMessage()) {
-            chatID += "_" + message.getMessageThreadId();
-        }
+        String chatID = getChatId(message);
 
         if (text.equalsIgnoreCase("/id")) {
             sendInfoMessage(chatID, message);
@@ -99,6 +105,25 @@ public class MessageListener extends EventListener {
                         new String[]{"<name>", "<chat>"},
                         new String[]{author, chat}
                 ))
+                .build()
+        );
+    }
+
+    private boolean isNewChatNameMessage(Message message) {
+        if (message.getNewChatTitle() == null && message.getForumTopicEdited() == null) return false;
+
+        User user = message.getFrom();
+        return user != null && user.getIsBot();
+    }
+
+    private String getChatId(Message message) {
+        return message.getChatId() + (message.isTopicMessage() ? "_" + message.getMessageThreadId() : "");
+    }
+
+    private void deleteMessage(String chatId, Integer messageId) {
+        telegramIntegration.get().executeMethod(DeleteMessage.builder()
+                .chatId(chatId)
+                .messageId(messageId)
                 .build()
         );
     }
