@@ -588,6 +588,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     public static final class Rightclick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean shouldCheckSneaking = false;
+        private boolean hideNameWhenInvisible = true;
 
         private Range range = Range.get(Range.Type.PLAYER);
 

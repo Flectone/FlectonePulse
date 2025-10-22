@@ -1,12 +1,13 @@
 package net.flectone.pulse.module.message.rightclick;
 
+import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -70,6 +71,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
         FPlayer fTarget = fPlayerService.getFPlayer(targetUUID);
         if (fTarget.isUnknown()) return;
         if (config().isShouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
+        if (config().isHideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionTypes.INVISIBILITY)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
