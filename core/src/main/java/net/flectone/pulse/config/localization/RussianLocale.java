@@ -412,6 +412,9 @@ public class RussianLocale implements Locale {
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
         localization.integration.telegram.forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
+        localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
+            put("айди", "ТПС <tps>");
+        }};
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{
             put("CHAT_GLOBAL", "<final_message>");
         }};

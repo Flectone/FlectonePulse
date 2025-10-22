@@ -829,6 +829,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
             String forMinecraft;
 
             @JsonMerge(OptBoolean.FALSE)
+            Map<String, String> infoChannel = new LinkedHashMap<>();
+
+            @JsonMerge(OptBoolean.FALSE)
             Map<String, String> messageChannel = new LinkedHashMap<>();
         }
 

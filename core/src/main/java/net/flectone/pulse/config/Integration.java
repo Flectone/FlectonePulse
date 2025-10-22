@@ -237,6 +237,8 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private boolean enable = false;
         private String token = "";
 
+        private ChannelInfo channelInfo = new ChannelInfo();
+
         @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
