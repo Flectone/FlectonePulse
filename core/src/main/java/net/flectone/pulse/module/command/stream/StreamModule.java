@@ -81,7 +81,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
         if (needStart == null) return;
 
-        boolean isStream = fPlayer.getSetting(SettingText.STREAM_PREFIX) != null;
+        boolean isStream = localization().getPrefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
             sendErrorMessage(metadataBuilder()
@@ -103,8 +103,10 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
             return;
         }
 
-        fPlayer.setSetting(SettingText.STREAM_PREFIX, needStart ? localization().getPrefixTrue() : null);
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.STREAM_PREFIX);
+        setStreamPrefix(fPlayer, needStart
+                ? localization().getPrefixTrue()
+                : StringUtils.isEmpty(localization().getPrefixFalse()) ? null : localization().getPrefixFalse()
+        );
 
         if (needStart) {
             String promptUrl = getPrompt(1);
@@ -136,6 +138,11 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .build()
             );
         }
+    }
+
+    public void setStreamPrefix(FPlayer fPlayer, String prefix) {
+        fPlayer.setSetting(SettingText.STREAM_PREFIX, prefix);
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.STREAM_PREFIX);
     }
 
     @Override
