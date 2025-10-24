@@ -291,7 +291,7 @@ public class Database {
             migration("1_3_0");
         }
 
-        if (versionName.isEmpty()) {
+        if (versionName.isEmpty() && fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.6.0")) {
             if (config().getType() == Type.POSTGRESQL) {
                 migration("1_6_0_postgre");
             } else {
