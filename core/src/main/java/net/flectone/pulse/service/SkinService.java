@@ -34,10 +34,6 @@ public class SkinService {
         profilePropertyCache.put(uuid, profileProperty);
     }
 
-    public void invalidate(FEntity entity) {
-        profilePropertyCache.invalidate(entity.getUuid());
-    }
-
     @NotNull
     public PlayerHeadObjectContents.ProfileProperty getProfilePropertyFromCache(FEntity entity) {
         PlayerHeadObjectContents.ProfileProperty profileProperty = profilePropertyCache.getIfPresent(entity.getUuid());
