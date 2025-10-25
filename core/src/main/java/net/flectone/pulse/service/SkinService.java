@@ -8,18 +8,17 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -29,7 +28,6 @@ public class SkinService {
     private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;
-    private final FLogger fLogger;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public void updateProfilePropertyCache(UUID uuid, PlayerHeadObjectContents.ProfileProperty profileProperty) {
@@ -42,12 +40,18 @@ public class SkinService {
 
     @NotNull
     public PlayerHeadObjectContents.ProfileProperty getProfilePropertyFromCache(FEntity entity) {
-        try {
-            return profilePropertyCache.get(entity.getUuid(), () -> getProfileProperty(entity));
-        } catch (ExecutionException e) {
-            fLogger.warning(e);
-            return getProfileProperty(entity);
+        PlayerHeadObjectContents.ProfileProperty profileProperty = profilePropertyCache.getIfPresent(entity.getUuid());
+        if (profileProperty != null) return profileProperty;
+
+        profileProperty = getProfileProperty(entity);
+
+        // not save profileProperty for offline player
+        if (entity instanceof FPlayer fPlayer && !platformPlayerAdapter.isOnline(fPlayer) && profileProperty.signature() == null) {
+            return profileProperty;
         }
+
+        profilePropertyCache.put(entity.getUuid(), profileProperty);
+        return profileProperty;
     }
 
     @NotNull
