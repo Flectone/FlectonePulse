@@ -7,18 +7,38 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkPulseListener implements PulseListener {
 
     private final AfkModule afkModule;
+
+    @Pulse(ignoreCancelled = true)
+    public void onMessagePrepareEvent(MessagePrepareEvent event) {
+        String messageType = event.getMessageType().name();
+
+        // check only sender-based message types
+        if (event.getMessageType() != MessageType.CHAT && !messageType.startsWith("COMMAND_")) return;
+
+        EventMetadata<?> eventMetadata = event.getEventMetadata();
+        if (!(eventMetadata.getSender() instanceof FPlayer fPlayer)) return;
+        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) == null) return;
+
+        int commandIndex = messageType.indexOf('_');
+        String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();
+        afkModule.remove(action, fPlayer);
+    }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
