@@ -189,7 +189,7 @@ public class FabricTaskScheduler implements TaskScheduler {
             }
         };
 
-        this.asyncExecutor = Executors.newCachedThreadPool(namedThreadFactory);
+        this.asyncExecutor = Executors.newFixedThreadPool(8, namedThreadFactory);
     }
 
     private static class ScheduledTask {
