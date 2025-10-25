@@ -73,6 +73,7 @@ public final class Config extends YamlFile {
         private String user = "root";
         private String password = "1234";
         private String parameters = "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8";
+        private String prefix = "";
         public Database() {}
     }
 

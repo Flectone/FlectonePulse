@@ -27,16 +27,19 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 import org.jdbi.v3.core.statement.SqlStatements;
+import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -76,11 +79,7 @@ public class Database {
             jdbi = Jdbi.create(dataSource);
             jdbi.installPlugin(new SqlObjectPlugin());
 
-            if (config().getType() == Type.POSTGRESQL) {
-                jdbi.getConfig(SqlStatements.class).setTemplateEngine((sql, ctx) ->
-                        Strings.CS.replace(sql, "`", "\"")
-                );
-            }
+            setupTemplateEngine();
 
             jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
@@ -115,6 +114,25 @@ public class Database {
             dataSource.close();
 
             fLogger.info("Database disconnected");
+        }
+    }
+
+    private void setupTemplateEngine() {
+        BiFunction<String, StatementContext, String> template = null;
+        if (StringUtils.isNotEmpty(config().getPrefix())) {
+            template = (sql, ctx) -> Strings.CS.replace(sql, "fp_", config().getPrefix());
+        }
+
+        if (config().getType() == Type.POSTGRESQL) {
+            if (template == null) {
+                template = (sql, ctx) -> sql;
+            }
+
+            template = template.andThen(sql -> Strings.CS.replace(sql, "`", "\""));
+        }
+
+        if (template != null) {
+            jdbi.getConfig(SqlStatements.class).setTemplateEngine(template::apply);
         }
     }
 
