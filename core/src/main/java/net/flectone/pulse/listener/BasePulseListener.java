@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -41,6 +42,7 @@ public class BasePulseListener implements PulseListener {
     private final IntegrationSender integrationSender;
     private final SoundPlayer soundPlayer;
     private final PacketProvider packetProvider;
+    private final SkinService skinService;
     private final FLogger fLogger;
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
@@ -57,6 +59,7 @@ public class BasePulseListener implements PulseListener {
     public void onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
         FPlayer fPlayer = event.getPlayer();
         fPlayerService.clearAndSave(fPlayer);
+        skinService.invalidate(fPlayer);
     }
 
     @Pulse
