@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -42,6 +43,7 @@ public class ObjectModule extends AbstractModule {
     private final PermissionChecker permissionChecker;
     private final SkinService skinService;
     private final PacketProvider packetProvider;
+    private final IntegrationModule integrationModule;
     private final @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV_1_21_9;
 
     @Override
@@ -166,6 +168,13 @@ public class ObjectModule extends AbstractModule {
 
         // check player version
         if (packetProvider.isNewerThanOrEquals(fReceiver, ClientVersion.V_1_21_9)) {
+            // bedrock player does not support object component
+            if (integrationModule.isBedrockPlayer(fReceiver)) {
+                return messageContext.isFlag(MessageFlag.USER_MESSAGE)
+                        ? Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT)
+                        : Tag.selfClosingInserting(Component.empty());
+            }
+
             // continue building
             return null;
         }
