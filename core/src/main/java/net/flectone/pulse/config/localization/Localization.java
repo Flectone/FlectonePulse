@@ -685,6 +685,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Override
+        public SubIntegrationConfig getGeyser() {
+            return null;
+        }
+
+        @Override
         public SubIntegrationConfig getInteractivechat() {
             return null;
         }

@@ -588,6 +588,9 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
         private Discord discord = new Discord();
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
+        private Geyser geyser = new Geyser();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
         private Interactivechat interactivechat = new Interactivechat();
 
@@ -661,6 +664,12 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @Getter
         public static final class Discord implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.discord";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Geyser implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.geyser";
             private Type type = Type.TRUE;
         }
 

@@ -24,6 +24,7 @@ dependencies {
     compileOnly "io.lettuce:lettuce-core:$lettuce_version"
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
+    compileOnly "org.geysermc.geyser:api:$geyser_version"
 }
 
 tasks.named("buildFinalJar", Jar) {

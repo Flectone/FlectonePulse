@@ -37,6 +37,9 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
     private Discord discord = new Discord();
 
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
+    private Geyser geyser = new Geyser();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
     private Interactivechat interactivechat = new Interactivechat();
 
@@ -148,6 +151,11 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     public static final class ChannelInfo {
         private boolean enable = false;
         private Ticker ticker = new Ticker(true, 1200);
+    }
+
+    @Getter
+    public static final class Geyser implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
     }
 
     @Getter

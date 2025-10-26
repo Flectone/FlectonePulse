@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration;
 
 import com.google.inject.Injector;
+import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -72,6 +73,10 @@ public abstract class IntegrationModule extends AbstractModule {
             }
         }
 
+        if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
+            addChildren(GeyserModule.class);
+        }
+
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);
         addChildren(TelegramModule.class);
@@ -102,6 +107,16 @@ public abstract class IntegrationModule extends AbstractModule {
     public abstract ExternalModeration getMute(FPlayer fPlayer);
 
     public abstract String getTritonLocale(FPlayer fPlayer);
+
+    public boolean isBedrockPlayer(FEntity fPlayer) {
+        if (!isEnable()) return false;
+
+        if (getChildren().contains(GeyserModule.class)) {
+            return injector.getInstance(GeyserModule.class).isBedrockPlayer(fPlayer);
+        }
+
+        return false;
+    }
 
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         if (!isEnable()) return false;

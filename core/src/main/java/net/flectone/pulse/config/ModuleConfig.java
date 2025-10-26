@@ -60,6 +60,7 @@ public interface ModuleConfig {
         SubIntegrationConfig getAdvancedban();
         SubIntegrationConfig getDeepl();
         SubIntegrationConfig getDiscord();
+        SubIntegrationConfig getGeyser();
         SubIntegrationConfig getInteractivechat();
         SubIntegrationConfig getItemsadder();
         SubIntegrationConfig getLitebans();
