@@ -3,11 +3,12 @@ package net.flectone.pulse.module.message.format;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
@@ -28,6 +29,9 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
@@ -43,6 +47,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
+    private final IntegrationModule integrationModule;
 
     @Override
     public void configureChildren() {
@@ -133,7 +138,15 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
                 .entrySet()
                 .stream()
                 .filter(entry -> isCorrectTag(entry.getKey(), sender, isUserMessage))
-                .forEach(entry -> messageContext.addReplacementTag(entry.getValue()));
+                .forEach(entry -> {
+                    if (entry.getKey() == AdventureTag.GRADIENT
+                            && integrationModule.isBedrockPlayer(messageContext.getReceiver())) {
+                        messageContext.addReplacementTag(bedrockGradientTag());
+                        return;
+                    }
+
+                    messageContext.addReplacementTag(entry.getValue());
+                });
     }
 
     public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {
@@ -141,6 +154,18 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         if (!tagResolverMap.containsKey(adventureTag)) return false;
 
         return !needPermission || permissionChecker.check(sender, permission().getAdventureTags().get(adventureTag));
+    }
+
+    private TagResolver bedrockGradientTag() {
+        return TagResolver.resolver( "gradient", (argumentQueue, context) -> {
+            Tag.Argument argument = argumentQueue.peek();
+            if (argument == null) return Tag.selfClosingInserting(Component.empty());
+
+            TextColor textColor = TextColor.fromHexString(argument.value());
+            if (textColor == null) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.styling(textColor);
+        });
     }
 
     private void putAdventureTag(AdventureTag adventureTag, TagResolver tagResolver) {
