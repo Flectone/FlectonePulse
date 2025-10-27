@@ -30,6 +30,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/")
     private boolean enable = true;
 
+    private boolean suggestInvisiblePlayers = true;
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/afk/")
     private Afk afk = new Afk();
 

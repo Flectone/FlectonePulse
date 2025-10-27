@@ -107,6 +107,13 @@ public class CommandModule extends AbstractModule {
     }
 
     @Override
+    public void onEnable() {
+        super.onEnable();
+
+        registerPermission(fileResolver.getPermission().getCommand().getSeeInvisiblePlayersInSuggest());
+    }
+
+    @Override
     public Command config() {
         return fileResolver.getCommand();
     }

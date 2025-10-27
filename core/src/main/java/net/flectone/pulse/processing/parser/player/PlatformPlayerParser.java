@@ -3,32 +3,34 @@ package net.flectone.pulse.processing.parser.player;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
-import org.incendo.cloud.parser.ArgumentParseResult;
-import org.incendo.cloud.parser.ArgumentParser;
-import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PlatformPlayerParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
-
-    private final StringParser<FPlayer> stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
+public class PlatformPlayerParser extends PlayerParser {
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
+    private final FPlayerService fPlayerService;
 
-    @Override
-    public @NonNull ArgumentParseResult<String> parse(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
-        return stringParser.parse(context, input);
+    @Inject
+    public PlatformPlayerParser(FPlayerService fPlayerService,
+                                IntegrationModule integrationModule,
+                                FileResolver fileResolver,
+                                PlatformPlayerAdapter platformPlayerAdapter,
+                                PermissionChecker permissionChecker) {
+        super(fPlayerService, integrationModule, fileResolver, platformPlayerAdapter, permissionChecker);
+
+        this.fPlayerService = fPlayerService;
+        this.integrationModule = integrationModule;
+        this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     @Override
@@ -36,6 +38,7 @@ public class PlatformPlayerParser implements ArgumentParser<FPlayer, String>, Bl
         return platformPlayerAdapter.getOnlinePlayers().stream()
                 .map(fPlayerService::getFPlayer)
                 .filter(player -> integrationModule.canSeeVanished(player, context.sender()))
+                .filter(fPlayer -> isVisible(context.sender(), fPlayer))
                 .map(FEntity::getName)
                 .toList();
     }

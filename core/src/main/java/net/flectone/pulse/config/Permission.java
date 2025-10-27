@@ -44,6 +44,8 @@ public final class Permission extends YamlFile implements ModuleConfig {
         private String name = "flectonepulse.module.command";
         private Type type = Type.TRUE;
 
+        private PermissionEntry seeInvisiblePlayersInSuggest = new PermissionEntry("flectonepulse.module.command.see_invisible_players_in_suggest", Type.OP);
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/afk/")
         private Afk afk = new Afk();
 
