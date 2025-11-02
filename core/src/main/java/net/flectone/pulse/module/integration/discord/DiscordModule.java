@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.discord;
 
 import com.alessiodp.libby.Library;
+import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -63,6 +64,16 @@ public class DiscordModule extends AbstractModule {
                 .version(BuildConfig.DISCORD4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("io{}netty")
+                        .relocatedPattern("net.flectone.pulse.library.discord.netty")
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml")
+                        .relocatedPattern("net.flectone.pulse.library.discord.fasterxml")
+                        .build()
+                )
                 .build()
         );
     }
