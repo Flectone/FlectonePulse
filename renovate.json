@@ -6,16 +6,6 @@
   "commitMessagePrefix": "chore(deps): ",
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
-      "automerge": true,
-      "automergeType": "branch"
-    },
-    {
       "matchDatasources": ["maven"],
       "registryUrls": [
         "https://jitpack.io",
