@@ -95,7 +95,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(contextMessage, () -> replace(sender, contextMessage));
+            formattedMessage = messageCache.get(sender.getUuid() + contextMessage, () -> replace(sender, contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
             formattedMessage = replace(sender, contextMessage);
