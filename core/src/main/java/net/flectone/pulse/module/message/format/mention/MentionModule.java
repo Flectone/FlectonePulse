@@ -119,38 +119,34 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                 return Tag.preProcessParsed(config().getTrigger() + mention);
             }
 
-            Optional<String> group = integrationModule.getGroups().stream()
-                    .filter(name -> name.equalsIgnoreCase(mention))
-                    .findFirst();
-
+            Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
-                if (receiver instanceof FPlayer mentionFPlayer
-                        && !permissionChecker.check(mentionFPlayer, permission().getBypass())
-                        && permissionChecker.check(mentionFPlayer, permission().getGroup() + "." + group.get())) {
-                    sendMention(processId, mentionFPlayer);
-                }
-            } else {
-                if (mention.equalsIgnoreCase(config().getEveryoneTag())) {
-                    if (!permissionChecker.check(sender, permission().getGroup() + ".default")) {
-                        return Tag.selfClosingInserting(Component.empty());
+                if (permissionChecker.check(sender, permission().getGroup() + "." + group.get())) {
+                    if (!permissionChecker.check(receiver, permission().getBypass())) {
+                        sendMention(processId, receiver);
                     }
 
-                    fPlayerService.getOnlineFPlayers().forEach(p -> sendMention(processId, p));
+                    return mentionTag(sender, receiver, mention);
                 }
-
+            } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission().getBypass())) {
                     sendMention(processId, mentionFPlayer);
+                    return mentionTag(sender, receiver, mention);
                 }
             }
 
-            String format = StringUtils.replaceEach(localization(receiver).getFormat(),
-                    new String[]{"<player>", "<target>"},
-                    new String[]{mention, mention}
-            );
-
-            return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
+            return Tag.preProcessParsed(config().getTrigger() + mention);
         });
+    }
+
+    private Tag mentionTag(FEntity sender, FPlayer receiver, String mention) {
+        String format = StringUtils.replaceEach(localization(receiver).getFormat(),
+                new String[]{ "<player>", "<target>" },
+                new String[]{ mention, mention }
+        );
+
+        return Tag.selfClosingInserting(messagePipeline.builder(sender, receiver, format).build());
     }
 
     private String replace(FEntity sender, String message) {
@@ -161,16 +157,36 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             if (!word.startsWith(config().getTrigger())) continue;
 
             String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().getTrigger(), "");
-
-            FPlayer mentionFPlayer = fPlayerService.getFPlayer(wordWithoutPrefix);
-            boolean isMention = !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)
-                    || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission().getGroup());
-            if (isMention) {
+            if (isMention(sender, wordWithoutPrefix)) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";
             }
         }
 
         return String.join(" ", words);
+    }
+
+    private boolean isMention(FEntity sender, String word) {
+        if (StringUtils.isEmpty(word)) return false;
+
+        Optional<String> group = findGroup(word);
+        if (group.isPresent()) {
+            return permissionChecker.check(sender, permission().getGroup() + "." + group.get());
+        }
+
+        FPlayer mentionFPlayer = fPlayerService.getFPlayer(word);
+        return !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender);
+    }
+
+    private Optional<String> findGroup(String group) {
+        if (config().getEveryoneTag().equalsIgnoreCase(group)) {
+            group = "default";
+        }
+
+        String finalGroup = group;
+        return integrationModule.getGroups()
+                .stream()
+                .filter(string -> string.equalsIgnoreCase(finalGroup))
+                .findFirst();
     }
 
     private void sendMention(UUID processId, FPlayer fPlayer) {
