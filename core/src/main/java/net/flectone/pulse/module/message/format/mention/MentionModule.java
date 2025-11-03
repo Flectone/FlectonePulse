@@ -95,7 +95,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         String formattedMessage;
         try {
-             formattedMessage = messageCache.get(contextMessage, () -> replace(sender, contextMessage));
+            formattedMessage = messageCache.get(contextMessage, () -> replace(sender, contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
             formattedMessage = replace(sender, contextMessage);
@@ -130,6 +130,14 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                     sendMention(processId, mentionFPlayer);
                 }
             } else {
+                if (mention.equalsIgnoreCase(config().getEveryoneTag())) {
+                    if (!permissionChecker.check(sender, permission().getGroup() + ".default")) {
+                        return Tag.selfClosingInserting(Component.empty());
+                    }
+
+                    fPlayerService.getOnlineFPlayers().forEach(p -> sendMention(processId, p));
+                }
+
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission().getBypass())) {
                     sendMention(processId, mentionFPlayer);
