@@ -82,7 +82,7 @@ public class ObjectModule extends AbstractModule {
             PlayerHeadObjectContents.Builder playerHeadBuilderComponent = ObjectContents.playerHead();
 
             String playerHead = argumentQueue.hasNext() ? argumentQueue.pop().value() : null;
-            if (playerHead == null) {
+            if (playerHead == null || playerHead.length() > 16) {
                 PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(sender);
 
                 Component playerHeadComponent = Component.object().contents(
