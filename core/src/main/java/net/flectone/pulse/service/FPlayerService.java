@@ -169,6 +169,10 @@ public class FPlayerService {
         return fPlayerRepository.get(id);
     }
 
+    public FPlayer getConsole() {
+        return fPlayerRepository.get(-1);
+    }
+
     public FPlayer getFPlayer(String name) {
         return fPlayerRepository.get(name);
     }
