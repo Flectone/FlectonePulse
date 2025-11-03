@@ -2,8 +2,10 @@ package net.flectone.pulse.module.integration.libertybans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.service.FPlayerService;
+import space.arim.libertybans.api.PlayerOperator;
 import space.arim.libertybans.api.punish.Punishment;
 import space.arim.libertybans.api.LibertyBans;
 import space.arim.libertybans.api.PunishmentType;
@@ -11,8 +13,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
+import space.arim.omnibus.Omnibus;
+import space.arim.omnibus.OmnibusProvider;
+
 import java.net.InetAddress;
-import java.time.Instant;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,56 +25,72 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LibertyBansIntegration implements FIntegration {
 
-    private final LibertyBans libertyBans;
     private final FLogger fLogger;
+    private final FPlayerService fPlayerService;
 
-    @Getter
-    private boolean hooked;
+    private LibertyBans libertyBans;
 
     @Override
     public void hook() {
-        hooked = true;
+        Omnibus omnibus = OmnibusProvider.getOmnibus();
+        Optional<LibertyBans> optionalLibertyBans = omnibus.getRegistry().getProvider(LibertyBans.class);
+        if (optionalLibertyBans.isEmpty()) return;
+
+        libertyBans = optionalLibertyBans.get();
+
         fLogger.info("✔ LibertyBans hooked");
     }
 
     @Override
     public void unhook() {
-        hooked = false;
         fLogger.info("✖ LibertyBans unhooked");
     }
-    public Optional<Punishment> muteSearching(FEntity fEntity) {
-        UUID uuid = getUUID(fEntity);
 
-        return libertyBans.getSelector()
-                .selectionByApplicabilityBuilder(uuid, (InetAddress) null)
-                .type(PunishmentType.MUTE)
-                .build()
-                .getFirstSpecificPunishment()
-                .toCompletableFuture().join();
+    public boolean isHooked() {
+        return libertyBans != null;
     }
 
     public boolean isMuted(FEntity fEntity) {
-        Optional<Punishment> muteOpt = muteSearching(fEntity);
-
-        return muteOpt.isPresent() &&
-                (muteOpt.get().getEndDate() == null || muteOpt.get().getEndDate().isAfter(Instant.now()));
+        return selectMute(fEntity).isPresent();
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        Optional<Punishment> muteOpt = muteSearching(fEntity);
+        Optional<Punishment> optionalPunishment = selectMute(fEntity);
+        if (optionalPunishment.isEmpty()) return null;
 
-        return muteOpt.map(punishment -> new ExternalModeration(
+        Punishment punishment = optionalPunishment.get();
+
+        FPlayer operator = punishment.getOperator() instanceof PlayerOperator playerOperator
+                ? fPlayerService.getFPlayer(playerOperator.getUUID())
+                : fPlayerService.getConsole();
+
+        return new ExternalModeration(
                 fEntity.getName(),
-                punishment.getOperator().toString(),
+                operator.getName(),
                 punishment.getReason(),
                 punishment.getIdentifier(),
-                punishment.getStartDateSeconds(),
-                punishment.getEndDateSeconds(),
+                punishment.getStartDate().toEpochMilli(),
+                punishment.getEndDate().toEpochMilli(),
                 !punishment.isPermanent()
-        )).orElse(null);
+        );
     }
 
-    private UUID getUUID(FEntity fEntity) {
-        return fEntity.getUuid();
+    private Optional<Punishment> selectMute(FEntity fEntity) {
+        if (!(fEntity instanceof FPlayer fPlayer) || !isHooked()) return Optional.empty();
+
+        try {
+            UUID uuid = fPlayer.getUuid();
+            InetAddress ip = InetAddress.getByName(fPlayer.getIp());
+
+            return libertyBans.getSelector()
+                    .selectionByApplicabilityBuilder(uuid, ip)
+                    .type(PunishmentType.MUTE)
+                    .build()
+                    .getFirstSpecificPunishment()
+                    .toCompletableFuture()
+                    .join();
+        } catch (UnknownHostException e) {
+            return Optional.empty();
+        }
     }
 }
