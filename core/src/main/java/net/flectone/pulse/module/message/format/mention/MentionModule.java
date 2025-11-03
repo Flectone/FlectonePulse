@@ -138,7 +138,6 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                     fPlayerService.getOnlineFPlayers().forEach(p -> sendMention(processId, p));
                 }
 
-
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission().getBypass())) {
                     sendMention(processId, mentionFPlayer);
