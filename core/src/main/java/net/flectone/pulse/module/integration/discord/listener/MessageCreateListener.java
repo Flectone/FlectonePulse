@@ -4,21 +4,23 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -39,11 +41,8 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         if (channel == null) return Mono.empty();
         if (!channel.equals(discordMessage.getChannelId().asString())) return Mono.empty();
 
-        String nickname = event.getMember()
-                .filter(member -> !member.isBot())
-                .flatMap(User::getGlobalName)
-                .orElse(null);
-        if (nickname == null) return Mono.empty();
+        Optional<Member> user = event.getMember();
+        if (user.isEmpty() || user.get().isBot()) return Mono.empty();
 
         String message = discordMessage.getContent();
         if (message.isEmpty()) {
@@ -56,22 +55,38 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
             );
         }
 
-        sendMessage(nickname, message);
+        sendMessage(user.get(), message);
 
         return Mono.empty();
     }
 
     @Async
-    public void sendMessage(String nickname, String message) {
+    public void sendMessage(Member member, String message) {
+        String globalName = member.getGlobalName().orElse("");
+        String nickname = member.getNickname().orElse("");
+        String displayName = member.getDisplayName();
+        String userName = member.getUsername();
+
         sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
                 .sender(FPlayer.UNKNOWN)
-                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
+                .format(string -> StringUtils.replaceEach(
+                        string.getForMinecraft(),
+                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                        new String[]{globalName, globalName, nickname, displayName, userName}
+                ))
+                .globalName(globalName)
                 .nickname(nickname)
+                .displayName(displayName)
+                .userName(userName)
                 .range(Range.get(Range.Type.PROXY))
                 .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
-                .integration(string -> Strings.CS.replace(string, "<name>", nickname))
+                .integration(string -> StringUtils.replaceEach(
+                        string,
+                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                        new String[]{globalName, globalName, nickname, displayName, userName}
+                ))
                 .build()
         );
     }

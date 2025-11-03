@@ -5,12 +5,22 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.event.EventMetadata;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @SuperBuilder
 public class DiscordMetadata<L extends Localization.Localizable> extends EventMetadata<L> {
 
     @NonNull
+    private final String globalName;
+
+    @NonNull
     private final String nickname;
+
+    @NonNull
+    private final String displayName;
+
+    @NotNull
+    private final String userName;
 
 }

@@ -402,7 +402,7 @@ public class RussianLocale implements Locale {
         localization.command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         localization.command.warnlist.player.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
-        localization.integration.discord.forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
+        localization.integration.discord.forMinecraft = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.discord.infoChannel = new LinkedHashMap<>() {{
             put("айди", "ТПС <tps>");
         }};
