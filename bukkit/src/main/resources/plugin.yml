@@ -20,6 +20,7 @@ softdepend:
   - ProtocolLib
   - packetevents
   - TAB
+  - LibertyBans
   - LiteBans
   - AdvancedBan
   - MOTD
