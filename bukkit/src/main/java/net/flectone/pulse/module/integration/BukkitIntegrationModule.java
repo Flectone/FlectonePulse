@@ -82,6 +82,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
             addChildren(ItemsAdderModule.class);
         }
 
+        if (platformServerAdapter.hasProject("LibertyBans")) {
+            addChildren(LibertyBansModule.class);
+        }
+
         if (platformServerAdapter.hasProject("LiteBans")) {
             addChildren(LiteBansModule.class);
         }
