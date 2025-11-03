@@ -18,6 +18,7 @@ dependencies {
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
     compileOnly "com.mojang:authlib:$mojang_authlib_version"
+    compileOnly "space.arim.libertybans:bans-api:$libertybans_version"
 }
 
 shadowJar {
