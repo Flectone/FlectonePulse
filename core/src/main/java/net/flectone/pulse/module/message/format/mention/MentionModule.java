@@ -127,7 +127,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (!mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
+                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
                     sendMention(processId, mentionFPlayer);
                     return mentionTag(sender, receiver, mention);
                 }
