@@ -31,6 +31,9 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
     private Advancedban advancedban = new Advancedban();
 
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/") // Ссылку на свои доксы вставишь
+    private Libertybans libertybans = new Libertybans();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
     private Deepl deepl = new Deepl();
 
@@ -100,6 +103,15 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
 
     @Getter
     public static final class Advancedban implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean disableFlectonepulseBan = true;
+        private boolean disableFlectonepulseMute = true;
+        private boolean disableFlectonepulseWarn = true;
+        private boolean disableFlectonepulseKick = true;
+    }
+
+    @Getter
+    public static final class Libertybans implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
         private boolean disableFlectonepulseBan = true;
         private boolean disableFlectonepulseMute = true;

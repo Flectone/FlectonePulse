@@ -584,6 +584,9 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
         private Advancedban advancedban = new Advancedban();
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
+        private Libertybans libertybans = new Libertybans();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
         private Deepl deepl = new Deepl();
 
@@ -654,6 +657,12 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @Getter
         public static final class Advancedban implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.advancedban";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Libertybans implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.libertybans";
             private Type type = Type.TRUE;
         }
 

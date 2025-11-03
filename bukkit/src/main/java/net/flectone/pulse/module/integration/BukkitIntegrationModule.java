@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
 import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.model.util.ExternalModeration;
@@ -208,6 +209,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
             return injector.getInstance(AdvancedBanModule.class).isMuted(fPlayer);
         }
 
+        if (getChildren().contains(LibertyBansModule.class)) {
+            return injector.getInstance(LibertyBansModule.class).isMuted(fPlayer);
+        }
+
         return false;
     }
 
@@ -219,6 +224,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (getChildren().contains(AdvancedBanModule.class)) {
             return injector.getInstance(AdvancedBanModule.class).getMute(fPlayer);
+        }
+
+        if (getChildren().contains(LibertyBansModule.class)) {
+            return injector.getInstance(LibertyBansModule.class).getMute(fPlayer);
         }
 
         return null;
