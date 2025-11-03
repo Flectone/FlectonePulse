@@ -95,10 +95,10 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(sender.getUuid() + contextMessage, () -> replace(sender, contextMessage));
+            formattedMessage = messageCache.get(contextMessage, () -> replace(contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            formattedMessage = replace(sender, contextMessage);
+            formattedMessage = replace(contextMessage);
         }
 
         messageContext.setMessage(formattedMessage);
@@ -122,15 +122,12 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
                 if (permissionChecker.check(sender, permission().getGroup() + "." + group.get())) {
-                    if (!permissionChecker.check(receiver, permission().getBypass())) {
-                        sendMention(processId, receiver);
-                    }
-
+                    sendMention(processId, receiver);
                     return mentionTag(sender, receiver, mention);
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission().getBypass())) {
+                if (!mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
                     sendMention(processId, mentionFPlayer);
                     return mentionTag(sender, receiver, mention);
                 }
@@ -149,7 +146,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         return Tag.selfClosingInserting(messagePipeline.builder(sender, receiver, format).build());
     }
 
-    private String replace(FEntity sender, String message) {
+    private String replace(String message) {
         String[] words = message.split(" ");
 
         for (int i = 0; i < words.length; i++) {
@@ -157,7 +154,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             if (!word.startsWith(config().getTrigger())) continue;
 
             String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().getTrigger(), "");
-            if (isMention(sender, wordWithoutPrefix)) {
+            if (isMention(wordWithoutPrefix)) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";
             }
         }
@@ -165,16 +162,16 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         return String.join(" ", words);
     }
 
-    private boolean isMention(FEntity sender, String word) {
+    private boolean isMention(String word) {
         if (StringUtils.isEmpty(word)) return false;
 
         Optional<String> group = findGroup(word);
         if (group.isPresent()) {
-            return permissionChecker.check(sender, permission().getGroup() + "." + group.get());
+            return true;
         }
 
         FPlayer mentionFPlayer = fPlayerService.getFPlayer(word);
-        return !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender);
+        return !mentionFPlayer.isUnknown();
     }
 
     private Optional<String> findGroup(String group) {
@@ -190,6 +187,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     private void sendMention(UUID processId, FPlayer fPlayer) {
+        if (permissionChecker.check(fPlayer, permission().getBypass())) return;
         if (processedMentions.containsKey(processId)) return;
 
         processedMentions.put(processId, true);
