@@ -31,9 +31,6 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
     private Advancedban advancedban = new Advancedban();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/") // Ссылку на свои доксы вставишь
-    private Libertybans libertybans = new Libertybans();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
     private Deepl deepl = new Deepl();
 
@@ -48,6 +45,9 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
     private Itemsadder itemsadder = new Itemsadder();
+
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
+    private Libertybans libertybans = new Libertybans();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
     private Litebans litebans = new Litebans();
