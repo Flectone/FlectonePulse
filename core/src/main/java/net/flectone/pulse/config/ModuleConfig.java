@@ -63,6 +63,7 @@ public interface ModuleConfig {
         SubIntegrationConfig getGeyser();
         SubIntegrationConfig getInteractivechat();
         SubIntegrationConfig getItemsadder();
+        SubIntegrationConfig getLibertybans();
         SubIntegrationConfig getLitebans();
         SubIntegrationConfig getLuckperms();
         SubIntegrationConfig getMaintenance();

@@ -700,6 +700,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Override
+        public SubIntegrationConfig getLibertybans() {
+            return null;
+        }
+
+        @Override
         public SubIntegrationConfig getLitebans() {
             return null;
         }
