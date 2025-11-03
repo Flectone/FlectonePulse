@@ -66,7 +66,7 @@ public class MessageListener extends EventListener {
         String text = message.getText();
         if (text == null) return;
 
-        String author = message.getFrom().getUserName();
+        User author = message.getFrom();
         if (author == null) return;
 
         String chat = message.getChat().getTitle();
@@ -86,15 +86,21 @@ public class MessageListener extends EventListener {
     }
 
     @Async
-    public void sendMessage(String author, String chat, String message) {
+    public void sendMessage(User user, String chat, String message) {
+        String userName = StringUtils.defaultString(user.getUserName());
+        String firstName = user.getFirstName();
+        String lastName = StringUtils.defaultString(user.getLastName());
+
         sendMessage(TelegramMetadata.<Localization.Integration.Telegram>builder()
                 .sender(FPlayer.UNKNOWN)
-                .format(s -> StringUtils.replaceEach(
-                        s.getForMinecraft(),
-                        new String[]{"<name>", "<chat>"},
-                        new String[]{String.valueOf(author), String.valueOf(chat)}
+                .format(localization -> StringUtils.replaceEach(
+                        localization.getForMinecraft(),
+                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
                 ))
-                .author(author)
+                .userName(userName)
+                .firstName(firstName)
+                .lastName(lastName)
                 .chat(chat)
                 .message(message)
                 .range(Range.get(Range.Type.PROXY))
@@ -102,8 +108,8 @@ public class MessageListener extends EventListener {
                 .sound(getModuleSound())
                 .integration(string -> StringUtils.replaceEach(
                         string,
-                        new String[]{"<name>", "<chat>"},
-                        new String[]{author, chat}
+                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
                 ))
                 .build()
         );

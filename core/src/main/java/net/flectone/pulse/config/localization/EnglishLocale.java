@@ -411,7 +411,7 @@ public class EnglishLocale implements Locale {
         }};
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
-        localization.integration.telegram.forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
+        localization.integration.telegram.forMinecraft = "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
             put("id", "TPS <tps>");
         }};
