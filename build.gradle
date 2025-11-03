@@ -56,6 +56,8 @@ subprojects {
         maven { url = "https://maven.nucleoid.xyz/" }
         maven { url = "https://api.modrinth.com/maven" }
         maven { url = "https://repo.opencollab.dev/main/" }
+        maven { url = "https://mvn-repo.arim.space/affero-gpl3/" }
+        maven { url = "https://mvn-repo.arim.space/lesser-gpl3/" }
     }
 
     dependencies {

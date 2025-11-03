@@ -46,6 +46,9 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
     private Itemsadder itemsadder = new Itemsadder();
 
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
+    private Libertybans libertybans = new Libertybans();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
     private Litebans litebans = new Litebans();
 
@@ -100,6 +103,15 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
 
     @Getter
     public static final class Advancedban implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean disableFlectonepulseBan = true;
+        private boolean disableFlectonepulseMute = true;
+        private boolean disableFlectonepulseWarn = true;
+        private boolean disableFlectonepulseKick = true;
+    }
+
+    @Getter
+    public static final class Libertybans implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
         private boolean disableFlectonepulseBan = true;
         private boolean disableFlectonepulseMute = true;
