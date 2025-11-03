@@ -6,8 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -27,8 +28,8 @@ public class UrlFormatter {
         if (StringUtils.isEmpty(url)) return "";
 
         try {
-            return new URI(url).toASCIIString();
-        } catch (URISyntaxException e) {
+            return new URL(url).toURI().toASCIIString();
+        } catch (MalformedURLException | URISyntaxException e) {
             return "";
         }
     }
