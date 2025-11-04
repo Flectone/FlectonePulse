@@ -82,8 +82,6 @@ public class MinecraftTranslationService {
     }
 
     public void loadTranslations() {
-        if (translations.isEmpty()) return;
-
         Path localizationFile = resolveLocalizationFile();
         if (!Files.exists(localizationFile)) return;
 
