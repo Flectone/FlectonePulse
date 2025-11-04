@@ -94,7 +94,7 @@ public class MessagePipeline {
             eventDispatcher.dispatch(new MessageFormattingEvent(context));
 
             // replace disabled tags
-            if (context.isFlag(MessageFlag.REPLACE_DISABLED_TAGS)) {
+            if (context.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !context.isFlag(MessageFlag.USER_MESSAGE)) {
                 Arrays.stream(ReplacementTag.values())
                         .filter(tag -> context.getTagResolvers()
                                 .stream()
