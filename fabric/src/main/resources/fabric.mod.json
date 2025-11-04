@@ -25,6 +25,6 @@
 	"depends": {
 		"fabricloader": ">=0.9.0",
 		"fabric-api-base": "*",
-		"packetevents": ">=2.10.0"
+		"packetevents": ">=2.10.1"
 	}
 }
