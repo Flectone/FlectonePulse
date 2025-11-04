@@ -49,9 +49,11 @@ public class MinecraftTranslationService {
         isModern = detectModernVersion();
 
         translations.clear();
-        downloadLocalizationFile();
-        loadLocalization();
-        initializeTranslations();
+
+        if (downloadLocalizationFile()) {
+            loadTranslations();
+            initGlobalTranslator();
+        }
     }
 
     public String getVersion() {
@@ -67,20 +69,44 @@ public class MinecraftTranslationService {
         return translations.get(key);
     }
 
-    public void downloadLocalizationFile() {
+    public boolean downloadLocalizationFile() {
+        Path outputPath = resolveLocalizationFile();
+        if (Files.exists(outputPath)) return true;
+
         String language = getLanguage();
-        String version = getVersion();
-
-        String extension = isModern ? ".json" : ".lang";
-        Path outputPath = translationPath.resolve(language + extension);
-
-        if (Files.exists(outputPath)) return;
-
         String formattedLanguage = isModern ? language : formatLegacyLanguage(language);
-        if (formattedLanguage == null) return;
+        if (formattedLanguage == null) return false;
 
-        String url = buildLocalizationUrl(version, formattedLanguage, extension);
-        downloadFile(url, outputPath);
+        String url = buildLocalizationUrl(getVersion(), formattedLanguage, isModern ? ".json" : ".lang");
+        return downloadFile(url, outputPath);
+    }
+
+    public void loadTranslations() {
+        if (translations.isEmpty()) return;
+
+        Path localizationFile = resolveLocalizationFile();
+        if (!Files.exists(localizationFile)) return;
+
+        try {
+            Map<String, String> loadedTranslations = isModern
+                    ? loadJsonTranslations(localizationFile)
+                    : loadLegacyTranslations(localizationFile);
+
+            translations.putAll(loadedTranslations);
+            fLogger.info("Loaded translation /localization/minecraft/" + localizationFile.getFileName());
+        } catch (IOException e) {
+            fLogger.warning("Failed to load translations");
+        }
+    }
+
+    public void initGlobalTranslator() {
+        if (translator != null) {
+            GlobalTranslator.translator().removeSource(translator);
+        }
+
+        translator = createFlectonePulseTranslator();
+
+        GlobalTranslator.translator().addSource(translator);
     }
 
     private boolean downloadFile(String fileUrl, Path outputPath) {
@@ -104,22 +130,11 @@ public class MinecraftTranslationService {
         return false;
     }
 
-    public void loadLocalization() {
+    private Path resolveLocalizationFile() {
         String language = getLanguage();
-        Path localizationFile = translationPath.resolve(language + (isModern ? ".json" : ".lang"));
-
-        if (!Files.exists(localizationFile)) return;
-
-        try {
-            Map<String, String> loadedTranslations = isModern
-                    ? loadJsonTranslations(localizationFile)
-                    : loadLegacyTranslations(localizationFile);
-
-            translations.putAll(loadedTranslations);
-            fLogger.info("Loaded translation /localization/minecraft/" + localizationFile.getFileName());
-        } catch (IOException e) {
-            fLogger.warning("Failed to load translations");
-        }
+        String version = getVersion();
+        String extension = isModern ? ".json" : ".lang";
+        return translationPath.resolve(version + "_" + language + extension);
     }
 
     private Map<String, String> loadJsonTranslations(Path file) throws IOException {
@@ -136,16 +151,6 @@ public class MinecraftTranslationService {
         });
 
         return result;
-    }
-
-    public void initializeTranslations() {
-        if (translator != null) {
-            GlobalTranslator.translator().removeSource(translator);
-        }
-
-        translator = createFlectonePulseTranslator();
-
-        GlobalTranslator.translator().addSource(translator);
     }
 
     private Translator createFlectonePulseTranslator() {
@@ -198,10 +203,9 @@ public class MinecraftTranslationService {
             HttpURLConnection connection = createConnection(url);
             return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
         } catch (IOException e) {
-            fLogger.warning("Failed to detect Minecraft version translation");
+            // legacy version
+            return false;
         }
-
-        return false;
     }
 
     private String formatLegacyLanguage(String language) {
