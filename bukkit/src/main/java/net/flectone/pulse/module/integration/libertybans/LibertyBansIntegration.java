@@ -70,7 +70,7 @@ public class LibertyBansIntegration implements FIntegration {
                 punishment.getReason(),
                 punishment.getIdentifier(),
                 punishment.getStartDate().toEpochMilli(),
-                punishment.getEndDate().toEpochMilli(),
+                punishment.isPermanent() ? -1 : punishment.getEndDate().toEpochMilli(),
                 punishment.isPermanent()
         );
     }
