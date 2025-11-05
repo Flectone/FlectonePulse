@@ -92,7 +92,7 @@ public class MinecraftTranslationService {
 
             translations.putAll(loadedTranslations);
             fLogger.info("Loaded translation /localization/minecraft/" + localizationFile.getFileName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             fLogger.warning("Failed to load translations");
         }
     }
