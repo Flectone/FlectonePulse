@@ -30,6 +30,8 @@
 
 ## 🏆 What makes FlectonePulse special?
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Flectone/FlectonePulse)
+
 FlectonePulse is a plugin and mod for Minecraft servers that takes control of chat, messages, and notifications. Beginners will especially love it because the setup is simple, and the result is a beautiful chat, integrations, and useful commands without any hassle.
 
 - All operations are performed asynchronously, the main server thread is not affected
