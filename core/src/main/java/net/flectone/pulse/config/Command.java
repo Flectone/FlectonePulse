@@ -676,6 +676,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Flectonepulse implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean executeInMainThread = false;
 
         @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){

@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FlectonePulse;
+import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -112,6 +113,19 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
+        if (config().isExecuteInMainThread()) {
+            syncReload(fPlayer);
+        } else {
+            reload(fPlayer);
+        }
+    }
+
+    @Sync
+    public void syncReload(FPlayer fPlayer) {
+        reload(fPlayer);
+    }
+
+    public void reload(FPlayer fPlayer) {
         try {
             Instant start = Instant.now();
 
