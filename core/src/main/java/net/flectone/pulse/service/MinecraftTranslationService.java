@@ -36,6 +36,7 @@ public class MinecraftTranslationService {
     private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
 
     private final Map<String, String> translations = new HashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final @Named("translationPath") Path translationPath;
     private final PacketProvider packetProvider;
@@ -135,8 +136,8 @@ public class MinecraftTranslationService {
         return translationPath.resolve(version + "_" + language + extension);
     }
 
-    private Map<String, String> loadJsonTranslations(Path file) throws IOException {
-        return new ObjectMapper().readValue(file, new TypeReference<>() {});
+    private Map<String, String> loadJsonTranslations(Path file) {
+        return objectMapper.readValue(file, new TypeReference<>() {});
     }
 
     private Map<String, String> loadLegacyTranslations(Path file) throws IOException {
