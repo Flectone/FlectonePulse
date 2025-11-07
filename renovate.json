@@ -28,7 +28,9 @@
         "https://api.modrinth.com/maven",
         "https://maven.fabricmc.net/",
         "https://repo1.maven.org/maven2/",
-        "https://maven.wagyourtail.xyz/releases"
+        "https://maven.wagyourtail.xyz/releases",
+        "https://mvn-repo.arim.space/affero-gpl3/",
+        "https://mvn-repo.arim.space/lesser-gpl3/"
       ]
     }
   ]
