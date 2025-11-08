@@ -1,16 +1,15 @@
 package net.flectone.pulse.module.integration;
 
 import com.google.inject.Injector;
-import net.flectone.pulse.module.integration.geyser.GeyserModule;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
@@ -18,6 +17,7 @@ import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -74,7 +74,11 @@ public abstract class IntegrationModule extends AbstractModule {
         }
 
         if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
-            addChildren(GeyserModule.class);
+            if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
+                addChildren(GeyserModule.class);
+            } else {
+                fLogger.warning("Geyser hook is failed, check that Geyser is turned on and working");
+            }
         }
 
         addChildren(DeeplModule.class);
