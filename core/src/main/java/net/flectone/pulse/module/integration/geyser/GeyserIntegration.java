@@ -19,12 +19,8 @@ public class GeyserIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        try {
-            this.geyserApi = GeyserApi.api();
-            fLogger.info("✔ Geyser hooked");
-        } catch (Exception ignored) {
-            fLogger.warning("Geyser hook is failed, check that Geyser is turned on and working");
-        }
+        this.geyserApi = GeyserApi.api();
+        fLogger.info("✔ Geyser hooked");
     }
 
     @Async(delay = 20)
