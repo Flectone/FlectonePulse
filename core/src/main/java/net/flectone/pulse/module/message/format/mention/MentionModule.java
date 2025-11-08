@@ -121,7 +121,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
             Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
-                if (permissionChecker.check(sender, permission().getGroup() + "." + group.get())) {
+                if (permissionChecker.check(sender, permission().getGroup().getName() + "." + group.get())) {
                     sendMention(processId, receiver);
                     return mentionTag(sender, receiver, mention);
                 }
