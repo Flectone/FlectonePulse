@@ -4,7 +4,7 @@ public enum MessageFlag {
 
     USER_MESSAGE(false),
     SENDER_COLOR_OUT(true),
-    MENTION(false),
+    MENTION(true),
     REPLACEMENT(true),
     REPLACE_DISABLED_TAGS(true),
     FIXATION(true),

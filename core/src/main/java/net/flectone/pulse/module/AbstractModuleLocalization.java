@@ -161,8 +161,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         MessagePipeline.Builder messageBuilder = messagePipeline.builder(sender, receiver, message)
                 .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                .flag(MessageFlag.MENTION, !receiver.isUnknown());
+                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut);
 
         return messageBuilder.build();
     }
