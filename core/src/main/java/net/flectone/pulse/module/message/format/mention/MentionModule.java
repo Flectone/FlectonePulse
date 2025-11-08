@@ -128,7 +128,10 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
-                    sendMention(processId, mentionFPlayer);
+                    if (mentionFPlayer.equals(receiver)) {
+                        sendMention(processId, mentionFPlayer);
+                    }
+
                     return mentionTag(sender, receiver, mention);
                 }
             }
@@ -186,7 +189,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                 .findFirst();
     }
 
-    private void sendMention(UUID processId, FPlayer fPlayer) {
+    public void sendMention(UUID processId, FPlayer fPlayer) {
         if (permissionChecker.check(fPlayer, permission().getBypass())) return;
         if (processedMentions.containsKey(processId)) return;
 
