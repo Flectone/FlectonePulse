@@ -10,6 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+import java.util.Optional;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SignListener implements Listener {
@@ -26,11 +28,9 @@ public class SignListener implements Listener {
         for (int x = 0; x < event.getLines().length; x++) {
             String string = event.getLine(x);
 
-            if (string != null && !string.isEmpty()) {
-                string = signModule.format(fPlayer, string);
-                if (string != null) {
-                    event.setLine(x, string);
-                }
+            Optional<String> formattedString = signModule.format(fPlayer, string);
+            if (formattedString.isPresent()) {
+                event.setLine(x, formattedString.get());
             }
         }
     }

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
@@ -51,6 +52,30 @@ public class MessagePipeline {
 
     public Builder builder(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
         return new Builder(messageUUID, sender, receiver, message);
+    }
+
+    public Optional<String> legacyFormat(@NotNull FPlayer fPlayer, @NotNull String message) {
+        LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
+
+        try {
+            Component deserialized = legacyComponentSerializer.deserialize(message);
+
+            Component component = builder(fPlayer, Strings.CS.replace(message, "§", "&"))
+                    .flag(MessageFlag.USER_MESSAGE, true)
+                    .build()
+                    .applyFallbackStyle(deserialized.style())
+                    .mergeStyle(deserialized);
+
+            String formattedMessage = LegacyComponentSerializer.legacySection().serialize(component);
+            if (!message.equalsIgnoreCase(formattedMessage)) {
+                return Optional.of(formattedMessage);
+            }
+
+        } catch (Exception ignored) {
+            // ignore problem
+        }
+
+        return Optional.empty();
     }
 
     public class Builder {

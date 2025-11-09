@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.meta.BookMeta;
 
+import java.util.Optional;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BookListener implements Listener {
@@ -29,18 +31,16 @@ public class BookListener implements Listener {
         for (int x = 1; x <= event.getNewBookMeta().getPages().size(); x++) {
             String string = bookMeta.getPage(x);
 
-            if (!string.isEmpty()) {
-                String formatted = bookModule.format(fPlayer, string);
-                if (formatted != null) {
-                    bookMeta.setPage(x, formatted);
-                }
+            Optional<String> formattedString = bookModule.format(fPlayer, string);
+            if (formattedString.isPresent()) {
+                bookMeta.setPage(x, formattedString.get());
             }
         }
 
-        if (event.isSigning() && bookMeta.getTitle() != null) {
-            String title = bookModule.format(fPlayer, bookMeta.getTitle());
-            if (title != null) {
-                bookMeta.setTitle(title);
+        if (event.isSigning()) {
+            Optional<String> formattedTitle = bookModule.format(fPlayer, bookMeta.getTitle());
+            if (formattedTitle.isPresent()) {
+                bookMeta.setTitle(formattedTitle.get());
             }
         }
 

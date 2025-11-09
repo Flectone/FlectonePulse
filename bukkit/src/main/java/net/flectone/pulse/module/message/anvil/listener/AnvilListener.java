@@ -14,6 +14,8 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Optional;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AnvilListener implements Listener {
@@ -35,7 +37,9 @@ public class AnvilListener implements Listener {
         ItemStack itemStack = event.getCurrentItem();
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        if (anvilModule.format(fPlayer, itemMeta)) {
+        Optional<String> displayName = anvilModule.format(fPlayer, itemMeta.getDisplayName());
+        if (displayName.isPresent()) {
+            itemMeta.setDisplayName(displayName.get());
             itemStack.setItemMeta(itemMeta);
         }
     }
