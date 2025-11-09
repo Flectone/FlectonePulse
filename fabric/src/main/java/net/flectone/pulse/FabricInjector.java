@@ -6,8 +6,6 @@ import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.anvil.AnvilModule;
-import net.flectone.pulse.module.message.anvil.FabricAnvilModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.platform.adapter.FabricServerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -52,7 +50,9 @@ public class FabricInjector extends PlatformInjector {
         bind(TaskScheduler.class).to(FabricTaskScheduler.class);
 
         bind(IntegrationModule.class).to(FabricIntegrationModule.class);
-        bind(AnvilModule.class).to(FabricAnvilModule.class);
+
+// TODO
+//        bind(AnvilModule.class).to(FabricAnvilModule.class);
 //        bind(BookModule.class).to(BukkitBookModule.class);
 //        bind(AfkModule.class).to(BukkitAfkModule.class);
 //        bind(BubbleModule.class).to(BukkitBubbleModule.class);
