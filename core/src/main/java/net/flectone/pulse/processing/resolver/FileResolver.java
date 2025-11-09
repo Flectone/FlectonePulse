@@ -105,6 +105,10 @@ public class FileResolver {
             if (isVersionOlderThan(preInitVersion, "1.6.0")) {
                 migration_1_6_0();
             }
+
+            if (isVersionOlderThan(preInitVersion, "1.6.3")) {
+                migration_1_6_2();
+            }
         }
 
         if (versionChanged) {
@@ -474,5 +478,54 @@ public class FileResolver {
 
             yamlFileProcessor.save(localization);
         }
+    }
+
+    private void migration_1_6_2() throws IOException {
+        Map<String, String> triggers = message.getFormat().getReplacement().getTriggers();
+
+        Map<String, String> updates = new HashMap<>();
+        updates.put("smile", ":-?\\)");
+        updates.put("big_smile", ":-?D");
+        updates.put("sad", ":-?\\(");
+        updates.put("ok_hand", "(?i):ok:");
+        updates.put("thumbs_up", ":\\+1:");
+        updates.put("thumbs_down", ":-1:");
+        updates.put("cool_smile", "(?i):cool:");
+        updates.put("cool_glasses", "B-\\)");
+        updates.put("clown", "(?i):clown:");
+        updates.put("heart", "<3");
+        updates.put("laughing", "(?i)xd");
+        updates.put("confused", "%-\\)");
+        updates.put("happy", "=D");
+        updates.put("angry", ">:-?\\(");
+        updates.put("ascii_idk", "(?i):idk:");
+        updates.put("ascii_angry", "(?i):angry:");
+        updates.put("ascii_happy", "(?i):happy:");
+        updates.put("ping", "%ping%");
+        updates.put("tps", "%tps%");
+        updates.put("online", "%online%");
+        updates.put("coords", "%coords%");
+        updates.put("stats", "%stats%");
+        updates.put("skin", "%skin%");
+        updates.put("item", "%item%");
+        updates.put("spoiler", "\\|\\|");
+        updates.put("bold", "\\*\\*");
+        updates.put("italic", "\\*");
+        updates.put("underline", "__");
+        updates.put("obfuscated", "\\?\\?");
+        updates.put("strikethrough", "~~");
+
+        String boundaryPattern = "(?<!\\\\)(?<!\\S)%s(?!\\S)";
+        String formatTemplate = "(?<!\\S)%1$s([^%1$s\\n]+)%1$s(?!\\S)";
+
+        updates.forEach((key, value) -> {
+            if (triggers.containsKey(key)) {
+                String pattern = key.equals("spoiler") || key.equals("bold") || key.equals("italic") || key.equals("underline") || key.equals("obfuscated") || key.equals("strikethrough")
+                        ? formatTemplate : boundaryPattern;
+                triggers.put(key, String.format(pattern, value));
+            }
+        });
+
+        yamlFileProcessor.save(message);
     }
 }
