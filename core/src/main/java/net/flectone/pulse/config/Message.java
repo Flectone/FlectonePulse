@@ -444,8 +444,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         public static final class Replacement implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
 
-            private static final String BOUNDARY = "(?<!\\\\{2,})(?<=\\s|^)(%s)(?=\\s|$|\\p{Punct})";
-            private static final String FORMAT_TEMPLATE = "(?<!\\\\{2,})(?<=\\s|^)%s([^\\n]*?)%s(?=\\s|$|\\p{Punct})";
+            private static final String BOUNDARY = "(?<!\\\\)(?<!\\S)%s(?!\\S)";
+            private static final String FORMAT_TEMPLATE = "(?<!\\S)%1$s([^%1$s\\n]+)%1$s(?!\\S)";
 
             @JsonMerge(OptBoolean.FALSE)
             private Map<String, String> triggers = new LinkedHashMap<>() {
@@ -483,12 +483,12 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
                     // text formatting
                     put("image", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|HTTPS?)://(?:[a-zA-Z0-9-]{1,63}\\.)*(?:imgur\\.com|discordapp\\.net|cdn\\.discordapp\\.com)/[\\w\\-./?=&%]*\\.(?:jpg|jpeg|png|gif|webp|bmp))(?!\\S)");
                     put("url", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|ftp|HTTPS?)://(?:[\\p{L}a-zA-Z0-9-]{1,63}\\.)+[\\p{L}a-zA-Z]{2,6}(?::\\d{1,5})?(?:/[\\w\\-./?=&%]*)?)(?!\\S)");
-                    put("spoiler", String.format(FORMAT_TEMPLATE, "\\|\\|", "\\|\\|"));
-                    put("bold", String.format(FORMAT_TEMPLATE, "\\*\\*", "\\*\\*"));
-                    put("italic", String.format(FORMAT_TEMPLATE, "\\*", "\\*"));
-                    put("underline", String.format(FORMAT_TEMPLATE, "__", "__"));
-                    put("obfuscated", String.format(FORMAT_TEMPLATE, "\\?\\?", "\\?\\?"));
-                    put("strikethrough", String.format(FORMAT_TEMPLATE, "~~", "~~"));
+                    put("spoiler", String.format(FORMAT_TEMPLATE, "\\|\\|"));
+                    put("bold", String.format(FORMAT_TEMPLATE, "\\*\\*"));
+                    put("italic", String.format(FORMAT_TEMPLATE, "\\*"));
+                    put("underline", String.format(FORMAT_TEMPLATE, "__"));
+                    put("obfuscated", String.format(FORMAT_TEMPLATE, "\\?\\?"));
+                    put("strikethrough", String.format(FORMAT_TEMPLATE, "~~"));
                 }
             };
         }
