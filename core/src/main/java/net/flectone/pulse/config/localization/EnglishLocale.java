@@ -577,6 +577,8 @@ public class EnglishLocale implements Locale {
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!";
         localization.message.update.formatConsole = "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
+        localization.message.vanilla.formatPlayer = "<display_name>";
+        localization.message.vanilla.formatEntity = "<display_name>";
         localization.message.vanilla.types = new LinkedHashMap<>() {
             {
                 put("advMode.notEnabled", "<fcolor:1>\uD83E\uDD16 Command blocks are not enabled on this server");

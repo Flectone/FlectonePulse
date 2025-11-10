@@ -129,7 +129,14 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
         List<TagResolver> tags = new ArrayList<>();
         parsedComponent.arguments().forEach((index, replacement) -> {
             switch (replacement) {
-                case FEntity fTarget -> tags.add(targetTag("arg_" + index, fResolver, fTarget));
+                case FEntity fTarget -> {
+                    Localization.Message.Vanilla localization = localization(fResolver);
+                    String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
+                            ? localization.getFormatPlayer()
+                            : localization.getFormatEntity();
+
+                    tags.add(targetTag("arg_" + index, formatTarget, fResolver, fTarget));
+                }
                 case Component component -> tags.add(TagResolver.resolver("arg_" + index, (argumentQueue, context) -> {
 
                     TextColor color = component.color();

@@ -577,6 +577,8 @@ public class RussianLocale implements Locale {
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         localization.message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
+        localization.message.vanilla.formatPlayer = "<display_name>";
+        localization.message.vanilla.formatEntity = "<display_name>";
         localization.message.vanilla.types = new LinkedHashMap<>() {
             {
                 put("advMode.notEnabled", "<fcolor:1>\uD83E\uDD16 На этом сервере командные блоки отключены");

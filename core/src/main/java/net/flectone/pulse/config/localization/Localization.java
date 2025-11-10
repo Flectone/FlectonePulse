@@ -1216,6 +1216,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Vanilla implements SubMessageConfig, Localizable {
+            String formatPlayer;
+            String formatEntity;
             Map<String, String> types = new LinkedHashMap<>();
         }
     }

@@ -192,14 +192,18 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
     }
 
-    public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
+    public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
         if (!isEnable() || target == null) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Component component = messagePipeline.builder(target, receiver, "<display_name>").build();
+            Component component = messagePipeline.builder(target, receiver, formatTarget).build();
 
             return Tag.selfClosingInserting(component);
         });
+    }
+
+    public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
+        return targetTag(tag, "<display_name>", receiver, target);
     }
 
     public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
