@@ -8,6 +8,7 @@ import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -26,15 +27,18 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
 
     private final Config config;
     private final Plugin plugin;
+    private final ReflectionResolver reflectionResolver;
     protected final LegacyPaperCommandManager<FPlayer> manager;
 
     @Inject
     public LegacyBukkitCommandRegistry(FileResolver fileResolver,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
+                                       ReflectionResolver reflectionResolver,
                                        FPlayerMapper fPlayerMapper) {
         this.config = fileResolver.getConfig();
         this.plugin = plugin;
+        this.reflectionResolver = reflectionResolver;
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
@@ -65,22 +69,52 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
         }
 
         // register new command
-        manager.command(command);
+        if (reflectionResolver.isPaper()) {
+            registerCommand(command);
+        } else {
+            syncRegisterCommand(command);
+        }
     }
 
     @Override
     public void unregisterCommand(String name) {
-        manager.deleteRootCommand(name);
+        if (reflectionResolver.isPaper()) {
+            deleteRootCommand(name);
+        } else {
+            syncDeleteRootCommand(name);
+        }
     }
 
     @Override
     public void reload() {
         if (!config.getCommand().isUnregisterOnReload()) return;
 
-        syncRemoveCommands();
+        if (reflectionResolver.isPaper()) {
+            unregisterCommands();
+        } else {
+            syncUnregisterCommands();
+        }
     }
 
-    public void removeCommands() {
+    public void deleteRootCommand(String name) {
+        manager.deleteRootCommand(name);
+    }
+
+    @Sync
+    public void syncDeleteRootCommand(String name) {
+        deleteRootCommand(name);
+    }
+
+    public void registerCommand(Command<FPlayer> command) {
+        manager.command(command);
+    }
+
+    @Sync
+    public void syncRegisterCommand(Command<FPlayer> command) {
+        registerCommand(command);
+    }
+
+    public void unregisterCommands() {
         manager.commands().stream()
                 .map(command -> command.rootComponent().name())
                 .toList() // fix concurrent modification
@@ -88,8 +122,8 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
     }
 
     @Sync
-    public void syncRemoveCommands() {
-        removeCommands();
+    public void syncUnregisterCommands() {
+        unregisterCommands();
     }
 
 }

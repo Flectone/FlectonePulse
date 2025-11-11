@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
@@ -23,19 +22,13 @@ import org.incendo.cloud.parser.standard.StringParser;
 @Singleton
 public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
-    private final Config config;
-    private final ReflectionResolver reflectionResolver;
-
     @Inject
     public ModernBukkitCommandRegistry(FileResolver fileResolver,
                                        ReflectionResolver reflectionResolver,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        FPlayerMapper fPlayerMapper) {
-        super(fileResolver, commandExceptionHandler, plugin, fPlayerMapper);
-
-        this.config = fileResolver.getConfig();
-        this.reflectionResolver = reflectionResolver;
+        super(fileResolver, commandExceptionHandler, plugin, reflectionResolver, fPlayerMapper);
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             manager.registerBrigadier();
@@ -66,17 +59,6 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
         } else if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             manager.registerAsynchronousCompletions();
-        }
-    }
-
-    @Override
-    public void reload() {
-        if (!config.getCommand().isUnregisterOnReload()) return;
-
-        if (reflectionResolver.isPaper()) {
-            removeCommands();
-        } else {
-            syncRemoveCommands();
         }
     }
 }
