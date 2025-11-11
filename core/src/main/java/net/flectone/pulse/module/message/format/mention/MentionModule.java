@@ -89,6 +89,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     public void format(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
+        if (isUnknownSender(sender)) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
@@ -138,6 +139,14 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
             return Tag.preProcessParsed(config().getTrigger() + mention);
         });
+    }
+
+    private boolean isUnknownSender(FEntity sender) {
+        if (!sender.isUnknown()) return false;
+        if (!(sender instanceof FPlayer fPlayer)) return false;
+
+        // console - unknown player, but known sender
+        return !fPlayer.isConsole();
     }
 
     private Tag mentionTag(FEntity sender, FPlayer receiver, String mention) {
