@@ -18,14 +18,12 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -48,7 +46,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
     private final ReflectionResolver reflectionResolver;
-    private final PlatformServerAdapter platformServerAdapter;
     private final Injector injector;
 
     @Override
@@ -116,9 +113,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        // fix async PlayerCommandSendEvent error
-        if (platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && !reflectionResolver.isPaper()
-                || config().isExecuteInMainThread()) {
+        if (config().isExecuteInMainThread()) {
             syncReload(fPlayer);
         } else {
             reload(fPlayer);
