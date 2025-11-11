@@ -113,10 +113,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(contextMessage, () -> processMessage(contextMessage));
+            formattedMessage = messageCache.get(contextMessage, () -> processMessage(sender, contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            formattedMessage = processMessage(contextMessage);
+            formattedMessage = processMessage(sender, contextMessage);
         }
 
         messageContext.setMessage(formattedMessage);
@@ -259,7 +259,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
     }
 
-    private String processMessage(String message) {
+    private String processMessage(FEntity sender, String message) {
         List<MatchInfo> matches = new ArrayList<>();
 
         for (Map.Entry<String, Pattern> entry : triggerPatterns.entrySet()) {
@@ -268,6 +268,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             Matcher matcher = entry.getValue().matcher(message);
 
             while (matcher.find()) {
+                // format only url/image for unknown senders
+                if (sender.isUnknown() && !isUrl) continue;
+
                 String replacement = buildReplacement(name, matcher, isUrl);
                 matches.add(new MatchInfo(matcher.start(), matcher.end(), replacement));
             }
