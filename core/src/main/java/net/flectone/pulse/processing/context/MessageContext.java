@@ -2,14 +2,16 @@ package net.flectone.pulse.processing.context;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -67,5 +69,9 @@ public class MessageContext {
 
     public void setFlags(Map<MessageFlag, Boolean> flags) {
         this.flags.putAll(flags);
+    }
+
+    public @NotNull String getMessage() {
+        return StringUtils.defaultString(message);
     }
 }
