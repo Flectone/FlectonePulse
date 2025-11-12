@@ -90,6 +90,12 @@ subprojects {
         downgradeTo = JavaVersion.VERSION_17
     }
 
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
+
     tasks.register("buildFinalJar", Jar) {
         archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
         destinationDirectory = file("$rootDir/build/libs")
