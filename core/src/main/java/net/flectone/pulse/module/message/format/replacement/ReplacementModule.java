@@ -35,8 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -539,7 +537,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
                 imageCache.put(link, component);
 
-            } catch (IOException | URISyntaxException ignored) {
+            } catch (Exception ignored) {
                 // return empty component
             }
 
