@@ -31,7 +31,7 @@ public class ListenerRegistry implements Registry {
 
     private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<Consumer<Event>>>> pulseListeners = new ConcurrentHashMap<>();
     private final List<PacketListenerCommon> packetListeners = new ArrayList<>();
-    private final Set<Class<?>> permanentListeners = new HashSet<>();
+    private final Set<PulseListener> permanentListeners = new HashSet<>();
 
     private final FLogger fLogger;
     private final Injector injector;
@@ -45,9 +45,8 @@ public class ListenerRegistry implements Registry {
         return new EnumMap<>(Event.Priority.class);
     }
 
-    public void registerPermanent(Class<?> clazzListener) {
-        permanentListeners.add(clazzListener);
-        register(clazzListener);
+    public void registerPermanent(PulseListener pulseListener) {
+        register(pulseListener);
     }
 
     public void register(Class<?> clazzListener) {
