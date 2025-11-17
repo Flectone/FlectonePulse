@@ -6,7 +6,9 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,13 +18,14 @@ public class Sound {
     private final boolean enable;
     private final float volume;
     private final float pitch;
-    private final String category;
+    private final SoundCategory category;
     private final String name;
 
-    // runtime value
+    // runtime values
     @Setter private String permission = "";
+    private com.github.retrooper.packetevents.protocol.sound.Sound packet;
 
-    public Sound(boolean enable, float volume, float pitch, String category, String name) {
+    public Sound(boolean enable, float volume, float pitch, SoundCategory category, String name) {
         this.enable = enable;
         this.volume = volume;
         this.pitch = pitch;
@@ -31,7 +34,16 @@ public class Sound {
     }
 
     public Sound() {
-        this(false, 1f, 1f, "BLOCK", "minecraft:block.note_block.bell");
+        this(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell");
+    }
+
+    @NotNull
+    public com.github.retrooper.packetevents.protocol.sound.Sound getPacket() {
+        if (this.packet == null) {
+            this.packet = Sounds.getByNameOrCreate(name);
+        }
+
+        return this.packet;
     }
 
     @JsonValue
@@ -61,7 +73,10 @@ public class Sound {
         float floatPitch = pitch == null ? 1f : Float.parseFloat(String.valueOf(pitch));
 
         Object category = map.get("category");
-        String stringCategory = category == null ? SoundCategory.BLOCK.name() : String.valueOf(category);
+        SoundCategory stringCategory = category == null ? SoundCategory.BLOCK : Arrays.stream(SoundCategory.values())
+                .filter(categoryValue -> categoryValue.name().equalsIgnoreCase(String.valueOf(category)))
+                .findAny()
+                .orElse(SoundCategory.MASTER);
 
         Object name = map.get("name");
         String stringName = name == null ? Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString() : String.valueOf(name);

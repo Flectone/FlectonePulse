@@ -944,7 +944,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString());
+        private Sound sound = new Sound(true, 1f, 1f, SoundCategory.BLOCK, Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString());
     }
 
     @Getter

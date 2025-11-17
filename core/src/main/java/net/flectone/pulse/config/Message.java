@@ -324,7 +324,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private String trigger = "@";
             private String everyoneTag = "here";
             private Destination destination = new Destination(Destination.Type.TOAST, new Toast("minecraft:bell", Toast.Type.TASK));
-            private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL.name(), Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
+            private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL, Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
         }
 
         @Getter
