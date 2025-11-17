@@ -40,8 +40,8 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.playerParser())
-                .required(promptType, commandParserProvider.messageParser(), mapSuggestion())
-                .optional(promptMessage, commandParserProvider.messageParser())
+                .required(promptType, commandParserProvider.messageParser(), typeWithMessageSuggestion())
+                .optional(promptMessage, commandParserProvider.messageParser()) // not used, only for better message help
         );
     }
 
@@ -64,7 +64,8 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                     .destination(destination)
                     .sound(getModuleSound())
                     .proxy(dataOutputStream -> {
-                        dataOutputStream.writeAsJson(fPlayerService.getConsole());
+                        // same format as 1 player
+                        dataOutputStream.writeAsJson(fPlayerService.getConsole()); // proxy indicator
                         dataOutputStream.writeAsJson(destination);
                         dataOutputStream.writeString(message);
                     })
@@ -123,7 +124,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         return fileResolver.getLocalization(sender).getCommand().getEmit();
     }
 
-    private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeWithMessageSuggestion() {
         return (context, input) -> {
             String[] words = input.input().split(" ");
             String string = words.length < 3 ? "" : words[2];
@@ -142,26 +143,30 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     }
 
     private Destination parseDestination(String string) {
-        int startIndexBracket = string.indexOf("{");
-        if (startIndexBracket == -1) {
-            String type = string.split(" ")[0];
-            return Destination.fromJson(Map.of("type", type));
+        try {
+            int startIndexBracket = string.indexOf("{");
+            if (startIndexBracket == -1) {
+                String type = string.split(" ")[0];
+                return Destination.fromJson(Map.of("type", type));
+            }
+
+            int endIndexBracket = findMatchingBracket(string, startIndexBracket);
+            if (endIndexBracket == -1) {
+                String type = string.split(" ")[0];
+                return Destination.fromJson(Map.of("type", type));
+            }
+
+            String type = string.substring(0, startIndexBracket);
+            Map<String, Object> destination = new HashMap<>();
+            destination.put("type", type);
+
+            String content = string.substring(startIndexBracket + 1, endIndexBracket);
+            parseContent(content, destination);
+
+            return Destination.fromJson(destination);
+        } catch (Exception ignored) {
+            return new Destination();
         }
-
-        int endIndexBracket = findMatchingBracket(string, startIndexBracket);
-        if (endIndexBracket == -1) {
-            String type = string.split(" ")[0];
-            return Destination.fromJson(Map.of("type", type));
-        }
-
-        String type = string.substring(0, startIndexBracket);
-        Map<String, Object> destination = new HashMap<>();
-        destination.put("type", type);
-
-        String content = string.substring(startIndexBracket + 1, endIndexBracket);
-        parseContent(content, destination);
-
-        return Destination.fromJson(destination);
     }
 
     private void parseContent(String content, Map<String, Object> map) {
