@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.*;
@@ -37,6 +38,14 @@ public class ListenerRegistry implements Registry {
     private final FLogger fLogger;
     private final Injector injector;
     private final PacketProvider packetProvider;
+
+    @NonNull
+    public Map<Event.Priority, List<Consumer<Event>>> getPulseListeners(Class<? extends Event> event) {
+        EnumMap<Event.Priority, List<Consumer<Event>>> enumMap = pulseListeners.get(event);
+        if (enumMap != null) return new EnumMap<>(enumMap);
+
+        return new EnumMap<>(Event.Priority.class);
+    }
 
     public void register(Class<?> clazzListener) {
         register(clazzListener, Event.Priority.NORMAL);

@@ -9,6 +9,8 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.ReloadEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
@@ -23,6 +25,10 @@ import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @Singleton
 public class FlectonePulseAPI  {
@@ -165,9 +171,15 @@ public class FlectonePulseAPI  {
 
         // reload registries
         instance.get(CommandRegistry.class).reload();
-        instance.get(ListenerRegistry.class).reload();
         instance.get(PermissionRegistry.class).reload();
         instance.get(ProxyRegistry.class).reload();
+
+        // reload ListenerRegistry and save reloadListeners to call them later
+        ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
+
+        Map<Event.Priority, List<Consumer<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
+
+        listenerRegistry.reload();
 
         // reload task scheduler
         instance.get(TaskScheduler.class).reload();
@@ -206,6 +218,8 @@ public class FlectonePulseAPI  {
         if (fileResolver.getConfig().getMetrics().isEnable()) {
             instance.get(MetricsService.class).reload();
         }
+
+        eventDispatcher.dispatch(reloadListeners, new ReloadEvent());
 
         // log plugin reloaded
         fLogger.logReloaded();
