@@ -153,6 +153,20 @@ public class FlectonePulseAPI  {
         // log plugin reloading
         fLogger.logReloading();
 
+        // close all open inventories
+        instance.get(InventoryController.class).closeAll();
+        instance.get(DialogController.class).closeAll();
+
+        // reload ListenerRegistry and save reloadListeners to call them later
+        ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
+
+        Map<Event.Priority, List<Consumer<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
+
+        listenerRegistry.reload();
+
+        // reload task scheduler
+        instance.get(TaskScheduler.class).reload();
+
         // get file resolver for configuration
         FileResolver fileResolver = instance.get(FileResolver.class);
 
@@ -165,24 +179,10 @@ public class FlectonePulseAPI  {
 
         instance.get(MinecraftTranslationService.class).reload();
 
-        // close all open inventories
-        instance.get(InventoryController.class).closeAll();
-        instance.get(DialogController.class).closeAll();
-
         // reload registries
         instance.get(CommandRegistry.class).reload();
         instance.get(PermissionRegistry.class).reload();
         instance.get(ProxyRegistry.class).reload();
-
-        // reload ListenerRegistry and save reloadListeners to call them later
-        ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
-
-        Map<Event.Priority, List<Consumer<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
-
-        listenerRegistry.reload();
-
-        // reload task scheduler
-        instance.get(TaskScheduler.class).reload();
 
         // reload logger with new configuration
         fLogger.setupFilter();
