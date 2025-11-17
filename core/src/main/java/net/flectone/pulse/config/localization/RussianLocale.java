@@ -180,6 +180,9 @@ public class RussianLocale implements Locale {
 
         localization.command.Do.format = "<fcolor:1>✎ <message><reset> <fcolor:1>(<i><display_name></i>)";
 
+        localization.command.emit.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
+        localization.command.emit.format = "<fcolor:4><message>";
+
         localization.command.exception.execution = "<color:#ff7171><b>⁉</b> Произошла ошибка при выполнении команды <br><color:#ff7171><b>⁉</b> <exception>";
         localization.command.exception.syntax = "<hover:show_text:\"<fcolor:2>Использовать <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Использование →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└";
         localization.command.exception.parseUnknown = "<color:#ff7171><b>⁉</b> Неизвестная ошибка аргумента в <br><input>";

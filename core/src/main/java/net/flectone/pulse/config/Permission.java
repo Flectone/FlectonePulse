@@ -89,6 +89,9 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @JsonProperty("do")
         private Do Do = new Do();
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/emit/")
+        private Emit emit = new Emit();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
         private Flectonepulse flectonepulse = new Flectonepulse();
 
@@ -336,6 +339,14 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.do.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.do.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Emit implements SubCommandConfig, ICommandPermission {
+            private String name = "flectonepulse.module.command.emit";
+            private Type type = Type.OP;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.emit.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.emit.sound", Type.TRUE);
         }
 
         @Getter

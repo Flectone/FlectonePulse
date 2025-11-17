@@ -20,6 +20,7 @@ import net.flectone.pulse.module.command.coin.CoinModule;
 import net.flectone.pulse.module.command.deletemessage.DeletemessageModule;
 import net.flectone.pulse.module.command.dice.DiceModule;
 import net.flectone.pulse.module.command.do_.DoModule;
+import net.flectone.pulse.module.command.emit.EmitModule;
 import net.flectone.pulse.module.command.flectonepulse.FlectonepulseModule;
 import net.flectone.pulse.module.command.geolocate.GeolocateModule;
 import net.flectone.pulse.module.command.helper.HelperModule;
@@ -75,6 +76,7 @@ public class CommandModule extends AbstractModule {
         addChildren(DeletemessageModule.class);
         addChildren(DiceModule.class);
         addChildren(DoModule.class);
+        addChildren(EmitModule.class);
         addChildren(FlectonepulseModule.class);
         addChildren(GeolocateModule.class);
         addChildren(HelperModule.class);

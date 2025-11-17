@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
+import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.anon.AnonModule;
@@ -29,6 +30,7 @@ import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.module.command.dice.DiceModule;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.module.command.do_.DoModule;
+import net.flectone.pulse.module.command.emit.EmitModule;
 import net.flectone.pulse.module.command.helper.HelperModule;
 import net.flectone.pulse.module.command.kick.KickModule;
 import net.flectone.pulse.module.command.me.MeModule;
@@ -157,6 +159,7 @@ public class ProxyMessageHandler {
             case COMMAND_DELETE -> handleDeleteCommand(input, fEntity);
             case COMMAND_DICE -> handleDiceCommand(input, fEntity, metadataUUID);
             case COMMAND_DO -> handleDoCommand(input, fEntity, metadataUUID);
+            case COMMAND_EMIT -> handleEmitCommand(input, fEntity, metadataUUID);
             case COMMAND_HELPER -> handleHelperCommand(input, fEntity, metadataUUID);
             case COMMAND_MUTE -> handleMuteCommand(input, fEntity, metadataUUID);
             case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
@@ -369,6 +372,39 @@ public class ProxyMessageHandler {
                 .sound(module.getModuleSound())
                 .build()
         );
+    }
+
+    private void handleEmitCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        EmitModule module = injector.getInstance(EmitModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
+
+        FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+        Destination destination = gson.fromJson(input.readUTF(), Destination.class);
+        String message = input.readUTF();
+
+        if (fTarget.isConsole()) {
+            module.sendMessage(module.metadataBuilder()
+                    .uuid(metadataUUID)
+                    .sender(fEntity)
+                    .range(Range.get(Range.Type.SERVER))
+                    .format(Localization.Command.Emit::getFormat)
+                    .message(message)
+                    .destination(destination)
+                    .sound(module.getModuleSound())
+                    .build()
+            );
+        } else {
+            module.sendMessage(module.metadataBuilder()
+                    .uuid(metadataUUID)
+                    .sender(fEntity)
+                    .filterPlayer(fTarget)
+                    .format(Localization.Command.Emit::getFormat)
+                    .message(message)
+                    .destination(destination)
+                    .sound(module.getModuleSound())
+                    .build()
+            );
+        }
     }
 
     private void handleHelperCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

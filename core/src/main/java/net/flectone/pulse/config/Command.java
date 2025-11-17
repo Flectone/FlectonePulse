@@ -75,6 +75,9 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @JsonProperty("do")
     private Do Do = new Do();
 
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/emit/")
+    private Emit emit = new Emit();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
     private Flectonepulse flectonepulse = new Flectonepulse();
 
@@ -669,6 +672,17 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private List<String> aliases = new ArrayList<>(List.of("do"));
 
         private Destination destination = new Destination();
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Emit implements SubCommandConfig, ICommandFile {
+        private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
+        private List<String> aliases = new ArrayList<>(List.of("emit"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }

@@ -143,6 +143,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do/")
         Do Do = new Do();
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/emit/")
+        Emit emit = new Emit();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
         Flectonepulse flectonepulse = new Flectonepulse();
 
@@ -366,6 +369,12 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Do implements SubCommandConfig, Localizable {
+            String format;
+        }
+
+        @Getter
+        public static final class Emit implements SubCommandConfig, Localizable {
+            String nullPlayer;
             String format;
         }
 

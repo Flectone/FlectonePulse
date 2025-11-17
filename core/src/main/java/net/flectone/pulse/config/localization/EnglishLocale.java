@@ -180,6 +180,9 @@ public class EnglishLocale implements Locale {
 
         localization.command.Do.format = "<fcolor:1>✎ <message><reset> <fcolor:1>(<i><display_name></i>)";
 
+        localization.command.emit.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
+        localization.command.emit.format = "<fcolor:4><message>";
+
         localization.command.exception.execution = "<color:#ff7171><b>⁉</b> An error occurred while executing the command <br><color:#ff7171><b>⁉</b> <exception>";
         localization.command.exception.syntax = "<hover:show_text:\"<fcolor:2>Use <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Usage →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└";
         localization.command.exception.parseUnknown = "<color:#ff7171><b>⁉</b> Unknown argument error while parsing <br><input>";

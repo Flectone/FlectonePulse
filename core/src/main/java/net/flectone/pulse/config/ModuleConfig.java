@@ -22,6 +22,7 @@ public interface ModuleConfig {
         SubCommandConfig getDeletemessage();
         SubCommandConfig getDice();
         SubCommandConfig getDo();
+        SubCommandConfig getEmit();
         SubCommandConfig getFlectonepulse();
         SubCommandConfig getGeolocate();
         SubCommandConfig getHelper();
