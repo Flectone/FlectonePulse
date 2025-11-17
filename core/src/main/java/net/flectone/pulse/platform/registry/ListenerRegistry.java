@@ -19,10 +19,7 @@ import net.flectone.pulse.util.logging.FLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -34,6 +31,7 @@ public class ListenerRegistry implements Registry {
 
     private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<Consumer<Event>>>> pulseListeners = new ConcurrentHashMap<>();
     private final List<PacketListenerCommon> packetListeners = new ArrayList<>();
+    private final Set<Class<?>> permanentListeners = new HashSet<>();
 
     private final FLogger fLogger;
     private final Injector injector;
@@ -45,6 +43,11 @@ public class ListenerRegistry implements Registry {
         if (enumMap != null) return new EnumMap<>(enumMap);
 
         return new EnumMap<>(Event.Priority.class);
+    }
+
+    public void registerPermanent(Class<?> clazzListener) {
+        permanentListeners.add(clazzListener);
+        register(clazzListener);
     }
 
     public void register(Class<?> clazzListener) {
@@ -117,6 +120,7 @@ public class ListenerRegistry implements Registry {
     public void reload() {
         unregisterAll();
         registerDefaultListeners();
+        permanentListeners.forEach(this::register);
     }
 
     public void registerDefaultListeners() {
