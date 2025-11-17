@@ -67,8 +67,8 @@ public class Destination {
                 timesMap.put("stay", times.stayTicks());
 
                 if (this.type != Type.ACTION_BAR) {
-                    timesMap.put("fade-in", times.fadeInTicks());
-                    timesMap.put("fade-out", times.fadeOutTicks());
+                    timesMap.put("fade_in", times.fadeInTicks());
+                    timesMap.put("fade_out", times.fadeOutTicks());
 
                     map.put("subtext", this.subtext);
                 }
@@ -150,17 +150,17 @@ public class Destination {
 
                 net.flectone.pulse.model.util.BossBar bossBar = new net.flectone.pulse.model.util.BossBar(longDuration, floatHealth, bossBarOverlay, bossBarColor);
 
-                Object playBossMusic = map.get("play-boss-music");
+                Object playBossMusic = map.get("play_boss_music");
                 if (playBossMusic != null && Boolean.parseBoolean(String.valueOf(playBossMusic))) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC);
                 }
 
-                Object createWorldFog = map.get("create-world-fog");
+                Object createWorldFog = map.get("create_world_fog");
                 if (createWorldFog != null && Boolean.parseBoolean(String.valueOf(createWorldFog))) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG);
                 }
 
-                Object darkenScreen = map.get("darken-screen");
+                Object darkenScreen = map.get("darken_screen");
                 if (darkenScreen != null && Boolean.parseBoolean(String.valueOf(darkenScreen))) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
                 }
