@@ -109,7 +109,6 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
-                .destination(config().getDestination())
                 .build()
         );
 
