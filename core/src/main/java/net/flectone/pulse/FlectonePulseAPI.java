@@ -219,7 +219,7 @@ public class FlectonePulseAPI  {
             instance.get(MetricsService.class).reload();
         }
 
-        eventDispatcher.dispatch(reloadListeners, new ReloadEvent());
+        eventDispatcher.dispatch(reloadListeners, new ReloadEvent(reloadException));
 
         // log plugin reloaded
         fLogger.logReloaded();
