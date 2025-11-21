@@ -46,6 +46,7 @@ public class ListenerRegistry implements Registry {
     }
 
     public void registerPermanent(PulseListener pulseListener) {
+        permanentListeners.add(pulseListener);
         register(pulseListener);
     }
 
