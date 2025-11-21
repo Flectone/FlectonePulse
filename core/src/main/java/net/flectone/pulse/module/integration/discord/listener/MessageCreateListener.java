@@ -20,6 +20,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -37,9 +38,9 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        String channel = config().getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+        List<String> channel = config().getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
         if (channel == null) return Mono.empty();
-        if (!channel.equals(discordMessage.getChannelId().asString())) return Mono.empty();
+        if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
 
         Optional<Member> user = event.getMember();
         if (user.isEmpty() || user.get().isBot()) return Mono.empty();

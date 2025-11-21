@@ -133,10 +133,10 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private ChannelInfo channelInfo = new ChannelInfo();
 
         @JsonMerge(OptBoolean.FALSE)
-        private Map<String, String> messageChannel = new LinkedHashMap<>(){
+        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), "");
-                put("CHAT_GLOBAL", "");
+                put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), List.of("123456"));
+                put("CHAT_GLOBAL", List.of("123456"));
             }
         };
 

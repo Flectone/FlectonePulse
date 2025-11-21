@@ -36,10 +36,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -68,10 +66,19 @@ public class DiscordIntegration implements FIntegration {
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (gateway == null) return;
 
-        String integrationChannel = config().getMessageChannel().get(messageName);
-        if (integrationChannel == null) return;
-        if (integrationChannel.isEmpty()) return;
+        List<String> channels = config().getMessageChannel().get(messageName);
+        if (channels == null) return;
+        if (channels.isEmpty()) return;
 
+        channels.forEach(string -> {
+            Optional<Snowflake> channel = parseSnowflake(string);
+            if (channel.isEmpty()) return;
+
+            sendMessage(sender, channel.get(), messageName, discordString);
+        });
+    }
+
+    public void sendMessage(FEntity sender, Snowflake channel, String messageName, UnaryOperator<String> discordString) {
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
         Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed());
 
@@ -94,7 +101,7 @@ public class DiscordIntegration implements FIntegration {
 
         String webhookAvatar = messageChannelEmbed.getWebhookAvatar();
         if (StringUtils.isNotEmpty(webhookAvatar)) {
-            long channelID = Snowflake.of(integrationChannel).asLong();
+            long channelID = channel.asLong();
 
             WebhookData webhookData = channelWebhooks.get(channelID);
 
@@ -139,7 +146,7 @@ public class DiscordIntegration implements FIntegration {
 
         messageCreateSpecBuilder.content(content);
 
-        discordClient.getChannelById(Snowflake.of(integrationChannel))
+        discordClient.getChannelById(channel)
                 .createMessage(messageCreateSpecBuilder.build().asRequest())
                 .subscribe();
     }
@@ -261,8 +268,15 @@ public class DiscordIntegration implements FIntegration {
         clientID = applicationInfo.getId().asLong();
 
         Set<Long> uniqueChannels = config().getMessageChannel().values().stream()
+                .flatMap(List::stream)
                 .filter(id -> !id.isEmpty())
-                .map(id -> Snowflake.of(id).asLong())
+                .map(id -> {
+                    Optional<Snowflake> snowflake = parseSnowflake(id);
+                    if (snowflake.isEmpty()) return null;
+
+                    return snowflake.get().asLong();
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         for (long channelID : uniqueChannels) {
@@ -319,6 +333,14 @@ public class DiscordIntegration implements FIntegration {
                                 )
                                 .block();
                     });
+        }
+    }
+
+    private Optional<Snowflake> parseSnowflake(String string) {
+        try {
+            return Optional.of(Snowflake.of(string));
+        } catch (Exception ignored) {
+            return Optional.empty();
         }
     }
 }
