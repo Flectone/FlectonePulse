@@ -94,7 +94,7 @@ public class MessageListener extends EventListener {
         sendMessage(TelegramMetadata.<Localization.Integration.Telegram>builder()
                 .sender(FPlayer.UNKNOWN)
                 .format(localization -> StringUtils.replaceEach(
-                        localization.getForMinecraft(),
+                        StringUtils.defaultString(localization.getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name())),
                         new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
                         new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
                 ))

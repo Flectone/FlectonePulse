@@ -69,11 +69,16 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
         sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
                 .sender(FPlayer.UNKNOWN)
-                .format(string -> StringUtils.replaceEach(
-                        string.getForMinecraft(),
-                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                        new String[]{globalName, globalName, nickname, displayName, userName}
-                ))
+                .format(localization -> {
+                    Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+                    if (channelEmbed == null) return "";
+
+                    return StringUtils.replaceEach(
+                            channelEmbed.getContent(),
+                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                            new String[]{globalName, globalName, nickname, displayName, userName}
+                    );
+                })
                 .globalName(globalName)
                 .nickname(nickname)
                 .displayName(displayName)

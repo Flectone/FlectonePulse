@@ -45,8 +45,8 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     public void sendMessage(String nickname, String channel, String message) {
         sendMessage(TwitchMetadata.<Localization.Integration.Twitch>builder()
                 .sender(FPlayer.UNKNOWN)
-                .format(s -> StringUtils.replaceEach(
-                        s.getForMinecraft(),
+                .format(localization -> StringUtils.replaceEach(
+                        StringUtils.defaultString(localization.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
                         new String[]{"<name>", "<channel>"},
                         new String[]{String.valueOf(nickname), String.valueOf(channel)}
                 ))

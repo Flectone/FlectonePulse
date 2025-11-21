@@ -405,25 +405,26 @@ public class RussianLocale implements Locale {
         localization.command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         localization.command.warnlist.player.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
-        localization.integration.discord.forMinecraft = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.discord.infoChannel = new LinkedHashMap<>() {{
             put("айди", "ТПС <tps>");
         }};
         localization.integration.discord.messageChannel = new LinkedHashMap<>() {{
+            put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new Localization.Integration.Discord.ChannelEmbed());
             put("CHAT_GLOBAL", new Localization.Integration.Discord.ChannelEmbed());
         }};
+        localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
-        localization.integration.telegram.forMinecraft = "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
             put("айди", "ТПС <tps>");
         }};
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{
+            put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
-        localization.integration.twitch.forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
         localization.integration.twitch.messageChannel = new LinkedHashMap<>() {{
+            put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
