@@ -14,6 +14,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
@@ -80,9 +81,10 @@ public class TelegramIntegration implements FIntegration {
 
         Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
         String message = localization.getMessageChannel().getOrDefault(messageName, "<final_message>");
-        if (message.isEmpty()) return;
+        if (StringUtils.isEmpty(message)) return;
 
         message = telegramString.apply(message);
+        if (StringUtils.isEmpty(message)) return;
 
         for (String chat : channels) {
 

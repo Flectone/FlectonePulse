@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -82,9 +83,11 @@ public class TwitchIntegration implements FIntegration {
         if (channels.isEmpty()) return;
 
         String message = fileResolver.getLocalization().getIntegration().getTwitch().getMessageChannel().getOrDefault(messageName, "<final_message>");
-        if (message.isEmpty()) return;
+        if (StringUtils.isEmpty(message)) return;
 
         message = twitchString.apply(message);
+        if (StringUtils.isEmpty(message)) return;
+
         for (String channel : channels) {
             twitchClient.getChat().sendMessage(channel, message);
         }

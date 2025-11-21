@@ -135,6 +135,8 @@ public class DiscordIntegration implements FIntegration {
         }
 
         String content = replaceString.apply(messageChannelEmbed.getContent());
+        if (StringUtils.isEmpty(content) && embed == null) return;
+
         messageCreateSpecBuilder.content(content);
 
         discordClient.getChannelById(Snowflake.of(integrationChannel))
