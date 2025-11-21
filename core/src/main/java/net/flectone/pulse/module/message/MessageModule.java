@@ -10,6 +10,7 @@ import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.auto.AutoModule;
 import net.flectone.pulse.module.message.book.BookModule;
+import net.flectone.pulse.module.message.bossbar.BossbarModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
@@ -41,6 +42,7 @@ public class MessageModule extends AbstractModule {
         addChildren(AnvilModule.class);
         addChildren(AutoModule.class);
         addChildren(BookModule.class);
+        addChildren(BossbarModule.class);
         addChildren(BrandModule.class);
         addChildren(BubbleModule.class);
         addChildren(ChatModule.class);

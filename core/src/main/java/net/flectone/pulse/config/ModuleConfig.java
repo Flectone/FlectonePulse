@@ -91,6 +91,7 @@ public interface ModuleConfig {
         SubMessageConfig getAnvil();
         SubMessageConfig getAuto();
         SubMessageConfig getBook();
+        SubMessageConfig getBossbar();
         SubMessageConfig getBrand();
         SubMessageConfig getBubble();
         SubMessageConfig getChat();

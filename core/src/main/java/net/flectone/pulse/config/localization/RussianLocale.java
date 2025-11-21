@@ -443,6 +443,25 @@ public class RussianLocale implements Locale {
             }});
         }};
 
+        localization.message.bossbar.announce = new LinkedHashMap<>() {
+            {
+                put("key", "message");
+            }
+        };
+
+        localization.message.bossbar.types = new LinkedHashMap<>() {
+            {
+                put("entity.minecraft.ender_dragon", "<sprite:gui:spectator/teleport_to_player><gradient:#ff6bff:#dda0dd>Эндер-дракон");
+                put("entity.minecraft.wither", "<sprite:gui:mob_effect/wither><gradient:#7b68ee:#9370db>Визер");
+                put("event.minecraft.raid", "<sprite:gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Рейд");
+                put("event.minecraft.raid.defeat", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Поражение");
+                put("event.minecraft.raid.defeat.full", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Рейд — Поражение");
+                put("event.minecraft.raid.raiders_remaining", " — Осталось рейдеров: <raiders>");
+                put("event.minecraft.raid.victory", "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Победа");
+                put("event.minecraft.raid.victory.full", "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Рейд — Победа");
+            }
+        };
+
         localization.message.brand.values = new LinkedList<>() {{
             add("<white>Майнкрафт");
             add("<aqua>Майнкрафт");

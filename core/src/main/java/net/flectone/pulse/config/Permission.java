@@ -830,6 +830,9 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
         private Book book = new Book();
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar/")
+        private Bossbar bossbar = new Bossbar();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
         private Brand brand = new Brand();
 
@@ -903,6 +906,12 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @Getter
         public static final class Book implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.book";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Bossbar implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.bossbar";
             private Type type = Type.TRUE;
         }
 

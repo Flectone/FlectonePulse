@@ -40,6 +40,9 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
     private Book book = new Book();
 
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar/")
+    private Bossbar bossbar = new Bossbar();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
     private Brand brand = new Brand();
 
@@ -129,6 +132,25 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Book implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
+    }
+
+    @Getter
+    public static final class Bossbar implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
+        private Map<String, Announce> announce = new LinkedHashMap<>() {
+            {
+                put("key", new Announce());
+            }
+        };
+
+        @Getter
+        @NoArgsConstructor
+        public static final class Announce {
+            private Destination destination = new Destination(Destination.Type.TITLE);
+            private Sound sound = new Sound();
+        }
     }
 
     @Getter

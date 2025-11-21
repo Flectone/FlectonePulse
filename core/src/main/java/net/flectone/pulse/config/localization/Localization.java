@@ -883,6 +883,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
             return null;
         }
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar/")
+        Bossbar bossbar = new Bossbar();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
         Brand brand = new Brand();
 
@@ -948,6 +951,15 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Auto implements SubMessageConfig, Localizable {
             @JsonMerge(OptBoolean.FALSE)
             Map<String, List<String>> types = new LinkedHashMap<>();
+        }
+
+        @Getter
+        public static final class Bossbar implements SubMessageConfig, Localizable {
+            @JsonMerge(OptBoolean.FALSE)
+            Map<String, String> announce = new LinkedHashMap<>();
+
+            @JsonMerge(OptBoolean.FALSE)
+            Map<String, String> types = new LinkedHashMap<>();
         }
 
         @Getter
@@ -1222,6 +1234,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Vanilla implements SubMessageConfig, Localizable {
             String formatPlayer;
             String formatEntity;
+
+            @JsonMerge(OptBoolean.FALSE)
             Map<String, String> types = new LinkedHashMap<>();
         }
     }

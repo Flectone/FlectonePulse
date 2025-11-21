@@ -443,6 +443,25 @@ public class EnglishLocale implements Locale {
             }});
         }};
 
+        localization.message.bossbar.announce = new LinkedHashMap<>() {
+            {
+                put("key", "message");
+            }
+        };
+
+        localization.message.bossbar.types = new LinkedHashMap<>() {
+            {
+                put("entity.minecraft.ender_dragon", "<sprite:gui:spectator/teleport_to_player><gradient:#ff6bff:#dda0dd>Ender Dragon");
+                put("entity.minecraft.wither", "<sprite:gui:mob_effect/wither><gradient:#7b68ee:#9370db>Wither");
+                put("event.minecraft.raid", "<sprite:gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Raid");
+                put("event.minecraft.raid.defeat", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Defeat");
+                put("event.minecraft.raid.defeat.full", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Raid - Defeat");
+                put("event.minecraft.raid.raiders_remaining", " - Raiders Remaining: <raiders>");
+                put("event.minecraft.raid.victory", "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Victory");
+                put("event.minecraft.raid.victory.full", "<sprite:gui:hud/heart/full><gradient:#32cd32:#228b22>Raid - Victory");
+            }
+        };
+
         localization.message.brand.values = new LinkedList<>() {{
             add("<white>Minecraft");
             add("<aqua>Minecraft");
