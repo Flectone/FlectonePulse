@@ -238,7 +238,8 @@ public abstract class PlatformInjector extends AbstractModule {
                 // deserialization
                 .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
                 .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
-                .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+                .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY) // convert single value to array
+                .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT) // fix empty null string
                 // serialization
                 .enable(SerializationFeature.INDENT_OUTPUT) // indent output for values
                 .disable(YAMLWriteFeature.SPLIT_LINES) // fix split long values
