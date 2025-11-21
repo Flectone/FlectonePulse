@@ -34,6 +34,10 @@ public class IntegrationSender {
     private final MessagePipeline messagePipeline;
 
     @Async(independent = true)
+    public void asyncSend(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
+        send(messageType, format, eventMetadata);
+    }
+
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
         UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
         if (integrationOperator == null) return;

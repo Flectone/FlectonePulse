@@ -84,6 +84,9 @@ public enum MessageType {
     VANILLA,
     VERSION,
 
+    SERVER_ENABLE,
+    SERVER_DISABLE,
+
     // only for invalidation cache
     SYSTEM_ONLINE,
     SYSTEM_OFFLINE,

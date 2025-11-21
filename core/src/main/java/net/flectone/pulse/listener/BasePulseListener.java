@@ -8,6 +8,8 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.lifecycle.DisableEvent;
+import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
@@ -75,7 +77,7 @@ public class BasePulseListener implements PulseListener {
         String rawFormat = event.getRawFormat();
         EventMetadata<?> eventMetadata = event.getEventMetadata();
 
-        integrationSender.send(messageType, rawFormat, eventMetadata);
+        integrationSender.asyncSend(messageType, rawFormat, eventMetadata);
 
         if (proxySender.send(messageType, eventMetadata)) {
             event.setCancelled(true);
@@ -112,5 +114,25 @@ public class BasePulseListener implements PulseListener {
             fLogger.warning("Toponline module is not supported on Fabric");
             event.setCancelled(true);
         }
+    }
+
+    @Pulse
+    public void onEnableEvent(EnableEvent event) {
+        integrationSender.send(MessageType.SERVER_ENABLE, "", EventMetadata.builder()
+                .sender(FPlayer.UNKNOWN)
+                .format("")
+                .integration()
+                .build()
+        );
+    }
+
+    @Pulse
+    public void onDisableEvent(DisableEvent event) {
+        integrationSender.send(MessageType.SERVER_DISABLE, "", EventMetadata.builder()
+                .sender(FPlayer.UNKNOWN)
+                .format("")
+                .integration()
+                .build()
+        );
     }
 }

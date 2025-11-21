@@ -10,7 +10,9 @@ import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.ReloadEvent;
+import net.flectone.pulse.model.event.lifecycle.DisableEvent;
+import net.flectone.pulse.model.event.lifecycle.EnableEvent;
+import net.flectone.pulse.model.event.lifecycle.ReloadEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
@@ -54,6 +56,7 @@ public class FlectonePulseAPI  {
         // log plugin information
         fLogger.logDescription();
 
+        // load minecraft localizations
         instance.get(MinecraftTranslationService.class).reload();
 
         // register default listeners
@@ -86,6 +89,9 @@ public class FlectonePulseAPI  {
             instance.get(MetricsService.class).reload();
         }
 
+        // call enable event
+        instance.get(EventDispatcher.class).dispatch(new EnableEvent(instance));
+
         // log plugin enabled
         fLogger.logEnabled();
     }
@@ -101,6 +107,9 @@ public class FlectonePulseAPI  {
 
         // log plugin disabling
         fLogger.logDisabling();
+
+        // call disable event
+        instance.get(EventDispatcher.class).dispatch(new DisableEvent(instance));
 
         // disable task scheduler
         instance.get(TaskScheduler.class).shutdown();
@@ -177,6 +186,7 @@ public class FlectonePulseAPI  {
             reloadException = new ReloadException(e.getMessage(), e);
         }
 
+        // load minecraft localizations
         instance.get(MinecraftTranslationService.class).reload();
 
         // reload registries
@@ -219,7 +229,8 @@ public class FlectonePulseAPI  {
             instance.get(MetricsService.class).reload();
         }
 
-        eventDispatcher.dispatch(reloadListeners, new ReloadEvent(reloadException));
+        // call reload event
+        eventDispatcher.dispatch(reloadListeners, new ReloadEvent(instance, reloadException));
 
         // log plugin reloaded
         fLogger.logReloaded();
