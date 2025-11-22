@@ -191,7 +191,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         // 3 - offline client, 4 - official client
-        boolean offlineClient = fPlayer.getUuid().version() == 3;
+        boolean offlineClient = fReceiver.getUuid().version() == 3;
         return messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).getFormat())
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient) // disable player_head for official client
                 .build();
