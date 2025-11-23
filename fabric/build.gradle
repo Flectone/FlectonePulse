@@ -38,7 +38,7 @@ dependencies {
 
 	modCompileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
 	modCompileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
-	modCompileOnly("maven.modrinth:vanish:1.6.1+1.21.10")
+	modCompileOnly("maven.modrinth:vanish:1.6.2+1.21.10")
     modCompileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	// fix integration with LuckPerms
