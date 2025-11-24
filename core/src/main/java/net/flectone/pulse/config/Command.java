@@ -937,7 +937,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> categories = new LinkedHashMap<>(){
             {
-                put("command", List.of("tell", "anon"));
+                put("command", List.of("tell", "msg", "w", "message", "send", "m", "anon"));
                 put("action", List.of("anvil", "book", "sign", "local"));
             }
         };
