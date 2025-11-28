@@ -134,14 +134,14 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             Optional<String> optionalValue = commandContext.optional(promptValue);
 
             fTarget.setSetting(settingText, optionalValue.orElse(null));
-            saveSetting(fPlayer, settingText);
+            saveSetting(fTarget, settingText);
             return;
         }
 
         String messageType = optionalType.get().toUpperCase();
 
         fTarget.setSetting(messageType, !fTarget.isSetting(messageType));
-        saveSetting(fPlayer, messageType);
+        saveSetting(fTarget, messageType);
     }
 
     private void open(FPlayer fPlayer, FPlayer fTarget) {
