@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -32,10 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@Getter
 @Singleton
 public class FlectonePulseAPI  {
 
-    @Getter private static FlectonePulse instance;
+    private static FlectonePulse instance;
 
     @Inject
     public FlectonePulseAPI(FlectonePulse instance) {
@@ -46,6 +48,7 @@ public class FlectonePulseAPI  {
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
     }
 
+    @SneakyThrows
     public void onEnable() {
         if (!instance.isReady()) return;
 
@@ -69,12 +72,8 @@ public class FlectonePulseAPI  {
         // setup filter
         fLogger.setupFilter();
 
-        try {
-            // connect to database
-            instance.get(Database.class).connect();
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
+        // test database connection
+        instance.get(Database.class).connect();
 
         // initialize packetevents
         PacketEvents.getAPI().init();
@@ -183,11 +182,17 @@ public class FlectonePulseAPI  {
         // get file resolver for configuration
         FileResolver fileResolver = instance.get(FileResolver.class);
 
+        // get database
+        Database database = instance.get(Database.class);
+
+        // save old database type
+        Database.Type oldDatabaseType = database.config().getType();
+
         try {
             // reload configuration files
             fileResolver.reload();
         } catch (Exception e) {
-            reloadException = new ReloadException(e.getMessage(), e);
+            reloadException = new ReloadException(e);
         }
 
         // load minecraft localizations
@@ -201,20 +206,34 @@ public class FlectonePulseAPI  {
         // reload logger with new configuration
         fLogger.setupFilter();
 
+        // terminate database
+        database.disconnect();
+
+        // test new database connection
+        try {
+            database.connect();
+        } catch (Exception e) {
+            if (reloadException == null) {
+                reloadException = new ReloadException(e);
+            }
+
+            // try to connect to old database
+            if (database.config().getType() != oldDatabaseType) {
+                database.config().setType(oldDatabaseType);
+
+                try {
+                    database.connect();
+                } catch (Exception ignored) {
+                    throw reloadException;
+                }
+            }
+        }
+
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
 
-        try {
-            // disconnect and reconnect to database
-            instance.get(Database.class).disconnect();
-            instance.get(Database.class).connect();
-
-            // reload fplayer service
-            fPlayerService.reload();
-
-        } catch (Exception e) {
-            reloadException = new ReloadException(e.getMessage(), e);
-        }
+        // reload fplayer service
+        fPlayerService.reload();
 
         // reload moderation service
         instance.get(ModerationService.class).reload();

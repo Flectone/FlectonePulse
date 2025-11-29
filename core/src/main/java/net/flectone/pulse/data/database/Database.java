@@ -9,7 +9,6 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.pool.HikariPool;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
@@ -74,21 +73,17 @@ public class Database {
 
         HikariConfig hikariConfig = createHikariConfig();
 
-        try {
-            dataSource = new HikariDataSource(hikariConfig);
-            jdbi = Jdbi.create(dataSource);
-            jdbi.installPlugin(new SqlObjectPlugin());
+        dataSource = new HikariDataSource(hikariConfig);
+        jdbi = Jdbi.create(dataSource);
+        jdbi.installPlugin(new SqlObjectPlugin());
 
-            setupTemplateEngine();
+        setupTemplateEngine();
 
-            jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
-            jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
-            jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
-            jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
-            jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
-        } catch (HikariPool.PoolInitializationException e) {
-            throw new RuntimeException(e);
-        }
+        jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
 
         executeSQLFile(platformServerAdapter.getResource("sqls/" + config().getType().name().toLowerCase() + ".sql"));
 
