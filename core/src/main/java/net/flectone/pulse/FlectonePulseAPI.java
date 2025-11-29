@@ -42,6 +42,10 @@ public class FlectonePulseAPI  {
         FlectonePulseAPI.instance = instance;
     }
 
+    public static void configurePacketEvents() {
+        System.setProperty("packetevents.nbt.default-max-size", "2097152");
+    }
+
     public void onEnable() {
         if (!instance.isReady()) return;
 

@@ -10,7 +10,6 @@ import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.logging.FLogger;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -34,22 +33,12 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         libraryResolver.loadLibraries();
 
         // configure packetevents api
-        System.setProperty("packetevents.nbt.default-max-size", "2097152");
+        FlectonePulseAPI.configurePacketEvents();
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        PacketEvents.getAPI().getSettings()
-                .reEncodeByDefault(false)
-                .checkForUpdates(false)
-                .debug(false);
+        PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
 
-        try {
-            // create guice injector for dependency injection
-            injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
-        } catch (RuntimeException e) {
-            fLogger.warning("FAILED TO ENABLE");
-            fLogger.warning(e);
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        // create guice injector for dependency injection
+        injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
 
         PacketEvents.getAPI().load();
     }

@@ -29,7 +29,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 	@Override
 	public void onPreLaunch() {
 		// configure packetevents api
-        System.setProperty("packetevents.nbt.default-max-size", "2097152");
+        FlectonePulseAPI.configurePacketEvents();
 		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
 	}
 
@@ -46,14 +46,8 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 		libraryResolver.resolveRepositories();
 		libraryResolver.loadLibraries();
 
-		try {
-			// create guice injector for dependency injection
-			injector = Guice.createInjector(new FabricInjector(this, libraryResolver, fLogger));
-		} catch (RuntimeException e) {
-			fLogger.warning("FAILED TO ENABLE");
-			fLogger.warning(e);
-			return;
-		}
+        // create guice injector for dependency injection
+        injector = Guice.createInjector(new FabricInjector(this, libraryResolver, fLogger));
 
 		onEnable();
 	}
