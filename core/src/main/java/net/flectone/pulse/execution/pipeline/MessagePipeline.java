@@ -21,6 +21,7 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -142,20 +143,51 @@ public class MessagePipeline {
         }
 
         public String defaultSerializerBuild() {
-            return MiniMessage.miniMessage().serialize(build());
+            return addTrailingSpaces(context.getMessage(), MiniMessage.miniMessage().serialize(build()));
         }
 
         public String plainSerializerBuild() {
-            return PlainTextComponentSerializer.plainText().serialize(build());
+            return addTrailingSpaces(context.getMessage(), PlainTextComponentSerializer.plainText().serialize(build()));
         }
 
         public String legacySerializerBuild() {
-            return LegacyComponentSerializer.legacySection().serialize(build());
+            return addTrailingSpaces(context.getMessage(), LegacyComponentSerializer.legacySection().serialize(build()));
         }
 
         public JsonElement jsonSerializerBuild() {
             return GsonComponentSerializer.gson().serializeToTree(build());
         }
+    }
+
+    // MiniMessage removes trailing spaces during serialization, so we need to add them back
+    public String addTrailingSpaces(String rawString, String finalString) {
+        if (StringUtils.isEmpty(rawString)) return finalString;
+
+        int countRawSpaces = countTrailingSpaces(rawString);
+        if (countRawSpaces == 0) return finalString;
+
+        int countFinalSpaces = countTrailingSpaces(finalString);
+
+        if (countRawSpaces > countFinalSpaces) {
+            finalString = finalString + " ".repeat(countRawSpaces - countFinalSpaces);
+        }
+
+        return finalString;
+    }
+
+    public int countTrailingSpaces(String string) {
+        if (StringUtils.isEmpty(string)) return 0;
+
+        int count = 0;
+        for (int i = string.length() - 1; i >= 0; i--) {
+            if (string.charAt(i) != ' ') {
+                break;
+            }
+
+            count++;
+        }
+
+        return count;
     }
 
     public enum ReplacementTag {
