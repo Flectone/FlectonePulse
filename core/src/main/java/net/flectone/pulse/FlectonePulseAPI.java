@@ -2,6 +2,7 @@ package net.flectone.pulse;
 
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -46,6 +47,14 @@ public class FlectonePulseAPI  {
 
     public static void configurePacketEvents() {
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
+    }
+
+    // fix PacketEvents error when FlectonePulse failed to start
+    public static void terminateFailedPacketEvents() {
+        PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
+        if (!packetEventsAPI.isInitialized()) {
+            packetEventsAPI.getInjector().uninject();
+        }
     }
 
     @SneakyThrows
@@ -100,11 +109,9 @@ public class FlectonePulseAPI  {
     }
 
     public void onDisable() {
-        if (!instance.isReady()) {
-            // terminate packetevents if injector is not initialized
-            PacketEvents.getAPI().terminate();
-            return;
-        }
+        terminateFailedPacketEvents();
+
+        if (!instance.isReady()) return;
 
         FLogger fLogger = instance.get(FLogger.class);
 

@@ -75,7 +75,10 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 
 	@Override
 	public void onDisable() {
-		if (!isReady()) return;
+        if (!isReady()) {
+            FlectonePulseAPI.terminateFailedPacketEvents();
+            return;
+        }
 
 		injector.getInstance(FlectonePulseAPI.class).onDisable();
 	}
