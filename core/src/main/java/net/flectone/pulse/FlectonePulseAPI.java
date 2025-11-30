@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@Getter
 @Singleton
 public class FlectonePulseAPI  {
 
+    @Getter 
     private static FlectonePulse instance;
 
     @Inject
