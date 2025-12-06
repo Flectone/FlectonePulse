@@ -57,10 +57,14 @@ public class FPlayerService {
     }
 
     public void reload() {
-        clear();
+        // invalidate and load console FPlayer to reload name
+        fPlayerRepository.invalid(getConsole().getUuid());
         addConsole();
 
+        // invalidate and load all platform players
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
+            fPlayerRepository.invalid(uuid);
+
             String name = platformPlayerAdapter.getName(uuid);
             FPlayer fPlayer = addFPlayer(uuid, name);
             loadData(fPlayer);
