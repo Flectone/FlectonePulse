@@ -1,9 +1,6 @@
 package net.flectone.pulse.config;
 
-import com.fasterxml.jackson.annotation.JsonMerge;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.OptBoolean;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
@@ -255,8 +252,8 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @Getter
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
-        private boolean enableMarkdown = false;
-        private boolean enableHtml = false;
+        private Mode mode = Mode.NONE;
+
         private String token = "";
 
         private ChannelInfo channelInfo = new ChannelInfo();
@@ -270,6 +267,13 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         };
 
         private Destination destination = new Destination();
+
+        public enum Mode {
+            MARKDOWN,
+            MARKDOWN_V2,
+            HTML,
+            NONE
+        }
     }
 
     @Getter

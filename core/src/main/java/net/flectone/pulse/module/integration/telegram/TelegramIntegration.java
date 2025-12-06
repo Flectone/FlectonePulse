@@ -98,8 +98,12 @@ public class TelegramIntegration implements FIntegration {
             }
 
             SendMessage sendMessage = sendMessageBuilder.build();
-            sendMessage.enableMarkdown(config().isEnableMarkdown());
-            sendMessage.enableHtml(config().isEnableHtml());
+
+            switch (config().getMode()) {
+                case MARKDOWN -> sendMessage.enableMarkdown(true);
+                case MARKDOWN_V2 -> sendMessage.enableMarkdownV2(true);
+                case HTML -> sendMessage.enableHtml(true);
+            }
 
             executeMethod(sendMessage);
         }
