@@ -76,6 +76,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -855,7 +856,7 @@ public class ProxyMessageHandler {
                 .parsedComponent(parsedComponent)
                 .sender(fEntity)
                 .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> module.tagResolvers(fResolver, parsedComponent))
+                .tagResolvers(fResolver -> new TagResolver[]{module.vanillaTag(fResolver, parsedComponent)})
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())

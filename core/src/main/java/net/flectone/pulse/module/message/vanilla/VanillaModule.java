@@ -34,8 +34,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -95,7 +93,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                     String format = StringUtils.defaultString(localization(fPlayer).getTypes().get(parsedComponent.translationKey()));
 
                     Component component = messagePipeline.builder(fPlayer, format)
-                            .tagResolvers(tagResolvers(fPlayer, parsedComponent))
+                            .tagResolvers(vanillaTag(fPlayer, parsedComponent))
                             .build();
 
                     sendPersonalDeath(fPlayer, component);
@@ -114,7 +112,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                 .parsedComponent(parsedComponent)
                 .sender(fPlayer)
                 .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> tagResolvers(fResolver, parsedComponent))
+                .tagResolvers(fResolver -> new TagResolver[]{vanillaTag(fResolver, parsedComponent)})
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())
@@ -132,10 +130,8 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
         return target instanceof FEntity fEntity ? fEntity : null;
     }
 
-    public TagResolver[] tagResolvers(FPlayer fResolver, ParsedComponent parsedComponent) {
-        List<TagResolver> tags = new ArrayList<>();
-
-        tags.add(TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
+    public TagResolver vanillaTag(FPlayer fResolver, ParsedComponent parsedComponent) {
+        return TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
             OptionalInt numberArgument = argumentQueue.pop().asInt();
@@ -175,12 +171,8 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             }
 
             return Tag.selfClosingInserting(Component.empty());
-
-        }));
-
-        return tags.toArray(new TagResolver[0]);
+        });
     }
-
 
     private Tag argumentResolver(FPlayer fResolver, Object replacement) {
         return switch (replacement) {
@@ -232,7 +224,6 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
         return null;
     }
-
 
     @Sync
     public void sendPersonalDeath(FPlayer fPlayer, Component component) {
