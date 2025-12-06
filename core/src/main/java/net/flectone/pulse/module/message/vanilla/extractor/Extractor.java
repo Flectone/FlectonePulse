@@ -210,7 +210,7 @@ public class Extractor {
         return valueComponent;
     }
 
-    protected Optional<String> extractTextContentOrTranslatableKey(Component component) {
+    public Optional<String> extractTextContentOrTranslatableKey(Component component) {
         if (component instanceof TextComponent textComponent) {
             String content = textComponent.content();
             if (!StringUtils.isEmpty(content)) return Optional.of(content);

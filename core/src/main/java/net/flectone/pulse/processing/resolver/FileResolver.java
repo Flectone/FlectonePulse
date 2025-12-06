@@ -106,8 +106,8 @@ public class FileResolver {
                 migration_1_6_0();
             }
 
-            if (isVersionOlderThan(preInitVersion, "1.6.3")) {
-                migration_1_6_3();
+            if (isVersionOlderThan(preInitVersion, "1.7.0")) {
+                migration_1_7_0();
             }
         }
 
@@ -480,7 +480,7 @@ public class FileResolver {
         }
     }
 
-    private void migration_1_6_3() throws IOException {
+    private void migration_1_7_0() throws IOException {
         Map<String, String> triggers = message.getFormat().getReplacement().getTriggers();
 
         Map<String, String> updates = new HashMap<>();
@@ -533,6 +533,11 @@ public class FileResolver {
             localizationIntegration.getDiscord().getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).setContent("<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>");
             localizationIntegration.getTelegram().getMessageChannel().put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
             localizationIntegration.getTwitch().getMessageChannel().put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
+
+            Localization.Message.Vanilla localizationVanilla = localization.getMessage().getVanilla();
+            for (Map.Entry<String, String> entry : localizationVanilla.getTypes().entrySet()) {
+                localizationVanilla.getTypes().put(entry.getKey(), Strings.CS.replace(entry.getValue(), "<arg_", "<argument:"));
+            }
 
             yamlFileProcessor.save(localization);
         }
