@@ -252,7 +252,7 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @Getter
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
-        private Mode mode = Mode.NONE;
+        private Mode parseMode = Mode.NONE;
 
         private String token = "";
 
