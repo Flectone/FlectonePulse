@@ -255,6 +255,8 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     @Getter
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
+        private boolean enableMarkdown = false;
+        private boolean enableHtml = false;
         private String token = "";
 
         private ChannelInfo channelInfo = new ChannelInfo();

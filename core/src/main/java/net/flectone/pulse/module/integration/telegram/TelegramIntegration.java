@@ -88,7 +88,7 @@ public class TelegramIntegration implements FIntegration {
 
         for (String chat : channels) {
 
-            var sendMessageBuilder = SendMessage.builder()
+            SendMessage.SendMessageBuilder<?, ?> sendMessageBuilder = SendMessage.builder()
                     .chatId(chat)
                     .text(message);
 
@@ -97,7 +97,11 @@ public class TelegramIntegration implements FIntegration {
                         .messageThreadId(Integer.parseInt(chat.split("_")[1]));
             }
 
-            executeMethod(sendMessageBuilder.build());
+            SendMessage sendMessage = sendMessageBuilder.build();
+            sendMessage.enableMarkdown(config().isEnableMarkdown());
+            sendMessage.enableHtml(config().isEnableHtml());
+
+            executeMethod(sendMessage);
         }
     }
 
