@@ -336,7 +336,7 @@ public class RussianLocale implements Locale {
         localization.command.stream.formatStart = "<br><color:#ff4e4e>│ 🔔 <fcolor:1>Объявление <br><color:#ff4e4e>│<br><color:#ff4e4e>│ <fcolor:1><display_name> начал трансляцию<br><color:#ff4e4e>│<br><urls><br>";
         localization.command.stream.formatEnd = "<fcolor:2>★ Спасибо за трансляцию на нашем сервере!";
 
-        localization.command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
+        localization.command.symbol.format = "<click:suggest_command:\"<input>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
 
         localization.command.tell.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.tell.sender = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";

@@ -5,15 +5,16 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
-import org.apache.commons.lang3.Strings;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -75,9 +76,10 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replace(s.getFormat(), "<message>", message))
+                .format(Localization.Command.Symbol::getFormat)
                 .destination(config().getDestination())
                 .message(message)
+                .tagResolvers(fResolver -> new TagResolver[]{inputTag(message)})
                 .sound(getModuleSound())
                 .build()
         );
@@ -101,5 +103,10 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     @Override
     public Localization.Command.Symbol localization(FEntity sender) {
         return fileResolver.getLocalization(sender).getCommand().getSymbol();
+    }
+
+    private TagResolver inputTag(String message) {
+        return TagResolver.resolver("input", (argumentQueue, context) ->
+                Tag.preProcessParsed(message));
     }
 }

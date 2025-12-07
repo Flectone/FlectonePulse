@@ -539,6 +539,10 @@ public class FileResolver {
                 localizationVanilla.getTypes().put(entry.getKey(), Strings.CS.replace(entry.getValue(), "<arg_", "<argument:"));
             }
 
+            Localization.Command.Symbol localizationSymbol = localization.getCommand().getSymbol();
+            String oldSymbolFormat = localizationSymbol.getFormat();
+            localizationSymbol.setFormat(Strings.CS.replace(oldSymbolFormat, "<click:suggest_command:\"<message>\">", "<click:suggest_command:\"<input>\">"));
+
             yamlFileProcessor.save(localization);
         }
 

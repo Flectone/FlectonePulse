@@ -564,6 +564,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
             String formatEnd;
         }
 
+        @Setter
         @Getter
         public static final class Symbol implements SubCommandConfig, Localizable {
             String format;

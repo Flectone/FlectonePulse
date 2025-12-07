@@ -336,7 +336,7 @@ public class EnglishLocale implements Locale {
         localization.command.stream.formatStart = "<br><color:#ff4e4e>│ 🔔 <fcolor:1>Announcement <br><color:#ff4e4e>│<br><color:#ff4e4e>│ <fcolor:1><display_name> started streaming<br><color:#ff4e4e>│<br><urls><br>";
         localization.command.stream.formatEnd = "<fcolor:2>★ Thanks for streaming on our server!";
 
-        localization.command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
+        localization.command.symbol.format = "<click:suggest_command:\"<input>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
 
         localization.command.tell.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.tell.sender = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";
