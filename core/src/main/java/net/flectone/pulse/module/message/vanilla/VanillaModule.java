@@ -28,13 +28,13 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Optional;
+import java.util.Collections;
 import java.util.OptionalInt;
 
 @Singleton
@@ -93,7 +93,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                     String format = StringUtils.defaultString(localization(fPlayer).getTypes().get(parsedComponent.translationKey()));
 
                     Component component = messagePipeline.builder(fPlayer, format)
-                            .tagResolvers(vanillaTag(fPlayer, parsedComponent))
+                            .tagResolvers(argumentTag(fPlayer, parsedComponent))
                             .build();
 
                     sendPersonalDeath(fPlayer, component);
@@ -112,7 +112,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                 .parsedComponent(parsedComponent)
                 .sender(fPlayer)
                 .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> new TagResolver[]{vanillaTag(fResolver, parsedComponent)})
+                .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())
@@ -130,7 +130,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
         return target instanceof FEntity fEntity ? fEntity : null;
     }
 
-    public TagResolver vanillaTag(FPlayer fResolver, ParsedComponent parsedComponent) {
+    public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
         return TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
@@ -141,36 +141,48 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             if (number > parsedComponent.arguments().size()) return Tag.selfClosingInserting(Component.empty());
 
             Object replacement = parsedComponent.arguments().get(number);
+
+            // <argument:...>
             if (!argumentQueue.hasNext()) return argumentResolver(fResolver, replacement);
+
+            // <argument:...:...>
             if (!(replacement instanceof Component component)) return Tag.selfClosingInserting(Component.empty());
 
             String type = argumentQueue.pop().lowerValue();
-            switch (type) {
-                case "text" -> {
-                    Optional<String> text = extractor.extractTextContentOrTranslatableKey(component);
-                    if (text.isPresent()) {
-                        return Tag.selfClosingInserting(Component.text(text.get()));
-                    }
-                }
-                case "style" -> {
-                    return Tag.styling(style -> style.merge(component.style()));
-                }
+            return switch (type) {
+                // <argument:...:text>
+                case "text" -> Tag.selfClosingInserting(clearComponent(component));
+                // <argument:...:text_without_chat_square_brackets>
+                case "inner_text" -> Tag.selfClosingInserting(extractInnerText(component));
+                // <argument:...:style>
+                case "style" -> Tag.styling(style -> style.merge(component.style()));
+                // <argument:...:hover_text:...>, <argument:...:hover_style>
                 case "hover_text", "hover_style" -> {
                     HoverEvent<?> hoverEvent = findFirstHoverEvent(component);
-                    if (hoverEvent != null) {
-                        if (type.equals("hover_style")) return Tag.styling(style -> style.hoverEvent(hoverEvent));
+                    if (hoverEvent == null) yield Tag.selfClosingInserting(Component.empty());
 
-                        return Tag.selfClosingInserting(switch (hoverEvent.value()) {
-                            case Component hoverComponent -> Component.text(PlainTextComponentSerializer.plainText().serialize(hoverComponent));
-                            case HoverEvent.ShowEntity showEntity -> showEntity.name() == null ? Component.empty() : showEntity.name();
-                            case HoverEvent.ShowItem showItem -> Component.text(showItem.item().value());
-                            default -> Component.empty();
-                        });
-                    }
+                    // <argument:...:hover_style>
+                    if (type.equals("hover_style")) yield Tag.styling(style -> style.hoverEvent(hoverEvent));
+
+                    // <argument:...:hover_text:...>
+                    yield Tag.selfClosingInserting(switch (hoverEvent.value()) {
+                        case Component hoverComponent -> {
+                            // <argument:...:hover_text>
+                            if (!argumentQueue.hasNext()) yield clearComponent(hoverComponent);
+
+                            OptionalInt childrenIndex = argumentQueue.pop().asInt();
+                            if (childrenIndex.isEmpty()) yield Component.empty();
+
+                            // <argument:...:hover_text:...>
+                            yield extractHoverText(hoverComponent, childrenIndex.getAsInt());
+                        }
+                        case HoverEvent.ShowEntity showEntity -> showEntity.name() == null ? Component.empty() : showEntity.name();
+                        case HoverEvent.ShowItem showItem -> Component.text(showItem.item().value());
+                        default -> Component.empty();
+                    });
                 }
-            }
-
-            return Tag.selfClosingInserting(Component.empty());
+                default -> Tag.selfClosingInserting(Component.empty());
+            };
         });
     }
 
@@ -206,6 +218,23 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             }
             default -> Tag.selfClosingInserting(Component.empty());
         };
+    }
+
+    private Component extractInnerText(Component component) {
+        if (!(component instanceof TranslatableComponent translatableComponent)) return Component.empty();
+        if (!translatableComponent.key().equals("chat.square_brackets")) return Component.empty();
+
+        return clearComponent(extractor.getValueComponent(component));
+    }
+
+    private Component extractHoverText(Component component, int index) {
+        if (index >= component.children().size()) return Component.empty();
+
+        return clearComponent(component.children().get(index));
+    }
+
+    private Component clearComponent(Component component) {
+        return component.style(Style.empty()).children(Collections.emptyList());
     }
 
     private HoverEvent<?> findFirstHoverEvent(Component component) {

@@ -856,7 +856,7 @@ public class ProxyMessageHandler {
                 .parsedComponent(parsedComponent)
                 .sender(fEntity)
                 .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> new TagResolver[]{module.vanillaTag(fResolver, parsedComponent)})
+                .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())
