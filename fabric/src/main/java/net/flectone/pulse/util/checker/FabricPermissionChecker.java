@@ -11,7 +11,6 @@ import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.platform.registry.FabricPermissionRegistry;
 import net.minecraft.command.permission.PermissionLevel;
-import net.minecraft.command.permission.PermissionPredicate;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -26,8 +25,6 @@ public class FabricPermissionChecker implements PermissionChecker {
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
 
-    private net.minecraft.command.permission.Permission operatorPermission;
-
     @Override
     public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
@@ -35,38 +32,21 @@ public class FabricPermissionChecker implements PermissionChecker {
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return true;
+        if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
-        int operatorPermissionLevel = minecraftServer.getOpPermissionLevel().getLevel().getLevel();
-        int permissionLevel = fabricPermissionRegistry.getPermissions().getOrDefault(permission, operatorPermissionLevel);
-
-        boolean value = permissionLevel == 0;
+        Integer fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);
+        boolean value = (fabricPermission != null && fabricPermission == 0) || fabricPlayerAdapter.isOperator(fPlayer);
 
         ServerPlayerEntity player = fabricPlayerAdapter.getPlayer(entity.getUuid());
         if (player != null) {
-            PermissionPredicate permissionPredicate = player.getPermissions();
-
-            value = switch (permissionLevel) {
-                case 0 -> permissionPredicate.hasPermission(TRUE_PERMISSION); // TRUE
-                case 1 -> false; // FALSE
-                case 2 -> permissionPredicate.hasPermission(getOpPermission(operatorPermissionLevel)); // OP
-                case 3 -> !permissionPredicate.hasPermission(getOpPermission(operatorPermissionLevel)); // NOT_OP
-                default -> permissionPredicate.hasPermission(getOpPermission(operatorPermissionLevel));
-            } || permissionPredicate.hasPermission(getOpPermission(operatorPermissionLevel));
+            value = value && player.getPermissions().hasPermission(TRUE_PERMISSION);
         }
 
-        return value || integrationModule.hasFPlayerPermission(fPlayer, permission);
+        return value;
     }
 
     @Override
     public boolean check(FEntity entity, Permission.IPermission permission) {
         return permission == null || check(entity, permission.getName());
     }
-
-    private net.minecraft.command.permission.Permission getOpPermission(int operatorPermissionLevel) {
-        if (operatorPermission != null) return operatorPermission;
-
-        operatorPermission = new net.minecraft.command.permission.Permission.Level(PermissionLevel.fromLevel(operatorPermissionLevel));
-        return operatorPermission;
-    }
-
 }

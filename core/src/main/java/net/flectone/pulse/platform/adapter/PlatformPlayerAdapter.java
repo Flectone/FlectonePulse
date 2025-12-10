@@ -80,6 +80,7 @@ public interface PlatformPlayerAdapter {
 
     // Player state methods
     boolean isConsole(@NotNull Object platformPlayer);
+    boolean isOperator(@NotNull FPlayer fPlayer);
     boolean isSneaking(@NotNull FPlayer fPlayer);
     boolean hasPlayedBefore(@NotNull FPlayer fPlayer);
     boolean hasPotionEffect(@NotNull FEntity fPlayer, @NotNull PotionType potionType);

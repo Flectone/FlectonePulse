@@ -223,6 +223,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean isOperator(@NotNull FPlayer fPlayer) {
+        return Bukkit.getOperators().stream().anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(fPlayer.getUuid()));
+    }
+
+    @Override
     public boolean isSneaking(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return false;

@@ -27,6 +27,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerConfigEntry;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -291,6 +292,17 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         return platformPlayer instanceof ServerCommandSource source
                 && source.getEntity() == null
                 && source.getServer().isDedicated();
+    }
+
+    @Override
+    public boolean isOperator(@NotNull FPlayer fPlayer) {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return false;
+
+        PlayerManager playerManager = minecraftServer.getPlayerManager();
+        if (playerManager == null) return false;
+
+        return playerManager.isOperator(new PlayerConfigEntry(fPlayer.getUuid(), fPlayer.getName()));
     }
 
     @Override
