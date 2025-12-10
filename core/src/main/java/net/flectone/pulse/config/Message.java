@@ -431,6 +431,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private boolean enable = true;
             private boolean playerHead = true;
             private boolean sprite = true;
+            private boolean needExtraSpace = true;
         }
 
         @Getter

@@ -94,7 +94,7 @@ public class ObjectModule extends AbstractModule {
                                 .build()
                 ).build().color(NamedTextColor.WHITE);
 
-                if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+                if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
                     playerHeadComponent = playerHeadComponent.append(Component.space());
                 }
 
@@ -146,7 +146,7 @@ public class ObjectModule extends AbstractModule {
                     .build()
                     .color(NamedTextColor.WHITE);
 
-            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
                 spriteComponent = spriteComponent.append(Component.space());
             }
 
@@ -159,11 +159,11 @@ public class ObjectModule extends AbstractModule {
 
         // check console version
         if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
-            if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
-                return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT);
+            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
+                return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT.append(Component.space()));
             }
 
-            return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT.append(Component.space()));
+            return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT);
         } else if (fReceiver.isUnknown()) {
             return Tag.selfClosingInserting(Component.empty());
         }
