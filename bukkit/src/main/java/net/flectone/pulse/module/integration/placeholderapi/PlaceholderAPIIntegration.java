@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -42,6 +43,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final PlaceholderAPIModule placeholderAPIModule;
+    private final MuteModule muteModule;
     private final FLogger fLogger;
 
     @Override
@@ -88,6 +90,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
         params = params.toLowerCase();
+        if (params.equalsIgnoreCase("mute_suffix")) {
+            return muteModule.getMuteSuffix(fPlayer, fPlayer);
+        }
 
         if (params.startsWith("fcolor")) {
 

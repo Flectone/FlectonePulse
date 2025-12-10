@@ -16,6 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -47,6 +48,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
     private final FLogger fLogger;
     private final PermissionChecker permissionChecker;
+    private final MuteModule muteModule;
 
     @Override
     public void hook() {
@@ -55,6 +57,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     @Override
     public void unhook() {
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
+
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
 
         Arrays.stream(MessageType.values()).forEach(setting ->
@@ -75,6 +79,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     @Async(delay = 20)
     public void register() {
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"), (context, argument) -> {
+            FPlayer fPlayer = fPlayerMapper.map(context.source());
+
+            return PlaceholderResult.value(muteModule.getMuteSuffix(fPlayer, fPlayer));
+        });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)

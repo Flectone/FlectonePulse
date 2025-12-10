@@ -22,7 +22,6 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
@@ -150,10 +149,15 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
-            if (muteChecker.check(fPlayer) == MuteChecker.Status.NONE) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(localization(messageContext.getReceiver()).getSuffix());
+            String suffix = getMuteSuffix(fPlayer, messageContext.getReceiver());
+            return Tag.preProcessParsed(suffix);
         });
+    }
+
+    public String getMuteSuffix(FPlayer fPlayer, FPlayer fReceiver) {
+        if (muteChecker.check(fPlayer) == MuteChecker.Status.NONE) return "";
+
+        return localization(fReceiver).getSuffix();
     }
 
     public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {
