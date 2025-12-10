@@ -184,6 +184,10 @@ public class FileResolver {
         localizationMap.put(language, localization);
     }
 
+    public boolean isSnapshot(String version) {
+        return version.endsWith("-SNAPSHOT");
+    }
+
     public boolean isVersionOlderThan(String first, String second) {
         String[] subFirst = parseVersionNumbers(first);
         if (subFirst.length != 3) return false;
@@ -204,7 +208,7 @@ public class FileResolver {
             }
         }
 
-        return false;
+        return isSnapshot(first) && !isSnapshot(second);
     }
 
     private String[] parseVersionNumbers(String string) {
