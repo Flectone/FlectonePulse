@@ -12,10 +12,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.mute.listener.MutePulseListener;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -42,7 +40,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
-    private final ListenerRegistry listenerRegistry;
     private final ProxySender proxySender;
     private final MuteChecker muteChecker;
 
@@ -59,8 +56,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                 .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
-
-        listenerRegistry.register(MutePulseListener.class);
     }
 
     @Override

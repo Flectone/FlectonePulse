@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.*;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.module.command.mute.listener.MutePulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -127,7 +128,7 @@ public class ListenerRegistry implements Registry {
         register(BasePacketListener.class);
         register(BasePulseListener.class);
         register(MessagePulseListener.class);
-
+        register(MutePulseListener.class);
         register(InventoryPacketListener.class);
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
