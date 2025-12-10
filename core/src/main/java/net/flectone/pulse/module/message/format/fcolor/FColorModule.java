@@ -10,28 +10,30 @@ import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.RegExUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.OptionalInt;
 
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FColorModule extends AbstractModule {
 
-    private static final Pattern FCOLOR_PATTERN = Pattern.compile("(<fcolor:(\\d+)>)|(</fcolor(:\\d+)?>)");
-
     private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
+    private final LegacyColorConvertor legacyColorConvertor;
 
     @Override
     public void onEnable() {
@@ -58,11 +60,11 @@ public class FColorModule extends AbstractModule {
     }
 
     public void format(MessageContext messageContext) {
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return;
+        String message = messageContext.getMessage();
+        if (!message.contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && !permissionChecker.check(sender, formatPermission().getLegacyColors())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().getLegacyColors())) return;
 
         FPlayer receiver = messageContext.getReceiver();
         if (isModuleDisabledFor(receiver)) return;
@@ -82,30 +84,22 @@ public class FColorModule extends AbstractModule {
             updateColorsMap(colorsMap, receiver, FColor.Type.OUT);
         }
 
-        String contextMessage = messageContext.getMessage();
-        String formattedMessage = replaceFColorPlaceholders(contextMessage, colorsMap);
-        messageContext.setMessage(formattedMessage);
-    }
+        // convert legacy colors
+        colorsMap.forEach((integer, string) -> colorsMap.put(integer, legacyColorConvertor.convert(string)));
 
-    private String replaceFColorPlaceholders(String contextMessage, Map<Integer, String> colorsMap) {
-        Matcher matcher = FCOLOR_PATTERN.matcher(contextMessage);
-        StringBuilder stringBuilder = new StringBuilder(contextMessage.length());
-        int lastEnd = 0;
-        while (matcher.find()) {
-            stringBuilder.append(contextMessage, lastEnd, matcher.start());
-            if (matcher.group(1) != null) {
-                // regex already catch NumberFormatException
-                int number = Integer.parseInt(matcher.group(2));
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
+            if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
-                String color = colorsMap.get(number);
-                stringBuilder.append(color != null ? color : "");
-            } // </fcolor:number> skipped
+            OptionalInt number = argumentQueue.pop().asInt();
+            if (number.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
-            lastEnd = matcher.end();
+            return Tag.preProcessParsed(colorsMap.getOrDefault(number.getAsInt(), ""));
+        });
+
+        // replace deprecated tag
+        if (message.contains("/fcolor")) {
+            messageContext.setMessage(RegExUtils.replaceAll(message, "</fcolor(:\\d+)?>", ""));
         }
-
-        stringBuilder.append(contextMessage.substring(lastEnd));
-        return stringBuilder.toString();
     }
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {
