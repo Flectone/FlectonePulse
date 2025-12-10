@@ -110,9 +110,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     public void addTag(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.SWEAR.getTagName())) return;
+
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {

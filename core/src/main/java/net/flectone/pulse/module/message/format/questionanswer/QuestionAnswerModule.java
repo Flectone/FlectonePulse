@@ -128,6 +128,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     public void addTag(MessageContext messageContext) {
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.QUESTION.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;

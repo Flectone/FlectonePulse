@@ -62,6 +62,7 @@ public class WorldModule extends AbstractModule {
 
     public void addTag(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.WORLD_PREFIX.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;

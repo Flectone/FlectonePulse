@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -57,6 +58,8 @@ public class FColorModule extends AbstractModule {
     }
 
     public void format(MessageContext messageContext) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return;
+
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
                 && !permissionChecker.check(sender, formatPermission().getLegacyColors())) return;

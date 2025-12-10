@@ -67,6 +67,7 @@ public class ObjectModule extends AbstractModule {
     }
 
     public void addPlayerHeadTag(MessageContext messageContext) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())) return;
         if (!config().isPlayerHead()) return;
 
         FEntity sender = messageContext.getSender();
@@ -120,6 +121,7 @@ public class ObjectModule extends AbstractModule {
     }
 
     public void addSpriteTag(MessageContext messageContext) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.SPRITE.getTagName())) return;
         if (!config().isSprite()) return;
 
         FEntity sender = messageContext.getSender();

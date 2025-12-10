@@ -121,6 +121,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     public void addTags(MessageContext messageContext) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName())) return;
+
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
 
@@ -185,76 +187,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 }
             };
         });
-
-        // deprecated resolvers
-        if (permissionChecker.check(sender, permission().getValues().get("ping"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) ->
-                    pingTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("tps"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) ->
-                    tpsTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("online"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) ->
-                    onlineTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("coords"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) ->
-                    coordsTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("stats"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) ->
-                    statsTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("skin"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) ->
-                    skinTag(sender, receiver)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("item"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ITEM, (argumentQueue, context) ->
-                    itemTag(sender, receiver, isTranslateItem)
-            );
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("url"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
-                Tag.Argument argument = argumentQueue.peek();
-                if (argument == null) return Tag.selfClosingInserting(Component.empty());
-
-                return urlTag(sender, receiver, argument.value());
-            });
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("image"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {
-                Tag.Argument argument = argumentQueue.peek();
-                if (argument == null) return Tag.selfClosingInserting(Component.empty());
-
-                return imageTag(sender, receiver, argument.value());
-            });
-        }
-
-        if (permissionChecker.check(sender, permission().getValues().get("spoiler"))) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPOILER, (argumentQueue, context) -> {
-                Tag.Argument argument = argumentQueue.peek();
-                if (argument == null) return Tag.selfClosingInserting(Component.empty());
-
-                return spoilerTag(sender, receiver, argument.value(), messageContext.getFlags());
-            });
-        }
     }
 
     private String processMessage(FEntity sender, String message) {

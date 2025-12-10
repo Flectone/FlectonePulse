@@ -141,6 +141,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     public void addTag(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.MUTE_SUFFIX.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
         if (!(sender instanceof FPlayer fPlayer)) return;

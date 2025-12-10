@@ -82,12 +82,14 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void addTag(MessageContext messageContext, UUID key) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.TRANSLATE.getTagName())) return;
+
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
 
         FPlayer receiver = messageContext.getReceiver();
 
-        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
+        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE), (argumentQueue, context) -> {
             String firstLang = "auto";
             String secondLang = receiver.getSetting(SettingText.LOCALE);
 

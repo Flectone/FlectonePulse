@@ -87,6 +87,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     public void addTag(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.AFK_SUFFIX.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;

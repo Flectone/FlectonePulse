@@ -106,6 +106,8 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public void addTags(MessageContext messageContext) {
+        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.MENTION.getTagName())) return;
+
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
 
