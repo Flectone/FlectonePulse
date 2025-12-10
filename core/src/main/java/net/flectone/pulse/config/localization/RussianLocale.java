@@ -46,6 +46,7 @@ public class RussianLocale implements Locale {
 
         localization.command.ban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.ban.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
+        localization.command.ban.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь забанить игрока с такими же или большими правами";
         localization.command.ban.reasons = new Localization.ReasonMap() {{
             put("default", "Ты заблокирован на этом сервере");
         }};
@@ -240,6 +241,7 @@ public class RussianLocale implements Locale {
 
         localization.command.mute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.mute.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
+        localization.command.mute.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь замутить игрока с такими же или большими правами";
         localization.command.mute.suffix = " <color:#ff7171>🔒</color>";
         localization.command.mute.reasons = new Localization.ReasonMap() {{
             put("default", "Ты был замучен на сервере");
@@ -378,18 +380,22 @@ public class RussianLocale implements Locale {
 
         localization.command.unban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.unban.notBanned = "<color:#ff7171><b>⁉</b> Игрок не заблокирован";
+        localization.command.unban.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь разбанить игрока с такими же или большими правами";
         localization.command.unban.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> разблокировал игрока <fcolor:2><player>";
 
         localization.command.unmute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.unmute.notMuted = "<color:#ff7171><b>⁉</b> Игрок не замучен";
+        localization.command.unmute.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь размутить игрока с такими же или большими правами";
         localization.command.unmute.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> размутил игрока <fcolor:2><player>";
 
         localization.command.unwarn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.unwarn.notWarned = "<color:#ff7171><b>⁉</b> Игрок не имеет предупреждений";
+        localization.command.unwarn.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь снять предупреждение с игрока с такими же или большими правами";
         localization.command.unwarn.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> снял предупреждение с игрока <fcolor:2><player>";
 
         localization.command.warn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         localization.command.warn.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
+        localization.command.warn.lowerWeightGroup = "<color:#ff7171><b>⁉</b> Ты не можешь выдать предупреждение игроку с такими же или большими правами";
         localization.command.warn.reasons = new Localization.ReasonMap() {{
             put("default", "Ты получил предупреждение");
         }};

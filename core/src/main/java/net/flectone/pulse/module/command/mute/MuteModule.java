@@ -87,7 +87,15 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                     .format(Localization.Command.Mute::getNullPlayer)
                     .build()
             );
+            return;
+        }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Mute::getLowerWeightGroup)
+                    .build()
+            );
             return;
         }
 

@@ -210,6 +210,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private boolean showConnectionAttempts = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 
@@ -817,6 +818,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Mute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 
@@ -1094,6 +1096,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Unban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 
@@ -1113,6 +1116,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Unmute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 
@@ -1127,6 +1131,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Unwarn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 
@@ -1142,6 +1147,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Warn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
+        private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
 

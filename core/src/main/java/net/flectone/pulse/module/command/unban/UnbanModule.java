@@ -94,6 +94,15 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
             return;
         }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Unban::getLowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         List<Moderation> bans = new ArrayList<>();
 
         if (id == -1) {

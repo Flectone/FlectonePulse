@@ -250,6 +250,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Ban implements SubCommandConfig, Localizable {
             String nullPlayer;
             String nullTime;
+            String lowerWeightGroup;
 
             @JsonMerge(OptBoolean.FALSE)
             ReasonMap reasons = new ReasonMap();
@@ -457,6 +458,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Mute implements SubCommandConfig, Localizable {
             String nullPlayer;
             String nullTime;
+            String lowerWeightGroup;
             String suffix;
 
             @JsonMerge(OptBoolean.FALSE)
@@ -635,6 +637,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Unban implements SubCommandConfig, Localizable {
             String nullPlayer;
             String notBanned;
+            String lowerWeightGroup;
             String format;
         }
 
@@ -642,6 +645,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Unmute implements SubCommandConfig, Localizable {
             String nullPlayer;
             String notMuted;
+            String lowerWeightGroup;
             String format;
         }
 
@@ -649,6 +653,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Unwarn implements SubCommandConfig, Localizable {
             String nullPlayer;
             String notWarned;
+            String lowerWeightGroup;
             String format;
         }
 
@@ -656,6 +661,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Warn implements SubCommandConfig, Localizable {
             String nullPlayer;
             String nullTime;
+            String lowerWeightGroup;
 
             @JsonMerge(OptBoolean.FALSE)
             ReasonMap reasons = new ReasonMap();

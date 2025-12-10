@@ -117,6 +117,15 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
             return;
         }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Ban::getLowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());

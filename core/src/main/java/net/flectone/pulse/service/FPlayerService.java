@@ -337,4 +337,11 @@ public class FPlayerService {
         fPlayer.setSetting(SettingText.LOCALE, locale);
         saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
     }
+
+    public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
+        if (source.isConsole()) return true;
+
+        return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target)
+                || platformPlayerAdapter.isOperator(source) && !platformPlayerAdapter.isOperator(target);
+    }
 }

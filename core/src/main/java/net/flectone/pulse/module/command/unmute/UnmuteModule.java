@@ -94,6 +94,15 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
             return;
         }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Unmute::getLowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         List<Moderation> mutes = new ArrayList<>();
 
         if (id == -1) {

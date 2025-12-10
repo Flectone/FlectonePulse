@@ -89,6 +89,15 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
             return;
         }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Warn::getLowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         long databaseTime = time + System.currentTimeMillis();
         String reason = timeReasonPair.second();
 

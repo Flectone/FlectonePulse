@@ -46,6 +46,7 @@ public class EnglishLocale implements Locale {
 
         localization.command.ban.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.ban.nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
+        localization.command.ban.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot ban a player with equal or higher permissions";
         localization.command.ban.reasons = new Localization.ReasonMap() {{
             put("default", "You have been banned from this server");
         }};
@@ -240,6 +241,7 @@ public class EnglishLocale implements Locale {
 
         localization.command.mute.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.mute.nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
+        localization.command.mute.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot mute a player with equal or higher permissions";
         localization.command.mute.suffix = " <color:#ff7171>🔒</color>";
         localization.command.mute.reasons = new Localization.ReasonMap() {{
             put("default", "You have been muted on this server");
@@ -378,18 +380,22 @@ public class EnglishLocale implements Locale {
 
         localization.command.unban.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.unban.notBanned = "<color:#ff7171><b>⁉</b> This player is not banned";
+        localization.command.unban.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot unban a player with equal or higher permissions";
         localization.command.unban.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unbanned the player <fcolor:2><player>";
 
         localization.command.unmute.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.unmute.notMuted = "<color:#ff7171><b>⁉</b> This player is not muted";
+        localization.command.unmute.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot unmute a player with equal or higher permissions";
         localization.command.unmute.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unmutted the player <fcolor:2><player>";
 
         localization.command.unwarn.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.unwarn.notWarned = "<color:#ff7171><b>⁉</b> This player is not warned";
+        localization.command.unwarn.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot unwarn a player with equal or higher permissions";
         localization.command.unwarn.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unwarned the player <fcolor:2><player>";
 
         localization.command.warn.nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
         localization.command.warn.nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
+        localization.command.warn.lowerWeightGroup = "<color:#ff7171><b>⁉</b> You cannot warn a player with equal or higher permissions";
         localization.command.warn.reasons = new Localization.ReasonMap() {{
             put("default", "You have been warned on this server");
         }};

@@ -94,6 +94,15 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
             return;
         }
 
+        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Unwarn::getLowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         List<Moderation> warns = new ArrayList<>();
 
         if (id == -1) {
