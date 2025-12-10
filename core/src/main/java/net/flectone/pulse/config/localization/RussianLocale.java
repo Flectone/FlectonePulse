@@ -264,7 +264,7 @@ public class RussianLocale implements Locale {
         localization.command.online.formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>";
 
         localization.command.ping.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        localization.command.ping.format = "<fcolor:1>🖧 Пинг игрока <display_name> равен <ping>";
+        localization.command.ping.format = "<fcolor:1>🖧 Пинг игрока <display_name> равен <replacement:ping>";
 
         localization.command.poll.nullPoll = "<color:#ff7171><b>⁉</b> Голосование не найдено";
         localization.command.poll.expired = "<color:#ff7171><b>⁉</b> Голосование завершено";
@@ -407,7 +407,7 @@ public class RussianLocale implements Locale {
         localization.command.warnlist.player.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         localization.integration.discord.infoChannel = new LinkedHashMap<>() {{
-            put("айди", "ТПС <tps>");
+            put("айди", "ТПС <replacement:tps>");
         }};
         localization.integration.discord.messageChannel = new LinkedHashMap<>() {{
             put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new Localization.Integration.Discord.ChannelEmbed());
@@ -417,7 +417,7 @@ public class RussianLocale implements Locale {
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
         localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
-            put("айди", "ТПС <tps>");
+            put("айди", "ТПС <replacement:tps>");
         }};
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{
             put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
@@ -496,9 +496,9 @@ public class RussianLocale implements Locale {
             put("ascii_idk", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>");
             put("ascii_angry", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>");
             put("ascii_happy", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>");
-            put("ping", "<fcolor:2><ping>");
-            put("tps", "<fcolor:2><tps>");
-            put("online", "<fcolor:2><online>");
+            put("ping", "<fcolor:2><value>");
+            put("tps", "<fcolor:2><value>");
+            put("online", "<fcolor:2><value>");
             put("coords", "<fcolor:2><x> <y> <z>");
             put("stats", "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
             put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Skin</u></hover></click>");
@@ -550,13 +550,13 @@ public class RussianLocale implements Locale {
         localization.message.sidebar.values = new LinkedList<>() {{
             add(new LinkedList<>() {{
                 add(" ");
-                add("<fcolor:1>Пинг <ping>");
+                add("<fcolor:1>Пинг <replacement:ping>");
                 add(" ");
                 add("<fcolor:1>FlectonePulse");
             }});
             add(new LinkedList<>() {{
                 add(" ");
-                add("<fcolor:2>ТПС <tps>");
+                add("<fcolor:2>ТПС <replacement:tps>");
                 add(" ");
                 add("<fcolor:2>FlectonePulse");
             }});
@@ -580,7 +580,7 @@ public class RussianLocale implements Locale {
             }});
             add(new LinkedList<>() {{
                 add(" ");
-                add("<fcolor:1>ТПС <tps>, Онлайн <online>");
+                add("<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>");
                 add(" ");
             }});
         }};
@@ -598,7 +598,7 @@ public class RussianLocale implements Locale {
         }};
         localization.message.tab.playerlistname.format = "<!shadow><player_head></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>";
 
-        localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
+        localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         localization.message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
         localization.message.vanilla.formatPlayer = "<display_name>";

@@ -273,7 +273,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         String format = Strings.CS.replace(
                 localization(receiver).getValues().getOrDefault("ping", ""),
-                "<ping>",
+                "<value>",
                 String.valueOf(ping)
         );
 
@@ -287,7 +287,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private Tag tpsTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
                 localization(receiver).getValues().getOrDefault("tps", ""),
-                "<tps>",
+                "<value>",
                 platformServerAdapter.getTPS()
         );
 
@@ -301,7 +301,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private Tag onlineTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
                 localization(receiver).getValues().getOrDefault("online", ""),
-                "<online>",
+                "<value>",
                 String.valueOf(platformServerAdapter.getOnlinePlayerCount())
         );
 

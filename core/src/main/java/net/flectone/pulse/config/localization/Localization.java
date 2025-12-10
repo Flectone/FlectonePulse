@@ -484,6 +484,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
             String formatTotal;
         }
 
+        @Setter
         @Getter
         public static final class Ping implements SubCommandConfig, Localizable {
             String nullPlayer;
@@ -1226,6 +1227,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
             }
         }
 
+        @Setter
         @Getter
         public static final class Update implements SubMessageConfig, Localizable {
             String formatPlayer;

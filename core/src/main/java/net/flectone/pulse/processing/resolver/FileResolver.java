@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 
@@ -538,6 +539,12 @@ public class FileResolver {
             localizationIntegration.getTelegram().getMessageChannel().put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
             localizationIntegration.getTwitch().getMessageChannel().put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
 
+            localizationIntegration.getDiscord().getInfoChannel().forEach((key, value) ->
+                    localizationIntegration.getDiscord().getInfoChannel().put(key, Strings.CS.replace(value, "<tps>", "<replacement:tps>")));
+
+            localizationIntegration.getTelegram().getInfoChannel().forEach((key, value) ->
+                    localizationIntegration.getTelegram().getInfoChannel().put(key, Strings.CS.replace(value, "<tps>", "<replacement:tps>")));
+
             Localization.Message.Vanilla localizationVanilla = localization.getMessage().getVanilla();
             for (Map.Entry<String, String> entry : localizationVanilla.getTypes().entrySet()) {
                 localizationVanilla.getTypes().put(entry.getKey(), Strings.CS.replace(entry.getValue(), "<arg_", "<argument:"));
@@ -546,6 +553,39 @@ public class FileResolver {
             Localization.Command.Symbol localizationSymbol = localization.getCommand().getSymbol();
             String oldSymbolFormat = localizationSymbol.getFormat();
             localizationSymbol.setFormat(Strings.CS.replace(oldSymbolFormat, "<click:suggest_command:\"<message>\">", "<click:suggest_command:\"<input>\">"));
+
+            Localization.Command.Ping localizationPing = localization.getCommand().getPing();
+            String oldPingFormat = localizationPing.getFormat();
+            localization.getCommand().getPing().setFormat(Strings.CS.replace(oldPingFormat, "<ping>", "<replacement:ping>"));
+
+            String[] oldTags = new String[]{"ping", "tps", "online"};
+
+            Localization.Message.Format.Replacement localizationReplacement = localization.getMessage().getFormat().getReplacement();
+            for (String key : oldTags) {
+                String value = localizationReplacement.getValues().get(key);
+                if (value != null) {
+                    localizationReplacement.getValues().put(key, Strings.CS.replace(value, "<" + key + ">", "<value>"));
+                }
+            }
+
+            Consumer<List<String>> stringsWithOldTagsConsumer = strings -> {
+                for (int i = 0; i < strings.size(); i++) {
+                    String string = strings.get(i);
+                    for (String oldTag : oldTags) {
+                        if (string.contains(oldTag)) {
+                            string = Strings.CS.replace(string, "<" + oldTag + ">", "<replacement:" + oldTag + ">");
+                            strings.set(i, string);
+                        }
+                    }
+                }
+            };
+            localization.getMessage().getSidebar().getValues().forEach(stringsWithOldTagsConsumer);
+            localization.getMessage().getTab().getFooter().getLists().forEach(stringsWithOldTagsConsumer);
+            localization.getMessage().getTab().getHeader().getLists().forEach(stringsWithOldTagsConsumer);
+
+            Localization.Message.Update localizationUpdate = localization.getMessage().getUpdate();
+            String oldUpdateFormat = localizationUpdate.getFormatPlayer();
+            localizationUpdate.setFormatPlayer(Strings.CS.replace(oldUpdateFormat, "<url:", "<replacement:url"));
 
             yamlFileProcessor.save(localization);
         }

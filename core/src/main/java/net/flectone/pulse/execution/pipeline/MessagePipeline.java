@@ -209,45 +209,7 @@ public class MessagePipeline {
         WORLD_PREFIX,
         PLAYER_HEAD,
         SPRITE,
-
-        @Deprecated
-        IMAGE,
-
-        @Deprecated
-        PING,
-
-        @Deprecated
-        TPS,
-
-        @Deprecated
-        ONLINE,
-
-        @Deprecated
-        COORDS,
-
-        @Deprecated
-        STATS,
-
-        @Deprecated
-        STYLE,
-
-        @Deprecated
-        SKIN,
-
-        @Deprecated
-        ITEM,
-
-        @Deprecated
-        URL,
-
-        @Deprecated
-        FCOLOR,
-
-        @Deprecated
-        TRANSLATETO,
-
-        @Deprecated
-        SPOILER;
+        FCOLOR;
 
         @Subst("")
         public String getTagName() {
