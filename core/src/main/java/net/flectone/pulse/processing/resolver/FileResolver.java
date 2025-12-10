@@ -585,7 +585,7 @@ public class FileResolver {
 
             Localization.Message.Update localizationUpdate = localization.getMessage().getUpdate();
             String oldUpdateFormat = localizationUpdate.getFormatPlayer();
-            localizationUpdate.setFormatPlayer(Strings.CS.replace(oldUpdateFormat, "<url:", "<replacement:url"));
+            localizationUpdate.setFormatPlayer(Strings.CS.replace(oldUpdateFormat, "<url:", "<replacement:url:"));
 
             yamlFileProcessor.save(localization);
         }
