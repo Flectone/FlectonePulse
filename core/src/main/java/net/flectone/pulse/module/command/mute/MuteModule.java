@@ -4,20 +4,28 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.mute.listener.MutePulseListener;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -34,7 +42,9 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
+    private final ListenerRegistry listenerRegistry;
     private final ProxySender proxySender;
+    private final MuteChecker muteChecker;
 
     @Override
     public void onEnable() {
@@ -49,6 +59,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                 .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
+
+        listenerRegistry.register(MutePulseListener.class);
     }
 
     @Override
@@ -125,6 +137,19 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     @Override
     public Localization.Command.Mute localization(FEntity sender) {
         return fileResolver.getLocalization(sender).getCommand().getMute();
+    }
+
+    public void addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+
+        FEntity sender = messageContext.getSender();
+        if (!(sender instanceof FPlayer fPlayer)) return;
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
+            if (muteChecker.check(fPlayer) == MuteChecker.Status.NONE) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(localization(messageContext.getReceiver()).getSuffix());
+        });
     }
 
     public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {

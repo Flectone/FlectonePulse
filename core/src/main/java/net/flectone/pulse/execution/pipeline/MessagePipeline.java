@@ -193,6 +193,7 @@ public class MessagePipeline {
     public enum ReplacementTag {
 
         AFK_SUFFIX,
+        MUTE_SUFFIX,
         STREAM_PREFIX,
         VAULT_SUFFIX,
         VAULT_PREFIX,

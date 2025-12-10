@@ -457,6 +457,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Mute implements SubCommandConfig, Localizable {
             String nullPlayer;
             String nullTime;
+            String suffix;
 
             @JsonMerge(OptBoolean.FALSE)
             ReasonMap reasons = new ReasonMap();
