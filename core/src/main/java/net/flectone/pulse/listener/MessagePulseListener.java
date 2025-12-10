@@ -25,17 +25,16 @@ public class MessagePulseListener implements PulseListener {
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
         FPlayer fReceiver = event.getReceiver();
-        if (fReceiver.isConsole()) {
+
+        Destination destination = event.getEventMetadata().getDestination();
+        if (fReceiver.isConsole() && destination.getType() != Destination.Type.CHAT) {
             messageSender.sendToConsole(message);
             return;
         }
 
-        Component submessage = event.getSubmessage();
-
-        Destination destination = event.getEventMetadata().getDestination();
         switch (destination.getType()) {
-            case TITLE -> messageSender.sendTitle(fReceiver, message, submessage, destination.getTimes());
-            case SUBTITLE -> messageSender.sendTitle(fReceiver, submessage, message, destination.getTimes());
+            case TITLE -> messageSender.sendTitle(fReceiver, message, event.getSubmessage(), destination.getTimes());
+            case SUBTITLE -> messageSender.sendTitle(fReceiver, event.getSubmessage(), message, destination.getTimes());
             case ACTION_BAR -> messageSender.sendActionBar(fReceiver, message, destination.getTimes().stayTicks());
             case BOSS_BAR -> messageSender.sendBoosBar(fReceiver, message, destination.getBossBar());
             case TAB_HEADER -> messageSender.sendPlayerListHeaderAndFooter(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));
