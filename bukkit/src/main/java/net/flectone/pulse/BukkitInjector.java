@@ -30,6 +30,8 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.*;
 import net.flectone.pulse.platform.registry.*;
+import net.flectone.pulse.platform.sender.BukkitMessageSender;
+import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.BukkitPermissionChecker;
@@ -97,6 +99,10 @@ public class BukkitInjector extends PlatformInjector {
 
         if (reflectionResolver.hasClass("de.maxhenkel.voicechat.api.VoicechatPlugin")) {
             bind(SimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
+        }
+
+        if (reflectionResolver.isPaper()) {
+            bind(MessageSender.class).to(BukkitMessageSender.class);
         }
 
         bind(AnvilModule.class).to(BukkitAnvilModule.class);

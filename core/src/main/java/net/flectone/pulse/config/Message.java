@@ -465,6 +465,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @Getter
         public static final class Replacement implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
+            private boolean usePaperDataComponents = false;
 
             private static final String BOUNDARY = "(?<!\\\\)(?<!\\S)%s(?!\\S)";
             private static final String FORMAT_TEMPLATE = "(?<!\\S)%1$s([^%1$s\\n]+)%1$s(?!\\S)";

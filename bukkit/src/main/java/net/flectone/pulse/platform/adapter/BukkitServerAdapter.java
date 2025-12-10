@@ -17,12 +17,15 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -41,10 +44,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -57,6 +57,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
+    private final FileResolver fileResolver;
+    private final PaperItemStackUtil paperItemStackUtil;
 
     private Pair<MethodHandle, Object> getTPSMethodPair;
 
@@ -267,7 +269,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(Object item, boolean translatable) {
+    public @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
         Component component = itemStack.getItemMeta() == null
@@ -281,17 +283,15 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         int amount = itemStack.getAmount();
 
-//        try {
-//            // it's not really working full
-//            // data components are not displayed
-//            // waiting for PacketEvents to implement this https://github.com/retrooper/packetevents/pull/1277
-//            if (reflectionResolver.isPaper()) {
-//                HoverEvent.ShowItem showItem = HoverEvent.ShowItem.showItem(key, amount, PaperItemStackUtil.getDataComponents(itemStack));
-//                return component.hoverEvent(HoverEvent.showItem(showItem));
-//            }
-//        } catch (Exception ignored) {
-//            // ignore incorrect hover
-//        }
+        // This is a shitty Paper-only hack. No idea when it'll break. Admins can enable it, but it is disabled by default
+        // Pray PacketEvents merges https://github.com/retrooper/packetevents/pull/1277
+        if (reflectionResolver.isPaper() && fileResolver.getMessage().getFormat().getReplacement().isUsePaperDataComponents() && translatable) {
+            String itemMark = paperItemStackUtil.saveItem(messageUUID, itemStack);
+
+            return Component.text(itemMark)
+                    .color(NamedTextColor.WHITE)
+                    .append(component);
+        }
 
         return component.hoverEvent(HoverEvent.showItem(key, amount));
     }

@@ -38,10 +38,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -186,7 +183,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(Object item, boolean translatable) {
+    public @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable) {
         if (!(item instanceof net.minecraft.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 

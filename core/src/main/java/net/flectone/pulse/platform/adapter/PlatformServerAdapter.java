@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 public interface PlatformServerAdapter {
 
@@ -99,15 +100,7 @@ public interface PlatformServerAdapter {
 
     void saveResource(String path);
 
-    /**
-     * Gets the translated display name of an item in Minecraft's
-     *
-     * @param item The platform-specific item object
-     * @param translatable Use translatable item name
-     * @return Localized item name or empty string if invalid
-     */
-    @NotNull Component translateItemName(Object item, boolean translatable);
-
+    @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable);
 
     @NotNull ItemStack buildItemStack(
             FPlayer fPlayer,

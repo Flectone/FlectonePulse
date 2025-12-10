@@ -152,7 +152,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 case "coords" -> coordsTag(sender, receiver);
                 case "stats" -> statsTag(sender, receiver);
                 case "skin" -> skinTag(sender, receiver);
-                case "item" -> itemTag(sender, receiver, isTranslateItem);
+                case "item" -> itemTag(sender, receiver, messageContext.getMessageUUID(), isTranslateItem);
                 case "url" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
@@ -386,9 +386,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag itemTag(FEntity sender, FPlayer receiver, boolean isTranslateItem) {
+    private Tag itemTag(FEntity sender, FPlayer receiver, UUID messageUUID, boolean isTranslateItem) {
         Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
-        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, isTranslateItem);
+        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageUUID, isTranslateItem);
 
         String format = localization(receiver).getValues().getOrDefault("item", "");
         Component componentFormat = messagePipeline.builder(sender, receiver, format)
