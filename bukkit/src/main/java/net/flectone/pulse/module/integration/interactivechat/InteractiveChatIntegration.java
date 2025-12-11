@@ -1,24 +1,25 @@
 package net.flectone.pulse.module.integration.interactivechat;
 
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.loohp.interactivechat.InteractiveChat;
 import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
+import com.loohp.interactivechat.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -98,14 +99,12 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
         if (receiver == null) return false;
 
         try {
-            String serializedMessage = MiniMessage.miniMessage().serialize(message);
-            var deserializedMessage = com.loohp.interactivechat.libs.net.kyori.adventure.text.minimessage.MiniMessage
-                    .miniMessage()
-                    .deserialize(serializedMessage);
+            String serializedMessage = AdventureSerializer.serializer().gson().serialize(message);
+            var deserializedMessage = GsonComponentSerializer.gson().deserialize(serializedMessage);
 
             InteractiveChatAPI.sendMessage(receiver, deserializedMessage);
         } catch (Exception ignored) {
-            fLogger.warning("An error occurred when sending messages via InteractiveChat, message will be sent via Flectonepulse");
+            fLogger.warning("An error occurred when sending messages via InteractiveChat, message will be sent via FlectonePulse");
             return false;
         }
 
