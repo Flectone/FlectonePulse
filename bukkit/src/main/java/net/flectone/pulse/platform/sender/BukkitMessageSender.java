@@ -40,7 +40,7 @@ public class BukkitMessageSender extends MessageSender {
     @Override
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         // use default sendMessage
-        if (!fileResolver.getMessage().getFormat().getReplacement().isUsePaperDataComponents()) {
+        if (!fileResolver.getConfig().getModule().isUsePaperMessageSender()) {
             super.sendMessage(fPlayer, component, silent);
             return;
         }
@@ -50,9 +50,6 @@ public class BukkitMessageSender extends MessageSender {
             super.sendMessage(fPlayer, replaceItemMarkToEmpty(component), silent);
             return;
         }
-
-        // integration with InteractiveChat
-        if (integrationModule.sendMessageWithInteractiveChat(fPlayer, replaceItemMarkToEmpty(component))) return;
 
         paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component));
     }

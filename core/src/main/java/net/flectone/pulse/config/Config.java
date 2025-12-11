@@ -118,6 +118,7 @@ public final class Config extends YamlFile {
     public static final class Module implements ModuleConfig, IEnable {
 
         private boolean enable = true;
+        private boolean usePaperMessageSender = false;
 
         @Override
         public CommandConfig getCommand() {
