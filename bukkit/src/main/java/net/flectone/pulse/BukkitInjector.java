@@ -101,8 +101,8 @@ public class BukkitInjector extends PlatformInjector {
             bind(SimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
         }
 
-        if (reflectionResolver.isPaper()) {
-            bind(MessageSender.class).to(BukkitMessageSender.class);
+        if (reflectionResolver.isPaper() && reflectionResolver.hasClass("com.", "github.retrooper.packetevents.util.adventure.AdventureSerializer")) {
+                bind(MessageSender.class).to(BukkitMessageSender.class);
         }
 
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
