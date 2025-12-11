@@ -132,7 +132,6 @@ public class BubbleService {
                 .animationTime(animationTime)
                 .scale(scale)
                 .billboard(billboard)
-                .viewers(receivers)
                 : Bubble.builder();
 
         return builder
@@ -143,6 +142,7 @@ public class BubbleService {
                 .elevation(elevation)
                 .interactionHeight(interactionHeight)
                 .interactionRiding(interactionRiding)
+                .viewers(receivers)
                 .build();
     }
 
