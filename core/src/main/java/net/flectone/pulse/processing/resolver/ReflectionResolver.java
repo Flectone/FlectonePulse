@@ -26,6 +26,11 @@ public class ReflectionResolver {
         this.paper = hasClass("com.destroystokyo.paper.ParticleBuilder");
     }
 
+    // relocation hack
+    public boolean hasClass(String... classParts) {
+        return hasClass(String.join("", classParts));
+    }
+
     public boolean hasClass(String className) {
         return resolveClass(className) != null;
     }
