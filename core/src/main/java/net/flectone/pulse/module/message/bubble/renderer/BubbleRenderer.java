@@ -25,7 +25,6 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -54,7 +53,6 @@ public class BubbleRenderer {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
-    private final PacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;

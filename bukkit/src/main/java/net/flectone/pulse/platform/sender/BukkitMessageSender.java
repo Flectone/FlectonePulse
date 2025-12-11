@@ -17,7 +17,6 @@ import net.kyori.adventure.text.TextReplacementConfig;
 @Singleton
 public class BukkitMessageSender extends MessageSender {
 
-    private final IntegrationModule integrationModule;
     private final FileResolver fileResolver;
     private final PaperItemStackUtil paperItemStackUtil;
 
@@ -32,7 +31,6 @@ public class BukkitMessageSender extends MessageSender {
                                FLogger fLogger) {
         super(packetSerializer, taskScheduler, packetSender, packetProvider, integrationModule, fLogger);
 
-        this.integrationModule = integrationModule;
         this.fileResolver = fileResolver;
         this.paperItemStackUtil = paperItemStackUtil;
     }
