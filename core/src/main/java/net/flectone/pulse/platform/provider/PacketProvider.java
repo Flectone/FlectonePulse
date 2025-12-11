@@ -63,7 +63,7 @@ public class PacketProvider {
         User user = getUser(fPlayer);
         if (user == null) return false;
 
-        return user.getClientVersion().isNewerThanOrEquals(clientVersion);
+        return user.getPacketVersion().isNewerThanOrEquals(clientVersion);
     }
 
     public @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {
