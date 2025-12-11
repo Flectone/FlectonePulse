@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.bubble.renderer;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -16,8 +15,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -30,6 +29,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
@@ -59,6 +59,7 @@ public class BubbleRenderer {
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final RandomUtil randomUtil;
+    private final EntityUtil entityUtil;
 
     public void renderBubble(Bubble bubble) {
         FPlayer sender = bubble.getSender();
@@ -81,7 +82,8 @@ public class BubbleRenderer {
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !fViewer.isIgnored(sender))
                 .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
-                .forEach(fViewer -> renderBubble(fViewer, bubble)));
+                .forEach(fViewer -> renderBubble(fViewer, bubble))
+        );
     }
 
     public void renderBubble(FPlayer fViewer, Bubble bubble) {
@@ -256,7 +258,7 @@ public class BubbleRenderer {
         metadataList.add(new EntityData<>(9, EntityDataTypes.INT, bubble.getAnimationTime()));
 
         // scale
-        metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, scale));
+        metadataList.add(new EntityData<>(entityUtil.displayOffset() + 3, EntityDataTypes.VECTOR3F, scale));
 
         packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(bubbleEntity.getId(), metadataList));
     }
@@ -268,25 +270,26 @@ public class BubbleRenderer {
         EntityType entityType = bubbleEntity.getEntityType();
 
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
+
             // scale
-            metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f()));
+            metadataList.add(new EntityData<>(entityUtil.displayOffset() + 3, EntityDataTypes.VECTOR3F, new Vector3f()));
 
             // center for viewer
-            metadataList.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) bubble.getBillboard().ordinal()));
+            metadataList.add(new EntityData<>(entityUtil.displayOffset() + 6, EntityDataTypes.BYTE, (byte) bubble.getBillboard().ordinal()));
 
             // text
             Component message = bubbleEntity.getMessage();
-            metadataList.add(new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, message));
+            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset(), EntityDataTypes.ADV_COMPONENT, message));
 
             // width
-            metadataList.add(new EntityData<>(24, EntityDataTypes.INT, 100000));
+            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 1, EntityDataTypes.INT, 100000));
 
             // background color
             int backgroundColor = bubble.getBackground();
-            metadataList.add(new EntityData<>(25, EntityDataTypes.INT, backgroundColor));
+            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 2, EntityDataTypes.INT, backgroundColor));
 
             if (bubble.isHasShadow()) {
-                metadataList.add(new EntityData<>(27, EntityDataTypes.BYTE, (byte) 0x01));
+                metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 4, EntityDataTypes.BYTE, (byte) 0x01));
             }
 
             return metadataList;
@@ -302,15 +305,7 @@ public class BubbleRenderer {
             metadataList.add(new EntityData<>(3, EntityDataTypes.BOOLEAN, visibleName));
 
             // radius
-            int radiusIndex = 8;
-
-            if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
-                radiusIndex = 6;
-            } else if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
-                radiusIndex = 7;
-            }
-
-            metadataList.add(new EntityData<>(radiusIndex, EntityDataTypes.FLOAT, 0f));
+            metadataList.add(new EntityData<>(entityUtil.areaEffectCloudRadiusIndex(), EntityDataTypes.FLOAT, 0f));
 
             return metadataList;
         }
