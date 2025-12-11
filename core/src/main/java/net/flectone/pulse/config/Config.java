@@ -66,6 +66,7 @@ public final class Config extends YamlFile {
     @Getter
     @Setter
     public static final class Database {
+        private boolean downloadDriver = true;
         private net.flectone.pulse.data.database.Database.Type type = net.flectone.pulse.data.database.Database.Type.H2;
         private String name = "flectonepulse";
         private String host = "127.0.0.1";
