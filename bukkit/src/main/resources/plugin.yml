@@ -27,3 +27,5 @@ softdepend:
   - MiniMOTD
   - ItemsAdder
   - Geyser-Spigot
+  - ViaVersion
+  - ViaBackwards
