@@ -25,11 +25,11 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
-import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -51,12 +51,12 @@ public class BubbleRenderer {
     
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
+    private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
-    private final RandomUtil randomUtil;
     private final EntityUtil entityUtil;
 
     public void renderBubble(Bubble bubble) {
@@ -181,7 +181,7 @@ public class BubbleRenderer {
     }
     
     private BubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {
-        int id = randomUtil.nextInt(Integer.MAX_VALUE);
+        int id = platformServerAdapter.generateEntityId();
 
         EntityType entityType = bubble instanceof ModernBubble
                 ? EntityTypes.TEXT_DISPLAY
@@ -191,7 +191,7 @@ public class BubbleRenderer {
     }
 
     private BubbleEntity createSpaceBubbleEntity(Bubble bubble, FPlayer viewer) {
-        int spaceEntityId = randomUtil.nextInt(Integer.MAX_VALUE);
+        int spaceEntityId = platformServerAdapter.generateEntityId();
 
         EntityType spaceBubbleEntityType = bubble.isInteractionRiding()
                 ? EntityTypes.INTERACTION

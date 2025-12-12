@@ -42,6 +42,13 @@ public interface PlatformServerAdapter {
     int getOnlinePlayerCount();
 
     /**
+     * Return new entity id
+     *
+     * @return entity id
+     */
+    int generateEntityId();
+
+    /**
      * Returns the name of the server core
      *
      * @return A string representing the name of the server core

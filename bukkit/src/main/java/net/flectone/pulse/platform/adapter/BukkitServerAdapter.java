@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -133,6 +134,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                     .filter(fPlayer -> !fPlayer.isUnknown())
                     .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
                     .count();
+    }
+
+    @Override
+    public int generateEntityId() {
+        return SpigotReflectionUtil.generateEntityId();
     }
 
     @Override

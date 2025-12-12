@@ -20,6 +20,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -52,6 +53,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final @Named("projectPath") Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
+    private final RandomUtil randomUtil;
 
     @Override
     public void dispatchCommand(String command) {
@@ -91,6 +93,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                     .filter(fPlayer -> !fPlayer.isUnknown())
                     .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
                     .count();
+    }
+
+    @Override
+    public int generateEntityId() {
+        return randomUtil.nextInt(Integer.MAX_VALUE);
     }
 
     @Override
