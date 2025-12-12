@@ -36,8 +36,11 @@ public class ReflectionResolver {
     }
 
     public void hasClassOrElse(String className, Consumer<LibraryResolver> libraryConsumer) {
-        boolean isAvailable = hasClass(className);
-        if (!isAvailable) {
+        hasClassOrElse(className, true, libraryConsumer);
+    }
+
+    public void hasClassOrElse(String className, boolean needChecking, Consumer<LibraryResolver> libraryConsumer) {
+        if (!needChecking || !hasClass(className)) {
             libraryConsumer.accept(libraryResolver);
         }
     }

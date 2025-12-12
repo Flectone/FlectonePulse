@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.creator.BackupCreator;
@@ -55,7 +54,6 @@ public class Database {
     private final Provider<VersionDAO> versionDAOProvider;
     private final YamlFileProcessor yamlFileProcessor;
     private final BackupCreator backupCreator;
-    private final LibraryResolver libraryResolver;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -72,6 +70,8 @@ public class Database {
             config().setType(Type.H2);
             yamlFileProcessor.save(fileResolver.getConfig());
         }
+
+        downloadDriver();
 
         HikariConfig hikariConfig = createHikariConfig();
 
@@ -139,17 +139,6 @@ public class Database {
         String connectionURL = "jdbc:" + config().getType().name().toLowerCase() + ":";
         switch (config().getType()) {
             case POSTGRESQL -> {
-                if (config().isDownloadDriver()) {
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("org{}postgresql")
-                            .artifactId("postgresql")
-                            .version(BuildConfig.POSTGRESQL_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    );
-                }
-
                 connectionURL = connectionURL +
                         "//" +
                         systemVariableResolver.substituteEnvVars(config().getHost()) +
@@ -168,17 +157,6 @@ public class Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
             case H2 -> {
-                if (config().isDownloadDriver()) {
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("com{}h2database")
-                            .artifactId("h2")
-                            .version(BuildConfig.H2_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    );
-                }
-
                 connectionURL = connectionURL +
                         "file:./" + projectPath.toString() +
                         File.separator +
@@ -194,17 +172,6 @@ public class Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
             case SQLITE -> {
-                if (config().isDownloadDriver()) {
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("org{}xerial")
-                            .artifactId("sqlite-jdbc")
-                            .version(BuildConfig.SQLITE_JDBC_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    );
-                }
-
                 connectionURL = connectionURL +
                         projectPath.toString() +
                         File.separator +
@@ -220,28 +187,8 @@ public class Database {
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
             case MYSQL, MARIADB -> {
-                if (config().isDownloadDriver()) {
-                    if (config().getType() == Type.MYSQL) {
-                        libraryResolver.loadLibrary(Library.builder()
-                                .groupId("com{}mysql")
-                                .artifactId("mysql-connector-j")
-                                .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
-                                .repository(BuildConfig.MAVEN_REPOSITORY)
-                                .resolveTransitiveDependencies(true)
-                                .build()
-                        );
-                    } else {
-                        libraryResolver.loadLibrary(Library.builder()
-                                .groupId("org{}mariadb{}jdbc")
-                                .artifactId("mariadb-java-client")
-                                .version(BuildConfig.MARIADB_JAVA_CLIENT_VERSION)
-                                .repository(BuildConfig.MAVEN_REPOSITORY)
-                                .resolveTransitiveDependencies(true)
-                                .build()
-                        );
-
-                        hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
-                    }
+                if (config().getType() == Type.MARIADB) {
+                    hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
                 }
 
                 connectionURL = connectionURL +
@@ -320,6 +267,62 @@ public class Database {
             executeSQLFile(sqlFile);
         } catch (IOException e) {
             fLogger.warning(e);
+        }
+    }
+
+    public void downloadDriver() {
+        boolean needChecking = !config().isIgnoreExistingDriver();
+        switch (config().getType()) {
+            case POSTGRESQL -> reflectionResolver.hasClassOrElse("org.postgresql.Driver", needChecking, libraryResolver ->
+                    libraryResolver.loadLibrary(Library.builder()
+                            .groupId("org{}postgresql")
+                            .artifactId("postgresql")
+                            .version(BuildConfig.POSTGRESQL_VERSION)
+                            .repository(BuildConfig.MAVEN_REPOSITORY)
+                            .resolveTransitiveDependencies(true)
+                            .build()
+                    )
+            );
+            case H2 -> reflectionResolver.hasClassOrElse("org.h2.Driver", needChecking, libraryResolver ->
+                    libraryResolver.loadLibrary(Library.builder()
+                            .groupId("com{}h2database")
+                            .artifactId("h2")
+                            .version(BuildConfig.H2_VERSION)
+                            .repository(BuildConfig.MAVEN_REPOSITORY)
+                            .resolveTransitiveDependencies(true)
+                            .build()
+                    )
+            );
+            case SQLITE -> reflectionResolver.hasClassOrElse("org.sqlite.JDBC", needChecking, libraryResolver ->
+                    libraryResolver.loadLibrary(Library.builder()
+                            .groupId("org{}xerial")
+                            .artifactId("sqlite-jdbc")
+                            .version(BuildConfig.SQLITE_JDBC_VERSION)
+                            .repository(BuildConfig.MAVEN_REPOSITORY)
+                            .resolveTransitiveDependencies(true)
+                            .build()
+                    )
+            );
+            case MARIADB -> reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", needChecking, libraryResolver ->
+                    libraryResolver.loadLibrary(Library.builder()
+                            .groupId("com{}mysql")
+                            .artifactId("mysql-connector-j")
+                            .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
+                            .repository(BuildConfig.MAVEN_REPOSITORY)
+                            .resolveTransitiveDependencies(true)
+                            .build()
+                    )
+            );
+            case MYSQL -> reflectionResolver.hasClassOrElse("org.mariadb.jdbc.Driver", needChecking, libraryResolver ->
+                    libraryResolver.loadLibrary(Library.builder()
+                            .groupId("org{}mariadb{}jdbc")
+                            .artifactId("mariadb-java-client")
+                            .version(BuildConfig.MARIADB_JAVA_CLIENT_VERSION)
+                            .repository(BuildConfig.MAVEN_REPOSITORY)
+                            .resolveTransitiveDependencies(true)
+                            .build()
+                    )
+            );
         }
     }
 
