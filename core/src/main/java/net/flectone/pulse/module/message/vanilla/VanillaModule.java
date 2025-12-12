@@ -35,6 +35,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.OptionalInt;
 
 @Singleton
@@ -188,13 +189,22 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
     private Tag argumentResolver(FPlayer fResolver, Object replacement) {
         return switch (replacement) {
-            case FEntity fTarget -> {
-                Localization.Message.Vanilla localization = localization(fResolver);
-                String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
-                        ? localization.getFormatPlayer()
-                        : localization.getFormatEntity();
+            case FEntity fTarget -> Tag.selfClosingInserting(buildFEntityComponent(fTarget, fResolver));
+            case List<?> entityList -> {
+                Component component = Component.empty();
 
-                yield Tag.selfClosingInserting(messagePipeline.builder(fTarget, fResolver, formatTarget).build());
+                boolean first = true;
+                for (Object entity : entityList) {
+                    if (entity instanceof FEntity fTarget) {
+                        component = component
+                                .append(first ? Component.empty() : Component.text(", "))
+                                .append(buildFEntityComponent(fTarget, fResolver));
+
+                        first = false;
+                    }
+                }
+
+                yield Tag.selfClosingInserting(component);
             }
             case Component component -> {
                 TextColor color = component.color();
@@ -218,6 +228,15 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             }
             default -> Tag.selfClosingInserting(Component.empty());
         };
+    }
+
+    private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
+        Localization.Message.Vanilla localization = localization(fResolver);
+        String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
+                ? localization.getFormatPlayer()
+                : localization.getFormatEntity();
+
+        return messagePipeline.builder(fTarget, fResolver, formatTarget).build();
     }
 
     private Component extractInnerText(Component component) {

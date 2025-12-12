@@ -16,6 +16,7 @@ import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -99,34 +100,46 @@ public class Extractor {
         Map<Integer, Object> parsedArguments = new HashMap<>();
 
         for (int i = 0; i < translatableComponent.arguments().size(); i++) {
-            Optional<FEntity> entity = extractFEntity(translatableComponent, i);
-            if (entity.isEmpty() || entity.get().isUnknown() && entity.get().getShowEntityName() == null) {
-                Optional<Component> component = getComponent(translatableComponent, i);
-                parsedArguments.put(i, component.orElse(Component.empty()));
-            } else {
-                parsedArguments.put(i, entity.get());
-            }
+            Object argument = extractArgument(translatableComponent, i);
+            parsedArguments.put(i, argument);
         }
 
         ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, parsedArguments);
         return Optional.of(parsedComponent);
     }
 
-    public Optional<FEntity> extractFEntity(TranslatableComponent translatableComponent, int index) {
-        Optional<Component> component = getComponent(translatableComponent, index, Component.class);
-        if (component.isEmpty()) return Optional.empty();
+    @Nullable
+    public Object extractArgument(TranslatableComponent translatableComponent, int index) {
+        return getComponent(translatableComponent, index).map(component -> {
+            Optional<FEntity> firstFEntity = extractFEntity(component);
 
-        return extractFEntity(component.get());
+            if (component.children().isEmpty()) {
+                FEntity fEntity = firstFEntity.orElse(null);
+                return isValid(fEntity) ? fEntity : component;
+            }
+
+            List<FEntity> entities = new ArrayList<>(component.children().size() + 1);
+
+            firstFEntity.ifPresent(entities::add);
+
+            for (Component child : component.children()) {
+                extractFEntity(child).ifPresent(entities::add);
+            }
+
+            if (entities.stream().anyMatch(this::isValid)) {
+                return entities.size() == 1 ? entities.getFirst() : entities;
+            }
+
+            return component;
+        }).orElse(Component.empty());
+    }
+
+    private boolean isValid(FEntity entity) {
+        return entity != null && (!entity.isUnknown() || entity.getShowEntityName() != null);
     }
 
     public Optional<FEntity> extractFEntity(Component component) {
         HoverEvent<?> hoverEvent = component.hoverEvent();
-
-        // support legacy and InteractiveChat components
-        if (hoverEvent == null && !component.children().isEmpty()) {
-            hoverEvent = component.children().getFirst().hoverEvent();
-        }
-
         if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_ENTITY) {
             HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
 
