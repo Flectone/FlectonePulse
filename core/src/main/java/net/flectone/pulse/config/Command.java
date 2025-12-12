@@ -214,6 +214,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Range range = Range.get(Range.Type.PROXY);
 
+        @JsonMerge(OptBoolean.FALSE)
         private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
             {
                 put(0, -1L);
@@ -828,6 +829,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Range range = Range.get(Range.Type.PROXY);
 
+        @JsonMerge(OptBoolean.FALSE)
         private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
             {
                 put(0, -1L);
@@ -1163,6 +1165,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Range range = Range.get(Range.Type.PROXY);
 
+        @JsonMerge(OptBoolean.FALSE)
         private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
             {
                 put(0, -1L);
