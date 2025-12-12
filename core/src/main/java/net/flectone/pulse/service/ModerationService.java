@@ -3,11 +3,13 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.data.repository.ModerationRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.data.repository.ModerationRepository;
+import net.flectone.pulse.module.integration.IntegrationModule;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class ModerationService {
 
     private final ModerationRepository moderationRepository;
+    private final IntegrationModule integrationModule;
 
     public void reload() {
         moderationRepository.invalidateAll();
@@ -97,11 +100,30 @@ public class ModerationService {
     public void remove(FPlayer fPlayer, List<Moderation> moderations) {
         if (moderations.isEmpty()) return;
 
-        moderationRepository.invalidate(fPlayer.getUuid(), moderations.get(0).getType());
+        moderationRepository.invalidate(fPlayer.getUuid(), moderations.getFirst().getType());
 
         for (Moderation moderation : moderations) {
             moderation.setInvalid();
             moderationRepository.updateValid(moderation);
         }
+    }
+
+    public boolean isAllowedTime(FPlayer fPlayer, long time, Map<Integer, Long> timeLimits) {
+        if (time != -1 && time < 1) return false;
+        if (timeLimits.isEmpty()) return true;
+
+        int groupWeight = integrationModule.getGroupWeight(fPlayer);
+
+        long timeLimit = -1;
+        for (Map.Entry<Integer, Long> timeEntry : timeLimits.entrySet()) {
+            if (groupWeight >= timeEntry.getKey()) {
+                if (timeEntry.getValue() == -1) return true;
+                if (timeEntry.getValue() > timeLimit) {
+                    timeLimit = timeEntry.getValue();
+                }
+            }
+        }
+
+        return time != -1 && timeLimit != -1 && timeLimit >= time;
     }
 }

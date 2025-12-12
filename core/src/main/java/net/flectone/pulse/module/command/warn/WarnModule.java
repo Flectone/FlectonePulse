@@ -68,7 +68,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
-        if (time < 1) {
+        if (!moderationService.isAllowedTime(fPlayer, time, config().getTimeLimits())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullTime)

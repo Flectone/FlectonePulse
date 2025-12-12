@@ -214,6 +214,12 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Range range = Range.get(Range.Type.PROXY);
 
+        private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
+            {
+                put(0, -1L);
+            }
+        };
+
         @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ban", "tempban"));
 
@@ -822,6 +828,12 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
         private Range range = Range.get(Range.Type.PROXY);
 
+        private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
+            {
+                put(0, -1L);
+            }
+        };
+
         @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("mute"));
 
@@ -1150,6 +1162,12 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean checkGroupWeight = true;
 
         private Range range = Range.get(Range.Type.PROXY);
+
+        private Map<Integer, Long> timeLimits = new LinkedHashMap<>(){
+            {
+                put(0, -1L);
+            }
+        };
 
         @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("warn"));

@@ -69,7 +69,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
-        if (time < 1) {
+        if (!moderationService.isAllowedTime(fPlayer, time, config().getTimeLimits())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::getNullTime)

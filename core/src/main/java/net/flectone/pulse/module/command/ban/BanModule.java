@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -39,6 +40,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ProxySender proxySender;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
+    private final IntegrationModule integrationModule;
 
     @Override
     public void onEnable() {
@@ -70,7 +72,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         long time = timeReasonPair.first();
         String reason = timeReasonPair.second();
 
-        if (time != -1 && time < 1) {
+        if (!moderationService.isAllowedTime(fPlayer, time, config().getTimeLimits())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullTime)
