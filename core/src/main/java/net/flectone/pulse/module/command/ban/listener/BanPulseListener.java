@@ -19,6 +19,8 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.kyori.adventure.text.Component;
 
+import java.util.List;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BanPulseListener implements PulseListener {
@@ -35,32 +37,36 @@ public class BanPulseListener implements PulseListener {
         if (!banModule.isEnable()) return;
 
         FPlayer fPlayer = event.getPlayer();
-        for (Moderation ban : moderationService.getValidBans(fPlayer)) {
-            event.setAllowed(false);
 
-            FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
+        List<Moderation> bans = moderationService.getValidBans(fPlayer);
+        if (bans.isEmpty()) return;
 
-            fPlayerService.loadColors(fPlayer);
+        event.setAllowed(false);
 
-            Localization.Command.Ban localization = banModule.localization(fPlayer);
-            String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
+        Moderation ban = bans.getFirst();
 
-            Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
-            event.setKickReason(reason);
+        FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
-            if (banModule.config().isShowConnectionAttempts()) {
-                banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
-                        .sender(fPlayer)
-                        .format((fReceiver, message) -> {
-                            String format = message.getConnectionAttempt();
-                            return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
-                        })
-                        .moderation(ban)
-                        .range(Range.get(Range.Type.SERVER))
-                        .filter(filter -> permissionChecker.check(filter, banModule.getPermission()))
-                        .build()
-                );
-            }
+        fPlayerService.loadColors(fPlayer);
+
+        Localization.Command.Ban localization = banModule.localization(fPlayer);
+        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
+
+        Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
+        event.setKickReason(reason);
+
+        if (banModule.config().isShowConnectionAttempts()) {
+            banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+                    .sender(fPlayer)
+                    .format((fReceiver, message) -> {
+                        String format = message.getConnectionAttempt();
+                        return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
+                    })
+                    .moderation(ban)
+                    .range(Range.get(Range.Type.SERVER))
+                    .filter(filter -> permissionChecker.check(filter, banModule.getPermission()))
+                    .build()
+            );
         }
     }
 
