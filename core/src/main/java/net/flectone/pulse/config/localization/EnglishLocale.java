@@ -412,6 +412,11 @@ public class EnglishLocale implements Locale {
         localization.command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
         localization.command.warnlist.player.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
+        localization.integration.discord.nullPlayer = "This player does not exist";
+        localization.integration.discord.customCommand = new LinkedHashMap<>() {{
+            put("ping", new Localization.Integration.Discord.ChannelEmbed());
+        }};
+        localization.integration.discord.customCommand.get("ping").content = "<player>'s ping is <replacement:ping>";
         localization.integration.discord.infoChannel = new LinkedHashMap<>() {{
             put("id", "TPS <replacement:tps>");
         }};
@@ -422,6 +427,11 @@ public class EnglishLocale implements Locale {
         localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>";
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
+        localization.integration.telegram.nullPlayer = "This player does not exist";
+        localization.integration.telegram.customCommand = new LinkedHashMap<>() {{
+            put("id", "Channel id: <id>");
+            put("ping", "<player>'s ping is <replacement:ping>");
+        }};
         localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
             put("id", "TPS <replacement:tps>");
         }};
@@ -430,6 +440,10 @@ public class EnglishLocale implements Locale {
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
+        localization.integration.twitch.nullPlayer = "This player does not exist";
+        localization.integration.twitch.customCommand = new LinkedHashMap<>() {{
+            put("ping", "<player>'s ping is <replacement:ping>");
+        }};
         localization.integration.twitch.messageChannel = new LinkedHashMap<>() {{
             put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>");
             put("CHAT_GLOBAL", "<final_message>");

@@ -789,6 +789,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Discord implements SubIntegrationConfig, Localizable {
+            String nullPlayer;
+
+            @JsonMerge(OptBoolean.FALSE)
+            Map<String, ChannelEmbed> customCommand = new LinkedHashMap<>();
+
             @JsonMerge(OptBoolean.FALSE)
             Map<String, String> infoChannel = new LinkedHashMap<>();
 
@@ -853,6 +858,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Telegram implements SubIntegrationConfig, Localizable {
+            String nullPlayer;
+
+            @JsonMerge(OptBoolean.FALSE)
+            Map<String, String> customCommand = new LinkedHashMap<>();
+
             @JsonMerge(OptBoolean.FALSE)
             Map<String, String> infoChannel = new LinkedHashMap<>();
 
@@ -867,6 +877,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Twitch implements SubIntegrationConfig, Localizable {
+            String nullPlayer;
+
+            @JsonMerge(OptBoolean.FALSE)
+            Map<String, String> customCommand = new LinkedHashMap<>();
+
             @JsonMerge(OptBoolean.FALSE)
             Map<String, String> messageChannel = new LinkedHashMap<>();
         }

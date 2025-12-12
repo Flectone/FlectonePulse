@@ -89,8 +89,12 @@ public class TwitchIntegration implements FIntegration {
         if (StringUtils.isEmpty(message)) return;
 
         for (String channel : channels) {
-            twitchClient.getChat().sendMessage(channel, message);
+            sendMessage(channel, message);
         }
+    }
+
+    public void sendMessage(String channel, String message) {
+        twitchClient.getChat().sendMessage(channel, message);
     }
 
     @Override

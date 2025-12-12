@@ -1,15 +1,15 @@
 package net.flectone.pulse.config;
 
 import com.fasterxml.jackson.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Getter
@@ -126,6 +126,14 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     public static final class Discord implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
+
+        @JsonMerge(OptBoolean.FALSE)
+        private Map<String, Command> customCommand = new LinkedHashMap<>() {
+            {
+                put("ping", new Command(true, List.of("!ping")));
+            }
+        };
+
         private Presence presence = new Presence();
         private ChannelInfo channelInfo = new ChannelInfo();
 
@@ -256,6 +264,14 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
 
         private String token = "";
 
+        @JsonMerge(OptBoolean.FALSE)
+        private Map<String, Command> customCommand = new LinkedHashMap<>() {
+            {
+                put("id", new Command(false, List.of("!id")));
+                put("ping", new Command(true, List.of("!ping")));
+            }
+        };
+
         private ChannelInfo channelInfo = new ChannelInfo();
 
         @JsonMerge(OptBoolean.FALSE)
@@ -288,6 +304,13 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private String token = "";
 
         @JsonMerge(OptBoolean.FALSE)
+        private Map<String, Command> customCommand = new LinkedHashMap<>() {
+            {
+                put("ping", new Command(true, List.of("!ping")));
+            }
+        };
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
                 put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), List.of("faseri4ka"));
@@ -313,5 +336,13 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private boolean enable = false;
         private String token = "";
         private String folderId = "";
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static final class Command {
+        private boolean needPlayer = false;
+        private List<String> aliases = new ArrayList<>();
     }
 }

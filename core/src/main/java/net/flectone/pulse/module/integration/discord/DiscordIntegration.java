@@ -74,13 +74,24 @@ public class DiscordIntegration implements FIntegration {
             Optional<Snowflake> channel = parseSnowflake(string);
             if (channel.isEmpty()) return;
 
-            sendMessage(sender, channel.get(), messageName, discordString);
+            Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.getMessageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed());
+            sendMessage(sender, channel.get(), channelEmbed, discordString);
         });
     }
 
-    public void sendMessage(FEntity sender, Snowflake channel, String messageName, UnaryOperator<String> discordString) {
-        Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed());
+    public void sendMessage(Snowflake channel, String text) {
+        MessageCreateSpec.Builder messageCreateSpecBuilder = MessageCreateSpec.builder()
+                .allowedMentions(AllowedMentions.suppressAll())
+                .content(text);
+
+        discordClient.getChannelById(channel)
+                .createMessage(messageCreateSpecBuilder.build().asRequest())
+                .subscribe();
+    }
+
+    public void sendMessage(FEntity sender, Snowflake channel, Localization.Integration.Discord.ChannelEmbed channelEmbed, UnaryOperator<String> discordString) {
+        if (channelEmbed == null) return;
 
         String skin = skinService.getSkin(sender);
 
@@ -92,14 +103,14 @@ public class DiscordIntegration implements FIntegration {
 
         UnaryOperator<String> replaceString = s -> discordString.andThen(replaceSkin).apply(s);
 
-        Localization.Integration.Discord.Embed messageEmbed = messageChannelEmbed.getEmbed();
+        Localization.Integration.Discord.Embed messageEmbed = channelEmbed.getEmbed();
 
         EmbedCreateSpec embed = null;
         if (messageEmbed != null) {
             embed = createEmbed(messageEmbed, replaceSkin, replaceString);
         }
 
-        String webhookAvatar = messageChannelEmbed.getWebhookAvatar();
+        String webhookAvatar = channelEmbed.getWebhookAvatar();
         if (StringUtils.isNotEmpty(webhookAvatar)) {
             long channelID = channel.asLong();
 
@@ -118,7 +129,7 @@ public class DiscordIntegration implements FIntegration {
                     .allowedMentions(AllowedMentionsData.builder().build())
                     .username(username)
                     .avatarUrl(replaceSkin.apply(webhookAvatar))
-                    .content(replaceString.apply(messageChannelEmbed.getContent()));
+                    .content(replaceString.apply(channelEmbed.getContent()));
 
             if (embed != null) {
                 webhookBuilder.addEmbed(embed.asRequest());
@@ -141,7 +152,7 @@ public class DiscordIntegration implements FIntegration {
             messageCreateSpecBuilder.addEmbed(embed);
         }
 
-        String content = replaceString.apply(messageChannelEmbed.getContent());
+        String content = replaceString.apply(channelEmbed.getContent());
         if (StringUtils.isEmpty(content) && embed == null) return;
 
         messageCreateSpecBuilder.content(content);
