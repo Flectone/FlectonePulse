@@ -714,6 +714,7 @@ public class EnglishLocale implements Locale {
                 put("commands.kill.success.multiple", "<fcolor:1>☠ Killed <fcolor:2><argument:0> <fcolor:1>entities");
                 put("commands.kill.success.single", "<fcolor:1>☠ Killed <argument:0>");
                 put("commands.kill.successful", "<fcolor:1>☠ Killed <argument:0>");
+                put("commands.list.players", "<fcolor:1>\uD83D\uDC65 There are <fcolor:2><argument:0><fcolor:1> of a max of <fcolor:2><argument:1><fcolor:1> players online: <argument:2>");
                 put("commands.locate.biome.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><argument:0><fcolor:1> is at <fcolor:2><argument:1><fcolor:1> (<fcolor:2><argument:2> <fcolor:1>blocks away)");
                 put("commands.locate.poi.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><argument:0><fcolor:1> is at <fcolor:2><argument:1><fcolor:1> (<fcolor:2><argument:2> <fcolor:1>blocks away)");
                 put("commands.locate.structure.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><argument:0><fcolor:1> is at <fcolor:2><argument:1><fcolor:1> (<fcolor:2><argument:2> <fcolor:1>blocks away)");

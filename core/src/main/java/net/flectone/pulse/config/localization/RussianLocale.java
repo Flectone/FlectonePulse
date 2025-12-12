@@ -714,6 +714,7 @@ public class RussianLocale implements Locale {
                 put("commands.kill.success.multiple", "<fcolor:1>☠ Уничтожено <fcolor:2><argument:0> <fcolor:1>сущностей");
                 put("commands.kill.success.single", "<fcolor:1>☠ <argument:0> был убит");
                 put("commands.kill.successful", "<fcolor:1>☠ <fcolor:1><argument:0> был убит");
+                put("commands.list.players", "<fcolor:1>\uD83D\uDC65 На сервере <fcolor:2><argument:0><fcolor:1> из <fcolor:2><argument:1><fcolor:1> игроков: <argument:2>");
                 put("commands.locate.biome.success", "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><argument:0><fcolor:1> находится по координатам <fcolor:2><argument:1><fcolor:1> (в <fcolor:2><argument:2> <fcolor:1>блоках отсюда)");
                 put("commands.locate.poi.success", "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><argument:0><fcolor:1> находится по координатам <fcolor:2><argument:1><fcolor:1> (в <fcolor:2><argument:2> <fcolor:1>блоках отсюда)");
                 put("commands.locate.structure.success", "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><argument:0><fcolor:1> находится по координатам <fcolor:2><argument:1><fcolor:1> (в <fcolor:2><argument:2> <fcolor:1>блоках отсюда)");
