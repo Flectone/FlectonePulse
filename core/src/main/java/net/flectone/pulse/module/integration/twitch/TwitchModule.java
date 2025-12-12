@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.twitch;
 
 import com.alessiodp.libby.Library;
+import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -40,6 +41,7 @@ public class TwitchModule extends AbstractModule {
         injector.getInstance(TwitchIntegration.class).unhook();
     }
 
+    // I hate this library...
     private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}github{}philippheuer{}credentialmanager")
@@ -73,6 +75,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -81,6 +88,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j-chat")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -89,6 +101,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j-auth")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -97,6 +114,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j-common")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -153,6 +175,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j-helix")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -161,6 +188,11 @@ public class TwitchModule extends AbstractModule {
                 .artifactId("twitch4j-kraken")
                 .version(BuildConfig.TWITCH4J_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -221,6 +253,11 @@ public class TwitchModule extends AbstractModule {
                 .version("13.6")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -230,6 +267,11 @@ public class TwitchModule extends AbstractModule {
                 .version("13.6")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -239,6 +281,11 @@ public class TwitchModule extends AbstractModule {
                 .version("13.6")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -248,6 +295,11 @@ public class TwitchModule extends AbstractModule {
                 .version("13.6")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -257,6 +309,11 @@ public class TwitchModule extends AbstractModule {
                 .version("2.15.0-rc3")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -266,6 +323,11 @@ public class TwitchModule extends AbstractModule {
                 .version("2.15.0-rc3")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -276,6 +338,11 @@ public class TwitchModule extends AbstractModule {
                 .version("2.15.0-rc3")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
@@ -285,6 +352,11 @@ public class TwitchModule extends AbstractModule {
                 .version("2.15.0-rc3")
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.twitch.jackson")
+                        .build()
+                )
                 .build()
         );
 
