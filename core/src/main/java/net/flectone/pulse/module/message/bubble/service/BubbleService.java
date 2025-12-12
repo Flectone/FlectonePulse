@@ -72,7 +72,7 @@ public class BubbleService {
         Message.Bubble config = fileResolver.getMessage().getBubble();
 
         long duration = calculateDuration(message);
-        int elevation = config.getElevation();
+        float elevation = config.getElevation();
         float interactionHeight = config.getInteraction().getHeight();
 
         boolean useModernBubble = isModern();
@@ -122,7 +122,7 @@ public class BubbleService {
         return bubbles;
     }
 
-    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int elevation, float interactionHeight,
+    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, float elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
                                int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
         Bubble.BubbleBuilder<?, ?> builder = useModern

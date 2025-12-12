@@ -531,6 +531,12 @@ public class FileResolver {
             }
         });
 
+        if (message.getBubble().getElevation() == 1) {
+            message.getBubble().setElevation(0.4f);
+        }
+
+        yamlFileProcessor.save(message);
+
         for (Localization localization : localizationMap.values()) {
             Localization.Integration localizationIntegration = localization.getIntegration();
 
@@ -589,7 +595,5 @@ public class FileResolver {
 
             yamlFileProcessor.save(localization);
         }
-
-        yamlFileProcessor.save(message);
     }
 }

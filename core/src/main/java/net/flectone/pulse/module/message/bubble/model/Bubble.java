@@ -25,7 +25,7 @@ public class Bubble {
 
     private final long duration;
 
-    private final int elevation;
+    private final float elevation;
 
     private final float interactionHeight;
 

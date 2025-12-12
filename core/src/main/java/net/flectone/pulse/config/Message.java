@@ -166,7 +166,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private boolean enable = true;
         private int maxCount = 3;
         private int maxLength = 30;
-        private int elevation = 1;
+        @Setter
+        private float elevation = 0.4f;
         private double distance = 30.0;
         private double readSpeed = 90.0;
         private double handicapChars = 10.0;

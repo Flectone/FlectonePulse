@@ -95,8 +95,12 @@ public class BubbleRenderer {
         BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
         bubbleEntities.push(bubbleEntity);
 
-        for (int i = 0; i < bubble.getElevation(); i++) {
+        if (bubble.isInteractionRiding()) {
             bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+        } else {
+            for (int i = 0; i < bubble.getElevation(); i++) {
+                bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+            }
         }
 
         activeBubbleEntities.put(key, bubbleEntities);
@@ -138,6 +142,14 @@ public class BubbleRenderer {
         int lastID = platformPlayerAdapter.getEntityId(sender.getUuid());
 
         for (BubbleEntity bubbleEntity : bubbleEntities) {
+            boolean isFirstBubble = bubbleEntities.getFirst().equals(bubbleEntity);
+
+            if (bubbleEntity.getEntityType() == EntityTypes.INTERACTION && !isFirstBubble) {
+                List<EntityData<?>> metadataList = createEntityData(bubbleEntity, false);
+
+                packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(bubbleEntity.getId(), metadataList));
+            }
+
             if (bubbleEntity.isVisible()) {
                 hasSpawnedSpace = false;
                 hasSeenVisible = true;
@@ -145,7 +157,7 @@ public class BubbleRenderer {
                 continue;
             }
 
-            spawnEntity(bubbleEntity);
+            spawnEntity(bubbleEntity, isFirstBubble);
 
             lastID = rideEntity(bubbleEntity, lastID, new int[]{bubbleEntity.getId()});
 
@@ -217,7 +229,7 @@ public class BubbleRenderer {
         activeBubbleEntities.clear();
     }
 
-    private void spawnEntity(BubbleEntity bubbleEntity) {
+    private void spawnEntity(BubbleEntity bubbleEntity, boolean isFirstBubble) {
         if (bubbleEntity.isCreated()) return;
 
         Location location = platformPlayerAdapter.getLocation(bubbleEntity.getBubble().getSender());
@@ -232,7 +244,7 @@ public class BubbleRenderer {
                 id, UUID.randomUUID(), entityType, location, 0, 0, null
         ));
 
-        List<EntityData<?>> metadataList = createEntityData(bubbleEntity);
+        List<EntityData<?>> metadataList = createEntityData(bubbleEntity, isFirstBubble);
 
         packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(id, metadataList));
 
@@ -262,10 +274,12 @@ public class BubbleRenderer {
     }
 
 
-    private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity) {
+    private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity, boolean isFirstBubble) {
         List<EntityData<?>> metadataList = new ArrayList<>();
 
         EntityType entityType = bubbleEntity.getEntityType();
+
+        Component message = bubbleEntity.getMessage();
 
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
 
@@ -276,7 +290,6 @@ public class BubbleRenderer {
             metadataList.add(new EntityData<>(entityUtil.displayOffset() + 6, EntityDataTypes.BYTE, (byte) bubble.getBillboard().ordinal()));
 
             // text
-            Component message = bubbleEntity.getMessage();
             metadataList.add(new EntityData<>(entityUtil.textDisplayOffset(), EntityDataTypes.ADV_COMPONENT, message));
 
             // width
@@ -295,7 +308,6 @@ public class BubbleRenderer {
 
         if (entityType == EntityTypes.AREA_EFFECT_CLOUD) {
             // text
-            Component message = bubbleEntity.getMessage();
             metadataList.add(new EntityData<>(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(message)));
 
             // custom name visible
@@ -315,7 +327,7 @@ public class BubbleRenderer {
             Bubble bubble = bubbleEntity.getBubble();
 
             // height
-            float height = bubble.getInteractionHeight();
+            float height = isFirstBubble ? bubble.getElevation() : bubble.getInteractionHeight();
             metadataList.add(new EntityData<>(9, EntityDataTypes.FLOAT, height));
 
             return metadataList;
