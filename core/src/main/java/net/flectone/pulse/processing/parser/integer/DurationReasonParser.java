@@ -57,7 +57,13 @@ public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, 
         while (matcher.find()) {
             String group = matcher.group();
             String timeUnit = group.substring(group.length() - 1);
-            int timeValue = Integer.parseInt(group.substring(0, group.length() - 1));
+            int timeValue;
+
+            try {
+                timeValue = Integer.parseInt(group.substring(0, group.length() - 1));
+            } catch (NumberFormatException ignored) {
+                timeValue = -1;
+            }
 
             duration = switch (timeUnit) {
                 case "d" -> duration.plusDays(timeValue);
