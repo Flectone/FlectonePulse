@@ -17,7 +17,10 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.type.tuple.Pair;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -45,24 +48,24 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         Optional<Member> user = event.getMember();
         if (user.isEmpty() || user.get().isBot()) return Mono.empty();
 
-        String message = discordMessage.getContent();
-        if (message.isEmpty()) {
-            if (discordMessage.getAttachments().isEmpty()) return Mono.empty();
+        String message = getMessageContent(discordMessage);
+        if (message == null) return Mono.empty();
 
-            message = String.join(" ", discordMessage.getAttachments()
-                    .stream()
-                    .map(Attachment::getUrl)
-                    .toList()
-            );
+        Pair<String, String> reply = null;
+        if (discordMessage.getReferencedMessage().isPresent()) {
+            Message referencedMessage = discordMessage.getReferencedMessage().get();
+            if (referencedMessage.getAuthor().isPresent()) {
+                reply = Pair.of(referencedMessage.getAuthor().get().getUsername(), getMessageContent(referencedMessage));
+            }
         }
 
-        sendMessage(user.get(), message);
+        sendMessage(user.get(), message, reply);
 
         return Mono.empty();
     }
 
     @Async
-    public void sendMessage(Member member, String message) {
+    public void sendMessage(Member member, String message, Pair<String, String> reply) {
         String globalName = member.getGlobalName().orElse("");
         String nickname = member.getNickname().orElse("");
         String displayName = member.getDisplayName();
@@ -76,8 +79,8 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
                     return StringUtils.replaceEach(
                             channelEmbed.getContent(),
-                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                            new String[]{globalName, globalName, nickname, displayName, userName}
+                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<reply_user>"},
+                            new String[]{globalName, globalName, nickname, displayName, userName, reply == null ? "" : "@" + reply.first() + " "}
                     );
                 })
                 .globalName(globalName)
@@ -88,10 +91,13 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply_message", (argumentQueue, context) ->
+                        Tag.preProcessParsed(reply == null ? "" : StringUtils.defaultString(reply.second()))
+                )})
                 .integration(string -> StringUtils.replaceEach(
                         string,
-                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                        new String[]{globalName, globalName, nickname, displayName, userName}
+                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<reply_user>"},
+                        new String[]{globalName, globalName, nickname, displayName, userName, reply == null ? "" : "@" + reply.first() + " "}
                 ))
                 .build()
         );
@@ -113,5 +119,20 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     @Override
     public Localization.Integration.Discord localization(FEntity sender) {
         return fileResolver.getLocalization(sender).getIntegration().getDiscord();
+    }
+
+    private String getMessageContent(Message message) {
+        String content = message.getContent();
+        if (content.isEmpty()) {
+            if (message.getAttachments().isEmpty()) return null;
+
+            return String.join(" ", message.getAttachments()
+                    .stream()
+                    .map(Attachment::getUrl)
+                    .toList()
+            );
+        }
+
+        return content;
     }
 }

@@ -419,19 +419,19 @@ public class EnglishLocale implements Locale {
             put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new Localization.Integration.Discord.ChannelEmbed());
             put("CHAT_GLOBAL", new Localization.Integration.Discord.ChannelEmbed());
         }};
-        localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>";
+        localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>";
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
         localization.integration.telegram.infoChannel = new LinkedHashMap<>() {{
             put("id", "TPS <replacement:tps>");
         }};
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{
-            put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
+            put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
         localization.integration.twitch.messageChannel = new LinkedHashMap<>() {{
-            put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
+            put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
