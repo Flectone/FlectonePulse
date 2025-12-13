@@ -39,9 +39,7 @@ public class BookListener implements Listener {
 
         if (event.isSigning()) {
             Optional<String> formattedTitle = bookModule.format(fPlayer, bookMeta.getTitle());
-            if (formattedTitle.isPresent()) {
-                bookMeta.setTitle(formattedTitle.get());
-            }
+            formattedTitle.ifPresent(bookMeta::setTitle);
         }
 
         event.setNewBookMeta(bookMeta);

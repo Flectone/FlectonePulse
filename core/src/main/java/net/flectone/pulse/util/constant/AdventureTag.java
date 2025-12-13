@@ -1,6 +1,7 @@
 package net.flectone.pulse.util.constant;
 
 public enum AdventureTag {
+
     HOVER,
     CLICK,
     COLOR,
@@ -20,4 +21,5 @@ public enum AdventureTag {
     NBT,
     PRIDE,
     SHADOW_COLOR
+
 }

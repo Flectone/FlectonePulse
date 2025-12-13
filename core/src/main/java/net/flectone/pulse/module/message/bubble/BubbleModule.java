@@ -60,9 +60,11 @@ public class BubbleModule extends AbstractModule {
     }
 
     public enum Billboard {
+
         FIXED,
         VERTICAL,
         HORIZONTAL,
         CENTER
+
     }
 }

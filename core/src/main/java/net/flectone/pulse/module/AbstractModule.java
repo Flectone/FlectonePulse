@@ -26,7 +26,7 @@ public abstract class AbstractModule {
     private PermissionRegistry permissionRegistry;
 
     @Nullable
-    private String permission;
+    private String modulePermission;
 
     @Setter
     private boolean enable;
@@ -39,7 +39,7 @@ public abstract class AbstractModule {
 
         registerPermission(permission);
 
-        this.permission = permission.getName();
+        this.modulePermission = permission.getName();
     }
 
     public void onDisable() {}
@@ -60,7 +60,7 @@ public abstract class AbstractModule {
         permissionRegistry.register(name, type);
     }
 
-    public void addChildren(Class<? extends AbstractModule> clazz) {
+    public void addChild(Class<? extends AbstractModule> clazz) {
         children.add(clazz);
     }
 
@@ -70,6 +70,10 @@ public abstract class AbstractModule {
 
     public void addPredicate(BiPredicate<FEntity, Boolean> biPredicate) {
         predicates.add(biPredicate);
+    }
+
+    public boolean containsChild(Class<? extends AbstractModule> clazz) {
+        return getChildren().contains(clazz);
     }
 
     public boolean isModuleDisabledFor(FEntity entity) {

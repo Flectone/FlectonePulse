@@ -69,7 +69,7 @@ public class BukkitProxy implements Proxy {
     @Nullable
     public String getChannel() {
         if (fileResolver.getConfig().getProxy().isBungeecord()) {
-            return  "BungeeCord";
+            return "BungeeCord";
         }
 
         if (fileResolver.getConfig().getProxy().isVelocity()) {

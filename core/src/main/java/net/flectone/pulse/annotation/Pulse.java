@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Pulse {
+
     Event.Priority priority() default Event.Priority.NORMAL;
+
     boolean ignoreCancelled() default false;
+
 }

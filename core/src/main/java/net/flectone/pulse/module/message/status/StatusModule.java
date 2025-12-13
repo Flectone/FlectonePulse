@@ -51,10 +51,10 @@ public class StatusModule extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(MOTDModule.class);
-        addChildren(IconModule.class);
-        addChildren(PlayersModule.class);
-        addChildren(VersionModule.class);
+        addChild(MOTDModule.class);
+        addChild(IconModule.class);
+        addChild(PlayersModule.class);
+        addChild(VersionModule.class);
     }
 
     @Override

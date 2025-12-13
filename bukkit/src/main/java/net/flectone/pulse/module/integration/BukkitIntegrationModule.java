@@ -35,7 +35,6 @@ import java.util.Set;
 @Singleton
 public class BukkitIntegrationModule extends IntegrationModule {
 
-    private final Injector injector;
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
@@ -47,8 +46,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
                                    ReflectionResolver reflectionResolver,
                                    Injector injector) {
         super(fileResolver, fLogger, platformServerAdapter, reflectionResolver, injector);
-
-        this.injector = injector;
+        
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
         this.fLogger = fLogger;
@@ -59,67 +57,67 @@ public class BukkitIntegrationModule extends IntegrationModule {
         super.configureChildren();
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
-            addChildren(AdvancedBanModule.class);
+            addChild(AdvancedBanModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlaceholderAPI")) {
-            addChildren(PlaceholderAPIModule.class);
+            addChild(PlaceholderAPIModule.class);
         }
 
         if (platformServerAdapter.hasProject("Vault")) {
-            addChildren(VaultModule.class);
+            addChild(VaultModule.class);
         }
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
             if (reflectionResolver.hasClass("com.loohp.interactivechat.registry.Registry")) {
-                addChildren(InteractiveChatModule.class);
+                addChild(InteractiveChatModule.class);
             } else {
                 fLogger.warning("Update InteractiveChat to the latest version");
             }
         }
 
         if (platformServerAdapter.hasProject("ItemsAdder")) {
-            addChildren(ItemsAdderModule.class);
+            addChild(ItemsAdderModule.class);
         }
 
         if (platformServerAdapter.hasProject("LibertyBans")) {
-            addChildren(LibertyBansModule.class);
+            addChild(LibertyBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("LiteBans")) {
-            addChildren(LiteBansModule.class);
+            addChild(LiteBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("Maintenance")) {
-            addChildren(MaintenanceModule.class);
+            addChild(MaintenanceModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniMOTD")) {
-            addChildren(MiniMOTDModule.class);
+            addChild(MiniMOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            addChildren(MiniPlaceholdersModule.class);
+            addChild(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("MOTD")) {
-            addChildren(MOTDModule.class);
+            addChild(MOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             if (reflectionResolver.hasClass("de.myzelyam.api.vanish.VanishAPI")) {
-                addChildren(SuperVanishModule.class);
+                addChild(SuperVanishModule.class);
             } else {
                 fLogger.warning("Integration with SuperVanish is not possible. Are you using another plugin with the same name? It is only supported https://www.spigotmc.org/resources/supervanish-be-invisible.1331/");
             }
         }
 
         if (platformServerAdapter.hasProject("TAB")) {
-            addChildren(TABModule.class);
+            addChild(TABModule.class);
         }
 
         if (platformServerAdapter.hasProject("Triton")) {
-            addChildren(TritonModule.class);
+            addChild(TritonModule.class);
         }
     }
 
@@ -127,8 +125,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public String checkMention(FEntity fSender, String message) {
         if (isModuleDisabledFor(fSender)) return message;
 
-        if (getChildren().contains(InteractiveChatModule.class)) {
-            return injector.getInstance(InteractiveChatModule.class).checkMention(fSender, message);
+        if (containsChild(InteractiveChatModule.class)) {
+            return getInstance(InteractiveChatModule.class).checkMention(fSender, message);
         }
 
         return message;
@@ -138,8 +136,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         boolean value = super.hasFPlayerPermission(fPlayer, permission);
 
-        if (getChildren().contains(VaultModule.class)) {
-            value = value && injector.getInstance(VaultModule.class).hasVaultPermission(fPlayer, permission);
+        if (containsChild(VaultModule.class)) {
+            value = value && getInstance(VaultModule.class).hasVaultPermission(fPlayer, permission);
         }
 
         return value;
@@ -150,8 +148,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
         String prefix = super.getPrefix(fPlayer);
         if (prefix != null) return prefix;
 
-        if (getChildren().contains(VaultModule.class)) {
-            return injector.getInstance(VaultModule.class).getPrefix(fPlayer);
+        if (containsChild(VaultModule.class)) {
+            return getInstance(VaultModule.class).getPrefix(fPlayer);
         }
 
         return null;
@@ -162,8 +160,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
         String suffix = super.getSuffix(fPlayer);
         if (suffix != null) return suffix;
 
-        if (getChildren().contains(VaultModule.class)) {
-            return injector.getInstance(VaultModule.class).getSuffix(fPlayer);
+        if (containsChild(VaultModule.class)) {
+            return getInstance(VaultModule.class).getSuffix(fPlayer);
         }
 
         return null;
@@ -174,8 +172,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
         Set<String> groups = super.getGroups();
         if (!groups.isEmpty()) return groups;
 
-        if (getChildren().contains(VaultModule.class)) {
-            return injector.getInstance(VaultModule.class).getGroups();
+        if (containsChild(VaultModule.class)) {
+            return getInstance(VaultModule.class).getGroups();
         }
 
         return Collections.emptySet();
@@ -183,8 +181,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (getChildren().contains(SuperVanishModule.class)) {
-            return injector.getInstance(SuperVanishModule.class).isVanished(sender);
+        if (containsChild(SuperVanishModule.class)) {
+            return getInstance(SuperVanishModule.class).isVanished(sender);
         }
 
         Player player = Bukkit.getPlayer(sender.getUuid());
@@ -205,16 +203,16 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public boolean isMuted(FPlayer fPlayer) {
-        if (getChildren().contains(LiteBansModule.class)) {
-            return injector.getInstance(LiteBansModule.class).isMuted(fPlayer);
+        if (containsChild(LiteBansModule.class)) {
+            return getInstance(LiteBansModule.class).isMuted(fPlayer);
         }
 
-        if (getChildren().contains(AdvancedBanModule.class)) {
-            return injector.getInstance(AdvancedBanModule.class).isMuted(fPlayer);
+        if (containsChild(AdvancedBanModule.class)) {
+            return getInstance(AdvancedBanModule.class).isMuted(fPlayer);
         }
 
-        if (getChildren().contains(LibertyBansModule.class)) {
-            return injector.getInstance(LibertyBansModule.class).isMuted(fPlayer);
+        if (containsChild(LibertyBansModule.class)) {
+            return getInstance(LibertyBansModule.class).isMuted(fPlayer);
         }
 
         return false;
@@ -222,16 +220,16 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public ExternalModeration getMute(FPlayer fPlayer) {
-        if (getChildren().contains(LiteBansModule.class)) {
-            return injector.getInstance(LiteBansModule.class).getMute(fPlayer);
+        if (containsChild(LiteBansModule.class)) {
+            return getInstance(LiteBansModule.class).getMute(fPlayer);
         }
 
-        if (getChildren().contains(AdvancedBanModule.class)) {
-            return injector.getInstance(AdvancedBanModule.class).getMute(fPlayer);
+        if (containsChild(AdvancedBanModule.class)) {
+            return getInstance(AdvancedBanModule.class).getMute(fPlayer);
         }
 
-        if (getChildren().contains(LibertyBansModule.class)) {
-            return injector.getInstance(LibertyBansModule.class).getMute(fPlayer);
+        if (containsChild(LibertyBansModule.class)) {
+            return getInstance(LibertyBansModule.class).getMute(fPlayer);
         }
 
         return null;
@@ -240,17 +238,17 @@ public class BukkitIntegrationModule extends IntegrationModule {
     @Override
     public String getTritonLocale(FPlayer fPlayer) {
         if (!isEnable()) return null;
-        if (!getChildren().contains(TritonModule.class)) return null;
+        if (!containsChild(TritonModule.class)) return null;
 
-        return injector.getInstance(TritonModule.class).getLocale(fPlayer);
+        return getInstance(TritonModule.class).getLocale(fPlayer);
     }
 
     @Override
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
         if (isModuleDisabledFor(fReceiver)) return false;
 
-        if (getChildren().contains(InteractiveChatModule.class)) {
-            return injector.getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);
+        if (containsChild(InteractiveChatModule.class)) {
+            return getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);
         }
 
         return false;

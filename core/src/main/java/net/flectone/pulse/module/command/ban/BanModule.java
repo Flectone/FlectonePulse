@@ -13,7 +13,6 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -40,7 +39,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ProxySender proxySender;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
 
     @Override
     public void onEnable() {

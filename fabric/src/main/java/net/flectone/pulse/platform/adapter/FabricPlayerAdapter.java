@@ -176,21 +176,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull String getTranslationKey(@NotNull UUID uuid) {
-        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
-        if (minecraftServer == null) return "";
-
-        for (ServerWorld serverWorld : minecraftServer.getWorlds()) {
-            Entity entity = serverWorld.getEntity(uuid);
-            if (entity == null) continue;
-
-            return getEntityTranslationKey(entity);
-        }
-
-        return "";
-    }
-
-    @Override
     public @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
         if (player == null) return GameMode.SURVIVAL;

@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Async {
+
     long delay() default 0;
+
     boolean independent() default false;
+
 }

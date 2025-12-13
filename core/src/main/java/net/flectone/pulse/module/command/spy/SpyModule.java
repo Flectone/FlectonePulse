@@ -117,7 +117,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     public Predicate<FPlayer> createFilter(FPlayer fPlayer) {
         return fReceiver -> !fPlayer.equals(fReceiver)
-                && permissionChecker.check(fReceiver, getPermission())
+                && permissionChecker.check(fReceiver, getModulePermission())
                 && fReceiver.getSetting(SettingText.SPY_STATUS) != null
                 && fReceiver.isOnline();
     }

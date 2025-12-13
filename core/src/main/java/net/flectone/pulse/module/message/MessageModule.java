@@ -38,26 +38,26 @@ public class MessageModule extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(AfkModule.class);
-        addChildren(AnvilModule.class);
-        addChildren(AutoModule.class);
-        addChildren(BookModule.class);
-        addChildren(BossbarModule.class);
-        addChildren(BrandModule.class);
-        addChildren(BubbleModule.class);
-        addChildren(ChatModule.class);
-        addChildren(FormatModule.class);
-        addChildren(GreetingModule.class);
-        addChildren(JoinModule.class);
-        addChildren(ObjectiveModule.class);
-        addChildren(QuitModule.class);
-        addChildren(RightclickModule.class);
-        addChildren(SidebarModule.class);
-        addChildren(SignModule.class);
-        addChildren(StatusModule.class);
-        addChildren(TabModule.class);
-        addChildren(UpdateModule.class);
-        addChildren(VanillaModule.class);
+        addChild(AfkModule.class);
+        addChild(AnvilModule.class);
+        addChild(AutoModule.class);
+        addChild(BookModule.class);
+        addChild(BossbarModule.class);
+        addChild(BrandModule.class);
+        addChild(BubbleModule.class);
+        addChild(ChatModule.class);
+        addChild(FormatModule.class);
+        addChild(GreetingModule.class);
+        addChild(JoinModule.class);
+        addChild(ObjectiveModule.class);
+        addChild(QuitModule.class);
+        addChild(RightclickModule.class);
+        addChild(SidebarModule.class);
+        addChild(SignModule.class);
+        addChild(StatusModule.class);
+        addChild(TabModule.class);
+        addChild(UpdateModule.class);
+        addChild(VanillaModule.class);
     }
 
     @Override

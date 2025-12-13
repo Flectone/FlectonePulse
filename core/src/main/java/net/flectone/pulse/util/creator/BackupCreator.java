@@ -130,7 +130,7 @@ public class BackupCreator {
         } catch (Exception e) {
             return false;
         }
-        }
+    }
 
     private Path resolveBackupPath(String newFileName) {
         return backupPath.resolve(preInitVersion).resolve(newFileName);

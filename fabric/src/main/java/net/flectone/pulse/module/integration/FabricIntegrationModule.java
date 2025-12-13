@@ -43,15 +43,15 @@ public class FabricIntegrationModule extends IntegrationModule {
         super.configureChildren();
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
-            addChildren(VanishModule.class);
+            addChild(VanishModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            addChildren(MiniPlaceholdersModule.class);
+            addChild(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("placeholder-api")) {
-            addChildren(PlaceholderAPIModule.class);
+            addChild(PlaceholderAPIModule.class);
         }
     }
 
@@ -62,7 +62,7 @@ public class FabricIntegrationModule extends IntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (getChildren().contains(VanishModule.class)) {
+        if (containsChild(VanishModule.class)) {
             return injector.getInstance(VanishModule.class).isVanished(sender);
         }
 

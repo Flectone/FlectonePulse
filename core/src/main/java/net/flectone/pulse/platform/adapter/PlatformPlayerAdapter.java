@@ -62,7 +62,6 @@ public interface PlatformPlayerAdapter {
     @Nullable String getIp(@NotNull FPlayer fPlayer);
     @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer);
     @Nullable PlayerHeadObjectContents.ProfileProperty getTexture(@NotNull UUID uuid);
-    @NotNull String getTranslationKey(@NotNull UUID uuid);
     @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer);
 
     // Player list methods

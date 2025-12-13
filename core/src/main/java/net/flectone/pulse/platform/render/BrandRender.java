@@ -14,11 +14,13 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BrandRender {
 
+    private static final String RESET_STYLE = "§r";
+
     private final PacketSender packetSender;
     private final PacketSerializer packetSerializer;
 
     public void render(FPlayer fPlayer, Component component) {
-        String message = LegacyComponentSerializer.legacySection().serialize(component) + "§r";
+        String message = LegacyComponentSerializer.legacySection().serialize(component) + RESET_STYLE;
 
         packetSender.send(fPlayer, new WrapperPlayServerPluginMessage(PacketSerializer.MINECRAFT_BRAND, packetSerializer.serialize(message)));
     }

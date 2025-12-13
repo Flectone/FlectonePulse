@@ -20,9 +20,9 @@ public class Module extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(IntegrationModule.class);
-        addChildren(CommandModule.class);
-        addChildren(MessageModule.class);
+        addChild(IntegrationModule.class);
+        addChild(CommandModule.class);
+        addChild(MessageModule.class);
     }
 
     @Override

@@ -22,8 +22,6 @@ public class AfkListener implements Listener {
     public void asyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
-
-
         afkModule.remove("chat", fPlayer);
     }
 

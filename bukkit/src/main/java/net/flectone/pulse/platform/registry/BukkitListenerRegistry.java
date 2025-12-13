@@ -53,15 +53,15 @@ public class BukkitListenerRegistry extends ListenerRegistry {
     private void registerEvents(Listener abstractListener, EventPriority eventPriority) {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
 
-        for (final Method method : abstractListener.getClass().getMethods()) {
-            final EventHandler eventHandler = method.getAnnotation(EventHandler.class);
+        for (Method method : abstractListener.getClass().getMethods()) {
+            EventHandler eventHandler = method.getAnnotation(EventHandler.class);
             if (eventHandler == null) continue;
 
             if (method.isBridge() || method.isSynthetic()) {
                 continue;
             }
 
-            final Class<? extends Event> eventClass = method.getParameterTypes()[0].asSubclass(Event.class);
+            Class<? extends Event> eventClass = method.getParameterTypes()[0].asSubclass(Event.class);
             method.setAccessible(true);
 
             EventExecutor executor = (listener, event) -> {

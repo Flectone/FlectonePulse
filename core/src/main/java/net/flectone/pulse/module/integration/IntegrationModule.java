@@ -54,20 +54,20 @@ public abstract class IntegrationModule extends AbstractModule {
         super.configureChildren();
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
-            addChildren(SkinsRestorerModule.class);
+            addChild(SkinsRestorerModule.class);
         }
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
-            addChildren(LuckPermsModule.class);
+            addChild(LuckPermsModule.class);
         }
 
         if (platformServerAdapter.hasProject("voicechat")) {
-            addChildren(SimpleVoiceModule.class);
+            addChild(SimpleVoiceModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlasmoVoice")) {
             if (reflectionResolver.hasClass("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent")) {
-                addChildren(PlasmoVoiceModule.class);
+                addChild(PlasmoVoiceModule.class);
             } else {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
@@ -75,17 +75,17 @@ public abstract class IntegrationModule extends AbstractModule {
 
         if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
-                addChildren(GeyserModule.class);
+                addChild(GeyserModule.class);
             } else {
                 fLogger.warning("Geyser hook is failed, check that Geyser is turned on and working");
             }
         }
 
-        addChildren(DeeplModule.class);
-        addChildren(DiscordModule.class);
-        addChildren(TelegramModule.class);
-        addChildren(TwitchModule.class);
-        addChildren(YandexModule.class);
+        addChild(DeeplModule.class);
+        addChild(DiscordModule.class);
+        addChild(TelegramModule.class);
+        addChild(TwitchModule.class);
+        addChild(YandexModule.class);
     }
 
     @Override
@@ -112,10 +112,14 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 
+    public <T> T getInstance(Class<T> clazz) {
+        return injector.getInstance(clazz);
+    }
+
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (!isEnable()) return false;
 
-        if (getChildren().contains(GeyserModule.class)) {
+        if (containsChild(GeyserModule.class)) {
             return injector.getInstance(GeyserModule.class).isBedrockPlayer(fPlayer);
         }
 
@@ -125,7 +129,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         if (!isEnable()) return false;
 
-        if (getChildren().contains(LuckPermsModule.class)) {
+        if (containsChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
         }
 
@@ -134,7 +138,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public String getTextureUrl(FEntity sender) {
         if (!isEnable()) return null;
-        if (!getChildren().contains(SkinsRestorerModule.class)) return null;
+        if (!containsChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
@@ -142,7 +146,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
         if (!isEnable()) return null;
-        if (!getChildren().contains(SkinsRestorerModule.class)) return null;
+        if (!containsChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getProfileProperty(fPlayer);
@@ -151,7 +155,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public String getPrefix(FPlayer fPlayer) {
         if (!isEnable()) return null;
 
-        if (getChildren().contains(LuckPermsModule.class)) {
+        if (containsChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
         }
 
@@ -161,7 +165,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public String getSuffix(FPlayer fPlayer) {
         if (!isEnable()) return null;
 
-        if (getChildren().contains(LuckPermsModule.class)) {
+        if (containsChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
         }
 
@@ -171,7 +175,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public Set<String> getGroups() {
         if (!isEnable()) return Collections.emptySet();
 
-        if (getChildren().contains(LuckPermsModule.class)) {
+        if (containsChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getGroups();
         }
 
@@ -180,21 +184,21 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public int getGroupWeight(FPlayer fPlayer) {
         if (!isEnable()) return 0;
-        if (!getChildren().contains(LuckPermsModule.class)) return 0;
+        if (!containsChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
-        if (getChildren().contains(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsChild(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (getChildren().contains(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsChild(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (getChildren().contains(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsChild(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
         }
     }
@@ -214,7 +218,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (isModuleDisabledFor(sender)) return text;
-        if (getChildren().contains(DeeplModule.class)) {
+        if (containsChild(DeeplModule.class)) {
             return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
         }
 
@@ -223,7 +227,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public String yandexTranslate(FPlayer sender, String source, String target, String text) {
         if (isModuleDisabledFor(sender)) return text;
-        if (getChildren().contains(YandexModule.class)) {
+        if (containsChild(YandexModule.class)) {
             return injector.getInstance(YandexModule.class).translate(sender, source, target, text);
         }
 

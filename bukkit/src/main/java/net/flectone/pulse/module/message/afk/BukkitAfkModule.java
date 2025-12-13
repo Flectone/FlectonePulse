@@ -27,7 +27,6 @@ public class BukkitAfkModule extends AfkModule {
         this.listenerRegistry = listenerRegistry;
     }
 
-
     @Override
     public void onEnable() {
         super.onEnable();

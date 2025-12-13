@@ -9,7 +9,7 @@ public abstract class ModuleEvent extends Event {
 
     private final AbstractModule module;
 
-    public ModuleEvent(AbstractModule module) {
+    protected ModuleEvent(AbstractModule module) {
         this.module = module;
     }
 

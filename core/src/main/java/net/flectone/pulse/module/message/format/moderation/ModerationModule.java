@@ -23,11 +23,11 @@ public class ModerationModule extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(CapsModule.class);
-        addChildren(DeleteModule.class);
-        addChildren(NewbieModule.class);
-        addChildren(FloodModule.class);
-        addChildren(SwearModule.class);
+        addChild(CapsModule.class);
+        addChild(DeleteModule.class);
+        addChild(NewbieModule.class);
+        addChild(FloodModule.class);
+        addChild(SwearModule.class);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.flectone.pulse.model.inventory;
 
 public enum ClickType {
+
     PICKUP,
     PLACE,
     SHIFT_CLICK,
@@ -9,4 +10,5 @@ public enum ClickType {
     DRAG_END,
     PICKUP_ALL,
     UNDEFINED
+
 }

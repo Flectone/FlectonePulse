@@ -21,9 +21,9 @@ public class TabModule extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(FooterModule.class);
-        addChildren(HeaderModule.class);
-        addChildren(PlayerlistnameModule.class);
+        addChild(FooterModule.class);
+        addChild(HeaderModule.class);
+        addChild(PlayerlistnameModule.class);
     }
 
     @Override

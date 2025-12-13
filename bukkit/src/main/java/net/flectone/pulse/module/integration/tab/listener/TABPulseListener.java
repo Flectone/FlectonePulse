@@ -29,15 +29,10 @@ public class TABPulseListener implements PulseListener {
         AbstractModule eventModule = event.getModule();
         Integration.TAB config = tabModule.config();
 
-        boolean shouldCancel = (eventModule instanceof HeaderModule && config.isDisableFlectonepulseHeader())
+        if ((eventModule instanceof HeaderModule && config.isDisableFlectonepulseHeader())
                 || (eventModule instanceof FooterModule && config.isDisableFlectonepulseFooter())
                 || (eventModule instanceof PlayerlistnameModule && config.isDisableFlectonepulsePlayerlistname())
-                || ((eventModule instanceof ScoreboardModule
-                        || eventModule instanceof BelownameModule
-                        || eventModule instanceof TabnameModule)
-                    && config.isDisableFlectonepulseScoreboard());
-
-        if (shouldCancel) {
+                || ((eventModule instanceof ScoreboardModule || eventModule instanceof BelownameModule || eventModule instanceof TabnameModule) && config.isDisableFlectonepulseScoreboard())) {
             event.setCancelled(true);
         }
     }

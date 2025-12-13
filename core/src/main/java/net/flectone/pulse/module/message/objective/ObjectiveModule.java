@@ -28,8 +28,8 @@ public class ObjectiveModule extends AbstractModule {
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(BelownameModule.class);
-        addChildren(TabnameModule.class);
+        addChild(BelownameModule.class);
+        addChild(TabnameModule.class);
     }
 
     @Override

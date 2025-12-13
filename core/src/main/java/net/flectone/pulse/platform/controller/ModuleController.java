@@ -10,6 +10,16 @@ import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.Module;
+import net.flectone.pulse.module.command.ban.BanModule;
+import net.flectone.pulse.module.command.banlist.BanlistModule;
+import net.flectone.pulse.module.command.kick.KickModule;
+import net.flectone.pulse.module.command.mute.MuteModule;
+import net.flectone.pulse.module.command.mutelist.MutelistModule;
+import net.flectone.pulse.module.command.unban.UnbanModule;
+import net.flectone.pulse.module.command.unmute.UnmuteModule;
+import net.flectone.pulse.module.command.unwarn.UnwarnModule;
+import net.flectone.pulse.module.command.warn.WarnModule;
+import net.flectone.pulse.module.command.warnlist.WarnlistModule;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
@@ -17,11 +27,17 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModuleController {
+
+    public static final Set<Class<? extends AbstractModule>> BAN_MODULES = Set.of(BanModule.class, BanlistModule.class, UnbanModule.class);
+    public static final Set<Class<? extends AbstractModule>> MUTE_MODULES = Set.of(MuteModule.class, MutelistModule.class, UnmuteModule.class);
+    public static final Set<Class<? extends AbstractModule>> WARN_MODULES = Set.of(WarnModule.class, WarnlistModule.class, UnwarnModule.class);
+    public static final Set<Class<? extends AbstractModule>> KICK_MODULES = Set.of(KickModule.class);
 
     private final Injector injector;
     private final EventDispatcher eventDispatcher;
@@ -116,13 +132,17 @@ public class ModuleController {
         module.getPredicates().clear();
 
         module.addPredicate(fPlayer -> !module.isEnable());
-        module.addPredicate(fPlayer -> !permissionChecker.check(fPlayer, module.getPermission()));
+        module.addPredicate(fPlayer -> !permissionChecker.check(fPlayer, module.getModulePermission()));
 
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
             module.addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()));
             module.addPredicate((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.getModuleCooldown()));
             module.addPredicate((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
         }
+    }
+
+    public boolean isInstanceOfAny(AbstractModule module, Set<Class<? extends AbstractModule>> classes) {
+        return classes.stream().anyMatch(clazz -> clazz.isInstance(module));
     }
 
 }

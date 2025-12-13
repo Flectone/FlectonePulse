@@ -53,17 +53,17 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public void configureChildren() {
         super.configureChildren();
 
-        addChildren(FColorModule.class);
-        addChildren(FixationModule.class);
-        addChildren(MentionModule.class);
-        addChildren(ModerationModule.class);
-        addChildren(NamesModule.class);
-        addChildren(ObjectModule.class);
-        addChildren(QuestionAnswerModule.class);
-        addChildren(ReplacementModule.class);
-        addChildren(ScoreboardModule.class);
-        addChildren(TranslateModule.class);
-        addChildren(WorldModule.class);
+        addChild(FColorModule.class);
+        addChild(FixationModule.class);
+        addChild(MentionModule.class);
+        addChild(ModerationModule.class);
+        addChild(NamesModule.class);
+        addChild(ObjectModule.class);
+        addChild(QuestionAnswerModule.class);
+        addChild(ReplacementModule.class);
+        addChild(ScoreboardModule.class);
+        addChild(TranslateModule.class);
+        addChild(WorldModule.class);
     }
 
     @Override
