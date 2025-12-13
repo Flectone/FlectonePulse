@@ -26,6 +26,7 @@ import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -34,6 +35,7 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -58,6 +60,7 @@ public class BubbleRenderer {
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final EntityUtil entityUtil;
+    private final TextScreenRender textScreenRender;
 
     public void renderBubble(Bubble bubble) {
         FPlayer sender = bubble.getSender();
@@ -129,7 +132,7 @@ public class BubbleRenderer {
         });
     }
 
-    private void rideEntities(FPlayer sender, FPlayer viewer) {
+    public void rideEntities(FPlayer sender, FPlayer viewer) {
         Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.get(sender.getUuid().toString() + viewer.getUuid());
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
@@ -139,7 +142,8 @@ public class BubbleRenderer {
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;
 
-        int lastID = platformPlayerAdapter.getEntityId(sender.getUuid());
+        int playerId = platformPlayerAdapter.getEntityId(sender.getUuid());
+        int lastID = playerId;
 
         for (BubbleEntity bubbleEntity : bubbleEntities) {
             boolean isFirstBubble = bubbleEntities.getFirst().equals(bubbleEntity);
@@ -159,7 +163,14 @@ public class BubbleRenderer {
 
             spawnEntity(bubbleEntity, isFirstBubble);
 
-            lastID = rideEntity(bubbleEntity, lastID, new int[]{bubbleEntity.getId()});
+            int[] passengers = new int[]{bubbleEntity.getId()};
+
+            List<Integer> textScreenPassengers = textScreenRender.getPassengers(viewer);
+            if (!textScreenPassengers.isEmpty() && playerId == lastID) {
+                passengers = ArrayUtils.add(textScreenPassengers.stream().mapToInt(Integer::intValue).toArray(), bubbleEntity.getId());
+            }
+
+            lastID = rideEntity(bubbleEntity, lastID, passengers);
 
             if (!bubbleEntity.isVisible() && hasSeenVisible) {
                 hasSpawnedSpace = true;

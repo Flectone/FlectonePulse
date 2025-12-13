@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
@@ -247,6 +248,9 @@ public class FlectonePulseAPI  {
 
         // reload modules and their children
         instance.get(ModuleController.class).reload();
+
+        // clear text screens
+        instance.get(TextScreenRender.class).clear();
 
         // process player load event for all platform fplayers
         EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);

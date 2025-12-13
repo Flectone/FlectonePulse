@@ -9,6 +9,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.kyori.adventure.text.Component;
 
@@ -18,6 +19,7 @@ public class MessagePulseListener implements PulseListener {
 
     private final MessageSender messageSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final TextScreenRender textScreenRender;
 
     @Pulse(priority = Event.Priority.HIGHEST)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
@@ -41,6 +43,7 @@ public class MessagePulseListener implements PulseListener {
             case TAB_FOOTER -> messageSender.sendPlayerListHeaderAndFooter(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
             case TOAST -> messageSender.sendToast(fReceiver, message, destination.getToast());
             case BRAND -> messageSender.sendBrand(fReceiver, message);
+            case TEXT_SCREEN -> textScreenRender.render(fReceiver, message, destination.getTextScreen());
             default -> messageSender.sendMessage(fReceiver, message, false);
         }
     }
