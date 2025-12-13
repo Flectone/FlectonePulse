@@ -3,12 +3,10 @@ package net.flectone.pulse.platform.sender;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.processing.serializer.PacketSerializer;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -21,15 +19,13 @@ public class BukkitMessageSender extends MessageSender {
     private final PaperItemStackUtil paperItemStackUtil;
 
     @Inject
-    public BukkitMessageSender(PacketSerializer packetSerializer,
-                               TaskScheduler taskScheduler,
-                               PacketSender packetSender,
+    public BukkitMessageSender(PacketSender packetSender,
                                PacketProvider packetProvider,
                                IntegrationModule integrationModule,
                                FileResolver fileResolver,
                                PaperItemStackUtil paperItemStackUtil,
                                FLogger fLogger) {
-        super(packetSerializer, taskScheduler, packetSender, packetProvider, integrationModule, fLogger);
+        super(packetSender, packetProvider, integrationModule, fLogger);
 
         this.fileResolver = fileResolver;
         this.paperItemStackUtil = paperItemStackUtil;

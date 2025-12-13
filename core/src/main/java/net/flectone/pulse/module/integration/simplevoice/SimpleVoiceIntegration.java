@@ -13,7 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.platform.sender.MessageSender;
+import net.flectone.pulse.platform.render.BrandRender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
@@ -25,7 +25,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
-    private final MessageSender messageSender;
+    private final BrandRender brandRender;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
@@ -92,6 +92,6 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         event.cancel();
 
         String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        messageSender.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        brandRender.render(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 }
