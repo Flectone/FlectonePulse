@@ -3,12 +3,21 @@ package net.flectone.pulse.model.util;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Getter
 public class Destination {
+
+    public static final Type DEFAULT_TYPE = Type.CHAT;
+    public static final String DEFAULT_SUBTEXT = "";
+    public static final BossBar DEFAULT_BOSS_BAR = new BossBar(100, 1f, net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS, net.kyori.adventure.bossbar.BossBar.Color.BLUE);
+    public static final Times DEFAULT_TIMES = new Times(20, 60, 20);
+    public static final Toast DEFAULT_TOAST = new Toast("minecraft:diamond", Toast.Type.TASK);
+    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", false, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
 
     private final Type type;
     private final String subtext;
@@ -18,14 +27,12 @@ public class Destination {
     private final TextScreen textScreen;
 
     public Destination(Type type, String subtext, BossBar bossBar, Times times, Toast toast, TextScreen textScreen) {
-        this.type = type != null ? type : Type.CHAT;
-        this.subtext = subtext != null ? subtext : "";
-        this.bossBar = bossBar != null ? bossBar : new BossBar(100, 1f,
-                net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS,
-                net.kyori.adventure.bossbar.BossBar.Color.BLUE);
-        this.times = times != null ? times : new Times(20, 60, 20);
-        this.toast = toast != null ? toast : new Toast("minecraft:diamond", Toast.Type.TASK);
-        this.textScreen = textScreen != null ? textScreen : new TextScreen("#00000040", false, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
+        this.type = type == null ? DEFAULT_TYPE : type;
+        this.subtext = subtext;
+        this.bossBar = bossBar;
+        this.times = times;
+        this.toast = toast;
+        this.textScreen = textScreen;
     }
 
     public Destination() {
@@ -63,12 +70,10 @@ public class Destination {
 
         switch (this.type) {
             case TOAST -> {
-                Toast toast = this.toast;
                 map.put("icon", toast.icon());
                 map.put("style", toast.style());
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
-                Times times = this.times;
                 Map<String, Object> timesMap = new LinkedHashMap<>();
                 timesMap.put("stay", times.stayTicks());
 
@@ -82,7 +87,6 @@ public class Destination {
                 map.put("times", timesMap);
             }
             case BOSS_BAR -> {
-                BossBar bossBar = this.bossBar;
                 map.put("duration", bossBar.getDuration());
                 map.put("health", bossBar.getHealth());
                 map.put("overlay", bossBar.getOverlay());
@@ -92,7 +96,6 @@ public class Destination {
                 map.put("darken_screen", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
             }
             case TEXT_SCREEN -> {
-                TextScreen textScreen = this.textScreen;
                 map.put("background", textScreen.background());
                 map.put("has_shadow", textScreen.hasShadow());
                 map.put("animation_time", textScreen.animationTime());
@@ -114,110 +117,77 @@ public class Destination {
 
         return switch (type) {
             case TOAST -> {
-                Object icon = map.get("icon");
-                String stringIcon = icon == null ? "minecraft:diamond" : String.valueOf(icon);
-
-                Object style = map.get("style");
-                Toast.Type toastStyle = style == null ? Toast.Type.TASK : Toast.Type.valueOf(String.valueOf(style));
-
-                yield new Destination(Type.TOAST, new Toast(stringIcon, toastStyle));
+                String icon = parseOrDefault(map.get("icon"), DEFAULT_TOAST.icon(), string -> string);
+                Toast.Type style = parseOrDefault(map.get("style"), DEFAULT_TOAST.style(), Toast.Type::valueOf);
+                yield new Destination(Type.TOAST, new Toast(icon, style));
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
-                Object times = map.get("times");
+                Object mapTimes = map.get("times");
 
-                if (times == null) {
+                if (mapTimes == null) {
                     yield new Destination(type);
                 }
 
-                Map<String, Object> timesMap = (Map<String, Object>) times;
+                Map<String, Object> timesMap = (Map<String, Object>) mapTimes;
 
-                Object fadeIn = timesMap.get("fade_in");
-                int fadeInTicks = fadeIn == null ? 20 : Integer.parseInt(String.valueOf(fadeIn));
+                int fadeIn = parseOrDefault(timesMap.get("fade_in"), DEFAULT_TIMES.fadeInTicks(), Integer::parseInt);
+                int stay = parseOrDefault(timesMap.get("stay"), DEFAULT_TIMES.stayTicks(), Integer::parseInt);
+                int fadeOut = parseOrDefault(timesMap.get("fade_out"), DEFAULT_TIMES.fadeInTicks(), Integer::parseInt);
 
-                Object stay = timesMap.get("stay");
-                int stayTicks = stay == null ? 60 : Integer.parseInt(String.valueOf(stay));
+                Times times = new Times(fadeIn, stay, fadeOut);
+                if (type == Type.ACTION_BAR) {
+                    yield new Destination(type, times);
+                }
 
-                Object fadeOut = timesMap.get("fade_out");
-                int fadeOutTicks = fadeOut == null ? 20 : Integer.parseInt(String.valueOf(fadeOut));
-
-                Times titleTimes = new Times(fadeInTicks, stayTicks, fadeOutTicks);
-
-                if (type == Type.ACTION_BAR) yield new Destination(type, titleTimes);
-
-                Object subtext = map.get("subtext");
-                String stringSubtext = subtext == null ? "" : String.valueOf(subtext);
-
-                yield new Destination(type, titleTimes, stringSubtext);
+                String subtext = parseOrDefault(map.get("subtext"), DEFAULT_SUBTEXT, string -> string);
+                yield new Destination(type, times, subtext);
             }
             case BOSS_BAR -> {
-                Object duration = map.get("duration");
-                long longDuration = duration == null ? 100 : Long.parseLong(String.valueOf(duration));
+                long duration = parseOrDefault(map.get("duration"), DEFAULT_BOSS_BAR.getDuration(), Long::parseLong);
+                float health = parseOrDefault(map.get("health"), DEFAULT_BOSS_BAR.getHealth(), Float::parseFloat);
+                net.kyori.adventure.bossbar.BossBar.Overlay overlay = parseOrDefault(map.get("overlay"), DEFAULT_BOSS_BAR.getOverlay(), net.kyori.adventure.bossbar.BossBar.Overlay::valueOf);
+                net.kyori.adventure.bossbar.BossBar.Color color = parseOrDefault(map.get("color"), DEFAULT_BOSS_BAR.getColor(), net.kyori.adventure.bossbar.BossBar.Color::valueOf);
 
-                Object health = map.get("health");
-                float floatHealth = health == null ? 1f : Float.parseFloat(String.valueOf(health));
+                net.flectone.pulse.model.util.BossBar bossBar = new net.flectone.pulse.model.util.BossBar(duration, health, overlay, color);
 
-                Object overlay = map.get("overlay");
-                net.kyori.adventure.bossbar.BossBar.Overlay bossBarOverlay = overlay == null
-                        ? net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS
-                        : net.kyori.adventure.bossbar.BossBar.Overlay.valueOf(String.valueOf(overlay));
-
-                Object color = map.get("color");
-                net.kyori.adventure.bossbar.BossBar.Color bossBarColor = color == null
-                        ? net.kyori.adventure.bossbar.BossBar.Color.BLUE
-                        : net.kyori.adventure.bossbar.BossBar.Color.valueOf(String.valueOf(color));
-
-                net.flectone.pulse.model.util.BossBar bossBar = new net.flectone.pulse.model.util.BossBar(longDuration, floatHealth, bossBarOverlay, bossBarColor);
-
-                Object playBossMusic = map.get("play_boss_music");
-                if (playBossMusic != null && Boolean.parseBoolean(String.valueOf(playBossMusic))) {
+                boolean playBossMusic = parseOrDefault(map.get("play_boss_music"), false, Boolean::parseBoolean);
+                if (playBossMusic) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC);
                 }
 
-                Object createWorldFog = map.get("create_world_fog");
-                if (createWorldFog != null && Boolean.parseBoolean(String.valueOf(createWorldFog))) {
+                boolean createWorldFog = parseOrDefault(map.get("create_world_fog"), false, Boolean::parseBoolean);
+                if (createWorldFog) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG);
                 }
 
-                Object darkenScreen = map.get("darken_screen");
-                if (darkenScreen != null && Boolean.parseBoolean(String.valueOf(darkenScreen))) {
+                boolean darkenScreen = parseOrDefault(map.get("darken_screen"), false, Boolean::parseBoolean);
+                if (darkenScreen) {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
                 }
 
                 yield new Destination(type, bossBar);
             }
             case TEXT_SCREEN -> {
-                Object background = map.get("background");
-                String stringBackground = background == null ? "#00000040" : String.valueOf(background);
+                String background = parseOrDefault(map.get("background"), DEFAULT_TEXT_SCREEN.background(), string -> string);
+                boolean hasShadow = parseOrDefault(map.get("has_shadow"), DEFAULT_TEXT_SCREEN.hasShadow(), Boolean::parseBoolean);
+                int animationTime = parseOrDefault(map.get("animation_time"), DEFAULT_TEXT_SCREEN.animationTime(), Integer::parseInt);
+                int liveTime = parseOrDefault(map.get("live_time"), DEFAULT_TEXT_SCREEN.liveTime(), Integer::parseInt);
+                int width = parseOrDefault(map.get("width"), DEFAULT_TEXT_SCREEN.width(), Integer::parseInt);
+                float scale = parseOrDefault(map.get("scale"), DEFAULT_TEXT_SCREEN.scale(), Float::parseFloat);
+                float offsetX = parseOrDefault(map.get("offset_x"), DEFAULT_TEXT_SCREEN.offsetX(), Float::parseFloat);
+                float offsetY = parseOrDefault(map.get("offset_y"), DEFAULT_TEXT_SCREEN.offsetY(), Float::parseFloat);
+                float offsetZ = parseOrDefault(map.get("offset_z"), DEFAULT_TEXT_SCREEN.offsetZ(), Float::parseFloat);
 
-                Object hasShadow = map.get("has_shadow");
-                boolean booleanHasShadow = hasShadow != null && Boolean.parseBoolean(String.valueOf(hasShadow));
-
-                Object animationTime = map.get("animation_time");
-                int integerAnimationTime = animationTime == null ? 2 : Integer.parseInt(String.valueOf(animationTime));
-
-                Object liveTime = map.get("live_time");
-                int integerLiveTime = liveTime == null ? 10 : Integer.parseInt(String.valueOf(liveTime));
-
-                Object width = map.get("width");
-                int integerWidth = width == null ? 100000 : Integer.parseInt(String.valueOf(width));
-
-                Object scale = map.get("scale");
-                float floatScale = scale == null ? 0.5f : Float.parseFloat(String.valueOf(scale));
-
-                Object offsetX = map.get("offset_x");
-                float floatOffsetX = offsetX == null ? 0 : Float.parseFloat(String.valueOf(offsetX));
-
-                Object offsetY = map.get("offset_y");
-                float floatOffsetY = offsetY == null ? -0.3f : Float.parseFloat(String.valueOf(offsetY));
-
-                Object offsetZ = map.get("offset_z");
-                float floatOffsetZ = offsetZ == null ? -0.8f : Float.parseFloat(String.valueOf(offsetZ));
-
-                TextScreen textScreen = new TextScreen(stringBackground, booleanHasShadow, integerAnimationTime, integerLiveTime, integerWidth, floatScale, floatOffsetX, floatOffsetY, floatOffsetZ);
+                TextScreen textScreen = new TextScreen(background, hasShadow, animationTime, liveTime, width, scale, offsetX, offsetY, offsetZ);
                 yield new Destination(type, textScreen);
             }
             default -> new Destination(type);
         };
+    }
+
+    @NotNull
+    private static <T> T parseOrDefault(Object object, T defaultObject, Function<String, T> functionParse) {
+        return object == null ? defaultObject : functionParse.apply(String.valueOf(object));
     }
 
     public enum Type {
