@@ -28,11 +28,11 @@ public class Destination {
 
     public Destination(Type type, String subtext, BossBar bossBar, Times times, Toast toast, TextScreen textScreen) {
         this.type = type == null ? DEFAULT_TYPE : type;
-        this.subtext = subtext;
-        this.bossBar = bossBar;
-        this.times = times;
-        this.toast = toast;
-        this.textScreen = textScreen;
+        this.subtext = subtext == null && (type == Type.TITLE || type == Type.SUBTITLE) ? DEFAULT_SUBTEXT : subtext;
+        this.bossBar = bossBar == null && type == Type.BOSS_BAR ? DEFAULT_BOSS_BAR : bossBar;
+        this.times = times == null && (type == Type.TITLE || type == Type.SUBTITLE || type == Type.ACTION_BAR) ? DEFAULT_TIMES : times;
+        this.toast = toast == null && type == Type.TOAST ? DEFAULT_TOAST : toast;
+        this.textScreen = textScreen == null && type == Type.TEXT_SCREEN ? DEFAULT_TEXT_SCREEN : textScreen;
     }
 
     public Destination() {
@@ -70,10 +70,12 @@ public class Destination {
 
         switch (this.type) {
             case TOAST -> {
+                Toast toast = this.toast == null ? DEFAULT_TOAST : this.toast;
                 map.put("icon", toast.icon());
                 map.put("style", toast.style());
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
+                Times times = this.times == null ? DEFAULT_TIMES : this.times;
                 Map<String, Object> timesMap = new LinkedHashMap<>();
                 timesMap.put("stay", times.stayTicks());
 
@@ -87,6 +89,7 @@ public class Destination {
                 map.put("times", timesMap);
             }
             case BOSS_BAR -> {
+                BossBar bossBar = this.bossBar == null ? DEFAULT_BOSS_BAR : this.bossBar;
                 map.put("duration", bossBar.getDuration());
                 map.put("health", bossBar.getHealth());
                 map.put("overlay", bossBar.getOverlay());
@@ -96,6 +99,7 @@ public class Destination {
                 map.put("darken_screen", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
             }
             case TEXT_SCREEN -> {
+                TextScreen textScreen = this.textScreen == null ? DEFAULT_TEXT_SCREEN : this.textScreen;
                 map.put("background", textScreen.background());
                 map.put("has_shadow", textScreen.hasShadow());
                 map.put("animation_time", textScreen.animationTime());
