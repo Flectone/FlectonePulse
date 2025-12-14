@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
 	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
-    mappings(loom.officialMojangMappings())
+	mappings("net.fabricmc:yarn:${yarn_mappings_version}:v2")
 
 	modCompileOnly("net.fabricmc:fabric-loader:${fabric_loader_version}")
 	Set<String> fabricApiModules = [

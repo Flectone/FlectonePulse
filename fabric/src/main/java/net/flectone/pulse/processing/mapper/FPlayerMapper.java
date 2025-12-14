@@ -6,38 +6,36 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.incendo.cloud.SenderMapper;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FPlayerMapper implements SenderMapper<CommandSourceStack, FPlayer> {
+public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer> {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
 
     @Override
-    public @NotNull FPlayer map(@NotNull CommandSourceStack sender) {
-        ServerPlayer player = sender.getPlayer();
+    public @NotNull FPlayer map(@NotNull ServerCommandSource sender) {
+        ServerPlayerEntity player = sender.getPlayer();
         if (player != null) {
-            return fPlayerService.getFPlayer(player.getUUID());
+            return fPlayerService.getFPlayer(player.getUuid());
         }
 
         return fPlayerService.getFPlayer(sender);
     }
 
     @Override
-    public @NotNull CommandSourceStack reverse(@NotNull FPlayer mapped) {
+    public @NotNull ServerCommandSource reverse(@NotNull FPlayer mapped) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
 
         Object obj = fPlayerService.toPlatformFPlayer(mapped);
-        if (obj instanceof ServerPlayer player) {
-            return player.createCommandSourceStack();
-        }
-
-        return minecraftServer.createCommandSourceStack();
+        return obj instanceof ServerPlayerEntity player
+                ? player.getCommandSource()
+                : minecraftServer.getCommandSource();
     }
 }

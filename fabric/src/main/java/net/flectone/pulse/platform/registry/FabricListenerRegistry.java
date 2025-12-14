@@ -11,13 +11,13 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.listener.FabricBaseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.logging.FLogger;
-import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.command.ServerCommandSource;
 
 @Singleton
 public class FabricListenerRegistry extends ListenerRegistry {
@@ -63,7 +63,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
         ServerPlayConnectionEvents.DISCONNECT.register(fabricBaseListener::asyncProcessQuitEvent);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            CommandNode<CommandSourceStack> root = dispatcher.getRoot();
+            CommandNode<ServerCommandSource> root = dispatcher.getRoot();
 
             for (String command : config.getCommand().getDisabledFabric()) {
                 root.getChildren().removeIf(node -> node.getName().equals(command));

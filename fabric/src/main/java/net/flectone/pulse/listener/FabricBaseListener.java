@@ -11,8 +11,8 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,18 +22,18 @@ public class FabricBaseListener {
     private final EventDispatcher eventDispatcher;
 
     @Async(delay = 1)
-    public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
-        ServerPlayer player = handler.getPlayer();
-        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
+    public void asyncProcessJoinEvent(ServerPlayNetworkHandler handler, PacketSender packetSender, MinecraftServer minecraftServer) {
+        ServerPlayerEntity player = handler.getPlayer();
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
 
         eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
         eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
     }
 
     @Async
-    public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
-        ServerPlayer player = handler.getPlayer();
-        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
+    public void asyncProcessQuitEvent(ServerPlayNetworkHandler handler, MinecraftServer minecraftServer) {
+        ServerPlayerEntity player = handler.getPlayer();
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
 
         eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
         eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));

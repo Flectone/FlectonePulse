@@ -28,9 +28,9 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -57,55 +57,56 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     @Override
     public void unhook() {
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"));
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
+
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
 
         Arrays.stream(MessageType.values()).forEach(setting ->
-                Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":" + setting.name().toLowerCase()))
+                Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
         );
 
         Arrays.stream(SettingText.values()).forEach(setting ->
-                Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":" + setting.name().toLowerCase()))
+                Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
         );
 
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"));
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"));
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"));
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"));
-        Placeholders.remove(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"));
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "tps"));
         fLogger.info("✖ Text Placeholder API unhooked");
     }
 
     @Async(delay = 20)
     public void register() {
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"), (context, argument) -> {
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
             return PlaceholderResult.value(muteModule.getMuteSuffix(fPlayer, fPlayer));
         });
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor"), (context, argument) ->
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)
         );
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_out"), (context, argument) ->
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_out"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.OUT)
         );
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_see"), (context, argument) ->
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_see"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
         Arrays.stream(MessageType.values()).forEach(messageType ->
-                Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":" + messageType.name().toLowerCase()), (context, argument) -> {
-                    FPlayer fPlayer = fPlayerMapper.map(context.source());
+            Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
+                FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-                    return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
-                })
+                return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
+            })
         );
 
         Arrays.stream(SettingText.values()).forEach(settingText ->
-                Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":" + settingText.name().toLowerCase()), (context, argument) -> {
+                Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, settingText.name().toLowerCase()), (context, argument) -> {
                     FPlayer fPlayer = fPlayerMapper.map(context.source());
 
                     String value = fPlayer.getSetting(settingText);
@@ -115,26 +116,26 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 })
         );
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, argument) -> {
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
             return PlaceholderResult.value(fPlayer.getName());
         });
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"), (context, argument) -> {
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
             return PlaceholderResult.value(fPlayer.getIp());
         });
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"), (context, argument) -> {
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
             return PlaceholderResult.value(String.valueOf(fPlayerService.getPing(fPlayer)));
         });
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) ->
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"), (context, argument) ->
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.register(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, argument) ->
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "tps"), (context, argument) ->
                 PlaceholderResult.value(platformServerAdapter.getTPS())
         );
 
@@ -152,11 +153,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         Object player = fPlayerService.toPlatformFPlayer(fPlayer);
-        if (!(player instanceof ServerPlayer playerEntity)) return;
+        if (!(player instanceof ServerPlayerEntity playerEntity)) return;
 
         String message = messageContext.getMessage();
 
-        Component text = Placeholders.parseText(Component.literal(message), PlaceholderContext.of(playerEntity.createCommandSourceStack()));
+        Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
         messageContext.setMessage(text.getString());
     }
 
