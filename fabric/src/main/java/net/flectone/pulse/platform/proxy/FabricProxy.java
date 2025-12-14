@@ -11,12 +11,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
@@ -27,8 +27,8 @@ public class FabricProxy implements Proxy {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageHandler proxyMessageHandler;
 
-    private CustomPayload.Id<ProxyPayload> channel;
-    private PacketCodec<RegistryByteBuf, ProxyPayload> packetCodec;
+    private CustomPacketPayload.Type<ProxyPayload> channel;
+    private StreamCodec<FriendlyByteBuf, ProxyPayload> streamCodec;
 
     @Override
     public boolean isEnable() {
@@ -40,11 +40,11 @@ public class FabricProxy implements Proxy {
         String channelName = getChannel();
         if (channelName == null) return;
 
-        channel = new CustomPayload.Id<>(Identifier.of(channelName));
+        channel = new CustomPacketPayload.Type<>(Identifier.parse(channelName));
 
-        if (packetCodec == null) {
-            packetCodec = PacketCodec.of(
-                    (value, buf) -> buf.writeBytes(value.data),
+        if (streamCodec == null) {
+            streamCodec = StreamCodec.of(
+                    (buf, payload) -> buf.writeBytes(payload.data()),
                     buf -> {
                         byte[] data = new byte[buf.readableBytes()];
                         buf.readBytes(data);
@@ -52,8 +52,8 @@ public class FabricProxy implements Proxy {
                     }
             );
 
-            PayloadTypeRegistry.playC2S().register(channel, packetCodec);
-            PayloadTypeRegistry.playS2C().register(channel, packetCodec);
+            PayloadTypeRegistry.playC2S().register(channel, streamCodec);
+            PayloadTypeRegistry.playS2C().register(channel, streamCodec);
         }
 
         ServerPlayNetworking.registerGlobalReceiver(channel, (payload, context) ->
@@ -77,9 +77,9 @@ public class FabricProxy implements Proxy {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        ServerPlayerEntity player = minecraftServer.getPlayerManager().getPlayer(sender.getUuid());
+        ServerPlayer player = minecraftServer.getPlayerList().getPlayer(sender.getUuid());
         if (player == null) {
-            player = Iterables.getFirst(minecraftServer.getPlayerManager().getPlayerList(), null);
+            player = Iterables.getFirst(minecraftServer.getPlayerList().getPlayers(), null);
         }
 
         if (player == null) return false;
@@ -101,11 +101,11 @@ public class FabricProxy implements Proxy {
         return null;
     }
 
-    public record ProxyPayload(Id<? extends CustomPayload> id, byte[] data) implements CustomPayload {
+    public record ProxyPayload(CustomPacketPayload.Type<ProxyPayload> type, byte[] data) implements CustomPacketPayload {
 
         @Override
-        public CustomPayload.Id<? extends CustomPayload> getId() {
-            return id;
+        public Type<ProxyPayload> type() {
+            return type;
         }
 
     }

@@ -31,7 +31,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +61,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (minecraftServer == null) return;
 
         try {
-            minecraftServer.getCommandManager().getDispatcher().execute(command, minecraftServer.getCommandSource());
+            minecraftServer.getCommands().getDispatcher().execute(command, minecraftServer.createCommandSourceStack());
         } catch (CommandSyntaxException e) {
             fLogger.warning(e);
         }
@@ -77,7 +77,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return 0;
 
-        return minecraftServer.getMaxPlayerCount();
+        return minecraftServer.getMaxPlayers();
     }
 
     @Override
@@ -113,8 +113,8 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return "";
 
-        for (ServerWorld serverWorld : minecraftServer.getWorlds()) {
-            return serverWorld.getRegistryKey().getValue().toString();
+        for (ServerLevel serverLevel : minecraftServer.getAllLevels()) {
+            return String.valueOf(serverLevel.getSeed());
         }
 
         return "";
@@ -131,7 +131,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (minecraftServer == null) return new JsonObject();
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("text", minecraftServer.getServerMotd());
+        jsonObject.addProperty("text", minecraftServer.getMotd());
         return jsonObject;
     }
 
@@ -145,7 +145,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        return minecraftServer.isOnlineMode();
+        return minecraftServer.enforceSecureProfile();
     }
 
     @Override
@@ -153,12 +153,12 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        return minecraftServer.isOnThread();
+        return minecraftServer.isSameThread();
     }
 
     @Override
     public @NotNull String getItemName(Object item) {
-        return item instanceof net.minecraft.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
+        return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
     }
 
     @Override
@@ -191,7 +191,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable) {
-        if (!(item instanceof net.minecraft.item.ItemStack itemStack)) return Component.empty();
+        if (!(item instanceof net.minecraft.world.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 
         Component component = itemStack.getCustomName() == null
@@ -199,23 +199,23 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
-        Key key = Key.key(itemStack.getRegistryEntry().getIdAsString());
+        Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
     }
 
 
-    private Component createItemMetaName(net.minecraft.item.ItemStack itemStack) {
-        String displayName = itemStack.getCustomName().getString();
-        if (displayName == null) return Component.empty();
+    private Component createItemMetaName(net.minecraft.world.item.ItemStack itemStack) {
+        net.minecraft.network.chat.Component customName = itemStack.getCustomName();
+        if (customName == null) return Component.empty();
 
-        Component componentName = messagePipelineProvider.get().builder(displayName).build();
+        Component componentName = messagePipelineProvider.get().builder(customName.getString()).build();
         String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }
 
-    private Component createTranslatableItemName(net.minecraft.item.ItemStack itemStack, boolean translatable) {
-        Component itemComponent = Component.translatable(itemStack.getItem().getTranslationKey());
+    private Component createTranslatableItemName(net.minecraft.world.item.ItemStack itemStack, boolean translatable) {
+        Component itemComponent = Component.translatable(itemStack.getItem().getDescriptionId());
 
         return translatable
                 ? itemComponent

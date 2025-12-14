@@ -20,22 +20,26 @@ import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerConfigEntry;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +59,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return 0;
 
-        for (ServerWorld world : minecraftServer.getWorlds()) {
+        for (ServerLevel world : minecraftServer.getAllLevels()) {
             Entity entity = world.getEntity(uuid);
             if (entity != null) {
                 return entity.getId();
@@ -70,21 +74,21 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return null;
 
-        return minecraftServer.getPlayerManager().getPlayerList()
+        return minecraftServer.getPlayerList().getPlayers()
                 .stream()
-                .filter(serverPlayerEntity -> serverPlayerEntity.getId() == entityId)
+                .filter(serverPlayer -> serverPlayer.getId() == entityId)
                 .findAny()
-                .map(Entity::getUuid)
+                .map(Entity::getUUID)
                 .orElse(null);
     }
 
     @Override
     public @Nullable UUID getUUID(@NotNull Object platformPlayer) {
         return switch (platformPlayer) {
-            case ServerPlayerEntity player -> player.getUuid();
-            case ServerCommandSource commandSource -> {
-                ServerPlayerEntity player = commandSource.getPlayer();
-                yield player == null ? null : player.getUuid();
+            case ServerPlayer player -> player.getUUID();
+            case net.minecraft.commands.CommandSourceStack commandSource -> {
+                ServerPlayer player = commandSource.getPlayer();
+                yield player == null ? null : player.getUUID();
             }
             default -> null;
         };
@@ -92,7 +96,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable Class<?> getPlayerClass() {
-        return ServerPlayerEntity.class;
+        return ServerPlayer.class;
     }
 
     @Override
@@ -107,7 +111,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull String getName(@NotNull UUID uuid) {
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return "";
 
         return player.getName().getString();
@@ -116,18 +120,24 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NotNull String getName(@NotNull Object platformPlayer) {
         return switch (platformPlayer) {
-            case ServerPlayerEntity player -> player.getName().getString();
-            case ServerCommandSource commandSource -> commandSource.getName();
+            case ServerPlayer player -> player.getName().getString();
+            case CommandSourceStack commandSource -> commandSource.getTextName();
             default -> "";
         };
     }
 
+    private final FLogger fLogger;
+
     @Override
     public @NotNull String getWorldName(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return "";
 
-        return player.getEntityWorld().getRegistryKey().getValue().getPath();
+        Level level = player.level();
+
+        ResourceKey<Level> dimension = level.dimension();
+
+        return dimension.identifier().getPath();
     }
 
     @Override
@@ -137,8 +147,11 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
-        if (player != null) return player.getIp();
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
+        if (player != null) {
+            ServerGamePacketListenerImpl connection = player.connection;
+            return connection.getRemoteAddress().toString();
+        }
 
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return null;
@@ -149,7 +162,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer) {
         if (platformPlayer instanceof Entity entity) {
-            return entity.getType().getTranslationKey();
+            return entity.getType().getDescriptionId();
         }
 
         return "";
@@ -157,7 +170,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable PlayerHeadObjectContents.ProfileProperty getTexture(@NotNull UUID uuid) {
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return null;
 
         GameProfile profile = player.getGameProfile();
@@ -177,10 +190,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return GameMode.SURVIVAL;
 
-        return GameMode.getById(player.getGameMode().getIndex());
+        return GameMode.getById(player.gameMode.getGameModeForPlayer().getId());
     }
 
     @Override
@@ -215,36 +228,36 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveModule.Mode mode) {
         if (mode == null) return 0;
 
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return 0;
 
         return switch (mode) {
             case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
             case LEVEL -> player.experienceLevel;
-            case FOOD -> player.getHungerManager().getFoodLevel();
+            case FOOD -> player.getFoodData().getFoodLevel();
             case PING -> packetProvider.getPlayerManager().getPing(player);
-            case ARMOR -> player.getArmor();
-            case ATTACK -> player.getMainHandStack().getDamage();
+            case ARMOR -> player.getArmorValue();
+            case ATTACK -> player.getMainHandItem().getDamageValue();
         };
     }
 
     @Override
     public @Nullable Statistics getStatistics(@NotNull FEntity fEntity) {
-        ServerPlayerEntity player = getPlayer(fEntity.getUuid());
+        ServerPlayer player = getPlayer(fEntity.getUuid());
         if (player == null) return null;
 
         return new Statistics(
                 Math.round(player.getHealth() * 10.0),
-                player.getArmor(),
+                player.getArmorValue(),
                 player.experienceLevel,
-                player.getHungerManager().getFoodLevel(),
-                player.getMainHandStack().getDamage()
+                player.getFoodData().getFoodLevel(),
+                player.getMainHandItem().getDamageValue()
         );
     }
 
     @Override
     public @Nullable Coordinates getCoordinates(@NotNull FEntity fEntity) {
-        ServerPlayerEntity player = getPlayer(fEntity.getUuid());
+        ServerPlayer player = getPlayer(fEntity.getUuid());
         if (player == null) return null;
 
         return new Coordinates(player.getBlockX(), player.getBlockY(), player.getBlockZ());
@@ -252,31 +265,31 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable Location getLocation(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return null;
 
-        return new Location(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+        return new Location(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
     }
 
     @Override
     public double distance(@NotNull FPlayer first, @NotNull FPlayer second) {
         if (first.equals(second)) return 0.0;
 
-        ServerPlayerEntity firstPlayer = getPlayer(first.getUuid());
+        ServerPlayer firstPlayer = getPlayer(first.getUuid());
         if (firstPlayer == null) return -1.0;
 
-        ServerPlayerEntity secondPlayer = getPlayer(second.getUuid());
+        ServerPlayer secondPlayer = getPlayer(second.getUuid());
         if (secondPlayer == null) return -1.0;
-        if (!firstPlayer.getEntityWorld().equals(secondPlayer.getEntityWorld())) return -1.0;
+        if (!firstPlayer.level().equals(secondPlayer.level())) return -1.0;
 
         return firstPlayer.distanceTo(secondPlayer);
     }
 
     @Override
     public boolean isConsole(@NotNull Object platformPlayer) {
-        return platformPlayer instanceof ServerCommandSource source
+        return platformPlayer instanceof net.minecraft.commands.CommandSourceStack source
                 && source.getEntity() == null
-                && source.getServer().isDedicated();
+                && source.getServer().isDedicatedServer();
     }
 
     @Override
@@ -284,18 +297,15 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        PlayerManager playerManager = minecraftServer.getPlayerManager();
-        if (playerManager == null) return false;
-
-        return playerManager.isOperator(new PlayerConfigEntry(fPlayer.getUuid(), fPlayer.getName()));
+        return minecraftServer.getPlayerList().isOp(new NameAndId(fPlayer.getUuid(), fPlayer.getName()));
     }
 
     @Override
     public boolean isSneaking(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return false;
 
-        return player.isSneaking();
+        return player.isCrouching();
     }
 
     @Override
@@ -305,17 +315,20 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean hasPotionEffect(@NotNull FEntity fPlayer, @NotNull PotionType potionType) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return false;
 
         ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
-        Optional<RegistryEntry.Reference<StatusEffect>> statusEffect = Registries.STATUS_EFFECT.getEntry(potionType.getId(clientVersion));
-        return statusEffect.filter(player::hasStatusEffect).isPresent();
+        Optional<Holder.Reference<@NotNull MobEffect>> effect = BuiltInRegistries.MOB_EFFECT.get(potionType.getId(clientVersion));
+        if (effect.isEmpty()) return false;
+
+        MobEffectInstance effectInstance = player.getEffect(effect.get());
+        return effectInstance != null && effectInstance.getDuration() > 0;
     }
 
     @Override
     public boolean isOnline(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         return player != null;
     }
 
@@ -336,18 +349,18 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public void updateInventory(@NotNull UUID uuid) {
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return;
 
-        player.getInventory().updateItems();
+        player.inventoryMenu.broadcastChanges();
     }
 
     @Override
     public @Nullable Object getItem(@NotNull UUID uuid) {
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return null;
 
-        return player.getMainHandStack();
+        return player.getMainHandItem();
     }
 
     @Override
@@ -355,44 +368,51 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return Collections.emptyList();
 
-        return minecraftServer.getPlayerManager().getPlayerList()
+        return minecraftServer.getPlayerList().getPlayers()
                 .stream()
-                .map(Entity::getUuid)
+                .map(Entity::getUUID)
                 .toList();
     }
 
     @Override
     public @NotNull Set<UUID> findPlayersWhoCanSee(FPlayer fPlayer, double x, double y, double z) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        ServerPlayer player = getPlayer(fPlayer.getUuid());
         if (player == null) return Collections.emptySet();
 
-        Vec3d position = new Vec3d(player.getX(), player.getY(), player.getZ());
-        Box searchBox = new Box(position.subtract(x, y, z), position.add(x, y, z));
-        return player.getEntityWorld().getEntitiesByClass(ServerPlayerEntity.class, searchBox, entity -> true)
+        Vec3 position = player.position();
+        AABB searchBox = new AABB(
+                position.x - x, position.y - y, position.z - z,
+                position.x + x, position.y + y, position.z + z
+        );
+
+        return player.level().getEntitiesOfClass(ServerPlayer.class, searchBox, entity -> true)
                 .stream()
                 .filter(target -> {
-                    HitResult hitResult = target.getEntityWorld().raycast(
-                            new RaycastContext(
-                                    target.getCameraPosVec(1.0F),
-                                    player.getCameraPosVec(1.0F),
-                                    RaycastContext.ShapeType.VISUAL,
-                                    RaycastContext.FluidHandling.SOURCE_ONLY,
+                    Vec3 startPos = target.getEyePosition(1.0F);
+                    Vec3 endPos = player.getEyePosition(1.0F);
+
+                    BlockHitResult hitResult = target.level().clip(
+                            new net.minecraft.world.level.ClipContext(
+                                    startPos,
+                                    endPos,
+                                    net.minecraft.world.level.ClipContext.Block.VISUAL,
+                                    net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY,
                                     target
                             )
                     );
 
                     return hitResult.getType() == HitResult.Type.MISS;
                 })
-                .map(Entity::getUuid)
+                .map(Entity::getUUID)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public @NotNull List<Integer> getPassengers(UUID uuid) {
-        ServerPlayerEntity player = getPlayer(uuid);
+        ServerPlayer player = getPlayer(uuid);
         if (player == null) return Collections.emptyList();
 
-        return player.getPassengerList()
+        return player.getPassengers()
                 .stream()
                 .map(Entity::getId)
                 .toList();
@@ -404,13 +424,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Nullable
-    public ServerPlayerEntity getPlayer(UUID uuid) {
+    public ServerPlayer getPlayer(UUID uuid) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return null;
 
-        PlayerManager playerManager = minecraftServer.getPlayerManager();
-        if (playerManager == null) return null;
-
-        return playerManager.getPlayer(uuid);
+        return minecraftServer.getPlayerList().getPlayer(uuid);
     }
 }

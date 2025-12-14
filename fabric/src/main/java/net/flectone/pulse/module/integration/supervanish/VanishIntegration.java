@@ -30,7 +30,7 @@ public class VanishIntegration implements FIntegration {
         this.fLogger = fLogger;
 
         VanishEvents.VANISH_EVENT.register((player, vanish) -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
+            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
 
             if (vanish) {
                 quitModule.send(fPlayer, true);
