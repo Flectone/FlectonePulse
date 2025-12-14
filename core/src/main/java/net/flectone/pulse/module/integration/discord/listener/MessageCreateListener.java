@@ -23,6 +23,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -92,8 +93,8 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
                     return StringUtils.replaceEach(
                             channelEmbed.getContent(),
-                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<reply_user>"},
-                            new String[]{globalName, globalName, nickname, displayName, userName, reply == null ? "" : "@" + reply.first() + " "}
+                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                            new String[]{globalName, globalName, nickname, displayName, userName}
                     );
                 })
                 .globalName(globalName)
@@ -104,13 +105,22 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
-                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply_message", (argumentQueue, context) ->
-                        Tag.preProcessParsed(reply == null ? "" : StringUtils.defaultString(reply.second()))
-                )})
+                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                    if (reply == null) return Tag.selfClosingInserting(Component.empty());
+
+                    Component componentReply = messagePipeline.builder(localization().getFormatReply())
+                            .tagResolvers(
+                                    TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                    TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                            )
+                            .build();
+
+                    return Tag.inserting(componentReply);
+                })})
                 .integration(string -> StringUtils.replaceEach(
                         string,
-                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>", "<reply_user>"},
-                        new String[]{globalName, globalName, nickname, displayName, userName, reply == null ? "" : "@" + reply.first() + " "}
+                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                        new String[]{globalName, globalName, nickname, displayName, userName}
                 ))
                 .build()
         );

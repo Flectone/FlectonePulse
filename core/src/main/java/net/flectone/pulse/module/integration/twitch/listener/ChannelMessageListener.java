@@ -20,6 +20,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -76,8 +77,8 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .sender(FPlayer.UNKNOWN)
                 .format(localization -> StringUtils.replaceEach(
                         StringUtils.defaultString(localization.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
-                        new String[]{"<name>", "<channel>", "<reply_user>"},
-                        new String[]{String.valueOf(nickname), String.valueOf(channel), reply == null ? "" : "@" + reply.first() + " "}
+                        new String[]{"<name>", "<channel>"},
+                        new String[]{String.valueOf(nickname), String.valueOf(channel)}
                 ))
                 .nickname(nickname)
                 .channel(channel)
@@ -85,13 +86,22 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(config().getDestination())
                 .sound(getModuleSound())
-                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply_message", (argumentQueue, context) ->
-                        Tag.preProcessParsed(reply == null ? "" : StringUtils.defaultString(reply.second()))
-                )})
+                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                    if (reply == null) return Tag.selfClosingInserting(Component.empty());
+
+                    Component componentReply = messagePipeline.builder(localization().getFormatReply())
+                            .tagResolvers(
+                                    TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                    TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                            )
+                            .build();
+
+                    return Tag.inserting(componentReply);
+                })})
                 .integration(string -> StringUtils.replaceEach(
                         string,
-                        new String[]{"<name>", "<channel>", "<reply_user>"},
-                        new String[]{nickname, channel, reply == null ? "" : "@" + reply.first() + " "}
+                        new String[]{"<name>", "<channel>"},
+                        new String[]{nickname, channel}
                 ))
                 .build()
         );

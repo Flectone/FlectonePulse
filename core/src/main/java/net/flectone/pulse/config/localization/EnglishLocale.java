@@ -413,6 +413,7 @@ public class EnglishLocale implements Locale {
         localization.command.warnlist.player.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         localization.integration.discord.nullPlayer = "This player does not exist";
+        localization.integration.discord.formatReply = "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Reply to @<reply_user>]</hover> ";
         localization.integration.discord.customCommand = new LinkedHashMap<>() {{
             put("ping", new Localization.Integration.Discord.ChannelEmbed());
         }};
@@ -424,10 +425,11 @@ public class EnglishLocale implements Locale {
             put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new Localization.Integration.Discord.ChannelEmbed());
             put("CHAT_GLOBAL", new Localization.Integration.Discord.ChannelEmbed());
         }};
-        localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>";
+        localization.integration.discord.messageChannel.get(MessageType.FROM_DISCORD_TO_MINECRAFT.name()).content = "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><reply><message>";
         localization.integration.discord.messageChannel.get("CHAT_GLOBAL").content = "<final_message>";
 
         localization.integration.telegram.nullPlayer = "This player does not exist";
+        localization.integration.telegram.formatReply = "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Reply to @<reply_user>]</hover> ";
         localization.integration.telegram.customCommand = new LinkedHashMap<>() {{
             put("id", "Channel id: <id>");
             put("ping", "<player>'s ping is <replacement:ping>");
@@ -436,16 +438,17 @@ public class EnglishLocale implements Locale {
             put("id", "TPS <replacement:tps>");
         }};
         localization.integration.telegram.messageChannel = new LinkedHashMap<>() {{
-            put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>");
+            put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><reply><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
         localization.integration.twitch.nullPlayer = "This player does not exist";
+        localization.integration.twitch.formatReply = "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Reply to @<reply_user>]</hover> ";
         localization.integration.twitch.customCommand = new LinkedHashMap<>() {{
             put("ping", "<player>'s ping is <replacement:ping>");
         }};
         localization.integration.twitch.messageChannel = new LinkedHashMap<>() {{
-            put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply_message>'><reply_user><message>");
+            put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><reply><message>");
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
