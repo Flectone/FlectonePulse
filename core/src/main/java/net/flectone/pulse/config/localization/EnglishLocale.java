@@ -475,7 +475,7 @@ public class EnglishLocale implements Locale {
 
         localization.message.bossbar.types = new LinkedHashMap<>() {
             {
-                put("entity.minecraft.ender_dragon", "<sprite:gui:spectator/teleport_to_player><gradient:#ff6bff:#dda0dd>Ender Dragon");
+                put("entity.minecraft.ender_dragon", "<sprite:item/endermite_spawn_egg><gradient:#ff6bff:#dda0dd>Ender Dragon");
                 put("entity.minecraft.wither", "<sprite:gui:mob_effect/wither><gradient:#7b68ee:#9370db>Wither");
                 put("event.minecraft.raid", "<sprite:gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Raid");
                 put("event.minecraft.raid.defeat", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Defeat");

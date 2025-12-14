@@ -475,7 +475,7 @@ public class RussianLocale implements Locale {
 
         localization.message.bossbar.types = new LinkedHashMap<>() {
             {
-                put("entity.minecraft.ender_dragon", "<sprite:gui:spectator/teleport_to_player><gradient:#ff6bff:#dda0dd>Эндер-дракон");
+                put("entity.minecraft.ender_dragon", "<sprite:item/endermite_spawn_egg><gradient:#ff6bff:#dda0dd>Эндер-дракон");
                 put("entity.minecraft.wither", "<sprite:gui:mob_effect/wither><gradient:#7b68ee:#9370db>Визер");
                 put("event.minecraft.raid", "<sprite:gui:mob_effect/raid_omen><gradient:#ff6b6b:#ff4444>Рейд");
                 put("event.minecraft.raid.defeat", "<sprite:gui:hud/heart/poisoned_full><gradient:#ff6b6b:#ff4444>Поражение");
