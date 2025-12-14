@@ -556,7 +556,9 @@ public class FileResolver {
                 localizationVanilla.getTypes().put(entry.getKey(), Strings.CS.replace(entry.getValue(), "<arg_", "<argument:"));
             }
 
-            if (localization.getLanguage().equalsIgnoreCase("ru_ru")) {
+            boolean isRussian = localization.getLanguage().equalsIgnoreCase("ru_ru");
+
+            if (isRussian) {
                 localizationVanilla.getTypes().put("commands.list.players", "<fcolor:1>\uD83D\uDC65 На сервере <fcolor:2><argument:0><fcolor:1> из <fcolor:2><argument:1><fcolor:1> игроков: <argument:2>");
                 localizationVanilla.getTypes().put("death.attack.spear", "<fcolor:1>☠ <argument:0> был проткнут <argument:1>");
                 localizationVanilla.getTypes().put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> был проткнут <argument:1> с помощью <argument:2>");
@@ -582,6 +584,10 @@ public class FileResolver {
                 if (value != null) {
                     localizationReplacement.getValues().put(key, Strings.CS.replace(value, "<" + key + ">", "<value>"));
                 }
+            }
+
+            if (isRussian && localizationReplacement.getValues().containsKey("url")) {
+                localizationReplacement.getValues().put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
             }
 
             Consumer<List<String>> stringsWithOldTagsConsumer = strings -> {
