@@ -406,8 +406,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull List<Integer> getPassengers(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+    public @NotNull List<Integer> getPassengers(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         if (player == null) return Collections.emptyList();
 
         return passengersProvider.getPassengers(player);

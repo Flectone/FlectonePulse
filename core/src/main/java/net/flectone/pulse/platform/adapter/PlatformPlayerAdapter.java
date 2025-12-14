@@ -95,6 +95,6 @@ public interface PlatformPlayerAdapter {
     // Player management
     @NotNull List<UUID> getOnlinePlayers();
     @NotNull Set<UUID> findPlayersWhoCanSee(FPlayer fPlayer, double x, double y, double z);
-    @NotNull List<Integer> getPassengers(FPlayer fPlayer);
+    @NotNull List<Integer> getPassengers(UUID uuid);
     @NotNull List<PlayedTimePlayer> getPlayedTimePlayers();
 }

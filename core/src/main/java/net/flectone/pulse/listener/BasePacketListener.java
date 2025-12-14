@@ -12,6 +12,7 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,6 +21,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
@@ -40,6 +42,7 @@ public class BasePacketListener implements PacketListener {
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
+    private final TextScreenRender textScreenRender;
     private final FLogger fLogger;
 
     @Override
@@ -87,6 +90,12 @@ public class BasePacketListener implements PacketListener {
                     loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
                     loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.getKickReason()))
             );
+        }
+
+        if (event.getPacketType() == PacketType.Play.Server.SET_PASSENGERS) {
+            WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
+            textScreenRender.updateAndRide(wrapper.getEntityId());
+            return;
         }
 
         Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);

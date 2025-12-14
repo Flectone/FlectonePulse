@@ -165,7 +165,7 @@ public class BubbleRenderer {
 
             int[] passengers = new int[]{bubbleEntity.getId()};
 
-            List<Integer> textScreenPassengers = textScreenRender.getPassengers(viewer);
+            List<Integer> textScreenPassengers = textScreenRender.getPassengers(viewer.getUuid());
             if (!textScreenPassengers.isEmpty() && playerId == lastID) {
                 passengers = ArrayUtils.add(textScreenPassengers.stream().mapToInt(Integer::intValue).toArray(), bubbleEntity.getId());
             }
@@ -348,7 +348,7 @@ public class BubbleRenderer {
     }
 
     public boolean isCorrectPlayer(FPlayer sender) {
-        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender);
+        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.getUuid());
 
         return platformPlayerAdapter.getGamemode(sender) != GameMode.SPECTATOR
                 && !platformPlayerAdapter.hasPotionEffect(sender, PotionTypes.INVISIBILITY)

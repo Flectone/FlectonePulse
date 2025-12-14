@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.TextScreen;
@@ -29,6 +30,7 @@ import net.kyori.adventure.text.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -56,7 +58,7 @@ public class TextScreenRender {
         int entityId = optionalId.get();
         int playerId = platformPlayerAdapter.getEntityId(fPlayer.getUuid());
 
-        ride(fPlayer, playerId, entityId);
+        addAndRide(fPlayer.getUuid(), playerId, entityId);
         bubbleRenderer.get().rideEntities(fPlayer, fPlayer);
 
         if (textScreen.hasAnimation()) {
@@ -66,8 +68,29 @@ public class TextScreenRender {
         animationDespawnAndDestroy(fPlayer, textScreen, entityId);
     }
 
-    public List<Integer> getPassengers(FPlayer fPlayer) {
-        return livingEntities.getOrDefault(fPlayer.getUuid(), new CopyOnWriteArrayList<>());
+    public List<Integer> getPassengers(UUID uuid) {
+        return livingEntities.getOrDefault(uuid, new CopyOnWriteArrayList<>());
+    }
+
+    public void ride(UUID uuid, int playerId, List<Integer> textScreenPassengers, boolean silent) {
+        List<Integer> playerPassengers = platformPlayerAdapter.getPassengers(uuid);
+        int[] finalPassengers = Stream.of(textScreenPassengers, playerPassengers)
+                .flatMap(Collection::stream)
+                .mapToInt(Integer::intValue)
+                .toArray();
+
+        packetSender.send(uuid, new WrapperPlayServerSetPassengers(playerId, finalPassengers), silent);
+    }
+
+    @Async
+    public void updateAndRide(int playerId) {
+        UUID uuid = platformPlayerAdapter.getPlayerByEntityId(playerId);
+        if (uuid == null) return;
+
+        List<Integer> textScreenPassengers = getPassengers(uuid);
+        if (textScreenPassengers.isEmpty()) return;
+
+        ride(uuid, playerId, textScreenPassengers, true);
     }
 
     private Optional<Integer> spawn(FPlayer fPlayer, Component message, TextScreen textScreen) {
@@ -116,13 +139,13 @@ public class TextScreenRender {
         return Optional.of(entityId);
     }
 
-    private void ride(FPlayer fPlayer, int playerId, int entityId) {
-        List<Integer> passengers = getPassengers(fPlayer);
-        passengers.add(entityId);
+    private void addAndRide(UUID uuid, int playerId, int entityId) {
+        List<Integer> textScreenPassengers = getPassengers(uuid);
+        textScreenPassengers.add(entityId);
 
-        livingEntities.put(fPlayer.getUuid(), passengers);
+        livingEntities.put(uuid, textScreenPassengers);
 
-        packetSender.send(fPlayer, new WrapperPlayServerSetPassengers(playerId, passengers.stream().mapToInt(Integer::intValue).toArray()));
+        ride(uuid, playerId, textScreenPassengers, false);
     }
 
     private void animationSpawn(FPlayer fPlayer, TextScreen textScreen, int entityId) {

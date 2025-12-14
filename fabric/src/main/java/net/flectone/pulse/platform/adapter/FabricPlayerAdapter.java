@@ -388,8 +388,8 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull List<Integer> getPassengers(FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+    public @NotNull List<Integer> getPassengers(UUID uuid) {
+        ServerPlayerEntity player = getPlayer(uuid);
         if (player == null) return Collections.emptyList();
 
         return player.getPassengerList()
