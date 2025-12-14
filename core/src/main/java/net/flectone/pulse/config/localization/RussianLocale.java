@@ -877,6 +877,8 @@ public class RussianLocale implements Locale {
                 put("death.attack.sonic_boom", "<fcolor:1>☠ <argument:0> был уничтожен звуковым зарядом");
                 put("death.attack.sonic_boom.item", "<fcolor:1>☠ <argument:0> был уничтожен звуковым зарядом, спасаясь от <argument:1>, держащего <fcolor:2><argument:2><fcolor:1>");
                 put("death.attack.sonic_boom.player", "<fcolor:1>☠ <argument:0> был уничтожен звуковым зарядом, спасаясь от <argument:1>");
+                put("death.attack.spear", "<fcolor:1>☠ <argument:0> был проткнут <argument:1>");
+                put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> был проткнут <argument:1> с помощью <argument:2>");
                 put("death.attack.stalagmite", "<fcolor:1>☠ <argument:0> пронзён сталагмитом");
                 put("death.attack.stalagmite.player", "<fcolor:1>☠ <argument:0> был пронзён сталагмитом, пока боролся с <argument:1>");
                 put("death.attack.starve", "<fcolor:1>☠ <argument:0> умер от голода");

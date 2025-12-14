@@ -556,6 +556,16 @@ public class FileResolver {
                 localizationVanilla.getTypes().put(entry.getKey(), Strings.CS.replace(entry.getValue(), "<arg_", "<argument:"));
             }
 
+            if (localization.getLanguage().equalsIgnoreCase("ru_ru")) {
+                localizationVanilla.getTypes().put("commands.list.players", "<fcolor:1>\uD83D\uDC65 На сервере <fcolor:2><argument:0><fcolor:1> из <fcolor:2><argument:1><fcolor:1> игроков: <argument:2>");
+                localizationVanilla.getTypes().put("death.attack.spear", "<fcolor:1>☠ <argument:0> был проткнут <argument:1>");
+                localizationVanilla.getTypes().put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> был проткнут <argument:1> с помощью <argument:2>");
+            } else {
+                localizationVanilla.getTypes().put("commands.list.players", "<fcolor:1>\uD83D\uDC65 There are <fcolor:2><argument:0><fcolor:1> of a max of <fcolor:2><argument:1><fcolor:1> players online: <argument:2>");
+                localizationVanilla.getTypes().put("death.attack.spear", "<fcolor:1>☠ <argument:0> was speared by <argument:1>");
+                localizationVanilla.getTypes().put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> was speared by <argument:1> using <argument:2>");
+            }
+
             Localization.Command.Symbol localizationSymbol = localization.getCommand().getSymbol();
             String oldSymbolFormat = localizationSymbol.getFormat();
             localizationSymbol.setFormat(Strings.CS.replace(oldSymbolFormat, "<click:suggest_command:\"<message>\">", "<click:suggest_command:\"<input>\">"));

@@ -877,6 +877,8 @@ public class EnglishLocale implements Locale {
                 put("death.attack.sonic_boom", "<fcolor:1>☠ <argument:0> was obliterated by a sonically-charged shriek");
                 put("death.attack.sonic_boom.item", "<fcolor:1>☠ <argument:0> was obliterated by a sonically-charged shriek while trying to escape <argument:1> wielding <fcolor:2><argument:2><fcolor:1>");
                 put("death.attack.sonic_boom.player", "<fcolor:1>☠ <argument:0> was obliterated by a sonically-charged shriek while trying to escape <argument:1>");
+                put("death.attack.spear", "<fcolor:1>☠ <argument:0> was speared by <argument:1>");
+                put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> was speared by <argument:1> using <argument:2>");
                 put("death.attack.stalagmite", "<fcolor:1>☠ <argument:0> was impaled on a stalagmite");
                 put("death.attack.stalagmite.player", "<fcolor:1>☠ <argument:0> was impaled on a stalagmite while fighting <argument:1>");
                 put("death.attack.starve", "<fcolor:1>☠ <argument:0> starved to death");
