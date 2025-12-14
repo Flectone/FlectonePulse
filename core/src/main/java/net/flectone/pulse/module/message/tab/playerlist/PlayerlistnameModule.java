@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.tab.playerlist;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -10,6 +9,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
@@ -64,6 +64,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private final ProxyRegistry proxyRegistry;
     private final ScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
+    private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
     @Override
     public void onEnable() {
@@ -143,7 +144,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
         Component name = buildFPlayerName(fPlayer, fReceiver);
 
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+        if (isNewerThanOrEqualsV_1_19_4) {
             if (isProxyMode()) {
                 List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> proxyPlayersInfo = getProxyPlayerInfos(fReceiver);
                 if (!proxyPlayersInfo.isEmpty()) {
