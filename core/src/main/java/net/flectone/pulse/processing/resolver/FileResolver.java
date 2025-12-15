@@ -110,6 +110,10 @@ public class FileResolver {
             if (isVersionOlderThan(preInitVersion, "1.7.0")) {
                 migration_1_7_0();
             }
+
+            if (isVersionOlderThan(preInitVersion, "1.7.1")) {
+                migration_1_7_1();
+            }
         }
 
         if (versionChanged) {
@@ -611,5 +615,22 @@ public class FileResolver {
 
             yamlFileProcessor.save(localization);
         }
+    }
+
+    private void migration_1_7_1() throws IOException {
+        for (Message.Vanilla.VanillaMessage vanillaMessage : message.getVanilla().getTypes()) {
+            if (!vanillaMessage.getName().equals("DEATH")) continue;
+
+            List<String> translationKeys = vanillaMessage.getTranslationKeys();
+            if (!translationKeys.contains("death.attack.spear")) {
+                translationKeys.add("death.attack.spear");
+            }
+
+            if (!translationKeys.contains("death.attack.spear.item")) {
+                translationKeys.add("death.attack.spear.item");
+            }
+        }
+
+        yamlFileProcessor.save(message);
     }
 }
