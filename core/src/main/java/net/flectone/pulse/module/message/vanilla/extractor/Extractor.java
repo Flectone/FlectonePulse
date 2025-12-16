@@ -118,7 +118,7 @@ public class Extractor {
                 return isValid(fEntity) ? fEntity : component;
             }
 
-            List<FEntity> entities = new ArrayList<>(component.children().size() + 1);
+            Set<FEntity> entities = LinkedHashSet.newLinkedHashSet(component.children().size() + 1);
 
             firstFEntity.ifPresent(entities::add);
 
@@ -127,7 +127,7 @@ public class Extractor {
             }
 
             if (entities.stream().anyMatch(this::isValid)) {
-                return entities.size() == 1 ? entities.getFirst() : entities;
+                return entities.size() == 1 ? entities.iterator().next() : entities;
             }
 
             return component;

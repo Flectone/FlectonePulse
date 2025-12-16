@@ -35,8 +35,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.OptionalInt;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -128,7 +128,11 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
     private FEntity getDeathTarget(ParsedComponent parsedComponent) {
         Object target = parsedComponent.arguments().get(0);
-        return target instanceof FEntity fEntity ? fEntity : null;
+        return switch (target) {
+            case FEntity fEntity -> fEntity;
+            case Set<?> entities when entities.iterator().next() instanceof FEntity fEntity -> fEntity;
+            default -> null;
+        };
     }
 
     public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
@@ -190,11 +194,11 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
     private Tag argumentResolver(FPlayer fResolver, Object replacement) {
         return switch (replacement) {
             case FEntity fTarget -> Tag.selfClosingInserting(buildFEntityComponent(fTarget, fResolver));
-            case List<?> entityList -> {
+            case Set<?> entities -> {
                 Component component = Component.empty();
 
                 boolean first = true;
-                for (Object entity : entityList) {
+                for (Object entity : entities) {
                     if (entity instanceof FEntity fTarget) {
                         component = component
                                 .append(first ? Component.empty() : Component.text(", "))
