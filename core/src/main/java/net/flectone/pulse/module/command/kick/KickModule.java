@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -14,7 +14,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -27,7 +27,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -38,10 +38,10 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptMessage, commandParserProvider.nativeMessageParser())
         );
@@ -56,7 +56,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         if (!fTarget.isOnline()) {
             sendErrorMessage( metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Kick::getNullPlayer)
+                    .format(Localization.Command.Kick::nullPlayer)
                     .build()
             );
 
@@ -76,8 +76,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                 .sender(fTarget)
                 .format(buildFormat(kick))
                 .moderation(kick)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
@@ -93,27 +93,27 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public Command.Kick config() {
-        return fileResolver.getCommand().getKick();
+        return fileFacade.command().kick();
     }
 
     @Override
     public Permission.Command.Kick permission() {
-        return fileResolver.getPermission().getCommand().getKick();
+        return fileFacade.permission().command().kick();
     }
 
     @Override
     public Localization.Command.Kick localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getKick();
+        return fileFacade.localization(sender).command().kick();
     }
 
     public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
-        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.getServer(), fReceiver, kick);
+        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, kick);
     }
 
     public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).getPerson(), fReceiver, kick);
+        String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).person(), fReceiver, kick);
 
         fPlayerService.kick(fReceiver, messagePipeline.builder(fReceiver, format).build());
     }

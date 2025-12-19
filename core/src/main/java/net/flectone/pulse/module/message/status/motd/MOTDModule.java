@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MOTDModule extends AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
 
@@ -34,28 +34,28 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
 
     @Override
     public Message.Status.MOTD config() {
-        return fileResolver.getMessage().getStatus().getMotd();
+        return fileFacade.message().status().motd();
     }
 
     @Override
     public Permission.Message.Status.MOTD permission() {
-        return fileResolver.getPermission().getMessage().getStatus().getMotd();
+        return fileFacade.permission().message().status().motd();
     }
 
     @Override
     public Localization.Message.Status.MOTD localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getStatus().getMotd();
+        return fileFacade.localization(sender).message().status().motd();
     }
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return localization(fPlayer).getValues();
+        return localization(fPlayer).values();
     }
 
     public JsonElement next(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return null;
 
-        String nextMessage = getNextMessage(fPlayer, config().isRandom());
+        String nextMessage = getNextMessage(fPlayer, config().random());
         if (nextMessage == null) return null;
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {

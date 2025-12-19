@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -20,7 +20,7 @@ import org.incendo.cloud.context.CommandContext;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ReplyModule extends AbstractModuleCommand<Localization.Command.Reply> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final TellModule tellModule;
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
@@ -29,9 +29,9 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -44,7 +44,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
         if (receiverName == null) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Reply::getNullReceiver)
+                    .format(Localization.Command.Reply::nullReceiver)
                     .build()
             );
 
@@ -65,16 +65,16 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     @Override
     public Command.Reply config() {
-        return fileResolver.getCommand().getReply();
+        return fileFacade.command().reply();
     }
 
     @Override
     public Permission.Command.Reply permission() {
-        return fileResolver.getPermission().getCommand().getReply();
+        return fileFacade.permission().command().reply();
     }
 
     @Override
     public Localization.Command.Reply localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getReply();
+        return fileFacade.localization(sender).command().reply();
     }
 }

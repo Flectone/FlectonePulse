@@ -1,6 +1,6 @@
 package net.flectone.pulse.util.checker;
 
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 
 public interface PermissionChecker {
@@ -21,6 +21,6 @@ public interface PermissionChecker {
      * @param permission The permission object to verify
      * @return true if the entity has the permission, false otherwise
      */
-    boolean check(FEntity entity, Permission.IPermission permission);
+    boolean check(FEntity entity, PermissionSetting permission);
 
 }

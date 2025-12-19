@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.dialog.Dialog;
@@ -43,7 +43,7 @@ public class DialogMenuBuilder implements MenuBuilder {
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        Component header = messagePipeline.builder(fPlayer, fTarget, localization.getInventory().trim()).build();
+        Component header = messagePipeline.builder(fPlayer, fTarget, localization.inventory().trim()).build();
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
         CommonDialogData commonDialogData = new CommonDialogData(
@@ -56,13 +56,13 @@ public class DialogMenuBuilder implements MenuBuilder {
                 List.of()
         );
 
-        Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().getModern().getColumns());
+        Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns());
 
         dialogBuilder = createDialogChatMenu(fPlayer, fTarget, dialogBuilder, localization);
-        dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.SEE, dialogBuilder, chatsettingModule.config().getMenu().getSee(), localization.getMenu().getSee());
-        dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.OUT, dialogBuilder, chatsettingModule.config().getMenu().getOut(), localization.getMenu().getOut());
+        dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.SEE, dialogBuilder, chatsettingModule.config().menu().see(), localization.menu().see());
+        dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.OUT, dialogBuilder, chatsettingModule.config().menu().out(), localization.menu().out());
 
-        for (String setting : chatsettingModule.config().getCheckbox().getTypes().keySet()) {
+        for (String setting : chatsettingModule.config().checkbox().types().keySet()) {
             dialogBuilder = createDialogCheckbox(fPlayer, fTarget, setting, dialogBuilder);
         }
 
@@ -70,9 +70,9 @@ public class DialogMenuBuilder implements MenuBuilder {
     }
 
     private Dialog.Builder createDialogCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType, Dialog.Builder dialogBuilder) {
-        Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().getCheckbox();
+        Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().checkbox();
 
-        int slot = checkbox.getTypes().get(messageType);
+        int slot = checkbox.types().get(messageType);
         if (slot == -1) return dialogBuilder;
 
         boolean enabled = fTarget.isSetting(messageType);
@@ -86,7 +86,7 @@ public class DialogMenuBuilder implements MenuBuilder {
         String id = "fp_" + UUID.randomUUID();
 
         ActionButton button = new ActionButton(
-                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().getModern().getButtonWidth()),
+                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().modern().buttonWidth()),
                 new DynamicCustomAction(ResourceLocation.minecraft(id), null)
         );
 
@@ -105,7 +105,7 @@ public class DialogMenuBuilder implements MenuBuilder {
                     Component componentInvertLore = messagePipeline.builder(fPlayer, fTarget, invertLore).build();
 
                     ActionButton invertButton = new ActionButton(
-                            new CommonButtonData(componentInvertTitle, componentInvertLore, chatsettingModule.config().getModern().getButtonWidth()),
+                            new CommonButtonData(componentInvertTitle, componentInvertLore, chatsettingModule.config().modern().buttonWidth()),
                             new DynamicCustomAction(ResourceLocation.minecraft(id), null)
                     );
 
@@ -116,15 +116,15 @@ public class DialogMenuBuilder implements MenuBuilder {
     }
 
     private Dialog.Builder createDialogChatMenu(FPlayer fPlayer, FPlayer fTarget, Dialog.Builder dialogBuilder, Localization.Command.Chatsetting localization) {
-        Command.Chatsetting.Menu.Chat chat = chatsettingModule.config().getMenu().getChat();
+        Command.Chatsetting.Menu.Chat chat = chatsettingModule.config().menu().chat();
 
-        int slot = chat.getSlot();
+        int slot = chat.slot();
         if (slot == -1) return dialogBuilder;
 
         String currentChat = chatsettingModule.getPlayerChat(fTarget);
 
         String[] messages = Strings.CS.replace(
-                localization.getMenu().getChat().getItem(),
+                localization.menu().chat().item(),
                 "<chat>", currentChat
         ).split("<br>");
 
@@ -137,7 +137,7 @@ public class DialogMenuBuilder implements MenuBuilder {
         String id = "fp_chat";
 
         ActionButton button = new ActionButton(
-                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().getModern().getButtonWidth()),
+                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().modern().buttonWidth()),
                 new DynamicCustomAction(ResourceLocation.minecraft(id), null)
         );
 
@@ -154,10 +154,10 @@ public class DialogMenuBuilder implements MenuBuilder {
                                                   Dialog.Builder dialogBuilder,
                                                   Command.Chatsetting.Menu.Color color,
                                                   Localization.Command.Chatsetting.Menu.SubMenu subMenu) {
-        int slot = color.getSlot();
+        int slot = color.slot();
         if (slot == -1) return dialogBuilder;
 
-        String[] messages = subMenu.getItem().split("<br>");
+        String[] messages = subMenu.item().split("<br>");
 
         String title = messages.length > 0 ? messages[0] : "";
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
@@ -168,7 +168,7 @@ public class DialogMenuBuilder implements MenuBuilder {
         String id = "fp_fcolor_" + type.ordinal();
 
         ActionButton button = new ActionButton(
-                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().getModern().getButtonWidth()),
+                new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().modern().buttonWidth()),
                 new DynamicCustomAction(ResourceLocation.minecraft(id), null)
         );
 
@@ -199,7 +199,7 @@ public class DialogMenuBuilder implements MenuBuilder {
                 List.of()
         );
 
-        Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().getModern().getColumns())
+        Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns())
                 .addCloseConsumer(dialog -> closeConsumer.run());
 
         for (int i = 0; i < items.size(); i++) {
@@ -216,7 +216,7 @@ public class DialogMenuBuilder implements MenuBuilder {
             String subId = id + "_" + i;
 
             ActionButton button = new ActionButton(
-                    new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().getModern().getButtonWidth()),
+                    new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().modern().buttonWidth()),
                     new DynamicCustomAction(ResourceLocation.minecraft(subId), null)
             );
 

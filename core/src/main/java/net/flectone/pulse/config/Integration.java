@@ -1,289 +1,291 @@
 package net.flectone.pulse.config;
 
-import com.fasterxml.jackson.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import lombok.Builder;
+import lombok.With;
+import lombok.extern.jackson.Jacksonized;
+import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.util.constant.MessageType;
 
-import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-@SuppressWarnings({"FieldMayBeFinal", "unused"})
-@Getter
-public final class Integration extends YamlFile implements ModuleConfig.IntegrationConfig, Config.IEnable {
+@With
+@Builder(toBuilder = true)
+@Jacksonized
+public record Integration(
 
-    public Integration(Path projectPath) {
-        super(projectPath.resolve("integration.yml"));
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
+        Boolean enable,
+
+        String avatarApiUrl,
+        String bodyApiUrl,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
+        Advancedban advancedban,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
+        Deepl deepl,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
+        Discord discord,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
+        Geyser geyser,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
+        Interactivechat interactivechat,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
+        Itemsadder itemsadder,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
+        Libertybans libertybans,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
+        Litebans litebans,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
+        Luckperms luckperms,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
+        Maintenance maintenance,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
+        MiniMOTD minimotd,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
+        MiniPlaceholders miniplaceholders,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
+        MOTD motd,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
+        Placeholderapi placeholderapi,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
+        Plasmovoice plasmovoice,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
+        Simplevoice simplevoice,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
+        Skinsrestorer skinsrestorer,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
+        Supervanish supervanish,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
+        Tab tab,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
+        Telegram telegram,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
+        Triton triton,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
+        Twitch twitch,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
+        Vault vault,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
+        Yandex yandex
+
+) implements EnableSetting {
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Advancedban(
+            Boolean enable,
+            Boolean disableFlectonepulseBan,
+            Boolean disableFlectonepulseMute,
+            Boolean disableFlectonepulseWarn,
+            Boolean disableFlectonepulseKick
+    ) implements EnableSetting {
     }
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
-    private boolean enable = true;
-
-    private String avatarApiUrl = "https://mc-heads.net/avatar/<skin>/8.png";
-    private String bodyApiUrl = "https://mc-heads.net/player/<skin>/16.png";
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
-    private Advancedban advancedban = new Advancedban();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
-    private Deepl deepl = new Deepl();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
-    private Discord discord = new Discord();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
-    private Geyser geyser = new Geyser();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
-    private Interactivechat interactivechat = new Interactivechat();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
-    private Itemsadder itemsadder = new Itemsadder();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
-    private Libertybans libertybans = new Libertybans();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
-    private Litebans litebans = new Litebans();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
-    private Luckperms luckperms = new Luckperms();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
-    private Maintenance maintenance = new Maintenance();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
-    private MiniMOTD minimotd = new MiniMOTD();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
-    private MiniPlaceholders miniplaceholders = new MiniPlaceholders();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
-    private MOTD motd = new MOTD();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
-    private Placeholderapi placeholderapi = new Placeholderapi();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
-    private Plasmovoice plasmovoice = new Plasmovoice();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
-    private Simplevoice simplevoice = new Simplevoice();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
-    private Skinsrestorer skinsrestorer = new Skinsrestorer();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
-    private Supervanish supervanish = new Supervanish();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
-    @JsonProperty("tab")
-    private TAB TAB = new TAB();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
-    private Telegram telegram = new Telegram();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
-    private Triton triton = new Triton();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
-    private Twitch twitch = new Twitch();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
-    private Vault vault = new Vault();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
-    private Yandex yandex = new Yandex();
-
-    @Getter
-    public static final class Advancedban implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseBan = true;
-        private boolean disableFlectonepulseMute = true;
-        private boolean disableFlectonepulseWarn = true;
-        private boolean disableFlectonepulseKick = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Libertybans(
+            Boolean enable,
+            Boolean disableFlectonepulseBan,
+            Boolean disableFlectonepulseMute,
+            Boolean disableFlectonepulseWarn,
+            Boolean disableFlectonepulseKick
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Libertybans implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseBan = true;
-        private boolean disableFlectonepulseMute = true;
-        private boolean disableFlectonepulseWarn = true;
-        private boolean disableFlectonepulseKick = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Deepl(
+            Boolean enable,
+            String authKey
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Deepl implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = false;
-        private String authKey = "";
-    }
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Discord(
+            Boolean enable,
+            String token,
+            Map<String, Command> customCommand,
+            Presence presence,
+            ChannelInfo channelInfo,
+            Map<String, List<String>> messageChannel,
+            Destination destination
+    ) implements EnableSetting {
 
-    @Getter
-    public static final class Discord implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = false;
-        private String token = "";
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, Command> customCommand = new LinkedHashMap<>() {
-            {
-                put("ping", new Command(true, List.of("!ping")));
-            }
-        };
-
-        private Presence presence = new Presence();
-        private ChannelInfo channelInfo = new ChannelInfo();
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
-            {
-                put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), List.of("123456"));
-                put("CHAT_GLOBAL", List.of("123456"));
-            }
-        };
-
-        private Destination destination = new Destination();
-
-        @Getter
-        public static final class Presence {
-            private boolean enable = true;
-
-            private String status = "ONLINE";
-            private Activity activity = new Activity();
-
-            @Getter
-            public static final class Activity {
-                private boolean enable = true;
-                private String type = "PLAYING";
-                private String name = "FlectonePulse";
-                private String url = "https://flectone.net/pulse/";
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Presence(
+                Boolean enable,
+                String status,
+                Activity activity
+        ) {
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Activity(
+                    Boolean enable,
+                    String type,
+                    String name,
+                    String url
+            ) {
             }
         }
     }
 
-    @Getter
-    public static final class ChannelInfo {
-        private boolean enable = false;
-        private Ticker ticker = new Ticker(true, 1200);
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record ChannelInfo(Boolean enable, Ticker ticker) {
     }
 
-    @Getter
-    public static final class Geyser implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Geyser(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Interactivechat implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Interactivechat(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Itemsadder implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Itemsadder(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Litebans implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseBan = true;
-        private boolean disableFlectonepulseMute = true;
-        private boolean disableFlectonepulseWarn = true;
-        private boolean disableFlectonepulseKick = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Litebans(
+            Boolean enable,
+            Boolean disableFlectonepulseBan,
+            Boolean disableFlectonepulseMute,
+            Boolean disableFlectonepulseWarn,
+            Boolean disableFlectonepulseKick
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Luckperms implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean tabSort = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Luckperms(Boolean enable, Boolean tabSort) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Maintenance implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseMaintenance = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Maintenance(Boolean enable, Boolean disableFlectonepulseMaintenance) implements EnableSetting {
     }
 
-    @Getter
-    public static final class MiniMOTD implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseStatus = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record MiniMOTD(
+            Boolean enable,
+            Boolean disableFlectonepulseStatus
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class MiniPlaceholders implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record MiniPlaceholders(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class MOTD implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseStatus = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record MOTD(Boolean enable, Boolean disableFlectonepulseStatus) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Placeholderapi implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Placeholderapi(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Plasmovoice implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Plasmovoice(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Simplevoice implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Simplevoice(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Skinsrestorer implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Skinsrestorer(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Supervanish implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Supervanish(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class TAB implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
-        private boolean disableFlectonepulseScoreboard = true;
-        private boolean disableFlectonepulseHeader = true;
-        private boolean disableFlectonepulseFooter = true;
-        private boolean disableFlectonepulsePlayerlistname = false;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Tab(
+            Boolean enable,
+            Boolean disableFlectonepulseScoreboard,
+            Boolean disableFlectonepulseHeader,
+            Boolean disableFlectonepulseFooter,
+            Boolean disableFlectonepulsePlayerlistname
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = false;
-        private Mode parseMode = Mode.NONE;
-
-        private String token = "";
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, Command> customCommand = new LinkedHashMap<>() {
-            {
-                put("id", new Command(false, List.of("!id")));
-                put("ping", new Command(true, List.of("!ping")));
-            }
-        };
-
-        private ChannelInfo channelInfo = new ChannelInfo();
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
-            {
-                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), List.of("123456"));
-                put("CHAT_GLOBAL", List.of("123456"));
-            }
-        };
-
-        private Destination destination = new Destination();
-
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Telegram(
+            Boolean enable,
+            Mode parseMode,
+            String token,
+            Map<String, Command> customCommand,
+            ChannelInfo channelInfo,
+            Map<String, List<String>> messageChannel,
+            Destination destination
+    ) implements EnableSetting {
         public enum Mode {
             MARKDOWN,
             MARKDOWN_V2,
@@ -292,57 +294,41 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         }
     }
 
-    @Getter
-    public static final class Triton implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Triton(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Twitch implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = false;
-        private String clientID = "";
-        private String token = "";
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, Command> customCommand = new LinkedHashMap<>() {
-            {
-                put("ping", new Command(true, List.of("!ping")));
-            }
-        };
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
-            {
-                put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), List.of("faseri4ka"));
-                put("CHAT_GLOBAL", List.of("faseri4ka"));
-            }
-        };
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(
-                "faseri4ka", List.of("stream start https://twitch.tv/faseri4ka")
-        ));
-
-        private Destination destination = new Destination();
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Twitch(
+            Boolean enable,
+            String clientID,
+            String token,
+            Map<String, Command> customCommand,
+            Map<String, List<String>> messageChannel,
+            Map<String, List<String>> followChannel,
+            Destination destination
+    ) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Vault implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = true;
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Vault(Boolean enable) implements EnableSetting {
     }
 
-    @Getter
-    public static final class Yandex implements SubIntegrationConfig, Config.IEnable {
-        private boolean enable = false;
-        private String token = "";
-        private String folderId = "";
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Yandex(Boolean enable, String token, String folderId) implements EnableSetting {
     }
 
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static final class Command {
-        private boolean needPlayer = false;
-        private List<String> aliases = new ArrayList<>();
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Command(Boolean needPlayer, List<String> aliases) {
     }
 }

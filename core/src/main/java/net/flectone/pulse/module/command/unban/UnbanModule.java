@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -13,7 +13,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,10 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptId = addPrompt(1, Localization.Command.Prompt::getId);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptId = addPrompt(1, Localization.Command.Prompt::id);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -67,17 +67,17 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
     @Override
     public Command.Unban config() {
-        return fileResolver.getCommand().getUnban();
+        return fileFacade.command().unban();
     }
 
     @Override
     public Permission.Command.Unban permission() {
-        return fileResolver.getPermission().getCommand().getUnban();
+        return fileFacade.permission().command().unban();
     }
 
     @Override
     public Localization.Command.Unban localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getUnban();
+        return fileFacade.localization(sender).command().unban();
     }
 
     public void unban(FPlayer fPlayer, String target, int id) {
@@ -87,17 +87,17 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         if (fTarget.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unban::getNullPlayer)
+                    .format(Localization.Command.Unban::nullPlayer)
                     .build()
             );
 
             return;
         }
 
-        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unban::getLowerWeightGroup)
+                    .format(Localization.Command.Unban::lowerWeightGroup)
                     .build()
             );
             return;
@@ -118,7 +118,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         if (bans.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unban::getNotBanned)
+                    .format(Localization.Command.Unban::notBanned)
                     .build()
             );
 
@@ -131,11 +131,11 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .sender(fTarget)
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(bans)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

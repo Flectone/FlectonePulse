@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.PlatformType;
 
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LuckPermsModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final LuckPermsIntegration luckPermsIntegration;
     private final PlatformServerAdapter platformServerAdapter;
 
@@ -43,12 +43,12 @@ public class LuckPermsModule extends AbstractModule {
 
     @Override
     public Integration.Luckperms config() {
-        return fileResolver.getIntegration().getLuckperms();
+        return fileFacade.integration().luckperms();
     }
 
     @Override
     public Permission.Integration.Luckperms permission() {
-        return fileResolver.getPermission().getIntegration().getLuckperms();
+        return fileFacade.permission().integration().luckperms();
     }
 
     public boolean hasLuckPermission(FPlayer fPlayer, String permission) {
@@ -59,7 +59,7 @@ public class LuckPermsModule extends AbstractModule {
 
     public int getGroupWeight(FPlayer fPlayer) {
         if (!isEnable()) return 0;
-        if (!config().isTabSort()) return 0;
+        if (!config().tabSort()) return 0;
 
         return luckPermsIntegration.getGroupWeight(fPlayer);
     }

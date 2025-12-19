@@ -14,14 +14,14 @@ import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TabnameModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
@@ -32,7 +32,7 @@ public class TabnameModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
@@ -49,12 +49,12 @@ public class TabnameModule extends AbstractModule {
 
     @Override
     public Message.Objective.Tabname config() {
-        return fileResolver.getMessage().getObjective().getTabname();
+        return fileFacade.message().objective().tabname();
     }
 
     @Override
     public Permission.Message.Objective.Tabname permission() {
-        return fileResolver.getPermission().getMessage().getObjective().getTabname();
+        return fileFacade.permission().message().objective().tabname();
     }
 
     public void create(FPlayer fPlayer) {
@@ -68,7 +68,7 @@ public class TabnameModule extends AbstractModule {
         if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
-            int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().getMode());
+            int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().mode());
             objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.TABLIST);
         });
     }

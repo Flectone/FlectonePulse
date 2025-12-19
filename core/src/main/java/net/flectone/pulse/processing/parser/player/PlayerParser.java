@@ -9,7 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
@@ -27,7 +27,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
 
     private final FPlayerService playerService;
     private final IntegrationModule integrationModule;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
 
@@ -46,9 +46,9 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
     }
 
     protected boolean isVisible(FPlayer sender, FPlayer fPlayer) {
-        if (fileResolver.getCommand().isSuggestInvisiblePlayers()) return true;
+        if (fileFacade.command().suggestInvisiblePlayers()) return true;
         if (!platformPlayerAdapter.hasPotionEffect(fPlayer, PotionTypes.INVISIBILITY)) return true;
 
-        return permissionChecker.check(sender, fileResolver.getPermission().getCommand().getSeeInvisiblePlayersInSuggest());
+        return permissionChecker.check(sender, fileFacade.permission().command().seeInvisiblePlayersInSuggest());
     }
 }

@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +15,7 @@ import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -34,7 +34,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
@@ -43,18 +43,18 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     public void onEnable() {
         super.onEnable();
 
-        String promptLanguage = addPrompt(0, Localization.Command.Prompt::getLanguage);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        String promptLanguage = addPrompt(0, Localization.Command.Prompt::language);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
                 .required(promptLanguage + " main", commandParserProvider.singleMessageParser(), languageSuggestion())
                 .required(promptLanguage + " target", commandParserProvider.singleMessageParser(), languageSuggestion())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
-                .permission(permission().getName())
+                .permission(permission().name())
         );
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {
-        return (context, input) -> config().getLanguages()
+        return (context, input) -> config().languages()
                 .stream()
                 .map(Suggestion::suggestion)
                 .toList();
@@ -79,7 +79,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         if (translatedMessage.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Translateto::getNullOrError)
+                    .format(Localization.Command.Translateto::nullOrError)
                     .build()
             );
 
@@ -92,8 +92,8 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                 .format(replaceLanguage(targetLang))
                 .targetLanguage(targetLang)
                 .messageToTranslate(messageToTranslate)
-                .range(config().getRange())
-                .destination(config().getDestination())
+                .range(config().range())
+                .destination(config().destination())
                 .message(translatedMessage)
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
@@ -113,25 +113,25 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public Command.Translateto config() {
-        return fileResolver.getCommand().getTranslateto();
+        return fileFacade.command().translateto();
     }
 
     @Override
     public Permission.Command.Translateto permission() {
-        return fileResolver.getPermission().getCommand().getTranslateto();
+        return fileFacade.permission().command().translateto();
     }
 
     @Override
     public Localization.Command.Translateto localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getTranslateto();
+        return fileFacade.localization(sender).command().translateto();
     }
 
     public Function<Localization.Command.Translateto, String> replaceLanguage(String targetLang) {
-        return message -> Strings.CS.replace(message.getFormat(), "<language>", targetLang);
+        return message -> Strings.CS.replace(message.format(), "<language>", targetLang);
     }
 
     public String translate(FPlayer fPlayer, String source, String target, String text) {
-        return switch (config().getService()) {
+        return switch (config().service()) {
             case DEEPL -> integrationModule.deeplTranslate(fPlayer, source, target, text);
             case GOOGLE -> googleTranslate(source, target, text);
             case YANDEX -> integrationModule.yandexTranslate(fPlayer, source, target, text);

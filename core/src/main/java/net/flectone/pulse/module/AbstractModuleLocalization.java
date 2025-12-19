@@ -3,8 +3,8 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -31,7 +31,7 @@ import java.util.List;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
-public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
+public abstract class AbstractModuleLocalization<M extends LocalizationSetting> extends AbstractModule {
 
     @Inject private FPlayerService fPlayerService;
     @Inject private RangeFilter rangeFilter;
@@ -49,23 +49,23 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return localization(FPlayer.UNKNOWN);
     }
 
-    public Sound createSound(Sound sound, Permission.IPermission permission) {
+    public Sound createSound(Sound sound, PermissionSetting permission) {
         this.moduleSound = sound;
 
         if (permission != null) {
             registerPermission(permission);
-            sound.setPermission(permission.getName());
+            sound.setPermission(permission.name());
         }
 
         return sound;
     }
 
-    public Cooldown createCooldown(Cooldown cooldown, Permission.IPermission permission) {
+    public Cooldown createCooldown(Cooldown cooldown, PermissionSetting permission) {
         this.moduleCooldown = cooldown;
 
         if (permission != null) {
             registerPermission(permission);
-            cooldown.setPermissionBypass(permission.getName());
+            cooldown.setPermissionBypass(permission.name());
         }
 
         return this.moduleCooldown;

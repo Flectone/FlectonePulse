@@ -5,7 +5,7 @@ import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentS
 import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class FLogger extends Logger {
     private final Consumer<LogRecord> logConsumer;
     private final LogFilter logFilter = new LogFilter();
 
-    @Setter private FileResolver fileResolver;
+    @Setter private FileFacade fileFacade;
 
     public FLogger(Consumer<LogRecord> logConsumer) {
         super("", null);
@@ -39,11 +39,11 @@ public class FLogger extends Logger {
     }
 
     public Config.Logger config() {
-        return fileResolver == null ? null : fileResolver.getConfig().getLogger();
+        return fileFacade == null ? null : fileFacade.config().logger();
     }
 
     public void setupFilter() {
-        logFilter.setFilters(config() == null ? Collections.emptyList() : config().getFilter());
+        logFilter.setFilters(config() == null ? Collections.emptyList() : config().filter());
     }
 
     @Override
@@ -54,11 +54,11 @@ public class FLogger extends Logger {
             return;
         }
 
-        String prefix = config().getPrefix();
+        String prefix = config().prefix();
 
         String color = switch (logRecord.getLevel().intValue()) {
-            case 900 -> config().getWarn();
-            case 800 -> config().getInfo();
+            case 900 -> config().warn();
+            case 800 -> config().info();
             default -> "";
         };
 
@@ -103,7 +103,7 @@ public class FLogger extends Logger {
         Config.Logger config = config();
         if (config == null) return;
 
-        config.getDescription().forEach(string -> {
+        config.description().forEach(string -> {
             string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
             info(string);
         });

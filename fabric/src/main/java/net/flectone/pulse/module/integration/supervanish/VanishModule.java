@@ -7,13 +7,13 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VanishModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final VanishIntegration vanishIntegration;
 
     @Override
@@ -32,12 +32,12 @@ public class VanishModule extends AbstractModule {
 
     @Override
     public Integration.Supervanish config() {
-        return fileResolver.getIntegration().getSupervanish();
+        return fileFacade.integration().supervanish();
     }
 
     @Override
     public Permission.Integration.Supervanish permission() {
-        return fileResolver.getPermission().getIntegration().getSupervanish();
+        return fileFacade.permission().integration().supervanish();
     }
 
     public boolean isVanished(FEntity sender) {

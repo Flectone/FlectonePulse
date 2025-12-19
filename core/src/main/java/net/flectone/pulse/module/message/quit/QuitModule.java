@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -14,14 +14,14 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuitModule extends AbstractModuleLocalization<Localization.Message.Quit> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
 
@@ -29,7 +29,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().getSound(), permission().getSound());
+        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(QuitPulseListener.class);
     }
@@ -41,17 +41,17 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public Message.Quit config() {
-        return fileResolver.getMessage().getQuit();
+        return fileFacade.message().quit();
     }
 
     @Override
     public Permission.Message.Quit permission() {
-        return fileResolver.getPermission().getMessage().getQuit();
+        return fileFacade.permission().message().quit();
     }
 
     @Override
     public Localization.Message.Quit localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getQuit();
+        return fileFacade.localization(sender).message().quit();
     }
 
     @Async
@@ -60,10 +60,10 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
                 .sender(fPlayer)
-                .format(Localization.Message.Quit::getFormat)
+                .format(Localization.Message.Quit::format)
                 .ignoreVanish(ignoreVanish)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .integration()

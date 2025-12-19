@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -50,16 +50,16 @@ public class BanPulseListener implements PulseListener {
         fPlayerService.loadColors(fPlayer);
 
         Localization.Command.Ban localization = banModule.localization(fPlayer);
-        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
+        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
 
         Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
         event.setKickReason(reason);
 
-        if (banModule.config().isShowConnectionAttempts()) {
+        if (banModule.config().showConnectionAttempts()) {
             banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format((fReceiver, message) -> {
-                        String format = message.getConnectionAttempt();
+                        String format = message.connectionAttempt();
                         return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
                     })
                     .moderation(ban)

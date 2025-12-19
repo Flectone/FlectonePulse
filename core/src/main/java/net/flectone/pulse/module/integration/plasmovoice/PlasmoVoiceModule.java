@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import su.plo.voice.api.server.PlasmoVoiceServer;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlasmoVoiceModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PlasmoVoiceIntegration plasmoVoiceIntegration;
 
     @Override
@@ -33,12 +33,12 @@ public class PlasmoVoiceModule extends AbstractModule {
 
     @Override
     public Integration.Plasmovoice config() {
-        return fileResolver.getIntegration().getPlasmovoice();
+        return fileFacade.integration().plasmovoice();
     }
 
     @Override
     public Permission.Integration.Plasmovoice permission() {
-        return fileResolver.getPermission().getIntegration().getPlasmovoice();
+        return fileFacade.permission().integration().plasmovoice();
     }
 
 }

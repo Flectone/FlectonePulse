@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.integration.discord.listener;
 
 import discord4j.core.event.domain.Event;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.util.constant.MessageType;
 import reactor.core.publisher.Mono;

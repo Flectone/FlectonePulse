@@ -10,7 +10,7 @@ import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
@@ -70,7 +70,7 @@ import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -91,7 +91,7 @@ import java.util.List;
 public class ProxyMessageHandler {
 
     private final Injector injector;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final FLogger fLogger;
     private final ModerationService moderationService;
@@ -143,7 +143,7 @@ public class ProxyMessageHandler {
             return;
         }
 
-        Set<String> configClusters = fileResolver.getConfig().getProxy().getClusters();
+        Set<String> configClusters = fileFacade.config().proxy().clusters();
         if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
             return;
         }
@@ -212,9 +212,9 @@ public class ProxyMessageHandler {
         module.sendMessage(module.metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Command.Anon::getFormat)
+                .format(Localization.Command.Anon::format)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getAnon().getDestination())
+                .destination(fileFacade.command().anon().destination())
                 .sound(module.getModuleSound())
                 .message(message)
                 .build()
@@ -230,9 +230,9 @@ public class ProxyMessageHandler {
         module.sendMessage(module.metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Command.Me::getFormat)
+                .format(Localization.Command.Me::format)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getMe().getDestination())
+                .destination(fileFacade.command().me().destination())
                 .message(message)
                 .sound(module.getModuleSound())
                 .build()
@@ -252,7 +252,7 @@ public class ProxyMessageHandler {
                 .format(module.replaceAnswer(answer))
                 .answer(answer)
                 .message(message)
-                .destination(fileResolver.getCommand().getBall().getDestination())
+                .destination(fileFacade.command().ball().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -275,7 +275,7 @@ public class ProxyMessageHandler {
                 .format(module.buildFormat(ban))
                 .moderation(ban)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getBan().getDestination())
+                .destination(fileFacade.command().ban().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -290,9 +290,9 @@ public class ProxyMessageHandler {
         module.sendMessage(module.metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Command.Broadcast::getFormat)
+                .format(Localization.Command.Broadcast::format)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getBroadcast().getDestination())
+                .destination(fileFacade.command().broadcast().destination())
                 .message(message)
                 .sound(module.getModuleSound())
                 .build()
@@ -325,7 +325,7 @@ public class ProxyMessageHandler {
                 .format(module.replaceResult(percent))
                 .percent(percent)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getCoin().getDestination())
+                .destination(fileFacade.command().coin().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -348,10 +348,10 @@ public class ProxyMessageHandler {
         module.sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(dice -> module.replaceResult(cubes, dice.getSymbols(), dice.getFormat()))
+                .format(dice -> module.replaceResult(cubes, dice.symbols(), dice.format()))
                 .cubes(cubes)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getDice().getDestination())
+                .destination(fileFacade.command().dice().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -366,10 +366,10 @@ public class ProxyMessageHandler {
         module.sendMessage(module.metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Command.Do::getFormat)
+                .format(Localization.Command.CommandDo::format)
                 .message(message)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getDo().getDestination())
+                .destination(fileFacade.command().commandDo().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -388,7 +388,7 @@ public class ProxyMessageHandler {
                     .uuid(metadataUUID)
                     .sender(fEntity)
                     .range(Range.get(Range.Type.SERVER))
-                    .format(Localization.Command.Emit::getFormat)
+                    .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
                     .sound(module.getModuleSound())
@@ -399,7 +399,7 @@ public class ProxyMessageHandler {
                     .uuid(metadataUUID)
                     .sender(fEntity)
                     .filterPlayer(fTarget)
-                    .format(Localization.Command.Emit::getFormat)
+                    .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
                     .sound(module.getModuleSound())
@@ -417,9 +417,9 @@ public class ProxyMessageHandler {
         module.sendMessage(module.metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Command.Helper::getGlobal)
+                .format(Localization.Command.Helper::global)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getHelper().getDestination())
+                .destination(fileFacade.command().helper().destination())
                 .message(message)
                 .sound(module.getModuleSound())
                 .filter(module.getFilterSee())
@@ -441,7 +441,7 @@ public class ProxyMessageHandler {
                 .format(module.buildFormat(mute))
                 .moderation(mute)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getMute().getDestination())
+                .destination(fileFacade.command().mute().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -460,10 +460,10 @@ public class ProxyMessageHandler {
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(unban -> Strings.CS.replace(unban.getFormat(), "<moderator>", fModerator.getName()))
+                .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
                 .moderations(bans)
-                .destination(fileResolver.getCommand().getUnban().getDestination())
+                .destination(fileFacade.command().unban().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -481,10 +481,10 @@ public class ProxyMessageHandler {
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
                 .moderations(mutes)
-                .destination(fileResolver.getCommand().getUnmute().getDestination())
+                .destination(fileFacade.command().unmute().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -502,10 +502,10 @@ public class ProxyMessageHandler {
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
                 .moderations(warns)
-                .destination(fileResolver.getCommand().getUnwarn().getDestination())
+                .destination(fileFacade.command().unwarn().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -551,7 +551,7 @@ public class ProxyMessageHandler {
                 .turned(true)
                 .action(action)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getSpy().getDestination())
+                .destination(fileFacade.command().spy().destination())
                 .message(string)
                 .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN))
                 .build()
@@ -571,7 +571,7 @@ public class ProxyMessageHandler {
                 .turned(true)
                 .urls(message)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getStream().getDestination())
+                .destination(fileFacade.command().stream().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -590,7 +590,7 @@ public class ProxyMessageHandler {
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
         if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
-        module.send(fEntity, fReceiver, fReceiver, Localization.Command.Tell::getReceiver, message, metadataUUID);
+        module.send(fEntity, fReceiver, fReceiver, Localization.Command.Tell::receiver, message, metadataUUID);
     }
 
     private void handleTranslateToCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -608,7 +608,7 @@ public class ProxyMessageHandler {
                 .targetLanguage(targetLang)
                 .messageToTranslate(messageToTranslate)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getTranslateto().getDestination())
+                .destination(fileFacade.command().translateto().destination())
                 .message(message)
                 .sound(module.getModuleSound())
                 .build()
@@ -622,13 +622,13 @@ public class ProxyMessageHandler {
         int value = input.readInt();
         String message = input.readUTF();
 
-        module.sendMessage(TryMetadata.<Localization.Command.Try>builder()
+        module.sendMessage(TryMetadata.<Localization.Command.CommandTry>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replacePercent(value))
                 .percent(value)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getTry().getDestination())
+                .destination(fileFacade.command().commandTry().destination())
                 .message(message)
                 .sound(module.getModuleSound())
                 .build()
@@ -649,7 +649,7 @@ public class ProxyMessageHandler {
                 .format(module.buildFormat(warn))
                 .moderation(warn)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getWarn().getDestination())
+                .destination(fileFacade.command().warn().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -670,7 +670,7 @@ public class ProxyMessageHandler {
                 .sender(fEntity)
                 .format(module.buildFormat(kick))
                 .moderation(kick)
-                .destination(fileResolver.getCommand().getKick().getDestination())
+                .destination(fileFacade.command().kick().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -718,7 +718,7 @@ public class ProxyMessageHandler {
         ChatModule chatModule = injector.getInstance(ChatModule.class);
         if (chatModule.isModuleDisabledFor(fPlayer)) return;
 
-        Optional<Map.Entry<String, Message.Chat.Type>> optionalChat = fileResolver.getMessage().getChat().getTypes()
+        Optional<Map.Entry<String, Message.Chat.Type>> optionalChat = fileFacade.message().chat().types()
                 .entrySet()
                 .stream()
                 .filter(chat -> chat.getKey().equals(proxyChatName))
@@ -732,11 +732,11 @@ public class ProxyMessageHandler {
         chatModule.sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
-                .format(s -> s.getTypes().get(chatName))
+                .format(s -> s.types().get(chatName))
                 .chatName(chatName)
                 .chatType(chatType)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(chatType.getDestination())
+                .destination(chatType.destination())
                 .message(message)
                 .sound(chatModule.getModuleSound())
                 .filter(chatModule.permissionFilter(chatName))
@@ -784,15 +784,15 @@ public class ProxyMessageHandler {
         boolean hasPlayedBefore = input.readBoolean();
         boolean ignoreVanish = input.readBoolean();
 
-        Message.Join message = fileResolver.getMessage().getJoin();
+        Message.Join message = fileFacade.message().join();
 
         module.sendMessage(JoinMetadata.<Localization.Message.Join>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
+                .format(s -> hasPlayedBefore || !message.first() ? s.format() : s.formatFirstTime())
                 .ignoreVanish(ignoreVanish)
                 .playedBefore(hasPlayedBefore)
-                .destination(message.getDestination())
+                .destination(message.destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -808,9 +808,9 @@ public class ProxyMessageHandler {
         module.sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(Localization.Message.Quit::getFormat)
+                .format(Localization.Message.Quit::format)
                 .ignoreVanish(ignoreVanish)
-                .destination(fileResolver.getMessage().getQuit().getDestination())
+                .destination(fileFacade.message().quit().destination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
                 .build()
@@ -827,12 +827,12 @@ public class ProxyMessageHandler {
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(s -> isAfk
-                        ? s.getFormatFalse().getGlobal()
-                        : s.getFormatTrue().getGlobal()
+                        ? s.formatFalse().global()
+                        : s.formatTrue().global()
                 )
                 .newStatus(isAfk)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getMessage().getAfk().getDestination())
+                .destination(fileFacade.message().afk().destination())
                 .sound(module.getModuleSound())
                 .build()
         );
@@ -849,17 +849,17 @@ public class ProxyMessageHandler {
 
         ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
 
-        String vanillaMessageName = vanillaMessage.getName();
+        String vanillaMessageName = vanillaMessage.name();
 
         module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .uuid(metadataUUID)
                 .parsedComponent(parsedComponent)
                 .sender(fEntity)
-                .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
+                .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                 .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                .destination(parsedComponent.vanillaMessage().getDestination())
+                .destination(parsedComponent.vanillaMessage().destination())
                 .build()
         );
     }

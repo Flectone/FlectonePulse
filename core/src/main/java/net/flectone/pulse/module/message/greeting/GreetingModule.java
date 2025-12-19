@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.FImage;
@@ -13,7 +13,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
 import net.flectone.pulse.module.message.greeting.model.GreetingMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GreetingModule extends AbstractModuleLocalization<Localization.Message.Greeting> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final SkinService skinService;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
@@ -34,7 +34,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().getSound(), permission().getSound());
+        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(GreetingPulseListener.class);
     }
@@ -46,17 +46,17 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
 
     @Override
     public Message.Greeting config() {
-        return fileResolver.getMessage().getGreeting();
+        return fileFacade.message().greeting();
     }
 
     @Override
     public Permission.Message.Greeting permission() {
-        return fileResolver.getPermission().getMessage().getGreeting();
+        return fileFacade.permission().message().greeting();
     }
 
     @Override
     public Localization.Message.Greeting localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getGreeting();
+        return fileFacade.localization(sender).message().greeting();
     }
 
     public void send(FPlayer fPlayer) {
@@ -70,7 +70,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
             sendMessage(GreetingMetadata.<Localization.Message.Greeting>builder()
                     .sender(fPlayer)
                     .format(s -> {
-                        String greetingMessage = String.join("<br>", localization(fPlayer).getFormat());
+                        String greetingMessage = String.join("<br>", localization(fPlayer).format());
 
                         for (String pixel : pixels) {
                             greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
@@ -79,7 +79,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                         return greetingMessage;
                     })
                     .pixels(pixels)
-                    .destination(config().getDestination())
+                    .destination(config().destination())
                     .sound(getModuleSound())
                     .build()
             );

@@ -31,7 +31,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
@@ -61,14 +61,14 @@ public class LegacyColorConvertor {
     ));
 
     private final @Named("legacyColorMessage") Cache<String, String> messageCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
     public void convert(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && !permissionChecker.check(sender, fileResolver.getPermission().getMessage().getFormat().getLegacyColors())) return;
+                && !permissionChecker.check(sender, fileFacade.permission().message().format().legacyColors())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;

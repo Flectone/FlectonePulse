@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -30,7 +30,7 @@ import org.incendo.cloud.context.CommandContext;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> implements PulseListener {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
@@ -43,10 +43,10 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser(true))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
@@ -63,7 +63,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         if (fReceiver.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Mail::getNullPlayer)
+                    .format(Localization.Command.Mail::nullPlayer)
                     .build()
             );
 
@@ -74,7 +74,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
             if (!tellModule.isEnable()) {
                 sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
-                        .format(Localization.Command.Mail::getOnlinePlayer)
+                        .format(Localization.Command.Mail::onlinePlayer)
                         .build()
                 );
 
@@ -98,11 +98,11 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         sendMessage(MailMetadata.<Localization.Command.Mail>builder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replaceOnce(s.getSender(), "<id>", String.valueOf(mail.id())))
+                .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))
                 .mail(mail)
                 .target(fReceiver)
                 .message(message)
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
@@ -116,16 +116,16 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public Command.Mail config() {
-        return fileResolver.getCommand().getMail();
+        return fileFacade.command().mail();
     }
 
     @Override
     public Permission.Command.Mail permission() {
-        return fileResolver.getPermission().getCommand().getMail();
+        return fileFacade.permission().command().mail();
     }
 
     @Override
     public Localization.Command.Mail localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getMail();
+        return fileFacade.localization(sender).command().mail();
     }
 }

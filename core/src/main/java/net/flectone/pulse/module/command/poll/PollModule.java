@@ -7,9 +7,8 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -22,9 +21,9 @@ import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -35,7 +34,6 @@ import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
@@ -46,7 +44,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     private final HashMap<Integer, Poll> pollMap = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
@@ -54,40 +52,39 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
-    private final YamlFileProcessor yamlFileProcessor;
     private final FLogger fLogger;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getCreate());
+        registerPermission(permission().create());
 
-        String promptTime = addPrompt(0, Localization.Command.Prompt::getTime);
-        String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::getRepeatTime);
-        String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::getMultipleVote);
-        String promptMessage = addPrompt(3, Localization.Command.Prompt::getMessage);
+        String promptTime = addPrompt(0, Localization.Command.Prompt::time);
+        String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::repeatTime);
+        String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::multipleVote);
+        String promptMessage = addPrompt(3, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
-                .permission(permission().getCreate().getName())
+                .permission(permission().create().name())
                 .required(promptTime, commandParserProvider.durationParser())
                 .required(promptRepeatTime, commandParserProvider.durationParser())
                 .required(promptMultipleVote, commandParserProvider.booleanParser())
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
 
-        if (config().isEnableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
+        if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
             registerCustomCommand(manager ->
                     manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
-                            .permission(permission().getCreate().getName())
+                            .permission(permission().create().name())
                             .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
             );
         }
 
-        String promptId = addPrompt(4, Localization.Command.Prompt::getId);
-        String promptNumber = addPrompt(5, Localization.Command.Prompt::getNumber);
+        String promptId = addPrompt(4, Localization.Command.Prompt::id);
+        String promptNumber = addPrompt(5, Localization.Command.Prompt::number);
         registerCustomCommand(manager ->
                 manager.commandBuilder(getCommandName() + "vote", CommandMeta.empty())
-                        .permission(permission().getName())
+                        .permission(permission().name())
                         .required(promptId, commandParserProvider.integerParser())
                         .required(promptNumber, commandParserProvider.integerParser())
                         .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
@@ -109,7 +106,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 if (status == null) return;
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
-                Range range = config().getRange();
+                Range range = config().range();
 
                 sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                         .sender(fPlayer)
@@ -203,21 +200,21 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public Command.Poll config() {
-        return fileResolver.getCommand().getPoll();
+        return fileFacade.command().poll();
     }
 
     @Override
     public Permission.Command.Poll permission() {
-        return fileResolver.getPermission().getCommand().getPoll();
+        return fileFacade.permission().command().poll();
     }
 
     @Override
     public Localization.Command.Poll localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getPoll();
+        return fileFacade.localization(sender).command().poll();
     }
 
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
-        Poll poll = new Poll(config().getLastId(),
+        Poll poll = new Poll(config().lastId(),
                 fPlayer.getId(),
                 endTimeValue + System.currentTimeMillis(),
                 repeatTimeValue,
@@ -228,7 +225,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         saveAndUpdateLast(poll);
 
-        Range range = config().getRange();
+        Range range = config().range();
 
         sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                 .sender(fPlayer)
@@ -250,11 +247,12 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
-        config().setLastId(poll.getId() + 1);
+
+        fileFacade.updateFilePack(filePack -> filePack.withCommand(filePack.command().withPoll(filePack.command().poll().withLastId(poll.getId() + 1))));
 
         try {
-            yamlFileProcessor.save(fileResolver.getCommand());
-        } catch (IOException e) {
+            fileFacade.saveFiles();
+        } catch (RuntimeException e) {
             fLogger.warning(e);
         }
     }
@@ -266,7 +264,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         if (poll == null) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Poll::getNullPoll)
+                    .format(Localization.Command.Poll::nullPoll)
                     .build()
             );
 
@@ -276,7 +274,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         if (poll.isEnded()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Poll::getExpired)
+                    .format(Localization.Command.Poll::expired)
                     .build()
             );
 
@@ -288,7 +286,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         if (voteType == -1) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Poll::getAlready)
+                    .format(Localization.Command.Poll::already)
                     .build()
             );
 
@@ -311,7 +309,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     public Function<Localization.Command.Poll, String> resolveVote(int voteType, int answerID, int pollID, int count) {
         return message -> StringUtils.replaceEach(
-                voteType == 1 ? message.getVoteTrue() : message.getVoteFalse(),
+                voteType == 1 ? message.voteTrue() : message.voteFalse(),
                 new String[]{"<answer_id>", "<id>", "<count>"},
                 new String[]{String.valueOf(answerID + 1), String.valueOf(pollID), String.valueOf(count)}
         );
@@ -327,7 +325,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 Component answerComponent = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
 
                 answersBuilder.append(StringUtils.replaceEach(
-                        message.getAnswerTemplate(),
+                        message.answerTemplate(),
                         new String[]{"<id>", "<number>", "<answer>", "<count>"},
                         new String[]{
                                 String.valueOf(poll.getId()),
@@ -342,16 +340,16 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
             String messageStatus = Strings.CS.replace(
                     switch (status) {
-                        case START -> message.getStatus().getStart();
-                        case RUN -> message.getStatus().getRun();
-                        case END -> message.getStatus().getEnd();
+                        case START -> message.status().start();
+                        case RUN -> message.status().run();
+                        case END -> message.status().end();
                     },
                     "<id>",
                     String.valueOf(poll.getId())
             );
 
             return StringUtils.replaceEach(
-                    message.getFormat(),
+                    message.format(),
                     new String[]{"<status>", "<answers>"},
                     new String[]{messageStatus, answersBuilder.toString()}
             );

@@ -73,7 +73,7 @@ public class ModuleController {
         configureChildren(clazz);
 
         // enable
-        enable(clazz, module -> module.config().isEnable());
+        enable(clazz, module -> module.config().enable());
     }
 
     public void terminate() {
@@ -124,7 +124,7 @@ public class ModuleController {
             }
         }
 
-        Predicate<AbstractModule> childPredicate =abstractModule -> module.isEnable() && abstractModule.config().isEnable();
+        Predicate<AbstractModule> childPredicate =abstractModule -> module.isEnable() && abstractModule.config().enable();
         module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
     }
 

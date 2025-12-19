@@ -18,7 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
@@ -58,7 +58,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PaperItemStackUtil paperItemStackUtil;
 
     private Pair<MethodHandle, Object> getTPSMethodPair;
@@ -291,7 +291,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         // This is a shitty Paper-only hack. No idea when it'll break. Admins can enable it, but it is disabled by default
         // Pray PacketEvents merges https://github.com/retrooper/packetevents/pull/1277
-        if (reflectionResolver.isPaper() && fileResolver.getConfig().getModule().isUsePaperMessageSender() && translatable) {
+        if (reflectionResolver.isPaper() && fileFacade.config().module().usePaperMessageSender() && translatable) {
             String itemMark = paperItemStackUtil.saveItem(messageUUID, itemStack);
 
             return Component.text(itemMark)

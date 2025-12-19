@@ -10,7 +10,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
@@ -18,7 +18,7 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeeplModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -40,12 +40,12 @@ public class DeeplModule extends AbstractModule {
 
     @Override
     public Integration.Deepl config() {
-        return fileResolver.getIntegration().getDeepl();
+        return fileFacade.integration().deepl();
     }
 
     @Override
     public Permission.Integration.Deepl permission() {
-        return fileResolver.getPermission().getIntegration().getDeepl();
+        return fileFacade.permission().integration().deepl();
     }
 
     public String translate(FPlayer sender, String source, String target, String text) {

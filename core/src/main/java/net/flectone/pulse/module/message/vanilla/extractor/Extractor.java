@@ -9,7 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.vanilla.model.Mapping;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.*;
@@ -55,15 +55,15 @@ public class Extractor {
 
     private final EntityUtil entityUtil;
     private final FPlayerService fPlayerService;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PacketProvider packetProvider;
 
     public void reload() {
         translationVanillaMessages.clear();
 
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = fileResolver.getMessage().getVanilla().getTypes();
+        List<Message.Vanilla.VanillaMessage> vanillaMessages = fileFacade.message().vanilla().types();
 
-        vanillaMessages.forEach(vanillaMessage -> vanillaMessage.getTranslationKeys()
+        vanillaMessages.forEach(vanillaMessage -> vanillaMessage.translationKeys()
                         .forEach(translationKey -> translationVanillaMessages.put(translationKey, vanillaMessage))
         );
     }
@@ -86,13 +86,13 @@ public class Extractor {
     }
 
     public Message.Vanilla.VanillaMessage getVanillaMessage(String translationKey) {
-        return translationVanillaMessages.getOrDefault(translationKey, new Message.Vanilla.VanillaMessage());
+        return translationVanillaMessages.getOrDefault(translationKey, Message.Vanilla.VanillaMessage.builder().build());
     }
 
     public Optional<ParsedComponent> extract(TranslatableComponent translatableComponent) {
         String translationKey = getOrLegacyMapping(translatableComponent.key());
 
-        Map<String, String> localization = fileResolver.getLocalization().getMessage().getVanilla().getTypes();
+        Map<String, String> localization = fileFacade.localization().message().vanilla().types();
         if (!localization.containsKey(translationKey)) return Optional.empty();
 
         Message.Vanilla.VanillaMessage vanillaMessage = getVanillaMessage(translationKey);

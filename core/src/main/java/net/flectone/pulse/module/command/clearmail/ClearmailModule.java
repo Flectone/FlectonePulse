@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
 
@@ -34,9 +34,9 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     public void onEnable() {
         super.onEnable();
 
-        String promptId = addPrompt(0, Localization.Command.Prompt::getId);
+        String promptId = addPrompt(0, Localization.Command.Prompt::id);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, input) -> {
                     FPlayer fPlayer = commandContext.sender();
 
@@ -62,7 +62,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
         if (optionalMail.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Clearmail::getNullMail)
+                    .format(Localization.Command.Clearmail::nullMail)
                     .build()
             );
 
@@ -75,9 +75,9 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
                 .sender(fPlayer)
-                .format(string -> Strings.CS.replaceOnce(string.getFormat(), "<id>", String.valueOf(mailID)))
+                .format(string -> Strings.CS.replaceOnce(string.format(), "<id>", String.valueOf(mailID)))
                 .mail(optionalMail.get())
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .message(optionalMail.get().message())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
@@ -92,16 +92,16 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public Command.Clearmail config() {
-        return fileResolver.getCommand().getClearmail();
+        return fileFacade.command().clearmail();
     }
 
     @Override
     public Permission.Command.Clearmail permission() {
-        return fileResolver.getPermission().getCommand().getClearmail();
+        return fileFacade.permission().command().clearmail();
     }
 
     @Override
     public Localization.Command.Clearmail localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getClearmail();
+        return fileFacade.localization(sender).command().clearmail();
     }
 }

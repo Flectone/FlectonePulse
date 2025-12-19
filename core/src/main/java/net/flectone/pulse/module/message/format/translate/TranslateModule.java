@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +15,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
@@ -33,7 +33,7 @@ import java.util.UUID;
 public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
 
@@ -58,17 +58,17 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public Message.Format.Translate config() {
-        return fileResolver.getMessage().getFormat().getTranslate();
+        return fileFacade.message().format().translate();
     }
 
     @Override
     public Permission.Message.Format.Translate permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getTranslate();
+        return fileFacade.permission().message().format().translate();
     }
 
     @Override
     public Localization.Message.Format.Translate localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getTranslate();
+        return fileFacade.localization(sender).message().format().translate();
     }
 
     public UUID saveMessage(String message) {
@@ -110,7 +110,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
                 }
             }
 
-            String action = localization(receiver).getAction();
+            String action = localization(receiver).action();
             action = Strings.CS.replaceOnce(action, "<language>", firstLang);
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
             action = Strings.CS.replace(action, "<message>", key.toString());

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +15,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -45,12 +45,12 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptReason = addPrompt(1, Localization.Command.Prompt::getReason);
-        String promptTime = addPrompt(2, Localization.Command.Prompt::getTime);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptReason = addPrompt(1, Localization.Command.Prompt::reason);
+        String promptTime = addPrompt(2, Localization.Command.Prompt::time);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
-                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
+                .permission(permission().name())
+                .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
     }
@@ -68,10 +68,10 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
-        if (!moderationService.isAllowedTime(fPlayer, time, config().getTimeLimits())) {
+        if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Warn::getNullTime)
+                    .format(Localization.Command.Warn::nullTime)
                     .build()
             );
 
@@ -82,17 +82,17 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         if (fTarget.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Warn::getNullPlayer)
+                    .format(Localization.Command.Warn::nullPlayer)
                     .build()
             );
 
             return;
         }
 
-        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Warn::getLowerWeightGroup)
+                    .format(Localization.Command.Warn::lowerWeightGroup)
                     .build()
             );
             return;
@@ -110,8 +110,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .sender(fTarget)
                 .format(buildFormat(warn))
                 .moderation(warn)
-                .range(config().getRange())
-                .destination(config().getDestination())
+                .range(config().range())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
@@ -127,7 +127,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .filter(moderation -> moderation.isValid() && !moderation.isExpired())
                 .toList().size();
 
-        String action = config().getActions().get(countWarns);
+        String action = config().actions().get(countWarns);
         if (StringUtils.isEmpty(action)) return;
 
         platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.getName()));
@@ -140,21 +140,21 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public Command.Warn config() {
-        return fileResolver.getCommand().getWarn();
+        return fileFacade.command().warn();
     }
 
     @Override
     public Permission.Command.Warn permission() {
-        return fileResolver.getPermission().getCommand().getWarn();
+        return fileFacade.permission().command().warn();
     }
 
     @Override
     public Localization.Command.Warn localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getWarn();
+        return fileFacade.localization(sender).command().warn();
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
-        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.getServer(), fReceiver, warn);
+        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, warn);
     }
 
     public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {
@@ -162,7 +162,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         sendMessage(metadataBuilder()
                 .sender(fReceiver)
-                .format(s -> moderationMessageFormatter.replacePlaceholders(s.getPerson(), fReceiver, warn))
+                .format(s -> moderationMessageFormatter.replacePlaceholders(s.person(), fReceiver, warn))
                 .build()
         );
     }

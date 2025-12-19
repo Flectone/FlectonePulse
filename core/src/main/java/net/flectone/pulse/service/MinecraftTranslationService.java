@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -40,7 +40,7 @@ public class MinecraftTranslationService {
 
     private final @Named("translationPath") Path translationPath;
     private final PacketProvider packetProvider;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
 
     private Translator translator;
@@ -62,7 +62,7 @@ public class MinecraftTranslationService {
     }
 
     public String getLanguage() {
-        return fileResolver.getConfig().getLanguage().getType().toLowerCase(Locale.ROOT);
+        return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
     }
 
     @Nullable

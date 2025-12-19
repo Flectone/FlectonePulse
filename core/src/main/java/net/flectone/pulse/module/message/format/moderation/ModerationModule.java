@@ -11,13 +11,13 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     @Override
     public void configureChildren() {
@@ -32,12 +32,12 @@ public class ModerationModule extends AbstractModule {
 
     @Override
     public Message.Format.Moderation config() {
-        return fileResolver.getMessage().getFormat().getModeration();
+        return fileFacade.message().format().moderation();
     }
 
     @Override
     public Permission.Message.Format.Moderation permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getModeration();
+        return fileFacade.permission().message().format().moderation();
     }
 
 }

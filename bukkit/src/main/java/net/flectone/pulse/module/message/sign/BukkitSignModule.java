@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.sign.listener.SignListener;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class BukkitSignModule extends SignModule {
@@ -13,10 +13,10 @@ public class BukkitSignModule extends SignModule {
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public BukkitSignModule(FileResolver fileResolver,
+    public BukkitSignModule(FileFacade fileFacade,
                             MessagePipeline messagePipeline,
                             ListenerRegistry listenerRegistry) {
-        super(fileResolver, messagePipeline);
+        super(fileFacade, messagePipeline);
 
         this.listenerRegistry = listenerRegistry;
     }

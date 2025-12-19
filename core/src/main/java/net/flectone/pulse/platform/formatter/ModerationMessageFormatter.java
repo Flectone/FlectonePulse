@@ -5,8 +5,8 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.checker.MuteChecker;
-import net.flectone.pulse.config.localization.Localization;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.Moderation;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationMessageFormatter {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
@@ -44,13 +44,13 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
-        Localization localization = fileResolver.getLocalization(fReceiver);
+        Localization localization = fileFacade.localization(fReceiver);
 
         Localization.ReasonMap constantReasons = switch (moderation.getType()) {
-            case BAN -> localization.getCommand().getBan().getReasons();
-            case MUTE -> localization.getCommand().getMute().getReasons();
-            case WARN -> localization.getCommand().getWarn().getReasons();
-            case KICK -> localization.getCommand().getKick().getReasons();
+            case BAN -> localization.command().ban().reasons();
+            case MUTE -> localization.command().mute().reasons();
+            case WARN -> localization.command().warn().reasons();
+            case KICK -> localization.command().kick().reasons();
         };
 
         FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
@@ -58,10 +58,10 @@ public class ModerationMessageFormatter {
         String reason = constantReasons.getConstant(moderation.getReason());
         String date = timeFormatter.formatDate(moderation.getDate());
         String time = moderation.isPermanent()
-                ? localization.getTime().getPermanent()
+                ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.getOriginalTime());
         String timeLeft = moderation.isPermanent()
-                ? localization.getTime().getPermanent()
+                ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.getRemainingTime());
 
         return replacePlaceholders(message, fTarget.getName(), fModerator.getName(),
@@ -70,14 +70,14 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
-        Localization localization = fileResolver.getLocalization(fReceiver);
+        Localization localization = fileFacade.localization(fReceiver);
 
         String date = timeFormatter.formatDate(moderation.date());
         String time = moderation.permanent()
-                ? localization.getTime().getPermanent()
+                ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.time());
         String timeLeft = moderation.permanent()
-                ? localization.getTime().getPermanent()
+                ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.time() - System.currentTimeMillis());
 
         return replacePlaceholders(message,
@@ -92,7 +92,7 @@ public class ModerationMessageFormatter {
     }
 
     public String buildMuteMessage(FPlayer fPlayer, MuteChecker.Status status) {
-        String format = fileResolver.getLocalization(fPlayer).getCommand().getMute().getPerson();
+        String format = fileFacade.localization(fPlayer).command().mute().person();
 
         return switch (status) {
             case LOCAL -> {

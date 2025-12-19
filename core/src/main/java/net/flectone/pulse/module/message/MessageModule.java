@@ -26,13 +26,13 @@ import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     @Override
     public void configureChildren() {
@@ -62,12 +62,12 @@ public class MessageModule extends AbstractModule {
 
     @Override
     public Message config() {
-        return fileResolver.getMessage();
+        return fileFacade.message();
     }
 
     @Override
     public Permission.Message permission() {
-        return fileResolver.getPermission().getMessage();
+        return fileFacade.permission().message();
     }
 
 }

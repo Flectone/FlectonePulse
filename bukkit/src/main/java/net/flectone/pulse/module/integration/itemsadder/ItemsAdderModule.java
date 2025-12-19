@@ -7,13 +7,13 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ItemsAdderModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ItemsAdderIntegration itemsAdderIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -35,12 +35,12 @@ public class ItemsAdderModule extends AbstractModule {
 
     @Override
     public Integration.Itemsadder config() {
-        return fileResolver.getIntegration().getItemsadder();
+        return fileFacade.integration().itemsadder();
     }
 
     @Override
     public Permission.Integration.Itemsadder permission() {
-        return fileResolver.getPermission().getIntegration().getItemsadder();
+        return fileFacade.permission().integration().itemsadder();
     }
 
     public boolean isHooked() {

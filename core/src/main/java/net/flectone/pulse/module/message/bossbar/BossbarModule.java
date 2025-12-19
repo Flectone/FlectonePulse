@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +15,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.bossbar.listener.BossbarPacketListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -34,7 +34,7 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
     private static final String RAIDERS_REMAINING_KEY = "event.minecraft.raid.raiders_remaining";
     private static final String RAIDERS_PLACEHOLDER = "<raiders>";
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
@@ -54,17 +54,17 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public Message.Bossbar config() {
-        return fileResolver.getMessage().getBossbar();
+        return fileFacade.message().bossbar();
     }
 
     @Override
     public Permission.Message.Bossbar permission() {
-        return fileResolver.getPermission().getMessage().getBossbar();
+        return fileFacade.permission().message().bossbar();
     }
 
     @Override
     public Localization.Message.Bossbar localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getBossbar();
+        return fileFacade.localization(sender).message().bossbar();
     }
 
     @Async
@@ -73,7 +73,7 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
         if (isModuleDisabledFor(fPlayer)) return;
         if (!fPlayer.isSetting(MessageType.BOSSBAR)) return;
 
-        String message = localization(fPlayer).getTypes().get(translationKey);
+        String message = localization(fPlayer).types().get(translationKey);
         if (StringUtils.isEmpty(message)) return;
 
         // it looks strange, but this is the only way to make normal color and message support
@@ -95,18 +95,18 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
 
         packetSender.send(fPlayer, wrapper);
 
-        Message.Bossbar.Announce messageAnnounce = config().getAnnounce().get(translationKey);
+        Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
         if (announce && messageAnnounce != null) {
             sendMessage(metadataBuilder()
                     .sender(FPlayer.UNKNOWN)
                     .format(localization -> Strings.CS.replace(
-                            StringUtils.defaultString(localization.getAnnounce().get(translationKey)),
+                            StringUtils.defaultString(localization.announce().get(translationKey)),
                             RAIDERS_PLACEHOLDER,
                             raiders
                     ))
                     .filterPlayer(fPlayer)
-                    .destination(messageAnnounce.getDestination())
-                    .sound(messageAnnounce.getSound())
+                    .destination(messageAnnounce.destination())
+                    .sound(messageAnnounce.sound())
                     .build()
             );
         }
@@ -117,7 +117,7 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
         if (StringUtils.isEmpty(raiders)) return MessagePipeline.ReplacementTag.empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String raidersRemaining = localization(fPlayer).getTypes().get(RAIDERS_REMAINING_KEY);
+            String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
             if (StringUtils.isEmpty(raidersRemaining)) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.selfClosingInserting(messagePipeline

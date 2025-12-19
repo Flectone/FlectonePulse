@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -39,7 +39,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
     private final Provider<DiscordIntegration> discordIntegration;
@@ -53,7 +53,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        List<String> channel = config().getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+        List<String> channel = config().messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
         if (channel == null) return Mono.empty();
         if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
 
@@ -88,11 +88,11 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
                 .sender(FPlayer.UNKNOWN)
                 .format(localization -> {
-                    Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+                    Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
                     if (channelEmbed == null) return "";
 
                     return StringUtils.replaceEach(
-                            channelEmbed.getContent(),
+                            channelEmbed.content(),
                             new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
                             new String[]{globalName, globalName, nickname, displayName, userName}
                     );
@@ -102,13 +102,13 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .displayName(displayName)
                 .userName(userName)
                 .range(Range.get(Range.Type.PROXY))
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .message(message)
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                     if (reply == null) return Tag.selfClosingInserting(Component.empty());
 
-                    Component componentReply = messagePipeline.builder(localization().getFormatReply())
+                    Component componentReply = messagePipeline.builder(localization().formatReply())
                             .tagResolvers(
                                     TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
                                     TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
@@ -131,17 +131,17 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
     @Override
     public Integration.Discord config() {
-        return fileResolver.getIntegration().getDiscord();
+        return fileFacade.integration().discord();
     }
 
     @Override
     public Permission.Integration.Discord permission() {
-        return fileResolver.getPermission().getIntegration().getDiscord();
+        return fileFacade.permission().integration().discord();
     }
 
     @Override
     public Localization.Integration.Discord localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getIntegration().getDiscord();
+        return fileFacade.localization(sender).integration().discord();
     }
 
     private String getMessageContent(Message message) {
@@ -167,28 +167,28 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String commandName = parts[0];
         String arguments = parts.length > 1 ? parts[1] : "";
 
-        for (Map.Entry<String, Integration.Command> commandEntry : config().getCustomCommand().entrySet()) {
+        for (Map.Entry<String, Integration.Command> commandEntry : config().customCommand().entrySet()) {
             Integration.Command command = commandEntry.getValue();
-            if (!command.getAliases().contains(commandName)) continue;
+            if (!command.aliases().contains(commandName)) continue;
 
             FPlayer fPlayer = FPlayer.UNKNOWN;
             Snowflake channel = message.getChannelId();
 
-            if (command.isNeedPlayer()) {
+            if (command.needPlayer()) {
                 if (arguments.isEmpty()) {
-                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::getNullPlayer));
+                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
                     return true;
                 }
 
                 String playerName = arguments.split(" ")[0];
                 fPlayer = fPlayerService.getFPlayer(playerName);
                 if (fPlayer.isUnknown()) {
-                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::getNullPlayer));
+                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
                     return true;
                 }
             }
 
-            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization().getCustomCommand().get(commandEntry.getKey());
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization().customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
             sendMessageToDiscord(fPlayer, channel, channelEmbed);

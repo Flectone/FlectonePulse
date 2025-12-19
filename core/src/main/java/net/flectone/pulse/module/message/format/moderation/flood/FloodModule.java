@@ -10,7 +10,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.flood.listener.FloodPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FloodModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
 
@@ -32,12 +32,12 @@ public class FloodModule extends AbstractModule {
 
     @Override
     public Message.Format.Moderation.Flood config() {
-        return fileResolver.getMessage().getFormat().getModeration().getFlood();
+        return fileFacade.message().format().moderation().flood();
     }
 
     @Override
     public Permission.Message.Format.Moderation.Flood permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
+        return fileFacade.permission().message().format().moderation().flood();
     }
 
     public void format(MessageContext messageContext) {
@@ -45,7 +45,7 @@ public class FloodModule extends AbstractModule {
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
-        if (permissionChecker.check(sender, permission().getBypass())) return;
+        if (permissionChecker.check(sender, permission().bypass())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
@@ -81,8 +81,8 @@ public class FloodModule extends AbstractModule {
     }
 
     private void appendSymbol(StringBuilder stringBuilder, char symbol, int count) {
-        int counts = count > config().getMaxRepeatedSymbols()
-                ? config().isTrimToSingle() ? 1 : config().getMaxRepeatedSymbols()
+        int counts = count > config().maxRepeatedSymbols()
+                ? config().trimToSingle() ? 1 : config().maxRepeatedSymbols()
                 : count;
 
         stringBuilder.append(String.valueOf(symbol).repeat(counts));
@@ -115,8 +115,8 @@ public class FloodModule extends AbstractModule {
     }
 
     private void appendWord(StringBuilder stringBuilder, String word, int count) {
-        int counts = count > config().getMaxRepeatedWords()
-                ? config().isTrimToSingle() ? 1 : config().getMaxRepeatedWords()
+        int counts = count > config().maxRepeatedWords()
+                ? config().trimToSingle() ? 1 : config().maxRepeatedWords()
                 : count;
 
         while (counts > 0) {

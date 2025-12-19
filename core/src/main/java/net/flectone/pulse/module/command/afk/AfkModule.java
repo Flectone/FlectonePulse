@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import org.incendo.cloud.context.CommandContext;
@@ -19,7 +19,7 @@ import org.incendo.cloud.context.CommandContext;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final SoundPlayer soundPlayer;
 
@@ -28,7 +28,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         super.onEnable();
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
         );
     }
 
@@ -39,17 +39,17 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     @Override
     public Command.Afk config() {
-        return fileResolver.getCommand().getAfk();
+        return fileFacade.command().afk();
     }
 
     @Override
     public Permission.Command.Afk permission() {
-        return fileResolver.getPermission().getCommand().getAfk();
+        return fileFacade.permission().command().afk();
     }
 
     @Override
     public Localization.Command localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand();
+        return fileFacade.localization(sender).command();
     }
 
     @Override

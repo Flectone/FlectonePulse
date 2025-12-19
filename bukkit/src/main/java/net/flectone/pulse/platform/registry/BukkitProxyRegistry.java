@@ -5,24 +5,24 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.BukkitProxy;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class BukkitProxyRegistry extends ProxyRegistry {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final Injector injector;
 
     @Inject
-    public BukkitProxyRegistry(FileResolver fileResolver,
+    public BukkitProxyRegistry(FileFacade fileFacade,
                                ReflectionResolver reflectionResolver,
                                FLogger fLogger,
                                Injector injector) {
-        super(fileResolver, reflectionResolver, fLogger, injector);
+        super(fileFacade, reflectionResolver, fLogger, injector);
 
-        this.fileResolver = fileResolver;
+        this.fileFacade = fileFacade;
         this.injector = injector;
     }
 
@@ -30,8 +30,8 @@ public class BukkitProxyRegistry extends ProxyRegistry {
     public void onEnable() {
         super.onEnable();
 
-        Config config = fileResolver.getConfig();
-        boolean isBukkitProxyEnable = config.getProxy().isBungeecord() || config.getProxy().isVelocity();
+        Config config = fileFacade.config();
+        boolean isBukkitProxyEnable = config.proxy().bungeecord() || config.proxy().velocity();
         if (isBukkitProxyEnable) {
             warnIfLocalDatabase();
 

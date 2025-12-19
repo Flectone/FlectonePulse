@@ -13,7 +13,7 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.listener.RedisListener;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RedisProxy implements Proxy {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final Provider<RedisListener> redisListenerProvider;
     private final SystemVariableResolver systemVariableResolver;
@@ -33,17 +33,17 @@ public class RedisProxy implements Proxy {
     private StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
 
     public Config.Proxy.Redis config() {
-        return fileResolver.getConfig().getProxy().getRedis();
+        return fileFacade.config().proxy().redis();
     }
 
     @Override
     public boolean isEnable() {
-        Database.Type database = fileResolver.getConfig().getDatabase().getType();
+        Database.Type database = fileFacade.config().database().type();
         boolean serverDatabase = database == Database.Type.MYSQL
                 || database == Database.Type.MARIADB
                 || database == Database.Type.POSTGRESQL;
 
-        return config().isEnable() && serverDatabase && pubSubConnection != null && pubSubConnection.isOpen();
+        return config().enable() && serverDatabase && pubSubConnection != null && pubSubConnection.isOpen();
     }
 
     @Override
@@ -53,14 +53,14 @@ public class RedisProxy implements Proxy {
         }
 
         RedisURI.Builder uriBuilder = RedisURI.builder()
-                .withHost(config().getHost())
-                .withPort(config().getPort())
-                .withSsl(config().isSsl());
+                .withHost(config().host())
+                .withPort(config().port())
+                .withSsl(config().ssl());
 
-        if (!config().getUser().isEmpty() && !config().getPassword().isEmpty()) {
+        if (!config().user().isEmpty() && !config().password().isEmpty()) {
             uriBuilder.withAuthentication(
-                    systemVariableResolver.substituteEnvVars(config().getUser()),
-                    systemVariableResolver.substituteEnvVars(config().getPassword())
+                    systemVariableResolver.substituteEnvVars(config().user()),
+                    systemVariableResolver.substituteEnvVars(config().password())
             );
         }
 

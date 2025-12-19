@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -18,7 +18,7 @@ import net.flectone.pulse.module.message.format.questionanswer.listener.Question
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -43,7 +43,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Pattern> patternMap = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -52,20 +52,20 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     public void onEnable() {
         super.onEnable();
 
-        config().getQuestions().forEach((key, questionMessage) -> {
+        config().questions().forEach((key, questionMessage) -> {
 
             try {
-                patternMap.put(key, Pattern.compile(questionMessage.getTarget()));
+                patternMap.put(key, Pattern.compile(questionMessage.target()));
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
             }
 
-            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().getQuestions().get(key);
+            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(key);
             if (questionPermission == null) return;
 
-            registerPermission(questionPermission.getAsk());
-            soundMap.put(key, createSound(questionMessage.getSound(), questionPermission.getSound()));
-            cooldownMap.put(key, createCooldown(questionMessage.getCooldown(), questionPermission.getCooldownBypass()));
+            registerPermission(questionPermission.ask());
+            soundMap.put(key, createSound(questionMessage.sound(), questionPermission.sound()));
+            cooldownMap.put(key, createCooldown(questionMessage.cooldown(), questionPermission.cooldownBypass()));
         });
 
         listenerRegistry.register(QuestionAnswerPulseListener.class);
@@ -88,17 +88,17 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public Message.Format.QuestionAnswer config() {
-        return fileResolver.getMessage().getFormat().getQuestionAnswer();
+        return fileFacade.message().format().questionAnswer();
     }
 
     @Override
     public Permission.Message.Format.QuestionAnswer permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
+        return fileFacade.permission().message().format().questionAnswer();
     }
 
     @Override
     public Localization.Message.Format.QuestionAnswer localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getQuestionAnswer();
+        return fileFacade.localization(sender).message().format().questionAnswer();
     }
 
     public void format(MessageContext messageContext) {
@@ -111,8 +111,8 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         StringBuilder result = new StringBuilder(contextMessage);
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
-            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().getQuestions().get(entry.getKey());
-            if (questionPermission != null && !permissionChecker.check(sender, questionPermission.getAsk())) continue;
+            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(entry.getKey());
+            if (questionPermission != null && !permissionChecker.check(sender, questionPermission.ask())) continue;
 
             Matcher matcher = entry.getValue().matcher(contextMessage);
             if (!matcher.find()) continue;
@@ -159,19 +159,19 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Async(delay = 1L)
     private void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
-        Message.Format.QuestionAnswer.Question questionMessage = config().getQuestions().get(question);
+        Message.Format.QuestionAnswer.Question questionMessage = config().questions().get(question);
         if (questionMessage == null) return;
 
-        Range range = questionMessage.getRange();
+        Range range = questionMessage.range();
         if (range.is(Range.Type.PLAYER) && !sender.equals(receiver)) return;
         if (!(receiver instanceof FPlayer fReceiver)) return;
 
         sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .sender(sender)
                 .filterPlayer(fReceiver)
-                .format(questionAnswer -> questionAnswer.getQuestions().getOrDefault(question, ""))
+                .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
                 .question(question)
-                .destination(questionMessage.getDestination())
+                .destination(questionMessage.destination())
                 .sound(soundMap.get(question))
                 .build()
         );

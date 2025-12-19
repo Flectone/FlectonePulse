@@ -12,7 +12,7 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -25,7 +25,7 @@ public class ProxyRegistry implements Registry {
 
     @Getter private final List<Proxy> proxies = new ArrayList<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
     private final Injector injector;
@@ -39,8 +39,8 @@ public class ProxyRegistry implements Registry {
     }
 
     public void onEnable() {
-        Config.Proxy.Redis redis = fileResolver.getConfig().getProxy().getRedis();
-        if (redis.isEnable()) {
+        Config.Proxy.Redis redis = fileFacade.config().proxy().redis();
+        if (redis.enable()) {
             warnIfLocalDatabase();
 
             reflectionResolver.hasClassOrElse("io.lettuce.core.RedisClient", this::loadLibraries);
@@ -53,9 +53,9 @@ public class ProxyRegistry implements Registry {
     }
 
     protected void warnIfLocalDatabase() {
-        Config.Database database = fileResolver.getConfig().getDatabase();
-        if (database.getType() == Database.Type.SQLITE) {
-            fLogger.warning("SQLITE database and Proxy are incompatible");
+        Config.Database database = fileFacade.config().database();
+        if (database.type() == Database.Type.SQLITE || database.type() == Database.Type.H2) {
+            fLogger.warning("SQLITE/H2 database and Proxy are incompatible");
         }
     }
 

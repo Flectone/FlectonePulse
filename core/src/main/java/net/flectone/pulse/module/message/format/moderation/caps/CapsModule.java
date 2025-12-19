@@ -10,7 +10,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.listener.CapsPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CapsModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
 
@@ -32,12 +32,12 @@ public class CapsModule extends AbstractModule {
 
     @Override
     public Message.Format.Moderation.Caps config() {
-        return fileResolver.getMessage().getFormat().getModeration().getCaps();
+        return fileFacade.message().format().moderation().caps();
     }
 
     @Override
     public Permission.Message.Format.Moderation.Caps permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getModeration().getCaps();
+        return fileFacade.permission().message().format().moderation().caps();
     }
 
     public void format(MessageContext messageContext) {
@@ -45,7 +45,7 @@ public class CapsModule extends AbstractModule {
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
-        if (permissionChecker.check(sender, permission().getBypass())) return;
+        if (permissionChecker.check(sender, permission().bypass())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
@@ -67,7 +67,7 @@ public class CapsModule extends AbstractModule {
             }
         }
 
-        return totalLetters > 0 && ((double) uppercaseCount / totalLetters) > config().getTrigger();
+        return totalLetters > 0 && ((double) uppercaseCount / totalLetters) > config().trigger();
     }
 
 }

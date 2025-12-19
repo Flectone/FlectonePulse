@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TictactoeService tictactoeService;
     private final ProxySender proxySender;
@@ -47,21 +47,21 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptHard = addPrompt(1, Localization.Command.Prompt::getHard);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptHard = addPrompt(1, Localization.Command.Prompt::hard);
         registerCommand(manager -> manager
                .required(promptPlayer, commandParserProvider.playerParser())
                .optional(promptHard, commandParserProvider.booleanParser())
-               .permission(permission().getName())
+               .permission(permission().name())
         );
 
-        String promptId = addPrompt(2, Localization.Command.Prompt::getId);
-        String promptMove = addPrompt(3, Localization.Command.Prompt::getMove);
+        String promptId = addPrompt(2, Localization.Command.Prompt::id);
+        String promptMove = addPrompt(3, Localization.Command.Prompt::move);
         registerCustomCommand(manager ->
                 manager.commandBuilder(getCommandName() + "move")
                         .required(promptId, commandParserProvider.integerParser())
                         .required(promptMove, commandParserProvider.singleMessageParser())
-                        .permission(permission().getName())
+                        .permission(permission().name())
                         .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
     }
@@ -87,7 +87,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::getNullPlayer)
+                    .format(Localization.Command.Tictactoe::nullPlayer)
                     .build()
             );
 
@@ -97,7 +97,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (fReceiver.equals(fPlayer)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::getMyself)
+                    .format(Localization.Command.Tictactoe::myself)
                     .build()
             );
 
@@ -114,7 +114,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .sender(fPlayer)
-                .format(Localization.Command.Tictactoe::getSender)
+                .format(Localization.Command.Tictactoe::sender)
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
@@ -142,17 +142,17 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public Command.Tictactoe config() {
-        return fileResolver.getCommand().getTictactoe();
+        return fileFacade.command().tictactoe();
     }
 
     @Override
     public Permission.Command.Tictactoe permission() {
-        return fileResolver.getPermission().getCommand().getTictactoe();
+        return fileFacade.permission().command().tictactoe();
     }
 
     @Override
     public Localization.Command.Tictactoe localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getTictactoe();
+        return fileFacade.localization(sender).command().tictactoe();
     }
 
     // /tictactoe %d create
@@ -165,7 +165,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .filterPlayer(fReceiver, false)
-                .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
+                .format(message -> String.format(message.receiver(), ticTacToe.getId()))
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
@@ -209,7 +209,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::getWrongGame)
+                    .format(Localization.Command.Tictactoe::wrongGame)
                     .build()
             );
 
@@ -219,7 +219,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (!ticTacToe.move(fPlayer, move)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::getWrongMove)
+                    .format(Localization.Command.Tictactoe::wrongMove)
                     .build()
             );
 
@@ -231,7 +231,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             ticTacToe.setEnded(true);
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::getWrongByPlayer)
+                    .format(Localization.Command.Tictactoe::wrongByPlayer)
                     .build()
             );
 
@@ -280,22 +280,22 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                                                                                       String move) {
         return (fResolver, message) -> {
             String title = (switch (typeTile) {
-                case 1 -> message.getFormatWin();
-                case -1 -> message.getFormatDraw();
-                default -> message.getFormatMove();
+                case 1 -> message.formatWin();
+                case -1 -> message.formatDraw();
+                default -> message.formatMove();
             });
 
-            Localization.Command.Tictactoe.Symbol messageSymbol = message.getSymbol();
+            Localization.Command.Tictactoe.Symbol messageSymbol = message.symbol();
 
-            String symbolFirst = messageSymbol.getFirst();
-            String symbolSecond = messageSymbol.getSecond();
+            String symbolFirst = messageSymbol.first();
+            String symbolSecond = messageSymbol.second();
 
             String formatField = StringUtils.replaceEach(
-                    String.join("<br>", message.getField()),
+                    String.join("<br>", message.field()),
                     new String[]{"<current_move>", "<last_move>"},
                     new String[]{
-                            ticTacToe.isEnded() ? "" : message.getCurrentMove(),
-                            message.getLastMove()
+                            ticTacToe.isEnded() ? "" : message.currentMove(),
+                            message.lastMove()
                     }
             );
 
@@ -309,11 +309,11 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                     }
             );
 
-            String symbolEmpty = messageSymbol.getBlank();
-            String symbolFirstRemove = messageSymbol.getFirstRemove();
-            String symbolFirstWin = messageSymbol.getFirstWin();
-            String symbolSecondRemove = messageSymbol.getSecondRemove();
-            String symbolSecondWin = messageSymbol.getSecondWin();
+            String symbolEmpty = messageSymbol.blank();
+            String symbolFirstRemove = messageSymbol.firstRemove();
+            String symbolFirstWin = messageSymbol.firstWin();
+            String symbolSecondRemove = messageSymbol.secondRemove();
+            String symbolSecondWin = messageSymbol.secondWin();
 
             return ticTacToe.build(
                     formatField,

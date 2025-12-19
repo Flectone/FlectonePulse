@@ -18,7 +18,7 @@ import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -38,7 +38,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -99,7 +99,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
-            Map<Integer, String> colorsMap = new HashMap<>(fileResolver.getMessage().getFormat().getFcolor().getDefaultColors());
+            Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
                 colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {
@@ -145,7 +145,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         FEntity fReceiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, placeholderAPIModule.permission().getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(sender, placeholderAPIModule.permission().use()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         String message = messageContext.getMessage();

@@ -17,19 +17,13 @@ import com.google.inject.name.Names;
 import lombok.SneakyThrows;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.localization.EnglishLocale;
-import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.*;
+import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.processing.resolver.SystemVariableResolver;
-import net.flectone.pulse.platform.registry.CacheRegistry;
-import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -49,7 +43,6 @@ import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,8 +77,8 @@ public abstract class PlatformInjector extends AbstractModule {
         // bind booleans
         setupBooleans();
 
-        // bind files
-        setupConfigurations();
+        // create jackson mapper
+        bind(ObjectMapper.class).toInstance(createMapper());
 
         // platform binding
         setupPlatform(reflectionResolver);
@@ -123,34 +116,6 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_19_4")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_6")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_6));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_9")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9));
-    }
-
-    private void setupConfigurations() throws IOException {
-        ObjectMapper mapper = createMapper();
-        bind(ObjectMapper.class).toInstance(mapper);
-
-        EnglishLocale englishLocale = new EnglishLocale();
-        bind(EnglishLocale.class).toInstance(englishLocale);
-
-        RussianLocale russianLocale = new RussianLocale();
-        bind(RussianLocale.class).toInstance(russianLocale);
-
-        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(mapper, englishLocale, russianLocale);
-        bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
-
-        SystemVariableResolver systemVariableResolver = new SystemVariableResolver();
-        bind(SystemVariableResolver.class).toInstance(systemVariableResolver);
-
-        BackupCreator backupCreator = new BackupCreator(systemVariableResolver, projectPath, projectPath.resolve("backups"), fLogger);
-        bind(BackupCreator.class).toInstance(backupCreator);
-
-        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor, backupCreator);
-        bind(FileResolver.class).toInstance(fileResolver);
-        fileResolver.reload();
-
-        CacheRegistry cacheRegistry = new CacheRegistry(fileResolver);
-        bind(CacheRegistry.class).toInstance(cacheRegistry);
-        cacheRegistry.init();
     }
 
     @Provides @Singleton @Named("offlinePlayers")
@@ -258,12 +223,6 @@ public abstract class PlatformInjector extends AbstractModule {
                 .withConfigOverride(List.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null list
                 .withConfigOverride(Set.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null set
                 .withConfigOverride(Map.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null map
-                .defaultMergeable(true)
-                .withConfigOverride(Destination.class, o -> o.setMergeable(false))
-                .withConfigOverride(Sound.class, o -> o.setMergeable(false))
-                .withConfigOverride(Range.class, o -> o.setMergeable(false))
-                .withConfigOverride(Ticker.class, o -> o.setMergeable(false))
-                .withConfigOverride(Cooldown.class, o -> o.setMergeable(false))
                 .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() {
                     // fix null values like "key: null"
                     // idk, why withConfigOverride(String.class, ...) doesn't fix it

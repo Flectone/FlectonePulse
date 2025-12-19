@@ -8,7 +8,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,7 +20,7 @@ import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -44,7 +44,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
     private static final String ARGUMENT = "argument";
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final Extractor extractor;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
@@ -67,31 +67,31 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public Message.Vanilla config() {
-        return fileResolver.getMessage().getVanilla();
+        return fileFacade.message().vanilla();
     }
 
     @Override
     public Permission.Message.Vanilla permission() {
-        return fileResolver.getPermission().getMessage().getVanilla();
+        return fileFacade.permission().message().vanilla();
     }
 
     @Override
     public Localization.Message.Vanilla localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getVanilla();
+        return fileFacade.localization(sender).message().vanilla();
     }
 
     @Async
     public void send(FPlayer fPlayer, ParsedComponent parsedComponent) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        Range range = parsedComponent.vanillaMessage().getRange();
+        Range range = parsedComponent.vanillaMessage().range();
         if (parsedComponent.translationKey().startsWith("death.")) {
             FEntity target = getDeathTarget(parsedComponent);
             if (target instanceof FPlayer) {
                 if (!target.equals(fPlayer)) {
-                    if (parsedComponent.vanillaMessage().isMultiMessage()) return;
+                    if (parsedComponent.vanillaMessage().multiMessage()) return;
                 } else {
-                    String format = StringUtils.defaultString(localization(fPlayer).getTypes().get(parsedComponent.translationKey()));
+                    String format = StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey()));
 
                     Component component = messagePipeline.builder(fPlayer, format)
                             .tagResolvers(argumentTag(fPlayer, parsedComponent))
@@ -102,21 +102,21 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             } else {
                 range = Range.get(Range.Type.PLAYER);
             }
-        } else if (parsedComponent.vanillaMessage().isMultiMessage()) {
+        } else if (parsedComponent.vanillaMessage().multiMessage()) {
             FEntity target = getDeathTarget(parsedComponent);
             if (target != null && !fPlayer.equals(target)) return;
         }
 
-        String vanillaMessageName = parsedComponent.vanillaMessage().getName();
+        String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
         sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .parsedComponent(parsedComponent)
                 .sender(fPlayer)
-                .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
+                .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                 .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                .destination(parsedComponent.vanillaMessage().getDestination())
+                .destination(parsedComponent.vanillaMessage().destination())
                 .integration()
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeString(parsedComponent.translationKey());
@@ -237,8 +237,8 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
         String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
-                ? localization.getFormatPlayer()
-                : localization.getFormatEntity();
+                ? localization.formatPlayer()
+                : localization.formatEntity();
 
         return messagePipeline.builder(fTarget, fResolver, formatTarget).build();
     }

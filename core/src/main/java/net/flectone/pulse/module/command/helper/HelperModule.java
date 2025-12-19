@@ -4,14 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HelperModule extends AbstractModuleCommand<Localization.Command.Helper> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxyRegistry proxyRegistry;
     private final PermissionChecker permissionChecker;
@@ -34,11 +34,11 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getSee());
+        registerPermission(permission().see());
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -50,14 +50,14 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
         Predicate<FPlayer> filter = getFilterSee();
 
         List<FPlayer> recipients = fPlayerService.getVisibleFPlayersFor(fPlayer).stream().filter(filter).toList();
-        if (recipients.isEmpty() && config().isNullHelper()) {
+        if (recipients.isEmpty() && config().nullHelper()) {
             boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
-                    .noneMatch(online -> permissionChecker.check(online, permission().getSee()));
+                    .noneMatch(online -> permissionChecker.check(online, permission().see()));
 
             if (nullHelper) {
                 sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
-                        .format(Localization.Command.Helper::getNullHelper)
+                        .format(Localization.Command.Helper::nullHelper)
                         .build()
                 );
 
@@ -69,16 +69,16 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(Localization.Command.Helper::getPlayer)
-                .destination(config().getDestination())
+                .format(Localization.Command.Helper::player)
+                .destination(config().destination())
                 .build()
         );
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(Localization.Command.Helper::getGlobal)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .format(Localization.Command.Helper::global)
+                .destination(config().destination())
+                .range(config().range())
                 .message(message)
                 .filter(filter)
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
@@ -95,20 +95,20 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Override
     public Command.Helper config() {
-        return fileResolver.getCommand().getHelper();
+        return fileFacade.command().helper();
     }
 
     @Override
     public Permission.Command.Helper permission() {
-        return fileResolver.getPermission().getCommand().getHelper();
+        return fileFacade.permission().command().helper();
     }
 
     @Override
     public Localization.Command.Helper localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getHelper();
+        return fileFacade.localization(sender).command().helper();
     }
 
     public Predicate<FPlayer> getFilterSee() {
-        return fPlayer -> permissionChecker.check(fPlayer, permission().getSee());
+        return fPlayer -> permissionChecker.check(fPlayer, permission().see());
     }
 }

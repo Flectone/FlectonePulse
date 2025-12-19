@@ -8,13 +8,13 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.motd.listener.MOTDPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MOTDModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MOTDIntegration motdIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -36,12 +36,12 @@ public class MOTDModule extends AbstractModule {
 
     @Override
     public Integration.MOTD config() {
-        return fileResolver.getIntegration().getMotd();
+        return fileFacade.integration().motd();
     }
 
     @Override
     public Permission.Integration.MOTD permission() {
-        return fileResolver.getPermission().getIntegration().getMotd();
+        return fileFacade.permission().integration().motd();
     }
 
     public boolean isHooked() {

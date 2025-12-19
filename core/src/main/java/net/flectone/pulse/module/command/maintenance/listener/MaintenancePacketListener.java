@@ -18,7 +18,7 @@ public class MaintenancePacketListener implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.isCancelled()) return;
         if (event.getPacketType() == PacketType.Status.Client.REQUEST) {
-            if (!maintenanceModule.config().isTurnedOn()) return;
+            if (!maintenanceModule.config().turnedOn()) return;
 
             event.setCancelled(true);
             maintenanceModule.sendStatus(event.getUser());

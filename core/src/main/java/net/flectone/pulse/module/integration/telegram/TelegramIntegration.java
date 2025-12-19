@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -32,7 +32,7 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramIntegration implements FIntegration {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
     private final MessageListener messageListener;
@@ -43,12 +43,12 @@ public class TelegramIntegration implements FIntegration {
     private OkHttpTelegramClient telegramClient;
 
     public Integration.Telegram config() {
-        return fileResolver.getIntegration().getTelegram();
+        return fileFacade.integration().telegram();
     }
 
     @Override
     public void hook() {
-        String token = systemVariableResolver.substituteEnvVars(config().getToken());
+        String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 
         try {
@@ -57,10 +57,10 @@ public class TelegramIntegration implements FIntegration {
             botsApplication = new TelegramBotsLongPollingApplication();
             botsApplication.registerBot(token, messageListener);
 
-            Integration.ChannelInfo channelInfo = config().getChannelInfo();
+            Integration.ChannelInfo channelInfo = config().channelInfo();
 
-            if (channelInfo.isEnable() && channelInfo.getTicker().isEnable()) {
-                long period = channelInfo.getTicker().getPeriod();
+            if (channelInfo.enable() && channelInfo.ticker().isEnable()) {
+                long period = channelInfo.ticker().getPeriod();
                 taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
                 updateChannelInfo();
             }
@@ -75,12 +75,12 @@ public class TelegramIntegration implements FIntegration {
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
         if (botsApplication == null) return;
 
-        List<String> channels = config().getMessageChannel().get(messageName);
+        List<String> channels = config().messageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
-        String message = localization.getMessageChannel().getOrDefault(messageName, "<final_message>");
+        Localization.Integration.Telegram localization = fileFacade.localization().integration().telegram();
+        String message = localization.messageChannel().getOrDefault(messageName, "<final_message>");
         if (StringUtils.isEmpty(message)) return;
 
         message = telegramString.apply(message);
@@ -99,7 +99,7 @@ public class TelegramIntegration implements FIntegration {
 
             SendMessage sendMessage = sendMessageBuilder.build();
 
-            switch (config().getParseMode()) {
+            switch (config().parseMode()) {
                 case MARKDOWN -> sendMessage.enableMarkdown(true);
                 case MARKDOWN_V2 -> sendMessage.enableMarkdownV2(true);
                 case HTML -> sendMessage.enableHtml(true);
@@ -124,11 +124,10 @@ public class TelegramIntegration implements FIntegration {
 
     public void updateChannelInfo() {
         if (botsApplication == null) return;
+        if (!config().channelInfo().enable()) return;
 
-        if (!config().getChannelInfo().isEnable()) return;
-
-        Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
-        for (Map.Entry<String, String> entry : localization.getInfoChannel().entrySet()) {
+        Localization.Integration.Telegram localization = fileFacade.localization().integration().telegram();
+        for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
             String chatId = entry.getKey();
             if (chatId.contains("_")) {
                 String[] ids = chatId.split("_");

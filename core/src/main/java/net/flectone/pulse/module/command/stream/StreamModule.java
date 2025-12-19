@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -17,7 +17,7 @@ import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
@@ -50,10 +50,10 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::getType);
-        String promptUrl = addPrompt(1, Localization.Command.Prompt::getUrl);
+        String promptType = addPrompt(0, Localization.Command.Prompt::type);
+        String promptUrl = addPrompt(1, Localization.Command.Prompt::url);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
@@ -81,12 +81,12 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
         if (needStart == null) return;
 
-        boolean isStream = localization().getPrefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
+        boolean isStream = localization().prefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Stream::getAlready)
+                    .format(Localization.Command.Stream::already)
                     .build()
             );
 
@@ -96,7 +96,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         if (!isStream && !needStart) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Stream::getNot)
+                    .format(Localization.Command.Stream::not)
                     .build()
             );
 
@@ -104,8 +104,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         }
 
         setStreamPrefix(fPlayer, needStart
-                ? localization().getPrefixTrue()
-                : StringUtils.isEmpty(localization().getPrefixFalse()) ? null : localization().getPrefixFalse()
+                ? localization().prefixTrue()
+                : StringUtils.isEmpty(localization().prefixFalse()) ? null : localization().prefixFalse()
         );
 
         if (needStart) {
@@ -122,8 +122,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .format(replaceUrls(urls))
                     .turned(true)
                     .urls(urls)
-                    .range(config().getRange())
-                    .destination(config().getDestination())
+                    .range(config().range())
+                    .destination(config().destination())
                     .sound(getModuleSound())
                     .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
                     .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
@@ -132,9 +132,9 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         } else {
             sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Stream::getFormatEnd)
+                    .format(Localization.Command.Stream::formatEnd)
                     .turned(false)
-                    .destination(config().getDestination())
+                    .destination(config().destination())
                     .build()
             );
         }
@@ -152,17 +152,17 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public Command.Stream config() {
-        return fileResolver.getCommand().getStream();
+        return fileFacade.command().stream();
     }
 
     @Override
     public Permission.Command.Stream permission() {
-        return fileResolver.getPermission().getCommand().getStream();
+        return fileFacade.permission().command().stream();
     }
 
     @Override
     public Localization.Command.Stream localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getStream();
+        return fileFacade.localization(sender).command().stream();
     }
 
     public void addTag(MessageContext messageContext) {
@@ -184,10 +184,10 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public Function<Localization.Command.Stream, String> replaceUrls(String string) {
         return message -> {
             List<String> urls = Arrays.stream(string.split(" "))
-                    .map(url -> Strings.CS.replace(message.getUrlTemplate(), "<url>", url))
+                    .map(url -> Strings.CS.replace(message.urlTemplate(), "<url>", url))
                     .toList();
 
-            return Strings.CS.replace(message.getFormatStart(), "<urls>", String.join("<br>", urls));
+            return Strings.CS.replace(message.formatStart(), "<urls>", String.join("<br>", urls));
         };
     }
 

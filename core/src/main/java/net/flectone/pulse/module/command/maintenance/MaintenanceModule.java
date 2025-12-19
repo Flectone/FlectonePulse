@@ -10,8 +10,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -21,24 +21,23 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
@@ -54,7 +53,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getJoin());
+        registerPermission(permission().join());
 
         listenerRegistry.register(MaintenancePacketListener.class);
         listenerRegistry.register(MaintenancePulseListener.class);
@@ -67,12 +66,12 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
         icon = iconUtil.convertIcon(file);
 
-        if (config().isTurnedOn()) {
+        if (config().turnedOn()) {
             kickOnlinePlayers(FPlayer.UNKNOWN);
         }
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
         );
     }
 
@@ -80,22 +79,22 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        boolean turned = !config().isTurnedOn();
+        boolean turned = !config().turnedOn();
 
-        config().setTurnedOn(turned);
+        fileFacade.updateFilePack(filePack -> filePack.withCommand(filePack.command().withMaintenance(filePack.command().maintenance().withTurnedOn(turned))));
 
         try {
-            fileResolver.save();
-        } catch (IOException e) {
+            fileFacade.saveFiles();
+        } catch (Exception e) {
             fLogger.warning(e);
             return;
         }
 
         sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
                 .sender(fPlayer)
-                .format(maintenance -> turned ? maintenance.getFormatTrue() : maintenance.getFormatFalse())
+                .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())
                 .turned(turned)
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .build()
         );
@@ -112,22 +111,22 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public Command.Maintenance config() {
-        return fileResolver.getCommand().getMaintenance();
+        return fileFacade.command().maintenance();
     }
 
     @Override
     public Permission.Command.Maintenance permission() {
-        return fileResolver.getPermission().getCommand().getMaintenance();
+        return fileFacade.permission().command().maintenance();
     }
 
     @Override
     public Localization.Command.Maintenance localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getMaintenance();
+        return fileFacade.localization(sender).command().maintenance();
     }
 
     public void sendStatus(User user) {
         if (!isEnable()) return;
-        if (!config().isTurnedOn()) return;
+        if (!config().turnedOn()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         fPlayerService.loadColors(fPlayer);
@@ -136,10 +135,10 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
         Localization.Command.Maintenance localizationMaintenance = localization(fPlayer);
 
-        responseJson.add("version", getVersionJson(localizationMaintenance.getServerVersion()));
+        responseJson.add("version", getVersionJson(localizationMaintenance.serverVersion()));
         responseJson.add("players", getPlayersJson());
 
-        responseJson.add("description", messagePipeline.builder(fPlayer, localizationMaintenance.getServerDescription()).jsonSerializerBuild());
+        responseJson.add("description", messagePipeline.builder(fPlayer, localizationMaintenance.serverDescription()).jsonSerializerBuild());
         responseJson.addProperty("favicon", "data:image/png;base64," + (icon == null ? "" : icon));
         responseJson.addProperty("enforcesSecureChat", false);
 
@@ -149,9 +148,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     public boolean isAllowed(FPlayer fPlayer) {
         if (!isEnable()) return true;
-        if (!config().isTurnedOn()) return true;
+        if (!config().turnedOn()) return true;
 
-        return permissionChecker.check(fPlayer, permission().getJoin());
+        return permissionChecker.check(fPlayer, permission().join());
     }
 
     private JsonElement getVersionJson(String message) {
@@ -177,9 +176,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private void kickOnlinePlayers(FPlayer fSender) {
         fPlayerService.getOnlineFPlayers()
                 .stream()
-                .filter(filter -> !permissionChecker.check(filter, permission().getJoin()))
+                .filter(filter -> !permissionChecker.check(filter, permission().join()))
                 .forEach(fReceiver -> {
-                    Component component = messagePipeline.builder(fSender, fReceiver, localization(fReceiver).getKick()).build();
+                    Component component = messagePipeline.builder(fSender, fReceiver, localization(fReceiver).kick()).build();
                     fPlayerService.kick(fReceiver, component);
                 });
     }

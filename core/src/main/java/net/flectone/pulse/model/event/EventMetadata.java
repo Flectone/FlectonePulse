@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Destination;
@@ -24,7 +24,7 @@ import java.util.function.UnaryOperator;
 
 @Getter
 @SuperBuilder
-public class EventMetadata<L extends Localization.Localizable> {
+public class EventMetadata<L extends LocalizationSetting> {
 
     @Builder.Default
     private final UUID uuid = UUID.randomUUID();
@@ -67,7 +67,7 @@ public class EventMetadata<L extends Localization.Localizable> {
     private final UnaryOperator<String> integration;
 
     public abstract static class EventMetadataBuilder<
-                L extends Localization.Localizable,
+                L extends LocalizationSetting,
                 C extends EventMetadata<L>,
                 B extends EventMetadataBuilder<L, C, B>> {
 

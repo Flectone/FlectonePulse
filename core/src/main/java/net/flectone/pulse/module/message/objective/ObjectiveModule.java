@@ -13,7 +13,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ObjectiveModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PacketSender packetSender;
 
     @Override
@@ -34,12 +34,12 @@ public class ObjectiveModule extends AbstractModule {
 
     @Override
     public Message.Objective config() {
-        return fileResolver.getMessage().getObjective();
+        return fileFacade.message().objective();
     }
 
     @Override
     public Permission.Message.Objective permission() {
-        return fileResolver.getPermission().getMessage().getObjective();
+        return fileFacade.permission().message().objective();
     }
 
     public void createObjective(FPlayer fPlayer, @Nullable Component displayName, ScoreboardPosition scoreboardPosition) {

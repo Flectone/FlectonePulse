@@ -8,20 +8,20 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaceholderAPIModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final Provider<PlaceholderAPIIntegration> placeholderAPIIntegrationProvider;
     private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
         super.onEnable();
-        registerPermission(permission().getUse());
+        registerPermission(permission().use());
 
         placeholderAPIIntegrationProvider.get().hook();
         listenerRegistry.register(PlaceholderAPIIntegration.class);
@@ -36,11 +36,11 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     @Override
     public Integration.Placeholderapi config() {
-        return fileResolver.getIntegration().getPlaceholderapi();
+        return fileFacade.integration().placeholderapi();
     }
 
     @Override
     public Permission.Integration.Placeholderapi permission() {
-        return fileResolver.getPermission().getIntegration().getPlaceholderapi();
+        return fileFacade.permission().integration().placeholderapi();
     }
 }

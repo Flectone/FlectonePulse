@@ -10,7 +10,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -24,7 +24,7 @@ import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.net.InetAddress;
@@ -35,7 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StatusModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MOTDModule MOTDModule;
     private final IconModule iconModule;
     private final PlayersModule playersModule;
@@ -66,12 +66,12 @@ public class StatusModule extends AbstractModule {
 
     @Override
     public Message.Status config() {
-        return fileResolver.getMessage().getStatus();
+        return fileFacade.message().status();
     }
 
     @Override
     public Permission.Message.Status permission() {
-        return fileResolver.getPermission().getMessage().getStatus();
+        return fileFacade.permission().message().status();
     }
 
     public void update(PacketSendEvent event) {
@@ -114,8 +114,8 @@ public class StatusModule extends AbstractModule {
         jsonObject.addProperty("name", version);
 
         int protocol = packetProvider.getServerVersion().getProtocolVersion();
-        if (versionModule.isEnable() && versionModule.config().getProtocol() != -1) {
-            protocol = versionModule.config().getProtocol();
+        if (versionModule.isEnable() && versionModule.config().protocol() != -1) {
+            protocol = versionModule.config().protocol();
         }
 
         jsonObject.addProperty("protocol", protocol);
@@ -138,12 +138,12 @@ public class StatusModule extends AbstractModule {
         JsonObject playersJson = new JsonObject();
 
         int max = playersModule.isEnable()
-                ? playersModule.config().getMax()
+                ? playersModule.config().max()
                 : platformServerAdapter.getMaxPlayers();
         playersJson.addProperty("max", max);
 
         int online = playersModule.isEnable()
-                ? playersModule.config().getOnline() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.config().getOnline()
+                ? playersModule.config().online() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.config().online()
                 : platformServerAdapter.getOnlinePlayerCount();
         playersJson.addProperty("online", online);
 
@@ -156,11 +156,11 @@ public class StatusModule extends AbstractModule {
         JsonArray jsonArray = new JsonArray();
 
         List<Localization.Message.Status.Players.Sample> samples = playersModule.getSamples(fPlayer);
-        samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample()) : samples;
+        samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample("<players>", null)) : samples;
 
         Collection<FPlayer> onlineFPlayers = fPlayerService.getVisibleFPlayersFor(fPlayer);
         samples.forEach(sample -> {
-            if ("<players>".equalsIgnoreCase(sample.getName())) {
+            if ("<players>".equalsIgnoreCase(sample.name())) {
                 onlineFPlayers.forEach(player -> {
                     JsonObject playerObject = new JsonObject();
                     playerObject.addProperty("name", player.getName());
@@ -172,8 +172,8 @@ public class StatusModule extends AbstractModule {
             }
 
             JsonObject playerObject = new JsonObject();
-            playerObject.addProperty("name", messagePipeline.builder(fPlayer, sample.getName()).legacySerializerBuild());
-            playerObject.addProperty("id", sample.getId() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.getId());
+            playerObject.addProperty("name", messagePipeline.builder(fPlayer, sample.name()).legacySerializerBuild());
+            playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.id());
             jsonArray.add(playerObject);
         });
 

@@ -11,7 +11,7 @@ import net.flectone.pulse.processing.parser.integer.ColorParser;
 import net.flectone.pulse.processing.parser.integer.DurationReasonParser;
 import net.flectone.pulse.processing.parser.player.PlayerParser;
 import net.flectone.pulse.processing.parser.string.MessageParser;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.brigadier.BrigadierSetting;
@@ -23,12 +23,12 @@ import org.incendo.cloud.parser.standard.StringParser;
 public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
     @Inject
-    public ModernBukkitCommandRegistry(FileResolver fileResolver,
+    public ModernBukkitCommandRegistry(FileFacade fileFacade,
                                        ReflectionResolver reflectionResolver,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        FPlayerMapper fPlayerMapper) {
-        super(fileResolver, commandExceptionHandler, plugin, reflectionResolver, fPlayerMapper);
+        super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, fPlayerMapper);
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             manager.registerBrigadier();

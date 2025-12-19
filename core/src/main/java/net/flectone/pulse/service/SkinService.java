@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class SkinService {
 
     private final @Named("profileProperty") Cache<UUID, PlayerHeadObjectContents.ProfileProperty> profilePropertyCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -81,11 +81,11 @@ public class SkinService {
     }
 
     public String getAvatarUrl(FEntity entity) {
-        return Strings.CS.replace(fileResolver.getIntegration().getAvatarApiUrl(), "<skin>", getSkin(entity));
+        return Strings.CS.replace(fileFacade.integration().avatarApiUrl(), "<skin>", getSkin(entity));
     }
 
     public String getBodyUrl(FEntity entity) {
-        return Strings.CS.replace(fileResolver.getIntegration().getBodyApiUrl(), "<skin>", getSkin(entity));
+        return Strings.CS.replace(fileFacade.integration().bodyApiUrl(), "<skin>", getSkin(entity));
     }
 
     public String getSkin(FEntity entity) {

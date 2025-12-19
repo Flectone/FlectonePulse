@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -24,7 +24,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -44,7 +44,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
@@ -70,9 +70,9 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getLegacyColors());
+        registerPermission(permission().legacyColors());
 
-        config().getAdventureTags().forEach(adventureTag -> registerPermission(permission().getAdventureTags().get(adventureTag)));
+        config().adventureTags().forEach(adventureTag -> registerPermission(permission().adventureTags().get(adventureTag)));
 
         putAdventureTag(AdventureTag.HOVER, StandardTags.hoverEvent());
         putAdventureTag(AdventureTag.CLICK, StandardTags.clickEvent());
@@ -96,7 +96,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
         listenerRegistry.register(FormatPulseListener.class);
 
-        if (config().isConvertLegacyColor()) {
+        if (config().convertLegacyColor()) {
             listenerRegistry.register(LegacyColorPulseListener.class);
         }
     }
@@ -115,17 +115,17 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public Message.Format config() {
-        return fileResolver.getMessage().getFormat();
+        return fileFacade.message().format();
     }
 
     @Override
     public Permission.Message.Format permission() {
-        return fileResolver.getPermission().getMessage().getFormat();
+        return fileFacade.permission().message().format();
     }
 
     @Override
     public Localization.Message.Format localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat();
+        return fileFacade.localization(sender).message().format();
     }
 
     public void addTags(MessageContext messageContext) {
@@ -150,10 +150,10 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {
-        if (!config().getAdventureTags().contains(adventureTag)) return false;
+        if (!config().adventureTags().contains(adventureTag)) return false;
         if (!tagResolverMap.containsKey(adventureTag)) return false;
 
-        return !needPermission || permissionChecker.check(sender, permission().getAdventureTags().get(adventureTag));
+        return !needPermission || permissionChecker.check(sender, permission().adventureTags().get(adventureTag));
     }
 
     private TagResolver bedrockGradientTag() {
@@ -169,7 +169,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     private void putAdventureTag(AdventureTag adventureTag, TagResolver tagResolver) {
-        if (config().getAdventureTags().contains(adventureTag)) {
+        if (config().adventureTags().contains(adventureTag)) {
             tagResolverMap.put(adventureTag, tagResolver);
         }
     }

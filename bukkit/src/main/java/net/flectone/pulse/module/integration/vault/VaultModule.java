@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.Collections;
 import java.util.Set;
@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VaultModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final VaultIntegration vaultIntegration;
 
     @Override
@@ -35,12 +35,12 @@ public class VaultModule extends AbstractModule {
 
     @Override
     public Integration.Vault config() {
-        return fileResolver.getIntegration().getVault();
+        return fileFacade.integration().vault();
     }
 
     @Override
     public Permission.Integration.Vault permission() {
-        return fileResolver.getPermission().getIntegration().getVault();
+        return fileFacade.permission().integration().vault();
     }
 
     public boolean hasVaultPermission(FPlayer fPlayer, String permission) {

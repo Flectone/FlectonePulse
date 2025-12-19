@@ -6,7 +6,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class BukkitJoinModule extends JoinModule {
@@ -14,11 +14,11 @@ public class BukkitJoinModule extends JoinModule {
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public BukkitJoinModule(FileResolver fileResolver,
+    public BukkitJoinModule(FileFacade fileFacade,
                             PlatformPlayerAdapter platformPlayerAdapter,
                             IntegrationModule integrationModule,
                             ListenerRegistry listenerRegistry) {
-        super(fileResolver, platformPlayerAdapter, integrationModule, listenerRegistry);
+        super(fileFacade, platformPlayerAdapter, integrationModule, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

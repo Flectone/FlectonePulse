@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.CacheName;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -23,7 +23,7 @@ public class CacheRegistry {
 
     private final Map<CacheName, Cache<?, ?>> cacheMap = new EnumMap<>(CacheName.class);
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     public void init() {
         Arrays.stream(CacheName.values()).forEach(this::create);
@@ -34,9 +34,9 @@ public class CacheRegistry {
             throw new IllegalArgumentException("Cache already created for " + cacheName);
         }
 
-        Config.Cache.CacheSetting cacheSetting = fileResolver.getConfig()
-                .getCache()
-                .getTypes()
+        Config.Cache.CacheSetting cacheSetting = fileFacade.config()
+                .cache()
+                .types()
                 .get(cacheName);
 
         if (cacheSetting == null) {
@@ -44,8 +44,8 @@ public class CacheRegistry {
         }
 
         Cache<K, V> cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(cacheSetting.getDuration(), cacheSetting.getTimeUnit())
-                .maximumSize(cacheSetting.getSize())
+                .expireAfterAccess(cacheSetting.duration(), cacheSetting.timeUnit())
+                .maximumSize(cacheSetting.size())
                 .build();
 
         cacheMap.put(cacheName, cache);

@@ -9,13 +9,13 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TabModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     @Override
     public void configureChildren() {
@@ -28,11 +28,11 @@ public class TabModule extends AbstractModule {
 
     @Override
     public Message.Tab config() {
-        return fileResolver.getMessage().getTab();
+        return fileFacade.message().tab();
     }
 
     @Override
     public Permission.Message.Tab permission() {
-        return fileResolver.getPermission().getMessage().getTab();
+        return fileFacade.permission().message().tab();
     }
 }

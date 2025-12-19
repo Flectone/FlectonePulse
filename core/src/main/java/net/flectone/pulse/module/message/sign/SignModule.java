@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
@@ -17,17 +17,17 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SignModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
 
     @Override
     public Message.Sign config() {
-        return fileResolver.getMessage().getSign();
+        return fileFacade.message().sign();
     }
 
     @Override
     public Permission.Message.Sign permission() {
-        return fileResolver.getPermission().getMessage().getSign();
+        return fileFacade.permission().message().sign();
     }
 
     public Optional<String> format(FPlayer fPlayer, String string) {

@@ -1,7 +1,7 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class AbstractModuleListLocalization<M extends Localization.Localizable> extends AbstractModuleLocalization<M> {
+public abstract class AbstractModuleListLocalization<M extends LocalizationSetting> extends AbstractModuleLocalization<M> {
 
     private final HashMap<Integer, Integer> messageIndexMap = new HashMap<>();
 

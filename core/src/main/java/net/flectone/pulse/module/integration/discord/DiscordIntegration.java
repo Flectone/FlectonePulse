@@ -19,13 +19,13 @@ import discord4j.rest.util.MultipartRequest;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.logging.FLogger;
@@ -47,7 +47,7 @@ public class DiscordIntegration implements FIntegration {
 
     private final Map<Long, WebhookData> channelWebhooks = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
     private final MessageCreateListener messageCreateListener;
@@ -60,13 +60,13 @@ public class DiscordIntegration implements FIntegration {
     private long clientID;
 
     public Integration.Discord config() {
-        return fileResolver.getIntegration().getDiscord();
+        return fileFacade.integration().discord();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (gateway == null) return;
 
-        List<String> channels = config().getMessageChannel().get(messageName);
+        List<String> channels = config().messageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
@@ -74,8 +74,8 @@ public class DiscordIntegration implements FIntegration {
             Optional<Snowflake> channel = parseSnowflake(string);
             if (channel.isEmpty()) return;
 
-            Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.getMessageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed());
+            Localization.Integration.Discord localization = fileFacade.localization().integration().discord();
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null));
             sendMessage(sender, channel.get(), channelEmbed, discordString);
         });
     }
@@ -103,14 +103,14 @@ public class DiscordIntegration implements FIntegration {
 
         UnaryOperator<String> replaceString = s -> discordString.andThen(replaceSkin).apply(s);
 
-        Localization.Integration.Discord.Embed messageEmbed = channelEmbed.getEmbed();
+        Localization.Integration.Discord.Embed messageEmbed = channelEmbed.embed();
 
         EmbedCreateSpec embed = null;
         if (messageEmbed != null) {
             embed = createEmbed(messageEmbed, replaceSkin, replaceString);
         }
 
-        String webhookAvatar = channelEmbed.getWebhookAvatar();
+        String webhookAvatar = channelEmbed.webhookAvatar();
         if (StringUtils.isNotEmpty(webhookAvatar)) {
             long channelID = channel.asLong();
 
@@ -129,7 +129,7 @@ public class DiscordIntegration implements FIntegration {
                     .allowedMentions(AllowedMentionsData.builder().build())
                     .username(username)
                     .avatarUrl(replaceSkin.apply(webhookAvatar))
-                    .content(replaceString.apply(channelEmbed.getContent()));
+                    .content(replaceString.apply(channelEmbed.content()));
 
             if (embed != null) {
                 webhookBuilder.addEmbed(embed.asRequest());
@@ -152,7 +152,7 @@ public class DiscordIntegration implements FIntegration {
             messageCreateSpecBuilder.addEmbed(embed);
         }
 
-        String content = replaceString.apply(channelEmbed.getContent());
+        String content = replaceString.apply(channelEmbed.content());
         if (StringUtils.isEmpty(content) && embed == null) return;
 
         messageCreateSpecBuilder.content(content);
@@ -177,59 +177,59 @@ public class DiscordIntegration implements FIntegration {
                                         UnaryOperator<String> discordString) {
         EmbedCreateSpec.Builder embedBuilder = EmbedCreateSpec.builder();
 
-        if (StringUtils.isNotEmpty(embed.getColor())) {
-            Color color = Color.decode(embed.getColor());
+        if (StringUtils.isNotEmpty(embed.color())) {
+            Color color = Color.decode(embed.color());
             embedBuilder.color(discord4j.rest.util.Color.of(color.getRGB()));
         }
 
-        if (StringUtils.isNotEmpty(embed.getTitle())) {
-            embedBuilder.title(discordString.apply(embed.getTitle()));
+        if (StringUtils.isNotEmpty(embed.title())) {
+            embedBuilder.title(discordString.apply(embed.title()));
         }
 
-        if (StringUtils.isNotEmpty(embed.getUrl())) {
-            embedBuilder.url(replaceSkin.apply(embed.getUrl()));
+        if (StringUtils.isNotEmpty(embed.url())) {
+            embedBuilder.url(replaceSkin.apply(embed.url()));
         }
 
-        Localization.Integration.Discord.Embed.Author author = embed.getAuthor();
-        if (StringUtils.isNotEmpty(author.getName())
-                || StringUtils.isNotEmpty(author.getUrl())
-                || StringUtils.isNotEmpty(author.getIconUrl())) {
+        Localization.Integration.Discord.Embed.Author author = embed.author();
+        if (StringUtils.isNotEmpty(author.name())
+                || StringUtils.isNotEmpty(author.url())
+                || StringUtils.isNotEmpty(author.iconUrl())) {
             embedBuilder.author(
-                    discordString.apply(author.getName()),
-                    replaceSkin.apply(author.getUrl()),
-                    replaceSkin.apply(author.getIconUrl())
+                    discordString.apply(author.name()),
+                    replaceSkin.apply(author.url()),
+                    replaceSkin.apply(author.iconUrl())
             );
         }
 
-        if (StringUtils.isNotEmpty(embed.getDescription())) {
-            embedBuilder.description(discordString.apply(embed.getDescription()));
+        if (StringUtils.isNotEmpty(embed.description())) {
+            embedBuilder.description(discordString.apply(embed.description()));
         }
 
-        if (StringUtils.isNotEmpty(embed.getThumbnail())) {
-            embedBuilder.thumbnail(discordString.apply(embed.getThumbnail()));
+        if (StringUtils.isNotEmpty(embed.thumbnail())) {
+            embedBuilder.thumbnail(discordString.apply(embed.thumbnail()));
         }
 
-        if (StringUtils.isNotEmpty(embed.getImage())) {
-            embedBuilder.image(replaceSkin.apply(embed.getImage()));
+        if (StringUtils.isNotEmpty(embed.image())) {
+            embedBuilder.image(replaceSkin.apply(embed.image()));
         }
 
-        if (embed.isTimestamp()) {
+        if (embed.timestamp()) {
             embedBuilder.timestamp(Instant.now());
         }
 
-        Localization.Integration.Discord.Embed.Footer footer = embed.getFooter();
-        if (StringUtils.isNotEmpty(footer.getText()) || StringUtils.isNotEmpty(footer.getIconUrl())) {
+        Localization.Integration.Discord.Embed.Footer footer = embed.footer();
+        if (StringUtils.isNotEmpty(footer.text()) || StringUtils.isNotEmpty(footer.iconUrl())) {
             embedBuilder.footer(
-                    discordString.apply(footer.getText()),
-                    replaceSkin.apply(footer.getIconUrl())
+                    discordString.apply(footer.text()),
+                    replaceSkin.apply(footer.iconUrl())
             );
         }
 
-        if (embed.getFields() != null && !embed.getFields().isEmpty()) {
-            for (Localization.Integration.Discord.Embed.Field field : embed.getFields()) {
-                if (StringUtils.isEmpty(field.getName()) || StringUtils.isEmpty(field.getValue())) continue;
+        if (embed.fields() != null && !embed.fields().isEmpty()) {
+            for (Localization.Integration.Discord.Embed.Field field : embed.fields()) {
+                if (StringUtils.isEmpty(field.name()) || StringUtils.isEmpty(field.value())) continue;
 
-                embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
+                embedBuilder.addField(field.name(), field.value(), field.inline());
             }
         }
 
@@ -238,7 +238,7 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        String token = systemVariableResolver.substituteEnvVars(config().getToken());
+        String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 
         discordClient = DiscordClient.create(token);
@@ -246,27 +246,27 @@ public class DiscordIntegration implements FIntegration {
         gateway = discordClient.gateway().login().block();
         if (gateway == null) return;
 
-        Integration.Discord.Presence presence = config().getPresence();
+        Integration.Discord.Presence presence = config().presence();
 
-        if (presence.isEnable()) {
-            Integration.Discord.Presence.Activity activity = presence.getActivity();
+        if (presence.enable()) {
+            Integration.Discord.Presence.Activity activity = presence.activity();
 
-            ClientActivity clientActivity = activity.isEnable()
-                    ? ClientActivity.of(Activity.Type.valueOf(activity.getType()), activity.getName(), activity.getUrl())
+            ClientActivity clientActivity = activity.enable()
+                    ? ClientActivity.of(Activity.Type.valueOf(activity.type()), activity.name(), activity.url())
                     : null;
 
-            gateway.updatePresence(ClientPresence.of(Status.valueOf(presence.getStatus()), clientActivity)).block();
+            gateway.updatePresence(ClientPresence.of(Status.valueOf(presence.status()), clientActivity)).block();
         }
 
-        Integration.ChannelInfo channelInfo = config().getChannelInfo();
+        Integration.ChannelInfo channelInfo = config().channelInfo();
 
-        if (channelInfo.isEnable() && channelInfo.getTicker().isEnable()) {
-            long period = channelInfo.getTicker().getPeriod();
+        if (channelInfo.enable() && channelInfo.ticker().isEnable()) {
+            long period = channelInfo.ticker().getPeriod();
             taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
             updateChannelInfo();
         }
 
-        if (!config().getMessageChannel().isEmpty()) {
+        if (!config().messageChannel().isEmpty()) {
             gateway.getEventDispatcher()
                     .on(messageCreateListener.getEventType())
                     .flatMap(messageCreateListener::execute)
@@ -278,7 +278,7 @@ public class DiscordIntegration implements FIntegration {
 
         clientID = applicationInfo.getId().asLong();
 
-        Set<Long> uniqueChannels = config().getMessageChannel().values().stream()
+        Set<Long> uniqueChannels = config().messageChannel().values().stream()
                 .flatMap(List::stream)
                 .filter(id -> !id.isEmpty())
                 .map(id -> {
@@ -322,10 +322,10 @@ public class DiscordIntegration implements FIntegration {
     public void updateChannelInfo() {
         if (gateway == null) return;
 
-        if (!config().getChannelInfo().isEnable()) return;
+        if (!config().channelInfo().enable()) return;
 
-        Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-        for (Map.Entry<String, String> entry : localization.getInfoChannel().entrySet()) {
+        Localization.Integration.Discord localization = fileFacade.localization().integration().discord();
+        for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
             String id = entry.getKey();
             if (!NumberUtils.isParsable(id)) continue;
 

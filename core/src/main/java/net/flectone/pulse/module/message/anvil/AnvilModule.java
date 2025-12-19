@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
@@ -17,17 +17,17 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AnvilModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
 
     @Override
     public Message.Anvil config() {
-        return fileResolver.getMessage().getAnvil();
+        return fileFacade.message().anvil();
     }
 
     @Override
     public Permission.Message.Anvil permission() {
-        return fileResolver.getPermission().getMessage().getAnvil();
+        return fileFacade.permission().message().anvil();
     }
 
     public Optional<String> format(FPlayer fPlayer, String string) {

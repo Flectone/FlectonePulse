@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -24,7 +24,7 @@ public class CooldownSender {
     private final MessagePipeline messagePipeline;
     private final TimeFormatter timeFormatter;
     private final EventDispatcher eventDispatcher;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     public boolean sendIfCooldown(FEntity entity, @Nullable Cooldown cooldown) {
         if (cooldown == null) return false;
@@ -37,7 +37,7 @@ public class CooldownSender {
         if (!cooldown.isCooldown(fPlayer.getUuid())) return false;
 
         long timeLeft = cooldown.getTimeLeft(fPlayer);
-        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileResolver.getLocalization(entity).getCooldown());
+        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
         Component component = messagePipeline.builder(fPlayer, cooldownMessage).build();
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));

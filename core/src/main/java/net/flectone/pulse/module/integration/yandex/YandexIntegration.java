@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceGrpc;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceOuterClass;
@@ -17,7 +17,7 @@ import java.time.Duration;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class YandexIntegration implements FIntegration {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
 
     private ServiceFactory factory;
@@ -30,7 +30,7 @@ public class YandexIntegration implements FIntegration {
                 .setTargetLanguageCode(target)
                 .setFormat(TranslationServiceOuterClass.TranslateRequest.Format.PLAIN_TEXT)
                 .addTexts(text)
-                .setFolderId(fileResolver.getIntegration().getYandex().getFolderId())
+                .setFolderId(fileFacade.integration().yandex().folderId())
                 .build()
         );
 
@@ -41,7 +41,7 @@ public class YandexIntegration implements FIntegration {
     public void hook() {
         try {
             factory = ServiceFactory.builder()
-                    .credentialProvider(Auth.oauthTokenBuilder().oauth(fileResolver.getIntegration().getYandex().getToken()))
+                    .credentialProvider(Auth.oauthTokenBuilder().oauth(fileFacade.integration().yandex().token()))
                     .requestTimeout(Duration.ofMinutes(1))
                     .build();
 

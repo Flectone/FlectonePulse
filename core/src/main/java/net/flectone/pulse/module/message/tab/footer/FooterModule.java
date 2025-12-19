@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -16,7 +16,7 @@ import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FooterModule extends AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
@@ -38,7 +38,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
@@ -51,7 +51,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         super.onDisable();
 
         // clear tab
-        Destination.Type destinationType = config().getDestination().getType();
+        Destination.Type destinationType = config().destination().getType();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
         }
@@ -64,34 +64,34 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
     @Override
     public Message.Tab.Footer config() {
-        return fileResolver.getMessage().getTab().getFooter();
+        return fileFacade.message().tab().footer();
     }
 
     @Override
     public Permission.Message.Tab.Footer permission() {
-        return fileResolver.getPermission().getMessage().getTab().getFooter();
+        return fileFacade.permission().message().tab().footer();
     }
 
     @Override
     public Localization.Message.Tab.Footer localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getTab().getFooter();
+        return fileFacade.localization(sender).message().tab().footer();
     }
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return joinMultiList(localization(fPlayer).getLists());
+        return joinMultiList(localization(fPlayer).lists());
     }
 
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, config().isRandom());
+        String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .build()
         );
     }

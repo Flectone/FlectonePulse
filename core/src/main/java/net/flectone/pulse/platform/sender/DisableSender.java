@@ -3,13 +3,13 @@ package net.flectone.pulse.platform.sender;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
@@ -19,7 +19,7 @@ public class DisableSender {
 
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     public boolean sendIfDisabled(FEntity entity, FEntity receiver, MessageType messageType) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
@@ -29,11 +29,11 @@ public class DisableSender {
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return true;
 
-        Localization.Command.Chatsetting localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting();
+        Localization.Command.Chatsetting localization = fileFacade.localization(fReceiver).command().chatsetting();
 
         String disableMessage = fPlayer.equals(fReceiver)
-                ? localization.getDisabledSelf()
-                : localization.getDisabledOther();
+                ? localization.disabledSelf()
+                : localization.disabledOther();
 
         Component component = messagePipeline.builder(receiver, fPlayer, disableMessage).build();
 

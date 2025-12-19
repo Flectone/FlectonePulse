@@ -7,7 +7,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
@@ -23,10 +23,10 @@ public class PlatformPlayerParser extends PlayerParser {
     @Inject
     public PlatformPlayerParser(FPlayerService fPlayerService,
                                 IntegrationModule integrationModule,
-                                FileResolver fileResolver,
+                                FileFacade fileFacade,
                                 PlatformPlayerAdapter platformPlayerAdapter,
                                 PermissionChecker permissionChecker) {
-        super(fPlayerService, integrationModule, fileResolver, platformPlayerAdapter, permissionChecker);
+        super(fPlayerService, integrationModule, fileFacade, platformPlayerAdapter, permissionChecker);
 
         this.fPlayerService = fPlayerService;
         this.integrationModule = integrationModule;

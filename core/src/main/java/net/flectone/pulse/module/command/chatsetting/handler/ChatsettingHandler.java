@@ -5,14 +5,14 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.SettingText;
@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatsettingHandler {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ChatsettingModule chatsettingModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
 
     public Permission.Message.Chat chatPermission() {
-        return fileResolver.getPermission().getMessage().getChat();
+        return fileFacade.permission().message().chat();
     }
 
     public void handleChatMenu(FPlayer fPlayer,
@@ -46,28 +46,28 @@ public class ChatsettingHandler {
                                Localization.Command.Chatsetting localization,
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(SettingText.CHAT_NAME.name()))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(SettingText.CHAT_NAME.name()))) {
             chatsettingModule.sendErrorMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Chatsetting::getNoPermission)
+                    .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
 
             return;
         }
 
-        List<SubMenuItem> items = chat.getTypes().stream()
-                .map(t -> new SubMenuItem(t.getName(), t.getMaterial(), null, chatPermission().getTypes().get(t.getName())))
+        List<SubMenuItem> items = chat.types().stream()
+                .map(t -> new SubMenuItem(t.name(), t.material(), null, chatPermission().types().get(t.name())))
                 .toList();
 
         Function<SubMenuItem, String> getItemMessage = item -> Strings.CS.replace(
-                localization.getMenu().getChat().getTypes().getOrDefault(item.name(), ""),
+                localization.menu().chat().types().getOrDefault(item.name(), ""),
                 "<chat>", item.name()
         );
 
         Consumer<SubMenuItem> onSelect = item -> fTarget.setSetting(SettingText.CHAT_NAME, "default".equalsIgnoreCase(item.name()) ? null : item.name());
 
-        String headerStr = localization.getMenu().getChat().getInventory();
+        String headerStr = localization.menu().chat().inventory();
         Component header = messagePipeline.builder(fPlayer, fTarget, headerStr).build();
 
         Runnable closeConsumer = () -> chatsettingModule.saveSetting(fTarget, SettingText.CHAT_NAME);
@@ -82,22 +82,22 @@ public class ChatsettingHandler {
                                  Localization.Command.Chatsetting.Menu.SubMenu subMenu,
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get("FCOLOR_" + type.name()))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get("FCOLOR_" + type.name()))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Chatsetting::getNoPermission)
+                    .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
 
             return;
         }
 
-        List<SubMenuItem> items = color.getTypes().stream()
-                .map(t -> new SubMenuItem(t.getName(), t.getMaterial(), t.getColors(), null))
+        List<SubMenuItem> items = color.types().stream()
+                .map(t -> new SubMenuItem(t.name(), t.material(), t.colors(), null))
                 .toList();
 
         Function<SubMenuItem, String> getItemMessage = item -> {
-            String message = subMenu.getTypes().getOrDefault(item.name(), "");
+            String message = subMenu.types().getOrDefault(item.name(), "");
             for (Map.Entry<Integer, String> entry : item.colors().entrySet()) {
                 String trigger = "<fcolor:" + entry.getKey() + ">";
                 String value = entry.getValue().isBlank() ? trigger : entry.getValue();
@@ -113,7 +113,7 @@ public class ChatsettingHandler {
                 .collect(Collectors.toSet())
         );
 
-        String headerStr = subMenu.getInventory();
+        String headerStr = subMenu.inventory();
         Component header = messagePipeline.builder(fPlayer, fTarget, headerStr).build();
 
         Runnable closeConsumer = () -> fPlayerService.saveColors(fTarget);
@@ -125,7 +125,7 @@ public class ChatsettingHandler {
         if (item.perm() != null && !permissionChecker.check(fPlayer, item.perm())) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Chatsetting::getNoPermission)
+                    .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
 
@@ -136,10 +136,10 @@ public class ChatsettingHandler {
     }
 
     public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType) {
-        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(messageType))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(messageType))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Chatsetting::getNoPermission)
+                    .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
 

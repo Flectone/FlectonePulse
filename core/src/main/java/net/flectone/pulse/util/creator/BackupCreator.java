@@ -6,9 +6,9 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.config.YamlFile;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.file.FilePathProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,14 +35,14 @@ public class BackupCreator {
     @Nullable
     private String preInitVersion;
 
-    public <T extends YamlFile> void backup(T yamlFile) {
+    public void backup(Path pathToFile) {
         if (preInitVersion == null) {
             fLogger.warning("Backup is not needed if the version has not changed");
             return;
         }
 
-        String fileName = yamlFile.getPathToFile().getFileName().toString();
-        backup(fileName, yamlFile.getPathToFile());
+        String fileName = pathToFile.getFileName().toString();
+        backup(fileName, pathToFile);
     }
 
     public void backup(Config.Database database) {
@@ -51,8 +51,8 @@ public class BackupCreator {
             return;
         }
 
-        Database.Type databaseType = database.getType();
-        String databaseName = systemVariableResolver.substituteEnvVars(database.getName());
+        Database.Type databaseType = database.type();
+        String databaseName = systemVariableResolver.substituteEnvVars(database.name());
         switch (databaseType) {
             case SQLITE, H2 -> {
                 databaseName = databaseName + (databaseType == Database.Type.SQLITE ? ".db" : ".h2.mv.db");
@@ -64,10 +64,10 @@ public class BackupCreator {
                     String backupFileName = databaseName + "_" + SIMPLE_DATE_FORMAT.format(new Date()) + ".sql";
                     Path backupPath = resolveBackupPath(backupFileName);
 
-                    String host = systemVariableResolver.substituteEnvVars(database.getHost());
-                    String port = systemVariableResolver.substituteEnvVars(database.getPort());
-                    String user = systemVariableResolver.substituteEnvVars(database.getUser());
-                    String password = systemVariableResolver.substituteEnvVars(database.getPassword());
+                    String host = systemVariableResolver.substituteEnvVars(database.host());
+                    String port = systemVariableResolver.substituteEnvVars(database.port());
+                    String user = systemVariableResolver.substituteEnvVars(database.user());
+                    String password = systemVariableResolver.substituteEnvVars(database.password());
 
                     Map<String, String> env = new HashMap<>(System.getenv());
                     ProcessBuilder processBuilder;

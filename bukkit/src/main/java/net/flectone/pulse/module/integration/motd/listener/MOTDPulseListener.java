@@ -21,7 +21,7 @@ public class MOTDPulseListener implements PulseListener {
         if (!motdModule.isHooked()) return;
 
         AbstractModule eventModule = event.getModule();
-        if (eventModule instanceof MaintenanceModule && motdModule.config().isDisableFlectonepulseStatus()) {
+        if (eventModule instanceof MaintenanceModule && motdModule.config().disableFlectonepulseStatus()) {
             event.setCancelled(true);
         }
     }

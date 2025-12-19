@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.format.names;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -14,7 +14,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -29,7 +29,7 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NamesModule extends AbstractModuleLocalization<Localization.Message.Format.Names> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
@@ -43,12 +43,12 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public Message.Format.Names config() {
-        return fileResolver.getMessage().getFormat().getNames();
+        return fileFacade.message().format().names();
     }
 
     @Override
     public Permission.Message.Format.Names permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getNames();
+        return fileFacade.permission().message().format().names();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public Localization.Message.Format.Names localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getNames();
+        return fileFacade.localization(sender).message().format().names();
     }
 
     public void addTags(MessageContext messageContext) {
@@ -75,7 +75,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                 Component showEntityName = sender.getShowEntityName();
                 if (showEntityName == null) {
                     Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
-                                    sender.getType().equals(FEntity.UNKNOWN_TYPE) ? localizationName.getUnknown() : localizationName.getEntity(),
+                                    sender.getType().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
                                     new String[]{"<name>", "<type>", "<uuid>"},
                                     new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
                             ))
@@ -85,9 +85,9 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                 }
 
                 Component displayName = messagePipeline.builder(sender, receiver, sender.getType().equals(FEntity.UNKNOWN_TYPE)
-                                ? localizationName.getUnknown()
+                                ? localizationName.unknown()
                                 : StringUtils.replaceEach(
-                                        localizationName.getEntity(),
+                                        localizationName.entity(),
                                         new String[]{"<type>", "<uuid>"},
                                         new String[]{sender.getType(), sender.getUuid().toString()}
                                 )
@@ -103,7 +103,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
             String constantName = fPlayer.getConstantName();
             if (constantName == null) {
-                constantName = localization(fPlayer).getConstant();
+                constantName = localization(fPlayer).constant();
             }
 
             if (constantName.isEmpty()) {
@@ -117,8 +117,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
             Localization.Message.Format.Names localization = localization(receiver);
 
             String displayName = fPlayer.isUnknown()
-                    ? Strings.CS.replace(localization.getUnknown(), "<name>", fPlayer.getName())
-                    : localization.getDisplay();
+                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
+                    : localization.display();
 
             Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();
 
@@ -157,7 +157,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
         FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
-            String formatInvisible = localization(receiver).getInvisible();
+            String formatInvisible = localization(receiver).invisible();
             Component name = messagePipeline.builder(sender, receiver, formatInvisible)
                     .build();
 

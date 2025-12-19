@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListe
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -38,7 +38,7 @@ public class ObjectModule extends AbstractModule {
     // this is too long, so we replace it with "☐"
     private static final Component DEFAULT_OBJECT_COMPONENT = Component.text("☐").color(NamedTextColor.WHITE);
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final SkinService skinService;
@@ -50,30 +50,30 @@ public class ObjectModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getPlayerHead());
-        registerPermission(permission().getSprite());
+        registerPermission(permission().playerHead());
+        registerPermission(permission().sprite());
 
         listenerRegistry.register(ObjectPulseListener.class);
     }
 
     @Override
     public Message.Format.Object config() {
-        return fileResolver.getMessage().getFormat().getObject();
+        return fileFacade.message().format().object();
     }
 
     @Override
     public Permission.Message.Format.Object permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getObject();
+        return fileFacade.permission().message().format().object();
     }
 
     public void addPlayerHeadTag(MessageContext messageContext) {
         if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())) return;
-        if (!config().isPlayerHead()) return;
+        if (!config().playerHead()) return;
 
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             if (isModuleDisabledFor(sender)) return;
-            if (!permissionChecker.check(sender, permission().getPlayerHead())) return;
+            if (!permissionChecker.check(sender, permission().playerHead())) return;
         }
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER_HEAD, ((argumentQueue, context) -> {
@@ -94,7 +94,7 @@ public class ObjectModule extends AbstractModule {
                                 .build()
                 ).build().color(NamedTextColor.WHITE);
 
-                if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
+                if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().needExtraSpace()) {
                     playerHeadComponent = playerHeadComponent.append(Component.space());
                 }
 
@@ -122,12 +122,12 @@ public class ObjectModule extends AbstractModule {
 
     public void addSpriteTag(MessageContext messageContext) {
         if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.SPRITE.getTagName())) return;
-        if (!config().isSprite()) return;
+        if (!config().sprite()) return;
 
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             if (isModuleDisabledFor(sender)) return;
-            if (!permissionChecker.check(sender, permission().getSprite())) return;
+            if (!permissionChecker.check(sender, permission().sprite())) return;
         }
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPRITE, ((argumentQueue, context) -> {
@@ -146,7 +146,7 @@ public class ObjectModule extends AbstractModule {
                     .build()
                     .color(NamedTextColor.WHITE);
 
-            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
+            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().needExtraSpace()) {
                 spriteComponent = spriteComponent.append(Component.space());
             }
 
@@ -159,7 +159,7 @@ public class ObjectModule extends AbstractModule {
 
         // check console version
         if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
-            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().isNeedExtraSpace()) {
+            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().needExtraSpace()) {
                 return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT.append(Component.space()));
             }
 

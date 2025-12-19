@@ -115,7 +115,7 @@ public class IntegrationSender {
             case VANILLA -> {
                 if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield "UNKNOWN";
 
-                String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().getName();
+                String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().name();
                 if (vanillaMessageName.isEmpty()) yield messageType.name();
 
                 yield vanillaMessageName.toUpperCase();

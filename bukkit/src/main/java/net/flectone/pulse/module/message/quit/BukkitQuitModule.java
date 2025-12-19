@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class BukkitQuitModule extends QuitModule {
@@ -13,10 +13,10 @@ public class BukkitQuitModule extends QuitModule {
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public BukkitQuitModule(FileResolver fileResolver,
+    public BukkitQuitModule(FileFacade fileFacade,
                             IntegrationModule integrationModule,
                             ListenerRegistry listenerRegistry) {
-        super(fileResolver, integrationModule, listenerRegistry);
+        super(fileFacade, integrationModule, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

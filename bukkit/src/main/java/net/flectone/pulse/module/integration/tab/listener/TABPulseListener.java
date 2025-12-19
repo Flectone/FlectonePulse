@@ -27,12 +27,12 @@ public class TABPulseListener implements PulseListener {
         if (!tabModule.isHooked()) return;
 
         AbstractModule eventModule = event.getModule();
-        Integration.TAB config = tabModule.config();
+        Integration.Tab config = tabModule.config();
 
-        if ((eventModule instanceof HeaderModule && config.isDisableFlectonepulseHeader())
-                || (eventModule instanceof FooterModule && config.isDisableFlectonepulseFooter())
-                || (eventModule instanceof PlayerlistnameModule && config.isDisableFlectonepulsePlayerlistname())
-                || ((eventModule instanceof ScoreboardModule || eventModule instanceof BelownameModule || eventModule instanceof TabnameModule) && config.isDisableFlectonepulseScoreboard())) {
+        if ((eventModule instanceof HeaderModule && config.disableFlectonepulseHeader())
+                || (eventModule instanceof FooterModule && config.disableFlectonepulseFooter())
+                || (eventModule instanceof PlayerlistnameModule && config.disableFlectonepulsePlayerlistname())
+                || ((eventModule instanceof ScoreboardModule || eventModule instanceof BelownameModule || eventModule instanceof TabnameModule) && config.disableFlectonepulseScoreboard())) {
             event.setCancelled(true);
         }
     }

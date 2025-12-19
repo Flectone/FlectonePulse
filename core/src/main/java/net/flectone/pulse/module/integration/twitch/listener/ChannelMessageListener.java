@@ -9,14 +9,14 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.twitch.TwitchIntegration;
 import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -34,7 +34,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final Provider<TwitchIntegration> twitchIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
@@ -46,7 +46,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     public void execute(ChannelMessageEvent event) {
         if (executeCommand(event)) return;
 
-        List<String> channel = config().getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
+        List<String> channel = config().messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
         if (channel == null || channel.isEmpty()) return;
 
         String channelName = event.getChannel().getName();
@@ -76,7 +76,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
         sendMessage(TwitchMetadata.<Localization.Integration.Twitch>builder()
                 .sender(FPlayer.UNKNOWN)
                 .format(localization -> StringUtils.replaceEach(
-                        StringUtils.defaultString(localization.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
+                        StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
                         new String[]{"<name>", "<channel>"},
                         new String[]{String.valueOf(nickname), String.valueOf(channel)}
                 ))
@@ -84,12 +84,12 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .channel(channel)
                 .message(message)
                 .range(Range.get(Range.Type.PROXY))
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                     if (reply == null) return Tag.selfClosingInserting(Component.empty());
 
-                    Component componentReply = messagePipeline.builder(localization().getFormatReply())
+                    Component componentReply = messagePipeline.builder(localization().formatReply())
                             .tagResolvers(
                                     TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
                                     TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
@@ -112,17 +112,17 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     @Override
     public Integration.Twitch config() {
-        return fileResolver.getIntegration().getTwitch();
+        return fileFacade.integration().twitch();
     }
 
     @Override
     public Permission.Integration.Twitch permission() {
-        return fileResolver.getPermission().getIntegration().getTwitch();
+        return fileFacade.permission().integration().twitch();
     }
 
     @Override
     public Localization.Integration.Twitch localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getIntegration().getTwitch();
+        return fileFacade.localization(sender).integration().twitch();
     }
 
     private boolean executeCommand(ChannelMessageEvent event) {
@@ -133,28 +133,28 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
         String commandName = parts[0];
         String arguments = parts.length > 1 ? parts[1] : "";
 
-        for (Map.Entry<String, Integration.Command> commandEntry : config().getCustomCommand().entrySet()) {
+        for (Map.Entry<String, Integration.Command> commandEntry : config().customCommand().entrySet()) {
             Integration.Command command = commandEntry.getValue();
-            if (!command.getAliases().contains(commandName)) continue;
+            if (!command.aliases().contains(commandName)) continue;
 
             FPlayer fPlayer = FPlayer.UNKNOWN;
             String channel = event.getChannel().getName();
 
-            if (command.isNeedPlayer()) {
+            if (command.needPlayer()) {
                 if (arguments.isEmpty()) {
-                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::getNullPlayer));
+                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
                     return true;
                 }
 
                 String playerName = arguments.split(" ")[0];
                 fPlayer = fPlayerService.getFPlayer(playerName);
                 if (fPlayer.isUnknown()) {
-                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::getNullPlayer));
+                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
                     return true;
                 }
             }
 
-            String localizationString = localization().getCustomCommand().get(commandEntry.getKey());
+            String localizationString = localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
             String formattedMessage = buildMessage(fPlayer, localizationString);

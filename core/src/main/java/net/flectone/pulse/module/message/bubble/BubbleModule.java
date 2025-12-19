@@ -12,7 +12,7 @@ import net.flectone.pulse.module.message.bubble.listener.BubblePacketListener;
 import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
 
@@ -44,12 +44,12 @@ public class BubbleModule extends AbstractModule {
 
     @Override
     public Message.Bubble config() {
-        return fileResolver.getMessage().getBubble();
+        return fileFacade.message().bubble();
     }
 
     @Override
     public Permission.Message.Bubble permission() {
-        return fileResolver.getPermission().getMessage().getBubble();
+        return fileFacade.permission().message().bubble();
     }
 
     @Async

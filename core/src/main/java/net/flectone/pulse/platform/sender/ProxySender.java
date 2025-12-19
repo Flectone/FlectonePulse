@@ -11,7 +11,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.constant.MessageType;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class ProxySender {
 
     private final ProxyRegistry proxyRegistry;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final Gson gson;
     private final FLogger fLogger;
@@ -61,7 +61,7 @@ public class ProxySender {
 
             output.writeUTF(tag.toProxyTag());
             output.writeUTF(metadataUUID.toString());
-            output.writeAsJson(fileResolver.getConfig().getProxy().getClusters());
+            output.writeAsJson(fileFacade.config().proxy().clusters());
             output.writeAsJson(sender);
             outputConsumer.accept(output);
 
@@ -83,7 +83,7 @@ public class ProxySender {
 
 
     private String getConstantName(FPlayer sender) {
-        String message = fileResolver.getLocalization(sender).getMessage().getFormat().getNames().getConstant();
+        String message = fileFacade.localization(sender).message().format().names().constant();
         if (message.isEmpty()) return "";
 
         return messagePipeline.builder(sender, message).defaultSerializerBuild();

@@ -10,7 +10,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
@@ -20,7 +20,7 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -71,12 +71,12 @@ public class TelegramModule extends AbstractModule {
 
     @Override
     public Integration.Telegram config() {
-        return fileResolver.getIntegration().getTelegram();
+        return fileFacade.integration().telegram();
     }
 
     @Override
     public Permission.Integration.Telegram permission() {
-        return fileResolver.getPermission().getIntegration().getTelegram();
+        return fileFacade.permission().integration().telegram();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {

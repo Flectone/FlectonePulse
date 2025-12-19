@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -15,14 +15,14 @@ import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class JoinModule extends AbstractModuleLocalization<Localization.Message.Join> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
@@ -31,7 +31,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().getSound(), permission().getSound());
+        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(JoinPulseListener.class);
     }
@@ -43,17 +43,17 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public Message.Join config() {
-        return fileResolver.getMessage().getJoin();
+        return fileFacade.message().join();
     }
 
     @Override
     public Permission.Message.Join permission() {
-        return fileResolver.getPermission().getMessage().getJoin();
+        return fileFacade.permission().message().join();
     }
 
     @Override
     public Localization.Message.Join localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getJoin();
+        return fileFacade.localization(sender).message().join();
     }
 
     @Async(delay = 5)
@@ -69,11 +69,11 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(JoinMetadata.<Localization.Message.Join>builder()
                 .sender(fPlayer)
-                .format(s -> hasPlayedBefore || !config().isFirst() ? s.getFormat() : s.getFormatFirstTime())
+                .format(s -> hasPlayedBefore || !config().first() ? s.format() : s.formatFirstTime())
                 .ignoreVanish(ignoreVanish)
                 .playedBefore(hasPlayedBefore)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> {

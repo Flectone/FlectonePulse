@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -13,7 +13,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unwarn> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,10 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptId = addPrompt(1, Localization.Command.Prompt::getId);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptId = addPrompt(1, Localization.Command.Prompt::id);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.warnedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -67,17 +67,17 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public Command.Unwarn config() {
-        return fileResolver.getCommand().getUnwarn();
+        return fileFacade.command().unwarn();
     }
 
     @Override
     public Permission.Command.Unwarn permission() {
-        return fileResolver.getPermission().getCommand().getUnwarn();
+        return fileFacade.permission().command().unwarn();
     }
 
     @Override
     public Localization.Command.Unwarn localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getUnwarn();
+        return fileFacade.localization(sender).command().unwarn();
     }
 
     public void unwarn(FPlayer fPlayer, String target, int id) {
@@ -87,17 +87,17 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         if (fTarget.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unwarn::getNullPlayer)
+                    .format(Localization.Command.Unwarn::nullPlayer)
                     .build()
             );
 
             return;
         }
 
-        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unwarn::getLowerWeightGroup)
+                    .format(Localization.Command.Unwarn::lowerWeightGroup)
                     .build()
             );
             return;
@@ -117,7 +117,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         if (warns.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unwarn::getNotWarned)
+                    .format(Localization.Command.Unwarn::notWarned)
                     .build()
             );
 
@@ -130,11 +130,11 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .sender(fTarget)
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(warns)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -16,7 +16,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -31,7 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
@@ -43,9 +43,9 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     public void onEnable() {
         super.onEnable();
 
-        String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
+        String promptNumber = addPrompt(0, Localization.Command.Prompt::number);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
@@ -58,7 +58,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         if (ignoreList.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Ignorelist::getEmpty)
+                    .format(Localization.Command.Ignorelist::empty)
                     .build()
             );
 
@@ -68,7 +68,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         Localization.Command.Ignorelist localization = localization(fPlayer);
 
         int size = ignoreList.size();
-        int perPage = config().getPerPage();
+        int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         String prompt = getPrompt(0);
@@ -78,7 +78,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         if (page > countPage || page < 1) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Ignorelist::getNullPage)
+                    .format(Localization.Command.Ignorelist::nullPage)
                     .build()
             );
 
@@ -92,7 +92,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                  .limit(perPage)
                  .toList();
 
-        String header = Strings.CS.replace(localization.getHeader(), "<count>", String.valueOf(size));
+        String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
@@ -101,7 +101,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
             String line = StringUtils.replaceEach(
-                    localization.getLine(),
+                    localization.line(),
                     new String[]{"<command>", "<date>"},
                     new String[]{"/ignore " + fTarget.getName(), timeFormatter.formatDate(ignore.date())}
             );
@@ -112,7 +112,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         }
 
         String footer = StringUtils.replaceEach(
-                localization.getFooter(),
+                localization.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
                 new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
@@ -131,16 +131,16 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     @Override
     public Command.Ignorelist config() {
-        return fileResolver.getCommand().getIgnorelist();
+        return fileFacade.command().ignorelist();
     }
 
     @Override
     public Permission.Command.Ignorelist permission() {
-        return fileResolver.getPermission().getCommand().getIgnorelist();
+        return fileFacade.permission().command().ignorelist();
     }
 
     @Override
     public Localization.Command.Ignorelist localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getIgnorelist();
+        return fileFacade.localization(sender).command().ignorelist();
     }
 }

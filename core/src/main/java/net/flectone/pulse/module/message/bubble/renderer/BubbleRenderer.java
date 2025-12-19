@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -28,7 +28,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -51,7 +51,7 @@ public class BubbleRenderer {
     
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
     
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -66,8 +66,8 @@ public class BubbleRenderer {
         FPlayer sender = bubble.getSender();
         if (!isCorrectPlayer(sender)) return;
 
-        Message.Bubble config = fileResolver.getMessage().getBubble();
-        double viewDistance = config.getDistance();
+        Message.Bubble config = fileFacade.message().bubble();
+        double viewDistance = config.distance();
 
         CompletableFuture<Set<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
 
@@ -185,7 +185,7 @@ public class BubbleRenderer {
     }
     
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
-        Localization.Message.Bubble localization = fileResolver.getLocalization(viewer).getMessage().getBubble();
+        Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
 
         Component message = messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
                 .flag(MessageFlag.USER_MESSAGE, true)
@@ -195,7 +195,7 @@ public class BubbleRenderer {
                 .build();
 
         
-        return messagePipeline.builder(bubble.getSender(), viewer, localization.getFormat())
+        return messagePipeline.builder(bubble.getSender(), viewer, localization.format())
                 .flag(MessageFlag.MENTION, false)
                 .flag(MessageFlag.INTERACTIVE_CHAT, false)
                 .flag(MessageFlag.QUESTION, false)

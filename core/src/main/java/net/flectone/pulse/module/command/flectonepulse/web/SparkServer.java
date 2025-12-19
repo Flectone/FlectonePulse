@@ -4,14 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.command.flectonepulse.web.controller.EditorController;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import spark.Service;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SparkServer {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final EditorController controller;
 
     private Service sparkService;
@@ -26,7 +26,7 @@ public class SparkServer {
         }
 
         sparkService = Service.ignite();
-        sparkService.port(fileResolver.getConfig().getEditor().getPort());
+        sparkService.port(fileFacade.config().editor().port());
         sparkService.staticFiles.location("/");
 
         sparkService.before((req, res) -> res.type("text/html; charset=utf-8"));

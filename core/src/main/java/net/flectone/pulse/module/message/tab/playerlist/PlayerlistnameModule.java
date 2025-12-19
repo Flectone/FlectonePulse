@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -29,7 +29,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -52,7 +52,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME
     );
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
@@ -72,7 +72,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
@@ -87,17 +87,17 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public Message.Tab.Playerlistname config() {
-        return fileResolver.getMessage().getTab().getPlayerlistname();
+        return fileFacade.message().tab().playerlistname();
     }
 
     @Override
     public Permission.Message.Tab.Playerlistname permission() {
-        return fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
+        return fileFacade.permission().message().tab().playerlistname();
     }
 
     @Override
     public Localization.Message.Tab.Playerlistname localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getTab().getPlayerlistname();
+        return fileFacade.localization(sender).message().tab().playerlistname();
     }
 
     @Async
@@ -176,7 +176,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     public boolean isProxyMode() {
-        return config().isProxyMode() && proxyRegistry.hasEnabledProxy();
+        return config().proxyMode() && proxyRegistry.hasEnabledProxy();
     }
 
     private List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> getProxyPlayerInfos(FPlayer fReceiver) {
@@ -193,7 +193,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         // 3 - offline client, 4 - official client
         boolean offlineClient = fReceiver.getUuid().version() == 3;
-        return messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).getFormat())
+        return messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).format())
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient) // disable player_head for official client
                 .build();
     }

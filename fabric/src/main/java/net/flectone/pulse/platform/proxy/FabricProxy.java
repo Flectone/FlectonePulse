@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricProxy implements Proxy {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageHandler proxyMessageHandler;
 
@@ -90,11 +90,11 @@ public class FabricProxy implements Proxy {
 
     @Nullable
     public String getChannel() {
-        if (fileResolver.getConfig().getProxy().isBungeecord()) {
+        if (fileFacade.config().proxy().bungeecord()) {
             return "bungeecord:main";
         }
 
-        if (fileResolver.getConfig().getProxy().isVelocity()) {
+        if (fileFacade.config().proxy().velocity()) {
             return "flectonepulse:main";
         }
 

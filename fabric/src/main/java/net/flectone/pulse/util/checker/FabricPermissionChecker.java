@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
@@ -46,7 +46,7 @@ public class FabricPermissionChecker implements PermissionChecker {
     }
 
     @Override
-    public boolean check(FEntity entity, Permission.IPermission permission) {
-        return permission == null || check(entity, permission.getName());
+    public boolean check(FEntity entity, PermissionSetting permission) {
+        return permission == null || check(entity, permission.name());
     }
 }

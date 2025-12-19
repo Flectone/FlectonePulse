@@ -29,7 +29,7 @@ public class MaintenancePulseListener implements PulseListener {
 
         fPlayerService.loadColors(fPlayer);
 
-        String reasonMessage = maintenanceModule.localization(fPlayer).getKick();
+        String reasonMessage = maintenanceModule.localization(fPlayer).kick();
         Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
 
         event.setKickReason(reason);

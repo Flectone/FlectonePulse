@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -30,7 +30,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WorldModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
@@ -41,7 +41,7 @@ public class WorldModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
@@ -52,12 +52,12 @@ public class WorldModule extends AbstractModule {
 
     @Override
     public Message.Format.World config() {
-        return fileResolver.getMessage().getFormat().getWorld();
+        return fileFacade.message().format().world();
     }
 
     @Override
     public Permission.Message.Format.World permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getWorld();
+        return fileFacade.permission().message().format().world();
     }
 
     public void addTag(MessageContext messageContext) {
@@ -80,9 +80,9 @@ public class WorldModule extends AbstractModule {
     public void update(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String newWorldPrefix = config().getMode() == Mode.TYPE
-                ? config().getValues().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
-                : config().getValues().get(platformPlayerAdapter.getWorldName(fPlayer));
+        String newWorldPrefix = config().mode() == Mode.TYPE
+                ? config().values().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
+                : config().values().get(platformPlayerAdapter.getWorldName(fPlayer));
 
         String fPlayerWorldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
         if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;

@@ -14,7 +14,7 @@ import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public class BubbleService {
 
     private final Map<UUID, Queue<Bubble>> playerBubbleQueues = new ConcurrentHashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final BubbleRenderer bubbleRenderer;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
@@ -69,27 +69,27 @@ public class BubbleService {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
         // default bubble
-        Message.Bubble config = fileResolver.getMessage().getBubble();
+        Message.Bubble config = fileFacade.message().bubble();
 
         long duration = calculateDuration(message);
-        float elevation = config.getElevation();
-        float interactionHeight = config.getInteraction().getHeight();
+        float elevation = config.elevation();
+        float interactionHeight = config.interaction().height();
 
         boolean useModernBubble = isModern();
         boolean useInteractionRiding = isInteractionRiding();
 
-        String wordBreakHint = config.getWordBreakHint();
+        String wordBreakHint = config.wordBreakHint();
 
         // modern bubble
-        Message.Bubble.Modern configModern = config.getModern();
+        Message.Bubble.Modern configModern = config.modern();
 
-        boolean hasShadow = configModern.isHasShadow();
-        int background = colorConverter.parseHexToArgb(configModern.getBackground());
-        int animationTime = configModern.getAnimationTime();
-        float scale = configModern.getScale();
-        BubbleModule.Billboard billboard = configModern.getBillboard();
+        boolean hasShadow = configModern.hasShadow();
+        int background = colorConverter.parseHexToArgb(configModern.background());
+        int animationTime = configModern.animationTime();
+        float scale = configModern.scale();
+        BubbleModule.Billboard billboard = configModern.billboard();
 
-        int maxLength = fileResolver.getMessage().getBubble().getMaxLength();
+        int maxLength = fileFacade.message().bubble().maxLength();
 
         List<Bubble> bubbles = new ArrayList<>();
 
@@ -152,7 +152,7 @@ public class BubbleService {
             return;
         }
 
-        int maxCount = fileResolver.getMessage().getBubble().getMaxCount();
+        int maxCount = fileFacade.message().bubble().maxCount();
 
         bubbleQueue.removeIf(bubble -> {
             if (bubble.isExpired()) {
@@ -183,19 +183,19 @@ public class BubbleService {
     }
     
     private long calculateDuration(String message) {
-        Message.Bubble config = fileResolver.getMessage().getBubble();
+        Message.Bubble config = fileFacade.message().bubble();
 
         int countWords = message.split(" ").length;
-        return (long) (((countWords + config.getHandicapChars()) / config.getReadSpeed()) * 60) * 1000L;
+        return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
     }
 
     private boolean isModern() {
         return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
-                && fileResolver.getMessage().getBubble().getModern().isEnable();
+                && fileFacade.message().bubble().modern().enable();
     }
 
     private boolean isInteractionRiding() {
         return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
-                && fileResolver.getMessage().getBubble().getInteraction().isEnable();
+                && fileFacade.message().bubble().interaction().enable();
     }
 }

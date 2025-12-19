@@ -8,13 +8,13 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.tab.listener.TABPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TABModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final TABIntegration tabIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -35,13 +35,13 @@ public class TABModule extends AbstractModule {
     }
 
     @Override
-    public Integration.TAB config() {
-        return fileResolver.getIntegration().getTAB();
+    public Integration.Tab config() {
+        return fileFacade.integration().tab();
     }
 
     @Override
-    public Permission.Integration.TAB permission() {
-        return fileResolver.getPermission().getIntegration().getTAB();
+    public Permission.Integration.Tab permission() {
+        return fileFacade.permission().integration().tab();
     }
 
     public boolean isHooked() {

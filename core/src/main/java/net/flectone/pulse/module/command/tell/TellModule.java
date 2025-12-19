@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -33,7 +33,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Getter private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
@@ -46,12 +46,12 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
-                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
+                .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
-                .permission(permission().getName())
+                .permission(permission().name())
         );
     }
 
@@ -77,17 +77,17 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public Command.Tell config() {
-        return fileResolver.getCommand().getTell();
+        return fileFacade.command().tell();
     }
 
     @Override
     public Permission.Command.Tell permission() {
-        return fileResolver.getPermission().getCommand().getTell();
+        return fileFacade.permission().command().tell();
     }
 
     @Override
     public Localization.Command.Tell localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getTell();
+        return fileFacade.localization(sender).command().tell();
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {
@@ -96,8 +96,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (fPlayer.getName().equalsIgnoreCase(playerName)) {
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tell::getMyself)
-                    .destination(config().getDestination())
+                    .format(Localization.Command.Tell::myself)
+                    .destination(config().destination())
                     .message(message)
                     .build()
             );
@@ -105,14 +105,14 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        Range range = config().getRange();
+        Range range = config().range();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
         if (!fReceiver.isConsole()
                 && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Tell::getNullPlayer)
+                    .format(Localization.Command.Tell::nullPlayer)
                     .build()
             );
 
@@ -138,13 +138,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             }, metadataUUID);
 
             if (isSent) {
-                send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::getSender, message, metadataUUID);
+                send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::sender, message, metadataUUID);
                 return;
             }
         }
 
-        send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::getSender, message, UUID.randomUUID());
-        send(fPlayer, fReceiver, fReceiver, Localization.Command.Tell::getReceiver, message, UUID.randomUUID());
+        send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::sender, message, UUID.randomUUID());
+        send(fPlayer, fReceiver, fReceiver, Localization.Command.Tell::receiver, message, UUID.randomUUID());
     }
 
     public void send(FEntity sender,
@@ -160,7 +160,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 .sender(sender)
                 .filterPlayer(fReceiver)
                 .format(format)
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .message(string)
                 .sound(isSenderToSender ? null : getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})

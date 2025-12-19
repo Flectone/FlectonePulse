@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.processing.parser.player.PlatformPlayerParser;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.parser.integer.ColorParser;
 import net.flectone.pulse.processing.parser.integer.DurationReasonParser;
@@ -118,7 +118,7 @@ public class CommandParserProvider {
         return ParserDescriptor.of(colorParser, String.class);
     }
 
-    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(boolean offlinePlayers, Permission.IPermission permission) {
+    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(boolean offlinePlayers, PermissionSetting permission) {
         return (context, input) -> {
             if (!permissionChecker.check(context.sender(), permission)) return Collections.emptyList();
 

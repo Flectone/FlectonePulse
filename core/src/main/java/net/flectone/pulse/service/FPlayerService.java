@@ -15,7 +15,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 
@@ -43,7 +43,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerService {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerRepository fPlayerRepository;
     private final SocialRepository socialRepository;
@@ -73,7 +73,7 @@ public class FPlayerService {
     }
 
     public void addConsole() {
-        FPlayer console = new FPlayer(true, fileResolver.getConfig().getLogger().getConsole());
+        FPlayer console = new FPlayer(true, fileFacade.config().logger().console());
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
     }

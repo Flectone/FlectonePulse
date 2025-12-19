@@ -11,7 +11,7 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitBaseListener implements Listener {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
@@ -89,7 +89,7 @@ public class BukkitBaseListener implements Listener {
         try {
             return player.getLocale();
         } catch (NoSuchMethodError e) {
-            return fileResolver.getConfig().getLanguage().getType();
+            return fileFacade.config().language().type();
         }
     }
 }

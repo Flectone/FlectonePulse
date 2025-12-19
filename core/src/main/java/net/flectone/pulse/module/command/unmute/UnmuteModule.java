@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -13,7 +13,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,10 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptId = addPrompt(1, Localization.Command.Prompt::getId);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptId = addPrompt(1, Localization.Command.Prompt::id);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.mutedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -67,17 +67,17 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Override
     public Command.Unmute config() {
-        return fileResolver.getCommand().getUnmute();
+        return fileFacade.command().unmute();
     }
 
     @Override
     public Permission.Command.Unmute permission() {
-        return fileResolver.getPermission().getCommand().getUnmute();
+        return fileFacade.permission().command().unmute();
     }
 
     @Override
     public Localization.Command.Unmute localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getUnmute();
+        return fileFacade.localization(sender).command().unmute();
     }
 
     public void unmute(FPlayer fPlayer, String target, int id) {
@@ -87,17 +87,17 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         if (fTarget.isUnknown()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unmute::getNullPlayer)
+                    .format(Localization.Command.Unmute::nullPlayer)
                     .build()
             );
 
             return;
         }
 
-        if (config().isCheckGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unmute::getLowerWeightGroup)
+                    .format(Localization.Command.Unmute::lowerWeightGroup)
                     .build()
             );
             return;
@@ -117,7 +117,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         if (mutes.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unmute::getNotMuted)
+                    .format(Localization.Command.Unmute::notMuted)
                     .build()
             );
 
@@ -130,11 +130,11 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .sender(fTarget)
-                .format(unmute -> Strings.CS.replace(unmute.getFormat(), "<moderator>", fPlayer.getName()))
+                .format(unmute -> Strings.CS.replace(unmute.format(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(mutes)
-                .destination(config().getDestination())
-                .range(config().getRange())
+                .destination(config().destination())
+                .range(config().range())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

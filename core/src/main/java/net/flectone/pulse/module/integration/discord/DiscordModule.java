@@ -11,7 +11,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -22,7 +22,7 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiscordModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
     private final FLogger fLogger;
@@ -49,12 +49,12 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public Integration.Discord config() {
-        return fileResolver.getIntegration().getDiscord();
+        return fileFacade.integration().discord();
     }
 
     @Override
     public Permission.Integration.Discord permission() {
-        return fileResolver.getPermission().getIntegration().getDiscord();
+        return fileFacade.permission().integration().discord();
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {

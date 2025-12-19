@@ -3,11 +3,10 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.YamlFile;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.file.FilePathProvider;
 import org.apache.commons.lang3.StringUtils;
 import spark.Request;
 import spark.Response;
@@ -15,6 +14,7 @@ import spark.Service;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,24 +22,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EditorController {
 
-    private final Map<String, YamlFile> configFiles = new LinkedHashMap<>();
+    private final Map<String, Object> configFiles = new LinkedHashMap<>();
     private final Map<String, List<LocalizationFile>> localizationFiles = new HashMap<>();
 
     private final UrlService urlService;
-    private final FileResolver fileResolver;
-    private final YamlFileProcessor yamlFileProcessor;
+    private final FileFacade fileFacade;
+    private final FilePathProvider filePathProvider;
 
     public void initConfigFiles() {
         configFiles.clear();
         localizationFiles.clear();
 
-        configFiles.put("config.yml", fileResolver.getConfig());
-        configFiles.put("commands.yml", fileResolver.getCommand());
-        configFiles.put("integration.yml", fileResolver.getIntegration());
-        configFiles.put("messages.yml", fileResolver.getMessage());
-        configFiles.put("permissions.yml", fileResolver.getPermission());
+        configFiles.put("config.yml", fileFacade.config());
+        configFiles.put("commands.yml", fileFacade.command());
+        configFiles.put("integration.yml", fileFacade.integration());
+        configFiles.put("messages.yml", fileFacade.message());
+        configFiles.put("permissions.yml", fileFacade.permission());
 
-        Map<String, Localization> localizationMap = fileResolver.getLocalizationMap();
+        Map<String, Localization> localizationMap = fileFacade.localizations();
         localizationFiles.put("localizations", new ArrayList<>());
 
         for (Map.Entry<String, Localization> entry : localizationMap.entrySet()) {
@@ -129,16 +129,16 @@ public class EditorController {
 
     private String getFileContent(String fileType, String fileName) throws IOException {
         if ("main".equals(fileType)) {
-            YamlFile config = configFiles.get(fileName);
-            if (config != null) {
-                return Files.readString(config.getPathToFile());
+            Object file = configFiles.get(fileName);
+            if (file != null) {
+                return Files.readString(filePathProvider.get(file));
             }
 
         } else if ("localizations".equals(fileType)) {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    return Files.readString(file.localization.getPathToFile());
+                    return Files.readString(filePathProvider.get(file));
                 }
             }
         }
@@ -148,10 +148,10 @@ public class EditorController {
 
     private void saveFileContent(String fileType, String fileName, String content) throws IOException {
         if ("main".equals(fileType)) {
-            YamlFile config = configFiles.get(fileName);
-            if (config != null) {
-                Files.writeString(config.getPathToFile(), content);
-                yamlFileProcessor.reload(config);
+            Object file = configFiles.get(fileName);
+            if (file != null) {
+                Files.writeString(filePathProvider.get(file), content);
+                fileFacade.reload();
                 return;
             }
 
@@ -159,8 +159,9 @@ public class EditorController {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    Files.writeString(file.localization.getPathToFile(), content);
-                    yamlFileProcessor.reload(file.localization);
+                    Path pathToFile = filePathProvider.get(file);
+                    Files.writeString(pathToFile, content);
+                    fileFacade.reload();
                     return;
                 }
             }

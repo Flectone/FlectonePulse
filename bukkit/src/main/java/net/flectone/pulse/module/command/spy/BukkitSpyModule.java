@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.bukkit.entity.Player;
@@ -30,11 +30,11 @@ public class BukkitSpyModule extends SpyModule {
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
-    public BukkitSpyModule(FileResolver fileResolver,
+    public BukkitSpyModule(FileFacade fileFacade,
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileResolver, fPlayerService, permissionChecker);
+        super(fileFacade, fPlayerService, permissionChecker);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
@@ -51,7 +51,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(PlayerCommandPreprocessEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().getCategories();
+        Map<String, List<String>> categories = config().categories();
         if (categories.get("command") == null) return;
 
         String action = event.getMessage();
@@ -69,7 +69,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(InventoryClickEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().getCategories();
+        Map<String, List<String>> categories = config().categories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("anvil")) return;
         if (event.isCancelled()) return;
@@ -95,7 +95,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(PlayerEditBookEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().getCategories();
+        Map<String, List<String>> categories = config().categories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("book")) return;
 
@@ -113,7 +113,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(SignChangeEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().getCategories();
+        Map<String, List<String>> categories = config().categories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("sign")) return;
 

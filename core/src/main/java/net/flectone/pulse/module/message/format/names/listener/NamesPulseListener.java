@@ -33,7 +33,7 @@ public class NamesPulseListener implements PulseListener {
     }
 
     private boolean isInvisible(FEntity entity) {
-        return namesModule.config().isShouldCheckInvisibility()
+        return namesModule.config().shouldCheckInvisibility()
                 && platformPlayerAdapter.hasPotionEffect(entity, PotionTypes.INVISIBILITY);
     }
 }

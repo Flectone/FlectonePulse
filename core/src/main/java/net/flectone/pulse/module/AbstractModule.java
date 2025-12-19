@@ -3,8 +3,9 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.config.Config;
+import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.registry.PermissionRegistry;
 import org.jetbrains.annotations.Nullable;
@@ -35,25 +36,25 @@ public abstract class AbstractModule {
     }
 
     public void onEnable() {
-        Permission.IPermission permission = permission();
+        PermissionSetting permission = permission();
 
         registerPermission(permission);
 
-        this.modulePermission = permission.getName();
+        this.modulePermission = permission.name();
     }
 
     public void onDisable() {}
 
     public void configureChildren() {}
 
-    public abstract Config.IEnable config();
+    public abstract EnableSetting config();
 
-    public abstract Permission.IPermission permission();
+    public abstract PermissionSetting permission();
 
-    public void registerPermission(Permission.IPermission permission) {
+    public void registerPermission(PermissionSetting permission) {
         if (permission == null) return;
 
-        registerPermission(permission.getName(), permission.getType());
+        registerPermission(permission.name(), permission.type());
     }
 
     public void registerPermission(String name, Permission.Type type) {

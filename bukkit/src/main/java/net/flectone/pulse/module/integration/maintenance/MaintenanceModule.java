@@ -8,13 +8,13 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MaintenanceIntegration maintenanceIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -36,12 +36,12 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public Integration.Maintenance config() {
-        return fileResolver.getIntegration().getMaintenance();
+        return fileFacade.integration().maintenance();
     }
 
     @Override
     public Permission.Integration.Maintenance permission() {
-        return fileResolver.getPermission().getIntegration().getMaintenance();
+        return fileFacade.permission().integration().maintenance();
     }
 
     public boolean isHooked() {

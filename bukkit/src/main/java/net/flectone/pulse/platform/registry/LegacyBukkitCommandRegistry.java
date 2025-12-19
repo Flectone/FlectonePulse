@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
@@ -31,12 +31,12 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
     protected final LegacyPaperCommandManager<FPlayer> manager;
 
     @Inject
-    public LegacyBukkitCommandRegistry(FileResolver fileResolver,
+    public LegacyBukkitCommandRegistry(FileFacade fileFacade,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        ReflectionResolver reflectionResolver,
                                        FPlayerMapper fPlayerMapper) {
-        this.config = fileResolver.getConfig();
+        this.config = fileFacade.config();
         this.plugin = plugin;
         this.reflectionResolver = reflectionResolver;
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
@@ -60,7 +60,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
                 .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
 
         boolean needUnregister = plugin.getServer().getPluginCommand(commandName) != null
-                || config.getCommand().isUnregisterOnReload() && isCloudCommand;
+                || config.command().unregisterOnReload() && isCloudCommand;
 
         if (needUnregister) {
             unregisterCommand(commandName);
@@ -87,7 +87,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
 
     @Override
     public void reload() {
-        if (!config.getCommand().isUnregisterOnReload()) return;
+        if (!config.command().unregisterOnReload()) return;
 
         if (reflectionResolver.isPaper()) {
             unregisterCommands();

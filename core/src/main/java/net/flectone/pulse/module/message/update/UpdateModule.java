@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -15,7 +15,8 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.comparator.VersionComparator;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -30,7 +31,8 @@ import java.net.http.HttpResponse;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UpdateModule extends AbstractModuleLocalization<Localization.Message.Update> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
+    private final VersionComparator versionComparator;
     private final ListenerRegistry listenerRegistry;
     private final Gson gson;
 
@@ -40,7 +42,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().getSound(), permission().getSound());
+        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(UpdatePulseListener.class);
 
@@ -54,17 +56,17 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public Message.Update config() {
-        return fileResolver.getMessage().getUpdate();
+        return fileFacade.message().update();
     }
 
     @Override
     public Permission.Message.Update permission() {
-        return fileResolver.getPermission().getMessage().getUpdate();
+        return fileFacade.permission().message().update();
     }
 
     @Override
     public Localization.Message.Update localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getUpdate();
+        return fileFacade.localization(sender).message().update();
     }
 
     @Async
@@ -72,19 +74,19 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
         if (isModuleDisabledFor(fPlayer)) return;
         if (latestVersion == null) return;
 
-        String currentVersion = fileResolver.getConfig().getVersion();
-        if (!fileResolver.isVersionOlderThan(currentVersion, latestVersion)) return;
+        String currentVersion = fileFacade.config().version();
+        if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
         sendMessage(UpdateMessageMetadata.<Localization.Message.Update>builder()
                 .sender(fPlayer)
                 .format((fResolver, s) -> StringUtils.replaceEach(
-                        fResolver.isUnknown() ? s.getFormatConsole() : s.getFormatPlayer(),
+                        fResolver.isUnknown() ? s.formatConsole() : s.formatPlayer(),
                         new String[]{"<current_version>", "<latest_version>"},
                         new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
                 ))
                 .currentVersion(currentVersion)
                 .latestVersion(latestVersion)
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .build()
         );

@@ -14,7 +14,7 @@ import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
@@ -30,7 +30,7 @@ import java.util.OptionalInt;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FColorModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final LegacyColorConvertor legacyColorConvertor;
@@ -40,23 +40,23 @@ public class FColorModule extends AbstractModule {
         super.onEnable();
 
         // register fColor types
-        permission().getColors().forEach((key, value) -> registerPermission(value));
+        permission().colors().forEach((key, value) -> registerPermission(value));
 
         listenerRegistry.register(FColorPulseListener.class);
     }
 
     @Override
     public Message.Format.FColor config() {
-        return fileResolver.getMessage().getFormat().getFcolor();
+        return fileFacade.message().format().fcolor();
     }
 
     @Override
     public Permission.Message.Format.FColor permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getFcolor();
+        return fileFacade.permission().message().format().fcolor();
     }
 
     public Permission.Message.Format formatPermission() {
-        return fileResolver.getPermission().getMessage().getFormat();
+        return fileFacade.permission().message().format();
     }
 
     public void format(MessageContext messageContext) {
@@ -64,13 +64,13 @@ public class FColorModule extends AbstractModule {
         if (!message.contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return;
 
         FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().getLegacyColors())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return;
 
         FPlayer receiver = messageContext.getReceiver();
         if (isModuleDisabledFor(receiver)) return;
 
         // default map colors
-        Map<Integer, String> colorsMap = new HashMap<>(config().getDefaultColors());
+        Map<Integer, String> colorsMap = new HashMap<>(config().defaultColors());
 
         // receivers see colors
         updateColorsMap(colorsMap, receiver, FColor.Type.SEE);
@@ -103,7 +103,7 @@ public class FColorModule extends AbstractModule {
     }
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {
-        if (permissionChecker.check(fPlayer, permission().getColors().get(type))) {
+        if (permissionChecker.check(fPlayer, permission().colors().get(type))) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }
     }

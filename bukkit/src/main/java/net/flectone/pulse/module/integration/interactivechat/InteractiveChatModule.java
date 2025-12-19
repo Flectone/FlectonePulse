@@ -9,14 +9,14 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.interactivechat.listener.InteractiveChatPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InteractiveChatModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final InteractiveChatIntegration interactiveChatIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -39,12 +39,12 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public Integration.Interactivechat config() {
-        return fileResolver.getIntegration().getInteractivechat();
+        return fileFacade.integration().interactivechat();
     }
 
     @Override
     public Permission.Integration.Interactivechat permission() {
-        return fileResolver.getPermission().getIntegration().getInteractivechat();
+        return fileFacade.permission().integration().interactivechat();
     }
 
     public String checkMention(FEntity fSender, String message) {

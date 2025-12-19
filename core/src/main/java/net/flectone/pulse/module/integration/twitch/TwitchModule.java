@@ -11,7 +11,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
@@ -21,7 +21,7 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TwitchModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -435,12 +435,12 @@ public class TwitchModule extends AbstractModule {
 
     @Override
     public Integration.Twitch config() {
-        return fileResolver.getIntegration().getTwitch();
+        return fileFacade.integration().twitch();
     }
 
     @Override
     public Permission.Integration.Twitch permission() {
-        return fileResolver.getPermission().getIntegration().getTwitch();
+        return fileFacade.permission().integration().twitch();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {

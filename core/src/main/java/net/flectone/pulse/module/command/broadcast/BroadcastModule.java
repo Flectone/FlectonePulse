@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -18,16 +18,16 @@ import org.incendo.cloud.context.CommandContext;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BroadcastModule extends AbstractModuleCommand<Localization.Command.Broadcast> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
         registerCommand(manager -> manager
-                        .permission(permission().getName())
+                        .permission(permission().name())
                         .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -40,10 +40,10 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(Localization.Command.Broadcast::getFormat)
+                .format(Localization.Command.Broadcast::format)
                 .message(message)
-                .range(config().getRange())
-                .destination(config().getDestination())
+                .range(config().range())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
@@ -58,16 +58,16 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public Command.Broadcast config() {
-        return fileResolver.getCommand().getBroadcast();
+        return fileFacade.command().broadcast();
     }
 
     @Override
     public Permission.Command.Broadcast permission() {
-        return fileResolver.getPermission().getCommand().getBroadcast();
+        return fileFacade.permission().command().broadcast();
     }
 
     @Override
     public Localization.Command.Broadcast localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getBroadcast();
+        return fileFacade.localization(sender).command().broadcast();
     }
 }

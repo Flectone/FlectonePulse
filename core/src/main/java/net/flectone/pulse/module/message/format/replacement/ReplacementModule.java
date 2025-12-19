@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -49,7 +49,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private final @Named("replacementMessage") Cache<String, String> messageCache;
     private final @Named("replacementImage") Cache<String, Component> imageCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -64,11 +64,11 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     public void onEnable() {
         super.onEnable();
 
-        permission().getValues().values().forEach(this::registerPermission);
+        permission().values().values().forEach(this::registerPermission);
 
         listenerRegistry.register(ReplacementPulseListener.class);
 
-        config().getTriggers().forEach((name, regex) ->
+        config().triggers().forEach((name, regex) ->
                 triggerPatterns.put(name, Pattern.compile(regex))
         );
     }
@@ -89,17 +89,17 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public Message.Format.Replacement config() {
-        return fileResolver.getMessage().getFormat().getReplacement();
+        return fileFacade.message().format().replacement();
     }
 
     @Override
     public Permission.Message.Format.Replacement permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getReplacement();
+        return fileFacade.permission().message().format().replacement();
     }
 
     @Override
     public Localization.Message.Format.Replacement localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getReplacement();
+        return fileFacade.localization(sender).message().format().replacement();
     }
 
     public void format(MessageContext messageContext) {
@@ -134,9 +134,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 
             String name = argument.value();
-            if (!permissionChecker.check(sender, permission().getValues().get(name))) return Tag.selfClosingInserting(Component.empty());
+            if (!permissionChecker.check(sender, permission().values().get(name))) return Tag.selfClosingInserting(Component.empty());
 
-            String replacement = localization(receiver).getValues().get(name);
+            String replacement = localization(receiver).values().get(name);
             if (replacement == null) return Tag.selfClosingInserting(Component.empty());
 
             List<String> values = new ArrayList<>();
@@ -254,9 +254,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         Localization.Message.Format.Replacement replacement = localization(receiver);
         String format = StringUtils.replaceEach(
-                replacement.getValues().getOrDefault("spoiler", ""),
+                replacement.values().getOrDefault("spoiler", ""),
                 new String[]{"<message_1>", "<symbols>"},
-                new String[]{spoilerText, StringUtils.repeat(replacement.getSpoilerSymbol(), length)}
+                new String[]{spoilerText, StringUtils.repeat(replacement.spoilerSymbol(), length)}
         );
 
         Component component = messagePipeline.builder(sender, receiver, format)
@@ -272,7 +272,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         int ping = fPlayerService.getPing(fPlayer);
 
         String format = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("ping", ""),
+                localization(receiver).values().getOrDefault("ping", ""),
                 "<value>",
                 String.valueOf(ping)
         );
@@ -286,7 +286,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag tpsTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("tps", ""),
+                localization(receiver).values().getOrDefault("tps", ""),
                 "<value>",
                 platformServerAdapter.getTPS()
         );
@@ -300,7 +300,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag onlineTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("online", ""),
+                localization(receiver).values().getOrDefault("online", ""),
                 "<value>",
                 String.valueOf(platformServerAdapter.getOnlinePlayerCount())
         );
@@ -318,7 +318,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
         if (coordinates != null) {
             String format = StringUtils.replaceEach(
-                    localization(receiver).getValues().getOrDefault("coords", ""),
+                    localization(receiver).values().getOrDefault("coords", ""),
                     new String[]{"<x>", "<y>", "<z>"},
                     new String[]{
                             String.valueOf(coordinates.x()),
@@ -341,7 +341,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
         if (statistics != null) {
             String format = StringUtils.replaceEach(
-                    localization(receiver).getValues().getOrDefault("stats", ""),
+                    localization(receiver).values().getOrDefault("stats", ""),
                     new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
                     new String[]{
                             String.valueOf(statistics.health()),
@@ -371,7 +371,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String format = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("skin", ""),
+                localization(receiver).values().getOrDefault("skin", ""),
                 "<message_1>",
                 url
         );
@@ -390,7 +390,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageUUID, isTranslateItem);
 
-        String format = localization(receiver).getValues().getOrDefault("item", "");
+        String format = localization(receiver).values().getOrDefault("item", "");
         Component componentFormat = messagePipeline.builder(sender, receiver, format)
                 .flag(MessageFlag.REPLACEMENT, false)
                 .tagResolvers(TagResolver.resolver("message_1", (argumentQueue, context) ->
@@ -406,7 +406,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
         String string = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("url", ""),
+                localization(receiver).values().getOrDefault("url", ""),
                 "<message_1>",
                 url
         );
@@ -431,7 +431,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String string = Strings.CS.replace(
-                localization(receiver).getValues().getOrDefault("image", ""),
+                localization(receiver).values().getOrDefault("image", ""),
                 "<message_1>",
                 url
         );

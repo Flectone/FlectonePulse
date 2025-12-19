@@ -10,13 +10,13 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.advancedban.listener.AdvancedBanPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AdvancedBanModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final AdvancedBanIntegration advancedBanIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -38,12 +38,12 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public Integration.Advancedban config() {
-        return fileResolver.getIntegration().getAdvancedban();
+        return fileFacade.integration().advancedban();
     }
 
     @Override
     public Permission.Integration.Advancedban permission() {
-        return fileResolver.getPermission().getIntegration().getAdvancedban();
+        return fileFacade.permission().integration().advancedban();
     }
 
     public boolean isMuted(FEntity fEntity) {

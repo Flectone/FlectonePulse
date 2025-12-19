@@ -21,7 +21,7 @@ public class MaintenancePulseListener implements PulseListener {
         if (!maintenanceModule.isHooked()) return;
 
         AbstractModule eventModule = event.getModule();
-        if (eventModule instanceof MaintenanceModule && maintenanceModule.config().isDisableFlectonepulseMaintenance()) {
+        if (eventModule instanceof MaintenanceModule && maintenanceModule.config().disableFlectonepulseMaintenance()) {
             event.setCancelled(true);
         }
     }

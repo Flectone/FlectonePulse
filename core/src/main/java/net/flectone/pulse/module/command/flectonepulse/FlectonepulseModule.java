@@ -12,7 +12,7 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -20,7 +20,7 @@ import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -40,7 +40,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FlectonePulse flectonePulse;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
@@ -52,9 +52,9 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::getType);
+        String promptType = addPrompt(0, Localization.Command.Prompt::type);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
         );
 
@@ -78,10 +78,10 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
-            if (fileResolver.getConfig().getEditor().getHost().isEmpty()) {
+            if (fileFacade.config().editor().host().isEmpty()) {
                 sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
-                        .format(Localization.Command.Flectonepulse::getNullHostEditor)
+                        .format(Localization.Command.Flectonepulse::nullHostEditor)
                         .build()
                 );
 
@@ -90,8 +90,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Flectonepulse::getFormatWebStarting)
-                    .destination(config().getDestination())
+                    .format(Localization.Command.Flectonepulse::formatWebStarting)
+                    .destination(config().destination())
                     .build()
             );
 
@@ -104,8 +104,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatEditor(), "<url>", url))
-                    .destination(config().getDestination())
+                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatEditor(), "<url>", url))
+                    .destination(config().destination())
                     .sound(getModuleSound())
                     .build()
             );
@@ -113,7 +113,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        if (config().isExecuteInMainThread()) {
+        if (config().executeInMainThread()) {
             syncReload(fPlayer);
         } else {
             reload(fPlayer);
@@ -137,8 +137,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatTrue(), "<time>", formattedTime))
-                    .destination(config().getDestination())
+                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatTrue(), "<time>", formattedTime))
+                    .destination(config().destination())
                     .sound(getModuleSound())
                     .build()
             );
@@ -148,9 +148,9 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Flectonepulse::getFormatFalse)
+                    .format(Localization.Command.Flectonepulse::formatFalse)
                     .message(e.getLocalizedMessage())
-                    .destination(config().getDestination())
+                    .destination(config().destination())
                     .build()
             );
 
@@ -164,17 +164,17 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public Command.Flectonepulse config() {
-        return fileResolver.getCommand().getFlectonepulse();
+        return fileFacade.command().flectonepulse();
     }
 
     @Override
     public Permission.Command.Flectonepulse permission() {
-        return fileResolver.getPermission().getCommand().getFlectonepulse();
+        return fileFacade.permission().command().flectonepulse();
     }
 
     @Override
     public Localization.Command.Flectonepulse localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getFlectonepulse();
+        return fileFacade.localization(sender).command().flectonepulse();
     }
 
     private void enableSpark() {

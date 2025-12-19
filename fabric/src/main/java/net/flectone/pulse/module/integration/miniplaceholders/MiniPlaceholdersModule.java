@@ -11,13 +11,13 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MiniPlaceholdersModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final MiniPlaceholdersIntegration miniPlaceholdersIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -25,7 +25,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getUse());
+        registerPermission(permission().use());
 
         miniPlaceholdersIntegration.hookLater();
 
@@ -49,11 +49,11 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
     @Override
     public Integration.MiniPlaceholders config() {
-        return fileResolver.getIntegration().getMiniplaceholders();
+        return fileFacade.integration().miniplaceholders();
     }
 
     @Override
     public Permission.Integration.MiniPlaceholders permission() {
-        return fileResolver.getPermission().getIntegration().getMiniplaceholders();
+        return fileFacade.permission().integration().miniplaceholders();
     }
 }

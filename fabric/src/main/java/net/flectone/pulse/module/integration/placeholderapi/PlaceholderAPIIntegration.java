@@ -21,7 +21,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -41,7 +41,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
     private final PlatformServerAdapter platformServerAdapter;
@@ -149,7 +149,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, fileResolver.getPermission().getIntegration().getPlaceholderapi().getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         Object player = fPlayerService.toPlatformFPlayer(fPlayer);
@@ -167,7 +167,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-        Map<Integer, String> colorsMap = new HashMap<>(fileResolver.getMessage().getFormat().getFcolor().getDefaultColors());
+        Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }

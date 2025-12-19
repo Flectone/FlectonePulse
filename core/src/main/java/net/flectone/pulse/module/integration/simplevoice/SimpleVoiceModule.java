@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -15,12 +15,12 @@ public class SimpleVoiceModule extends AbstractModule {
 
     @Getter private static SimpleVoiceIntegration SIMPLE_VOICE_INTEGRATION;
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     @Inject
-    public SimpleVoiceModule(FileResolver fileResolver,
+    public SimpleVoiceModule(FileFacade fileFacade,
                              SimpleVoiceIntegration simpleVoiceIntegration) {
-        this.fileResolver = fileResolver;
+        this.fileFacade = fileFacade;
 
         SimpleVoiceModule.SIMPLE_VOICE_INTEGRATION = simpleVoiceIntegration;
     }
@@ -40,11 +40,11 @@ public class SimpleVoiceModule extends AbstractModule {
 
     @Override
     public Integration.Simplevoice config() {
-        return fileResolver.getIntegration().getSimplevoice();
+        return fileFacade.integration().simplevoice();
     }
 
     @Override
     public Permission.Integration.Simplevoice permission() {
-        return fileResolver.getPermission().getIntegration().getSimplevoice();
+        return fileFacade.permission().integration().simplevoice();
     }
 }

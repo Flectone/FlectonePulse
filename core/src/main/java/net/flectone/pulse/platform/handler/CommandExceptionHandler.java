@@ -3,12 +3,12 @@ package net.flectone.pulse.platform.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -28,7 +28,7 @@ import org.incendo.cloud.parser.standard.StringParser;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandExceptionHandler {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
@@ -36,25 +36,25 @@ public class CommandExceptionHandler {
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        Localization.Command.Exception localizationException = fileResolver.getLocalization(fPlayer)
-                .getCommand().getException();
+        Localization.Command.Exception localizationException = fileFacade.localization(fPlayer)
+                .command().exception();
 
         Throwable throwable = context.exception().getCause();
         String message = switch (throwable) {
             case BooleanParser.BooleanParseException e -> Strings.CS.replace(
-                    localizationException.getParseBoolean(), "<input>", e.input()
+                    localizationException.parseBoolean(), "<input>", e.input()
             );
             case NumberParseException e -> Strings.CS.replace(
-                    localizationException.getParseNumber(), "<input>", e.input()
+                    localizationException.parseNumber(), "<input>", e.input()
             );
             case DurationParser.DurationParseException e -> Strings.CS.replace(
-                    localizationException.getParseNumber(), "<input>", e.input()
+                    localizationException.parseNumber(), "<input>", e.input()
             );
             case StringParser.StringParseException e -> Strings.CS.replace(
-                    localizationException.getParseString(), "<input>", e.input()
+                    localizationException.parseString(), "<input>", e.input()
             );
             default -> Strings.CS.replace(
-                    localizationException.getParseUnknown(), "<input>", String.valueOf(throwable.getMessage())
+                    localizationException.parseUnknown(), "<input>", String.valueOf(throwable.getMessage())
             );
         };
 
@@ -66,7 +66,7 @@ public class CommandExceptionHandler {
 
         String correctSyntax = context.exception().correctSyntax();
         String message = StringUtils.replaceEach(
-                fileResolver.getLocalization(fPlayer).getCommand().getException().getSyntax(),
+                fileFacade.localization(fPlayer).command().exception().syntax(),
                 new String[]{"<correct_syntax>", "<command>"},
                 new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
         );
@@ -77,8 +77,8 @@ public class CommandExceptionHandler {
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        String message = fileResolver.getLocalization(fPlayer)
-                .getCommand().getException().getPermission();
+        String message = fileFacade.localization(fPlayer)
+                .command().exception().permission();
 
         send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
@@ -90,7 +90,7 @@ public class CommandExceptionHandler {
         FPlayer fPlayer = context.context().sender();
 
         String message = Strings.CS.replace(
-                fileResolver.getLocalization(fPlayer).getCommand().getException().getExecution(),
+                fileFacade.localization(fPlayer).command().exception().execution(),
                 "<exception>",
                 context.exception().getMessage()
         );

@@ -4,30 +4,30 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
+public class DoModule extends AbstractModuleCommand<Localization.Command.CommandDo> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -40,10 +40,10 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(Localization.Command.Do::getFormat)
+                .format(Localization.Command.CommandDo::format)
                 .message(message)
-                .range(config().getRange())
-                .destination(config().getDestination())
+                .range(config().range())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
@@ -57,17 +57,17 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
     }
 
     @Override
-    public Command.Do config() {
-        return fileResolver.getCommand().getDo();
+    public Command.CommandDo config() {
+        return fileFacade.command().commandDo();
     }
 
     @Override
-    public Permission.Command.Do permission() {
-        return fileResolver.getPermission().getCommand().getDo();
+    public Permission.Command.CommandDo permission() {
+        return fileFacade.permission().command().commandDo();
     }
 
     @Override
-    public Localization.Command.Do localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getDo();
+    public Localization.Command.CommandDo localization(FEntity sender) {
+        return fileFacade.localization(sender).command().commandDo();
     }
 }

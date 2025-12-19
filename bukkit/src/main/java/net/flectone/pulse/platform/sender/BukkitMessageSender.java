@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -15,26 +15,26 @@ import net.kyori.adventure.text.TextReplacementConfig;
 @Singleton
 public class BukkitMessageSender extends MessageSender {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PaperItemStackUtil paperItemStackUtil;
 
     @Inject
     public BukkitMessageSender(PacketSender packetSender,
                                PacketProvider packetProvider,
                                IntegrationModule integrationModule,
-                               FileResolver fileResolver,
+                               FileFacade fileFacade,
                                PaperItemStackUtil paperItemStackUtil,
                                FLogger fLogger) {
         super(packetSender, packetProvider, integrationModule, fLogger);
 
-        this.fileResolver = fileResolver;
+        this.fileFacade = fileFacade;
         this.paperItemStackUtil = paperItemStackUtil;
     }
 
     @Override
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         // use default sendMessage
-        if (!fileResolver.getConfig().getModule().isUsePaperMessageSender()) {
+        if (!fileFacade.config().module().usePaperMessageSender()) {
             super.sendMessage(fPlayer, component, silent);
             return;
         }

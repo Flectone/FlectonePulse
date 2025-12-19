@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,7 +16,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.swear.listener.SwearPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -37,7 +37,7 @@ import java.util.regex.PatternSyntaxException;
 public class SwearModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Swear> {
 
     private final @Named("swearMessage") Cache<String, String> messageCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -49,11 +49,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().getBypass());
-        registerPermission(permission().getSee());
+        registerPermission(permission().bypass());
+        registerPermission(permission().see());
 
         try {
-            combinedPattern = Pattern.compile(String.join("|", config().getTrigger()));
+            combinedPattern = Pattern.compile(String.join("|", config().trigger()));
         } catch (PatternSyntaxException e) {
             fLogger.warning(e);
         }
@@ -75,19 +75,17 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public Message.Format.Moderation.Swear config() {
-        return fileResolver.getMessage().getFormat().getModeration().getSwear();
+        return fileFacade.message().format().moderation().swear();
     }
 
     @Override
     public Permission.Message.Format.Moderation.Swear permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
+        return fileFacade.permission().message().format().moderation().swear();
     }
-
-
 
     @Override
     public Localization.Message.Format.Moderation.Swear localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getModeration().getSwear();
+        return fileFacade.localization(sender).message().format().moderation().swear();
     }
 
     public void format(MessageContext messageContext) {
@@ -124,11 +122,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             String swear = swearTag.value();
             if (swear.isBlank()) return Tag.selfClosingInserting(Component.empty());
 
-            String symbols = localization(receiver).getSymbol().repeat(swear.length());
+            String symbols = localization(receiver).symbol().repeat(swear.length());
 
             Component component = messagePipeline.builder(sender, receiver, symbols).build();
 
-            if (permissionChecker.check(receiver, permission().getSee())) {
+            if (permissionChecker.check(receiver, permission().see())) {
                 component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));
             }
 
@@ -137,7 +135,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     private String replace(FEntity sender, String string) {
-        if (permissionChecker.check(sender, permission().getBypass())) return string;
+        if (permissionChecker.check(sender, permission().bypass())) return string;
         if (combinedPattern == null) return string;
 
         StringBuilder result = new StringBuilder();
@@ -157,11 +155,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     private boolean isIgnored(String word) {
         if (StringUtils.isEmpty(word)) return true;
-        if (config().getIgnore().isEmpty()) return false;
+        if (config().ignore().isEmpty()) return false;
 
         String fullWord = word.trim().toLowerCase(Locale.ROOT);
 
-        return config().getIgnore().contains(fullWord);
+        return config().ignore().contains(fullWord);
     }
 
     private String getFullWord(String text, int position) {

@@ -1,21 +1,16 @@
-package net.flectone.pulse.processing.processor;
+package net.flectone.pulse.util.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.YamlFile;
-import net.flectone.pulse.config.localization.EnglishLocale;
-import net.flectone.pulse.config.localization.Localization;
-import net.flectone.pulse.config.localization.RussianLocale;
-import net.flectone.pulse.exception.YamlReadException;
-import net.flectone.pulse.exception.YamlWriteException;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.exception.FileWriteException;
+import net.flectone.pulse.model.file.FilePack;
 import org.apache.commons.lang3.Strings;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.exc.MismatchedInputException;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -25,9 +20,11 @@ import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class YamlFileProcessor {
+public class FileWriter {
 
-    private final String header =
+    public static final long LAST_MODIFIED_TIME = System.currentTimeMillis();
+
+    private static final String HEADER =
             """
             #  ___       ___  __  ___  __        ___
             # |__  |    |__  /  `  |  /  \\ |\\ | |__
@@ -41,67 +38,63 @@ public class YamlFileProcessor {
             #
             """;
 
-    private final ObjectMapper mapper;
-    private final EnglishLocale englishLocale;
-    private final RussianLocale russianLocale;
+    private final ObjectMapper yamlMapper;
+    private final FilePathProvider filePathProvider;
 
-    public <T extends YamlFile> void reload(T yamlFile) throws IOException {
-        if (yamlFile instanceof Localization localization) {
-            initLocalization(localization);
+    public void save(FilePack files, boolean checkExist) {
+        Path commandPath = filePathProvider.get(files.command());
+        if (!checkExist || !Files.exists(commandPath)) {
+            save(commandPath, files.command());
         }
 
-        load(yamlFile);
-        save(yamlFile);
-    }
-
-    public void initLocalization(Localization localization) {
-        if (!localization.isInitialized()) {
-            if (localization.getLanguage().equals("ru_ru")) {
-                russianLocale.init(localization);
-            } else {
-                englishLocale.init(localization);
-            }
-
-            localization.setInitialized(true);
+        Path configPath = filePathProvider.get(files.config());
+        if (!checkExist || !Files.exists(configPath)) {
+            save(configPath, files.config());
         }
-    }
 
-    public <T extends YamlFile> void load(T yamlFile) throws IOException {
-        if (Files.exists(yamlFile.getPathToFile())) {
-            File file = yamlFile.getPathToFile().toFile();
+        Path integrationPath = filePathProvider.get(files.integration());
+        if (!checkExist || !Files.exists(integrationPath)) {
+            save(integrationPath, files.integration());
+        }
 
-            try {
-                mapper.readerForUpdating(yamlFile).readValue(file);
-            } catch (Exception e) {
-                if (e instanceof MismatchedInputException mismatchedInputException
-                        && mismatchedInputException.getMessage() != null
-                        && mismatchedInputException.getMessage().contains("No content to map due to end-of-input")) {
-                    save(yamlFile);
-                    return;
+        Path messagePath = filePathProvider.get(files.message());
+        if (!checkExist || !Files.exists(messagePath)) {
+            save(messagePath, files.message());
+        }
+
+        Path permissionPath = filePathProvider.get(files.permission());
+        if (!checkExist || !Files.exists(permissionPath)) {
+            save(permissionPath, files.permission());
+        }
+
+        files.localizations().values()
+                .forEach( localization -> {
+                    Path localizationPath = filePathProvider.get(localization);
+                    if (!checkExist || !Files.exists(localizationPath)) {
+                        save(localizationPath, localization);
+                    }
                 }
-
-                throw new YamlReadException(file.getName(), e);
-            }
-        }
+        );
     }
 
-    public <T extends YamlFile> void save(T yamlFile) throws IOException {
+    public void save(Path pathToFile, Object fileResource) {
+        if (pathToFile.toFile().lastModified() == LAST_MODIFIED_TIME) return;
+
         Map<String, String> comments = new LinkedHashMap<>();
 
-        boolean english = yamlFile instanceof Localization localization
-                && !localization.getLanguage().equals("ru_ru");
-        collectDescriptions(yamlFile.getClass(), "", comments, new HashSet<>(), english);
-
-        Path pathToFile = yamlFile.getPathToFile();
+        boolean english = fileResource instanceof Localization localization
+                && !localization.language().equals("ru_ru");
+        collectDescriptions(fileResource.getClass(), "", comments, new HashSet<>(), english);
 
         try {
-            String yaml = mapper.writeValueAsString(yamlFile);
-            String yamlWithComments = header + addCommentsToYaml(yaml, comments);
+            String yaml = yamlMapper.writeValueAsString(fileResource);
+            String yamlWithComments = HEADER + addCommentsToYaml(yaml, comments);
 
             Files.createDirectories(pathToFile.getParent());
             Files.writeString(pathToFile, yamlWithComments);
+            pathToFile.toFile().setLastModified(LAST_MODIFIED_TIME);
         } catch (IOException e) {
-            throw new YamlWriteException(pathToFile.toFile().getName(), e);
+            throw new FileWriteException(pathToFile.toFile().getName(), e);
         }
     }
 
@@ -263,4 +256,5 @@ public class YamlFileProcessor {
 
         return new String(arr);
     }
+
 }

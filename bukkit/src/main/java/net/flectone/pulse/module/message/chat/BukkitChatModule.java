@@ -15,7 +15,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -31,7 +31,7 @@ public class BukkitChatModule extends ChatModule {
     private final FLogger fLogger;
 
     @Inject
-    protected BukkitChatModule(FileResolver fileResolver,
+    protected BukkitChatModule(FileFacade fileFacade,
                                FPlayerService fPlayerService,
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
@@ -45,7 +45,7 @@ public class BukkitChatModule extends ChatModule {
                                CooldownSender cooldownSender,
                                FLogger fLogger,
                                ProxyRegistry proxyRegistry) {
-        super(fileResolver, fPlayerService, platformServerAdapter, permissionChecker,
+        super(fileFacade, fPlayerService, platformServerAdapter, permissionChecker,
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry, muteSender,
                 disableSender, cooldownSender, proxyRegistry);
 
@@ -59,18 +59,18 @@ public class BukkitChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        Message.Chat.Mode mode = config().getMode();
+        Message.Chat.Mode mode = config().mode();
         if (mode == Message.Chat.Mode.PACKET) return; // already registered in super class
         if (mode == Message.Chat.Mode.PAPER) {
             if (reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
                 ChatPaperListener chatPaperListener = new ChatPaperListener(fPlayerService, this);
-                listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().getPriority().name()));
+                listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().priority().name()));
                 return;
             }
 
             fLogger.warning("It is not possible to use chat in PAPER mode on your server. BUKKIT mode is currently in use.");
         }
 
-        listenerRegistry.register(ChatBukkitListener.class, config().getPriority());
+        listenerRegistry.register(ChatBukkitListener.class, config().priority());
     }
 }

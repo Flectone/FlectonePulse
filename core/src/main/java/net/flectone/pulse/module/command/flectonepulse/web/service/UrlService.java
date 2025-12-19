@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.module.command.flectonepulse.web.exception.EmptyHostException;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,19 +16,19 @@ public class UrlService {
 
     private final AtomicReference<UUID> currentToken = new AtomicReference<>(UUID.randomUUID());
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     public Config.Editor config() {
-        return fileResolver.getConfig().getEditor();
+        return fileFacade.config().editor();
     }
 
     public String generateUrl() {
         String url = "http";
-        if (config().isHttps()) {
+        if (config().https()) {
             url += "s";
         }
 
-        return url + "://" + getLocalIp() + ":" + config().getPort() + "/editor/" + currentToken.get();
+        return url + "://" + getLocalIp() + ":" + config().port() + "/editor/" + currentToken.get();
     }
 
     public boolean validateToken(String token) {
@@ -40,7 +40,7 @@ public class UrlService {
     }
 
     private String getLocalIp() throws EmptyHostException {
-        String host = config().getHost();
+        String host = config().host();
         if (host.isEmpty()) {
             throw new EmptyHostException();
         }

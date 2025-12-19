@@ -13,7 +13,7 @@ import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.listener.FabricBaseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.logging.FLogger;
@@ -29,7 +29,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
     private final TpsTracker tpsTracker;
 
     @Inject
-    public FabricListenerRegistry(FileResolver fileResolver,
+    public FabricListenerRegistry(FileFacade fileFacade,
                                   FabricFlectonePulse fabricFlectonePulse,
                                   Provider<FabricBaseListener> fabricBaseListenerProvider,
                                   FabricTaskScheduler fabricTaskScheduler,
@@ -39,7 +39,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
                                   PacketProvider packetProvider) {
         super(fLogger, injector, packetProvider);
 
-        this.config = fileResolver.getConfig();
+        this.config = fileFacade.config();
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fabricBaseListenerProvider = fabricBaseListenerProvider;
         this.fabricTaskScheduler = fabricTaskScheduler;
@@ -65,7 +65,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             CommandNode<ServerCommandSource> root = dispatcher.getRoot();
 
-            for (String command : config.getCommand().getDisabledFabric()) {
+            for (String command : config.command().disabledFabric()) {
                 root.getChildren().removeIf(node -> node.getName().equals(command));
             }
         });

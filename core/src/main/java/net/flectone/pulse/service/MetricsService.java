@@ -10,7 +10,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.MetricsSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 import java.time.Instant;
 
@@ -22,7 +22,7 @@ public class MetricsService {
     private final MetricsSender metricsSender;
     private final PlatformServerAdapter platformServerAdapter;
     private final PacketProvider packetProvider;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ModuleController moduleController;
 
     public void reload() {
@@ -44,13 +44,13 @@ public class MetricsService {
         metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
         metricsDTO.setTotalRAM(Runtime.getRuntime().maxMemory());
 
-        Config config = fileResolver.getConfig();
+        Config config = fileFacade.config();
 
-        metricsDTO.setProjectVersion(config.getVersion());
-        metricsDTO.setProjectLanguage(config.getLanguage().getType());
+        metricsDTO.setProjectVersion(config.version());
+        metricsDTO.setProjectLanguage(config.language().type());
         metricsDTO.setOnlineMode(platformServerAdapter.isOnlineMode() ? "True" : "False");
         metricsDTO.setProxyMode(getProxyMode());
-        metricsDTO.setDatabaseMode(config.getDatabase().getType().name());
+        metricsDTO.setDatabaseMode(config.database().type().name());
         metricsDTO.setPlayerCount(platformServerAdapter.getOnlinePlayerCount());
         metricsDTO.setModules(moduleController.collectModuleStatuses());
         metricsDTO.setCreatedAt(Instant.now().toString());
@@ -59,10 +59,10 @@ public class MetricsService {
     }
 
     private String getProxyMode() {
-        Config.Proxy config = fileResolver.getConfig().getProxy();
-        if (config.isBungeecord()) return "BungeeCord";
-        if (config.isVelocity()) return "Velocity";
-        if (config.getRedis().isEnable()) return "Redis";
+        Config.Proxy config = fileFacade.config().proxy();
+        if (config.bungeecord()) return "BungeeCord";
+        if (config.velocity()) return "Velocity";
+        if (config.redis().enable()) return "Redis";
 
         return "None";
     }

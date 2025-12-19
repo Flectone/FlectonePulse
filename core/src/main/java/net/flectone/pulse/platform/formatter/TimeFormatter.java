@@ -3,8 +3,8 @@ package net.flectone.pulse.platform.formatter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -21,14 +21,14 @@ public class TimeFormatter {
 
     private static final Format SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     public String format(FPlayer fPlayer, long time) {
 
-        Localization.Time message = fileResolver.getLocalization(fPlayer).getTime();
-        if (message.getFormat().isEmpty()) return "";
+        Localization.Time message = fileFacade.localization(fPlayer).time();
+        if (message.format().isEmpty()) return "";
 
-        String formattedTime = DurationFormatUtils.formatDuration(time, message.getFormat(), false);
+        String formattedTime = DurationFormatUtils.formatDuration(time, message.format(), false);
 
         StringBuilder result = new StringBuilder();
         for (String part : formattedTime.split(" ")) {
@@ -38,7 +38,7 @@ public class TimeFormatter {
         }
 
         String finalResult = result.toString().trim();
-        return finalResult.isEmpty() ? message.getZero() : finalResult;
+        return finalResult.isEmpty() ? message.zero() : finalResult;
     }
 
     private boolean isZeroComponent(String part) {

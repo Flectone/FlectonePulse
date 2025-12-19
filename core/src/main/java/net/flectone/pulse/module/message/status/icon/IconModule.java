@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ public class IconModule extends AbstractModule {
 
     private final List<String> iconList = new ArrayList<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
     private final RandomUtil randomUtil;
     private final IconUtil iconUtil;
@@ -49,16 +49,16 @@ public class IconModule extends AbstractModule {
 
     @Override
     public Message.Status.Icon config() {
-        return fileResolver.getMessage().getStatus().getIcon();
+        return fileFacade.message().status().icon();
     }
 
     @Override
     public Permission.Message.Status.Icon permission() {
-        return fileResolver.getPermission().getMessage().getStatus().getIcon();
+        return fileFacade.permission().message().status().icon();
     }
 
     public void initIcons() {
-        List<String> iconNames = config().getValues();
+        List<String> iconNames = config().values();
         if (iconNames.isEmpty()) return;
 
         iconNames.forEach(iconName -> {
@@ -90,7 +90,7 @@ public class IconModule extends AbstractModule {
         if (isModuleDisabledFor(fPlayer)) return null;
         if (iconList.isEmpty()) return null;
 
-        if (config().isRandom()) {
+        if (config().random()) {
             index = randomUtil.nextInt(0, iconList.size());
         } else {
             index++;

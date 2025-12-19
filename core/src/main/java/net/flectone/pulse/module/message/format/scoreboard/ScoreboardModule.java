@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPu
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
@@ -34,7 +34,7 @@ public class ScoreboardModule extends AbstractModule {
 
     private final Map<UUID, Team> uuidTeamMap = new ConcurrentHashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -45,7 +45,7 @@ public class ScoreboardModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> uuidTeamMap.keySet().forEach(uuid -> {
                 FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
@@ -73,12 +73,12 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public Message.Format.Scoreboard config() {
-        return fileResolver.getMessage().getFormat().getScoreboard();
+        return fileFacade.message().format().scoreboard();
     }
 
     @Override
     public Permission.Message.Format.Scoreboard permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getScoreboard();
+        return fileFacade.permission().message().format().scoreboard();
     }
 
     @Async
@@ -117,24 +117,24 @@ public class ScoreboardModule extends AbstractModule {
         Component displayName = Component.text(teamName);
 
         Component prefix = Component.empty();
-        if (!config().getPrefix().isEmpty()) {
-            prefix = messagePipeline.builder(fPlayer, config().getPrefix())
+        if (!config().prefix().isEmpty()) {
+            prefix = messagePipeline.builder(fPlayer, config().prefix())
                     .flag(MessageFlag.INVISIBLE_NAME, false)
                     .build();
         }
 
         Component suffix = Component.empty();
-        if (!config().getSuffix().isEmpty()) {
-            suffix = messagePipeline.builder(fPlayer, config().getSuffix())
+        if (!config().suffix().isEmpty()) {
+            suffix = messagePipeline.builder(fPlayer, config().suffix())
                     .flag(MessageFlag.INVISIBLE_NAME, false)
                     .build();
         }
 
-        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = config().isNameVisible()
+        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = config().nameVisible()
                 ? WrapperPlayServerTeams.NameTagVisibility.ALWAYS
                 : WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
-        TextColor color = messagePipeline.builder(fPlayer, config().getColor()).build().color();
+        TextColor color = messagePipeline.builder(fPlayer, config().color()).build().color();
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(

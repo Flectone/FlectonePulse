@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -22,7 +22,7 @@ import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -35,7 +35,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -47,7 +47,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().getTicker();
+        Ticker ticker = config().ticker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
@@ -70,22 +70,22 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Override
     public Message.Sidebar config() {
-        return fileResolver.getMessage().getSidebar();
+        return fileFacade.message().sidebar();
     }
 
     @Override
     public Permission.Message.Sidebar permission() {
-        return fileResolver.getPermission().getMessage().getSidebar();
+        return fileFacade.permission().message().sidebar();
     }
 
     @Override
     public Localization.Message.Sidebar localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getSidebar();
+        return fileFacade.localization(sender).message().sidebar();
     }
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return joinMultiList(localization(fPlayer).getValues());
+        return joinMultiList(localization(fPlayer).values());
     }
 
     public void remove(FPlayer fPlayer) {
@@ -115,7 +115,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, config().isRandom());
+        String format = getNextMessage(fPlayer, config().random());
         if (format == null) return;
 
         String[] lines = format.split("<br>");

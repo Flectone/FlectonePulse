@@ -18,7 +18,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -31,18 +31,18 @@ import java.util.function.UnaryOperator;
 
 public abstract class IntegrationModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
-    protected IntegrationModule(FileResolver fileResolver,
+    protected IntegrationModule(FileFacade fileFacade,
                                 FLogger fLogger,
                                 PlatformServerAdapter platformServerAdapter,
                                 ReflectionResolver reflectionResolver,
                                 Injector injector) {
-        this.fileResolver = fileResolver;
+        this.fileFacade = fileFacade;
         this.fLogger = fLogger;
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
@@ -90,12 +90,12 @@ public abstract class IntegrationModule extends AbstractModule {
 
     @Override
     public Integration config() {
-        return fileResolver.getIntegration();
+        return fileFacade.integration();
     }
 
     @Override
     public Permission.Integration permission() {
-        return fileResolver.getPermission().getIntegration();
+        return fileFacade.permission().integration();
     }
 
     public abstract String checkMention(FEntity fPlayer, String message);

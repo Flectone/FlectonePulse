@@ -21,7 +21,7 @@ import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -40,12 +40,12 @@ public class BukkitIntegrationModule extends IntegrationModule {
     private final FLogger fLogger;
 
     @Inject
-    public BukkitIntegrationModule(FileResolver fileResolver,
+    public BukkitIntegrationModule(FileFacade fileFacade,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    ReflectionResolver reflectionResolver,
                                    Injector injector) {
-        super(fileResolver, fLogger, platformServerAdapter, reflectionResolver, injector);
+        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, injector);
         
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;

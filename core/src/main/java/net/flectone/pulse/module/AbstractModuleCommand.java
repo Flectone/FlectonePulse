@@ -1,12 +1,13 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.setting.CommandPermissionSetting;
+import net.flectone.pulse.config.setting.CommandSetting;
+import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.registry.CommandRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
@@ -18,15 +19,15 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
+public abstract class AbstractModuleCommand<M extends LocalizationSetting> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
 
     private final List<String> prompts = new ArrayList<>();
 
-    @Inject private FileResolver fileResolver;
+    @Inject private FileFacade fileFacade;
     @Inject private CommandRegistry commandParserProvider;
 
     protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
-        List<String> aliases = config().getAliases();
+        List<String> aliases = config().aliases();
         String commandName = getCommandName();
 
         commandParserProvider.registerCommand(manager ->
@@ -43,7 +44,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     // all prompt methods for solving the problems of a non-existent argument
     // when changing the plugin language at runtime
     protected void clearPrompts() {
-        if (fileResolver.getConfig().getCommand().isUnregisterOnReload()) {
+        if (fileFacade.config().command().unregisterOnReload()) {
             prompts.clear();
         }
     }
@@ -52,7 +53,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
         // this command already registered and ignored
         if (prompts.size() != index) return "unknown";
 
-        String prompt = promptLocalization.apply(fileResolver.getLocalization().getCommand().getPrompt());
+        String prompt = promptLocalization.apply(fileFacade.localization().command().prompt());
         prompts.add(prompt);
 
         return prompt;
@@ -70,7 +71,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     public String getCommandName() {
-        List<String> aliases = config().getAliases();
+        List<String> aliases = config().aliases();
         if (aliases.isEmpty()) return "flectonepulsenull";
 
         return aliases.getFirst();
@@ -80,8 +81,8 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     public void onEnable() {
         super.onEnable();
 
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        createCooldown(config().cooldown(), permission().cooldownBypass());
+        createSound(config().sound(), permission().sound());
     }
 
     @Override
@@ -96,9 +97,9 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
         execute(commandContext.sender(), commandContext);
     }
 
-    public abstract Permission.ICommandPermission permission();
+    public abstract CommandPermissionSetting permission();
 
     public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 
-    public abstract Command.ICommandFile config();
+    public abstract CommandSetting config();
 }

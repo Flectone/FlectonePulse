@@ -19,12 +19,9 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.registry.CommandRegistry;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.registry.PermissionRegistry;
-import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.MinecraftTranslationService;
@@ -62,13 +59,17 @@ public class FlectonePulseAPI  {
     public void onEnable() {
         if (!instance.isReady()) return;
 
+        // init defaults files
+        FileFacade fileFacade = instance.get(FileFacade.class);
+        fileFacade.reload();
+
+        // init cache
+        instance.get(CacheRegistry.class).init();
+
         FLogger fLogger = instance.get(FLogger.class);
 
-        // get file resolver for configuration
-        FileResolver fileResolver = instance.get(FileResolver.class);
-
         // set file resolver
-        fLogger.setFileResolver(fileResolver);
+        fLogger.setFileFacade(fileFacade);
 
         // log plugin information
         fLogger.logDescription();
@@ -98,7 +99,7 @@ public class FlectonePulseAPI  {
         instance.get(ProxyRegistry.class).onEnable();
 
         // reload metrics service if enabled
-        if (fileResolver.getConfig().getMetrics().isEnable()) {
+        if (fileFacade.config().metrics().enable()) {
             instance.get(MetricsService.class).reload();
         }
 
@@ -126,7 +127,7 @@ public class FlectonePulseAPI  {
         instance.get(TaskScheduler.class).shutdown();
 
         // send metrics data if enabled
-        if (instance.get(FileResolver.class).getConfig().getMetrics().isEnable()) {
+        if (instance.get(FileFacade.class).config().metrics().enable()) {
             instance.get(MetricsService.class).send();
         }
 
@@ -188,17 +189,17 @@ public class FlectonePulseAPI  {
         instance.get(TaskScheduler.class).reload();
 
         // get file resolver for configuration
-        FileResolver fileResolver = instance.get(FileResolver.class);
+        FileFacade fileFacade = instance.get(FileFacade.class);
 
         // get database
         Database database = instance.get(Database.class);
 
         // save old database type
-        Database.Type oldDatabaseType = database.config().getType();
+        Database.Type oldDatabaseType = database.config().type();
 
         try {
             // reload configuration files
-            fileResolver.reload();
+            fileFacade.reload();
         } catch (Exception e) {
             reloadException = new ReloadException(e);
         }
@@ -226,8 +227,14 @@ public class FlectonePulseAPI  {
             }
 
             // try to connect to old database
-            if (database.config().getType() != oldDatabaseType) {
-                database.config().setType(oldDatabaseType);
+            if (database.config().type() != oldDatabaseType) {
+                fileFacade.updateFilePack(filePack ->
+                        filePack.withConfig(
+                                filePack.config().withDatabase(
+                                        filePack.config().database().withType(oldDatabaseType)
+                                )
+                        )
+                );
 
                 try {
                     database.connect();
@@ -259,7 +266,7 @@ public class FlectonePulseAPI  {
         );
 
         // reload metrics service if enabled
-        if (fileResolver.getConfig().getMetrics().isEnable()) {
+        if (fileFacade.config().metrics().enable()) {
             instance.get(MetricsService.class).reload();
         }
 

@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,7 +16,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -38,7 +38,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
     private final @Named("mentionMessage") Cache<String, String> messageCache;
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
@@ -50,10 +50,10 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().getSound(), permission().getSound());
+        createSound(config().sound(), permission().sound());
 
-        registerPermission(permission().getGroup());
-        registerPermission(permission().getBypass());
+        registerPermission(permission().group());
+        registerPermission(permission().bypass());
 
         listenerRegistry.register(MentionPulseListener.class);
     }
@@ -73,17 +73,17 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public Message.Format.Mention config() {
-        return fileResolver.getMessage().getFormat().getMention();
+        return fileFacade.message().format().mention();
     }
 
     @Override
     public Permission.Message.Format.Mention permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getMention();
+        return fileFacade.permission().message().format().mention();
     }
 
     @Override
     public Localization.Message.Format.Mention localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getMention();
+        return fileFacade.localization(sender).message().format().mention();
     }
 
     public void format(MessageContext messageContext) {
@@ -119,12 +119,12 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
             String mention = mentionTag.value();
             if (mention.isEmpty()) {
-                return Tag.preProcessParsed(config().getTrigger() + mention);
+                return Tag.preProcessParsed(config().trigger() + mention);
             }
 
             Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
-                if (permissionChecker.check(sender, permission().getGroup().getName() + "." + group.get())) {
+                if (permissionChecker.check(sender, permission().group().name() + "." + group.get())) {
                     sendMention(processId, receiver);
                     return mentionTag(sender, receiver, mention);
                 }
@@ -139,7 +139,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                 }
             }
 
-            return Tag.preProcessParsed(config().getTrigger() + mention);
+            return Tag.preProcessParsed(config().trigger() + mention);
         });
     }
 
@@ -152,7 +152,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     private Tag mentionTag(FEntity sender, FPlayer receiver, String mention) {
-        String format = StringUtils.replaceEach(localization(receiver).getFormat(),
+        String format = StringUtils.replaceEach(localization(receiver).format(),
                 new String[]{ "<player>", "<target>" },
                 new String[]{ mention, mention }
         );
@@ -165,9 +165,9 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
-            if (!word.startsWith(config().getTrigger())) continue;
+            if (!word.startsWith(config().trigger())) continue;
 
-            String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().getTrigger(), "");
+            String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().trigger(), "");
             if (isMention(wordWithoutPrefix)) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";
             }
@@ -189,7 +189,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     private Optional<String> findGroup(String group) {
-        if (config().getEveryoneTag().equalsIgnoreCase(group)) {
+        if (config().everyoneTag().equalsIgnoreCase(group)) {
             group = "default";
         }
 
@@ -201,15 +201,15 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public void sendMention(UUID processId, FPlayer fPlayer) {
-        if (permissionChecker.check(fPlayer, permission().getBypass())) return;
+        if (permissionChecker.check(fPlayer, permission().bypass())) return;
         if (processedMentions.containsKey(processId)) return;
 
         processedMentions.put(processId, true);
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .format(Localization.Message.Format.Mention::getPerson)
-                .destination(config().getDestination())
+                .format(Localization.Message.Format.Mention::person)
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .build()
         );

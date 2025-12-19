@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.auto;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AutoModule extends AbstractModuleListLocalization<Localization.Message.Auto> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
 
@@ -32,10 +32,10 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     public void onEnable() {
         super.onEnable();
 
-        config().getTypes().forEach((key, value) -> {
-            Sound sound = createSound(value.getSound(), permission().getTypes().get(key));
+        config().types().forEach((key, value) -> {
+            Sound sound = createSound(value.sound(), permission().types().get(key));
 
-            Ticker ticker = value.getTicker();
+            Ticker ticker = value.ticker();
             if (ticker.isEnable()) {
                 taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.getPeriod());
             }
@@ -49,17 +49,17 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
 
     @Override
     public Message.Auto config() {
-        return fileResolver.getMessage().getAuto();
+        return fileFacade.message().auto();
     }
 
     @Override
     public Permission.Message.Auto permission() {
-        return fileResolver.getPermission().getMessage().getAuto();
+        return fileFacade.permission().message().auto();
     }
 
     @Override
     public Localization.Message.Auto localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getAuto();
+        return fileFacade.localization(sender).message().auto();
     }
 
     @Override
@@ -70,16 +70,16 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        List<String> messages = localization(fPlayer).getTypes().get(name);
+        List<String> messages = localization(fPlayer).types().get(name);
         if (messages == null) return;
 
-        String format = getNextMessage(fPlayer, type.isRandom(), messages);
+        String format = getNextMessage(fPlayer, type.random(), messages);
         if (StringUtils.isEmpty(format)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
-                .destination(type.getDestination())
+                .destination(type.destination())
                 .sound(sound)
                 .build()
         );

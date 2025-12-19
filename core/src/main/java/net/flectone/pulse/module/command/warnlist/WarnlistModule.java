@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -17,7 +17,7 @@ import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -33,7 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WarnlistModule extends AbstractModuleCommand<Localization.Command.Warnlist> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -47,10 +47,10 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptNumber = addPrompt(1, Localization.Command.Prompt::getNumber);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptNumber = addPrompt(1, Localization.Command.Prompt::number);
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
                 .optional(promptPlayer, commandParserProvider.warnedParser())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
@@ -61,7 +61,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         if (isModuleDisabledFor(fPlayer, true)) return;
 
         Localization.Command.Warnlist localization = localization(fPlayer);
-        Localization.ListTypeMessage localizationType = localization.getGlobal();
+        Localization.ListTypeMessage localizationType = localization.global();
 
         String commandLine = "/" + getCommandName();
 
@@ -84,7 +84,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 if (targetFPlayer.isUnknown()) {
                     sendErrorMessage(metadataBuilder()
                             .sender(fPlayer)
-                            .format(Localization.Command.Warnlist::getNullPlayer)
+                            .format(Localization.Command.Warnlist::nullPlayer)
                             .build()
                     );
 
@@ -92,7 +92,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 }
 
                 commandLine += " " + playerName;
-                localizationType = localization.getPlayer();
+                localizationType = localization.player();
             }
         }
 
@@ -103,7 +103,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         if (moderationList.isEmpty()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Warnlist::getEmpty)
+                    .format(Localization.Command.Warnlist::empty)
                     .build()
             );
 
@@ -111,13 +111,13 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         }
 
         int size = moderationList.size();
-        int perPage = config().getPerPage();
+        int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Warnlist::getNullPage)
+                    .format(Localization.Command.Warnlist::nullPage)
                     .build()
             );
 
@@ -129,7 +129,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 .limit(perPage)
                 .toList();
 
-        String header = Strings.CS.replace(localizationType.getHeader(), "<count>", String.valueOf(size));
+        String header = Strings.CS.replace(localizationType.header(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
@@ -138,7 +138,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
-            String line = Strings.CS.replace(localizationType.getLine(), "<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
@@ -147,7 +147,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         }
 
         String footer = StringUtils.replaceEach(
-                localizationType.getFooter(),
+                localizationType.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
                 new String[]{
                         commandLine,
@@ -172,16 +172,16 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     @Override
     public Command.Warnlist config() {
-        return fileResolver.getCommand().getWarnlist();
+        return fileFacade.command().warnlist();
     }
 
     @Override
     public Permission.Command.Warnlist permission() {
-        return fileResolver.getPermission().getCommand().getWarnlist();
+        return fileFacade.permission().command().warnlist();
     }
 
     @Override
     public Localization.Command.Warnlist localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getWarnlist();
+        return fileFacade.localization(sender).command().warnlist();
     }
 }

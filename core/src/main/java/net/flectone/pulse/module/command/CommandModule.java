@@ -50,13 +50,13 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandModule extends AbstractModule {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
 
     @Override
     public void configureChildren() {
@@ -112,16 +112,16 @@ public class CommandModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(fileResolver.getPermission().getCommand().getSeeInvisiblePlayersInSuggest());
+        registerPermission(fileFacade.permission().command().seeInvisiblePlayersInSuggest());
     }
 
     @Override
     public Command config() {
-        return fileResolver.getCommand();
+        return fileFacade.command();
     }
 
     @Override
     public Permission.Command permission() {
-        return fileResolver.getPermission().getCommand();
+        return fileFacade.permission().command();
     }
 }

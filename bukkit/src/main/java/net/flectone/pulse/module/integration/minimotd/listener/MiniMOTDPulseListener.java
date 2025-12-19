@@ -22,7 +22,7 @@ public class MiniMOTDPulseListener implements PulseListener {
 
         AbstractModule eventModule = event.getModule();
         if (eventModule instanceof MaintenanceModule
-                && miniMOTDModule.config().isDisableFlectonepulseStatus()
+                && miniMOTDModule.config().disableFlectonepulseStatus()
                 && miniMOTDModule.isHooked()) {
             event.setCancelled(true);
         }

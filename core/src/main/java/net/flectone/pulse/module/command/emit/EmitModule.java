@@ -6,14 +6,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
@@ -26,7 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final FPlayerService fPlayerService;
 
@@ -34,11 +34,11 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptType = addPrompt(1, Localization.Command.Prompt::getType);
-        String promptMessage = addPrompt(2, Localization.Command.Prompt::getMessage);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptType = addPrompt(1, Localization.Command.Prompt::type);
+        String promptMessage = addPrompt(2, Localization.Command.Prompt::message);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
+                .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .required(promptType, commandParserProvider.messageParser(), typeWithMessageSuggestion())
                 .optional(promptMessage, commandParserProvider.messageParser()) // not used, only for better message help
@@ -59,7 +59,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .range(Range.get(Range.Type.PROXY))
-                    .format(Localization.Command.Emit::getFormat)
+                    .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
                     .sound(getModuleSound())
@@ -80,7 +80,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         if (!fTarget.isOnline()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Emit::getNullPlayer)
+                    .format(Localization.Command.Emit::nullPlayer)
                     .build()
             );
 
@@ -90,7 +90,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .filterPlayer(fTarget)
-                .format(Localization.Command.Emit::getFormat)
+                .format(Localization.Command.Emit::format)
                 .message(message)
                 .destination(destination)
                 .sound(getModuleSound())
@@ -111,17 +111,17 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
     @Override
     public Command.Emit config() {
-        return fileResolver.getCommand().getEmit();
+        return fileFacade.command().emit();
     }
 
     @Override
     public Permission.Command.Emit permission() {
-        return fileResolver.getPermission().getCommand().getEmit();
+        return fileFacade.permission().command().emit();
     }
 
     @Override
     public Localization.Command.Emit localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getEmit();
+        return fileFacade.localization(sender).command().emit();
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeWithMessageSuggestion() {

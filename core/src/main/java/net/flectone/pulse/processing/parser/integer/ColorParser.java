@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
@@ -30,7 +30,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
     private final StringParser<FPlayer> stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
 
     @Override
@@ -47,8 +47,8 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
         String current = args.length == 0 || currentInput.endsWith(" ") ? "" : args[args.length - 1];
 
-        int maxColors = fileResolver.getMessage().getFormat().getFcolor().getDefaultColors().size();
-        boolean hasOtherPermission = permissionChecker.check(context.sender(), fileResolver.getPermission().getCommand().getChatcolor().getOther());
+        int maxColors = fileFacade.message().format().fcolor().defaultColors().size();
+        boolean hasOtherPermission = permissionChecker.check(context.sender(), fileFacade.permission().command().chatcolor().other());
         if (!hasOtherPermission && args.length >= maxColors ||
                 hasOtherPermission && args.length >= maxColors + 1) {
             return Collections.emptyList();

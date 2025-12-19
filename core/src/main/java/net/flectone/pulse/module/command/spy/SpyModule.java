@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
 
@@ -36,7 +36,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         super.onEnable();
 
         registerCommand(manager -> manager
-                .permission(permission().getName())
+                .permission(permission().name())
         );
     }
 
@@ -55,10 +55,10 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
                 .sender(fPlayer)
-                .format(s -> !turnedBefore ? s.getFormatTrue() : s.getFormatFalse())
+                .format(s -> !turnedBefore ? s.formatTrue() : s.formatFalse())
                 .turned(!turnedBefore)
                 .action("turning")
-                .destination(config().getDestination())
+                .destination(config().destination())
                 .sound(getModuleSound())
                 .build()
         );
@@ -71,23 +71,23 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Override
     public Command.Spy config() {
-        return fileResolver.getCommand().getSpy();
+        return fileFacade.command().spy();
     }
 
     @Override
     public Permission.Command.Spy permission() {
-        return fileResolver.getPermission().getCommand().getSpy();
+        return fileFacade.permission().command().spy();
     }
 
     @Override
     public Localization.Command.Spy localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getSpy();
+        return fileFacade.localization(sender).command().spy();
     }
 
     public void checkChat(FPlayer fPlayer, String chat, String message) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().getCategories();
+        Map<String, List<String>> categories = config().categories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains(chat)) return;
 
@@ -102,8 +102,8 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .format(replaceAction(action))
                 .turned(true)
                 .action(action)
-                .range(config().getRange())
-                .destination(config().getDestination())
+                .range(config().range())
+                .destination(config().destination())
                 .message(message)
                 .filter(createFilter(fPlayer))
                 .proxy(dataOutputStream -> {
@@ -123,6 +123,6 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     public Function<Localization.Command.Spy, String> replaceAction(String action) {
-        return message -> Strings.CS.replace(message.getFormatLog(), "<action>", action);
+        return message -> Strings.CS.replace(message.formatLog(), "<action>", action);
     }
 }

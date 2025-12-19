@@ -20,8 +20,8 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.comparator.VersionComparator;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.creator.BackupCreator;
@@ -44,7 +44,8 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class Database {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
+    private final VersionComparator versionComparator;
     private final @Named("projectPath") Path projectPath;
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
@@ -52,23 +53,21 @@ public class Database {
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
     private final Provider<VersionDAO> versionDAOProvider;
-    private final YamlFileProcessor yamlFileProcessor;
     private final BackupCreator backupCreator;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
 
     public Config.Database config() {
-        return fileResolver.getConfig().getDatabase();
+        return fileFacade.config().database();
     }
 
     public void connect() throws IOException {
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)
-                && config().getType() == Type.SQLITE) {
+                && config().type() == Type.SQLITE) {
             fLogger.warning("SQLite database is not supported on this version of Minecraft, H2 Database will be used");
 
-            config().setType(Type.H2);
-            yamlFileProcessor.save(fileResolver.getConfig());
+            fileFacade.updateFilePack(filePack -> filePack.withConfig(filePack.config().withDatabase(config().withType(Type.H2))));
         }
 
         downloadDriver();
@@ -87,7 +86,7 @@ public class Database {
         jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
 
-        executeSQLFile(platformServerAdapter.getResource("sqls/" + config().getType().name().toLowerCase() + ".sql"));
+        executeSQLFile(platformServerAdapter.getResource("sqls/" + config().type().name().toLowerCase() + ".sql"));
 
         checkMigration();
 
@@ -102,7 +101,7 @@ public class Database {
     }
 
     public void init() {
-        fLogger.info(config().getType() + " database connected");
+        fLogger.info(config().type() + " database connected");
     }
 
     public void disconnect() {
@@ -116,11 +115,11 @@ public class Database {
 
     private void setupTemplateEngine() {
         BiFunction<String, StatementContext, String> template = null;
-        if (StringUtils.isNotEmpty(config().getPrefix())) {
-            template = (sql, ctx) -> Strings.CS.replace(sql, "fp_", config().getPrefix());
+        if (StringUtils.isNotEmpty(config().prefix())) {
+            template = (sql, ctx) -> Strings.CS.replace(sql, "fp_", config().prefix());
         }
 
-        if (config().getType() == Type.POSTGRESQL) {
+        if (config().type() == Type.POSTGRESQL) {
             if (template == null) {
                 template = (sql, ctx) -> sql;
             }
@@ -136,21 +135,21 @@ public class Database {
     private HikariConfig createHikariConfig() {
         HikariConfig hikariConfig = new HikariConfig();
 
-        String connectionURL = "jdbc:" + config().getType().name().toLowerCase() + ":";
-        switch (config().getType()) {
+        String connectionURL = "jdbc:" + config().type().name().toLowerCase() + ":";
+        switch (config().type()) {
             case POSTGRESQL -> {
                 connectionURL = connectionURL +
                         "//" +
-                        systemVariableResolver.substituteEnvVars(config().getHost()) +
+                        systemVariableResolver.substituteEnvVars(config().host()) +
                         ":" +
-                        systemVariableResolver.substituteEnvVars(config().getPort()) +
+                        systemVariableResolver.substituteEnvVars(config().port()) +
                         "/" +
-                        systemVariableResolver.substituteEnvVars(config().getName()) +
-                        config().getParameters();
+                        systemVariableResolver.substituteEnvVars(config().name()) +
+                        config().parameters();
 
                 hikariConfig.setDriverClassName("org.postgresql.Driver");
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().getUser()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().getPassword()));
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
                 hikariConfig.setMaximumPoolSize(8);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
@@ -160,7 +159,7 @@ public class Database {
                 connectionURL = connectionURL +
                         "file:./" + projectPath.toString() +
                         File.separator +
-                        systemVariableResolver.substituteEnvVars(config().getName()) + ".h2" +
+                        systemVariableResolver.substituteEnvVars(config().name()) + ".h2" +
                         ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
 
                 hikariConfig.setDriverClassName("org.h2.Driver");
@@ -175,7 +174,7 @@ public class Database {
                 connectionURL = connectionURL +
                         projectPath.toString() +
                         File.separator +
-                        systemVariableResolver.substituteEnvVars(config().getName()) +
+                        systemVariableResolver.substituteEnvVars(config().name()) +
                         ".db";
 
                 hikariConfig.setMaximumPoolSize(5);
@@ -187,21 +186,21 @@ public class Database {
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
             case MYSQL, MARIADB -> {
-                if (config().getType() == Type.MARIADB) {
+                if (config().type() == Type.MARIADB) {
                     hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
                 }
 
                 connectionURL = connectionURL +
                         "//" +
-                        systemVariableResolver.substituteEnvVars(config().getHost()) +
+                        systemVariableResolver.substituteEnvVars(config().host()) +
                         ":" +
-                        systemVariableResolver.substituteEnvVars(config().getPort()) +
+                        systemVariableResolver.substituteEnvVars(config().port()) +
                         "/" +
-                        systemVariableResolver.substituteEnvVars(config().getName()) +
-                        config().getParameters();
+                        systemVariableResolver.substituteEnvVars(config().name()) +
+                        config().parameters();
 
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().getUser()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().getPassword()));
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
                 hikariConfig.setMaximumPoolSize(8);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
@@ -210,7 +209,7 @@ public class Database {
                 hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
                 hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
             }
-            default -> throw new IllegalStateException(config().getType() + " not supported");
+            default -> throw new IllegalStateException(config().type() + " not supported");
         }
 
         hikariConfig.setJdbcUrl(connectionURL);
@@ -239,26 +238,26 @@ public class Database {
     }
 
     private void checkMigration() {
-        if (!fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), fileResolver.getConfig().getVersion())) return;
+        if (!versionComparator.isOlderThan(fileFacade.getPreInitVersion(), fileFacade.config().version())) return;
 
         backupCreator.backup(config());
 
         VersionDAO versionDAO = versionDAOProvider.get();
         Optional<String> versionName = versionDAO.find();
 
-        if (versionName.isEmpty() && fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
+        if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.3.0")) {
             migration("1_3_0");
         }
 
-        if (versionName.isEmpty() && fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.6.0")) {
-            if (config().getType() == Type.POSTGRESQL) {
+        if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.6.0")) {
+            if (config().type() == Type.POSTGRESQL) {
                 migration("1_6_0_postgre");
             } else {
                 migration("1_6_0");
             }
         }
 
-        versionDAO.insertOrUpdate(fileResolver.getConfig().getVersion());
+        versionDAO.insertOrUpdate(fileFacade.config().version());
     }
 
     private void migration(String version) {
@@ -271,8 +270,8 @@ public class Database {
     }
 
     public void downloadDriver() {
-        boolean needChecking = !config().isIgnoreExistingDriver();
-        switch (config().getType()) {
+        boolean needChecking = !config().ignoreExistingDriver();
+        switch (config().type()) {
             case POSTGRESQL -> reflectionResolver.hasClassOrElse("org.postgresql.Driver", needChecking, libraryResolver ->
                     libraryResolver.loadLibrary(Library.builder()
                             .groupId("org{}postgresql")

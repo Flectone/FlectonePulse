@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
@@ -25,7 +25,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -47,7 +47,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Sound> soundMap = new HashMap<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -64,16 +64,16 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     public void onEnable() {
         super.onEnable();
 
-        config().getTypes().forEach((key, value) -> {
-            Permission.Message.Chat.Type permissions = permission().getTypes().get(key);
+        config().types().forEach((key, value) -> {
+            Permission.Message.Chat.Type permissions = permission().types().get(key);
             if (permissions == null) return;
 
             registerPermission(permissions);
-            cooldownMap.put(key, createCooldown(value.getCooldown(), permissions.getCooldownBypass()));
-            soundMap.put(key, createSound(value.getSound(), permissions.getSound()));
+            cooldownMap.put(key, createCooldown(value.cooldown(), permissions.cooldownBypass()));
+            soundMap.put(key, createSound(value.sound(), permissions.sound()));
         });
 
-        if (config().getMode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+        if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             listenerRegistry.register(ChatPacketListener.class);
         }
     }
@@ -93,17 +93,17 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public Message.Chat config() {
-        return fileResolver.getMessage().getChat();
+        return fileFacade.message().chat();
     }
 
     @Override
     public Permission.Message.Chat permission() {
-        return fileResolver.getPermission().getMessage().getChat();
+        return fileFacade.permission().message().chat();
     }
 
     @Override
     public Localization.Message.Chat localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getChat();
+        return fileFacade.localization(sender).message().chat();
     }
 
     public void handleChatEvent(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
@@ -120,10 +120,10 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         Pair<String, Message.Chat.Type> playerChat = getPlayerChat(fPlayer, eventMessage);
 
         Message.Chat.Type chatType = playerChat.second();
-        if (chatType == null || !chatType.isEnable()) {
+        if (chatType == null || !chatType.enable()) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Message.Chat::getNullChat)
+                    .format(Localization.Message.Chat::nullChat)
                     .build()
             );
 
@@ -136,12 +136,12 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        String trigger = chatType.getTrigger();
+        String trigger = chatType.trigger();
         if (!StringUtils.isEmpty(trigger) && eventMessage.startsWith(trigger)) {
             eventMessage = eventMessage.substring(trigger.length()).trim();
         }
 
-        Range chatRange = chatType.getRange();
+        Range chatRange = chatType.range();
 
         // in local chat you can mention it too,
         // but I don't want to full support InteractiveChat
@@ -152,7 +152,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
-        successEvent.accept(finalMessage, playerChat.second().isCancel());
+        successEvent.accept(finalMessage, playerChat.second().cancel());
 
         sendMessage(fPlayer, eventMessage, finalMessage, playerChat);
     }
@@ -162,11 +162,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         String chatName = playerChat.first();
         ChatMetadata<Localization.Message.Chat> chatMetadata = ChatMetadata.<Localization.Message.Chat>builder()
                 .sender(fPlayer)
-                .format(localization -> localization.getTypes().get(chatName))
+                .format(localization -> localization.types().get(chatName))
                 .chatName(chatName)
                 .chatType(playerChat.second())
-                .destination(playerChat.second().getDestination())
-                .range(playerChat.second().getRange())
+                .destination(playerChat.second().destination())
+                .range(playerChat.second().range())
                 .message(finalMessage)
                 .sound(soundMap.get(chatName))
                 .filter(permissionFilter(chatName))
@@ -193,21 +193,21 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     @Async(delay = 1L)
     public void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Pair<String, Message.Chat.Type> playerChat) {
-        if (!playerChat.second().getNullReceiver().isEnable()) return;
+        if (!playerChat.second().nullReceiver().enable()) return;
         if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
 
-        if (playerChat.second().getRange().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.first())) {
+        if (playerChat.second().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.first())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
-                    .format(Localization.Message.Chat::getNullReceiver)
-                    .destination(playerChat.second().getNullReceiver().getDestination())
+                    .format(Localization.Message.Chat::nullReceiver)
+                    .destination(playerChat.second().nullReceiver().destination())
                     .build()
             );
         }
     }
 
     public Predicate<FPlayer> permissionFilter(String chatName) {
-        return fReceiver -> permissionChecker.check(fReceiver, permission().getTypes().get(chatName));
+        return fReceiver -> permissionChecker.check(fReceiver, permission().types().get(chatName));
     }
 
     private boolean noLocalReceiversFor(FPlayer fPlayer, List<FPlayer> receivers) {
@@ -262,30 +262,30 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     private Pair<String, Message.Chat.Type> getPlayerChat(FPlayer fPlayer, String eventMessage) {
         String returnedChatName = fPlayer.getSetting(SettingText.CHAT_NAME);
-        Message.Chat.Type playerChat = config().getTypes().get(returnedChatName);
+        Message.Chat.Type playerChat = config().types().get(returnedChatName);
 
         // if that chat *does* have a trigger, return it
-        if (playerChat != null && !StringUtils.isEmpty(playerChat.getTrigger())) {
+        if (playerChat != null && !StringUtils.isEmpty(playerChat.trigger())) {
             return Pair.of(returnedChatName, playerChat);
         }
 
         int priority = Integer.MIN_VALUE;
 
-        for (Map.Entry<String, Message.Chat.Type> entry : config().getTypes().entrySet()) {
+        for (Map.Entry<String, Message.Chat.Type> entry : config().types().entrySet()) {
             Message.Chat.Type chat = entry.getValue();
             String chatName = entry.getKey();
 
-            if (!chat.isEnable()) continue;
-            if (chat.getTrigger() != null
-                    && !chat.getTrigger().isEmpty()
-                    && !eventMessage.startsWith(chat.getTrigger())) continue;
-            if (eventMessage.equals(chat.getTrigger())) continue;
+            if (!chat.enable()) continue;
+            if (chat.trigger() != null
+                    && !chat.trigger().isEmpty()
+                    && !eventMessage.startsWith(chat.trigger())) continue;
+            if (eventMessage.equals(chat.trigger())) continue;
 
-            if (chat.getPriority() <= priority) continue;
-            if (!permissionChecker.check(fPlayer, permission().getTypes().get(chatName))) continue;
+            if (chat.priority() <= priority) continue;
+            if (!permissionChecker.check(fPlayer, permission().types().get(chatName))) continue;
 
             playerChat = chat;
-            priority = chat.getPriority();
+            priority = chat.priority();
             returnedChatName = chatName;
         }
 

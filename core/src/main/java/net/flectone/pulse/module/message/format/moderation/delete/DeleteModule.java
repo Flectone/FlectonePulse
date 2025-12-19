@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.format.moderation.delete;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -15,7 +15,7 @@ import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryM
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -39,7 +39,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     // only for skipping FlectonePulse messages
     private final List<Component> cachedComponents = new CopyOnWriteArrayList<>();
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -67,17 +67,17 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public Message.Format.Moderation.Delete config() {
-        return fileResolver.getMessage().getFormat().getModeration().getDelete();
+        return fileFacade.message().format().moderation().delete();
     }
 
     @Override
     public Permission.Message.Format.Moderation.Delete permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getModeration().getDelete();
+        return fileFacade.permission().message().format().moderation().delete();
     }
 
     @Override
     public Localization.Message.Format.Moderation.Delete localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getModeration().getDelete();
+        return fileFacade.localization(sender).message().format().moderation().delete();
     }
 
     public void clearHistory(FPlayer fPlayer) {
@@ -96,7 +96,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
             String placeholder = Strings.CS.replace(
-                    localization(receiver).getPlaceholder(),
+                    localization(receiver).placeholder(),
                     "<uuid>",
                     messageUUID.toString()
             );
@@ -123,7 +123,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
         List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, k -> new ArrayList<>());
 
-        if (history.size() >= config().getHistoryLength()) {
+        if (history.size() >= config().historyLength()) {
             history.removeFirst();
         }
 
@@ -162,7 +162,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
             List<HistoryMessage> history = entry.getValue();
 
             FPlayer fReceiver = fPlayerService.getFPlayer(receiver);
-            String format = localization(fReceiver).getFormat();
+            String format = localization(fReceiver).format();
             if (format.isBlank()) {
                 history.removeIf(historyMessage -> historyMessage.uuid().equals(messageUUID));
             } else {
@@ -188,7 +188,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
 
         // empty messages
-        for (int i = 0; i < config().getHistoryLength(); i++) {
+        for (int i = 0; i < config().historyLength(); i++) {
             if (i >= history.size()) {
                 messageSender.sendMessage(fPlayer, Component.newline(), true);
             }

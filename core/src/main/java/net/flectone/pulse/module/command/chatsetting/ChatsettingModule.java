@@ -8,7 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -38,7 +38,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
-    private final FileResolver fileResolver;
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
@@ -53,14 +53,14 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     public void onEnable() {
         super.onEnable();
 
-        permission().getSettings().values().forEach(this::registerPermission);
+        permission().settings().values().forEach(this::registerPermission);
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
-        String promptType = addPrompt(1, Localization.Command.Prompt::getType);
-        String promptValue = addPrompt(2, Localization.Command.Prompt::getValue);
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
+        String promptType = addPrompt(1, Localization.Command.Prompt::type);
+        String promptValue = addPrompt(2, Localization.Command.Prompt::value);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission().getName())
-                .optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(true, permission().getOther()))
+                .permission(permission().name())
+                .optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()))
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
@@ -68,7 +68,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, input) -> {
-            if (!permissionChecker.check(context.sender(), permission().getOther())) return Collections.emptyList();
+            if (!permissionChecker.check(context.sender(), permission().other())) return Collections.emptyList();
 
             return Arrays.stream(MessageType.values())
                     .map(setting -> Suggestion.suggestion(setting.name()))
@@ -80,7 +80,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        if (permissionChecker.check(fPlayer, permission().getOther())) {
+        if (permissionChecker.check(fPlayer, permission().other())) {
             String promptPlayer = getPrompt(0);
             Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
             if (optionalPlayer.isPresent()) {
@@ -101,17 +101,17 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public Command.Chatsetting config() {
-        return fileResolver.getCommand().getChatsetting();
+        return fileFacade.command().chatsetting();
     }
 
     @Override
     public Permission.Command.Chatsetting permission() {
-        return fileResolver.getPermission().getCommand().getChatsetting();
+        return fileFacade.permission().command().chatsetting();
     }
 
     @Override
     public Localization.Command.Chatsetting localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCommand().getChatsetting();
+        return fileFacade.localization(sender).command().chatsetting();
     }
 
     private void executeOther(FPlayer fPlayer, String target, CommandContext<FPlayer> commandContext) {
@@ -145,7 +145,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     }
 
     private void open(FPlayer fPlayer, FPlayer fTarget) {
-        MenuBuilder menuBuilder = config().getModern().isEnable() && isNewerThanOrEqualsV_1_21_6
+        MenuBuilder menuBuilder = config().modern().enable() && isNewerThanOrEqualsV_1_21_6
                 ? dialogMenuBuilderProvider.get()
                 : inventoryMenuBuilderProvider.get();
         menuBuilder.open(fPlayer, fTarget);
@@ -177,27 +177,27 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     }
 
     public String getCheckboxMaterial(boolean enabled) {
-        Command.Chatsetting.Checkbox checkbox = config().getCheckbox();
-        return enabled ? checkbox.getEnabledMaterial() : checkbox.getDisabledMaterial();
+        Command.Chatsetting.Checkbox checkbox = config().checkbox();
+        return enabled ? checkbox.enabledMaterial() : checkbox.disabledMaterial();
     }
 
     public String getCheckboxTitle(FPlayer fPlayer, String setting, boolean enabled) {
-        Localization.Command.Chatsetting.Checkbox localizationCheckbox = localization(fPlayer).getCheckbox();
-        String statusColor = enabled ? localizationCheckbox.getEnabledColor() : localizationCheckbox.getDisabledColor();
+        Localization.Command.Chatsetting.Checkbox localizationCheckbox = localization(fPlayer).checkbox();
+        String statusColor = enabled ? localizationCheckbox.enabledColor() : localizationCheckbox.disabledColor();
 
         return Strings.CS.replace(
-                localizationCheckbox.getTypes().getOrDefault(setting, ""),
+                localizationCheckbox.types().getOrDefault(setting, ""),
                 "<status_color>",
                 statusColor
         );
     }
 
     public String getCheckboxLore(FPlayer fPlayer, boolean enabled) {
-        Localization.Command.Chatsetting.Checkbox localizationCheckbox = localization(fPlayer).getCheckbox();
-        String statusColor = enabled ? localizationCheckbox.getEnabledColor() : localizationCheckbox.getDisabledColor();
+        Localization.Command.Chatsetting.Checkbox localizationCheckbox = localization(fPlayer).checkbox();
+        String statusColor = enabled ? localizationCheckbox.enabledColor() : localizationCheckbox.disabledColor();
 
         return Strings.CS.replace(
-                enabled ? localizationCheckbox.getEnabledHover() : localizationCheckbox.getDisabledHover(),
+                enabled ? localizationCheckbox.enabledHover() : localizationCheckbox.disabledHover(),
                 "<status_color>",
                 statusColor
         );

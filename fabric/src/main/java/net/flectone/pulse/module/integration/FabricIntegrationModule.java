@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.supervanish.VanishModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
@@ -25,7 +25,7 @@ public class FabricIntegrationModule extends IntegrationModule {
     private final Injector injector;
 
     @Inject
-    public FabricIntegrationModule(FileResolver fileManager,
+    public FabricIntegrationModule(FileFacade fileManager,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    Provider<PermissionChecker> permissionCheckerProvider,
