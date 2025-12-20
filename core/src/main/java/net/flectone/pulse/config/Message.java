@@ -666,6 +666,11 @@ public record Message(
             }
 
             @Override
+            public Boolean multiMessage() {
+                return multiMessage != null;
+            }
+
+            @Override
             public Range range() {
                 return range != null ? range : Range.get(Range.Type.PLAYER);
             }
