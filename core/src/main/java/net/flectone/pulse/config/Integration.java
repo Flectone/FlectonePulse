@@ -31,6 +31,9 @@ public record Integration(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
         Discord discord,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/floodgate/")
+        Floodgate floodgate,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
         Geyser geyser,
 
@@ -167,6 +170,12 @@ public record Integration(
     @Builder(toBuilder = true)
     @Jacksonized
     public record ChannelInfo(Boolean enable, Ticker ticker) {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Floodgate(Boolean enable) implements EnableSetting {
     }
 
     @With

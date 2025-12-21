@@ -154,6 +154,7 @@ public interface PermissionMerger {
     @Mapping(target = "libertybans", expression = "java(mergeLibertybans(target.build().libertybans().toBuilder(), source.libertybans()))")
     @Mapping(target = "deepl", expression = "java(mergeDeepl(target.build().deepl().toBuilder(), source.deepl()))")
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
+    @Mapping(target = "floodgate", expression = "java(mergeFloodgate(target.build().floodgate().toBuilder(), source.floodgate()))")
     @Mapping(target = "geyser", expression = "java(mergeGeyser(target.build().geyser().toBuilder(), source.geyser()))")
     @Mapping(target = "interactivechat", expression = "java(mergeInteractivechat(target.build().interactivechat().toBuilder(), source.interactivechat()))")
     @Mapping(target = "itemsadder", expression = "java(mergeItemsadder(target.build().itemsadder().toBuilder(), source.itemsadder()))")
@@ -183,6 +184,8 @@ public interface PermissionMerger {
     Permission.Integration.Deepl mergeDeepl(@MappingTarget Permission.Integration.Deepl.DeeplBuilder target, Permission.Integration.Deepl deepl);
 
     Permission.Integration.Discord mergeDiscord(@MappingTarget Permission.Integration.Discord.DiscordBuilder target, Permission.Integration.Discord discord);
+
+    Permission.Integration.Floodgate mergeFloodgate(@MappingTarget Permission.Integration.Floodgate.FloodgateBuilder target, Permission.Integration.Floodgate floodgate);
 
     Permission.Integration.Geyser mergeGeyser(@MappingTarget Permission.Integration.Geyser.GeyserBuilder target, Permission.Integration.Geyser geyser);
 

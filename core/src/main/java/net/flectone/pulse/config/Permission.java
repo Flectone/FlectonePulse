@@ -647,6 +647,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
             Discord discord,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/floodgate/")
+            Floodgate floodgate,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
             Geyser geyser,
 
@@ -739,6 +742,14 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Discord(
+                String name,
+                Permission.Type type
+        ) implements PermissionSetting {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Floodgate(
                 String name,
                 Permission.Type type
         ) implements PermissionSetting {}

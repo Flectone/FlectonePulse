@@ -9,6 +9,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.floodgate.FloodgateModule;
 import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
@@ -73,6 +74,10 @@ public abstract class IntegrationModule extends AbstractModule {
             }
         }
 
+        if (platformServerAdapter.hasProject("floodgate")) {
+            addChild(FloodgateModule.class);
+        }
+
         if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
                 addChild(GeyserModule.class);
@@ -118,6 +123,10 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (!isEnable()) return false;
+
+        if (containsChild(FloodgateModule.class)) {
+            return injector.getInstance(FloodgateModule.class).isBedrockPlayer(fPlayer);
+        }
 
         if (containsChild(GeyserModule.class)) {
             return injector.getInstance(GeyserModule.class).isBedrockPlayer(fPlayer);

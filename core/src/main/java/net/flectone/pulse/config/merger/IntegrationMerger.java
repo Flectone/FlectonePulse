@@ -10,6 +10,7 @@ public interface IntegrationMerger {
     @Mapping(target = "libertybans", expression = "java(mergeLibertybans(target.build().libertybans().toBuilder(), source.libertybans()))")
     @Mapping(target = "deepl", expression = "java(mergeDeepl(target.build().deepl().toBuilder(), source.deepl()))")
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
+    @Mapping(target = "floodgate", expression = "java(mergeFloodgate(target.build().floodgate().toBuilder(), source.floodgate()))")
     @Mapping(target = "geyser", expression = "java(mergeGeyser(target.build().geyser().toBuilder(), source.geyser()))")
     @Mapping(target = "interactivechat", expression = "java(mergeInteractivechat(target.build().interactivechat().toBuilder(), source.interactivechat()))")
     @Mapping(target = "itemsadder", expression = "java(mergeItemsadder(target.build().itemsadder().toBuilder(), source.itemsadder()))")
@@ -48,6 +49,8 @@ public interface IntegrationMerger {
     Integration.Discord.Presence.Activity mergeActivity(@MappingTarget Integration.Discord.Presence.Activity.ActivityBuilder target, Integration.Discord.Presence.Activity activity);
 
     Integration.ChannelInfo mergeChannelInfo(@MappingTarget Integration.ChannelInfo.ChannelInfoBuilder target, Integration.ChannelInfo channelInfo);
+
+    Integration.Floodgate mergeFloodgate(@MappingTarget Integration.Floodgate.FloodgateBuilder target, Integration.Floodgate floodgate);
 
     Integration.Geyser mergeGeyser(@MappingTarget Integration.Geyser.GeyserBuilder target, Integration.Geyser geyser);
 

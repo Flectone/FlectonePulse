@@ -38,6 +38,8 @@ discord:
     - "123456"
   destination:
     type: "CHAT"
+floodgate:
+  enable: true
 geyser:
   enable: true
 interactivechat:

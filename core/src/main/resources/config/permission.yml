@@ -522,6 +522,9 @@ integration:
   discord:
     name: "flectonepulse.module.integration.discord"
     type: "TRUE"
+  floodgate:
+    name: "flectonepulse.module.integration.floodgate"
+    type: "TRUE"
   geyser:
     name: "flectonepulse.module.integration.geyser"
     type: "TRUE"
