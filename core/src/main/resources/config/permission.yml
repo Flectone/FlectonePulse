@@ -616,6 +616,7 @@ message:
   bossbar:
     name: "flectonepulse.module.message.bossbar"
     type: "TRUE"
+    types: {}
   brand:
     name: "flectonepulse.module.message.brand"
     type: "TRUE"
