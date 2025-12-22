@@ -39,25 +39,25 @@ public class MessagePulseListener implements PulseListener {
         Destination destination = event.getEventMetadata().getDestination();
 
         // fallback for legacy versions
-        if (destination.getType() == Destination.Type.TEXT_SCREEN && !isNewerThanOrEqualsV_1_19_4) {
+        if (destination.type() == Destination.Type.TEXT_SCREEN && !isNewerThanOrEqualsV_1_19_4) {
             destination = new Destination(Destination.Type.TITLE);
         }
 
-        if (fReceiver.isConsole() && destination.getType() != Destination.Type.CHAT) {
+        if (fReceiver.isConsole() && destination.type() != Destination.Type.CHAT) {
             messageSender.sendToConsole(message);
             return;
         }
 
-        switch (destination.getType()) {
-            case TITLE -> titleRender.render(fReceiver, message, event.getSubmessage(), destination.getTimes());
-            case SUBTITLE -> titleRender.render(fReceiver, event.getSubmessage(), message, destination.getTimes());
-            case ACTION_BAR -> actionBarRender.render(fReceiver, message, destination.getTimes().stayTicks());
-            case BOSS_BAR -> bossBarRender.render(fReceiver, message, destination.getBossBar());
+        switch (destination.type()) {
+            case TITLE -> titleRender.render(fReceiver, message, event.getSubmessage(), destination.times());
+            case SUBTITLE -> titleRender.render(fReceiver, event.getSubmessage(), message, destination.times());
+            case ACTION_BAR -> actionBarRender.render(fReceiver, message, destination.times().stayTicks());
+            case BOSS_BAR -> bossBarRender.render(fReceiver, message, destination.bossBar());
             case TAB_HEADER -> listFooterRender.render(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));
             case TAB_FOOTER -> listFooterRender.render(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
-            case TOAST -> toastRender.render(fReceiver, message, destination.getToast());
+            case TOAST -> toastRender.render(fReceiver, message, destination.toast());
             case BRAND -> brandRender.render(fReceiver, message);
-            case TEXT_SCREEN -> textScreenRender.render(fReceiver, message, destination.getTextScreen());
+            case TEXT_SCREEN -> textScreenRender.render(fReceiver, message, destination.textScreen());
             default -> messageSender.sendMessage(fReceiver, message, false);
         }
     }

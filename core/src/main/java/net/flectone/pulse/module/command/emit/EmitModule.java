@@ -165,7 +165,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
             return Destination.fromJson(destination);
         } catch (Exception ignored) {
-            return new Destination();
+            return Destination.DEFAULT_CHAT;
         }
     }
 
@@ -243,7 +243,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     public String parseMessage(Destination destination, String string) {
         int startIndexBracket = string.indexOf("{");
         if (startIndexBracket == -1) {
-            String typeName = destination.getType().name();
+            String typeName = destination.type().name();
             if (string.startsWith(typeName + " ")) {
                 return string.substring(typeName.length()).trim();
             }

@@ -51,7 +51,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         super.onDisable();
 
         // clear tab
-        Destination.Type destinationType = config().destination().getType();
+        Destination.Type destinationType = config().destination().type();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
         }

@@ -144,8 +144,8 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
             // destination subtext
             Component subComponent = Component.empty();
             Destination destination = eventMetadata.getDestination();
-            if (destination.getType() == Destination.Type.TITLE
-                    || destination.getType() == Destination.Type.SUBTITLE) {
+            if (destination.type() == Destination.Type.TITLE
+                    || destination.type() == Destination.Type.SUBTITLE) {
                 subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
             }
 
@@ -165,9 +165,9 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
     private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
         Destination destination = eventMetadata.getDestination();
-        return destination.getSubtext().isEmpty()
+        return destination.subtext().isEmpty()
                 ? Component.empty()
-                : messagePipeline.builder(eventMetadata.getSender(), receiver, destination.getSubtext())
+                : messagePipeline.builder(eventMetadata.getSender(), receiver, destination.subtext())
                 .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .tagResolvers(messageTag(message))
                 .build();

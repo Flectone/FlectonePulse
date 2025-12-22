@@ -679,7 +679,7 @@ public record Message(
 
             @Override
             public Destination destination() {
-                return destination != null ? destination : new Destination();
+                return destination != null ? destination : Destination.DEFAULT_CHAT;
             }
 
             @Override
@@ -708,7 +708,7 @@ public record Message(
                     result.put("range", range);
                 }
 
-                if (destination != null && destination.getType() != Destination.Type.CHAT) {
+                if (destination != null && destination.type() != Destination.Type.CHAT) {
                     result.put("destination", destination);
                 }
 
