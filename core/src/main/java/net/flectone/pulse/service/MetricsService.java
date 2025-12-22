@@ -30,32 +30,33 @@ public class MetricsService {
     }
 
     public void send() {
-        MetricsDTO metricsDTO = new MetricsDTO();
-
-        metricsDTO.setServerUUID(platformServerAdapter.getServerUUID());
-        metricsDTO.setServerCore(platformServerAdapter.getServerCore());
-        metricsDTO.setServerVersion(packetProvider.getServerVersion().getReleaseName());
-
-        metricsDTO.setOsName(getOsName());
-        metricsDTO.setOsArchitecture(getOsArch());
-        metricsDTO.setOsVersion(getOsVersion());
-
-        metricsDTO.setJavaVersion(getJavaVersion());
-        metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
-        metricsDTO.setTotalRAM(Runtime.getRuntime().maxMemory());
-
         Config config = fileFacade.config();
 
-        metricsDTO.setProjectVersion(config.version());
-        metricsDTO.setProjectLanguage(config.language().type());
-        metricsDTO.setOnlineMode(platformServerAdapter.isOnlineMode() ? "True" : "False");
-        metricsDTO.setProxyMode(getProxyMode());
-        metricsDTO.setDatabaseMode(config.database().type().name());
-        metricsDTO.setPlayerCount(platformServerAdapter.getOnlinePlayerCount());
-        metricsDTO.setModules(moduleController.collectModuleStatuses());
-        metricsDTO.setCreatedAt(Instant.now().toString());
+        MetricsDTO metricsDTO = MetricsDTO.builder()
+                .serverUUID(platformServerAdapter.getServerUUID())
+                .serverCore(platformServerAdapter.getServerCore())
+                .serverVersion(packetProvider.getServerVersion().getReleaseName())
+                .osName(getOsName())
+                .osArchitecture(getOsArch())
+                .osVersion(getOsVersion())
+                .javaVersion(getJavaVersion())
+                .cpuCores(Runtime.getRuntime().availableProcessors())
+                .totalRAM(Runtime.getRuntime().maxMemory())
+                .projectVersion(config.version())
+                .projectLanguage(config.language().type())
+                .onlineMode(booleanToString(platformServerAdapter.isOnlineMode()))
+                .proxyMode(getProxyMode())
+                .databaseMode(config.database().type().name())
+                .playerCount(platformServerAdapter.getOnlinePlayerCount())
+                .modules(moduleController.collectModuleStatuses())
+                .createdAt(Instant.now().toString())
+                .build();
 
         metricsSender.sendMetrics(metricsDTO);
+    }
+
+    private String booleanToString(boolean value) {
+        return value ? "True" : "False";
     }
 
     private String getProxyMode() {
