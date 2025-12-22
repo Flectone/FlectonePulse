@@ -110,7 +110,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         } else {
             moderationService.getValidBans(fTarget)
                     .stream()
-                    .filter(moderation -> moderation.getId() == id)
+                    .filter(moderation -> moderation.id() == id)
                     .findAny()
                     .ifPresent(bans::add);
         }

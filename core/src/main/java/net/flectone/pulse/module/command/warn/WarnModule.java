@@ -124,7 +124,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         if (warns.isEmpty()) return;
 
         int countWarns = warns.stream()
-                .filter(moderation -> moderation.isValid() && !moderation.isExpired())
+                .filter(Moderation::isActive)
                 .toList().size();
 
         String action = config().actions().get(countWarns);

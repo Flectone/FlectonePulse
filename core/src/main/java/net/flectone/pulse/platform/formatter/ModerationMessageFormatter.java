@@ -46,17 +46,17 @@ public class ModerationMessageFormatter {
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
         Localization localization = fileFacade.localization(fReceiver);
 
-        Localization.ReasonMap constantReasons = switch (moderation.getType()) {
+        Localization.ReasonMap constantReasons = switch (moderation.type()) {
             case BAN -> localization.command().ban().reasons();
             case MUTE -> localization.command().mute().reasons();
             case WARN -> localization.command().warn().reasons();
             case KICK -> localization.command().kick().reasons();
         };
 
-        FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
-        FPlayer fModerator = fPlayerService.getFPlayer(moderation.getModerator());
-        String reason = constantReasons.getConstant(moderation.getReason());
-        String date = timeFormatter.formatDate(moderation.getDate());
+        FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
+        FPlayer fModerator = fPlayerService.getFPlayer(moderation.moderator());
+        String reason = constantReasons.getConstant(moderation.reason());
+        String date = timeFormatter.formatDate(moderation.date());
         String time = moderation.isPermanent()
                 ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.getOriginalTime());
@@ -65,7 +65,7 @@ public class ModerationMessageFormatter {
                 : timeFormatter.format(fReceiver, moderation.getRemainingTime());
 
         return replacePlaceholders(message, fTarget.getName(), fModerator.getName(),
-                String.valueOf(moderation.getId()), reason, date, time, timeLeft
+                String.valueOf(moderation.id()), reason, date, time, timeLeft
         );
     }
 

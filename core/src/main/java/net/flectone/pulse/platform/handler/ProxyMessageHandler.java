@@ -265,7 +265,7 @@ public class ProxyMessageHandler {
 
         Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
 
-        FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
+        FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.kick(fModerator, (FPlayer) fEntity, ban);
@@ -433,7 +433,7 @@ public class ProxyMessageHandler {
 
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
-        FPlayer fModerator = fPlayerService.getFPlayer(mute.getModerator());
+        FPlayer fModerator = fPlayerService.getFPlayer(mute.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
@@ -641,7 +641,7 @@ public class ProxyMessageHandler {
 
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
-        FPlayer fModerator = fPlayerService.getFPlayer(warn.getModerator());
+        FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
@@ -663,7 +663,7 @@ public class ProxyMessageHandler {
 
         Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
 
-        FPlayer fModerator = fPlayerService.getFPlayer(kick.getModerator());
+        FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()

@@ -45,7 +45,7 @@ public class BanPulseListener implements PulseListener {
 
         Moderation ban = bans.getFirst();
 
-        FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
+        FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
 
         fPlayerService.loadColors(fPlayer);
 

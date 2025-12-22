@@ -109,7 +109,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
             mutes.addAll(moderationService.getValidMutes(fTarget));
         } else {
             moderationService.getValidMutes(fTarget).stream()
-                    .filter(moderation -> moderation.getId() == id)
+                    .filter(moderation -> moderation.id() == id)
                     .findAny()
                     .ifPresent(mutes::add);
         }

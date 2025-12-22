@@ -136,7 +136,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unmuteModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);

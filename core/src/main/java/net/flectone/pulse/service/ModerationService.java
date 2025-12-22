@@ -100,11 +100,10 @@ public class ModerationService {
     public void remove(FPlayer fPlayer, List<Moderation> moderations) {
         if (moderations.isEmpty()) return;
 
-        moderationRepository.invalidate(fPlayer.getUuid(), moderations.getFirst().getType());
+        moderationRepository.invalidate(fPlayer.getUuid(), moderations.getFirst().type());
 
         for (Moderation moderation : moderations) {
-            moderation.setInvalid();
-            moderationRepository.updateValid(moderation);
+            moderationRepository.updateValid(moderation.withValid(false));
         }
     }
 

@@ -85,6 +85,6 @@ public class ModerationDAO extends BaseDAO<ModerationSQL> {
     }
 
     public void updateValid(Moderation moderation) {
-        useHandle(sql -> sql.invalidate(moderation.getId()));
+        useHandle(sql -> sql.invalidate(moderation.id()));
     }
 }

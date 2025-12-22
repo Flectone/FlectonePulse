@@ -136,7 +136,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);

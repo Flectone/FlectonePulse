@@ -135,7 +135,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 .append(Component.newline());
 
         for (Moderation moderation : finalModerationList) {
-            FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unbanModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);

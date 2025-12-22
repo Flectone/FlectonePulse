@@ -109,7 +109,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
             warns.addAll(moderationService.getValidWarns(fTarget));
         } else {
             moderationService.getValidWarns(fTarget).stream()
-                    .filter(warn -> warn.getId() == id)
+                    .filter(warn -> warn.id() == id)
                     .findAny()
                     .ifPresent(warns::add);
         }
