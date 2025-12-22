@@ -48,8 +48,8 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         super.onEnable();
 
         Ticker ticker = config().ticker();
-        if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
+        if (ticker.enable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.period());
         }
 
         listenerRegistry.register(SidebarPulseListener.class);

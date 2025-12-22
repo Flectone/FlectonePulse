@@ -46,7 +46,7 @@ public class ScoreboardModule extends AbstractModule {
         super.onEnable();
 
         Ticker ticker = config().ticker();
-        if (ticker.isEnable()) {
+        if (ticker.enable()) {
             taskScheduler.runAsyncTimer(() -> uuidTeamMap.keySet().forEach(uuid -> {
                 FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
@@ -57,7 +57,7 @@ public class ScoreboardModule extends AbstractModule {
                 // update info
                 uuidTeamMap.put(uuid, newTeam);
 
-            }), ticker.getPeriod());
+            }), ticker.period());
         }
 
         listenerRegistry.register(ScoreboardPulseListener.class);

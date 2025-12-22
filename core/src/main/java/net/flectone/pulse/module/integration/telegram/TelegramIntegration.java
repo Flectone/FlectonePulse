@@ -59,8 +59,8 @@ public class TelegramIntegration implements FIntegration {
 
             Integration.ChannelInfo channelInfo = config().channelInfo();
 
-            if (channelInfo.enable() && channelInfo.ticker().isEnable()) {
-                long period = channelInfo.ticker().getPeriod();
+            if (channelInfo.enable() && channelInfo.ticker().enable()) {
+                long period = channelInfo.ticker().period();
                 taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
                 updateChannelInfo();
             }

@@ -2,23 +2,13 @@ package net.flectone.pulse.model.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Getter
-@AllArgsConstructor
-public class Ticker {
+public record Ticker(boolean enable, long period) {
 
-    private final boolean enable;
-    private final long period;
-
-    public Ticker() {
-        this.enable = false;
-        this.period = 100L;
-    }
+    public static final Ticker DEFAULT = new Ticker(false, 100L);
 
     @JsonValue
     public Map<String, Object> toJson() {
@@ -35,7 +25,7 @@ public class Ticker {
     @JsonCreator
     public static Ticker fromJson(Map<String, Object> map) {
         boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
-        if (!isEnable) return new Ticker();
+        if (!isEnable) return DEFAULT;
 
         Object period = map.get("period");
         long longPeriod = period == null ? 100L : Long.parseLong(String.valueOf(period));

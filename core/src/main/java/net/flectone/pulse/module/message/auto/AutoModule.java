@@ -39,8 +39,8 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
             Pair<Sound, PermissionSetting> sound = Pair.of(value.sound(), permission().types().get(key));
 
             Ticker ticker = value.ticker();
-            if (ticker.isEnable()) {
-                taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.getPeriod());
+            if (ticker.enable()) {
+                taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.period());
             }
         });
     }

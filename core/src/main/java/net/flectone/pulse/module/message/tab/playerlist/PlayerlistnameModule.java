@@ -73,8 +73,8 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 
         Ticker ticker = config().ticker();
-        if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
+        if (ticker.enable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.period());
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);

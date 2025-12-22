@@ -51,8 +51,8 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     public void onEnable() {
         super.onEnable();
 
-        if (config().ticker().isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), config().ticker().getPeriod());
+        if (config().ticker().enable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), config().ticker().period());
         }
 
         listenerRegistry.register(AfkPulseListener.class);

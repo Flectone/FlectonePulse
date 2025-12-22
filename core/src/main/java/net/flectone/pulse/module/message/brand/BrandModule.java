@@ -34,8 +34,8 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         super.onEnable();
 
         Ticker ticker = config().ticker();
-        if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
+        if (ticker.enable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.period());
         }
 
         listenerRegistry.register(BrandPulseListener.class);
