@@ -704,7 +704,7 @@ public record Message(
                     result.put("multi_message", true);
                 }
 
-                if (range != null && range.getType() != Range.Type.PLAYER) {
+                if (range != null && range.type() != Range.Type.PLAYER) {
                     result.put("range", range);
                 }
 

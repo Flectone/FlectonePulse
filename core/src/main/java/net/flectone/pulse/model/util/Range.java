@@ -2,36 +2,37 @@ package net.flectone.pulse.model.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-@Getter
-public class Range {
+public record Range(int value, Type type) {
 
-    private static final Map<Type, Range> DEFAULT_RANGES = new EnumMap<>(Type.class);
+    private static final Map<Type, Range> DEFAULT_RANGES = EnumSet.allOf(Type.class).stream()
+                    .filter(type -> type != Type.BLOCKS)
+                    .collect(Collectors.toMap(
+                            Function.identity(),
+                            Range::new,
+                            (a, b) -> a,
+                            () -> new EnumMap<>(Type.class)
+                    ));
 
-    static {
-        Arrays.stream(Type.values())
-                .filter(enumType -> enumType != Type.BLOCKS)
-                .forEach(enumType -> DEFAULT_RANGES.put(enumType, new Range(enumType)));
+    public Range {
+        if (value < 0 && type == Type.BLOCKS) {
+            throw new IllegalArgumentException("Block range cannot be negative: " + value);
+        }
     }
 
-    private final int value;
-    private final Type type;
-
     public Range(int value) {
-        if (value < 0) throw new IllegalArgumentException("Block range cannot be negative: " + value);
-
-        this.value = value;
-        this.type = Type.BLOCKS;
+        this(value, Type.BLOCKS);
     }
 
     public Range(Type type) {
-        this.value = type.value;
-        this.type = type;
+        this(type.value, type);
     }
 
     public boolean is(Type type) {
@@ -69,7 +70,6 @@ public class Range {
             if (type == Range.Type.BLOCKS) {
                 return new Range(value);
             }
-
             return new Range(type);
         } catch (NumberFormatException e) {
             Range.Type type = Range.Type.fromString(string);
@@ -106,5 +106,4 @@ public class Range {
                     .orElseThrow(() -> new IllegalArgumentException("Unknown range type: " + string));
         }
     }
-
 }

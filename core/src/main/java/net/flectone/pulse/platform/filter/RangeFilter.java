@@ -30,8 +30,8 @@ public class RangeFilter {
             if (fReceiver.isUnknown()) return true;
             if (fReceiver.isIgnored(fPlayer)) return false;
 
-            return switch (range.getType()) {
-                case BLOCKS -> checkDistance(fPlayer, fReceiver, range.getValue());
+            return switch (range.type()) {
+                case BLOCKS -> checkDistance(fPlayer, fReceiver, range.value());
                 case WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
                 case WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
                 default -> true;
