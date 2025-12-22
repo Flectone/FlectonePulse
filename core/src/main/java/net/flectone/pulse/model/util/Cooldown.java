@@ -11,9 +11,7 @@ public record Cooldown(
         long duration
 ) {
 
-    public Cooldown() {
-        this(false, 60L);
-    }
+    public static final Cooldown DEFAULT = new Cooldown(false, 60L);
 
     @JsonValue
     public Map<String, Object> toJson() {
@@ -30,7 +28,7 @@ public record Cooldown(
     @JsonCreator
     public static Cooldown fromJson(Map<String, Object> map) {
         boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
-        if (!isEnable) return new Cooldown();
+        if (!isEnable) return DEFAULT;
 
         Object duration = map.get("duration");
         long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
