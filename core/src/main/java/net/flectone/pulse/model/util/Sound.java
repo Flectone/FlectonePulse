@@ -18,9 +18,7 @@ public record Sound(
         com.github.retrooper.packetevents.protocol.sound.Sound packet
 ) {
 
-    public Sound() {
-        this(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell", Sounds.getByNameOrCreate("minecraft:block.note_block.bell"));
-    }
+    public static final Sound DEFAULT = new Sound(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell", Sounds.getByNameOrCreate("minecraft:block.note_block.bell"));
 
     @JsonValue
     public Map<String, Object> toJson() {
@@ -40,7 +38,7 @@ public record Sound(
     @JsonCreator
     public static Sound fromJson(Map<String, Object> map) {
         boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
-        if (!isEnable) return new Sound();
+        if (!isEnable) return DEFAULT;
 
         Object volume = map.get("volume");
         float floatVolume = volume == null ? 1f : Float.parseFloat(String.valueOf(volume));
@@ -59,4 +57,5 @@ public record Sound(
 
         return new Sound(true, floatVolume, floatPitch, stringCategory, stringName, Sounds.getByNameOrCreate(stringName));
     }
+
 }

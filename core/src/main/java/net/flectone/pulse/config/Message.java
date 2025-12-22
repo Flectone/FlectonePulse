@@ -684,7 +684,7 @@ public record Message(
 
             @Override
             public Sound sound() {
-                return sound != null ? sound : new Sound();
+                return sound != null ? sound : Sound.DEFAULT;
             }
 
             @Override
