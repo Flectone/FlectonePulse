@@ -162,7 +162,7 @@ format:
       enable: true
       volume: 0.1
       pitch: 0.1
-      category: "NEUTRAL"
+      category: "BLOCK"
       name: "minecraft:entity.experience_orb.pickup"
   moderation:
     enable: true
