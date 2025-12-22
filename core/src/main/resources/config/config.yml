@@ -65,6 +65,10 @@ logger:
   - "FlectonePulseDatabase - "
 cache:
   types:
+    COOLDOWN:
+      duration: 5
+      time_unit: "HOURS"
+      size: 5000
     DIALOG_CLICK:
       duration: 1
       time_unit: "SECONDS"

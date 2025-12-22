@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.file.FilePack;
+import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.constant.DefaultLocalization;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Singleton
@@ -456,6 +458,8 @@ public class FileMigrator {
 
             vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
         }
+
+        files.config().cache().types().put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(5, TimeUnit.HOURS, 5000));
 
         return files.withMessage(files.message().withVanilla(files.message().vanilla().withTypes(vanillaMessages)));
     }

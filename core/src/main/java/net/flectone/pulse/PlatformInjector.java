@@ -24,6 +24,8 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.checker.CooldownChecker;
+import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -118,54 +120,59 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_9")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9));
     }
 
+    @Provides @Singleton @Named("cooldown")
+    public Cache<CooldownChecker.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.COOLDOWN);
+    }
+
     @Provides @Singleton @Named("offlinePlayers")
     public Cache<UUID, FPlayer> provideOfflinePlayersCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getOfflinePlayersCache();
+        return cacheRegistry.getCache(CacheName.OFFLINE_PLAYERS);
     }
 
     @Provides @Singleton @Named("profileProperty")
     public Cache<UUID, PlayerHeadObjectContents.ProfileProperty> provideProfilePropertyCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getProfilePropertyCache();
+        return cacheRegistry.getCache(CacheName.PROFILE_PROPERTY);
     }
 
     @Provides @Singleton @Named("dialogClick")
     public Cache<UUID, AtomicInteger> provideDialogClickCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getDialogClickCache();
+        return cacheRegistry.getCache(CacheName.DIALOG_CLICK);
     }
 
     @Provides @Singleton @Named("moderation")
     public Cache<Pair<UUID, Moderation.Type>, List<Moderation>> provideModerationCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getModerationCache();
+        return cacheRegistry.getCache(CacheName.MODERATION);
     }
 
     @Provides @Singleton @Named("legacyColorMessage")
     public Cache<String, String> provideLegacyColorMessageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getLegacyColorMessageCache();
+        return cacheRegistry.getCache(CacheName.LEGACY_COLOR_MESSAGE);
     }
 
     @Provides @Singleton @Named("mentionMessage")
     public Cache<String, String> provideMentionMessageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getMentionMessageCache();
+        return cacheRegistry.getCache(CacheName.MENTION_MESSAGE);
     }
 
     @Provides @Singleton @Named("swearMessage")
     public Cache<String, String> provideSwearMessageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getSwearMessageCache();
+        return cacheRegistry.getCache(CacheName.SWEAR_MESSAGE);
     }
 
     @Provides @Singleton @Named("replacementMessage")
     public Cache<String, String> provideReplacementMessageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getReplacementMessageCache();
+        return cacheRegistry.getCache(CacheName.REPLACEMENT_MESSAGE);
     }
 
     @Provides @Singleton @Named("replacementImage")
     public Cache<String, Component> provideReplacementImageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getReplacementImageCache();
+        return cacheRegistry.getCache(CacheName.REPLACEMENT_IMAGE);
     }
 
     @Provides @Singleton @Named("translateMessage")
     public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
-        return cacheRegistry.getTranslateMessageCache();
+        return cacheRegistry.getCache(CacheName.TRANSLATE_MESSAGE);
     }
 
     private void setupInterceptors() {
