@@ -1,10 +1,12 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
@@ -25,8 +27,6 @@ public class MiniPlaceholdersModule extends AbstractModule {
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().use());
-
         miniPlaceholdersIntegration.hookLater();
 
         listenerRegistry.register(MessageFormattingEvent.class, Event.Priority.HIGH, event -> {
@@ -38,6 +38,11 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
             miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
         });
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().use());
     }
 
     @Override

@@ -53,8 +53,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().join());
-
         listenerRegistry.register(MaintenancePacketListener.class);
         listenerRegistry.register(MaintenancePulseListener.class);
 
@@ -73,6 +71,12 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission().name())
         );
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().join());
     }
 
     @Override

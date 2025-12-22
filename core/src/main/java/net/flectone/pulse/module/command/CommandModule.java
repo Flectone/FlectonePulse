@@ -109,10 +109,8 @@ public class CommandModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        super.onEnable();
-
-        registerPermission(fileFacade.permission().command().seeInvisiblePlayersInSuggest());
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format.moderation.swear;
 
 import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -49,9 +51,6 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().bypass());
-        registerPermission(permission().see());
-
         try {
             combinedPattern = Pattern.compile(String.join("|", config().trigger()));
         } catch (PatternSyntaxException e) {
@@ -59,6 +58,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         }
 
         listenerRegistry.register(SwearPulseListener.class);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().see(), permission().bypass());
     }
 
     @Override

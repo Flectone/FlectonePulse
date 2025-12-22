@@ -43,6 +43,11 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().addAll(permission().types().values());
+    }
+
+    @Override
     public MessageType messageType() {
         return MessageType.AUTO;
     }

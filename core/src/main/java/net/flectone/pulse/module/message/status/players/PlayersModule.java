@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.message.status.players;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -30,9 +32,13 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     @Override
     public void onEnable() {
         super.onEnable();
-        registerPermission(permission().bypass());
 
         listenerRegistry.register(PlayersPulseListener.class);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().bypass());
     }
 
     @Override

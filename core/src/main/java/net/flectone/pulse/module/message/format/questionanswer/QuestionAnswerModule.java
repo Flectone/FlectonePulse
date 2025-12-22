@@ -72,6 +72,18 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     }
 
     @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .addAll(permission().questions().values().stream().flatMap(question ->
+                        Stream.of(
+                                question,
+                                question.sound(),
+                                question.cooldownBypass()
+                        )).toList()
+                );
+    }
+
+    @Override
     public void onDisable() {
         super.onDisable();
 

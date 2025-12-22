@@ -1,14 +1,12 @@
 package net.flectone.pulse.module;
 
-import com.google.inject.Inject;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.flectone.pulse.config.setting.EnableSetting;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.platform.registry.PermissionRegistry;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -23,25 +21,17 @@ public abstract class AbstractModule {
     private final Set<Class<? extends AbstractModule>> children = new LinkedHashSet<>();
     private final List<BiPredicate<FEntity, Boolean>> predicates = new ArrayList<>();
 
-    @Inject
-    private PermissionRegistry permissionRegistry;
-
-    @Nullable
-    private String modulePermission;
-
     @Setter
     private boolean enable;
 
     protected AbstractModule() {
     }
 
-    public void onEnable() {
-        PermissionSetting permission = permission();
-
-        registerPermission(permission);
-
-        this.modulePermission = permission.name();
+    public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
+        return ImmutableList.<PermissionSetting>builder().add(permission());
     }
+
+    public void onEnable() {}
 
     public void onDisable() {}
 
@@ -50,16 +40,6 @@ public abstract class AbstractModule {
     public abstract EnableSetting config();
 
     public abstract PermissionSetting permission();
-
-    public void registerPermission(PermissionSetting permission) {
-        if (permission == null) return;
-
-        registerPermission(permission.name(), permission.type());
-    }
-
-    public void registerPermission(String name, Permission.Type type) {
-        permissionRegistry.register(name, type);
-    }
 
     public void addChild(Class<? extends AbstractModule> clazz) {
         children.add(clazz);

@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.command.helper;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -34,13 +36,17 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().see());
-
         String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().see());
     }
 
     @Override
@@ -83,7 +89,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .filter(filter)
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

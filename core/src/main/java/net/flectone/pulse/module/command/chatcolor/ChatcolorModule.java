@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.chatcolor;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -8,6 +9,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,10 +17,10 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -40,9 +42,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().other());
-        permission().colors().values().forEach(this::registerPermission);
-
         String promptType = addPrompt(0, Localization.Command.Prompt::type);
         String promptColor = addPrompt(1, Localization.Command.Prompt::color);
         String promptPlayer = addPrompt(2, Localization.Command.Prompt::player);
@@ -57,6 +56,13 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
             return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()));
         });
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().other())
+                .addAll(permission().colors().values());
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -191,7 +197,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::format)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

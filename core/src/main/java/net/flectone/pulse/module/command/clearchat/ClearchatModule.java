@@ -35,13 +35,17 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().other());
-
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
         registerCommand(commandBuilder -> commandBuilder
                         .permission(permission().name())
                         .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission().other()))
         );
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().other());
     }
 
     @Override

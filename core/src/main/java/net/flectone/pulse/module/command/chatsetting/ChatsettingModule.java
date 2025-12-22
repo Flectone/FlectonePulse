@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.chatsetting;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -53,8 +55,6 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     public void onEnable() {
         super.onEnable();
 
-        permission().settings().values().forEach(this::registerPermission);
-
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
         String promptType = addPrompt(1, Localization.Command.Prompt::type);
         String promptValue = addPrompt(2, Localization.Command.Prompt::value);
@@ -64,6 +64,13 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().other())
+                .addAll(permission().settings().values());
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {

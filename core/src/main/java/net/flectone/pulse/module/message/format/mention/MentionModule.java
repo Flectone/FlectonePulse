@@ -50,12 +50,12 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().sound(), permission().sound());
-
-        registerPermission(permission().group());
-        registerPermission(permission().bypass());
-
         listenerRegistry.register(MentionPulseListener.class);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
     }
 
     @Override

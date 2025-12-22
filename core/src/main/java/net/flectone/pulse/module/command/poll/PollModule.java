@@ -58,8 +58,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().create());
-
         String promptTime = addPrompt(0, Localization.Command.Prompt::time);
         String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::repeatTime);
         String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::multipleVote);
@@ -122,6 +120,12 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
             toRemove.forEach(pollMap::remove);
         }, 20L);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().create());
     }
 
     @Override

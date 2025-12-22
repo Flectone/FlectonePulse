@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.message.format;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -24,11 +26,11 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -70,10 +72,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         super.onEnable();
 
-        registerPermission(permission().legacyColors());
-
-        config().adventureTags().forEach(adventureTag -> registerPermission(permission().adventureTags().get(adventureTag)));
-
         putAdventureTag(AdventureTag.HOVER, StandardTags.hoverEvent());
         putAdventureTag(AdventureTag.CLICK, StandardTags.clickEvent());
         putAdventureTag(AdventureTag.COLOR, StandardTags.color());
@@ -99,6 +97,13 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         if (config().convertLegacyColor()) {
             listenerRegistry.register(LegacyColorPulseListener.class);
         }
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .add(permission().legacyColors())
+                .addAll(permission().adventureTags().values());
     }
 
     @Override

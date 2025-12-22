@@ -1,10 +1,12 @@
 package net.flectone.pulse.module.message.format.moderation.caps;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.listener.CapsPulseListener;
@@ -28,6 +30,11 @@ public class CapsModule extends AbstractModule {
         super.onEnable();
 
         listenerRegistry.register(CapsPulseListener.class);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder().add(permission().bypass());
     }
 
     @Override

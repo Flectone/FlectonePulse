@@ -79,11 +79,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Override
-    public void onDisable() {
-        super.onDisable();
-
-        cooldownMap.clear();
-        soundMap.clear();
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return super.permissionBuilder()
+                .addAll(permission().types().values())
+                .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::sound).toList())
+                .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::cooldownBypass).toList());
     }
 
     @Override
