@@ -1,7 +1,5 @@
 package net.flectone.pulse.model.util;
 
-import lombok.Getter;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,21 +11,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
-public class FImage {
-
-    private final String urlString;
-    private final String name;
-
-    public FImage(String urlString) {
-        this.urlString = urlString;
-        this.name = urlString.substring(urlString.lastIndexOf('/')+1);
-    }
+public record FImage(String link) {
 
     // Idea taken from here
     // https://github.com/QuiltServerTools/BlockBot/blob/5d5fa854002de2c12200edbe22f12382350ca7eb/src/main/kotlin/io/github/quiltservertools/blockbotdiscord/extensions/BlockBotApiExtension.kt#L136
     public List<String> convertImageUrl() throws IOException, URISyntaxException {
-        URL url = new URI(urlString).toURL();
+        URL url = new URI(link).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
