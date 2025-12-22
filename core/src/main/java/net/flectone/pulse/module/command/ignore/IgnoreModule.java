@@ -91,7 +91,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                 .ignore(metadataIgnore)
                 .ignored(optionalIgnore.isEmpty())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

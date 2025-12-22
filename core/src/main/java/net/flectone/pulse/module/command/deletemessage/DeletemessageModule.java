@@ -63,7 +63,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 .format(Localization.Command.Deletemessage::format)
                 .deletedUUID(uuid)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

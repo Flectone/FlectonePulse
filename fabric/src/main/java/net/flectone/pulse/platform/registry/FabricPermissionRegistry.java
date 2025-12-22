@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Permission;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,9 @@ public class FabricPermissionRegistry implements PermissionRegistry {
 
     @Override
     public void register(String name, Permission.Type type) {
+        if (StringUtils.isEmpty(name)) return;
+        if (type == null) return;
+
         permissions.put(name, type.ordinal());
     }
 

@@ -4,46 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Getter
-public class Sound {
-
-    private final boolean enable;
-    private final float volume;
-    private final float pitch;
-    private final SoundCategory category;
-    private final String name;
-
-    // runtime values
-    @Setter private String permission = "";
-    private com.github.retrooper.packetevents.protocol.sound.Sound packet;
-
-    public Sound(boolean enable, float volume, float pitch, SoundCategory category, String name) {
-        this.enable = enable;
-        this.volume = volume;
-        this.pitch = pitch;
-        this.category = category;
-        this.name = name;
-    }
+public record Sound(
+        boolean enable,
+        float volume,
+        float pitch,
+        SoundCategory category,
+        String name,
+        com.github.retrooper.packetevents.protocol.sound.Sound packet
+) {
 
     public Sound() {
-        this(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell");
-    }
-
-    @NotNull
-    public com.github.retrooper.packetevents.protocol.sound.Sound getPacket() {
-        if (this.packet == null) {
-            this.packet = Sounds.getByNameOrCreate(name);
-        }
-
-        return this.packet;
+        this(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell", Sounds.getByNameOrCreate("minecraft:block.note_block.bell"));
     }
 
     @JsonValue
@@ -81,6 +57,6 @@ public class Sound {
         Object name = map.get("name");
         String stringName = name == null ? Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString() : String.valueOf(name);
 
-        return new Sound(true, floatVolume, floatPitch, stringCategory, stringName);
+        return new Sound(true, floatVolume, floatPitch, stringCategory, stringName, Sounds.getByNameOrCreate(stringName));
     }
 }

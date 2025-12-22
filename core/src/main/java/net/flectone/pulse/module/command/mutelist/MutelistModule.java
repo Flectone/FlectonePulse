@@ -156,7 +156,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_MUTELIST, fPlayer, component));
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

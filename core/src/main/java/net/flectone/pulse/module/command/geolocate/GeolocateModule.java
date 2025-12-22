@@ -88,7 +88,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                 ))
                 .response(response)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
 

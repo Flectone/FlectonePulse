@@ -1,10 +1,9 @@
 package net.flectone.pulse.module;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -24,10 +23,12 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.type.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
@@ -38,37 +39,57 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     @Inject private MessagePipeline messagePipeline;
     @Inject private EventDispatcher eventDispatcher;
 
-    @Getter private Cooldown moduleCooldown;
-    @Getter private Sound moduleSound;
-
     public abstract MessageType messageType();
 
     public abstract M localization(FEntity sender);
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        ImmutableList.Builder<PermissionSetting> builder = super.permissionBuilder();
+
+        if (permission() instanceof CooldownPermissionSetting cooldownPermission) {
+            builder.add(cooldownPermission.cooldownBypass());
+        }
+
+        if (permission() instanceof SoundPermissionSetting soundPermission) {
+            builder.add(soundPermission.sound());
+        }
+
+        return builder;
+    }
 
     public M localization() {
         return localization(FPlayer.UNKNOWN);
     }
 
-    public Sound createSound(Sound sound, PermissionSetting permission) {
-        this.moduleSound = sound;
-
-        if (permission != null) {
-            registerPermission(permission);
-            sound.setPermission(permission.name());
+    public Optional<Pair<Cooldown, PermissionSetting>> cooldown() {
+        if (config() instanceof CooldownConfigSetting cooldownSetting
+                && permission() instanceof CooldownPermissionSetting cooldownPermission) {
+            return Optional.of(Pair.of(cooldownSetting.cooldown(), cooldownPermission.cooldownBypass()));
         }
 
-        return sound;
+        return Optional.empty();
     }
 
-    public Cooldown createCooldown(Cooldown cooldown, PermissionSetting permission) {
-        this.moduleCooldown = cooldown;
+    public Pair<Cooldown, PermissionSetting> cooldownOrThrow() {
+        return cooldown().orElseThrow(() -> new IllegalStateException(
+                "Cooldown not configured for module: " + getClass().getSimpleName()
+        ));
+    }
 
-        if (permission != null) {
-            registerPermission(permission);
-            cooldown.setPermissionBypass(permission.name());
+    public Optional<Pair<Sound, PermissionSetting>> sound() {
+        if (config() instanceof SoundConfigSetting soundSetting
+                && permission() instanceof SoundPermissionSetting soundPermission) {
+            return Optional.of(Pair.of(soundSetting.sound(), soundPermission.sound()));
         }
 
-        return this.moduleCooldown;
+        return Optional.empty();
+    }
+
+    public Pair<Sound, PermissionSetting> soundOrThrow() {
+        return sound().orElseThrow(() -> new IllegalStateException(
+                "Sound not configured for module: " + getClass().getSimpleName()
+        ));
     }
 
     @SuppressWarnings("unchecked")

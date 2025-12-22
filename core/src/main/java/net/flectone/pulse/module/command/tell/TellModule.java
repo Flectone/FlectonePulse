@@ -162,7 +162,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 .format(format)
                 .destination(config().destination())
                 .message(string)
-                .sound(isSenderToSender ? null : getModuleSound())
+                .sound(isSenderToSender ? null : soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );

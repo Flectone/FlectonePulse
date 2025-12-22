@@ -78,7 +78,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                 .moderation(kick)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
                 .build()

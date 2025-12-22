@@ -56,7 +56,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
                 .range(config().range())
                 .destination(config().destination())
                 .message(message)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeInt(random);
                     dataOutputStream.writeString(message);

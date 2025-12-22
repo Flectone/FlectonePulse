@@ -59,6 +59,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.join.JoinModule;
@@ -215,7 +216,7 @@ public class ProxyMessageHandler {
                 .format(Localization.Command.Anon::format)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().anon().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .message(message)
                 .build()
         );
@@ -234,7 +235,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().me().destination())
                 .message(message)
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -254,7 +255,7 @@ public class ProxyMessageHandler {
                 .message(message)
                 .destination(fileFacade.command().ball().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -276,7 +277,7 @@ public class ProxyMessageHandler {
                 .moderation(ban)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().ban().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -294,7 +295,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().broadcast().destination())
                 .message(message)
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -326,7 +327,7 @@ public class ProxyMessageHandler {
                 .percent(percent)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().coin().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -352,7 +353,7 @@ public class ProxyMessageHandler {
                 .cubes(cubes)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().dice().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -370,7 +371,7 @@ public class ProxyMessageHandler {
                 .message(message)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().commandDo().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -391,7 +392,7 @@ public class ProxyMessageHandler {
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
-                    .sound(module.getModuleSound())
+                    .sound(module.soundOrThrow())
                     .build()
             );
         } else {
@@ -402,7 +403,7 @@ public class ProxyMessageHandler {
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
-                    .sound(module.getModuleSound())
+                    .sound(module.soundOrThrow())
                     .build()
             );
         }
@@ -421,7 +422,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().helper().destination())
                 .message(message)
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .filter(module.getFilterSee())
                 .build()
         );
@@ -442,7 +443,7 @@ public class ProxyMessageHandler {
                 .moderation(mute)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().mute().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -465,7 +466,7 @@ public class ProxyMessageHandler {
                 .moderations(bans)
                 .destination(fileFacade.command().unban().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -486,7 +487,7 @@ public class ProxyMessageHandler {
                 .moderations(mutes)
                 .destination(fileFacade.command().unmute().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -507,7 +508,7 @@ public class ProxyMessageHandler {
                 .moderations(warns)
                 .destination(fileFacade.command().unwarn().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -529,7 +530,7 @@ public class ProxyMessageHandler {
                         .poll(poll)
                         .range(Range.get(Range.Type.SERVER))
                         .message(poll.getTitle())
-                        .sound(module.getModuleSound())
+                        .sound(module.soundOrThrow())
                         .build()
                 );
             }
@@ -572,7 +573,7 @@ public class ProxyMessageHandler {
                 .urls(message)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().stream().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -610,7 +611,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().translateto().destination())
                 .message(message)
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -630,7 +631,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().commandTry().destination())
                 .message(message)
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -650,7 +651,7 @@ public class ProxyMessageHandler {
                 .moderation(warn)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.command().warn().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -672,7 +673,7 @@ public class ProxyMessageHandler {
                 .moderation(kick)
                 .destination(fileFacade.command().kick().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -725,7 +726,6 @@ public class ProxyMessageHandler {
                 .findAny();
 
         if (optionalChat.isEmpty()) return;
-
         String chatName = optionalChat.get().getKey();
         Message.Chat.Type chatType = optionalChat.get().getValue();
 
@@ -733,12 +733,13 @@ public class ProxyMessageHandler {
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(s -> s.types().get(chatName))
+                .chat(new Chat(chatName, chatType, chatModule.permission().types().get(chatName)))
                 .chatName(chatName)
                 .chatType(chatType)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(chatType.destination())
                 .message(message)
-                .sound(chatModule.getModuleSound())
+                .sound(chatModule.soundOrThrow())
                 .filter(chatModule.permissionFilter(chatName))
                 .build()
         );
@@ -794,7 +795,7 @@ public class ProxyMessageHandler {
                 .playedBefore(hasPlayedBefore)
                 .destination(message.destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -812,7 +813,7 @@ public class ProxyMessageHandler {
                 .ignoreVanish(ignoreVanish)
                 .destination(fileFacade.message().quit().destination())
                 .range(Range.get(Range.Type.SERVER))
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -833,7 +834,7 @@ public class ProxyMessageHandler {
                 .newStatus(isAfk)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileFacade.message().afk().destination())
-                .sound(module.getModuleSound())
+                .sound(module.soundOrThrow())
                 .build()
         );
     }

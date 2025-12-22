@@ -141,7 +141,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                 .moderation(ban)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream ->
                         dataOutputStream.writeAsJson(ban)
                 )

@@ -135,7 +135,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                 .moderations(warns)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(warns);

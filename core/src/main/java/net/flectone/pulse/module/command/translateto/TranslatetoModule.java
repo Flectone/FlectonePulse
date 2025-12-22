@@ -95,7 +95,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                 .range(config().range())
                 .destination(config().destination())
                 .message(translatedMessage)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeString(targetLang);
                     dataOutputStream.writeString(message);

@@ -62,7 +62,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .proxy(dataOutputStream -> {
                         // same format as 1 player
                         dataOutputStream.writeAsJson(fPlayerService.getConsole()); // proxy indicator
@@ -93,7 +93,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                 .format(Localization.Command.Emit::format)
                 .message(message)
                 .destination(destination)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fTarget);
                     dataOutputStream.writeAsJson(destination);

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.poll;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -239,7 +241,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .action(Action.CREATE)
                 .range(range)
                 .message(poll.getTitle())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeUTF(Action.CREATE.name());
                     dataOutputStream.writeAsJson(poll);

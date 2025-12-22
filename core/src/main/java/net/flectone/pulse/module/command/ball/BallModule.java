@@ -54,7 +54,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 .message(message)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeInt(answer);
                     dataOutputStream.writeString(message);

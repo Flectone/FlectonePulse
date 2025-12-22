@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
-import net.flectone.pulse.config.setting.CommandPermissionSetting;
+import net.flectone.pulse.config.setting.CooldownPermissionSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.config.setting.SoundPermissionSetting;
 import net.flectone.pulse.util.constant.AdventureTag;
 
 import java.util.Map;
@@ -181,7 +182,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -191,7 +192,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -201,7 +202,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -211,7 +212,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -221,7 +222,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -231,7 +232,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -243,7 +244,7 @@ public record Permission(
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound,
                 Map<String, PermissionEntry> colors
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -255,7 +256,7 @@ public record Permission(
                 PermissionEntry other,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {
 
             @With
             @Builder(toBuilder = true)
@@ -275,7 +276,7 @@ public record Permission(
                 PermissionEntry other,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -285,7 +286,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -295,7 +296,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -305,7 +306,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -315,7 +316,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -325,7 +326,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -335,7 +336,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -345,7 +346,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -355,7 +356,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -366,7 +367,7 @@ public record Permission(
                 PermissionEntry see,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -376,7 +377,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -386,7 +387,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -396,7 +397,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -406,7 +407,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -417,7 +418,7 @@ public record Permission(
                 PermissionEntry join,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -427,7 +428,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        )implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -437,7 +438,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -447,7 +448,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -457,7 +458,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -467,7 +468,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -478,7 +479,7 @@ public record Permission(
                 PermissionEntry create,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -488,7 +489,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -498,7 +499,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -508,7 +509,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -518,7 +519,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -528,7 +529,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -538,7 +539,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -548,7 +549,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -558,7 +559,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -568,7 +569,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -578,7 +579,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -588,7 +589,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -598,7 +599,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -608,7 +609,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -618,7 +619,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -628,7 +629,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements CommandPermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
     }
 
     @With
@@ -1023,7 +1024,8 @@ public record Permission(
         @Jacksonized
         public record Bossbar(
                 String name,
-                Permission.Type type
+                Permission.Type type,
+                Map<String, PermissionEntry> types
         ) implements PermissionSetting {}
 
         @With
@@ -1059,7 +1061,7 @@ public record Permission(
                     Permission.Type type,
                     PermissionEntry cooldownBypass,
                     PermissionEntry sound
-            ) implements PermissionSetting {}
+            ) implements CooldownPermissionSetting, SoundPermissionSetting {}
         }
 
         @With
@@ -1145,7 +1147,7 @@ public record Permission(
                     PermissionEntry group,
                     PermissionEntry bypass,
                     PermissionEntry sound
-            ) implements PermissionSetting {}
+            ) implements SoundPermissionSetting {}
 
             @With
             @Builder(toBuilder = true)
@@ -1255,10 +1257,11 @@ public record Permission(
                 @Builder(toBuilder = true)
                 @Jacksonized
                 public record Question(
-                        PermissionEntry ask,
+                        String name,
+                        Permission.Type type,
                         PermissionEntry sound,
                         PermissionEntry cooldownBypass
-                ) {}
+                ) implements CooldownPermissionSetting, SoundPermissionSetting {}
             }
 
             @With
@@ -1302,7 +1305,7 @@ public record Permission(
                 String name,
                 Permission.Type type,
                 PermissionEntry sound
-        ) implements PermissionSetting {}
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -1311,7 +1314,7 @@ public record Permission(
                 String name,
                 Permission.Type type,
                 PermissionEntry sound
-        ) implements PermissionSetting {}
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -1351,7 +1354,7 @@ public record Permission(
                 String name,
                 Permission.Type type,
                 PermissionEntry sound
-        ) implements PermissionSetting {}
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -1361,7 +1364,7 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
-        ) implements PermissionSetting {}
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -1482,7 +1485,7 @@ public record Permission(
                 String name,
                 Permission.Type type,
                 PermissionEntry sound
-        ) implements PermissionSetting {}
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)

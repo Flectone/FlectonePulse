@@ -46,7 +46,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                 .percent(percent)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(output -> output.writeInt(percent))
                 .integration(string -> Strings.CS.replace(
                         string,

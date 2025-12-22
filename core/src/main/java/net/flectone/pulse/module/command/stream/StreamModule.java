@@ -124,7 +124,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .urls(urls)
                     .range(config().range())
                     .destination(config().destination())
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
                     .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
                     .build()

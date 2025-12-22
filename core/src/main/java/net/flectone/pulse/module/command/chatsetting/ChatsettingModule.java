@@ -98,7 +98,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
         open(fPlayer, fPlayer);
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

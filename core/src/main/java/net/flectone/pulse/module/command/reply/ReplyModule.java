@@ -55,7 +55,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
         tellModule.send(fPlayer, receiverName, message);
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

@@ -162,7 +162,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_WARNLIST, fPlayer, component));
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

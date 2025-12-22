@@ -117,7 +117,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(Localization.Command.Tictactoe::sender)
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
@@ -168,7 +168,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(message -> String.format(message.receiver(), ticTacToe.getId()))
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

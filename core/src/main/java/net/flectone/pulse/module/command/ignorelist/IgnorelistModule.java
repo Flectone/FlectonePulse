@@ -121,7 +121,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

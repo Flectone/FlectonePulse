@@ -59,7 +59,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .turned(!turnedBefore)
                 .action("turning")
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }
@@ -117,7 +117,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     public Predicate<FPlayer> createFilter(FPlayer fPlayer) {
         return fReceiver -> !fPlayer.equals(fReceiver)
-                && permissionChecker.check(fReceiver, getModulePermission())
+                && permissionChecker.check(fReceiver, permission())
                 && fReceiver.getSetting(SettingText.SPY_STATUS) != null
                 && fReceiver.isOnline();
     }

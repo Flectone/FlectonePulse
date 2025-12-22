@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Destination;
@@ -14,6 +15,7 @@ import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.type.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class EventMetadata<L extends LocalizationSetting> {
     private final Range range;
 
     @Nullable
-    private final Sound sound;
+    private final Pair<Sound, PermissionSetting> sound;
 
     @Nullable
     private final String message;

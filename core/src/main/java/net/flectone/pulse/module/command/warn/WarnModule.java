@@ -112,7 +112,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .moderation(warn)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
                 .build()

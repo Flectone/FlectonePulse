@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.format.questionanswer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +8,10 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -18,13 +19,15 @@ import net.flectone.pulse.module.message.format.questionanswer.listener.Question
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,39 +36,31 @@ import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuestionAnswerModule extends AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
-    private final Map<String, Sound> soundMap = new HashMap<>();
-    private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Pattern> patternMap = new HashMap<>();
 
     private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
+    private final CooldownChecker cooldownChecker;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
         config().questions().forEach((key, questionMessage) -> {
-
             try {
                 patternMap.put(key, Pattern.compile(questionMessage.target()));
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
             }
-
-            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(key);
-            if (questionPermission == null) return;
-
-            registerPermission(questionPermission.ask());
-            soundMap.put(key, createSound(questionMessage.sound(), questionPermission.sound()));
-            cooldownMap.put(key, createCooldown(questionMessage.cooldown(), questionPermission.cooldownBypass()));
         });
 
         listenerRegistry.register(QuestionAnswerPulseListener.class);
@@ -88,8 +83,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         super.onDisable();
 
         processedQuestions.clear();
-        soundMap.clear();
-        cooldownMap.clear();
         patternMap.clear();
     }
 
@@ -124,13 +117,15 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
             Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(entry.getKey());
-            if (questionPermission != null && !permissionChecker.check(sender, questionPermission.ask())) continue;
+            if (questionPermission != null && !permissionChecker.check(sender, questionPermission)) continue;
 
             Matcher matcher = entry.getValue().matcher(contextMessage);
             if (!matcher.find()) continue;
 
-            Cooldown cooldown = cooldownMap.get(entry.getKey());
-            if (cooldown != null && cooldown.isCooldown(sender.getUuid())) continue;
+            Message.Format.QuestionAnswer.Question question = config().questions().get(entry.getKey());
+            if (question != null
+                    && (questionPermission != null && !permissionChecker.check(sender, questionPermission.cooldownBypass()))
+                    && cooldownChecker.check(sender.getUuid(), question.cooldown())) continue;
 
             result.append("<question:'").append(entry.getKey()).append("'>");
         }
@@ -178,13 +173,16 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         if (range.is(Range.Type.PLAYER) && !sender.equals(receiver)) return;
         if (!(receiver instanceof FPlayer fReceiver)) return;
 
+        Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
+        Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
+
         sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .sender(sender)
                 .filterPlayer(fReceiver)
                 .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
                 .question(question)
                 .destination(questionMessage.destination())
-                .sound(soundMap.get(question))
+                .sound(sound)
                 .build()
         );
     }

@@ -15,8 +15,8 @@ import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -30,8 +30,6 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     @Override
     public void onEnable() {
         super.onEnable();
-
-        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(JoinPulseListener.class);
     }
@@ -74,7 +72,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                 .playedBefore(hasPlayedBefore)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeBoolean(hasPlayedBefore);

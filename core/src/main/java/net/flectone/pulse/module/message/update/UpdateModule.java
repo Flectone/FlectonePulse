@@ -42,8 +42,6 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().sound(), permission().sound());
-
         listenerRegistry.register(UpdatePulseListener.class);
 
         checkAndUpdateLatestVersion();
@@ -87,7 +85,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
                 .currentVersion(currentVersion)
                 .latestVersion(latestVersion)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

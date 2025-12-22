@@ -94,7 +94,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                 })
                 .type(type)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

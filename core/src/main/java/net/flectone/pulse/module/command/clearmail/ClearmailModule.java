@@ -79,7 +79,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .mail(optionalMail.get())
                 .destination(config().destination())
                 .message(optionalMail.get().message())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );

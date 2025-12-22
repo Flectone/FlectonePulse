@@ -185,7 +185,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                     )
                     .newStatus(isAfk)
                     .destination(config().destination())
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .build()
             );
 
@@ -201,7 +201,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 .newStatus(isAfk)
                 .range(range)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .integration()

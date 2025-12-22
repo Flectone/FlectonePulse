@@ -44,7 +44,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Command
                 .message(message)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()

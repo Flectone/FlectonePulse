@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.CommandSetting;
+import net.flectone.pulse.config.setting.CooldownConfigSetting;
 import net.flectone.pulse.config.setting.EnableSetting;
+import net.flectone.pulse.config.setting.SoundConfigSetting;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
@@ -172,7 +174,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -182,7 +184,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -194,7 +196,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -210,7 +212,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -221,7 +223,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -233,7 +235,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -244,7 +246,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -255,7 +257,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -268,7 +270,7 @@ public record Command(
             Menu menu,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
 
         @With
         @Builder(toBuilder = true)
@@ -344,7 +346,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -355,7 +357,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -368,7 +370,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -382,7 +384,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -394,7 +396,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -404,7 +406,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -416,7 +418,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -428,7 +430,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -441,7 +443,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -453,7 +455,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -464,7 +466,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -476,7 +478,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -487,7 +489,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -499,7 +501,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -511,7 +513,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -526,7 +528,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -537,7 +539,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -550,7 +552,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -561,7 +563,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -574,7 +576,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -584,7 +586,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -595,7 +597,7 @@ public record Command(
             Map<String, List<String>> strategies,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -608,7 +610,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -620,7 +622,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -632,7 +634,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -645,7 +647,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -655,7 +657,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -666,7 +668,7 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -680,7 +682,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
 
         public enum Service {
             DEEPL,
@@ -702,7 +704,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -715,7 +717,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -728,7 +730,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -741,7 +743,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -757,7 +759,7 @@ public record Command(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 
     @With
     @Builder(toBuilder = true)
@@ -768,5 +770,5 @@ public record Command(
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
-    ) implements CommandSetting {}
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
 }

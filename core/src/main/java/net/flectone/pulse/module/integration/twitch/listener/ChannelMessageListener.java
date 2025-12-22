@@ -85,7 +85,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .message(message)
                 .range(Range.get(Range.Type.PROXY))
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                     if (reply == null) return Tag.selfClosingInserting(Component.empty());
 

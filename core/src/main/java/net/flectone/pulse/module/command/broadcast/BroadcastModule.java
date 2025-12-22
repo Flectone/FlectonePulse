@@ -44,7 +44,7 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                 .message(message)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()

@@ -161,7 +161,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override

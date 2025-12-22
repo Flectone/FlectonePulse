@@ -103,7 +103,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                 .target(fReceiver)
                 .message(message)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );

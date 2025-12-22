@@ -136,7 +136,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                 .moderations(bans)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(bans);

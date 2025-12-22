@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.message.auto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,6 +18,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +36,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         super.onEnable();
 
         config().types().forEach((key, value) -> {
-            Sound sound = createSound(value.sound(), permission().types().get(key));
+            Pair<Sound, PermissionSetting> sound = Pair.of(value.sound(), permission().types().get(key));
 
             Ticker ticker = value.ticker();
             if (ticker.isEnable()) {
@@ -72,7 +75,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         return Collections.emptyList();
     }
 
-    public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
+    public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Pair<Sound, PermissionSetting> sound) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         List<String> messages = localization(fPlayer).types().get(name);

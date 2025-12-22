@@ -44,7 +44,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
                 .destination(config().destination())
                 .range(config().range())
                 .message(message)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()

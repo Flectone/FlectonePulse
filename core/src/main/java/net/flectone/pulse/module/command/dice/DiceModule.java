@@ -64,7 +64,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                 .format(dice -> replaceResult(cubes, dice.symbols(), dice.format()))
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
                 .integration(string -> replaceResult(cubes, localization().symbols(), string))
                 .build()

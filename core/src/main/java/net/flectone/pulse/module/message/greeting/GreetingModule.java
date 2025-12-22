@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.greeting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.FImage;
@@ -13,9 +13,9 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
 import net.flectone.pulse.module.message.greeting.model.GreetingMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
@@ -33,8 +33,6 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     @Override
     public void onEnable() {
         super.onEnable();
-
-        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(GreetingPulseListener.class);
     }
@@ -80,7 +78,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                     })
                     .pixels(pixels)
                     .destination(config().destination())
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .build()
             );
 

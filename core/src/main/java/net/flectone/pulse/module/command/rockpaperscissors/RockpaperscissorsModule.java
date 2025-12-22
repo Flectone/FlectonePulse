@@ -127,7 +127,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 ))
                 .rockPaperScissors(rockPaperScissors)
                 .gamePhase(GamePhase.CREATE)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

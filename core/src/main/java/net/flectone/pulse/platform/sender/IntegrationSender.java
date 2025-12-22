@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -110,7 +111,10 @@ public class IntegrationSender {
             case CHAT -> {
                 if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield "UNKNOWN";
 
-                yield messageType.name() + "_" + chatMetadata.getChatName().toUpperCase();
+                Chat chat = chatMetadata.getChat();
+                if (chat.name() == null) yield messageType.name();
+
+                yield messageType.name() + "_" + chat.name().toUpperCase();
             }
             case VANILLA -> {
                 if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield "UNKNOWN";

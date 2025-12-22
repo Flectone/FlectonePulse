@@ -64,7 +64,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                 .filterPlayer(fPlayer)
                 .format(Localization.Command.Ping::format)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
 

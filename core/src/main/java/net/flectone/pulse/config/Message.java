@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
+import net.flectone.pulse.config.setting.CooldownConfigSetting;
 import net.flectone.pulse.config.setting.EnableSetting;
+import net.flectone.pulse.config.setting.SoundConfigSetting;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -123,7 +125,7 @@ public record Message(
                 Destination destination,
                 Ticker ticker,
                 Sound sound
-        ) {
+        ) implements SoundConfigSetting {
         }
     }
 
@@ -147,7 +149,7 @@ public record Message(
         public record Announce(
                 Destination destination,
                 Sound sound
-        ) {
+        ) implements SoundConfigSetting {
         }
     }
 
@@ -230,7 +232,7 @@ public record Message(
                 Destination destination,
                 Cooldown cooldown,
                 Sound sound
-        ) {
+        ) implements CooldownConfigSetting, SoundConfigSetting {
 
             @With
             @Builder(toBuilder = true)
@@ -292,7 +294,7 @@ public record Message(
                 String everyoneTag,
                 Destination destination,
                 Sound sound
-        ) implements EnableSetting {
+        ) implements EnableSetting, SoundConfigSetting {
         }
 
         @With
@@ -398,7 +400,7 @@ public record Message(
                     Cooldown cooldown,
                     Sound sound,
                     String target
-            ) {
+            ) implements CooldownConfigSetting, SoundConfigSetting {
             }
 
         }
@@ -450,7 +452,7 @@ public record Message(
             Boolean enable,
             Destination destination,
             Sound sound
-    ) implements EnableSetting {
+    ) implements EnableSetting, SoundConfigSetting {
     }
 
     @With
@@ -462,7 +464,7 @@ public record Message(
             Range range,
             Destination destination,
             Sound sound
-    ) implements EnableSetting {
+    ) implements EnableSetting, SoundConfigSetting {
     }
 
     @With
@@ -503,7 +505,7 @@ public record Message(
             Range range,
             Destination destination,
             Sound sound
-    ) implements EnableSetting {
+    ) implements EnableSetting, SoundConfigSetting {
     }
 
     @With
@@ -517,7 +519,7 @@ public record Message(
             Destination destination,
             Cooldown cooldown,
             Sound sound
-    ) implements EnableSetting {
+    ) implements EnableSetting, CooldownConfigSetting, SoundConfigSetting {
     }
 
     @With
@@ -637,7 +639,7 @@ public record Message(
             Boolean enable,
             Destination destination,
             Sound sound
-    ) implements EnableSetting {
+    ) implements EnableSetting, SoundConfigSetting {
     }
 
     @With
@@ -658,7 +660,7 @@ public record Message(
                 Destination destination,
                 Sound sound,
                 List<String> translationKeys
-        ) {
+        ) implements SoundConfigSetting {
 
             @Override
             public String name() {
@@ -710,7 +712,7 @@ public record Message(
                     result.put("destination", destination);
                 }
 
-                if (sound != null && sound.isEnable()) {
+                if (sound != null && sound.enable()) {
                     result.put("sound", sound);
                 }
 

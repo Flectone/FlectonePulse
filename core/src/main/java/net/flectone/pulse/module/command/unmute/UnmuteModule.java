@@ -135,7 +135,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                 .moderations(mutes)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(mutes);

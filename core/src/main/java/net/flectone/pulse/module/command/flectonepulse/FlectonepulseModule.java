@@ -106,7 +106,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatEditor(), "<url>", url))
                     .destination(config().destination())
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .build()
             );
 
@@ -139,7 +139,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatTrue(), "<time>", formattedTime))
                     .destination(config().destination())
-                    .sound(getModuleSound())
+                    .sound(soundOrThrow())
                     .build()
             );
 

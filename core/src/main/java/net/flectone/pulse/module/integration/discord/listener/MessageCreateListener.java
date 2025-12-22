@@ -104,7 +104,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(config().destination())
                 .message(message)
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                     if (reply == null) return Tag.selfClosingInserting(Component.empty());
 

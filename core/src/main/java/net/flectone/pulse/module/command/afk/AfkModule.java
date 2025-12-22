@@ -62,6 +62,6 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
             afkMessageModule.setAfk(fPlayer);
         }
 
-        soundPlayer.play(getModuleSound(), fPlayer);
+        soundPlayer.play(soundOrThrow(), fPlayer);
     }
 }

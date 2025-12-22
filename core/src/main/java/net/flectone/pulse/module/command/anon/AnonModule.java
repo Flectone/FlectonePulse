@@ -44,7 +44,7 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
                 .message(message)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()

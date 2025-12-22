@@ -34,9 +34,6 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     public void onEnable() {
         super.onEnable();
 
-        createSound(config().sound(), permission().sound());
-        createCooldown(config().cooldown(), permission().cooldownBypass());
-
         listenerRegistry.register(RightclickPacketListener.class);
     }
 
@@ -78,7 +75,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
                 .filterPlayer(fPlayer)
                 .format(Localization.Message.Rightclick::format)
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

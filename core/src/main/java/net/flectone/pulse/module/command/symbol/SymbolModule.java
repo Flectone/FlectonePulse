@@ -80,7 +80,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
                 .destination(config().destination())
                 .message(message)
                 .tagResolvers(fResolver -> new TagResolver[]{inputTag(message)})
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .build()
         );
     }

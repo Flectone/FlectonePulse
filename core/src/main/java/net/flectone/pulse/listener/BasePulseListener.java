@@ -15,7 +15,6 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
-import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
@@ -65,9 +64,7 @@ public class BasePulseListener implements PulseListener {
     public void onMessageSendEvent(MessageSendEvent event) {
         EventMetadata<?> eventMetadata = event.getEventMetadata();
         if (eventMetadata.getSound() != null) {
-            Sound sound = eventMetadata.getSound();
-
-            soundPlayer.play(sound, eventMetadata.getSender(), event.getReceiver());
+            soundPlayer.play(eventMetadata.getSound(), eventMetadata.getSender(), event.getReceiver());
         }
     }
 

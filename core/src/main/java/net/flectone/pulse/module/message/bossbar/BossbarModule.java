@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.bossbar;
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -24,6 +26,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.UUID;
 
@@ -111,7 +114,7 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
                     ))
                     .filterPlayer(fPlayer)
                     .destination(messageAnnounce.destination())
-                    .sound(messageAnnounce.sound())
+                    .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
                     .build()
             );
         }

@@ -6,12 +6,14 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSo
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import org.incendo.cloud.type.tuple.Pair;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,36 +24,46 @@ public class SoundPlayer {
     private final PacketSender packetSender;
     private final PermissionChecker permissionChecker;
 
-    public void play(Sound sound, FEntity sender) {
+    public void play(Pair<Sound, PermissionSetting> soundPermission, FEntity sender) {
         if (sender instanceof FPlayer fPlayer) {
-            play(sound, fPlayer, fPlayer);
+            play(soundPermission, fPlayer, fPlayer);
         }
     }
 
-    public void play(Sound sound, FEntity sender, FPlayer receiver) {
-        if (!sound.isEnable()) return;
-        if (!permissionChecker.check(sender, sound.getPermission())) return;
+    public void play(Pair<Sound, PermissionSetting> soundPermission, FEntity sender, FPlayer receiver) {
+        if (soundPermission == null) return;
 
-        packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(sound.getPacket(), sound.getCategory(),
+        Sound sound = soundPermission.first();
+        if (!sound.enable()) return;
+        if (!permissionChecker.check(sender, soundPermission.second())) return;
+
+        packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(
+                sound.packet(),
+                sound.category(),
                 platformPlayerAdapter.getEntityId(receiver.getUuid()),
-                sound.getVolume(),
-                sound.getPitch()
+                sound.volume(),
+                sound.pitch()
         ));
     }
 
-    public void play(Sound sound, FPlayer sender, Vector3i vector3i) {
-        if (!sound.isEnable()) return;
-        if (!permissionChecker.check(sender, sound.getPermission())) return;
+    public void play(Pair<Sound, PermissionSetting> soundPermission, FPlayer sender, Vector3i vector3i) {
+        if (soundPermission == null) return;
+
+        Sound sound = soundPermission.first();
+        if (!sound.enable()) return;
+        if (!permissionChecker.check(sender, soundPermission.second())) return;
 
         fPlayerService.getOnlineFPlayers().stream()
                 .filter(fReceiver -> {
                     double distance = platformPlayerAdapter.distance(sender, fReceiver);
                     return distance >= 0 && distance <= 16;
                 })
-                .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerSoundEffect(sound.getPacket(), sound.getCategory(),
+                .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerSoundEffect(
+                        sound.packet(),
+                        sound.category(),
                         vector3i.multiply(8),
-                        sound.getVolume(),
-                        sound.getPitch()
+                        sound.volume(),
+                        sound.pitch()
                 )));
     }
 

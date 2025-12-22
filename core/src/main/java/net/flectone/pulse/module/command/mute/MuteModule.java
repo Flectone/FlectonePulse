@@ -112,7 +112,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                 .moderation(mute)
                 .range(config().range())
                 .destination(config().destination())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute))
                 .build()

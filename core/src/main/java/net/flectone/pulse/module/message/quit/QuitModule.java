@@ -14,8 +14,8 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -28,8 +28,6 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     @Override
     public void onEnable() {
         super.onEnable();
-
-        createSound(config().sound(), permission().sound());
 
         listenerRegistry.register(QuitPulseListener.class);
     }
@@ -64,7 +62,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
                 .ignoreVanish(ignoreVanish)
                 .destination(config().destination())
                 .range(config().range())
-                .sound(getModuleSound())
+                .sound(soundOrThrow())
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .integration()
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
