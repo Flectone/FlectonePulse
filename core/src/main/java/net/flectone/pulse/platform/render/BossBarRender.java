@@ -25,10 +25,10 @@ public class BossBarRender {
         WrapperPlayServerBossBar addWrapper = new WrapperPlayServerBossBar(bossBarUUID, WrapperPlayServerBossBar.Action.ADD);
 
         addWrapper.setTitle(component);
-        addWrapper.setHealth(bossBar.getHealth());
-        addWrapper.setOverlay(bossBar.getOverlay());
-        addWrapper.setColor(bossBar.getColor());
-        addWrapper.setFlags(bossBar.getFlags());
+        addWrapper.setHealth(bossBar.health());
+        addWrapper.setOverlay(bossBar.overlay());
+        addWrapper.setColor(bossBar.color());
+        addWrapper.setFlags(bossBar.flags());
 
         packetSender.send(fPlayer, addWrapper);
 
@@ -36,7 +36,7 @@ public class BossBarRender {
             WrapperPlayServerBossBar removeWrapper = new WrapperPlayServerBossBar(bossBarUUID, WrapperPlayServerBossBar.Action.REMOVE);
             packetSender.send(fPlayer, removeWrapper);
 
-        }, bossBar.getDuration());
+        }, bossBar.duration());
     }
 
 }

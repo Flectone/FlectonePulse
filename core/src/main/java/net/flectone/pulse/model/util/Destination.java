@@ -90,13 +90,13 @@ public class Destination {
             }
             case BOSS_BAR -> {
                 BossBar bossBar = this.bossBar == null ? DEFAULT_BOSS_BAR : this.bossBar;
-                map.put("duration", bossBar.getDuration());
-                map.put("health", bossBar.getHealth());
-                map.put("overlay", bossBar.getOverlay());
-                map.put("color", bossBar.getColor());
-                map.put("play_boss_music", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
-                map.put("create_world_fog", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
-                map.put("darken_screen", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
+                map.put("duration", bossBar.duration());
+                map.put("health", bossBar.health());
+                map.put("overlay", bossBar.overlay());
+                map.put("color", bossBar.color());
+                map.put("play_boss_music", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
+                map.put("create_world_fog", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
+                map.put("darken_screen", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
             }
             case TEXT_SCREEN -> {
                 TextScreen textScreen = this.textScreen == null ? DEFAULT_TEXT_SCREEN : this.textScreen;
@@ -147,26 +147,26 @@ public class Destination {
                 yield new Destination(type, times, subtext);
             }
             case BOSS_BAR -> {
-                long duration = parseOrDefault(map.get("duration"), DEFAULT_BOSS_BAR.getDuration(), Long::parseLong);
-                float health = parseOrDefault(map.get("health"), DEFAULT_BOSS_BAR.getHealth(), Float::parseFloat);
-                net.kyori.adventure.bossbar.BossBar.Overlay overlay = parseOrDefault(map.get("overlay"), DEFAULT_BOSS_BAR.getOverlay(), net.kyori.adventure.bossbar.BossBar.Overlay::valueOf);
-                net.kyori.adventure.bossbar.BossBar.Color color = parseOrDefault(map.get("color"), DEFAULT_BOSS_BAR.getColor(), net.kyori.adventure.bossbar.BossBar.Color::valueOf);
+                long duration = parseOrDefault(map.get("duration"), DEFAULT_BOSS_BAR.duration(), Long::parseLong);
+                float health = parseOrDefault(map.get("health"), DEFAULT_BOSS_BAR.health(), Float::parseFloat);
+                net.kyori.adventure.bossbar.BossBar.Overlay overlay = parseOrDefault(map.get("overlay"), DEFAULT_BOSS_BAR.overlay(), net.kyori.adventure.bossbar.BossBar.Overlay::valueOf);
+                net.kyori.adventure.bossbar.BossBar.Color color = parseOrDefault(map.get("color"), DEFAULT_BOSS_BAR.color(), net.kyori.adventure.bossbar.BossBar.Color::valueOf);
 
                 net.flectone.pulse.model.util.BossBar bossBar = new net.flectone.pulse.model.util.BossBar(duration, health, overlay, color);
 
                 boolean playBossMusic = parseOrDefault(map.get("play_boss_music"), false, Boolean::parseBoolean);
                 if (playBossMusic) {
-                    bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC);
+                    bossBar = bossBar.withFlag(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC);
                 }
 
                 boolean createWorldFog = parseOrDefault(map.get("create_world_fog"), false, Boolean::parseBoolean);
                 if (createWorldFog) {
-                    bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG);
+                    bossBar = bossBar.withFlag(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG);
                 }
 
                 boolean darkenScreen = parseOrDefault(map.get("darken_screen"), false, Boolean::parseBoolean);
                 if (darkenScreen) {
-                    bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
+                    bossBar = bossBar.withFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
                 }
 
                 yield new Destination(type, bossBar);
