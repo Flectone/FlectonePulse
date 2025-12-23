@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -85,20 +86,19 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         Localization.Command.Toponline localization = localization(fPlayer);
 
         String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
-        Component component = messagePipeline.builder(fPlayer, header)
-                .build()
-                .append(Component.newline());
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
+        Component component = messagePipeline.build(headerContext).append(Component.newline());
 
         for (PlatformPlayerAdapter.PlayedTimePlayer timePlayer : finalPlayedTimePlayers) {
-
             String line = StringUtils.replaceEach(
                     localization.line(),
                     new String[]{"<time_player>", "<time>"},
                     new String[]{timePlayer.name(), timeFormatter.format(fPlayer, timePlayer.playedTime())}
             );
 
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, line);
             component = component
-                    .append(messagePipeline.builder(fPlayer, line).build())
+                    .append(messagePipeline.build(lineContext))
                     .append(Component.newline());
         }
 
@@ -107,7 +107,8 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                 new String[]{"/" + getCommandName(), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
-        component = component.append(messagePipeline.builder(fPlayer, footer).build());
+        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
+        component = component.append(messagePipeline.build(footerContext));
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 

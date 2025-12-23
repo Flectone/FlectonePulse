@@ -16,6 +16,7 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +40,8 @@ public class InventoryMenuBuilder implements MenuBuilder {
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        Component header = messagePipeline.builder(fPlayer, fTarget, localization.inventory()).build();
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory());
+        Component header = messagePipeline.build(headerContext);
 
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)

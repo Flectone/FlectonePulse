@@ -23,13 +23,13 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 
 import java.io.File;
@@ -144,7 +144,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         responseJson.add("version", getVersionJson(localizationMaintenance.serverVersion()));
         responseJson.add("players", getPlayersJson());
 
-        responseJson.add("description", messagePipeline.builder(fPlayer, localizationMaintenance.serverDescription()).jsonSerializerBuild());
+        MessageContext context = messagePipeline.createContext(fPlayer, localizationMaintenance.serverDescription());
+        responseJson.add("description", messagePipeline.buildJson(context));
+
         responseJson.addProperty("favicon", "data:image/png;base64," + (icon == null ? "" : icon));
         responseJson.addProperty("enforcesSecureChat", false);
 
@@ -184,8 +186,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                 .stream()
                 .filter(filter -> !permissionChecker.check(filter, permission().join()))
                 .forEach(fReceiver -> {
-                    Component component = messagePipeline.builder(fSender, fReceiver, localization(fReceiver).kick()).build();
-                    fPlayerService.kick(fReceiver, component);
+                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, localization(fReceiver).kick());
+                    fPlayerService.kick(fReceiver, messagePipeline.build(messageContext));
                 });
     }
 }

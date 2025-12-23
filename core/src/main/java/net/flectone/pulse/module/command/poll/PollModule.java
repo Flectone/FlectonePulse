@@ -23,6 +23,7 @@ import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -328,7 +329,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
             int k = 0;
             for (String answer : poll.getAnswers()) {
 
-                Component answerComponent = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
+                MessageContext answerContext = messagePipeline.createContext(fPlayer, FPlayer.UNKNOWN, answer);
+                Component answerComponent = messagePipeline.build(answerContext);
 
                 answersBuilder.append(StringUtils.replaceEach(
                         message.answerTemplate(),

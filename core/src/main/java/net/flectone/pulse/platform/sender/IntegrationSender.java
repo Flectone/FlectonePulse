@@ -12,6 +12,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,13 @@ import java.util.regex.Pattern;
 public class IntegrationSender {
 
     private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
+    private static final Map<MessageFlag, Boolean> DEFAULT_MESSAGE_FLAGS = Map.of(
+            MessageFlag.TRANSLATE, false,
+            MessageFlag.USER_MESSAGE, true,
+            MessageFlag.MENTION, false,
+            MessageFlag.INTERACTIVE_CHAT, false,
+            MessageFlag.QUESTION, false
+    );
 
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
@@ -72,26 +81,23 @@ public class IntegrationSender {
 
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
         FEntity sender = eventMetadata.getSender();
-        return messagePipeline.builder(sender, FPlayer.UNKNOWN, text)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
-                .build();
+        MessageContext messageContext = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
+                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .withFlag(MessageFlag.TRANSLATE, false)
+                .addTagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN));
+
+        return messagePipeline.build(messageContext);
     }
 
     private Component createMessage(EventMetadata<?> eventMetadata) {
         String message = eventMetadata.getMessage();
-        FEntity sender = eventMetadata.getSender();
-        return StringUtils.isEmpty(message)
-                ? Component.empty()
-                : messagePipeline.builder(sender, FPlayer.UNKNOWN, message)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .build();
+        if (StringUtils.isEmpty(message)) return Component.empty();
+
+        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), FPlayer.UNKNOWN, message)
+                .withFlags(DEFAULT_MESSAGE_FLAGS)
+                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut());
+
+        return messagePipeline.build(context);
     }
 
     private String clearMessage(String finalMessage) {

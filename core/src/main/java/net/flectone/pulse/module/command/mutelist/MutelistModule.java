@@ -17,6 +17,7 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -130,19 +131,18 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 .toList();
 
         String header = Strings.CS.replace(localizationType.header(), "<count>", String.valueOf(size));
-        Component component = messagePipeline.builder(fPlayer, header)
-                .build()
-                .append(Component.newline());
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
+        Component component = messagePipeline.build(headerContext).append(Component.newline());
 
         for (Moderation moderation : finalModerationList) {
-
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unmuteModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
+            MessageContext lineContext = messagePipeline.createContext(fTarget, fPlayer, line);
             component = component
-                    .append(messagePipeline.builder(fTarget, fPlayer, line).build())
+                    .append(messagePipeline.build(lineContext))
                     .append(Component.newline());
         }
 
@@ -152,7 +152,8 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
-        component = component.append(messagePipeline.builder(fPlayer, footer).build());
+        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
+        component = component.append(messagePipeline.build(footerContext));
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_MUTELIST, fPlayer, component));
 

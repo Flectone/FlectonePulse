@@ -159,7 +159,9 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                 new String[]{ mention, mention }
         );
 
-        return Tag.selfClosingInserting(messagePipeline.builder(sender, receiver, format).build());
+        MessageContext context = messagePipeline.createContext(sender, receiver, format);
+        Component component = messagePipeline.build(context);
+        return Tag.selfClosingInserting(component);
     }
 
     private String replace(String message) {

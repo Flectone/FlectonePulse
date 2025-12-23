@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.AttributesProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.provider.PassengersProvider;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -46,6 +47,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final AttributesProvider attributesProvider;
     private final PassengersProvider passengersProvider;
     private final ReflectionResolver reflectionResolver;
+    private final MessagePipeline messagePipeline;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -257,7 +259,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (!headerModule.isModuleDisabledFor(fPlayer)) {
             header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
+                return messagePipeline.build(messageContext);
             }
         }
 
@@ -278,7 +281,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (!footerModule.isModuleDisabledFor(fPlayer)) {
             footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
+                return messagePipeline.build(messageContext);
             }
         }
 

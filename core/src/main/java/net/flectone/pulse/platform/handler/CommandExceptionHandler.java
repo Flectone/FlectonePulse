@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -58,7 +59,8 @@ public class CommandExceptionHandler {
             );
         };
 
-        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
+        send(fPlayer, messagePipeline.build(messageContext));
     }
 
     public void handleInvalidSyntaxException(ExceptionContext<FPlayer, InvalidSyntaxException> context) {
@@ -71,7 +73,8 @@ public class CommandExceptionHandler {
                 new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
         );
 
-        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
+        send(fPlayer, messagePipeline.build(messageContext));
     }
 
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
@@ -80,7 +83,8 @@ public class CommandExceptionHandler {
         String message = fileFacade.localization(fPlayer)
                 .command().exception().permission();
 
-        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
+        send(fPlayer, messagePipeline.build(messageContext));
     }
 
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
@@ -95,7 +99,8 @@ public class CommandExceptionHandler {
                 context.exception().getMessage()
         );
 
-        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
+        send(fPlayer, messagePipeline.build(messageContext));
     }
 
     private void send(FPlayer fPlayer, Component component) {

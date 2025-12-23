@@ -18,6 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -195,7 +196,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         List<Component> componentLore = lore.length == 0
                 ? Collections.emptyList()
                 : Arrays.stream(lore)
-                .map(message -> messagePipelineProvider.get().builder(fPlayer, message).build().decoration(TextDecoration.ITALIC, false))
+                .map(message -> {
+                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
+                    Component component = messagePipelineProvider.get().build(messageContext);
+                    return component.decoration(TextDecoration.ITALIC, false);
+                })
                 .toList();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
@@ -208,7 +213,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull String title) {
         return title.isEmpty()
                 ? Component.empty()
-                : messagePipelineProvider.get().builder(fPlayer, title).build();
+                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
     }
 
     private @NotNull ItemStack buildModernItemStack(@NotNull Material material, @NotNull Component name, @NotNull List<Component> lore) {
@@ -306,7 +311,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         String displayName = itemStack.getItemMeta().getDisplayName();
         if (displayName == null) return Component.empty();
 
-        Component componentName = messagePipelineProvider.get().builder(displayName).build();
+        MessageContext messageContext = messagePipelineProvider.get().createContext(displayName);
+        Component componentName = messagePipelineProvider.get().build(messageContext);
         String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);

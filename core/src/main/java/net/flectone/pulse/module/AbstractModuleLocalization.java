@@ -15,6 +15,7 @@ import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.filter.RangeFilter;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -163,26 +164,24 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
     private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
         Destination destination = eventMetadata.getDestination();
-        return destination.subtext().isEmpty()
-                ? Component.empty()
-                : messagePipeline.builder(eventMetadata.getSender(), receiver, destination.subtext())
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .tagResolvers(messageTag(message))
-                .build();
+        if (destination.subtext().isEmpty()) return Component.empty();
+
+        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, destination.subtext())
+                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .addTagResolver(messageTag(message));
+
+        return messagePipeline.build(context);
     }
 
     private Component buildMessageComponent(FPlayer receiver, EventMetadata<M> eventMetadata) {
         String message = eventMetadata.getMessage();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
-        FEntity sender = eventMetadata.getSender();
-        boolean senderColorOut = eventMetadata.isSenderColorOut();
+        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, message)
+                .withFlag(MessageFlag.USER_MESSAGE, true)
+                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut());
 
-        MessagePipeline.Builder messageBuilder = messagePipeline.builder(sender, receiver, message)
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut);
-
-        return messageBuilder.build();
+        return messagePipeline.build(context);
     }
 
     private Component buildFormatComponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
@@ -190,21 +189,19 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
         FEntity sender = eventMetadata.getSender();
-        boolean senderColorOut = eventMetadata.isSenderColorOut();
 
-        MessagePipeline.Builder formatBuilder = messagePipeline
-                .builder(eventMetadata.getUuid(), sender, receiver, formatContent)
-                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                .tagResolvers(eventMetadata.getTagResolvers(receiver))
-                .tagResolvers(messageTag(message));
+        MessageContext messageContext = messagePipeline.createContext(eventMetadata.getUuid(), sender, receiver, formatContent)
+                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .addTagResolvers(eventMetadata.getTagResolvers(receiver))
+                .addTagResolver(messageTag(message));
 
         if (!receiver.isUnknown()) {
-            formatBuilder = formatBuilder
-                    .userMessage(eventMetadata.getMessage())
-                    .translate(formatContent.contains("<translate")); // support new <translate> and old <translateto>
+            messageContext = messageContext
+                    .withUserMessage(eventMetadata.getMessage())
+                    .withFlag(MessageFlag.TRANSLATE, formatContent.contains("<translate"));
         }
 
-        return formatBuilder.build();
+        return messagePipeline.build(messageContext);
     }
 
     public TagResolver messageTag(Component message) {
@@ -215,7 +212,8 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (!isEnable() || target == null) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Component component = messagePipeline.builder(target, receiver, formatTarget).build();
+            MessageContext messageContext = messagePipeline.createContext(target, receiver, formatTarget);
+            Component component = messagePipeline.build(messageContext);
 
             return Tag.selfClosingInserting(component);
         });

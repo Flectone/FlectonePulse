@@ -29,6 +29,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
@@ -193,9 +194,11 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         // 3 - offline client, 4 - official client
         boolean offlineClient = fReceiver.getUuid().version() == 3;
-        return messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).format())
-                .flag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient) // disable player_head for official client
-                .build();
+
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
+                .withFlag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient); // disable player_head for official client
+
+        return messagePipeline.build(messageContext);
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {

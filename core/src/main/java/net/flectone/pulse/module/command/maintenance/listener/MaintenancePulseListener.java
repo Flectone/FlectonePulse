@@ -7,9 +7,9 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
@@ -22,14 +22,15 @@ public class MaintenancePulseListener implements PulseListener {
     private final MessagePipeline messagePipeline;
 
     @Pulse
-    public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
+    public PlayerPreLoginEvent onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
         FPlayer fPlayer = event.player();
         if (maintenanceModule.isAllowed(fPlayer)) return event;
 
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = maintenanceModule.localization(fPlayer).kick();
-        Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, reasonMessage);
+        Component reason = messagePipeline.build(messageContext);
 
         return event.withAllowed(false).withKickReason(reason);
     }

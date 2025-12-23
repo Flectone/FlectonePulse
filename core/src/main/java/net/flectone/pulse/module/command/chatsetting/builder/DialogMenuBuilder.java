@@ -22,6 +22,7 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.controller.DialogController;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
@@ -43,7 +44,9 @@ public class DialogMenuBuilder implements MenuBuilder {
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        Component header = messagePipeline.builder(fPlayer, fTarget, localization.inventory().trim()).build();
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
+        Component header = messagePipeline.build(headerContext);
+
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
         CommonDialogData commonDialogData = new CommonDialogData(
@@ -78,10 +81,12 @@ public class DialogMenuBuilder implements MenuBuilder {
         boolean enabled = fTarget.isSetting(messageType);
 
         String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
-        Component componentTitle = messagePipeline.builder(fPlayer, fTarget, title).build();
+        MessageContext titleContext = messagePipeline.createContext(fPlayer, fTarget, title);
+        Component componentTitle = messagePipeline.build(titleContext);
 
         String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
-        Component componentLore = messagePipeline.builder(fPlayer, fTarget, lore).build();
+        MessageContext loreContext = messagePipeline.createContext(fPlayer, fTarget, lore);
+        Component componentLore = messagePipeline.build(loreContext);
 
         String id = "fp_" + UUID.randomUUID();
 
@@ -99,10 +104,12 @@ public class DialogMenuBuilder implements MenuBuilder {
                     boolean currentEnabled = status.toBoolean();
 
                     String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-                    Component componentInvertTitle = messagePipeline.builder(fPlayer, fTarget, invertTitle).build();
+                    MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, fTarget, invertTitle);
+                    Component componentInvertTitle = messagePipeline.build(invertTitleContext);
 
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-                    Component componentInvertLore = messagePipeline.builder(fPlayer, fTarget, invertLore).build();
+                    MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, fTarget, invertLore);
+                    Component componentInvertLore = messagePipeline.build(invertLoreContext);
 
                     ActionButton invertButton = new ActionButton(
                             new CommonButtonData(componentInvertTitle, componentInvertLore, chatsettingModule.config().modern().buttonWidth()),
@@ -131,8 +138,11 @@ public class DialogMenuBuilder implements MenuBuilder {
         String title = messages.length > 0 ? messages[0] : "";
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-        Component componentTitle = messagePipeline.builder(fTarget, title).build();
-        Component componentLore = messagePipeline.builder(fTarget, lore).build();
+        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
+        Component componentTitle = messagePipeline.build(titleContext);
+
+        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
+        Component componentLore = messagePipeline.build(loreContext);
 
         String id = "fp_chat";
 
@@ -162,8 +172,11 @@ public class DialogMenuBuilder implements MenuBuilder {
         String title = messages.length > 0 ? messages[0] : "";
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-        Component componentTitle = messagePipeline.builder(fTarget, title).build();
-        Component componentLore = messagePipeline.builder(fTarget, lore).build();
+        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
+        Component componentTitle = messagePipeline.build(titleContext);
+
+        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
+        Component componentLore = messagePipeline.build(loreContext);
 
         String id = "fp_fcolor_" + type.ordinal();
 
@@ -210,8 +223,11 @@ public class DialogMenuBuilder implements MenuBuilder {
             String title = messages.length > 0 ? messages[0] : "";
             String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-            Component componentTitle = messagePipeline.builder(fTarget, title).build();
-            Component componentLore = messagePipeline.builder(fTarget, lore).build();
+            MessageContext titleContext = messagePipeline.createContext(fTarget, title);
+            Component componentTitle = messagePipeline.build(titleContext);
+
+            MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
+            Component componentLore = messagePipeline.build(loreContext);
 
             String subId = id + "_" + i;
 
@@ -228,7 +244,6 @@ public class DialogMenuBuilder implements MenuBuilder {
             }));
         }
 
-        // reopen - false because submenu is a new menu
         dialogController.open(fPlayer, dialogBuilder.build(), false);
     }
 }

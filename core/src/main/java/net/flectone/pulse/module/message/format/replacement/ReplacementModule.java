@@ -184,9 +184,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
                     replacement = StringUtils.replaceEach(replacement, searchList, replacementList);
 
-                    Component component = messagePipeline.builder(sender, receiver, replacement)
-                            .flag(MessageFlag.REPLACEMENT, false)
-                            .build();
+                    MessageContext componentContext = messagePipeline.createContext(sender, receiver, replacement)
+                            .withFlag(MessageFlag.REPLACEMENT, false);
+                    Component component = messagePipeline.build(componentContext);
 
                     yield Tag.selfClosingInserting(component);
                 }
@@ -249,10 +249,12 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         if (spoilerText.equals("\\")) return Tag.selfClosingInserting(Component.empty());
 
         // "." to have the original context like ||%stats%||
-        Component spoilerComponent = messagePipeline.builder(sender, receiver, "." + spoilerText)
-                .flags(new EnumMap<>(flags)) // extend message flags
-                .flag(MessageFlag.TRANSLATE_ITEM, false) // we don't need to double format "|| %item% ||"
-                .build();
+        EnumMap<MessageFlag, Boolean> spoilerFlags = new EnumMap<>(flags);
+        spoilerFlags.put(MessageFlag.TRANSLATE_ITEM, false); // we don't need to double format "|| %item% ||"
+
+        MessageContext spoilerContext = messagePipeline.createContext(sender, receiver, "." + spoilerText)
+                .withFlags(spoilerFlags);
+        Component spoilerComponent = messagePipeline.build(spoilerContext);
 
         int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
@@ -264,9 +266,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 new String[]{spoilerText, StringUtils.repeat(replacement.spoilerSymbol(), length)}
         );
 
-        Component component = messagePipeline.builder(sender, receiver, format)
-                // don't set .flag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
-                .build();
+        MessageContext formatContext = messagePipeline.createContext(sender, receiver, format);
+        // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+        Component component = messagePipeline.build(formatContext);
 
         return Tag.selfClosingInserting(component);
     }
@@ -282,9 +284,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 String.valueOf(ping)
         );
 
-        Component component = messagePipeline.builder(fPlayer, receiver, format)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .build();
+        MessageContext context = messagePipeline.createContext(fPlayer, receiver, format)
+                .withFlag(MessageFlag.REPLACEMENT, false);
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
@@ -296,9 +298,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 platformServerAdapter.getTPS()
         );
 
-        Component component = messagePipeline.builder(sender, receiver, format)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                .withFlag(MessageFlag.REPLACEMENT, false);
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
@@ -310,9 +312,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 String.valueOf(platformServerAdapter.getOnlinePlayerCount())
         );
 
-        Component component = messagePipeline.builder(sender, receiver, format)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                .withFlag(MessageFlag.REPLACEMENT, false);
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
@@ -332,9 +334,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                     }
             );
 
-            component = messagePipeline.builder(sender, receiver, format)
-                    .flag(MessageFlag.REPLACEMENT, false)
-                    .build();
+            MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                    .withFlag(MessageFlag.REPLACEMENT, false);
+            component = messagePipeline.build(context);
         }
 
         return Tag.selfClosingInserting(component);
@@ -357,9 +359,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                     }
             );
 
-           component = messagePipeline.builder(sender, receiver, format)
-                   .flag(MessageFlag.REPLACEMENT, false)
-                   .build();
+            MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                    .withFlag(MessageFlag.REPLACEMENT, false);
+            component = messagePipeline.build(context);
         }
 
         return Tag.selfClosingInserting(component);
@@ -381,12 +383,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 url
         );
 
-        Component component = messagePipeline.builder(sender, receiver, format)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .tagResolvers(TagResolver.resolver("pixels", (argumentQueue, context) ->
-                        Tag.inserting(componentPixels))
-                )
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                .withFlag(MessageFlag.REPLACEMENT, false)
+                .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
@@ -396,12 +396,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageUUID, isTranslateItem);
 
         String format = localization(receiver).values().getOrDefault("item", "");
-        Component componentFormat = messagePipeline.builder(sender, receiver, format)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .tagResolvers(TagResolver.resolver("message_1", (argumentQueue, context) ->
-                        Tag.selfClosingInserting(componentItem))
-                )
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+                .withFlag(MessageFlag.REPLACEMENT, false)
+                .addTagResolver(TagResolver.resolver("message_1", (argumentQueue, ctx) -> Tag.selfClosingInserting(componentItem)));
+        Component componentFormat = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(componentFormat);
     }
@@ -416,10 +414,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 url
         );
 
-        Component component = messagePipeline.builder(sender, receiver, string)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .flag(MessageFlag.LEGACY_COLORS, false)
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, string)
+                .withFlag(MessageFlag.REPLACEMENT, false)
+                .withFlag(MessageFlag.LEGACY_COLORS, false);
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
@@ -441,13 +439,11 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 url
         );
 
-        Component component = messagePipeline.builder(sender, receiver, string)
-                .flag(MessageFlag.REPLACEMENT, false)
-                .flag(MessageFlag.LEGACY_COLORS, false)
-                .tagResolvers(TagResolver.resolver("pixels", (argumentQueue, context) ->
-                        Tag.inserting(componentPixels))
-                )
-                .build();
+        MessageContext context = messagePipeline.createContext(sender, receiver, string)
+                .withFlag(MessageFlag.REPLACEMENT, false)
+                .withFlag(MessageFlag.LEGACY_COLORS, false)
+                .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
+        Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }

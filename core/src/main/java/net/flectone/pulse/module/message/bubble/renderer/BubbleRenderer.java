@@ -28,6 +28,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
@@ -48,7 +49,13 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleRenderer {
-    
+
+    private static final Map<MessageFlag, Boolean> BUBBLE_MESSAGE_FLAGS = Map.of(
+            MessageFlag.MENTION, false,
+            MessageFlag.INTERACTIVE_CHAT, false,
+            MessageFlag.QUESTION, false
+    );
+
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
     
     private final FileFacade fileFacade;
@@ -187,20 +194,18 @@ public class BubbleRenderer {
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
         Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
 
-        Component message = messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .build();
+        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer)
+                .withFlags(BUBBLE_MESSAGE_FLAGS);
 
-        
-        return messagePipeline.builder(bubble.getSender(), viewer, localization.format())
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .tagResolvers(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
-                .build();
+        Component message = messagePipeline.build(messageContext
+                .withMessage(bubble.getRawMessage())
+                .withFlag(MessageFlag.USER_MESSAGE, true)
+        );
+
+        return messagePipeline.build(messageContext
+                .withMessage(localization.format())
+                .addTagResolver(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
+        );
     }
     
     private BubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {

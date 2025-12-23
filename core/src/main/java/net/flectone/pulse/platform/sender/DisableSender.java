@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -35,7 +36,8 @@ public class DisableSender {
                 ? localization.disabledSelf()
                 : localization.disabledOther();
 
-        Component component = messagePipeline.builder(receiver, fPlayer, disableMessage).build();
+        MessageContext messageContext = messagePipeline.createContext(receiver, fPlayer, disableMessage);
+        Component component = messagePipeline.build(messageContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
 

@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.belowname.listener.BelownamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -76,8 +77,8 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     public void create(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        Component displayName = messagePipeline.builder(fPlayer, localization(fPlayer).format())
-                .build();
+        MessageContext displayNameContext = messagePipeline.createContext(fPlayer, localization(fPlayer).format());
+        Component displayName = messagePipeline.build(displayNameContext);
 
         objectiveModule.createObjective(fPlayer, displayName, ScoreboardPosition.BELOWNAME);
         update(fPlayer);

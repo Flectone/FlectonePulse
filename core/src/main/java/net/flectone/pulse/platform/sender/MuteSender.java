@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -30,8 +31,8 @@ public class MuteSender {
         if (status == MuteChecker.Status.NONE) return false;
 
         String muteMessage = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        Component component = messagePipeline.builder(fPlayer, muteMessage)
-                .build();
+        MessageContext muteContext = messagePipeline.createContext(fPlayer, muteMessage);
+        Component component = messagePipeline.build(muteContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
 

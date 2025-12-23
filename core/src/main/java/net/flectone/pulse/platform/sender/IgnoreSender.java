@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -37,7 +38,8 @@ public class IgnoreSender {
     }
 
     private void sendMessage(FPlayer sender, FPlayer receiver, String ignoreMessage) {
-        Component component = messagePipeline.builder(receiver, sender, ignoreMessage).build();
+        MessageContext messageContext = messagePipeline.createContext(receiver, sender, ignoreMessage);
+        Component component = messagePipeline.build(messageContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, sender, component));
     }

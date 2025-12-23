@@ -74,27 +74,30 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                 Component showEntityName = sender.getShowEntityName();
                 if (showEntityName == null) {
-                    Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
+                    MessageContext displayContext = messagePipeline.createContext(sender, receiver,
+                            StringUtils.replaceEach(
                                     sender.getType().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
                                     new String[]{"<name>", "<type>", "<uuid>"},
                                     new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
-                            ))
-                            .build();
+                            )
+                    );
+                    Component displayName = messagePipeline.build(displayContext);
 
                     return Tag.selfClosingInserting(displayName);
                 }
 
-                Component displayName = messagePipeline.builder(sender, receiver, sender.getType().equals(FEntity.UNKNOWN_TYPE)
-                                ? localizationName.unknown()
-                                : StringUtils.replaceEach(
+                MessageContext displayContext = messagePipeline.createContext(sender, receiver,
+                                sender.getType().equals(FEntity.UNKNOWN_TYPE)
+                                        ? localizationName.unknown()
+                                        : StringUtils.replaceEach(
                                         localizationName.entity(),
                                         new String[]{"<type>", "<uuid>"},
                                         new String[]{sender.getType(), sender.getUuid().toString()}
                                 )
                         )
-                        .tagResolvers(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
-                        .build();
+                        .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)));
 
+                Component displayName = messagePipeline.build(displayContext);
                 return Tag.selfClosingInserting(displayName);
             });
         }
@@ -111,14 +114,18 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                 return Tag.selfClosingInserting(Component.empty());
                             }
 
-                            return Tag.preProcessParsed(messagePipeline.builder(fPlayer, constantName).defaultSerializerBuild());
+                            MessageContext constantContext = messagePipeline.createContext(fPlayer, constantName);
+                            String serialized = messagePipeline.buildDefault(constantContext);
+                            return Tag.preProcessParsed(serialized);
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, context) -> {
                             Localization.Message.Format.Names localization = localization(receiver);
                             String displayName = fPlayer.isUnknown()
                                     ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
                                     : localization.display();
-                            Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();
+
+                            MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName);
+                            Component displayNameComponent = messagePipeline.build(displayContext);
 
                             return Tag.selfClosingInserting(displayNameComponent);
                         }),
@@ -126,14 +133,16 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             String prefix = integrationModule.getPrefix(fPlayer);
                             if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
 
-                            String text = messagePipeline.builder(fPlayer, receiver, prefix).defaultSerializerBuild();
+                            MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix);
+                            String text = messagePipeline.buildDefault(prefixContext);
                             return Tag.preProcessParsed(text);
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.VAULT_SUFFIX.getTagName(), (argumentQueue, context) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
                             if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
 
-                            String text = messagePipeline.builder(fPlayer, receiver, suffix).defaultSerializerBuild();
+                            MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix);
+                            String text = messagePipeline.buildDefault(suffixContext);
                             return Tag.preProcessParsed(text);
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (argumentQueue, context) ->
@@ -148,12 +157,14 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
         if (isModuleDisabledFor(sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
-            String formatInvisible = localization(receiver).invisible();
-            Component name = messagePipeline.builder(sender, receiver, formatInvisible)
-                    .build();
+        return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER),
+                (argumentQueue, context) -> {
+                    String formatInvisible = localization(receiver).invisible();
+                    MessageContext invisibleContext = messagePipeline.createContext(sender, receiver, formatInvisible);
+                    Component name = messagePipeline.build(invisibleContext);
 
-            return Tag.selfClosingInserting(name);
-        });
+                    return Tag.selfClosingInserting(name);
+                }
+        );
     }
 }

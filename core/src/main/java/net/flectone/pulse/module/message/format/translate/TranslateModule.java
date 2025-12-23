@@ -5,9 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,11 +15,10 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
-import net.kyori.adventure.text.Component;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +30,13 @@ import java.util.UUID;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
+
+    private static final Map<MessageFlag, Boolean> DEFAULT_TAG_FLAGS = Map.of(
+            MessageFlag.MENTION, false,
+            MessageFlag.INTERACTIVE_CHAT, false,
+            MessageFlag.QUESTION, false,
+            MessageFlag.TRANSLATE, false
+    );
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;
@@ -115,14 +121,10 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
             action = Strings.CS.replace(action, "<message>", key.toString());
 
-            Component component = messagePipeline.builder(sender, receiver, action)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .flag(MessageFlag.TRANSLATE, false)
-                    .build();
+            MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
+                    .withFlags(DEFAULT_TAG_FLAGS);
 
-            return Tag.selfClosingInserting(component);
+            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         });
     }
 

@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -92,12 +93,10 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                     if (parsedComponent.vanillaMessage().multiMessage()) return;
                 } else {
                     String format = StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey()));
+                    MessageContext messageContext = messagePipeline.createContext(fPlayer, format)
+                            .addTagResolver(argumentTag(fPlayer, parsedComponent));
 
-                    Component component = messagePipeline.builder(fPlayer, format)
-                            .tagResolvers(argumentTag(fPlayer, parsedComponent))
-                            .build();
-
-                    sendPersonalDeath(fPlayer, component);
+                    sendPersonalDeath(fPlayer, messagePipeline.build(messageContext));
                 }
             } else {
                 range = Range.get(Range.Type.PLAYER);
@@ -240,7 +239,8 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                 ? localization.formatPlayer()
                 : localization.formatEntity();
 
-        return messagePipeline.builder(fTarget, fResolver, formatTarget).build();
+        MessageContext context = messagePipeline.createContext(fTarget, fResolver, formatTarget);
+        return messagePipeline.build(context);
     }
 
     private Component extractInnerText(Component component) {

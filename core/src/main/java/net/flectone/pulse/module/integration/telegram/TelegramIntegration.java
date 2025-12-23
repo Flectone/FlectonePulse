@@ -10,10 +10,10 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -152,8 +152,8 @@ public class TelegramIntegration implements FIntegration {
     }
 
     private String getNewChatName(String value) {
-        return PlainTextComponentSerializer.plainText()
-                .serialize(messagePipeline.builder(value).build());
+        MessageContext messageContext = messagePipeline.createContext(value);
+        return messagePipeline.buildPlain(messageContext);
     }
 
     public void executeMethod(BotApiMethod<?> method) {

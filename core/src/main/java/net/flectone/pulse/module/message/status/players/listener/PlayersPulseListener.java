@@ -10,6 +10,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
@@ -29,7 +30,8 @@ public class PlayersPulseListener implements PulseListener {
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = playersModule.localization(fPlayer).full();
-        Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
+        MessageContext reasonContext = messagePipeline.createContext(fPlayer, reasonMessage);
+        Component reason = messagePipeline.build(reasonContext);
 
         return event.withAllowed(false).withKickReason(reason);
     }

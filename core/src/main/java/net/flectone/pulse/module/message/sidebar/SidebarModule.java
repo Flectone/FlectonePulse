@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -122,7 +123,8 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         if (lines.length == 0) return;
 
         String objectiveName = createObjectiveName(fPlayer);
-        Component title = messagePipeline.builder(fPlayer, lines[0]).build();
+        MessageContext titleContext = messagePipeline.createContext(fPlayer, lines[0]);
+        Component title = messagePipeline.build(titleContext);
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
@@ -149,10 +151,9 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         for (int i = 1; i < lines.length; i++) {
             int lineIndex = i - 1;
 
-            String lineId;
-            Component line;
-            lineId = createLineId(lineIndex, fPlayer);
-            line = messagePipeline.builder(fPlayer, lines[i]).build();
+            String lineId = createLineId(lineIndex, fPlayer);
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
+            Component line = messagePipeline.build(lineContext);
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     lineId,
@@ -184,7 +185,8 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         for (int i = 1; i < lines.length; i++) {
             int lineIndex = i - 1;
 
-            String line = messagePipeline.builder(fPlayer, lines[i]).legacySerializerBuild();
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
+            String line = messagePipeline.buildLegacy(lineContext);
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     line,

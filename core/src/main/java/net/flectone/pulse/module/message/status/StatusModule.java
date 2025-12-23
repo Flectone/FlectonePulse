@@ -24,6 +24,7 @@ import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 
@@ -171,8 +172,11 @@ public class StatusModule extends AbstractModule {
             }
 
             JsonObject playerObject = new JsonObject();
-            playerObject.addProperty("name", messagePipeline.builder(fPlayer, sample.name()).legacySerializerBuild());
+
+            MessageContext sampleContext = messagePipeline.createContext(fPlayer, sample.name());
+            playerObject.addProperty("name", messagePipeline.buildLegacy(sampleContext));
             playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.id());
+
             jsonArray.add(playerObject);
         });
 

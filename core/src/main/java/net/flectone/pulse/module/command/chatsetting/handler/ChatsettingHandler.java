@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -52,7 +53,6 @@ public class ChatsettingHandler {
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
-
             return;
         }
 
@@ -68,7 +68,8 @@ public class ChatsettingHandler {
         Consumer<SubMenuItem> onSelect = item -> fTarget.setSetting(SettingText.CHAT_NAME, "default".equalsIgnoreCase(item.name()) ? null : item.name());
 
         String headerStr = localization.menu().chat().inventory();
-        Component header = messagePipeline.builder(fPlayer, fTarget, headerStr).build();
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, headerStr);
+        Component header = messagePipeline.build(headerContext);
 
         Runnable closeConsumer = () -> chatsettingModule.saveSetting(fTarget, SettingText.CHAT_NAME);
 
@@ -88,7 +89,6 @@ public class ChatsettingHandler {
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
-
             return;
         }
 
@@ -114,7 +114,8 @@ public class ChatsettingHandler {
         );
 
         String headerStr = subMenu.inventory();
-        Component header = messagePipeline.builder(fPlayer, fTarget, headerStr).build();
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, headerStr);
+        Component header = messagePipeline.build(headerContext);
 
         Runnable closeConsumer = () -> fPlayerService.saveColors(fTarget);
 
@@ -128,7 +129,6 @@ public class ChatsettingHandler {
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
-
             return;
         }
 
@@ -142,7 +142,6 @@ public class ChatsettingHandler {
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
-
             return Status.DENIED;
         }
 

@@ -14,10 +14,11 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -114,7 +115,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         if (isModuleDisabledFor(fModerator)) return;
 
         String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).person(), fReceiver, kick);
+        MessageContext messageContext = messagePipeline.createContext(fReceiver, format);
 
-        fPlayerService.kick(fReceiver, messagePipeline.builder(fReceiver, format).build());
+        fPlayerService.kick(fReceiver, messagePipeline.build(messageContext));
     }
 }

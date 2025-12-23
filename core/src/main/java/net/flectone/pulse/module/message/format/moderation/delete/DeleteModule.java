@@ -34,6 +34,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeleteModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
+    private static final Map<MessageFlag, Boolean> DEFAULT_TAG_FLAGS = Map.of(
+            MessageFlag.MENTION, false,
+            MessageFlag.INTERACTIVE_CHAT, false,
+            MessageFlag.QUESTION, false,
+            MessageFlag.DELETE, false
+    );
+
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 
     // only for skipping FlectonePulse messages
@@ -101,12 +108,9 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
                     messageUUID.toString()
             );
 
-            Component componentPlaceholder = messagePipeline.builder(sender, receiver, placeholder)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .flag(MessageFlag.DELETE, false)
-                    .build();
+            MessageContext placeholderContext = messagePipeline.createContext(sender, receiver, placeholder)
+                    .withFlags(DEFAULT_TAG_FLAGS);
+            Component componentPlaceholder = messagePipeline.build(placeholderContext);
 
             return Tag.selfClosingInserting(componentPlaceholder);
         });
@@ -169,7 +173,8 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
                 for (int i = 0; i < history.size(); i++) {
                     HistoryMessage historyMessage = history.get(i);
                     if (messageUUID.equals(historyMessage.uuid())) {
-                        Component removedComponent = messagePipeline.builder(sender, fReceiver, format).build();
+                        MessageContext messageContext = messagePipeline.createContext(sender, fReceiver, format);
+                        Component removedComponent = messagePipeline.build(messageContext);
                         history.set(i, new HistoryMessage(messageUUID, removedComponent));
                     }
                 }

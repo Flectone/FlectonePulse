@@ -19,6 +19,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.TpsTracker;
@@ -208,7 +209,8 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         String displayName = itemStack.getCustomName().getString();
         if (displayName == null) return Component.empty();
 
-        Component componentName = messagePipelineProvider.get().builder(displayName).build();
+        MessageContext messageContext = messagePipelineProvider.get().createContext(displayName);
+        Component componentName = messagePipelineProvider.get().build(messageContext);
         String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
@@ -241,7 +243,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         List<Component> componentLore = lore.length == 0
                 ? Collections.emptyList()
                 : Arrays.stream(lore)
-                .map(message -> messagePipelineProvider.get().builder(fPlayer, message).build().decoration(TextDecoration.ITALIC, false))
+                .map(message -> {
+                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
+                    Component component = messagePipelineProvider.get().build(messageContext);
+                    return component.decoration(TextDecoration.ITALIC, false);
+                })
                 .toList();
 
         return new ItemStack.Builder()
@@ -254,6 +260,6 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull String title) {
         return title.isEmpty()
                 ? Component.empty()
-                : messagePipelineProvider.get().builder(fPlayer, title).build();
+                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
     }
 }

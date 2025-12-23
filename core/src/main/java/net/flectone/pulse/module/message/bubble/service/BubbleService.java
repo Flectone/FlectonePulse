@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.RandomUtil;
@@ -26,6 +27,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleService {
+
+    private static final Map<MessageFlag, Boolean> PLAIN_MESSAGE_FLAGS = Map.of(MessageFlag.USER_MESSAGE, true,
+            MessageFlag.MENTION, false,
+            MessageFlag.INTERACTIVE_CHAT, false,
+            MessageFlag.QUESTION, false,
+            MessageFlag.TRANSLATE_ITEM, false,
+            MessageFlag.OBJECT_SPRITE, false,
+            MessageFlag.OBJECT_PLAYER_HEAD, false,
+            MessageFlag.REPLACE_DISABLED_TAGS, false
+    );
 
     private final Map<UUID, Queue<Bubble>> playerBubbleQueues = new ConcurrentHashMap<>();
 
@@ -49,18 +60,8 @@ public class BubbleService {
                 uuid -> new ConcurrentLinkedQueue<>()
         );
 
-        message = messagePipeline.builder(sender, message)
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .flag(MessageFlag.TRANSLATE_ITEM, false)
-                .flag(MessageFlag.OBJECT_SPRITE, false)
-                .flag(MessageFlag.OBJECT_PLAYER_HEAD, false)
-                .flag(MessageFlag.REPLACE_DISABLED_TAGS, false)
-                .plainSerializerBuild();
-
-        List<Bubble> bubbles = splitMessageToBubbles(sender, message, receivers);
+        MessageContext messageContext = messagePipeline.createContext(sender, message).withFlags(PLAIN_MESSAGE_FLAGS);
+        List<Bubble> bubbles = splitMessageToBubbles(sender, messagePipeline.buildPlain(messageContext), receivers);
 
         bubbleQueue.addAll(bubbles);
     }

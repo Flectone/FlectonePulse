@@ -24,6 +24,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.NBTPoll;
 import net.flectone.pulse.platform.controller.DialogController;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
@@ -53,34 +54,48 @@ public class DialogPollBuilder {
     public void openDialog(FPlayer fPlayer, String inputValue, boolean multipleValue, float endTimeValue, float repeatTimeValue, List<String> answers) {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
-        Component headerName = messagePipeline.builder(fPlayer, poll.header()).build();
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, poll.header());
+        Component headerName = messagePipeline.build(headerContext);
+
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
+        MessageContext inputNameContext = messagePipeline.createContext(fPlayer, poll.inputName());
+        Component inputNameComponent = messagePipeline.build(inputNameContext);
+
         Input input = new Input(INPUT_KEY, new TextInputControl(200,
-                messagePipeline.builder(fPlayer, poll.inputName()).build(),
+                inputNameComponent,
                 true,
                 inputValue,
                 256,
                 null
         ));
 
+        MessageContext multipleNameContext = messagePipeline.createContext(fPlayer, poll.multipleName());
+        Component multipleNameComponent = messagePipeline.build(multipleNameContext);
+
         Input multiple = new Input(MULTIPLE_KEY, new BooleanInputControl(
-                messagePipeline.builder(fPlayer, poll.multipleName()).build(),
+                multipleNameComponent,
                 multipleValue,
                 "true",
                 "false"
         ));
 
+        MessageContext endTimeNameContext = messagePipeline.createContext(fPlayer, poll.endTimeName());
+        Component endTimeNameComponent = messagePipeline.build(endTimeNameContext);
+
         Input endTime = new Input(END_TIME_KEY, new NumberRangeInputControl(
                 200,
-                messagePipeline.builder(fPlayer, poll.endTimeName()).build(),
+                endTimeNameComponent,
                 "options.generic_value",
                 new NumberRangeInputControl.RangeInfo(1.0f, 600.0f, endTimeValue, 1.0f)
         ));
 
+        MessageContext repeatTimeNameContext = messagePipeline.createContext(fPlayer, poll.repeatTimeName());
+        Component repeatTimeNameComponent = messagePipeline.build(repeatTimeNameContext);
+
         Input repeatTime = new Input(REPEAT_TIME_KEY, new NumberRangeInputControl(
                 200,
-                messagePipeline.builder(fPlayer, poll.repeatTimeName()).build(),
+                repeatTimeNameComponent,
                 "options.generic_value",
                 new NumberRangeInputControl.RangeInfo(1.0f, 600.0f, repeatTimeValue, 1.0f)
         ));
@@ -89,8 +104,11 @@ public class DialogPollBuilder {
 
         for (int i = 0; i < answers.size(); i++) {
             String inputAnswerName = Strings.CS.replace(poll.inputAnswerName(), "<number>", String.valueOf(i + 1));
+            MessageContext answerNameContext = messagePipeline.createContext(fPlayer, inputAnswerName);
+            Component answerNameComponent = messagePipeline.build(answerNameContext);
+
             Input inputAnswer = new Input(ANSWER_KEY + i, new TextInputControl(200,
-                    messagePipeline.builder(fPlayer, inputAnswerName).build(),
+                    answerNameComponent,
                     true,
                     answers.get(i),
                     1024,
@@ -123,9 +141,12 @@ public class DialogPollBuilder {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
         String newAnswerButtonId = "fp_new_answer";
+        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, poll.newAnswerButtonName());
+        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+
         ActionButton button = new ActionButton(
                 new CommonButtonData(
-                        messagePipeline.builder(fPlayer, poll.newAnswerButtonName()).build(),
+                        buttonNameComponent,
                         Component.empty(),
                         200
                 ),
@@ -152,9 +173,12 @@ public class DialogPollBuilder {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
         String newAnswerButtonId = "fp_remove_answer";
+        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, poll.removeAnswerButtonName());
+        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+
         ActionButton button = new ActionButton(
                 new CommonButtonData(
-                        messagePipeline.builder(fPlayer, poll.removeAnswerButtonName()).build(),
+                        buttonNameComponent,
                         Component.empty(),
                         200
                 ),
@@ -179,9 +203,12 @@ public class DialogPollBuilder {
 
     private Dialog.Builder addCreateButton(FPlayer fPlayer, Dialog.Builder builder) {
         String createId = "fp_create";
+        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, pollModule.localization(fPlayer).modern().createButtonName());
+        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+
         ActionButton button = new ActionButton(
                 new CommonButtonData(
-                        messagePipeline.builder(fPlayer, pollModule.localization(fPlayer).modern().createButtonName()).build(),
+                        buttonNameComponent,
                         Component.empty(),
                         200
                 ),

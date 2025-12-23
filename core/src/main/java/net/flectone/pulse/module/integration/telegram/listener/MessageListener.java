@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -125,14 +126,13 @@ public class MessageListener extends EventListener {
                 .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                     if (reply == null) return Tag.selfClosingInserting(Component.empty());
 
-                    Component componentReply = messagePipeline.builder(localization().formatReply())
-                            .tagResolvers(
+                    MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
+                            .addTagResolvers(
                                     TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
                                     TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
-                            )
-                            .build();
+                            );
 
-                    return Tag.inserting(componentReply);
+                    return Tag.inserting(messagePipeline.build(tagContext));
                 })})
                 .integration(string -> StringUtils.replaceEach(
                         string,
@@ -217,10 +217,13 @@ public class MessageListener extends EventListener {
     }
 
     private String buildMessage(FPlayer fPlayer, String localization) {
-        return messagePipeline.builder(fPlayer, localization)
-                .flag(MessageFlag.OBJECT_PLAYER_HEAD, false)
-                .flag(MessageFlag.OBJECT_SPRITE, false)
-                .plainSerializerBuild();
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, localization)
+                .withFlags(Map.of(
+                        MessageFlag.OBJECT_PLAYER_HEAD, false,
+                        MessageFlag.OBJECT_SPRITE, false
+                ));
+
+        return messagePipeline.buildPlain(messageContext);
     }
 
     public String getChatId(Message message) {

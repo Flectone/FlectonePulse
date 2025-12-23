@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.entity.Entity;
@@ -48,6 +49,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PacketProvider packetProvider;
+    private final MessagePipeline messagePipeline;
     private final Injector injector;
 
     @Override
@@ -190,7 +192,8 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (!headerModule.isModuleDisabledFor(fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
+                return messagePipeline.build(messageContext);
             }
         }
 
@@ -204,7 +207,8 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (!footerModule.isModuleDisabledFor(fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
+                return messagePipeline.build(messageContext);
             }
         }
 

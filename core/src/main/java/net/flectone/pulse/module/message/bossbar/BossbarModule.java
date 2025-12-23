@@ -17,6 +17,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.bossbar.listener.BossbarPacketListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -92,10 +93,10 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
             message = message + RAIDERS_PLACEHOLDER;
         }
 
-        Component title = messagePipeline.builder(fPlayer, message)
-                .tagResolvers(raidersTag(fPlayer, raiders))
-                .build();
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, message)
+                .addTagResolver(raidersTag(fPlayer, raiders));
 
+        Component title = messagePipeline.build(messageContext);
         if (title.equals(oldTitle)) return;
 
         WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(bossbarUUID, WrapperPlayServerBossBar.Action.UPDATE_TITLE);
@@ -128,10 +129,9 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
             String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
             if (StringUtils.isEmpty(raidersRemaining)) return Tag.selfClosingInserting(Component.empty());
 
-            return Tag.selfClosingInserting(messagePipeline
-                    .builder(fPlayer, Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders))
-                    .build()
-            );
+            String replaced = Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders);
+            MessageContext tagContext = messagePipeline.createContext(fPlayer, replaced);
+            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         });
     }
 

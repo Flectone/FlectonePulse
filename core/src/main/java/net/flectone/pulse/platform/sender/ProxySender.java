@@ -86,6 +86,6 @@ public class ProxySender {
         String message = fileFacade.localization(sender).message().format().names().constant();
         if (message.isEmpty()) return "";
 
-        return messagePipeline.builder(sender, message).defaultSerializerBuild();
+        return messagePipeline.buildDefault(messagePipeline.createContext(sender, message));
     }
 }

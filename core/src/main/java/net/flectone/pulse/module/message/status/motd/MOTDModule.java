@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 
@@ -58,10 +59,11 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
         String nextMessage = getNextMessage(fPlayer, config().random());
         if (nextMessage == null) return null;
 
+        MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage);
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            return messagePipeline.builder(fPlayer, nextMessage).jsonSerializerBuild();
+            return messagePipeline.buildJson(nextMessageContext);
         } else {
-            String serializedText = messagePipeline.builder(fPlayer, nextMessage).legacySerializerBuild();
+            String serializedText = messagePipeline.buildLegacy(nextMessageContext);
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("text", serializedText);
             return jsonObject;

@@ -17,10 +17,12 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -165,10 +167,12 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         if (fModerator == null) return;
 
         Localization.Command.Ban localization = localization(fTarget);
-
         String formatPlayer = localization.person();
         formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);
 
-        fPlayerService.kick(fTarget, messagePipeline.builder(fModerator, fTarget, formatPlayer).build());
+        MessageContext messageContext = messagePipeline.createContext(fModerator, fTarget, formatPlayer);
+        Component kickMessage = messagePipeline.build(messageContext);
+
+        fPlayerService.kick(fTarget, kickMessage);
     }
 }

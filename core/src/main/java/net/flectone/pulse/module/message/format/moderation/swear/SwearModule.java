@@ -128,7 +128,8 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
             String symbols = localization(receiver).symbol().repeat(swear.length());
 
-            Component component = messagePipeline.builder(sender, receiver, symbols).build();
+            MessageContext tagContext = messagePipeline.createContext(sender, receiver, symbols);
+            Component component = messagePipeline.build(tagContext);
 
             if (permissionChecker.check(receiver, permission().see())) {
                 component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));

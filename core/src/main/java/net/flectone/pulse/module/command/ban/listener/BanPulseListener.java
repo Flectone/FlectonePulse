@@ -15,6 +15,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -38,22 +39,18 @@ public class BanPulseListener implements PulseListener {
         if (!banModule.isEnable()) return event;
 
         FPlayer fPlayer = event.player();
-
         List<Moderation> bans = moderationService.getValidBans(fPlayer);
         if (bans.isEmpty()) return event;
 
-        event = event.withAllowed(false);
-
         Moderation ban = bans.getFirst();
-
         FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
-
         fPlayerService.loadColors(fPlayer);
 
         Localization.Command.Ban localization = banModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
 
-        Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
+        MessageContext messageContext = messagePipeline.createContext(fModerator, fPlayer, formatPlayer);
+        Component reason = messagePipeline.build(messageContext);
 
         if (banModule.config().showConnectionAttempts()) {
             banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()

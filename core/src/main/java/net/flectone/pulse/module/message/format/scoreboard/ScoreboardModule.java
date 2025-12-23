@@ -16,6 +16,7 @@ import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPu
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -118,23 +119,27 @@ public class ScoreboardModule extends AbstractModule {
 
         Component prefix = Component.empty();
         if (!config().prefix().isEmpty()) {
-            prefix = messagePipeline.builder(fPlayer, config().prefix())
-                    .flag(MessageFlag.INVISIBLE_NAME, false)
-                    .build();
+            MessageContext prefixContext = messagePipeline.createContext(fPlayer, config().prefix())
+                    .withFlag(MessageFlag.INVISIBLE_NAME, false);
+            prefix = messagePipeline.build(prefixContext);
         }
 
         Component suffix = Component.empty();
         if (!config().suffix().isEmpty()) {
-            suffix = messagePipeline.builder(fPlayer, config().suffix())
-                    .flag(MessageFlag.INVISIBLE_NAME, false)
-                    .build();
+            MessageContext suffixContext = messagePipeline.createContext(fPlayer, config().suffix())
+                    .withFlag(MessageFlag.INVISIBLE_NAME, false);
+            suffix = messagePipeline.build(suffixContext);
         }
 
         WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = config().nameVisible()
                 ? WrapperPlayServerTeams.NameTagVisibility.ALWAYS
                 : WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
-        TextColor color = messagePipeline.builder(fPlayer, config().color()).build().color();
+
+        MessageContext colorContext = messagePipeline.createContext(fPlayer, config().color());
+        Component colorComponent = messagePipeline.build(colorContext);
+        TextColor color = colorComponent.color();
+
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(

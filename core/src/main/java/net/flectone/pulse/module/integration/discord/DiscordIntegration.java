@@ -25,11 +25,11 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -333,8 +333,8 @@ public class DiscordIntegration implements FIntegration {
             gateway.getChannelById(snowflake)
                     .blockOptional()
                     .ifPresent(channel -> {
-                        String name = PlainTextComponentSerializer.plainText()
-                                .serialize(messagePipeline.builder(entry.getValue()).build());
+                        MessageContext nameContext = messagePipeline.createContext(entry.getValue());
+                        String name = messagePipeline.buildPlain(nameContext);
 
                         channel.getRestChannel()
                                 .modify(ChannelModifyRequest.builder()

@@ -23,11 +23,9 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
-import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,20 +37,69 @@ public class MessagePipeline {
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
 
-    public Builder builder(@NotNull String message) {
-        return builder(FPlayer.UNKNOWN, message);
+    public MessageContext createContext(@NotNull String message) {
+        return createContext(FPlayer.UNKNOWN, message);
     }
 
-    public Builder builder(@NotNull FPlayer sender, @NotNull String message) {
-        return new Builder(sender, sender, message, this);
+    public MessageContext createContext(@NotNull FPlayer sender, @NotNull String message) {
+        return createContext(sender, sender, message);
     }
 
-    public Builder builder(@NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
-        return new Builder(sender, receiver, message, this);
+    public MessageContext createContext(@NotNull FEntity sender, @NotNull FPlayer receiver) {
+        return new MessageContext(UUID.randomUUID(), sender, receiver, null);
     }
 
-    public Builder builder(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
-        return new Builder(messageUUID, sender, receiver, message, this);
+    public MessageContext createContext(@NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
+        return new MessageContext(UUID.randomUUID(), sender, receiver, message);
+    }
+
+    public MessageContext createContext(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
+        return new MessageContext(messageUUID, sender, receiver, message);
+    }
+
+    public Component build(MessageContext context) {
+        MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(context));
+        MessageContext eventContext = event.context();
+
+        MessageContext finalContext = eventContext;
+
+        if (finalContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !finalContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            finalContext = finalContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
+                    .filter(tag -> eventContext.tagResolvers()
+                            .stream()
+                            .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
+                            .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
+                    )
+                    .map(ReplacementTag::empty).toList()
+            );
+        }
+
+        try {
+            return miniMessage.deserialize(
+                    Strings.CS.replace(finalContext.message(), "§", "&"),
+                    finalContext.tagResolvers().toArray(new TagResolver[0])
+            );
+        } catch (Exception e) {
+            fLogger.warning(e);
+        }
+
+        return Component.empty();
+    }
+
+    public String buildDefault(MessageContext context) {
+        return addTrailingSpaces(context.message(), MiniMessage.miniMessage().serialize(build(context)));
+    }
+
+    public String buildPlain(MessageContext context) {
+        return addTrailingSpaces(context.message(), PlainTextComponentSerializer.plainText().serialize(build(context)));
+    }
+
+    public String buildLegacy(MessageContext context) {
+        return addTrailingSpaces(context.message(), LegacyComponentSerializer.legacySection().serialize(build(context)));
+    }
+
+    public JsonElement buildJson(MessageContext context) {
+        return GsonComponentSerializer.gson().serializeToTree(build(context));
     }
 
     public Optional<String> legacyFormat(@NotNull FPlayer fPlayer, @NotNull String message) {
@@ -61,9 +108,10 @@ public class MessagePipeline {
         try {
             Component deserialized = legacyComponentSerializer.deserialize(message);
 
-            Component component = builder(fPlayer, Strings.CS.replace(message, "§", "&"))
-                    .flag(MessageFlag.USER_MESSAGE, true)
-                    .build()
+            MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
+                    .withFlag(MessageFlag.USER_MESSAGE, true);
+
+            Component component = build(context)
                     .applyFallbackStyle(deserialized.style())
                     .mergeStyle(deserialized);
 
@@ -79,7 +127,6 @@ public class MessagePipeline {
         return Optional.empty();
     }
 
-    // MiniMessage removes trailing spaces during serialization, so we need to add them back
     public String addTrailingSpaces(String rawString, String finalString) {
         if (StringUtils.isEmpty(rawString)) return finalString;
 
@@ -110,95 +157,7 @@ public class MessagePipeline {
         return count;
     }
 
-    public record Builder(
-            MessageContext context,
-            MessagePipeline pipeline
-    ) {
-
-        public Builder(UUID messageUUID, FEntity sender, FPlayer receiver, String message, MessagePipeline pipeline) {
-            this(new MessageContext(messageUUID, sender, receiver, message), pipeline);
-        }
-
-        public Builder(FEntity sender, FPlayer receiver, String message, MessagePipeline pipeline) {
-            this(UUID.randomUUID(), sender, receiver, message, pipeline);
-        }
-
-        @CheckReturnValue
-        public Builder flag(MessageFlag flag, boolean value) {
-            return new Builder(context.withFlag(flag, value), pipeline);
-        }
-
-        @CheckReturnValue
-        public Builder flags(Map<MessageFlag, Boolean> flags) {
-            return new Builder(context.withFlags(flags), pipeline);
-        }
-
-        @CheckReturnValue
-        public Builder userMessage(String userMessage) {
-            return new Builder(context.withUserMessage(userMessage), pipeline);
-        }
-
-        @CheckReturnValue
-        public Builder translate(boolean translate) {
-            return flag(MessageFlag.TRANSLATE, translate);
-        }
-
-        @CheckReturnValue
-        public Builder tagResolvers(TagResolver... tagResolvers) {
-            return new Builder(context.addTagResolvers(tagResolvers), pipeline);
-        }
-
-        public Component build() {
-            MessageFormattingEvent event = pipeline.eventDispatcher.dispatch(new MessageFormattingEvent(context));
-            MessageContext eventContext = event.context();
-
-            MessageContext finalContext = eventContext;
-
-            if (finalContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !finalContext.isFlag(MessageFlag.USER_MESSAGE)) {
-                finalContext = finalContext.addTagResolvers(
-                        Arrays.stream(ReplacementTag.values())
-                        .filter(tag -> eventContext.tagResolvers()
-                                .stream()
-                                .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
-                                .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
-                        )
-                        .map(ReplacementTag::empty)
-                        .toList()
-                );
-            }
-
-            try {
-                return pipeline.miniMessage.deserialize(
-                        Strings.CS.replace(finalContext.message(), "§", "&"),
-                        finalContext.tagResolvers().toArray(new TagResolver[0])
-                );
-            } catch (Exception e) {
-                pipeline.fLogger.warning(e);
-            }
-
-            return Component.empty();
-        }
-
-        public String defaultSerializerBuild() {
-            return pipeline.addTrailingSpaces(context.message(), MiniMessage.miniMessage().serialize(build()));
-        }
-
-        public String plainSerializerBuild() {
-            return pipeline.addTrailingSpaces(context.message(), PlainTextComponentSerializer.plainText().serialize(build()));
-        }
-
-        public String legacySerializerBuild() {
-            return pipeline.addTrailingSpaces(context.message(), LegacyComponentSerializer.legacySection().serialize(build()));
-        }
-
-        public JsonElement jsonSerializerBuild() {
-            return GsonComponentSerializer.gson().serializeToTree(build());
-        }
-
-    }
-
     public enum ReplacementTag {
-
         AFK_SUFFIX,
         MUTE_SUFFIX,
         STREAM_PREFIX,
@@ -232,6 +191,5 @@ public class MessagePipeline {
                     Tag.selfClosingInserting(Component.empty())
             );
         }
-
     }
 }
