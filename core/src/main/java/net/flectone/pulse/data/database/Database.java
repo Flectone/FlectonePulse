@@ -302,7 +302,7 @@ public class Database {
                             .build()
                     )
             );
-            case MARIADB -> reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", needChecking, libraryResolver ->
+            case MYSQL -> reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", needChecking, libraryResolver ->
                     libraryResolver.loadLibrary(Library.builder()
                             .groupId("com{}mysql")
                             .artifactId("mysql-connector-j")
@@ -312,7 +312,7 @@ public class Database {
                             .build()
                     )
             );
-            case MYSQL -> reflectionResolver.hasClassOrElse("org.mariadb.jdbc.Driver", needChecking, libraryResolver ->
+            case MARIADB -> reflectionResolver.hasClassOrElse("org.mariadb.jdbc.Driver", needChecking, libraryResolver ->
                     libraryResolver.loadLibrary(Library.builder()
                             .groupId("org{}mariadb{}jdbc")
                             .artifactId("mariadb-java-client")
