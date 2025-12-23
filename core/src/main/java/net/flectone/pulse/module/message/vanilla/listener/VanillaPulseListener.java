@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
@@ -21,15 +22,16 @@ public class VanillaPulseListener implements PulseListener {
     private final Extractor extractor;
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+    public Event onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent == null) return;
+        if (translatableComponent == null) return event;
 
         Optional<ParsedComponent> parsedComponent = extractor.extract(translatableComponent);
-        if (parsedComponent.isEmpty()) return;
+        if (parsedComponent.isEmpty()) return event;
 
-        event.setCancelled(true);
-        vanillaModule.send(event.getFPlayer(), parsedComponent.get());
+        vanillaModule.send(event.player(), parsedComponent.get());
+
+        return event.withCancelled(true);
     }
 
 }

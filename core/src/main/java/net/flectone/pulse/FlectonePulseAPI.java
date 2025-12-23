@@ -21,16 +21,16 @@ import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 @Singleton
 public class FlectonePulseAPI  {
@@ -181,7 +181,7 @@ public class FlectonePulseAPI  {
         // reload ListenerRegistry and save reloadListeners to call them later
         ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
 
-        Map<Event.Priority, List<Consumer<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
+        Map<Event.Priority, List<UnaryOperator<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
 
         listenerRegistry.reload();
 

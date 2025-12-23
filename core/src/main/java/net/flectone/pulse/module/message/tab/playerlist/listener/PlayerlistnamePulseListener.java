@@ -22,7 +22,7 @@ public class PlayerlistnamePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
         playerlistnameModule.update();
     }

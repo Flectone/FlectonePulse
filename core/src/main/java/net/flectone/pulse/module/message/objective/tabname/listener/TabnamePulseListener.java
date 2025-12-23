@@ -19,21 +19,21 @@ public class TabnamePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         tabnameModule.create(fPlayer);
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         tabnameModule.create(fPlayer);
     }
 
     @Pulse
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         tabnameModule.remove(fPlayer);
     }
 

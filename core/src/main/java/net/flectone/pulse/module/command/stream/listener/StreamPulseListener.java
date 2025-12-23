@@ -22,7 +22,7 @@ public class StreamPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
 
         boolean hasStreamPermission = !streamModule.isModuleDisabledFor(fPlayer);
 
@@ -46,7 +46,7 @@ public class StreamPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         streamModule.addTag(messageContext);
     }

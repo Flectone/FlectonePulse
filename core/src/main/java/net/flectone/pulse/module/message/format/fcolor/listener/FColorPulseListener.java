@@ -18,7 +18,7 @@ public class FColorPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         fColorModule.format(messageContext);
     }

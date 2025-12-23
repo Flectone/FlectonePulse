@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
@@ -19,18 +20,20 @@ public class AdvancedBanPulseListener implements PulseListener {
     private final AdvancedBanModule advancedBanModule;
 
     @Pulse
-    public void onModuleEnableEvent(ModuleEnableEvent event) {
-        if (!advancedBanModule.isHooked()) return;
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        if (!advancedBanModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.getModule();
+        AbstractModule eventModule = event.module();
         Integration.Advancedban config = advancedBanModule.config();
 
         if ((config.disableFlectonepulseBan() && moduleController.isInstanceOfAny(eventModule, ModuleController.BAN_MODULES)) ||
                 (config.disableFlectonepulseMute() && moduleController.isInstanceOfAny(eventModule, ModuleController.MUTE_MODULES)) ||
                 (config.disableFlectonepulseWarn() && moduleController.isInstanceOfAny(eventModule, ModuleController.WARN_MODULES)) ||
                 (config.disableFlectonepulseKick() && moduleController.isInstanceOfAny(eventModule, ModuleController.KICK_MODULES))) {
-            event.setCancelled(true);
+            return event.withCancelled(true);
         }
+
+        return event;
     }
 
 }

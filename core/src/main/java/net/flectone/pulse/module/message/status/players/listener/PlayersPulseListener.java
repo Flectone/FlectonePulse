@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -21,18 +22,16 @@ public class PlayersPulseListener implements PulseListener {
     private final MessagePipeline messagePipeline;
 
     @Pulse
-    public void onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
-        FPlayer fPlayer = event.getPlayer();
-        if (playersModule.isAllowed(fPlayer)) return;
-
-        event.setAllowed(false);
+    public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
+        FPlayer fPlayer = event.player();
+        if (playersModule.isAllowed(fPlayer)) return event;
 
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = playersModule.localization(fPlayer).full();
         Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
 
-        event.setKickReason(reason);
+        return event.withAllowed(false).withKickReason(reason);
     }
 
 }

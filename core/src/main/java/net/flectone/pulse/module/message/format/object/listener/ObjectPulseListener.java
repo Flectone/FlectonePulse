@@ -18,7 +18,7 @@ public class ObjectPulseListener implements PulseListener {
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.OBJECT_PLAYER_HEAD)) return;
         if (!messageContext.isFlag(MessageFlag.OBJECT_SPRITE)) return;
 

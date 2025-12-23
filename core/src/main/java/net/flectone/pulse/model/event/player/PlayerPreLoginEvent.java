@@ -1,19 +1,19 @@
 package net.flectone.pulse.model.event.player;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.kyori.adventure.text.Component;
 
-@Setter
-@Getter
-public class PlayerPreLoginEvent extends PlayerEvent {
+@With
+public record PlayerPreLoginEvent(
+        boolean cancelled,
+        FPlayer player,
+        Component kickReason,
+        boolean allowed
+) implements PlayerEvent {
 
-    private Component kickReason = Component.empty();
-    private boolean allowed = true;
-
-    public PlayerPreLoginEvent(FPlayer fPlayer) {
-        super(fPlayer);
+    public PlayerPreLoginEvent(FPlayer player) {
+        this(false, player, Component.empty(), true);
     }
 
 }

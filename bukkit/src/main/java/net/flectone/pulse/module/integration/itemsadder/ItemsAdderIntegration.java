@@ -39,7 +39,7 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
 
     @Pulse(priority = Event.Priority.LOW)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         if (!isHooked()) return;
 
         FEntity fPlayer = messageContext.getSender();

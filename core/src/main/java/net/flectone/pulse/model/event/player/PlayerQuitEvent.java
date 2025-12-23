@@ -1,11 +1,16 @@
 package net.flectone.pulse.model.event.player;
 
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 
-public class PlayerQuitEvent extends PlayerEvent {
+@With
+public record PlayerQuitEvent(
+        boolean cancelled,
+        FPlayer player
+) implements PlayerEvent {
 
-    public PlayerQuitEvent(FPlayer fPlayer) {
-        super(fPlayer);
+    public PlayerQuitEvent(FPlayer player) {
+        this(false, player);
     }
 
 }

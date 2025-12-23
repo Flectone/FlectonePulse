@@ -1,16 +1,17 @@
 package net.flectone.pulse.model.event.message;
 
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.model.event.Event;
 
-@Getter
-public class MessageFormattingEvent extends Event {
-
-    private final MessageContext context;
+@With
+public record MessageFormattingEvent(
+        boolean cancelled,
+        MessageContext context
+) implements Event {
 
     public MessageFormattingEvent(MessageContext context) {
-        this.context = context;
+        this(false, context);
     }
 
 }

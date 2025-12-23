@@ -26,12 +26,12 @@ public class AfkPulseListener implements PulseListener {
 
     @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        String messageType = event.getMessageType().name();
+        String messageType = event.messageType().name();
 
         // check only sender-based message types
-        if (event.getMessageType() != MessageType.CHAT && !messageType.startsWith("COMMAND_")) return;
+        if (event.messageType() != MessageType.CHAT && !messageType.startsWith("COMMAND_")) return;
 
-        EventMetadata<?> eventMetadata = event.getEventMetadata();
+        EventMetadata<?> eventMetadata = event.eventMetadata();
         if (!(eventMetadata.getSender() instanceof FPlayer fPlayer)) return;
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) == null) return;
 
@@ -42,27 +42,27 @@ public class AfkPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         afkModule.remove("", fPlayer);
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         afkModule.remove("", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         afkModule.remove("quit", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         afkModule.addTag(messageContext);
     }

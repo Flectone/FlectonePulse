@@ -1,21 +1,20 @@
 package net.flectone.pulse.model.event.message;
 
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 
-@Getter
-public class MessagePrepareEvent extends Event {
-
-    private final MessageType messageType;
-    private final String rawFormat;
-    private final EventMetadata<?> eventMetadata;
+@With
+public record MessagePrepareEvent(
+        boolean cancelled,
+        MessageType messageType,
+        String rawFormat,
+        EventMetadata<?> eventMetadata
+) implements Event {
 
     public MessagePrepareEvent(MessageType messageType, String rawFormat, EventMetadata<?> eventMetadata) {
-        this.messageType = messageType;
-        this.rawFormat = rawFormat;
-        this.eventMetadata = eventMetadata;
+        this(false, messageType, rawFormat, eventMetadata);
     }
 
 }

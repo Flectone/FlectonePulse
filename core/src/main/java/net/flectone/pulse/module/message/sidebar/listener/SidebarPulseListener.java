@@ -18,13 +18,13 @@ public class SidebarPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         sidebarModule.create(fPlayer);
     }
 
     @Pulse
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         sidebarModule.remove(fPlayer);
     }
 

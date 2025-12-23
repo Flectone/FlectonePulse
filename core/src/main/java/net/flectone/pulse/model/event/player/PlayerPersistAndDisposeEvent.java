@@ -1,11 +1,16 @@
 package net.flectone.pulse.model.event.player;
 
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 
-public class PlayerPersistAndDisposeEvent extends PlayerEvent {
+@With
+public record PlayerPersistAndDisposeEvent(
+        boolean cancelled,
+        FPlayer player
+) implements PlayerEvent {
 
-    public PlayerPersistAndDisposeEvent(FPlayer fPlayer) {
-        super(fPlayer);
+    public PlayerPersistAndDisposeEvent(FPlayer player) {
+        this(false, player);
     }
 
 }

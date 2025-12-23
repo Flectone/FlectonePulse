@@ -45,7 +45,7 @@ public class BukkitBaseListener implements Listener {
             playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {}, loginEvent -> {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
 
-                Component reason = loginEvent.getKickReason();
+                Component reason = loginEvent.kickReason();
                 event.setKickMessage(LegacyComponentSerializer.legacySection().serialize(reason));
             });
         }

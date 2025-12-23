@@ -1,23 +1,22 @@
 package net.flectone.pulse.model.event.message;
 
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.incendo.cloud.type.tuple.Pair;
 
-@Getter
-public class MessageReceiveEvent extends Event {
-
-    private final FPlayer fPlayer;
-    private final Component component;
-    private final boolean overlay;
+@With
+public record MessageReceiveEvent(
+        boolean cancelled,
+        FPlayer player,
+        Component component,
+        boolean overlay
+) implements Event {
 
     public MessageReceiveEvent(FPlayer fPlayer, Component component, boolean overlay) {
-        this.fPlayer = fPlayer;
-        this.component = component;
-        this.overlay = overlay;
+        this(false, fPlayer, component, overlay);
     }
 
     public MessageReceiveEvent(FPlayer fPlayer, Pair<Component, Boolean> pair) {

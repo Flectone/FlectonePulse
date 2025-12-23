@@ -21,21 +21,21 @@ public class WorldPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         worldModule.update(fPlayer);
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         worldModule.update(fPlayer);
     }
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         worldModule.addTag(messageContext);
     }

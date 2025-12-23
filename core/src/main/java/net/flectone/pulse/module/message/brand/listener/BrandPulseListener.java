@@ -17,14 +17,14 @@ public class BrandPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        brandModule.send(event.getPlayer());
+        brandModule.send(event.player());
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
-        brandModule.send(event.getPlayer());
+        brandModule.send(event.player());
     }
 
 }

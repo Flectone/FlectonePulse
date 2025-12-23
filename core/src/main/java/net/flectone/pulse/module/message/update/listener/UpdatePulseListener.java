@@ -17,7 +17,7 @@ public class UpdatePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         updateModule.send(fPlayer);
     }
 

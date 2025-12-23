@@ -23,14 +23,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 @Getter
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ListenerRegistry implements Registry {
 
-    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<Consumer<Event>>>> pulseListeners = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new ConcurrentHashMap<>();
     private final List<PacketListenerCommon> packetListeners = new ArrayList<>();
     private final Set<PulseListener> permanentListeners = new HashSet<>();
 
@@ -39,8 +39,8 @@ public class ListenerRegistry implements Registry {
     private final PacketProvider packetProvider;
 
     @NonNull
-    public Map<Event.Priority, List<Consumer<Event>>> getPulseListeners(Class<? extends Event> event) {
-        EnumMap<Event.Priority, List<Consumer<Event>>> enumMap = pulseListeners.get(event);
+    public Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
+        EnumMap<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
         if (enumMap != null) return new EnumMap<>(enumMap);
 
         return new EnumMap<>(Event.Priority.class);
@@ -93,18 +93,25 @@ public class ListenerRegistry implements Registry {
         Class<? extends Event> eventClass = (Class<? extends Event>) paramTypes[0];
 
         register(eventClass, annotation.priority(), event -> {
-            if (event.isCancelled() && !annotation.ignoreCancelled()) return;
+            if (event.cancelled() && !annotation.ignoreCancelled()) return event;
 
             try {
-                method.invoke(listener, event);
+                Object result = method.invoke(listener, event);
+
+                if (result instanceof Event newEvent) {
+                    return newEvent;
+                }
+
+                return event;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 fLogger.warning("Failed to invoke @Pulse handler");
                 fLogger.warning(e);
+                return event;
             }
         });
     }
 
-    public void register(Class<? extends Event> eventClass, Event.Priority priority, Consumer<Event> handler) {
+    public void register(Class<? extends Event> eventClass, Event.Priority priority, UnaryOperator<Event> handler) {
         pulseListeners.computeIfAbsent(eventClass, k -> new EnumMap<>(Event.Priority.class))
                 .computeIfAbsent(priority, k -> new CopyOnWriteArrayList<>())
                 .add(handler);

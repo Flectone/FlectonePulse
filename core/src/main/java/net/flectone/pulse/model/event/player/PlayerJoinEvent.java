@@ -1,11 +1,16 @@
 package net.flectone.pulse.model.event.player;
 
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 
-public class PlayerJoinEvent extends PlayerEvent {
+@With
+public record PlayerJoinEvent(
+        boolean cancelled,
+        FPlayer player
+) implements PlayerEvent {
 
     public PlayerJoinEvent(FPlayer player) {
-        super(player);
+        this(false, player);
     }
 
 }

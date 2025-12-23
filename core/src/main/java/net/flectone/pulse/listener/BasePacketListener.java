@@ -88,7 +88,7 @@ public class BasePacketListener implements PacketListener {
 
             playerPreLoginProcessor.processAsyncLogin(uuid, playerName,
                     loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
-                    loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.getKickReason()))
+                    loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
             );
         }
 
@@ -116,10 +116,9 @@ public class BasePacketListener implements PacketListener {
         }
 
         FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
-        MessageReceiveEvent messageReceiveEvent = new MessageReceiveEvent(fPlayer, triplet);
+        MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, triplet));
 
-        eventDispatcher.dispatch(messageReceiveEvent);
-        event.setCancelled(messageReceiveEvent.isCancelled());
+        event.setCancelled(messageReceiveEvent.cancelled());
     }
 
     private Optional<Pair<Component, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {

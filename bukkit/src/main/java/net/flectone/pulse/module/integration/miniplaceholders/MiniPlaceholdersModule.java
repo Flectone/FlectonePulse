@@ -42,11 +42,12 @@ public class MiniPlaceholdersModule extends AbstractModule {
         listenerRegistry.register(MessageFormattingEvent.class, Event.Priority.HIGH, event -> {
             MessageFormattingEvent messageFormattingEvent = (MessageFormattingEvent) event;
 
-            MessageContext messageContext = messageFormattingEvent.getContext();
+            MessageContext messageContext = messageFormattingEvent.context();
             FEntity sender = messageContext.getSender();
-            if (isModuleDisabledFor(sender)) return;
+            if (isModuleDisabledFor(sender)) return event;
 
             miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
+            return event;
         });
     }
 

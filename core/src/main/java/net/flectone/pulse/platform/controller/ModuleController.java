@@ -99,11 +99,9 @@ public class ModuleController {
         AbstractModule module = injector.getInstance(clazz);
 
         if (module.isEnable()) {
-            ModuleDisableEvent preDisableEvent = new ModuleDisableEvent(module);
+            ModuleDisableEvent preDisableEvent = eventDispatcher.dispatch(new ModuleDisableEvent(module));
 
-            eventDispatcher.dispatch(preDisableEvent);
-
-            if (preDisableEvent.isCancelled()) {
+            if (preDisableEvent.cancelled()) {
                 // nothing
             } else {
                 module.onDisable();
@@ -115,11 +113,9 @@ public class ModuleController {
         module.setEnable(enablePredicate.test(module));
 
         if (module.isEnable()) {
-            ModuleEnableEvent preEnableEvent = new ModuleEnableEvent(module);
+            ModuleEnableEvent preEnableEvent = eventDispatcher.dispatch(new ModuleEnableEvent(module));
 
-            eventDispatcher.dispatch(preEnableEvent);
-
-            if (preEnableEvent.isCancelled()) {
+            if (preEnableEvent.cancelled()) {
                 module.setEnable(false);
             } else {
                 module.permissionBuilder().build().forEach(permissionRegistry::register);

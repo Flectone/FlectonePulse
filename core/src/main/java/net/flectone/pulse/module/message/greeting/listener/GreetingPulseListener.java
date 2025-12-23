@@ -17,7 +17,7 @@ public class GreetingPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         greetingModule.send(fPlayer);
     }
 

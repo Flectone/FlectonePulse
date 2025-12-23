@@ -23,7 +23,7 @@ public class NamesPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME) && isInvisible(sender)) {
             namesModule.addInvisibleTag(messageContext);

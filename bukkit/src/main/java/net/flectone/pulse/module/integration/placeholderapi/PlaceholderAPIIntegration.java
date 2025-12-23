@@ -139,7 +139,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     @Pulse(priority = Event.Priority.LOW)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         FEntity sender = messageContext.getSender();
         if (placeholderAPIModule.isModuleDisabledFor(sender)) return;
 

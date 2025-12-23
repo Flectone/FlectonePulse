@@ -36,10 +36,8 @@ public class PlayerPreLoginProcessor {
         }
 
         FPlayer fPlayer = fPlayerService.addFPlayer(uuid, name);
-        PlayerPreLoginEvent event = new PlayerPreLoginEvent(fPlayer);
-        eventDispatcher.dispatch(event);
-
-        if (event.isAllowed()) {
+        PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
+        if (event.allowed()) {
             fPlayerService.loadData(fPlayer);
             allowedConsumer.accept(event);
         } else {

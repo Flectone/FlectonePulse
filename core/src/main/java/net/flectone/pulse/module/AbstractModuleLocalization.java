@@ -100,12 +100,10 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     public List<FPlayer> createReceivers(MessageType messageType, EventMetadata<M> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization());
 
-        MessagePrepareEvent messagePrepareEvent = new MessagePrepareEvent(messageType, rawFormat, eventMetadata);
-
-        eventDispatcher.dispatch(messagePrepareEvent);
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(messageType, rawFormat, eventMetadata));
 
         // if canceled, it means that message was sent to Proxy
-        if (messagePrepareEvent.isCancelled()) return Collections.emptyList();
+        if (messagePrepareEvent.cancelled()) return Collections.emptyList();
 
         FPlayer filterPlayer = eventMetadata.getFilterPlayer();
 

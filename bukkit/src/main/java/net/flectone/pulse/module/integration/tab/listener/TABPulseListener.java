@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
@@ -23,18 +24,20 @@ public class TABPulseListener implements PulseListener {
     private final TABModule tabModule;
 
     @Pulse
-    public void onModuleEnableEvent(ModuleEnableEvent event) {
-        if (!tabModule.isHooked()) return;
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        if (!tabModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.getModule();
+        AbstractModule eventModule = event.module();
         Integration.Tab config = tabModule.config();
 
         if ((eventModule instanceof HeaderModule && config.disableFlectonepulseHeader())
                 || (eventModule instanceof FooterModule && config.disableFlectonepulseFooter())
                 || (eventModule instanceof PlayerlistnameModule && config.disableFlectonepulsePlayerlistname())
                 || ((eventModule instanceof ScoreboardModule || eventModule instanceof BelownameModule || eventModule instanceof TabnameModule) && config.disableFlectonepulseScoreboard())) {
-            event.setCancelled(true);
+            return event.withCancelled(true);
         }
+
+        return event;
     }
 
 }

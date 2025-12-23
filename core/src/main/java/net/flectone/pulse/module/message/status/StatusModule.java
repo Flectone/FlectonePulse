@@ -94,9 +94,8 @@ public class StatusModule extends AbstractModule {
 
         responseJson.addProperty("enforcesSecureChat", false);
 
-        StatusResponseEvent responseEvent = new StatusResponseEvent(responseJson);
-        eventDispatcher.dispatch(responseEvent);
-        if (responseEvent.isCancelled()) return;
+        StatusResponseEvent responseEvent = eventDispatcher.dispatch(new StatusResponseEvent(responseJson));
+        if (responseEvent.cancelled()) return;
 
         event.markForReEncode(true);
 

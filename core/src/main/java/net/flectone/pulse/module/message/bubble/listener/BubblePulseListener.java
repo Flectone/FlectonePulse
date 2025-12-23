@@ -17,7 +17,7 @@ public class BubblePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         bubbleService.clear(fPlayer);
     }
 

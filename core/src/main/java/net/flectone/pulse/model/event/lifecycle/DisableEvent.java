@@ -1,16 +1,17 @@
 package net.flectone.pulse.model.event.lifecycle;
 
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.model.event.Event;
 
-@Getter
-public class DisableEvent extends Event {
-
-    private final FlectonePulse flectonePulse;
+@With
+public record DisableEvent(
+        boolean cancelled,
+        FlectonePulse flectonePulse
+) implements Event {
 
     public DisableEvent(FlectonePulse flectonePulse) {
-        this.flectonePulse = flectonePulse;
+        this(false, flectonePulse);
     }
 
 }

@@ -46,7 +46,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         Set<TagResolver> resolvers = new HashSet<>();

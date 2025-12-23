@@ -7,6 +7,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -21,18 +22,16 @@ public class MaintenancePulseListener implements PulseListener {
     private final MessagePipeline messagePipeline;
 
     @Pulse
-    public void onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
-        FPlayer fPlayer = event.getPlayer();
-        if (maintenanceModule.isAllowed(fPlayer)) return;
-
-        event.setAllowed(false);
+    public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
+        FPlayer fPlayer = event.player();
+        if (maintenanceModule.isAllowed(fPlayer)) return event;
 
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = maintenanceModule.localization(fPlayer).kick();
         Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
 
-        event.setKickReason(reason);
+        return event.withAllowed(false).withKickReason(reason);
     }
 
 }

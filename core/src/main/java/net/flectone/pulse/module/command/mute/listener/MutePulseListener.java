@@ -18,7 +18,7 @@ public class MutePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         muteModule.addTag(messageContext);
     }

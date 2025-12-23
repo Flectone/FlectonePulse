@@ -46,7 +46,7 @@ public class BasePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
 
         // set correct ip
         fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
@@ -56,61 +56,62 @@ public class BasePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         fPlayerService.clearAndSave(fPlayer);
     }
 
     @Pulse
     public void onMessageSendEvent(MessageSendEvent event) {
-        EventMetadata<?> eventMetadata = event.getEventMetadata();
+        EventMetadata<?> eventMetadata = event.eventMetadata();
         if (eventMetadata.getSound() != null) {
-            soundPlayer.play(eventMetadata.getSound(), eventMetadata.getSender(), event.getReceiver());
+            soundPlayer.play(eventMetadata.getSound(), eventMetadata.getSender(), event.receiver());
         }
     }
 
     @Pulse
-    public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        MessageType messageType = event.getMessageType();
-        String rawFormat = event.getRawFormat();
-        EventMetadata<?> eventMetadata = event.getEventMetadata();
+    public Event onMessagePrepareEvent(MessagePrepareEvent event) {
+        MessageType messageType = event.messageType();
+        String rawFormat = event.rawFormat();
+        EventMetadata<?> eventMetadata = event.eventMetadata();
 
         integrationSender.asyncSend(messageType, rawFormat, eventMetadata);
 
         if (proxySender.send(messageType, eventMetadata)) {
-            event.setCancelled(true);
+            return event.withCancelled(true);
         }
+
+        return event;
     }
 
     @Pulse
-    public void onModuleEnableEvent(ModuleEnableEvent event) {
-        AbstractModule eventModule = event.getModule();
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        AbstractModule eventModule = event.module();
         if (eventModule instanceof BubbleModule
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             fLogger.warning("Bubble module is not supported on this version of Minecraft");
-            event.setCancelled(true);
-            return;
+            return event.withCancelled(true);
         }
 
         if (eventModule instanceof TabModule
                 && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
             fLogger.warning("TAB module is not supported on this version of Minecraft");
-            event.setCancelled(true);
-            return;
+            return event.withCancelled(true);
         }
 
         if (eventModule instanceof OnlineModule
                 && platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             fLogger.warning("Online module is not supported on Fabric");
-            event.setCancelled(true);
-            return;
+            return event.withCancelled(true);
         }
 
         if (eventModule instanceof ToponlineModule
                 && platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             fLogger.warning("Toponline module is not supported on Fabric");
-            event.setCancelled(true);
+            return event.withCancelled(true);
         }
+
+        return event;
     }
 
     @Pulse

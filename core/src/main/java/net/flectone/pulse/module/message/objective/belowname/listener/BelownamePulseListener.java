@@ -18,13 +18,13 @@ public class BelownamePulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         belownameModule.create(fPlayer);
     }
 
     @Pulse
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         belownameModule.remove(fPlayer);
     }
 

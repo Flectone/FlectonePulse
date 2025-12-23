@@ -1,23 +1,20 @@
 package net.flectone.pulse.model.event;
 
-import lombok.Getter;
-import lombok.Setter;
+public interface Event {
 
-@Setter
-@Getter
-public abstract class Event {
+    boolean cancelled();
 
-    private boolean cancelled;
+    <T extends Event> T withCancelled(boolean cancelled);
 
-    protected Event() {
-    }
+    enum Priority {
 
-    public enum Priority {
         LOWEST,
         LOW,
         NORMAL,
         HIGH,
         HIGHEST,
         MONITOR
+
     }
+
 }

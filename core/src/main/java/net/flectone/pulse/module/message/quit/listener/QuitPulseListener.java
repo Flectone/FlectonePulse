@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.quit.QuitModule;
@@ -19,19 +20,19 @@ public class QuitPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         quitModule.send(fPlayer, false);
     }
 
     @Pulse
-    public void onTranslatableMessageReceive(MessageReceiveEvent event) {
+    public Event onTranslatableMessageReceive(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent == null) return;
+        if (translatableComponent == null) return event;
 
         String translationKey = translatableComponent.key();
-        if (!translationKey.equals("multiplayer.player.left")) return;
+        if (!translationKey.equals("multiplayer.player.left")) return event;
 
-        event.setCancelled(true);
+        return event.withCancelled(true);
     }
 
 }

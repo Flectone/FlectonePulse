@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
@@ -17,15 +18,17 @@ public class MiniMOTDPulseListener implements PulseListener {
     private final MiniMOTDModule miniMOTDModule;
 
     @Pulse
-    public void onModuleEnableEvent(ModuleEnableEvent event) {
-        if (!miniMOTDModule.isHooked()) return;
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        if (!miniMOTDModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.getModule();
+        AbstractModule eventModule = event.module();
         if (eventModule instanceof MaintenanceModule
                 && miniMOTDModule.config().disableFlectonepulseStatus()
                 && miniMOTDModule.isHooked()) {
-            event.setCancelled(true);
+            return event.withCancelled(true);
         }
+
+        return event;
     }
 
 }

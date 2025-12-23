@@ -31,12 +31,12 @@ public class MessagePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGHEST)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
-        Component message = event.getMessage();
+        Component message = event.message();
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
-        FPlayer fReceiver = event.getReceiver();
+        FPlayer fReceiver = event.receiver();
 
-        Destination destination = event.getEventMetadata().getDestination();
+        Destination destination = event.eventMetadata().getDestination();
 
         // fallback for legacy versions
         if (destination.type() == Destination.Type.TEXT_SCREEN && !isNewerThanOrEqualsV_1_19_4) {
@@ -49,8 +49,8 @@ public class MessagePulseListener implements PulseListener {
         }
 
         switch (destination.type()) {
-            case TITLE -> titleRender.render(fReceiver, message, event.getSubmessage(), destination.times());
-            case SUBTITLE -> titleRender.render(fReceiver, event.getSubmessage(), message, destination.times());
+            case TITLE -> titleRender.render(fReceiver, message, event.submessage(), destination.times());
+            case SUBTITLE -> titleRender.render(fReceiver, event.submessage(), message, destination.times());
             case ACTION_BAR -> actionBarRender.render(fReceiver, message, destination.times().stayTicks());
             case BOSS_BAR -> bossBarRender.render(fReceiver, message, destination.bossBar());
             case TAB_HEADER -> listFooterRender.render(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));

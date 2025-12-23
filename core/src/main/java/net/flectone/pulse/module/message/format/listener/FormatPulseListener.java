@@ -17,7 +17,7 @@ public class FormatPulseListener implements PulseListener {
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
 
         formatModule.addTags(messageContext);
     }

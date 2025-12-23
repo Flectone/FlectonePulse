@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.message.join.JoinModule;
@@ -22,7 +23,7 @@ public class JoinPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
             // delay for vanish plugins and newer versions
             joinModule.sendLater(fPlayer);
@@ -32,13 +33,13 @@ public class JoinPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+    public Event onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent == null) return;
+        if (translatableComponent == null) return event;
 
         String translationKey = translatableComponent.key();
-        if (!translationKey.equals("multiplayer.player.joined") && !translationKey.equals("multiplayer.player.joined.renamed")) return;
+        if (!translationKey.equals("multiplayer.player.joined") && !translationKey.equals("multiplayer.player.joined.renamed")) return event;
 
-        event.setCancelled(true);
+        return event.withCancelled(true);
     }
 }

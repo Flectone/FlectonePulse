@@ -1,16 +1,17 @@
 package net.flectone.pulse.model.event.message;
 
 import com.google.gson.JsonObject;
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.model.event.Event;
 
-@Getter
-public class StatusResponseEvent extends Event {
-
-    private final JsonObject response;
+@With
+public record StatusResponseEvent(
+        boolean cancelled,
+        JsonObject response
+) implements Event {
 
     public StatusResponseEvent(JsonObject response) {
-        this.response = response;
+        this(false, response);
     }
 
 }

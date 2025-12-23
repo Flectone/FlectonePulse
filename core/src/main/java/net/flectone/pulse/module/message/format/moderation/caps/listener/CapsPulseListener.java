@@ -18,7 +18,7 @@ public class CapsPulseListener implements PulseListener {
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.CAPS)) return;
 
         capsModule.format(messageContext);

@@ -19,21 +19,21 @@ public class ScoreboardPulseListener implements PulseListener {
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         scoreboardModule.create(fPlayer, false);
     }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
-        if (!event.isReload()) return;
+        if (!event.reload()) return;
 
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         scoreboardModule.create(fPlayer, true);
     }
 
     @Pulse
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         scoreboardModule.remove(fPlayer);
     }
 

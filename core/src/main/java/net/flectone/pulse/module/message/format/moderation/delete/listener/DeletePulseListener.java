@@ -28,7 +28,7 @@ public class DeletePulseListener implements PulseListener {
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+        MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.DELETE)) return;
 
         deleteModule.addTag(messageContext);
@@ -36,16 +36,16 @@ public class DeletePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FPlayer fPlayer = event.getPlayer();
+        FPlayer fPlayer = event.player();
         deleteModule.clearHistory(fPlayer);
     }
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         // skip action bar messages
-        if (event.isOverlay()) return;
+        if (event.overlay()) return;
 
-        Component component = event.getComponent();
+        Component component = event.component();
 
         // skip FlectonePulse messages
         if (deleteModule.isCached(component)) {
@@ -53,7 +53,7 @@ public class DeletePulseListener implements PulseListener {
             return;
         }
 
-        FPlayer fReceiver = event.getFPlayer();
+        FPlayer fReceiver = event.player();
         UUID messageUUID = UUID.randomUUID();
 
         deleteModule.save(fReceiver, messageUUID, component, false);
@@ -61,12 +61,12 @@ public class DeletePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
-        EventMetadata<?> eventMetadata = event.getEventMetadata();
+        EventMetadata<?> eventMetadata = event.eventMetadata();
         if (eventMetadata.getDestination().type() != Destination.Type.CHAT) return;
 
-        FPlayer fReceiver = event.getReceiver();
+        FPlayer fReceiver = event.receiver();
         UUID messageUUID = eventMetadata.getUuid();
-        Component component = event.getMessage();
+        Component component = event.message();
 
         deleteModule.save(fReceiver, messageUUID, component, true);
     }

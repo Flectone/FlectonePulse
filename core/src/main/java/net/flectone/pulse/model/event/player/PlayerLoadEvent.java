@@ -1,17 +1,17 @@
 package net.flectone.pulse.model.event.player;
 
-import lombok.Getter;
+import lombok.With;
 import net.flectone.pulse.model.entity.FPlayer;
 
-@Getter
-public class PlayerLoadEvent extends PlayerEvent {
-
-    private final boolean reload;
+@With
+public record PlayerLoadEvent(
+        boolean cancelled,
+        FPlayer player,
+        boolean reload
+) implements PlayerEvent {
 
     public PlayerLoadEvent(FPlayer player, boolean reload) {
-        super(player);
-
-        this.reload = reload;
+        this(false, player, reload);
     }
 
     public PlayerLoadEvent(FPlayer player) {
