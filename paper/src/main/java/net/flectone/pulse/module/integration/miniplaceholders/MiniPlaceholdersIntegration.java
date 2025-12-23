@@ -45,26 +45,26 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     }
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
         Set<TagResolver> resolvers = new HashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
-        Audience sender = getAudienceOrDefault(messageContext.getSender().getUuid(), null);
+        Audience sender = getAudienceOrDefault(messageContext.sender().getUuid(), null);
         Audience receiver = null;
         if (sender != null) {
-            receiver = getAudienceOrDefault(messageContext.getReceiver().getUuid(), sender);
+            receiver = getAudienceOrDefault(messageContext.receiver().getUuid(), sender);
 
             resolvers.add(MiniPlaceholders.audiencePlaceholders());
             resolvers.add(MiniPlaceholders.relationalPlaceholders());
         }
 
         TagResolver[] resolversArray = resolvers.toArray(new TagResolver[0]);
-        String message = replaceMiniPlaceholders(messageContext.getMessage(), resolversArray, sender, receiver);
+        String message = replaceMiniPlaceholders(messageContext.message(), resolversArray, sender, receiver);
 
-        messageContext.setMessage(message);
+        return event.withContext(messageContext.withMessage(message));
     }
 
     private Audience getAudienceOrDefault(UUID uuid, Audience defaultAudience) {

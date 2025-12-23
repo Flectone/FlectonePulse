@@ -61,15 +61,15 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
         return fileFacade.localization(sender).message().format().names();
     }
 
-    public void addTags(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (isModuleDisabledFor(sender)) return;
+    public MessageContext addTags(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        FPlayer receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.receiver();
 
         if (!(sender instanceof FPlayer fPlayer)) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
+            return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
                 Localization.Message.Format.Names localizationName = localization(receiver);
 
                 Component showEntityName = sender.getShowEntityName();
@@ -97,66 +97,58 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                 return Tag.selfClosingInserting(displayName);
             });
-            return;
         }
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
-            String constantName = fPlayer.getConstantName();
-            if (constantName == null) {
-                constantName = localization(fPlayer).constant();
-            }
+        return messageContext
+                .addTagResolvers(
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, context) -> {
+                            String constantName = fPlayer.getConstantName();
+                            if (constantName == null) {
+                                constantName = localization(fPlayer).constant();
+                            }
 
-            if (constantName.isEmpty()) {
-                return Tag.selfClosingInserting(Component.empty());
-            }
+                            if (constantName.isEmpty()) {
+                                return Tag.selfClosingInserting(Component.empty());
+                            }
 
-            return Tag.preProcessParsed(messagePipeline.builder(fPlayer, constantName).defaultSerializerBuild());
-        });
+                            return Tag.preProcessParsed(messagePipeline.builder(fPlayer, constantName).defaultSerializerBuild());
+                        }),
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, context) -> {
+                            Localization.Message.Format.Names localization = localization(receiver);
+                            String displayName = fPlayer.isUnknown()
+                                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
+                                    : localization.display();
+                            Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-            Localization.Message.Format.Names localization = localization(receiver);
+                            return Tag.selfClosingInserting(displayNameComponent);
+                        }),
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.VAULT_PREFIX.getTagName(), (argumentQueue, context) -> {
+                            String prefix = integrationModule.getPrefix(fPlayer);
+                            if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
 
-            String displayName = fPlayer.isUnknown()
-                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
-                    : localization.display();
+                            String text = messagePipeline.builder(fPlayer, receiver, prefix).defaultSerializerBuild();
+                            return Tag.preProcessParsed(text);
+                        }),
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.VAULT_SUFFIX.getTagName(), (argumentQueue, context) -> {
+                            String suffix = integrationModule.getSuffix(fPlayer);
+                            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
 
-            Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();
-
-            return Tag.selfClosingInserting(displayNameComponent);
-        });
-
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_PREFIX, (argumentQueue, context) -> {
-            String prefix = integrationModule.getPrefix(fPlayer);
-            if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
-
-            String text = messagePipeline.builder(fPlayer, receiver, prefix)
-                    .defaultSerializerBuild();
-
-            return Tag.preProcessParsed(text);
-        });
-
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_SUFFIX, (argumentQueue, context) -> {
-            String suffix = integrationModule.getSuffix(fPlayer);
-            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
-
-            String text = messagePipeline.builder(fPlayer, receiver, suffix)
-                    .defaultSerializerBuild();
-
-            return Tag.preProcessParsed(text);
-        });
-
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER, (argumentQueue, context) ->
-                Tag.preProcessParsed(fPlayer.getName())
-        );
+                            String text = messagePipeline.builder(fPlayer, receiver, suffix).defaultSerializerBuild();
+                            return Tag.preProcessParsed(text);
+                        }),
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (argumentQueue, context) ->
+                                Tag.preProcessParsed(fPlayer.getName())
+                        )
+                );
     }
 
-    public void addInvisibleTag(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (isModuleDisabledFor(sender)) return;
+    public MessageContext addInvisibleTag(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        FPlayer receiver = messageContext.getReceiver();
-        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
+        FPlayer receiver = messageContext.receiver();
+        return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
             String formatInvisible = localization(receiver).invisible();
             Component name = messagePipeline.builder(sender, receiver, formatInvisible)
                     .build();

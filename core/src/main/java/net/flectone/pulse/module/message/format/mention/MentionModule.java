@@ -88,13 +88,13 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         return fileFacade.localization(sender).message().format().mention();
     }
 
-    public void format(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
-        if (isUnknownSender(sender)) return;
+    public MessageContext format(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
+        if (isUnknownSender(sender)) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (StringUtils.isEmpty(contextMessage)) return;
+        String contextMessage = messageContext.message();
+        if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
         String formattedMessage;
         try {
@@ -104,18 +104,18 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             formattedMessage = replace(contextMessage);
         }
 
-        messageContext.setMessage(formattedMessage);
+        return messageContext.withMessage(formattedMessage);
     }
 
-    public void addTags(MessageContext messageContext) {
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.MENTION.getTagName())) return;
+    public MessageContext addTags(MessageContext messageContext) {
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.MENTION.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        UUID processId = messageContext.getMessageUUID();
-        FPlayer receiver = messageContext.getReceiver();
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
+        UUID processId = messageContext.messageUUID();
+        FPlayer receiver = messageContext.receiver();
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
 

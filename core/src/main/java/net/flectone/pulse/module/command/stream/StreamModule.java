@@ -165,15 +165,15 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         return fileFacade.localization(sender).command().stream();
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.STREAM_PREFIX.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.STREAM_PREFIX.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (!(sender instanceof FPlayer fPlayer)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        FEntity sender = messageContext.sender();
+        if (!(sender instanceof FPlayer fPlayer)) return messageContext;
+        if (isModuleDisabledFor(fPlayer)) return messageContext;
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
 

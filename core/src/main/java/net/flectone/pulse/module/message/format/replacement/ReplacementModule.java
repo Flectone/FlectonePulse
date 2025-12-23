@@ -107,12 +107,12 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return fileFacade.localization(sender).message().format().replacement();
     }
 
-    public void format(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+    public MessageContext format(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (StringUtils.isEmpty(contextMessage)) return;
+        String contextMessage = messageContext.message();
+        if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
         String formattedMessage;
         try {
@@ -122,19 +122,19 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             formattedMessage = processMessage(sender, contextMessage);
         }
 
-        messageContext.setMessage(formattedMessage);
+        return messageContext.withMessage(formattedMessage);
     }
 
-    public void addTags(MessageContext messageContext) {
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName())) return;
+    public MessageContext addTags(MessageContext messageContext) {
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        FPlayer receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.receiver();
         boolean isTranslateItem = messageContext.isFlag(MessageFlag.TRANSLATE_ITEM);
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 
@@ -157,7 +157,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 case "coords" -> coordsTag(sender, receiver);
                 case "stats" -> statsTag(sender, receiver);
                 case "skin" -> skinTag(sender, receiver);
-                case "item" -> itemTag(sender, receiver, messageContext.getMessageUUID(), isTranslateItem);
+                case "item" -> itemTag(sender, receiver, messageContext.messageUUID(), isTranslateItem);
                 case "url" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
@@ -171,7 +171,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 case "spoiler" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
-                    yield spoilerTag(sender, receiver, values.get(1), messageContext.getFlags());
+                    yield spoilerTag(sender, receiver, values.get(1), messageContext.flags());
                 }
                 default -> {
                     String[] searchList = new String[values.size()];

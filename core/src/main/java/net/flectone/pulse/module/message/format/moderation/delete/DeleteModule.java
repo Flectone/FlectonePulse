@@ -84,17 +84,17 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         playersHistory.remove(fPlayer.getUuid());
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.DELETE.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.DELETE.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        FPlayer receiver = messageContext.getReceiver();
-        if (isModuleDisabledFor(receiver)) return;
+        FEntity sender = messageContext.sender();
+        FPlayer receiver = messageContext.receiver();
+        if (isModuleDisabledFor(receiver)) return messageContext;
 
-        UUID messageUUID = messageContext.getMessageUUID();
+        UUID messageUUID = messageContext.messageUUID();
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
             String placeholder = Strings.CS.replace(
                     localization(receiver).placeholder(),
                     "<uuid>",

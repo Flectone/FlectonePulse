@@ -138,17 +138,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        FEntity sender = messageContext.getSender();
-        if (placeholderAPIModule.isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (placeholderAPIModule.isModuleDisabledFor(sender)) return event;
 
-        FEntity fReceiver = messageContext.getReceiver();
+        FEntity fReceiver = messageContext.receiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, placeholderAPIModule.permission().use()) && isUserMessage) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
+        if (!permissionChecker.check(sender, placeholderAPIModule.permission().use()) && isUserMessage) return event;
+        if (!(sender instanceof FPlayer fPlayer)) return event;
 
-        String message = messageContext.getMessage();
+        String message = messageContext.message();
 
         try {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());
@@ -167,6 +167,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             // ignore placeholderapi exceptions
         }
 
-        messageContext.setMessage(message);
+        return event.withContext(messageContext.withMessage(message));
     }
 }

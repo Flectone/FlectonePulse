@@ -63,15 +63,15 @@ public class FColorModule extends AbstractModule {
         return fileFacade.permission().message().format();
     }
 
-    public void format(MessageContext messageContext) {
-        String message = messageContext.getMessage();
-        if (!message.contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return;
+    public MessageContext format(MessageContext messageContext) {
+        String message = messageContext.message();
+        if (!message.contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return;
+        FEntity sender = messageContext.sender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return messageContext;
 
-        FPlayer receiver = messageContext.getReceiver();
-        if (isModuleDisabledFor(receiver)) return;
+        FPlayer receiver = messageContext.receiver();
+        if (isModuleDisabledFor(receiver)) return messageContext;
 
         // default map colors
         Map<Integer, String> colorsMap = new HashMap<>(config().defaultColors());
@@ -91,7 +91,7 @@ public class FColorModule extends AbstractModule {
         // convert legacy colors
         colorsMap.forEach((integer, string) -> colorsMap.put(integer, legacyColorConvertor.convert(string)));
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
+        messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
             OptionalInt number = argumentQueue.pop().asInt();
@@ -102,8 +102,10 @@ public class FColorModule extends AbstractModule {
 
         // replace deprecated tag
         if (message.contains("/fcolor")) {
-            messageContext.setMessage(RegExUtils.replaceAll(message, "</fcolor(:\\d+)?>", ""));
+            messageContext = messageContext.withMessage(RegExUtils.replaceAll(message, "</fcolor(:\\d+)?>", ""));
         }
+
+        return messageContext;
     }
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {

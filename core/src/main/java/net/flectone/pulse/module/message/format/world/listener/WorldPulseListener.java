@@ -11,7 +11,6 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.processing.context.MessageContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -34,9 +33,7 @@ public class WorldPulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
-
-        worldModule.addTag(messageContext);
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        return event.withContext(worldModule.addTag(event.context()));
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -17,11 +18,12 @@ public class SwearPulseListener implements PulseListener {
     private final SwearModule swearModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.SWEAR)) return;
+        if (!messageContext.isFlag(MessageFlag.SWEAR)) return event;
 
-        swearModule.format(messageContext);
-        swearModule.addTag(messageContext);
+        messageContext = swearModule.format(messageContext);
+        messageContext = swearModule.addTag(messageContext);
+        return event.withContext(messageContext);
     }
 }

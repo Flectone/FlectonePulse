@@ -37,14 +37,14 @@ public class FixationModule extends AbstractModule {
         return fileFacade.permission().message().format().fixation();
     }
 
-    public void format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+    public MessageContext format(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (contextMessage.isBlank()) return;
+        String contextMessage = messageContext.message();
+        if (contextMessage.isBlank()) return messageContext;
 
         if (config().endDot() && config().nonDotSymbols().stream().noneMatch(contextMessage::endsWith)) {
             contextMessage = contextMessage + ".";
@@ -54,6 +54,6 @@ public class FixationModule extends AbstractModule {
             contextMessage = Character.toUpperCase(contextMessage.charAt(0)) + contextMessage.substring(1);
         }
 
-        messageContext.setMessage(contextMessage);
+        return messageContext.withMessage(contextMessage);
     }
 }

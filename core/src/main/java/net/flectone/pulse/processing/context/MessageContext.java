@@ -1,7 +1,6 @@
 package net.flectone.pulse.processing.context;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.With;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -11,67 +10,94 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.CheckReturnValue;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
-public class MessageContext {
+@With
+public record MessageContext(
+        Map<MessageFlag, Boolean> flags,
+        Set<TagResolver> tagResolvers,
+        FEntity sender,
+        FPlayer receiver,
+        UUID messageUUID,
+        String message,
+        String userMessage
+) {
 
-    private final Map<MessageFlag, Boolean> flags = new EnumMap<>(MessageFlag.class);
-    private final Set<TagResolver> tagResolvers = new HashSet<>();
-
-    private final FEntity sender;
-    private final FPlayer receiver;
-    private final UUID messageUUID;
-    private String message;
-    private String userMessage;
+    public MessageContext {
+        flags = Map.copyOf(new EnumMap<>(flags != null && !flags.isEmpty() ? flags : new EnumMap<>(MessageFlag.class)));
+        tagResolvers = Set.copyOf(tagResolvers != null ? tagResolvers : Set.of());
+        userMessage = StringUtils.defaultString(userMessage);
+    }
 
     public MessageContext(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
-        this.messageUUID = messageUUID;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.message = message;
+        this(
+                new EnumMap<>(MessageFlag.class),
+                Set.of(),
+                sender,
+                receiver,
+                messageUUID,
+                message,
+                null
+        );
     }
 
-    public void addTagResolvers(TagResolver... resolvers) {
-        if (resolvers == null || resolvers.length == 0) return;
+    @CheckReturnValue
+    public MessageContext withFlag(MessageFlag flag, boolean value) {
+        Map<MessageFlag, Boolean> newFlags = this.flags.isEmpty()
+                ? new EnumMap<>(MessageFlag.class)
+                : new EnumMap<>(this.flags);
 
-        tagResolvers.addAll(Arrays.asList(resolvers));
+        newFlags.put(flag, value);
+        return withFlags(newFlags);
     }
 
-    public void addReplacementTag(TagResolver tagResolver) {
-        tagResolvers.add(tagResolver);
+    @CheckReturnValue
+    public MessageContext addTagResolver(TagResolver tagResolver) {
+        Set<TagResolver> newResolvers = new HashSet<>(this.tagResolvers);
+        newResolvers.add(tagResolver);
+
+        return withTagResolvers(newResolvers);
     }
 
-    public void addReplacementTag(MessagePipeline.ReplacementTag replacementTag, BiFunction<ArgumentQueue, Context, Tag> handler) {
-        addReplacementTag(TagResolver.resolver(replacementTag.getTagName(), handler));
+    @CheckReturnValue
+    public MessageContext addTagResolvers(Collection<TagResolver> tagResolvers) {
+        if (tagResolvers == null || tagResolvers.isEmpty()) return this;
+
+        Set<TagResolver> newResolvers = new HashSet<>(this.tagResolvers);
+        newResolvers.addAll(tagResolvers);
+
+        return withTagResolvers(newResolvers);
     }
 
-    public void addReplacementTag(Set<MessagePipeline.ReplacementTag> replacementTags, BiFunction<ArgumentQueue, Context, Tag> handler) {
+    @CheckReturnValue
+    public MessageContext addTagResolvers(TagResolver... resolvers) {
+        if (resolvers == null || resolvers.length == 0) return this;
+
+        return addTagResolvers(Arrays.asList(resolvers));
+    }
+
+    @CheckReturnValue
+    public MessageContext addTagResolver(MessagePipeline.ReplacementTag replacementTag,
+                                         BiFunction<ArgumentQueue, Context, Tag> handler) {
+        return addTagResolver(TagResolver.resolver(replacementTag.getTagName(), handler));
+    }
+
+    @CheckReturnValue
+    public MessageContext addTagResolver(Set<MessagePipeline.ReplacementTag> replacementTags,
+                                         BiFunction<ArgumentQueue, Context, Tag> handler) {
         Set<String> tags = replacementTags.stream()
                 .map(MessagePipeline.ReplacementTag::getTagName)
                 .collect(Collectors.toSet());
 
-        addReplacementTag(TagResolver.resolver(tags, handler));
+        return addTagResolver(TagResolver.resolver(tags, handler));
     }
 
     public boolean isFlag(MessageFlag flag) {
         return flags.getOrDefault(flag, flag.getDefaultValue());
     }
 
-    public void setFlag(MessageFlag flag, boolean value) {
-        flags.put(flag, value);
-    }
-
-    public void setFlags(Map<MessageFlag, Boolean> flags) {
-        this.flags.putAll(flags);
-    }
-
-    public @NotNull String getMessage() {
-        return StringUtils.defaultString(message);
-    }
 }

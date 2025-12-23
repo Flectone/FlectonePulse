@@ -65,15 +65,15 @@ public class LegacyColorConvertor {
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
-    public void convert(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
+    public MessageContext convert(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && !permissionChecker.check(sender, fileFacade.permission().message().format().legacyColors())) return;
+                && !permissionChecker.check(sender, fileFacade.permission().message().format().legacyColors())) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (StringUtils.isEmpty(contextMessage)) return;
+        String contextMessage = messageContext.message();
+        if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
-        messageContext.setMessage(convert(contextMessage));
+        return messageContext.withMessage(convert(contextMessage));
     }
 
     public String convert(String text) {

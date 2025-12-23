@@ -70,17 +70,17 @@ public class ObjectModule extends AbstractModule {
         return fileFacade.permission().message().format().object();
     }
 
-    public void addPlayerHeadTag(MessageContext messageContext) {
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())) return;
-        if (!config().playerHead()) return;
+    public MessageContext addPlayerHeadTag(MessageContext messageContext) {
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())) return messageContext;
+        if (!config().playerHead()) return messageContext;
 
-        FEntity sender = messageContext.getSender();
+        FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            if (isModuleDisabledFor(sender)) return;
-            if (!permissionChecker.check(sender, permission().playerHead())) return;
+            if (isModuleDisabledFor(sender)) return messageContext;
+            if (!permissionChecker.check(sender, permission().playerHead())) return messageContext;
         }
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER_HEAD, ((argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.PLAYER_HEAD, ((argumentQueue, context) -> {
             Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);
             if (receiverVersionTag != null) return receiverVersionTag;
 
@@ -124,17 +124,17 @@ public class ObjectModule extends AbstractModule {
         }));
     }
 
-    public void addSpriteTag(MessageContext messageContext) {
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.SPRITE.getTagName())) return;
-        if (!config().sprite()) return;
+    public MessageContext addSpriteTag(MessageContext messageContext) {
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.SPRITE.getTagName())) return messageContext;
+        if (!config().sprite()) return messageContext;
 
-        FEntity sender = messageContext.getSender();
+        FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            if (isModuleDisabledFor(sender)) return;
-            if (!permissionChecker.check(sender, permission().sprite())) return;
+            if (isModuleDisabledFor(sender)) return messageContext;
+            if (!permissionChecker.check(sender, permission().sprite())) return messageContext;
         }
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPRITE, ((argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SPRITE, ((argumentQueue, context) -> {
             Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);
             if (receiverVersionTag != null) return receiverVersionTag;
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
@@ -159,7 +159,7 @@ public class ObjectModule extends AbstractModule {
     }
 
     private Tag checkAndGetReceiverTag(MessageContext messageContext) {
-        FPlayer fReceiver = messageContext.getReceiver();
+        FPlayer fReceiver = messageContext.receiver();
 
         // check console version
         if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {

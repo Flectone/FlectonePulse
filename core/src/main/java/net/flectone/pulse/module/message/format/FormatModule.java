@@ -133,25 +133,26 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         return fileFacade.localization(sender).message().format();
     }
 
-    public void addTags(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+    public MessageContext addTags(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
 
-        tagResolverMap
+        return messageContext.addTagResolvers(tagResolverMap
                 .entrySet()
                 .stream()
                 .filter(entry -> isCorrectTag(entry.getKey(), sender, isUserMessage))
-                .forEach(entry -> {
+                .map(entry -> {
                     if (entry.getKey() == AdventureTag.GRADIENT
-                            && integrationModule.isBedrockPlayer(messageContext.getReceiver())) {
-                        messageContext.addReplacementTag(bedrockGradientTag());
-                        return;
+                            && integrationModule.isBedrockPlayer(messageContext.receiver())) {
+                        return bedrockGradientTag();
                     }
 
-                    messageContext.addReplacementTag(entry.getValue());
-                });
+                    return entry.getValue();
+                })
+                .toList()
+        );
     }
 
     public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {

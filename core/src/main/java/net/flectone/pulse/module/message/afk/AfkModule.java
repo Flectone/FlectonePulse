@@ -85,15 +85,15 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         return fileFacade.localization(sender).message().afk();
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.AFK_SUFFIX.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.AFK_SUFFIX.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
+        if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
 

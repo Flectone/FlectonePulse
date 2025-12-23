@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -17,11 +18,12 @@ public class MentionPulseListener implements PulseListener {
     private final MentionModule mentionModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.MENTION)) return;
+        if (!messageContext.isFlag(MessageFlag.MENTION)) return event;
 
-        mentionModule.format(messageContext);
-        mentionModule.addTags(messageContext);
+        messageContext = mentionModule.format(messageContext);
+        messageContext = mentionModule.addTags(messageContext);
+        return event.withContext(messageContext);
     }
 }

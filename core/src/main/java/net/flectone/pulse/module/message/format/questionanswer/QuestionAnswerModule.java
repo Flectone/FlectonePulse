@@ -106,13 +106,13 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         return fileFacade.localization(sender).message().format().questionAnswer();
     }
 
-    public void format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+    public MessageContext format(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
+        String contextMessage = messageContext.message();
         StringBuilder result = new StringBuilder(contextMessage);
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
@@ -130,20 +130,20 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
             result.append("<question:'").append(entry.getKey()).append("'>");
         }
 
-        messageContext.setMessage(result.toString());
+        return messageContext.withMessage(result.toString());
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.QUESTION.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.QUESTION.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        UUID processId = messageContext.getMessageUUID();
-        FEntity receiver = messageContext.getReceiver();
+        UUID processId = messageContext.messageUUID();
+        FEntity receiver = messageContext.receiver();
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {
             Tag.Argument questionTag = argumentQueue.peek();
             if (questionTag == null) return Tag.selfClosingInserting(Component.empty());
 

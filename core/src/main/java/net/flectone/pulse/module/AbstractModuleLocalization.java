@@ -200,7 +200,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
         if (!receiver.isUnknown()) {
             formatBuilder = formatBuilder
-                    .setUserMessage(eventMetadata.getMessage())
+                    .userMessage(eventMetadata.getMessage())
                     .translate(formatContent.contains("<translate")); // support new <translate> and old <translateto>
         }
 

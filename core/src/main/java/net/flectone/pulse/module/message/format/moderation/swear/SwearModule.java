@@ -7,9 +7,9 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -18,10 +18,10 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.swear.listener.SwearPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -92,13 +92,13 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         return fileFacade.localization(sender).message().format().moderation().swear();
     }
 
-    public void format(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+    public MessageContext format(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (StringUtils.isEmpty(contextMessage)) return;
+        String contextMessage = messageContext.message();
+        if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
         String formattedMessage;
         try {
@@ -108,18 +108,18 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             formattedMessage = replace(sender, contextMessage);
         }
 
-        messageContext.setMessage(formattedMessage);
+        return messageContext.withMessage(formattedMessage);
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.SWEAR.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.SWEAR.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
 
-        FPlayer receiver = messageContext.getReceiver();
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
+        FPlayer receiver = messageContext.receiver();
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return Tag.selfClosingInserting(Component.empty());
 

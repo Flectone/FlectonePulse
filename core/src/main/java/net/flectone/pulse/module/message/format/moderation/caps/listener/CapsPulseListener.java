@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -17,10 +18,10 @@ public class CapsPulseListener implements PulseListener {
     private final CapsModule capsModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.CAPS)) return;
+        if (!messageContext.isFlag(MessageFlag.CAPS)) return event;
 
-        capsModule.format(messageContext);
+        return event.withContext(capsModule.format(messageContext));
     }
 }

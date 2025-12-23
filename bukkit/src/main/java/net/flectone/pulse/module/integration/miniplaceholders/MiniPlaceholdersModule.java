@@ -43,11 +43,10 @@ public class MiniPlaceholdersModule extends AbstractModule {
             MessageFormattingEvent messageFormattingEvent = (MessageFormattingEvent) event;
 
             MessageContext messageContext = messageFormattingEvent.context();
-            FEntity sender = messageContext.getSender();
+            FEntity sender = messageContext.sender();
             if (isModuleDisabledFor(sender)) return event;
 
-            miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
-            return event;
+            return miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
         });
     }
 

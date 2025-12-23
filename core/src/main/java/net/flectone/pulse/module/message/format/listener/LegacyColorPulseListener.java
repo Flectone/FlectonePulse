@@ -18,10 +18,10 @@ public class LegacyColorPulseListener implements PulseListener {
     private final LegacyColorConvertor legacyColorConvertor;
 
     @Pulse(priority = Event.Priority.HIGHEST)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.LEGACY_COLORS)) return;
+        if (!messageContext.isFlag(MessageFlag.LEGACY_COLORS)) return event;
 
-        legacyColorConvertor.convert(messageContext);
+        return event.withContext(legacyColorConvertor.convert(messageContext));
     }
 }

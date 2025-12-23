@@ -3,7 +3,6 @@ package net.flectone.pulse.execution.pipeline;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
@@ -24,6 +23,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -44,15 +44,15 @@ public class MessagePipeline {
     }
 
     public Builder builder(@NotNull FPlayer sender, @NotNull String message) {
-        return new Builder(sender, sender, message);
+        return new Builder(sender, sender, message, this);
     }
 
     public Builder builder(@NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
-        return new Builder(sender, receiver, message);
+        return new Builder(sender, receiver, message, this);
     }
 
     public Builder builder(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
-        return new Builder(messageUUID, sender, receiver, message);
+        return new Builder(messageUUID, sender, receiver, message, this);
     }
 
     public Optional<String> legacyFormat(@NotNull FPlayer fPlayer, @NotNull String message) {
@@ -77,86 +77,6 @@ public class MessagePipeline {
         }
 
         return Optional.empty();
-    }
-
-    public class Builder {
-
-        @Getter private final MessageContext context;
-
-        public Builder(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
-            this.context = new MessageContext(messageUUID, sender, receiver, message);
-        }
-
-        public Builder(FEntity sender, FPlayer receiver, String message) {
-            this(UUID.randomUUID(), sender, receiver, message);
-        }
-
-        public Builder flag(MessageFlag flag, boolean value) {
-            context.setFlag(flag, value);
-            return this;
-        }
-
-        public Builder flags(Map<MessageFlag, Boolean> flags) {
-            context.setFlags(flags);
-            return this;
-        }
-
-        public Builder setUserMessage(String userMessage) {
-            context.setUserMessage(userMessage);
-            return this;
-        }
-
-        public Builder translate(boolean translate) {
-            context.setFlag(MessageFlag.TRANSLATE, translate);
-            return this;
-        }
-
-        public Builder tagResolvers(TagResolver... tagResolvers) {
-            context.addTagResolvers(tagResolvers);
-            return this;
-        }
-
-        public Component build() {
-            eventDispatcher.dispatch(new MessageFormattingEvent(context));
-
-            // replace disabled tags
-            if (context.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !context.isFlag(MessageFlag.USER_MESSAGE)) {
-                Arrays.stream(ReplacementTag.values())
-                        .filter(tag -> context.getTagResolvers()
-                                .stream()
-                                .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
-                                .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
-                        )
-                        .forEach(tag -> context.addReplacementTag(tag.empty()));
-            }
-
-            try {
-                return miniMessage.deserialize(
-                        Strings.CS.replace(context.getMessage(), "§", "&"),
-                        context.getTagResolvers().toArray(new TagResolver[0])
-                );
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-
-            return Component.empty();
-        }
-
-        public String defaultSerializerBuild() {
-            return addTrailingSpaces(context.getMessage(), MiniMessage.miniMessage().serialize(build()));
-        }
-
-        public String plainSerializerBuild() {
-            return addTrailingSpaces(context.getMessage(), PlainTextComponentSerializer.plainText().serialize(build()));
-        }
-
-        public String legacySerializerBuild() {
-            return addTrailingSpaces(context.getMessage(), LegacyComponentSerializer.legacySection().serialize(build()));
-        }
-
-        public JsonElement jsonSerializerBuild() {
-            return GsonComponentSerializer.gson().serializeToTree(build());
-        }
     }
 
     // MiniMessage removes trailing spaces during serialization, so we need to add them back
@@ -188,6 +108,93 @@ public class MessagePipeline {
         }
 
         return count;
+    }
+
+    public record Builder(
+            MessageContext context,
+            MessagePipeline pipeline
+    ) {
+
+        public Builder(UUID messageUUID, FEntity sender, FPlayer receiver, String message, MessagePipeline pipeline) {
+            this(new MessageContext(messageUUID, sender, receiver, message), pipeline);
+        }
+
+        public Builder(FEntity sender, FPlayer receiver, String message, MessagePipeline pipeline) {
+            this(UUID.randomUUID(), sender, receiver, message, pipeline);
+        }
+
+        @CheckReturnValue
+        public Builder flag(MessageFlag flag, boolean value) {
+            return new Builder(context.withFlag(flag, value), pipeline);
+        }
+
+        @CheckReturnValue
+        public Builder flags(Map<MessageFlag, Boolean> flags) {
+            return new Builder(context.withFlags(flags), pipeline);
+        }
+
+        @CheckReturnValue
+        public Builder userMessage(String userMessage) {
+            return new Builder(context.withUserMessage(userMessage), pipeline);
+        }
+
+        @CheckReturnValue
+        public Builder translate(boolean translate) {
+            return flag(MessageFlag.TRANSLATE, translate);
+        }
+
+        @CheckReturnValue
+        public Builder tagResolvers(TagResolver... tagResolvers) {
+            return new Builder(context.addTagResolvers(tagResolvers), pipeline);
+        }
+
+        public Component build() {
+            MessageFormattingEvent event = pipeline.eventDispatcher.dispatch(new MessageFormattingEvent(context));
+            MessageContext eventContext = event.context();
+
+            MessageContext finalContext = eventContext;
+
+            if (finalContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !finalContext.isFlag(MessageFlag.USER_MESSAGE)) {
+                finalContext = finalContext.addTagResolvers(
+                        Arrays.stream(ReplacementTag.values())
+                        .filter(tag -> eventContext.tagResolvers()
+                                .stream()
+                                .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
+                                .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
+                        )
+                        .map(ReplacementTag::empty)
+                        .toList()
+                );
+            }
+
+            try {
+                return pipeline.miniMessage.deserialize(
+                        Strings.CS.replace(finalContext.message(), "§", "&"),
+                        finalContext.tagResolvers().toArray(new TagResolver[0])
+                );
+            } catch (Exception e) {
+                pipeline.fLogger.warning(e);
+            }
+
+            return Component.empty();
+        }
+
+        public String defaultSerializerBuild() {
+            return pipeline.addTrailingSpaces(context.message(), MiniMessage.miniMessage().serialize(build()));
+        }
+
+        public String plainSerializerBuild() {
+            return pipeline.addTrailingSpaces(context.message(), PlainTextComponentSerializer.plainText().serialize(build()));
+        }
+
+        public String legacySerializerBuild() {
+            return pipeline.addTrailingSpaces(context.message(), LegacyComponentSerializer.legacySection().serialize(build()));
+        }
+
+        public JsonElement jsonSerializerBuild() {
+            return GsonComponentSerializer.gson().serializeToTree(build());
+        }
+
     }
 
     public enum ReplacementTag {

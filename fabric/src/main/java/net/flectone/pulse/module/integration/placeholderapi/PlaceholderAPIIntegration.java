@@ -143,22 +143,22 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        FEntity sender = messageContext.getSender();
-        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return;
+        FEntity sender = messageContext.sender();
+        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return event;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
+        if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;
+        if (!(sender instanceof FPlayer fPlayer)) return event;
 
         Object player = fPlayerService.toPlatformFPlayer(fPlayer);
-        if (!(player instanceof ServerPlayerEntity playerEntity)) return;
+        if (!(player instanceof ServerPlayerEntity playerEntity)) return event;
 
-        String message = messageContext.getMessage();
+        String message = messageContext.message();
 
         Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
-        messageContext.setMessage(text.getString());
+        return event.withContext(messageContext.withMessage(text.getString()));
     }
 
     private PlaceholderResult fColorPlaceholder(PlaceholderContext context, String argument, FColor.Type... types) {

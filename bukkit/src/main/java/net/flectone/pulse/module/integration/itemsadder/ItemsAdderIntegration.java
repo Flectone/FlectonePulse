@@ -38,15 +38,15 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!isHooked()) return;
+        if (!isHooked()) return event;
 
-        FEntity fPlayer = messageContext.getSender();
+        FEntity fPlayer = messageContext.sender();
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return;
+        if (player == null) return event;
 
-        String message = FontImageWrapper.replaceFontImages(player, messageContext.getMessage());
-        messageContext.setMessage(message);
+        String message = FontImageWrapper.replaceFontImages(player, messageContext.message());
+        return event.withContext(messageContext.withMessage(message));
     }
 }

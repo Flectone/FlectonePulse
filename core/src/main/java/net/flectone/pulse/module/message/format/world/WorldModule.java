@@ -60,15 +60,15 @@ public class WorldModule extends AbstractModule {
         return fileFacade.permission().message().format().world();
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.WORLD_PREFIX.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.WORLD_PREFIX.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
+        if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
             String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
             if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
 

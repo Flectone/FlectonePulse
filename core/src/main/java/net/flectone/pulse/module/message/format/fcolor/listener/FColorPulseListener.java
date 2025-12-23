@@ -17,10 +17,10 @@ public class FColorPulseListener implements PulseListener {
     private final FColorModule fColorModule;
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = fColorModule.format(event.context());
 
-        fColorModule.format(messageContext);
+        return event.withContext(messageContext);
     }
 
 }

@@ -27,11 +27,11 @@ public class DeletePulseListener implements PulseListener {
     private final DeleteModule deleteModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.DELETE)) return;
+        if (!messageContext.isFlag(MessageFlag.DELETE)) return event;
 
-        deleteModule.addTag(messageContext);
+        return event.withContext(deleteModule.addTag(messageContext));
     }
 
     @Pulse(priority = Event.Priority.MONITOR)

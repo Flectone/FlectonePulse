@@ -61,9 +61,9 @@ public class AfkPulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = afkModule.addTag(event.context());
 
-        afkModule.addTag(messageContext);
+        return event.withContext(messageContext);
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -17,13 +18,14 @@ public class ObjectPulseListener implements PulseListener {
     private final ObjectModule objectModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.OBJECT_PLAYER_HEAD)) return;
-        if (!messageContext.isFlag(MessageFlag.OBJECT_SPRITE)) return;
+        if (!messageContext.isFlag(MessageFlag.OBJECT_PLAYER_HEAD)) return event;
+        if (!messageContext.isFlag(MessageFlag.OBJECT_SPRITE)) return event;
 
-        objectModule.addPlayerHeadTag(messageContext);
-        objectModule.addSpriteTag(messageContext);
+        messageContext = objectModule.addPlayerHeadTag(messageContext);
+        messageContext = objectModule.addSpriteTag(messageContext);
+        return event.withContext(messageContext);
     }
 
 }

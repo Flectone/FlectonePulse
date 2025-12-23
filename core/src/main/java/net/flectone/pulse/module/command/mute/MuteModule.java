@@ -141,15 +141,15 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         return fileFacade.localization(sender).command().mute();
     }
 
-    public void addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
-        if (!messageContext.getMessage().contains(MessagePipeline.ReplacementTag.MUTE_SUFFIX.getTagName())) return;
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.MUTE_SUFFIX.getTagName())) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (!(sender instanceof FPlayer fPlayer)) return;
+        FEntity sender = messageContext.sender();
+        if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
-            String suffix = getMuteSuffix(fPlayer, messageContext.getReceiver());
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
+            String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
             return Tag.preProcessParsed(suffix);
         });
     }

@@ -22,13 +22,13 @@ public class NamesPulseListener implements PulseListener {
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        FEntity sender = messageContext.getSender();
+        FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME) && isInvisible(sender)) {
-            namesModule.addInvisibleTag(messageContext);
+            return event.withContext(namesModule.addInvisibleTag(messageContext));
         } else {
-            namesModule.addTags(messageContext);
+            return event.withContext(namesModule.addTags(messageContext));
         }
     }
 

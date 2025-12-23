@@ -47,20 +47,20 @@ public class FloodModule extends AbstractModule {
         return fileFacade.permission().message().format().moderation().flood();
     }
 
-    public void format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+    public MessageContext format(MessageContext messageContext) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
 
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
-        if (permissionChecker.check(sender, permission().bypass())) return;
+        FEntity sender = messageContext.sender();
+        if (isModuleDisabledFor(sender)) return messageContext;
+        if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
-        String contextMessage = messageContext.getMessage();
-        if (StringUtils.isEmpty(contextMessage)) return;
+        String contextMessage = messageContext.message();
+        if (StringUtils.isEmpty(contextMessage)) return messageContext;
 
         contextMessage = replaceRepeatedSymbols(contextMessage);
         contextMessage = replaceRepeatedWords(contextMessage);
 
-        messageContext.setMessage(contextMessage);
+        return messageContext.withMessage(contextMessage);
     }
 
     private String replaceRepeatedSymbols(String string) {

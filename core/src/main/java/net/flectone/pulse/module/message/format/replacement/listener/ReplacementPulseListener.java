@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -17,12 +18,13 @@ public class ReplacementPulseListener implements PulseListener {
     private final ReplacementModule replacementModule;
 
     @Pulse
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.REPLACEMENT)) return;
+        if (!messageContext.isFlag(MessageFlag.REPLACEMENT)) return event;
 
-        replacementModule.format(messageContext);
-        replacementModule.addTags(messageContext);
+        messageContext = replacementModule.format(messageContext);
+        messageContext = replacementModule.addTags(messageContext);
+        return event.withContext(messageContext);
     }
 
 }

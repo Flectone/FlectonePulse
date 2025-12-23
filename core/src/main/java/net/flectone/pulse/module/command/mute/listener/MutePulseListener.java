@@ -17,10 +17,10 @@ public class MutePulseListener implements PulseListener {
     private final MuteModule muteModule;
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = muteModule.addTag(event.context());
 
-        muteModule.addTag(messageContext);
+        return event.withContext(messageContext);
     }
 
 }
