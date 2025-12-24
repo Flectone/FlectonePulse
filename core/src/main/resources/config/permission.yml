@@ -600,6 +600,9 @@ message:
   afk:
     name: "flectonepulse.module.message.afk"
     type: "TRUE"
+    sound:
+      name: "flectonepulse.module.message.afk.sound"
+      type: "TRUE"
   anvil:
     name: "flectonepulse.module.message.anvil"
     type: "TRUE"

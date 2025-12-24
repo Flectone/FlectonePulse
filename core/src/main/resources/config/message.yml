@@ -10,6 +10,8 @@ afk:
   ticker:
     enable: true
     period: 20
+  sound:
+    enable: false
 anvil:
   enable: false
 auto:

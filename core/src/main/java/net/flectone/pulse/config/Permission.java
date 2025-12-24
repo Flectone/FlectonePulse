@@ -991,8 +991,9 @@ public record Permission(
         @Jacksonized
         public record Afk(
                 String name,
-                Permission.Type type
-        ) implements PermissionSetting {}
+                Permission.Type type,
+                PermissionEntry sound
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)

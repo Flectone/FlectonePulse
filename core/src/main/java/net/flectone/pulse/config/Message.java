@@ -99,8 +99,9 @@ public record Message(
             Integer delay,
             List<String> ignore,
             Destination destination,
-            Ticker ticker
-    ) implements EnableSetting {
+            Ticker ticker,
+            Sound sound
+    ) implements EnableSetting, SoundConfigSetting {
     }
 
     @With
