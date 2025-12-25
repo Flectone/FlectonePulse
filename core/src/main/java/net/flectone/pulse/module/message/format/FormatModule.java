@@ -3,12 +3,14 @@ package net.flectone.pulse.module.message.format;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
@@ -52,20 +54,20 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     private final IntegrationModule integrationModule;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(FColorModule.class);
-        addChild(FixationModule.class);
-        addChild(MentionModule.class);
-        addChild(ModerationModule.class);
-        addChild(NamesModule.class);
-        addChild(ObjectModule.class);
-        addChild(QuestionAnswerModule.class);
-        addChild(ReplacementModule.class);
-        addChild(ScoreboardModule.class);
-        addChild(TranslateModule.class);
-        addChild(WorldModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                FColorModule.class,
+                FixationModule.class,
+                MentionModule.class,
+                ModerationModule.class,
+                NamesModule.class,
+                ObjectModule.class,
+                QuestionAnswerModule.class,
+                ReplacementModule.class,
+                ScoreboardModule.class,
+                TranslateModule.class,
+                WorldModule.class
+        );
     }
 
     @Override

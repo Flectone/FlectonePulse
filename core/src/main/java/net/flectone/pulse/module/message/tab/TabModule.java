@@ -1,7 +1,9 @@
 package net.flectone.pulse.module.message.tab;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -18,12 +20,12 @@ public class TabModule extends AbstractModule {
     private final FileFacade fileFacade;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(FooterModule.class);
-        addChild(HeaderModule.class);
-        addChild(PlayerlistnameModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                FooterModule.class,
+                HeaderModule.class,
+                PlayerlistnameModule.class
+        );
     }
 
     @Override

@@ -2,11 +2,13 @@ package net.flectone.pulse.module.message.status;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -49,13 +51,13 @@ public class StatusModule extends AbstractModule {
     private final EventDispatcher eventDispatcher;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(MOTDModule.class);
-        addChild(IconModule.class);
-        addChild(PlayersModule.class);
-        addChild(VersionModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                MOTDModule.class,
+                IconModule.class,
+                PlayersModule.class,
+                VersionModule.class
+        );
     }
 
     @Override

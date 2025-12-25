@@ -1,7 +1,9 @@
 package net.flectone.pulse.module.message;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -35,29 +37,29 @@ public class MessageModule extends AbstractModule {
     private final FileFacade fileFacade;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(AfkModule.class);
-        addChild(AnvilModule.class);
-        addChild(AutoModule.class);
-        addChild(BookModule.class);
-        addChild(BossbarModule.class);
-        addChild(BrandModule.class);
-        addChild(BubbleModule.class);
-        addChild(ChatModule.class);
-        addChild(FormatModule.class);
-        addChild(GreetingModule.class);
-        addChild(JoinModule.class);
-        addChild(ObjectiveModule.class);
-        addChild(QuitModule.class);
-        addChild(RightclickModule.class);
-        addChild(SidebarModule.class);
-        addChild(SignModule.class);
-        addChild(StatusModule.class);
-        addChild(TabModule.class);
-        addChild(UpdateModule.class);
-        addChild(VanillaModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                AfkModule.class,
+                AnvilModule.class,
+                AutoModule.class,
+                BookModule.class,
+                BossbarModule.class,
+                BrandModule.class,
+                BubbleModule.class,
+                ChatModule.class,
+                FormatModule.class,
+                GreetingModule.class,
+                JoinModule.class,
+                ObjectiveModule.class,
+                QuitModule.class,
+                RightclickModule.class,
+                SidebarModule.class,
+                SignModule.class,
+                StatusModule.class,
+                TabModule.class,
+                UpdateModule.class,
+                VanillaModule.class
+        );
     }
 
     @Override

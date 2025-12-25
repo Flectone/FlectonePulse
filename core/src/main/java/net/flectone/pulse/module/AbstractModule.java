@@ -8,23 +8,26 @@ import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 @Getter
+@Setter
 public abstract class AbstractModule {
 
-    private final Set<Class<? extends AbstractModule>> children = new LinkedHashSet<>();
-    private final List<BiPredicate<FEntity, Boolean>> predicates = new ArrayList<>();
-
-    @Setter
+    private List<BiPredicate<FEntity, Boolean>> predicates;
+    private List<Class<? extends AbstractModule>> children;
     private boolean enable;
 
     protected AbstractModule() {
+    }
+
+    public ImmutableList.Builder<@NonNull BiPredicate<FEntity, Boolean>> predicateBuilder() {
+        return ImmutableList.builder();
+    }
+
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return ImmutableList.builder();
     }
 
     public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
@@ -35,26 +38,14 @@ public abstract class AbstractModule {
 
     public void onDisable() {}
 
-    public void configureChildren() {}
-
     public abstract EnableSetting config();
 
     public abstract PermissionSetting permission();
 
-    public void addChild(Class<? extends AbstractModule> clazz) {
-        children.add(clazz);
-    }
-
-    public void addPredicate(Predicate<FEntity> predicate) {
-        predicates.add((fEntity, value) -> predicate.test(fEntity));
-    }
-
-    public void addPredicate(BiPredicate<FEntity, Boolean> biPredicate) {
-        predicates.add(biPredicate);
-    }
-
     public boolean containsChild(Class<? extends AbstractModule> clazz) {
-        return getChildren().contains(clazz);
+        if (children == null) return false;
+
+        return children.contains(clazz);
     }
 
     public boolean isModuleDisabledFor(FEntity entity) {
@@ -62,6 +53,8 @@ public abstract class AbstractModule {
     }
 
     public boolean isModuleDisabledFor(FEntity entity, boolean isMessage) {
+        if (predicates == null) return false;
+
         for (BiPredicate<FEntity, Boolean> predicate : predicates) {
             if (predicate.test(entity, isMessage)) {
                 return true;

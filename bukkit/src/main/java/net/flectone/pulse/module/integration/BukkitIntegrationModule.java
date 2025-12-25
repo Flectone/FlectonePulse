@@ -1,8 +1,11 @@
 package net.flectone.pulse.module.integration;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.NonNull;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
 import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -53,72 +56,74 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
-            addChild(AdvancedBanModule.class);
+            builder.add(AdvancedBanModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlaceholderAPI")) {
-            addChild(PlaceholderAPIModule.class);
+            builder.add(PlaceholderAPIModule.class);
         }
 
         if (platformServerAdapter.hasProject("Vault")) {
-            addChild(VaultModule.class);
+            builder.add(VaultModule.class);
         }
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
             if (reflectionResolver.hasClass("com.loohp.interactivechat.registry.Registry")) {
-                addChild(InteractiveChatModule.class);
+                builder.add(InteractiveChatModule.class);
             } else {
                 fLogger.warning("Update InteractiveChat to the latest version");
             }
         }
 
         if (platformServerAdapter.hasProject("ItemsAdder")) {
-            addChild(ItemsAdderModule.class);
+            builder.add(ItemsAdderModule.class);
         }
 
         if (platformServerAdapter.hasProject("LibertyBans")) {
-            addChild(LibertyBansModule.class);
+            builder.add(LibertyBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("LiteBans")) {
-            addChild(LiteBansModule.class);
+            builder.add(LiteBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("Maintenance")) {
-            addChild(MaintenanceModule.class);
+            builder.add(MaintenanceModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniMOTD")) {
-            addChild(MiniMOTDModule.class);
+            builder.add(MiniMOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            addChild(MiniPlaceholdersModule.class);
+            builder.add(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("MOTD")) {
-            addChild(MOTDModule.class);
+            builder.add(MOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             if (reflectionResolver.hasClass("de.myzelyam.api.vanish.VanishAPI")) {
-                addChild(SuperVanishModule.class);
+                builder.add(SuperVanishModule.class);
             } else {
                 fLogger.warning("Integration with SuperVanish is not possible. Are you using another plugin with the same name? It is only supported https://www.spigotmc.org/resources/supervanish-be-invisible.1331/");
             }
         }
 
         if (platformServerAdapter.hasProject("TAB")) {
-            addChild(TABModule.class);
+            builder.add(TABModule.class);
         }
 
         if (platformServerAdapter.hasProject("Triton")) {
-            addChild(TritonModule.class);
+            builder.add(TritonModule.class);
         }
+
+        return builder;
     }
 
     @Override

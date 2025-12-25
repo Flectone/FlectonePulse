@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.integration;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
+import lombok.NonNull;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -19,9 +21,9 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -51,46 +53,48 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
-            addChild(SkinsRestorerModule.class);
+            builder.add(SkinsRestorerModule.class);
         }
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
-            addChild(LuckPermsModule.class);
+            builder.add(LuckPermsModule.class);
         }
 
         if (platformServerAdapter.hasProject("voicechat")) {
-            addChild(SimpleVoiceModule.class);
+            builder.add(SimpleVoiceModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlasmoVoice")) {
             if (reflectionResolver.hasClass("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent")) {
-                addChild(PlasmoVoiceModule.class);
+                builder.add(PlasmoVoiceModule.class);
             } else {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
         }
 
         if (platformServerAdapter.hasProject("floodgate")) {
-            addChild(FloodgateModule.class);
+            builder.add(FloodgateModule.class);
         }
 
         if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
-                addChild(GeyserModule.class);
+                builder.add(GeyserModule.class);
             } else {
                 fLogger.warning("Geyser hook is failed, check that Geyser is turned on and working");
             }
         }
 
-        addChild(DeeplModule.class);
-        addChild(DiscordModule.class);
-        addChild(TelegramModule.class);
-        addChild(TwitchModule.class);
-        addChild(YandexModule.class);
+        return builder.add(
+                DeeplModule.class,
+                DiscordModule.class,
+                TelegramModule.class,
+                TwitchModule.class,
+                YandexModule.class
+        );
     }
 
     @Override

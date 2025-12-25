@@ -1,10 +1,13 @@
 package net.flectone.pulse.platform.controller;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.module.ModuleDisableEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
@@ -27,8 +30,10 @@ import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 @Singleton
@@ -89,8 +94,8 @@ public class ModuleController {
     public void configureChildren(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
-        module.getChildren().clear();
-        module.configureChildren();
+        module.setChildren(module.childrenBuilder().build());
+        module.setPredicates(buildPredicates(module));
 
         module.getChildren().forEach(this::configureChildren);
     }
@@ -107,8 +112,6 @@ public class ModuleController {
                 module.onDisable();
             }
         }
-
-        addDefaultPredicates(module);
 
         module.setEnable(enablePredicate.test(module));
 
@@ -127,17 +130,21 @@ public class ModuleController {
         module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
     }
 
-    public void addDefaultPredicates(AbstractModule module) {
-        module.getPredicates().clear();
+    public List<BiPredicate<FEntity, Boolean>> buildPredicates(AbstractModule module) {
+        ImmutableList.Builder<@NonNull BiPredicate<FEntity, Boolean>> predicatesBuilder = module.predicateBuilder();
 
-        module.addPredicate(fPlayer -> !module.isEnable());
-        module.addPredicate(fPlayer -> !permissionChecker.check(fPlayer, module.permission()));
+        predicatesBuilder
+                .add((fPlayer, needBoolean) -> !module.isEnable())
+                .add((fPlayer, needBoolean) -> !permissionChecker.check(fPlayer, module.permission()));
 
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
-            module.addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()));
-            module.addPredicate((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.cooldown()));
-            module.addPredicate((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
+            predicatesBuilder
+                    .add((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()))
+                    .add((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.cooldown()))
+                    .add((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
         }
+
+        return predicatesBuilder.build();
     }
 
     public boolean isInstanceOfAny(AbstractModule module, Set<Class<? extends AbstractModule>> classes) {

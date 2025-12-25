@@ -3,8 +3,10 @@ package net.flectone.pulse.module.message.objective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -25,11 +27,11 @@ public class ObjectiveModule extends AbstractModule {
     private final PacketSender packetSender;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(BelownameModule.class);
-        addChild(TabnameModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                BelownameModule.class,
+                TabnameModule.class
+        );
     }
 
     @Override

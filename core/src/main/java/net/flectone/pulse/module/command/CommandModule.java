@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
@@ -61,53 +62,53 @@ public class CommandModule extends AbstractModule {
     private final FileFacade fileFacade;
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
-
-        addChild(AfkModule.class);
-        addChild(AnonModule.class);
-        addChild(BallModule.class);
-        addChild(BanModule.class);
-        addChild(BanlistModule.class);
-        addChild(BroadcastModule.class);
-        addChild(ChatcolorModule.class);
-        addChild(ChatsettingModule.class);
-        addChild(ClearchatModule.class);
-        addChild(ClearmailModule.class);
-        addChild(CoinModule.class);
-        addChild(DeletemessageModule.class);
-        addChild(DiceModule.class);
-        addChild(DoModule.class);
-        addChild(EmitModule.class);
-        addChild(FlectonepulseModule.class);
-        addChild(GeolocateModule.class);
-        addChild(HelperModule.class);
-        addChild(IgnoreModule.class);
-        addChild(IgnorelistModule.class);
-        addChild(KickModule.class);
-        addChild(MailModule.class);
-        addChild(MaintenanceModule.class);
-        addChild(MeModule.class);
-        addChild(MuteModule.class);
-        addChild(MutelistModule.class);
-        addChild(OnlineModule.class);
-        addChild(PingModule.class);
-        addChild(PollModule.class);
-        addChild(ReplyModule.class);
-        addChild(RockpaperscissorsModule.class);
-        addChild(SpyModule.class);
-        addChild(StreamModule.class);
-        addChild(SymbolModule.class);
-        addChild(TellModule.class);
-        addChild(TictactoeModule.class);
-        addChild(ToponlineModule.class);
-        addChild(TranslatetoModule.class);
-        addChild(TryModule.class);
-        addChild(UnbanModule.class);
-        addChild(UnmuteModule.class);
-        addChild(UnwarnModule.class);
-        addChild(WarnModule.class);
-        addChild(WarnlistModule.class);
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        return super.childrenBuilder().add(
+                AfkModule.class,
+                AnonModule.class,
+                BallModule.class,
+                BanModule.class,
+                BanlistModule.class,
+                BroadcastModule.class,
+                ChatcolorModule.class,
+                ChatsettingModule.class,
+                ClearchatModule.class,
+                ClearmailModule.class,
+                CoinModule.class,
+                DeletemessageModule.class,
+                DiceModule.class,
+                DoModule.class,
+                EmitModule.class,
+                FlectonepulseModule.class,
+                GeolocateModule.class,
+                HelperModule.class,
+                IgnoreModule.class,
+                IgnorelistModule.class,
+                KickModule.class,
+                MailModule.class,
+                MaintenanceModule.class,
+                MeModule.class,
+                MuteModule.class,
+                MutelistModule.class,
+                OnlineModule.class,
+                PingModule.class,
+                PollModule.class,
+                ReplyModule.class,
+                RockpaperscissorsModule.class,
+                SpyModule.class,
+                StreamModule.class,
+                SymbolModule.class,
+                TellModule.class,
+                TictactoeModule.class,
+                ToponlineModule.class,
+                TranslatetoModule.class,
+                TryModule.class,
+                UnbanModule.class,
+                UnmuteModule.class,
+                UnwarnModule.class,
+                WarnModule.class,
+                WarnlistModule.class
+        );
     }
 
     @Override

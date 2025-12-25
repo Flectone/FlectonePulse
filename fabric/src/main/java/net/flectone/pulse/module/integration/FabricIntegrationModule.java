@@ -1,9 +1,12 @@
 package net.flectone.pulse.module.integration;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.NonNull;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -39,20 +42,22 @@ public class FabricIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public void configureChildren() {
-        super.configureChildren();
+    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
-            addChild(VanishModule.class);
+            builder.add(VanishModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            addChild(MiniPlaceholdersModule.class);
+            builder.add(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("placeholder-api")) {
-            addChild(PlaceholderAPIModule.class);
+            builder.add(PlaceholderAPIModule.class);
         }
+
+        return builder;
     }
 
     @Override
