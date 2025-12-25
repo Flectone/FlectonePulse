@@ -20,7 +20,7 @@ public class EventDispatcher {
     @CheckReturnValue
     @SuppressWarnings("unchecked")
     public <T extends Event> T dispatch(Map<Event.Priority, List<UnaryOperator<Event>>> listeners, T event) {
-        if (listeners == null) return event.withCancelled(true);
+        if (listeners == null) return event;
 
         T currentEvent = event;
 
