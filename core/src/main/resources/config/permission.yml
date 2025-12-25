@@ -790,9 +790,8 @@ message:
       type: "TRUE"
       questions:
         server:
-          ask:
-            name: "flectonepulse.module.message.format.questionanswer.server"
-            type: "TRUE"
+          name: "flectonepulse.module.message.format.questionanswer.server"
+          type: "TRUE"
           sound:
             name: "flectonepulse.module.message.format.questionanswer.sound.server"
             type: "TRUE"
@@ -800,9 +799,8 @@ message:
             name: "flectonepulse.module.message.format.questionanswer.cooldown.bypass.server"
             type: "TRUE"
         flectone:
-          ask:
-            name: "flectonepulse.module.message.format.questionanswer.flectone"
-            type: "TRUE"
+          name: "flectonepulse.module.message.format.questionanswer.flectone"
+          type: "TRUE"
           sound:
             name: "flectonepulse.module.message.format.questionanswer.sound.flectone"
             type: "TRUE"
