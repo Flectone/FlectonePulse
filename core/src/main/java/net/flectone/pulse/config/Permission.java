@@ -744,8 +744,9 @@ public record Permission(
         @Jacksonized
         public record Discord(
                 String name,
-                Permission.Type type
-        ) implements PermissionSetting {}
+                Permission.Type type,
+                PermissionEntry sound
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -882,8 +883,9 @@ public record Permission(
         @Jacksonized
         public record Telegram(
                 String name,
-                Permission.Type type
-        ) implements PermissionSetting {}
+                Permission.Type type,
+                PermissionEntry sound
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -898,8 +900,9 @@ public record Permission(
         @Jacksonized
         public record Twitch(
                 String name,
-                Permission.Type type
-        ) implements PermissionSetting {}
+                Permission.Type type,
+                PermissionEntry sound
+        ) implements SoundPermissionSetting {}
 
         @With
         @Builder(toBuilder = true)

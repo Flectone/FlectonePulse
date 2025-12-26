@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.EnableSetting;
+import net.flectone.pulse.config.setting.SoundConfigSetting;
 import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 
 import java.util.List;
@@ -142,8 +144,9 @@ public record Integration(
             Presence presence,
             ChannelInfo channelInfo,
             Map<String, List<String>> messageChannel,
-            Destination destination
-    ) implements EnableSetting {
+            Destination destination,
+            Sound sound
+    ) implements SoundConfigSetting, EnableSetting {
 
         @With
         @Builder(toBuilder = true)
@@ -293,8 +296,9 @@ public record Integration(
             Map<String, Command> customCommand,
             ChannelInfo channelInfo,
             Map<String, List<String>> messageChannel,
-            Destination destination
-    ) implements EnableSetting {
+            Destination destination,
+            Sound sound
+    ) implements SoundConfigSetting, EnableSetting {
         public enum Mode {
             MARKDOWN,
             MARKDOWN_V2,
@@ -319,8 +323,9 @@ public record Integration(
             Map<String, Command> customCommand,
             Map<String, List<String>> messageChannel,
             Map<String, List<String>> followChannel,
-            Destination destination
-    ) implements EnableSetting {
+            Destination destination,
+            Sound sound
+    ) implements SoundConfigSetting, EnableSetting {
     }
 
     @With

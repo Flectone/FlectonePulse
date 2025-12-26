@@ -522,6 +522,9 @@ integration:
   discord:
     name: "flectonepulse.module.integration.discord"
     type: "TRUE"
+    sound:
+      name: "flectonepulse.module.integration.discord.sound"
+      type: "TRUE"
   floodgate:
     name: "flectonepulse.module.integration.floodgate"
     type: "TRUE"
@@ -582,12 +585,18 @@ integration:
   telegram:
     name: "flectonepulse.module.integration.telegram"
     type: "TRUE"
+    sound:
+      name: "flectonepulse.module.integration.telegram.sound"
+      type: "TRUE"
   triton:
     name: "flectonepulse.module.integration.triton"
     type: "TRUE"
   twitch:
     name: "flectonepulse.module.integration.twitch"
     type: "TRUE"
+    sound:
+      name: "flectonepulse.module.integration.twitch.sound"
+      type: "TRUE"
   vault:
     name: "flectonepulse.module.integration.vault"
     type: "TRUE"

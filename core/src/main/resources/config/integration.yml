@@ -38,6 +38,8 @@ discord:
     - "123456"
   destination:
     type: "CHAT"
+  sound:
+    enable: false
 floodgate:
   enable: true
 geyser:
@@ -113,6 +115,8 @@ telegram:
     - "123456"
   destination:
     type: "CHAT"
+  sound:
+    enable: false
 triton:
   enable: true
 twitch:
@@ -134,6 +138,8 @@ twitch:
     - "stream start https://twitch.tv/faseri4ka"
   destination:
     type: "CHAT"
+  sound:
+    enable: false
 vault:
   enable: true
 yandex:
