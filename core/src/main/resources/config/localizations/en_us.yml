@@ -196,6 +196,7 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     null_host_editor: "<color:#ff7171><b>⁉</b> The host parameter cannot be empty and must be configured in <u>config.yml"
+    null_port_editor: "<color:#ff7171><b>⁉</b> Port <port> is unavailable, configure an alternative port in <u>config.yml</u>"
     format_false: "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>"
     format_true: "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)"
     format_web_starting: "<fcolor:2>★ Web server starting, please wait..."

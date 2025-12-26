@@ -30,6 +30,8 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -82,6 +84,17 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::nullHostEditor)
+                        .build()
+                );
+
+                return;
+            }
+
+            int port = fileFacade.config().editor().port();
+            if (!isPortAvailable(port)) {
+                sendErrorMessage(metadataBuilder()
+                        .sender(fPlayer)
+                        .format(localization -> Strings.CS.replace(localization.nullPortEditor(), "<port>", String.valueOf(port)))
                         .build()
                 );
 
@@ -175,6 +188,14 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     @Override
     public Localization.Command.Flectonepulse localization(FEntity sender) {
         return fileFacade.localization(sender).command().flectonepulse();
+    }
+
+    public boolean isPortAvailable(int port) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private void enableSpark() {

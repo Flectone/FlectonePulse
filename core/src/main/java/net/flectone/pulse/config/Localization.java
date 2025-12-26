@@ -385,6 +385,7 @@ public record Localization(
         @Jacksonized
         public record Flectonepulse(
                 String nullHostEditor,
+                String nullPortEditor,
                 String formatFalse,
                 String formatTrue,
                 String formatWebStarting,

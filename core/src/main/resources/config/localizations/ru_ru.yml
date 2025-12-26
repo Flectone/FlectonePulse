@@ -196,6 +196,7 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     null_host_editor: "<color:#ff7171><b>⁉</b> Параметр host должен быть настроен в <u>config.yml"
+    null_port_editor: "<color:#ff7171><b>⁉</b> Порт <port> недоступен, выбери другой в <u>config.yml"
     format_false: "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>"
     format_true: "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)"
     format_web_starting: "<fcolor:2>★ Запуск веб-сервера, подождите..."
