@@ -52,6 +52,10 @@ public record Moderation(
         return (Math.abs(date - time) + 500) / 1000 * 1000;
     }
 
+    public boolean equals(Moderation moderation) {
+        return this.id == moderation.id();
+    }
+
     public enum Type {
         MUTE,
         BAN,
