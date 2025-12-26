@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -28,6 +29,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -35,7 +37,7 @@ public class MinecraftTranslationService {
 
     private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
 
-    private final Map<String, String> translations = new HashMap<>();
+    private final Map<String, String> translations = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final @Named("translationPath") Path translationPath;
@@ -43,12 +45,17 @@ public class MinecraftTranslationService {
     private final FileFacade fileFacade;
     private final FLogger fLogger;
 
-    private Translator translator;
+    private String language;
     private boolean isModern;
+    private Translator translator;
 
+    @Async(independent = true)
     public void reload() {
-        isModern = detectModernVersion();
+        String newLanguage = fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+        if (newLanguage.equals(language) && !translations.isEmpty()) return;
 
+        language = newLanguage;
+        isModern = detectModernVersion();
         translations.clear();
 
         if (downloadLocalizationFile()) {
@@ -61,10 +68,6 @@ public class MinecraftTranslationService {
         return packetProvider.getServerVersion().getReleaseName();
     }
 
-    public String getLanguage() {
-        return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
-    }
-
     @Nullable
     public String translate(String key) {
         return translations.get(key);
@@ -74,7 +77,6 @@ public class MinecraftTranslationService {
         Path outputPath = resolveLocalizationFile();
         if (Files.exists(outputPath)) return true;
 
-        String language = getLanguage();
         String formattedLanguage = isModern ? language : formatLegacyLanguage(language);
         if (formattedLanguage == null) return false;
 
@@ -130,7 +132,6 @@ public class MinecraftTranslationService {
     }
 
     private Path resolveLocalizationFile() {
-        String language = getLanguage();
         String version = getVersion();
         String extension = isModern ? ".json" : ".lang";
         return translationPath.resolve(version + "_" + language + extension);
