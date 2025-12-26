@@ -181,7 +181,7 @@ public class Database {
                 if (config().type() == Type.MARIADB) {
                     hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
                 } else {
-                    hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
+                    hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
                 }
 
                 connectionURL = connectionURL +
@@ -294,7 +294,7 @@ public class Database {
                             .build()
                     )
             );
-            case MYSQL -> reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", needChecking, libraryResolver ->
+            case MYSQL -> reflectionResolver.hasClassOrElse("com.mysql.cj.jdbc.Driver", needChecking, libraryResolver ->
                     libraryResolver.loadLibrary(Library.builder()
                             .groupId("com{}mysql")
                             .artifactId("mysql-connector-j")
