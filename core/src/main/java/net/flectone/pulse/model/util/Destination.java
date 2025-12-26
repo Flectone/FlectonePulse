@@ -21,12 +21,18 @@ public record Destination(
     public static final BossBar DEFAULT_BOSS_BAR = new BossBar(100, 1f, net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS, net.kyori.adventure.bossbar.BossBar.Color.BLUE);
     public static final Times DEFAULT_TIMES = new Times(20, 60, 20);
     public static final Toast DEFAULT_TOAST = new Toast("minecraft:diamond", Toast.Type.TASK);
-    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", false, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
+    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", false, true, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
 
-    public static final Destination DEFAULT_CHAT = new Destination(DEFAULT_TYPE);
-    public static final Destination DEFAULT_BRAND = new Destination(Type.BRAND);
-    public static final Destination DEFAULT_TAB_HEADER = new Destination(Type.TAB_HEADER);
-    public static final Destination DEFAULT_TAB_FOOTER = new Destination(Type.TAB_FOOTER);
+    public static final Destination EMPTY_ACTION_BAR = new Destination(Type.ACTION_BAR, DEFAULT_TIMES);
+    public static final Destination EMPTY_BOSS_BAR = new Destination(Type.BOSS_BAR, DEFAULT_BOSS_BAR);
+    public static final Destination EMPTY_BRAND = new Destination(Type.BRAND);
+    public static final Destination EMPTY_CHAT = new Destination(DEFAULT_TYPE);
+    public static final Destination EMPTY_TITLE = new Destination(Type.TITLE, DEFAULT_TIMES, DEFAULT_SUBTEXT);
+    public static final Destination EMPTY_SUBTITLE = new Destination(Type.SUBTITLE, DEFAULT_TIMES, DEFAULT_SUBTEXT);
+    public static final Destination EMPTY_TAB_HEADER = new Destination(Type.TAB_HEADER);
+    public static final Destination EMPTY_TAB_FOOTER = new Destination(Type.TAB_FOOTER);
+    public static final Destination EMPTY_TEXT_SCREEN = new Destination(Type.TEXT_SCREEN, DEFAULT_TEXT_SCREEN);
+    public static final Destination EMPTY_TOAST = new Destination(Type.TOAST, DEFAULT_TOAST);
 
     public Destination {
         type = type != null ? type : DEFAULT_TYPE;
@@ -120,7 +126,8 @@ public record Destination(
             case TOAST -> {
                 String icon = parseOrDefault(map.get("icon"), DEFAULT_TOAST.icon(), string -> string);
                 Toast.Type style = parseOrDefault(map.get("style"), DEFAULT_TOAST.style(), Toast.Type::valueOf);
-                yield new Destination(Type.TOAST, new Toast(icon, style));
+                Toast toast = new Toast(icon, style);
+                yield toast.equals(DEFAULT_TOAST) ? EMPTY_TOAST : new Destination(Type.TOAST, toast);
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
                 Object mapTimes = map.get("times");
@@ -137,10 +144,13 @@ public record Destination(
 
                 Times times = new Times(fadeIn, stay, fadeOut);
                 if (type == Type.ACTION_BAR) {
-                    yield new Destination(type, times);
+                    yield times.equals(DEFAULT_TIMES) ? EMPTY_ACTION_BAR : new Destination(type, times);
                 }
 
                 String subtext = parseOrDefault(map.get("subtext"), DEFAULT_SUBTEXT, string -> string);
+                if (type == Type.TITLE && times.equals(DEFAULT_TIMES) && subtext.equals(DEFAULT_SUBTEXT)) yield EMPTY_TITLE;
+                if (type == Type.SUBTITLE && times.equals(DEFAULT_TIMES) && subtext.equals(DEFAULT_SUBTEXT)) yield EMPTY_SUBTITLE;
+
                 yield new Destination(type, times, subtext);
             }
             case BOSS_BAR -> {
@@ -166,11 +176,12 @@ public record Destination(
                     bossBar = bossBar.withFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
                 }
 
-                yield new Destination(type, bossBar);
+                yield bossBar.equals(DEFAULT_BOSS_BAR) ? EMPTY_BOSS_BAR : new Destination(type, bossBar);
             }
             case TEXT_SCREEN -> {
                 String background = parseOrDefault(map.get("background"), DEFAULT_TEXT_SCREEN.background(), string -> string);
                 boolean hasShadow = parseOrDefault(map.get("has_shadow"), DEFAULT_TEXT_SCREEN.hasShadow(), Boolean::parseBoolean);
+                boolean seeThrough = parseOrDefault(map.get("see_through"), DEFAULT_TEXT_SCREEN.seeThrough(), Boolean::parseBoolean);
                 int animationTime = parseOrDefault(map.get("animation_time"), DEFAULT_TEXT_SCREEN.animationTime(), Integer::parseInt);
                 int liveTime = parseOrDefault(map.get("live_time"), DEFAULT_TEXT_SCREEN.liveTime(), Integer::parseInt);
                 int width = parseOrDefault(map.get("width"), DEFAULT_TEXT_SCREEN.width(), Integer::parseInt);
@@ -179,13 +190,13 @@ public record Destination(
                 float offsetY = parseOrDefault(map.get("offset_y"), DEFAULT_TEXT_SCREEN.offsetY(), Float::parseFloat);
                 float offsetZ = parseOrDefault(map.get("offset_z"), DEFAULT_TEXT_SCREEN.offsetZ(), Float::parseFloat);
 
-                TextScreen textScreen = new TextScreen(background, hasShadow, animationTime, liveTime, width, scale, offsetX, offsetY, offsetZ);
-                yield new Destination(type, textScreen);
+                TextScreen textScreen = new TextScreen(background, hasShadow, seeThrough, animationTime, liveTime, width, scale, offsetX, offsetY, offsetZ);
+                yield textScreen.equals(DEFAULT_TEXT_SCREEN) ? EMPTY_TEXT_SCREEN : new Destination(type, textScreen);
             }
-            case BRAND -> DEFAULT_BRAND;
-            case CHAT -> DEFAULT_CHAT;
-            case TAB_HEADER -> DEFAULT_TAB_HEADER;
-            case TAB_FOOTER -> DEFAULT_TAB_FOOTER;
+            case BRAND -> EMPTY_BRAND;
+            case CHAT -> EMPTY_CHAT;
+            case TAB_HEADER -> EMPTY_TAB_HEADER;
+            case TAB_FOOTER -> EMPTY_TAB_FOOTER;
         };
     }
 

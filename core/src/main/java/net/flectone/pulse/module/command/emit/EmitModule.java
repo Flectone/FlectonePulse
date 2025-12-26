@@ -165,7 +165,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
             return Destination.fromJson(destination);
         } catch (Exception ignored) {
-            return Destination.DEFAULT_CHAT;
+            return Destination.EMPTY_CHAT;
         }
     }
 

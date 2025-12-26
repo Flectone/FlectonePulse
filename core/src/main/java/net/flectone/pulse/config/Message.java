@@ -736,7 +736,7 @@ public record Message(
 
             @Override
             public Destination destination() {
-                return destination != null ? destination : Destination.DEFAULT_CHAT;
+                return destination != null ? destination : Destination.EMPTY_CHAT;
             }
 
             @Override

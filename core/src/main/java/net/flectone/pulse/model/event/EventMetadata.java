@@ -48,7 +48,7 @@ public class EventMetadata<L extends LocalizationSetting> {
 
     @NonNull
     @Builder.Default
-    private final Destination destination = Destination.DEFAULT_CHAT;
+    private final Destination destination = Destination.EMPTY_CHAT;
 
     @NonNull
     private final Range range;
