@@ -105,6 +105,7 @@ public record Destination(
                 TextScreen textScreen = this.textScreen != null ? this.textScreen : DEFAULT_TEXT_SCREEN;
                 map.put("background", textScreen.background());
                 map.put("has_shadow", textScreen.hasShadow());
+                map.put("see_through", textScreen.seeThrough());
                 map.put("animation_time", textScreen.animationTime());
                 map.put("live_time", textScreen.liveTime());
                 map.put("width", textScreen.width());
