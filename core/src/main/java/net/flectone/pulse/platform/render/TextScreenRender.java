@@ -131,8 +131,18 @@ public class TextScreenRender {
         // background color
         metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 2, EntityDataTypes.INT, colorConverter.parseHexToArgb(textScreen.background())));
 
+        byte flags = 0x00;
+
         if (textScreen.hasShadow()) {
-            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 4, EntityDataTypes.BYTE, (byte) 0x01));
+            flags |= 0x01;
+        }
+
+        if (textScreen.seeThrough()) {
+            flags |= 0x02;
+        }
+
+        if (flags != 0x00) {
+            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 4, EntityDataTypes.BYTE, flags));
         }
 
         packetSender.send(fPlayer, new WrapperPlayServerEntityMetadata(entityId, metadataList));
