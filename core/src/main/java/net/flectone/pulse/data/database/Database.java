@@ -106,7 +106,6 @@ public class Database {
 
     public void disconnect() {
         if (dataSource != null) {
-            dataSource.getHikariPoolMXBean().softEvictConnections();
             dataSource.close();
 
             fLogger.info("Database disconnected");
@@ -150,8 +149,6 @@ public class Database {
                 hikariConfig.setDriverClassName("org.postgresql.Driver");
                 hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
                 hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
-                hikariConfig.setMaximumPoolSize(8);
-                hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
@@ -163,9 +160,6 @@ public class Database {
                         ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
 
                 hikariConfig.setDriverClassName("org.h2.Driver");
-                hikariConfig.setMaximumPoolSize(5);
-                hikariConfig.setMinimumIdle(1);
-                hikariConfig.setConnectionTimeout(30000);
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
@@ -177,9 +171,7 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config().name()) +
                         ".db";
 
-                hikariConfig.setMaximumPoolSize(5);
-                hikariConfig.setMinimumIdle(1);
-                hikariConfig.setConnectionTimeout(30000);
+                hikariConfig.setDriverClassName("org.sqlite.JDBC");
                 hikariConfig.addDataSourceProperty("busy_timeout", 30000);
                 hikariConfig.addDataSourceProperty("journal_mode", "WAL");
                 hikariConfig.addDataSourceProperty("synchronous", "NORMAL");
@@ -188,6 +180,8 @@ public class Database {
             case MYSQL, MARIADB -> {
                 if (config().type() == Type.MARIADB) {
                     hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
+                } else {
+                    hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
                 }
 
                 connectionURL = connectionURL +
@@ -201,8 +195,6 @@ public class Database {
 
                 hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
                 hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
-                hikariConfig.setMaximumPoolSize(8);
-                hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
