@@ -196,6 +196,7 @@ public record Message(
         public record Modern(
                 Boolean enable,
                 Boolean hasShadow,
+                Boolean seeThrough,
                 Integer animationTime,
                 Float scale,
                 String background,

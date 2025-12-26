@@ -85,6 +85,7 @@ public class BubbleService {
         Message.Bubble.Modern configModern = config.modern();
 
         boolean hasShadow = configModern.hasShadow();
+        boolean seeThrough = configModern.seeThrough();
         int background = colorConverter.parseHexToArgb(configModern.background());
         int animationTime = configModern.animationTime();
         float scale = configModern.scale();
@@ -105,7 +106,7 @@ public class BubbleService {
             String newMessage = isLetter ? line + wordBreakHint : line.toString().trim();
             bubbles.add(buildBubble(
                     id, sender, newMessage, duration, elevation, interactionHeight,
-                    useInteractionRiding, useModernBubble, hasShadow, background,
+                    useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
 
@@ -115,7 +116,7 @@ public class BubbleService {
         if (!line.isEmpty()) {
             bubbles.add(buildBubble(
                     id, sender, line.toString(), duration, elevation, interactionHeight,
-                    useInteractionRiding, useModernBubble, hasShadow, background,
+                    useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
         }
@@ -124,11 +125,12 @@ public class BubbleService {
     }
 
     private Bubble buildBubble(int id, FPlayer sender, String message, long duration, float elevation, float interactionHeight,
-                               boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
+                               boolean interactionRiding, boolean useModern, boolean hasShadow, boolean seeThrough, int background,
                                int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
         Bubble.BubbleBuilder<?, ?> builder = useModern
                 ? ModernBubble.builder()
                 .hasShadow(hasShadow)
+                .seeThrough(seeThrough)
                 .background(background)
                 .animationTime(animationTime)
                 .scale(scale)

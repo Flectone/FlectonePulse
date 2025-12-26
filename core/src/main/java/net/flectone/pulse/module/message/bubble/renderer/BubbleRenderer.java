@@ -315,8 +315,18 @@ public class BubbleRenderer {
             int backgroundColor = bubble.getBackground();
             metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 2, EntityDataTypes.INT, backgroundColor));
 
+            byte flags = 0x00;
+
             if (bubble.isHasShadow()) {
-                metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 4, EntityDataTypes.BYTE, (byte) 0x01));
+                flags |= 0x01;
+            }
+
+            if (bubble.isSeeThrough()) {
+                flags |= 0x02;
+            }
+
+            if (flags != 0x00) {
+                metadataList.add(new EntityData<>(entityUtil.textDisplayOffset() + 4, EntityDataTypes.BYTE, flags));
             }
 
             return metadataList;

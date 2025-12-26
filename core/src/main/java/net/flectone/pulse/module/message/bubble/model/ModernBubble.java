@@ -9,6 +9,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 public class ModernBubble extends Bubble {
 
     private final boolean hasShadow;
+    private final boolean seeThrough;
 
     private final int background;
 
