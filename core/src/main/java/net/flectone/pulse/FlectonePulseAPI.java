@@ -126,11 +126,6 @@ public class FlectonePulseAPI  {
         // disable task scheduler
         instance.get(TaskScheduler.class).shutdown();
 
-        // send metrics data if enabled
-        if (instance.get(FileFacade.class).config().metrics().enable()) {
-            instance.get(MetricsService.class).send();
-        }
-
         // close all open inventories
         instance.get(InventoryController.class).closeAll();
         instance.get(DialogController.class).closeAll();
