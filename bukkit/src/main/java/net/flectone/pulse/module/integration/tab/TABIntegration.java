@@ -18,12 +18,12 @@ public class TABIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("✔ tab hooked");
+        fLogger.info("✔ TAB hooked");
     }
 
     @Override
     public void unhook() {
         hooked = false;
-        fLogger.info("✖ tab unhooked");
+        fLogger.info("✖ TAB unhooked");
     }
 }
