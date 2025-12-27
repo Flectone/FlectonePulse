@@ -200,7 +200,7 @@ public class ObjectModule extends AbstractModuleLocalization<Localization.Messag
         }
 
         // for old client
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent));
+        return Tag.selfClosingInserting(Component.empty());
     }
 
     private Component getDefaultObjectComponent(MessageContext messageContext) {
@@ -214,7 +214,7 @@ public class ObjectModule extends AbstractModuleLocalization<Localization.Messag
             component = component.append(Component.space());
         }
 
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) || messageContext.receiver().isConsole()) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             component = component.color(NamedTextColor.WHITE);
         }
 
