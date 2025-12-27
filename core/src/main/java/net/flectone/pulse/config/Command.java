@@ -122,6 +122,9 @@ public record Command(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
         Rockpaperscissors rockpaperscissors,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/sprite/")
+        Sprite sprite,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
         Spy spy,
 
@@ -595,6 +598,18 @@ public record Command(
             Boolean enable,
             List<String> aliases,
             Map<String, List<String>> strategies,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Sprite(
+            Boolean enable,
+            Integer perPage,
+            List<String> aliases,
+            List<String> categories,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}

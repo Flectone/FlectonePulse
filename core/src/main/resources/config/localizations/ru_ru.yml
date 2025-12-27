@@ -312,6 +312,14 @@ command:
       paper: "бумага"
       rock: "камень"
       scissors: "ножницы"
+  sprite:
+    null_atlas: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Этого атласа не существует"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    download_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Не удалось загрузить атлас, возможно его не существует, повторите попытку позже"
+    atlas_downloading: "<fcolor:2>★ <fcolor:1>Атлас <fcolor:2><atlas> <fcolor:1>скачивается, подождите..."
+    header: "<fcolor:2>▋ <fcolor:1>Спрайты из атласа <fcolor:2><atlas><fcolor:1>, всего их <fcolor:2><count> <br>"
+    line_element: "<white><hover:show_text:\"<fcolor:1>Скопировать <fcolor:2><sprite>\"><click:copy_to_clipboard:'<sprite:<atlas>:<sprite>>'><sprite:<atlas>:<sprite>> "
+    footer: "<br><br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   spy:
     format_true: "<fcolor:1>[👁] Ты <color:#98FB98>включил <fcolor:1>слежку"
     format_false: "<fcolor:1>[👁] Ты <color:#F08080>выключил <fcolor:1>слежку"

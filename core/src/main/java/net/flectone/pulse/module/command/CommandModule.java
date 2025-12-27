@@ -40,6 +40,7 @@ import net.flectone.pulse.module.command.ping.PingModule;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.reply.ReplyModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
+import net.flectone.pulse.module.command.sprite.SpriteModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.symbol.SymbolModule;
@@ -95,6 +96,7 @@ public class CommandModule extends AbstractModule {
                 PollModule.class,
                 ReplyModule.class,
                 RockpaperscissorsModule.class,
+                SpriteModule.class,
                 SpyModule.class,
                 StreamModule.class,
                 SymbolModule.class,

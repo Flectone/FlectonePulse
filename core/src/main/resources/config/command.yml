@@ -628,6 +628,31 @@ rockpaperscissors:
     enable: false
   sound:
     enable: false
+sprite:
+  enable: true
+  per_page: 16
+  aliases:
+    - "sprite"
+  categories:
+    - "armor_trims"
+    - "banner_patterns"
+    - "beds"
+    - "blocks"
+    - "celestials"
+    - "chest"
+    - "decorated_pot"
+    - "gui"
+    - "items"
+    - "map_decorations"
+    - "paintings"
+    - "particles"
+    - "shield_patterns"
+    - "shulker_boxes"
+    - "signs"
+  cooldown:
+    enable: false
+  sound:
+    enable: false
 spy:
   enable: true
   range: "PROXY"

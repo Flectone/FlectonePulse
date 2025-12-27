@@ -312,6 +312,14 @@ command:
       paper: "paper"
       rock: "rock"
       scissors: "scissors"
+  sprite:
+    null_atlas: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This atlas does not exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page does not exist"
+    download_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Failed to download atlas, it may not exist, please try again later"
+    atlas_downloading: "<fcolor:2>★ <fcolor:1>Atlas <fcolor:2><atlas> <fcolor:1>is downloading, wait..."
+    header: "<fcolor:2>▋ <fcolor:1>Sprites from atlas <fcolor:2><atlas><fcolor:1>, total <fcolor:2><count> <br>"
+    line_element: "<white><hover:show_text:\"<fcolor:1>Copy <fcolor:2><sprite>\"><click:copy_to_clipboard:'<sprite:<atlas>:<sprite>>'><sprite:<atlas>:<sprite>> "
+    footer: "<br><br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   spy:
     format_true: "<fcolor:1>[👁] You <color:#98FB98>turned on <fcolor:1>spy mode"
     format_false: "<fcolor:1>[👁] You <color:#F08080>turned off <fcolor:1>spy mode"

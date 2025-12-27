@@ -37,6 +37,7 @@ public interface CommandMerger {
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
     @Mapping(target = "reply", expression = "java(mergeReply(target.build().reply().toBuilder(), source.reply()))")
     @Mapping(target = "rockpaperscissors", expression = "java(mergeRockpaperscissors(target.build().rockpaperscissors().toBuilder(), source.rockpaperscissors()))")
+    @Mapping(target = "sprite", expression = "java(mergeSprite(target.build().sprite().toBuilder(), source.sprite()))")
     @Mapping(target = "spy", expression = "java(mergeSpy(target.build().spy().toBuilder(), source.spy()))")
     @Mapping(target = "stream", expression = "java(mergeStream(target.build().stream().toBuilder(), source.stream()))")
     @Mapping(target = "symbol", expression = "java(mergeSymbol(target.build().symbol().toBuilder(), source.symbol()))")
@@ -129,6 +130,8 @@ public interface CommandMerger {
     Command.Reply mergeReply(@MappingTarget Command.Reply.ReplyBuilder target, Command.Reply reply);
 
     Command.Rockpaperscissors mergeRockpaperscissors(@MappingTarget Command.Rockpaperscissors.RockpaperscissorsBuilder target, Command.Rockpaperscissors rockpaperscissors);
+
+    Command.Sprite mergeSprite(@MappingTarget Command.Sprite.SpriteBuilder target, Command.Sprite sprite);
 
     Command.Spy mergeSpy(@MappingTarget Command.Spy.SpyBuilder target, Command.Spy spy);
 

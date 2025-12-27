@@ -393,6 +393,15 @@ command:
     sound:
       name: "flectonepulse.module.command.rockpaperscissors.sound"
       type: "TRUE"
+  sprite:
+    name: "flectonepulse.module.command.sprite"
+    type: "TRUE"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.spy.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.spy.sound"
+      type: "TRUE"
   spy:
     name: "flectonepulse.module.command.spy"
     type: "OP"

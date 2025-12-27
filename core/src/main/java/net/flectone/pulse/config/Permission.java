@@ -133,6 +133,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
             Rockpaperscissors rockpaperscissors,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/sprite/")
+            Sprite sprite,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
             Spy spy,
 
@@ -495,6 +498,16 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Rockpaperscissors(
+                String name,
+                Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Sprite(
                 String name,
                 Permission.Type type,
                 PermissionEntry cooldownBypass,

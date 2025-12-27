@@ -47,6 +47,7 @@ public interface PermissionMerger {
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
     @Mapping(target = "reply", expression = "java(mergeReply(target.build().reply().toBuilder(), source.reply()))")
     @Mapping(target = "rockpaperscissors", expression = "java(mergeRockpaperscissors(target.build().rockpaperscissors().toBuilder(), source.rockpaperscissors()))")
+    @Mapping(target = "sprite", expression = "java(mergeSprite(target.build().sprite().toBuilder(), source.sprite()))")
     @Mapping(target = "spy", expression = "java(mergeSpy(target.build().spy().toBuilder(), source.spy()))")
     @Mapping(target = "stream", expression = "java(mergeStream(target.build().stream().toBuilder(), source.stream()))")
     @Mapping(target = "symbol", expression = "java(mergeSymbol(target.build().symbol().toBuilder(), source.symbol()))")
@@ -123,6 +124,8 @@ public interface PermissionMerger {
     Permission.Command.Reply mergeReply(@MappingTarget Permission.Command.Reply.ReplyBuilder target, Permission.Command.Reply reply);
 
     Permission.Command.Rockpaperscissors mergeRockpaperscissors(@MappingTarget Permission.Command.Rockpaperscissors.RockpaperscissorsBuilder target, Permission.Command.Rockpaperscissors rockpaperscissors);
+
+    Permission.Command.Sprite mergeSprite(@MappingTarget Permission.Command.Sprite.SpriteBuilder target, Permission.Command.Sprite sprite);
 
     Permission.Command.Spy mergeSpy(@MappingTarget Permission.Command.Spy.SpyBuilder target, Permission.Command.Spy spy);
 

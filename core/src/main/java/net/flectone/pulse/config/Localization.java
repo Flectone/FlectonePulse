@@ -143,6 +143,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
             Rockpaperscissors rockpaperscissors,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/sprite/")
+            Sprite sprite,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
             Spy spy,
 
@@ -574,6 +577,19 @@ public record Localization(
                 String formatWin,
                 String formatDraw,
                 Map<String, String> strategies
+        ) implements LocalizationSetting {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Sprite(
+                String nullAtlas,
+                String nullPage,
+                String downloadError,
+                String atlasDownloading,
+                String header,
+                String lineElement,
+                String footer
         ) implements LocalizationSetting {}
 
         @With

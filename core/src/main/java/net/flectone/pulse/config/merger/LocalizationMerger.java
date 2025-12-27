@@ -46,6 +46,7 @@ public interface LocalizationMerger {
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
     @Mapping(target = "reply", expression = "java(mergeReply(target.build().reply().toBuilder(), source.reply()))")
     @Mapping(target = "rockpaperscissors", expression = "java(mergeRockpaperscissors(target.build().rockpaperscissors().toBuilder(), source.rockpaperscissors()))")
+    @Mapping(target = "sprite", expression = "java(mergeSprite(target.build().sprite().toBuilder(), source.sprite()))")
     @Mapping(target = "spy", expression = "java(mergeSpy(target.build().spy().toBuilder(), source.spy()))")
     @Mapping(target = "stream", expression = "java(mergeStream(target.build().stream().toBuilder(), source.stream()))")
     @Mapping(target = "symbol", expression = "java(mergeSymbol(target.build().symbol().toBuilder(), source.symbol()))")
@@ -145,6 +146,8 @@ public interface LocalizationMerger {
     Localization.Command.Reply mergeReply(@MappingTarget Localization.Command.Reply.ReplyBuilder target, Localization.Command.Reply reply);
 
     Localization.Command.Rockpaperscissors mergeRockpaperscissors(@MappingTarget Localization.Command.Rockpaperscissors.RockpaperscissorsBuilder target, Localization.Command.Rockpaperscissors rockpaperscissors);
+
+    Localization.Command.Sprite mergeSprite(@MappingTarget Localization.Command.Sprite.SpriteBuilder target, Localization.Command.Sprite sprite);
 
     Localization.Command.Spy mergeSpy(@MappingTarget Localization.Command.Spy.SpyBuilder target, Localization.Command.Spy spy);
 
