@@ -319,7 +319,7 @@ command:
     atlas_downloading: "<fcolor:2>★ <fcolor:1>Atlas <fcolor:2><atlas> <fcolor:1>is downloading, wait..."
     header: "<fcolor:2>▋ <fcolor:1>Sprites from atlas <fcolor:2><atlas><fcolor:1>, total <fcolor:2><count> <br>"
     line_element: "<white><hover:show_text:\"<fcolor:1>Copy <fcolor:2><sprite>\"><click:copy_to_clipboard:'<sprite:<atlas>:<sprite>>'><sprite:<atlas>:<sprite>> "
-    footer: "<br><br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+    footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   spy:
     format_true: "<fcolor:1>[👁] You <color:#98FB98>turned on <fcolor:1>spy mode"
     format_false: "<fcolor:1>[👁] You <color:#F08080>turned off <fcolor:1>spy mode"
@@ -333,7 +333,11 @@ command:
     format_start: "<br><color:#ff4e4e>│ 🔔 <fcolor:1>Announcement <br><color:#ff4e4e>│<br><color:#ff4e4e>│ <fcolor:1><display_name> started streaming<br><color:#ff4e4e>│<br><urls><br>"
     format_end: "<fcolor:2>★ Thanks for streaming on our server!"
   symbol:
-    format: "<click:suggest_command:\"<input>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>"
+    null_category: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This category does not exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page does not exist"
+    header: "<fcolor:2>▋ <fcolor:1>Symbols from category <fcolor:2><category><fcolor:1>, total <fcolor:2><count> <br>"
+    line_element: "<fcolor:1><hover:show_text:\"<fcolor:1>Copy <fcolor:2><symbol>\"><click:copy_to_clipboard:'<symbol>'><symbol> "
+    footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   tell:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     sender: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"

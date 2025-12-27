@@ -695,6 +695,7 @@ stream:
     name: "minecraft:block.note_block.bell"
 symbol:
   enable: true
+  per_page: 16
   aliases:
   - "symbol"
   categories:

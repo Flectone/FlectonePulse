@@ -617,7 +617,13 @@ public record Localization(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Symbol(String format) implements LocalizationSetting {}
+        public record Symbol(
+                String nullCategory,
+                String nullPage,
+                String header,
+                String lineElement,
+                String footer
+        ) implements LocalizationSetting {}
 
         @With
         @Builder(toBuilder = true)

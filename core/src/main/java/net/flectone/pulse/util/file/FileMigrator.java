@@ -385,9 +385,6 @@ public class FileMigrator {
                 localizationVanilla.types().put("death.attack.spear.item", "<fcolor:1>☠ <argument:0> was speared by <argument:1> using <argument:2>");
             }
 
-            Localization.Command.Symbol localizationSymbol = localization.command().symbol();
-            String oldSymbolFormat = localizationSymbol.format();
-
             Localization.Command.Ping localizationPing = localization.command().ping();
             String oldPingFormat = localizationPing.format();
 
@@ -396,7 +393,6 @@ public class FileMigrator {
 
             localization = localization
                     .withCommand(localization.command()
-                            .withSymbol(localization.command().symbol().withFormat(Strings.CS.replace(oldSymbolFormat, "<click:suggest_command:\"<message>\">", "<click:suggest_command:\"<input>\">")))
                             .withPing(localization.command().ping().withFormat(Strings.CS.replace(oldPingFormat, "<ping>", "<replacement:ping>")))
                     )
                     .withMessage(localization.message()

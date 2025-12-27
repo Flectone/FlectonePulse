@@ -644,6 +644,7 @@ public record Command(
     @Jacksonized
     public record Symbol(
             Boolean enable,
+            Integer perPage,
             List<String> aliases,
             Map<String, String> categories,
             Destination destination,
