@@ -76,6 +76,7 @@ public enum MessageType {
     PLAYERLISTNAME,
     QUESTION_ANSWER,
     QUIT,
+    OBJECT,
     REPLACEMENT,
     RIGHT_CLICK,
     SIDEBAR,

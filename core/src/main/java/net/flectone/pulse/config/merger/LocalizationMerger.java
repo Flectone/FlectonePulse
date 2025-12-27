@@ -207,7 +207,6 @@ public interface LocalizationMerger {
     @Mapping(target = "vanilla", expression = "java(mergeVanilla(target.build().vanilla().toBuilder(), source.vanilla()))")
     Localization.Message mergeMessage(@MappingTarget Localization.Message.MessageBuilder target, Localization.Message source);
 
-
     Localization.Message.Afk mergeAfk2(@MappingTarget Localization.Message.Afk.AfkBuilder target, Localization.Message.Afk afk);
 
     Localization.Message.Auto mergeAuto(@MappingTarget Localization.Message.Auto.AutoBuilder target, Localization.Message.Auto auto);
@@ -220,6 +219,7 @@ public interface LocalizationMerger {
 
     Localization.Message.Chat mergeChat2(@MappingTarget Localization.Message.Chat.ChatBuilder target, Localization.Message.Chat chat);
 
+    @Mapping(target = "object", expression = "java(mergeObject(target.build().object().toBuilder(), source.object()))")
     @Mapping(target = "replacement", expression = "java(mergeReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "mention", expression = "java(mergeMention2(target.build().mention().toBuilder(), source.mention()))")
     @Mapping(target = "moderation", expression = "java(mergeModeration(target.build().moderation().toBuilder(), source.moderation()))")
@@ -227,6 +227,8 @@ public interface LocalizationMerger {
     @Mapping(target = "questionAnswer", expression = "java(mergeQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "translate", expression = "java(mergeTranslate(target.build().translate().toBuilder(), source.translate()))")
     Localization.Message.Format mergeFormat(@MappingTarget Localization.Message.Format.FormatBuilder target, Localization.Message.Format source);
+
+    Localization.Message.Format.Object mergeObject(@MappingTarget Localization.Message.Format.Object.ObjectBuilder target, Localization.Message.Format.Object object);
 
     Localization.Message.Format.Replacement mergeReplacement(@MappingTarget Localization.Message.Format.Replacement.ReplacementBuilder target, Localization.Message.Format.Replacement replacement);
 

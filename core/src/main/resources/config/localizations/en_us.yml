@@ -473,6 +473,8 @@ message:
       global: "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>"
       local: "<delete><display_name><fcolor:3>: <message><reset><translate>"
   format:
+    object:
+      default_symbol: "☐"
     replacement:
       spoiler_symbol: "█"
       values:

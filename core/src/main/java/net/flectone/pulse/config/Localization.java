@@ -941,6 +941,9 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Format(
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object/")
+                Object object,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement/")
                 Replacement replacement,
 
@@ -959,6 +962,13 @@ public record Localization(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate/")
                 Translate translate
         ) implements LocalizationSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Object(
+                    String defaultSymbol
+            ) implements LocalizationSetting {}
 
             @With
             @Builder(toBuilder = true)

@@ -174,7 +174,9 @@ public class MessagePipeline {
         TRANSLATE,
         WORLD_PREFIX,
         PLAYER_HEAD,
+        PLAYER_HEAD_OR,
         SPRITE,
+        SPRITE_OR,
         FCOLOR;
 
         @Subst("")
