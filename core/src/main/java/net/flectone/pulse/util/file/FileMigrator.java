@@ -460,4 +460,23 @@ public class FileMigrator {
         return files.withMessage(files.message().withVanilla(files.message().vanilla().withTypes(vanillaMessages)));
     }
 
+    public FilePack migration_1_7_2(FilePack files) {
+        Map<String, Localization> newLocalizations = new HashMap<>();
+
+        for (Localization localization : files.localizations().values()) {
+
+            String newDisplay = Strings.CS.replace(localization.message().format().names().display(), "<player_head>", "<white><player_head></white>");
+            String newPlayerlistname = Strings.CS.replace(localization.message().tab().playerlistname().format(), "<player_head>", "<white><player_head></white>");
+
+            newLocalizations.put(localization.language(),
+                    localization.withMessage(localization.message()
+                            .withFormat(localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplay)))
+                            .withTab(localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerlistname)))
+                    )
+            );
+        }
+
+        return files.withLocalizations(newLocalizations);
+    }
+
 }
