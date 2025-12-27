@@ -108,7 +108,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
         bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
         bind(Path.class).annotatedWith(Names.named("backupPath")).toInstance(projectPath.resolve("backups"));
-        bind(Path.class).annotatedWith(Names.named("translationPath")).toInstance(projectPath.resolve("localizations/minecraft"));
+        bind(Path.class).annotatedWith(Names.named("minecraftPath")).toInstance(projectPath.resolve("minecraft"));
     }
 
     private void setupBooleans() {

@@ -40,7 +40,7 @@ public class MinecraftTranslationService {
     private final Map<String, String> translations = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final @Named("translationPath") Path translationPath;
+    private final @Named("minecraftPath") Path minecraftPath;
     private final PacketProvider packetProvider;
     private final FileFacade fileFacade;
     private final FLogger fLogger;
@@ -94,7 +94,7 @@ public class MinecraftTranslationService {
                     : loadLegacyTranslations(localizationFile);
 
             translations.putAll(loadedTranslations);
-            fLogger.info("Loaded translation /localization/minecraft/" + localizationFile.getFileName());
+            fLogger.info("Loaded translation " + localizationFile.getFileName());
         } catch (Exception e) {
             fLogger.warning("Failed to load translations");
         }
@@ -132,9 +132,11 @@ public class MinecraftTranslationService {
     }
 
     private Path resolveLocalizationFile() {
-        String version = getVersion();
         String extension = isModern ? ".json" : ".lang";
-        return translationPath.resolve(version + "_" + language + extension);
+        return minecraftPath
+                .resolve(getVersion())
+                .resolve("lang")
+                .resolve(language + extension);
     }
 
     private Map<String, String> loadJsonTranslations(Path file) {
