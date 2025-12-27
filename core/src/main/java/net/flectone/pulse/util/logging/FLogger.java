@@ -8,6 +8,8 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -117,10 +119,11 @@ public class FLogger extends Logger {
     }
 
     public void warning(String exception, Throwable throwable) {
-        LogRecord logRecord = new LogRecord(Level.WARNING, exception);
-        logRecord.setThrown(throwable);
-        throwable.printStackTrace();
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        throwable.printStackTrace(printWriter);
 
+        LogRecord logRecord = new LogRecord(Level.WARNING, exception + "\n" + stringWriter);
         log(logRecord);
     }
 
