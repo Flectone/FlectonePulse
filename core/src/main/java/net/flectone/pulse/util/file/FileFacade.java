@@ -57,6 +57,11 @@ public class FileFacade {
         }
 
         saveFiles();
+
+        // fix migration problems
+        if (versionChanged) {
+            updateFiles();
+        }
     }
 
     public Command command() {
