@@ -1,16 +1,16 @@
-cooldown: "<color:#ff7171><b>⁉</b> Слишком быстро, попробуй через <time>"
+cooldown: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Слишком быстро, попробуй через <time>"
 time:
   format: "dd'д' HH'ч' mm'м' ss.SSS'с'"
   permanent: "НАВСЕГДА"
   zero: "0с"
 command:
   exception:
-    execution: "<color:#ff7171><b>⁉</b> Произошла ошибка при выполнении команды <br><color:#ff7171><b>⁉</b> <exception>"
-    parse_unknown: "<color:#ff7171><b>⁉</b> Неизвестная ошибка аргумента в <br><input>"
-    parse_boolean: "<color:#ff7171><b>⁉</b> Ожидался boolean аргумент, но ты ввёл <br><input>"
-    parse_number: "<color:#ff7171><b>⁉</b> Ожидался числовой аргумент, но ты ввёл <br><input>"
-    parse_string: "<color:#ff7171><b>⁉</b> Ожидался строковый аргумент, но ты ввёл <br><input>"
-    permission: "<color:#ff7171><b>⁉</b> У тебя нет прав на использование этой команды"
+    execution: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Произошла ошибка при выполнении команды <br><color:#ff7171><sprite_or:⁉:gui:icon/chat_modified><exception>"
+    parse_unknown: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Неизвестная ошибка аргумента в <br><input>"
+    parse_boolean: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ожидался boolean аргумент, но ты ввёл <br><input>"
+    parse_number: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ожидался числовой аргумент, но ты ввёл <br><input>"
+    parse_string: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ожидался строковый аргумент, но ты ввёл <br><input>"
+    permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>У тебя нет прав на использование этой команды"
     syntax: "<hover:show_text:\"<fcolor:2>Использовать <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Использование →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└"
   prompt:
     message: "сообщение"
@@ -54,9 +54,9 @@ command:
     - "Перспективы не очень хорошие"
     - "Весьма сомнительно"
   ban:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_time: "<color:#ff7171><b>⁉</b> Невозможное время"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь забанить игрока с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Невозможное время"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь забанить игрока с такими же или большими правами"
     reasons:
       default: "Ты заблокирован на этом сервере"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> заблокировал игрока <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
@@ -64,8 +64,8 @@ command:
     connection_attempt: "<color:#ff7171>🔒 Заблокированный <fcolor:2><player><fcolor:1> попытался подключиться <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
   banlist:
     empty: "<color:#98FB98>☺ Блокировки не найдены"
-    null_page: "<color:#ff7171><b>⁉</b> Страница не найдена"
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Блокировки: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
@@ -77,14 +77,14 @@ command:
   broadcast:
     format: "<br><color:#ffd500>│ 🕫 Сообщение для всех <br>│<br>│ Автор <display_name> <br>│<br>│ <fcolor:1><message> <br>"
   chatcolor:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_type: "<color:#ff7171><b>⁉</b> Тип введён неверно"
-    null_color: "<color:#ff7171><b>⁉</b> Цвета введены неверно"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_type: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Тип введён неверно"
+    null_color: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Цвета введены неверно"
     format: "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br>"
   chatsetting:
-    no_permission: "<color:#ff7171><b>⁉</b> Нет разрешения на изменение этой настройки"
-    disabled_self: "<color:#ff7171><b>⁉</b> Эта функция отключена с помощью /chatsetting"
-    disabled_other: "<color:#ff7171><b>⁉</b> Он отключил эту функцию с помощью /chatsetting"
+    no_permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Нет разрешения на изменение этой настройки"
+    disabled_self: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Эта функция отключена с помощью /chatsetting"
+    disabled_other: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Он отключил эту функцию с помощью /chatsetting"
     inventory: "Настройки чата"
     checkbox:
       enabled_color: "<color:#98FB98>"
@@ -167,10 +167,10 @@ command:
           magenta: "<gradient:#FF5CD9:#FF3DCF>Пурпурные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
           pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
   clearchat:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format: "<fcolor:1>💬 Чат очищен"
   clearmail:
-    null_mail: "<color:#ff7171><b>⁉</b> Письма не найдено"
+    null_mail: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Письма не найдено"
     format: "<fcolor:2>✉ [УДАЛЕНО] Письмо #<id> для <target> » <fcolor:1><message>"
   coin:
     head: "орёл"
@@ -178,7 +178,7 @@ command:
     format: "<fcolor:1>✎ <display_name> подбросил монетку - <result>"
     format_draw: "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)"
   deletemessage:
-    null_message: "<color:#ff7171><b>⁉</b> Сообщение не существует"
+    null_message: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Сообщение не существует"
     format: "<color:#98FB98>☒ Сообщение успешно удалено"
   dice:
     symbols:
@@ -192,45 +192,45 @@ command:
   do:
     format: "<fcolor:1>✎ <message><reset> <fcolor:1>(<i><display_name></i>)"
   emit:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format: "<fcolor:4><message>"
   flectonepulse:
-    null_host_editor: "<color:#ff7171><b>⁉</b> Параметр host должен быть настроен в <u>config.yml"
-    null_port_editor: "<color:#ff7171><b>⁉</b> Порт <port> недоступен, выбери другой в <u>config.yml"
+    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Параметр host должен быть настроен в <u>config.yml"
+    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Порт <port> недоступен, выбери другой в <u>config.yml"
     format_false: "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>"
     format_true: "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)"
     format_web_starting: "<fcolor:2>★ Запуск веб-сервера, подождите..."
     format_editor: "<fcolor:2>★ Ссылка для веб-редактирования <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
   geolocate:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_or_error: "<color:#ff7171><b>⁉</b> Ошибка, попробуй чуть позже"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ошибка, попробуй чуть позже"
     format: "<fcolor:1>Геолокация <display_name><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>"
   helper:
-    null_helper: "<color:#ff7171><b>⁉</b> Сейчас нет людей, кто бы смог помочь"
+    null_helper: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Сейчас нет людей, кто бы смог помочь"
     global: "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><message>"
     player: "<fcolor:2>👤 Запрос отправлен, ожидай ответа"
   ignore:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    myself: "<color:#ff7171><b>⁉</b> Нельзя игнорировать самого себя"
-    he: "<color:#ff7171><b>⁉</b> Он тебя игнорирует"
-    you: "<color:#ff7171><b>⁉</b> Ты его игнорируешь"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Нельзя игнорировать самого себя"
+    he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Он тебя игнорирует"
+    you: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты его игнорируешь"
     format_true: "<color:#ff7171>☹ Ты игнорируешь <display_name>"
     format_false: "<color:#98FB98>☺ Ты перестал игнорировать <display_name>"
   ignorelist:
     empty: "<color:#98FB98>☺ Игнорируемых игроков нет"
-    null_page: "<color:#ff7171><b>⁉</b> Страница не найдена"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игнорирования: <count> <br>"
     line: "<hover:show_text:\"<fcolor:1>Перестать игнорировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1>Дата: <date>"
     footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     reasons:
       default: "Исключён модератором"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> исключил <fcolor:2><player><fcolor:1> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     person: "<color:#ff7171>🔒 КИК 🔒 <fcolor:1><br><br>Айди: <id><br><br>Дата: <date><br><br>Модератор: <moderator><br><br>Причина: <reason>"
   mail:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    online_player: "<color:#ff7171><b>⁉</b> Игрок в сети"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    online_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок в сети"
     sender: "<fcolor:2>✉ Письмо #<id> для <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>"
   maintenance:
@@ -242,9 +242,9 @@ command:
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_time: "<color:#ff7171><b>⁉</b> Невозможное время"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь замутить игрока с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Невозможное время"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь замутить игрока с такими же или большими правами"
     suffix: " <color:#ff7171>🔒</color>"
     reasons:
       default: "Ты был замучен на сервере"
@@ -252,8 +252,8 @@ command:
     person: "<color:#ff7171>🔒 Ты замучен, осталось <time_left>"
   mutelist:
     empty: "<color:#98FB98>☺ Муты не найдены"
-    null_page: "<color:#ff7171><b>⁉</b> Страница не найдена"
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Муты: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
@@ -263,18 +263,18 @@ command:
       line: "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   online:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format_current: "<fcolor:1>⌛ <display_name> сейчас на сервере"
     format_first: "<fcolor:1>⌛ <display_name> впервые зашёл на сервер <time> назад"
     format_last: "<fcolor:1>⌛ <display_name> <fcolor:1>последний раз был на сервере <time> назад"
     format_total: "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>"
   ping:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format: "<fcolor:1>🖧 Пинг игрока <display_name> равен <replacement:ping>"
   poll:
-    null_poll: "<color:#ff7171><b>⁉</b> Голосование не найдено"
-    expired: "<color:#ff7171><b>⁉</b> Голосование завершено"
-    already: "<color:#ff7171><b>⁉</b> Ты уже проголосовал в этом голосовании"
+    null_poll: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Голосование не найдено"
+    expired: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Голосование завершено"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты уже проголосовал в этом голосовании"
     vote_true: "<color:#4eff52>👍 Ты выбрал <answer_id> вариант в голосовании #<id>. Всего таких голосов <count>"
     vote_false: "<color:#ff4e4e>🖓 Ты передумал об <answer_id> варианте в голосовании #<id>. Всего таких голосов <count> без тебя"
     format: "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>"
@@ -296,13 +296,13 @@ command:
       input_answers_initial: ""
       create_button_name: "Создать голосование"
   reply:
-    null_receiver: "<color:#ff7171><b>⁉</b> Некому отвечать"
+    null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Некому отвечать"
   rockpaperscissors:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_game: "<color:#ff7171><b>⁉</b> Этой игры не существует"
-    wrong_move: "<color:#ff7171><b>⁉</b> Такой ход невозможен"
-    already: "<color:#ff7171><b>⁉</b> Ты уже сходил"
-    myself: "<color:#ff7171><b>⁉</b> Ты не можешь играть с самим собой"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Этой игры не существует"
+    wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Такой ход невозможен"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты уже сходил"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь играть с самим собой"
     sender: "<fcolor:2>✂ <fcolor:1>Теперь ходит <target>"
     receiver: "<fcolor:2>✂ <display_name> <fcolor:1>предложил сыграть в камень-ножницы-бумага"
     format_move: "<fcolor:2>✂ <fcolor:1>Выбери свой ход <fcolor:2><click:run_command:\"/rps <target> rock <uuid>\">[🪨 камень]</click> <click:run_command:\"/rps <target> scissors <uuid>\">[✂ ножницы]</click> <click:run_command:\"/rps <target> paper <uuid>\">[🧻 бумага]</click>"
@@ -325,8 +325,8 @@ command:
     format_false: "<fcolor:1>[👁] Ты <color:#F08080>выключил <fcolor:1>слежку"
     format_log: "<fcolor:1>[👁] <display_name> <color:#98FB98><action> <fcolor:1>→ <fcolor:2><message>"
   stream:
-    already: "<color:#ff7171><b>⁉</b> Ты уже включил трансляцию"
-    not: "<color:#ff7171><b>⁉</b> Ты не включил трансляцию"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты уже включил трансляцию"
+    not: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не включил трансляцию"
     prefix_true: "<color:#ff4e4e>⏻</color:#ff4e4e> "
     prefix_false: ""
     url_template: "<color:#ff4e4e>│ <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url></hover></click>"
@@ -335,16 +335,16 @@ command:
   symbol:
     format: "<click:suggest_command:\"<input>\"><fcolor:2>🖥 Нажми, чтобы использовать: <fcolor:1><message>"
   tell:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     sender: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
     myself: "<fcolor:2>✉ [Заметка] <fcolor:1><message>"
   tictactoe:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    myself: "<color:#ff7171><b>⁉</b> Ты не можешь играть с самим собой"
-    wrong_game: "<color:#ff7171><b>⁉</b> Этой игры не существует"
-    wrong_move: "<color:#ff7171><b>⁉</b> Такой ход невозможен"
-    wrong_by_player: "<color:#ff7171><b>⁉</b> Игра закончена, потому что один из игроков не в сети"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь играть с самим собой"
+    wrong_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Этой игры не существует"
+    wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Такой ход невозможен"
+    wrong_by_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игра закончена, потому что один из игроков не в сети"
     symbol:
       blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>"
       first: "<fcolor:2>☑"
@@ -362,43 +362,43 @@ command:
     sender: "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <target>"
     receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
   toponline:
-    null_page: "<color:#ff7171><b>⁉</b> Страница не найдена"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игроков: <count> <br>"
     line: "<fcolor:2><time_player> <fcolor:1>наиграл <fcolor:2><time>"
     footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   translateto:
-    null_or_error: "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык"
+    null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ошибка, возможно указан неправильный язык"
     format: "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><message>"
   try:
     format_true: "<color:#98FB98>☺ <display_name> <message><reset> <color:#98FB98><percent>%"
     format_false: "<color:#F08080>☹ <display_name> <message><reset> <color:#F08080><percent>%"
   unban:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    not_banned: "<color:#ff7171><b>⁉</b> Игрок не заблокирован"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь разбанить игрока с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    not_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не заблокирован"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь разбанить игрока с такими же или большими правами"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator><color:#98FB98> разблокировал игрока <fcolor:2><player>"
   unmute:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    not_muted: "<color:#ff7171><b>⁉</b> Игрок не замучен"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь размутить игрока с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    not_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не замучен"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь размутить игрока с такими же или большими правами"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator><color:#98FB98> размутил игрока <fcolor:2><player>"
   unwarn:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    not_warned: "<color:#ff7171><b>⁉</b> Игрок не имеет предупреждений"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь снять предупреждение с игрока с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    not_warned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не имеет предупреждений"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь снять предупреждение с игрока с такими же или большими правами"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator><color:#98FB98> снял предупреждение с игрока <fcolor:2><player>"
   warn:
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
-    null_time: "<color:#ff7171><b>⁉</b> Невозможное время"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> Ты не можешь выдать предупреждение игроку с такими же или большими правами"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Невозможное время"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь выдать предупреждение игроку с такими же или большими правами"
     reasons:
       default: "Ты получил предупреждение"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> выдал предупреждение игроку <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     person: "<color:#ff7171>🔒 Ты получил предупреждение на <time>"
   warnlist:
     empty: "<color:#98FB98>☺ Предупреждения не найдены"
-    null_page: "<color:#ff7171><b>⁉</b> Страница не найдена"
-    null_player: "<color:#ff7171><b>⁉</b> Игрок не найден"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Предупреждения: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
@@ -475,8 +475,8 @@ message:
   bubble:
     format: "<fcolor:3><message>"
   chat:
-    null_chat: "<color:#ff7171><b>⁉</b> На сервер выключен чат"
-    null_receiver: "<color:#ff7171><b>⁉</b> Тебя никто не услышал"
+    null_chat: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервер выключен чат"
+    null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Тебя никто не услышал"
     types:
       global: "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>"
       local: "<delete><display_name><fcolor:3>: <message><reset><translate>"
@@ -531,7 +531,7 @@ message:
         symbol: "❤"
     names:
       constant: ""
-      display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player_head><player>\"><player_head><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
+      display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>👻 Невидимка"
@@ -540,7 +540,7 @@ message:
         server: "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!"
         flectone: "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом"
     translate:
-      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄"
+      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
     format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:
@@ -594,7 +594,7 @@ message:
         - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><player_head></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"

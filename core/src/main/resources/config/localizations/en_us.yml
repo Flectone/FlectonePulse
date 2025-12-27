@@ -1,16 +1,16 @@
-cooldown: "<color:#ff7171><b>⁉</b> Too fast, you'll be able to use it in <time>"
+cooldown: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Too fast, you'll be able to use it in <time>"
 time:
   format: "dd'd' HH'h' mm'm' ss.SSS's'"
   permanent: "PERMANENT"
   zero: "0s"
 command:
   exception:
-    execution: "<color:#ff7171><b>⁉</b> An error occurred while executing the command <br><color:#ff7171><b>⁉</b> <exception>"
-    parse_unknown: "<color:#ff7171><b>⁉</b> Unknown argument error while parsing <br><input>"
-    parse_boolean: "<color:#ff7171><b>⁉</b> A boolean argument was expected, but you entered <br><input>"
-    parse_number: "<color:#ff7171><b>⁉</b> A number argument was expected, but you entered <br><input>"
-    parse_string: "<color:#ff7171><b>⁉</b> A string argument was expected, but you entered <br><input>"
-    permission: "<color:#ff7171><b>⁉</b> You don't have permission to use this command"
+    execution: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>An error occurred while executing the command <br><color:#ff7171><sprite_or:⁉:gui:icon/chat_modified><exception>"
+    parse_unknown: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Unknown argument error while parsing <br><input>"
+    parse_boolean: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>A boolean argument was expected, but you entered <br><input>"
+    parse_number: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>A number argument was expected, but you entered <br><input>"
+    parse_string: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>A string argument was expected, but you entered <br><input>"
+    permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You don't have permission to use this command"
     syntax: "<hover:show_text:\"<fcolor:2>Use <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Usage →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└"
   prompt:
     message: "message"
@@ -54,9 +54,9 @@ command:
     - "The prospects are not good"
     - "Very doubtful"
   ban:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_time: "<color:#ff7171><b>⁉</b> Incorrect time"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot ban a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot ban a player with equal or higher permissions"
     reasons:
       default: "You have been banned from this server"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>has banned <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
@@ -64,8 +64,8 @@ command:
     connection_attempt: "<color:#ff7171>🔒 Banned <fcolor:2><player> <fcolor:1>tried to log in <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   banlist:
     empty: "<color:#98FB98>☺ No bans found"
-    null_page: "<color:#ff7171><b>⁉</b> This page doesn't exist"
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Bans: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
@@ -77,14 +77,14 @@ command:
   broadcast:
     format: "<br><color:#ffd500>│ 🕫 Message for everyone <br>│<br>│ Author <display_name> <br>│<br>│ <fcolor:1><message> <br>"
   chatcolor:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_type: "<color:#ff7171><b>⁉</b> Incorrect type entered"
-    null_color: "<color:#ff7171><b>⁉</b> Incorrect colors entered"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_type: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect type entered"
+    null_color: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect colors entered"
     format: "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br>"
   chatsetting:
-    no_permission: "<color:#ff7171><b>⁉</b> No permission to change this setting"
-    disabled_self: "<color:#ff7171><b>⁉</b> This feature is disabled via /chatsetting"
-    disabled_other: "<color:#ff7171><b>⁉</b> He disabled this feature via /chatsetting"
+    no_permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>No permission to change this setting"
+    disabled_self: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This feature is disabled via /chatsetting"
+    disabled_other: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>He disabled this feature via /chatsetting"
     inventory: "Chat Settings"
     checkbox:
       enabled_color: "<color:#98FB98>"
@@ -167,10 +167,10 @@ command:
           magenta: "<gradient:#FF5CD9:#FF3DCF>Magenta colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
           pink: "<gradient:#FF80B7:#FF66A6>Pink colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
   clearchat:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:1>💬 Chat is cleared"
   clearmail:
-    null_mail: "<color:#ff7171><b>⁉</b> This mail does not exist"
+    null_mail: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This mail does not exist"
     format: "<fcolor:2>✉ [REMOVED] Mail #<id> for <target> » <fcolor:1><message>"
   coin:
     head: "heads"
@@ -178,7 +178,7 @@ command:
     format: "<fcolor:1>✎ <display_name> player got <result>"
     format_draw: "<fcolor:1>✎ <display_name> player got edge :)"
   deletemessage:
-    null_message: "<color:#ff7171><b>⁉</b> This message does not exist"
+    null_message: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This message does not exist"
     format: "<color:#98FB98>☒ Successfully deleted message"
   dice:
     symbols:
@@ -192,45 +192,45 @@ command:
   do:
     format: "<fcolor:1>✎ <message><reset> <fcolor:1>(<i><display_name></i>)"
   emit:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:4><message>"
   flectonepulse:
-    null_host_editor: "<color:#ff7171><b>⁉</b> The host parameter cannot be empty and must be configured in <u>config.yml"
-    null_port_editor: "<color:#ff7171><b>⁉</b> Port <port> is unavailable, configure an alternative port in <u>config.yml</u>"
+    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>The host parameter cannot be empty and must be configured in <u>config.yml"
+    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Port <port> is unavailable, configure an alternative port in <u>config.yml</u>"
     format_false: "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>"
     format_true: "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)"
     format_web_starting: "<fcolor:2>★ Web server starting, please wait..."
     format_editor: "<fcolor:2>★ Link for web editing <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
   geolocate:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_or_error: "<color:#ff7171><b>⁉</b> Problem receiving information, try again"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Problem receiving information, try again"
     format: "<fcolor:1>Geolocation for <display_name><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>"
   helper:
-    null_helper: "<color:#ff7171><b>⁉</b> There are no people who can help you"
+    null_helper: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>There are no people who can help you"
     global: "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>"
     player: "<fcolor:2>👤 Request sent, awaiting reply"
   ignore:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    myself: "<color:#ff7171><b>⁉</b> You can't ignore yourself"
-    he: "<color:#ff7171><b>⁉</b> You can't write to him because he ignore you"
-    you: "<color:#ff7171><b>⁉</b> You can't write to him because you ignore him"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't ignore yourself"
+    he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because he ignore you"
+    you: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because you ignore him"
     format_true: "<color:#ff7171>☹ You ignore <display_name>"
     format_false: "<color:#98FB98>☺ You unignore <display_name>"
   ignorelist:
     empty: "<color:#98FB98>☺ You don't ignore anyone"
-    null_page: "<color:#ff7171><b>⁉</b> This page doesn't exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
     header: "<fcolor:2>▋ Ignores: <count><br>"
     line: "<hover:show_text:\"<fcolor:1>Click to unignore <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1>Date: <date>"
     footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     reasons:
       default: "Kicked by an operator"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>kicked <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 KICK 🔒 <fcolor:1><br><br>ID: <id><br><br>Date: <date><br><br>Moderator: <moderator><br><br>Reason: <reason>"
   mail:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    online_player: "<color:#ff7171><b>⁉</b> This player is online"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    online_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is online"
     sender: "<fcolor:2>✉ Mail #<id> for <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>"
   maintenance:
@@ -242,9 +242,9 @@ command:
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_time: "<color:#ff7171><b>⁉</b> Incorrect time"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot mute a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot mute a player with equal or higher permissions"
     suffix: " <color:#ff7171>🔒</color>"
     reasons:
       default: "You have been muted on this server"
@@ -252,8 +252,8 @@ command:
     person: "<color:#ff7171>🔒 You are muted, <time_left> left"
   mutelist:
     empty: "<color:#98FB98>☺ No mutes found"
-    null_page: "<color:#ff7171><b>⁉</b> This page doesn't exist"
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Mutes: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_localization.command:\"<localization.command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
@@ -263,18 +263,18 @@ command:
       line: "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   online:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format_current: "<fcolor:1>⌛ <display_name> currently on server"
     format_first: "<fcolor:1>⌛ <display_name> was first on server <time> ago"
     format_last: "<fcolor:1>⌛ <display_name> <fcolor:1>was last on server <time> ago"
     format_total: "<fcolor:1>⌛ <display_name> <fcolor:1>has spent a total of <time> on server"
   ping:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:1>🖧 <display_name>'s ping is <replacement:ping>"
   poll:
-    null_poll: "<color:#ff7171><b>⁉</b> Poll not found"
-    expired: "<color:#ff7171><b>⁉</b> The poll has ended"
-    already: "<color:#ff7171><b>⁉</b> You have already voted in this poll"
+    null_poll: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Poll not found"
+    expired: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>The poll has ended"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You have already voted in this poll"
     vote_true: "<color:#4eff52>👍 You voted for option <answer_id> in poll #<id>. There are <count> of you"
     vote_false: "<color:#ff4e4e>🖓 You rejected option <answer_id> in poll #<id>. There are <count> without you"
     format: "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>"
@@ -296,13 +296,13 @@ command:
       input_answers_initial: ""
       create_button_name: "Create poll"
   reply:
-    null_receiver: "<color:#ff7171><b>⁉</b> No one to answer"
+    null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>No one to answer"
   rockpaperscissors:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_game: "<color:#ff7171><b>⁉</b> This game does not exist"
-    wrong_move: "<color:#ff7171><b>⁉</b> This move is not possible"
-    already: "<color:#ff7171><b>⁉</b> You've already made your move"
-    myself: "<color:#ff7171><b>⁉</b> You can't play with yourself"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This game does not exist"
+    wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This move is not possible"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You've already made your move"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't play with yourself"
     sender: "<fcolor:1>Now goes <target>"
     receiver: "<fcolor:2>✂ <display_name> <fcolor:1>suggested a game of rock-paper-scissors"
     format_move: "<fcolor:2>✂ <fcolor:1>Choose your move <fcolor:2><click:run_command:\"/rps <target> rock <uuid>\">[🪨 rock]</click> <click:run_command:\"/rps <target> scissors <uuid>\">[✂ scissors]</click> <click:run_command:\"/rps <target> paper <uuid>\">[🧻 paper]</click>"
@@ -325,8 +325,8 @@ command:
     format_false: "<fcolor:1>[👁] You <color:#F08080>turned off <fcolor:1>spy mode"
     format_log: "<fcolor:1>[👁] <display_name> <color:#98FB98><action> <fcolor:1>→ <fcolor:2><message>"
   stream:
-    already: "<color:#ff7171><b>⁉</b> You are already streaming"
-    not: "<color:#ff7171><b>⁉</b> You don't stream"
+    already: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You are already streaming"
+    not: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You don't stream"
     prefix_true: "<color:#ff4e4e>⏻</color:#ff4e4e> "
     prefix_false: ""
     url_template: "<color:#ff4e4e>│ <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url></hover></click>"
@@ -335,16 +335,16 @@ command:
   symbol:
     format: "<click:suggest_command:\"<input>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>"
   tell:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     sender: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
     myself: "<fcolor:2>✉ [Note] <fcolor:1><message>"
   tictactoe:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    myself: "<color:#ff7171><b>⁉</b> You can't play with yourself"
-    wrong_game: "<color:#ff7171><b>⁉</b> This game does not exist"
-    wrong_move: "<color:#ff7171><b>⁉</b> This step is not possible"
-    wrong_by_player: "<color:#ff7171><b>⁉</b> This game ended because player quit"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't play with yourself"
+    wrong_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This game does not exist"
+    wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This step is not possible"
+    wrong_by_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This game ended because player quit"
     symbol:
       blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>"
       first: "<fcolor:2>☑"
@@ -362,43 +362,43 @@ command:
     sender: "<fcolor:1>☐ An offer to play was sent to <target>"
     receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
   toponline:
-    null_page: "<color:#ff7171><b>⁉</b> This page doesn't exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
     header: "<fcolor:2>▋ Players: <count> <br>"
     line: "<fcolor:2><time_player> <fcolor:1>played for <fcolor:2><time>"
     footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   translateto:
-    null_or_error: "<color:#ff7171><b>⁉</b> Error, you may have specified an unsupported language"
+    null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Error, you may have specified an unsupported language"
     format: "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><message>"
   try:
     format_true: "<color:#98FB98>☺ <display_name> <message><reset> <color:#98FB98><percent>%"
     format_false: "<color:#F08080>☹ <display_name> <message><reset> <color:#F08080><percent>%"
   unban:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    not_banned: "<color:#ff7171><b>⁉</b> This player is not banned"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot unban a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    not_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not banned"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unban a player with equal or higher permissions"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unbanned the player <fcolor:2><player>"
   unmute:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    not_muted: "<color:#ff7171><b>⁉</b> This player is not muted"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot unmute a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    not_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not muted"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unmute a player with equal or higher permissions"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unmutted the player <fcolor:2><player>"
   unwarn:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    not_warned: "<color:#ff7171><b>⁉</b> This player is not warned"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot unwarn a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    not_warned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not warned"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unwarn a player with equal or higher permissions"
     format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unwarned the player <fcolor:2><player>"
   warn:
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
-    null_time: "<color:#ff7171><b>⁉</b> Incorrect time"
-    lower_weight_group: "<color:#ff7171><b>⁉</b> You cannot warn a player with equal or higher permissions"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot warn a player with equal or higher permissions"
     reasons:
       default: "You have been warned on this server"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>gave a warning to <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 You are warned a <time>"
   warnlist:
     empty: "<color:#98FB98>☺ No warns found"
-    null_page: "<color:#ff7171><b>⁉</b> This page doesn't exist"
-    null_player: "<color:#ff7171><b>⁉</b> This player does not exist"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Warns: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
@@ -475,8 +475,8 @@ message:
   bubble:
     format: "<fcolor:3><message>"
   chat:
-    null_chat: "<color:#ff7171><b>⁉</b> Chat is disabled on this server"
-    null_receiver: "<color:#ff7171><b>⁉</b> Nobody heard you"
+    null_chat: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Chat is disabled on this server"
+    null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Nobody heard you"
     types:
       global: "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>"
       local: "<delete><display_name><fcolor:3>: <message><reset><translate>"
@@ -531,7 +531,7 @@ message:
         symbol: "❤"
     names:
       constant: ""
-      display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player_head><player>\"><player_head><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
+      display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>👻 Invisible"
@@ -540,7 +540,7 @@ message:
         server: "<fcolor:2>[Answer] @<player><fcolor:1>, this is a vanilla server in minecraft!"
         flectone: "<fcolor:2>[Answer] @<player><fcolor:1>, this is a brand and projects created by TheFaser"
     translate:
-      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>⇄"
+      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
     format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:
@@ -594,7 +594,7 @@ message:
         - "<fcolor:1>TPS <replacement:tps>, Online <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><player_head></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <replacement:url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!"
     format_console: "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"
