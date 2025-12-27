@@ -6,6 +6,7 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
@@ -20,9 +21,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -43,6 +42,7 @@ public class MinecraftTranslationService {
     private final @Named("minecraftPath") Path minecraftPath;
     private final PacketProvider packetProvider;
     private final FileFacade fileFacade;
+    private final WebUtil webUtil;
     private final FLogger fLogger;
 
     private String language;
@@ -81,7 +81,7 @@ public class MinecraftTranslationService {
         if (formattedLanguage == null) return false;
 
         String url = buildLocalizationUrl(getVersion(), formattedLanguage, isModern ? ".json" : ".lang");
-        return downloadFile(url, outputPath);
+        return webUtil.downloadFile(url, outputPath);
     }
 
     public void loadTranslations() {
@@ -108,27 +108,6 @@ public class MinecraftTranslationService {
         translator = createFlectonePulseTranslator();
 
         GlobalTranslator.translator().addSource(translator);
-    }
-
-    private boolean downloadFile(String fileUrl, Path outputPath) {
-        try {
-            HttpURLConnection connection = createConnection(fileUrl);
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                fLogger.info("Downloading translation " + fileUrl);
-
-                try (InputStream inputStream = connection.getInputStream()) {
-                    Files.createDirectories(outputPath.getParent());
-                    Files.copy(inputStream, outputPath);
-                    return true;
-                }
-            }
-
-            fLogger.warning("Failed to download translation. HTTP response: " + connection.getResponseCode() + " - " + fileUrl);
-        } catch (IOException e) {
-            fLogger.warning("Failed to download translation file");
-        }
-
-        return false;
     }
 
     private Path resolveLocalizationFile() {
@@ -190,19 +169,10 @@ public class MinecraftTranslationService {
         );
     }
 
-    private HttpURLConnection createConnection(String url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-        connection.setRequestMethod("GET");
-        connection.setConnectTimeout(10000);
-        connection.setReadTimeout(10000);
-        return connection;
-    }
-
     private boolean detectModernVersion() {
         try {
             String url = buildLocalizationUrl(getVersion(), "en_us", ".json");
-            HttpURLConnection connection = createConnection(url);
+            HttpURLConnection connection = webUtil.createConnection(url);
             return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
         } catch (IOException e) {
             // legacy version
