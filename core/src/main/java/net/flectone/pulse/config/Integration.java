@@ -13,6 +13,13 @@ import net.flectone.pulse.model.util.Ticker;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configuration for third-party integrations in FlectonePulse.
+ * Contains settings for various external services and plugins.
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @With
 @Builder(toBuilder = true)
 @Jacksonized

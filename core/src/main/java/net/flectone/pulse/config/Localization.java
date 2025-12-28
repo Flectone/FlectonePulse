@@ -11,6 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configuration for localization in FlectonePulse.
+ * Contains all translatable strings for commands, messages, and integrations.
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @With
 @Builder(toBuilder = true)
 @Jacksonized

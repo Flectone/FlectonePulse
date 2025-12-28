@@ -10,6 +10,7 @@ import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
+import org.jspecify.annotations.NonNull;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -18,6 +19,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Repository for managing player data in FlectonePulse.
+ * Provides caching and retrieval of player information from various sources.
+ *
+ * @author TheFaser
+ * @since 0.8.1
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerRepository {
@@ -29,11 +37,22 @@ public class FPlayerRepository {
     private final SettingDAO settingDAO;
     private final ColorsDAO colorsDAO;
 
-    public void invalid(UUID uuid) {
+    /**
+     * Invalidates a player from all caches.
+     *
+     * @param uuid the player UUID to invalidate
+     */
+    public void invalid(@NonNull UUID uuid) {
         onlinePlayers.remove(uuid);
         offlinePlayersCache.invalidate(uuid);
     }
 
+    /**
+     * Gets a player by database ID with caching.
+     *
+     * @param id the player database ID
+     * @return the player
+     */
     public FPlayer get(int id) {
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
@@ -53,7 +72,13 @@ public class FPlayerRepository {
         return dbPlayer;
     }
 
-    public FPlayer get(InetAddress inetAddress) {
+    /**
+     * Gets a player by IP address with caching.
+     *
+     * @param inetAddress the IP address
+     * @return the player
+     */
+    public FPlayer get(@NonNull InetAddress inetAddress) {
         String ip = inetAddress.getHostAddress();
 
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
@@ -74,7 +99,13 @@ public class FPlayerRepository {
         return dbPlayer;
     }
 
-    public FPlayer get(UUID uuid) {
+    /**
+     * Gets a player by UUID with caching.
+     *
+     * @param uuid the player UUID
+     * @return the player
+     */
+    public FPlayer get(@NonNull UUID uuid) {
         FPlayer onlinePlayer = onlinePlayers.get(uuid);
         if (onlinePlayer != null) return onlinePlayer;
 
@@ -87,7 +118,13 @@ public class FPlayerRepository {
         return dbPlayer;
     }
 
-    public FPlayer get(String playerName) {
+    /**
+     * Gets a player by name with caching.
+     *
+     * @param playerName the player name
+     * @return the player
+     */
+    public FPlayer get(@NonNull String playerName) {
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
                 .filter(p -> p.getName().equalsIgnoreCase(playerName))
@@ -114,23 +151,50 @@ public class FPlayerRepository {
         }
     }
 
-    public boolean save(UUID uuid, String name) {
+    /**
+     * Saves a new player to the database.
+     *
+     * @param uuid the player UUID
+     * @param name the player name
+     * @return true if a new player was inserted, false if existing player was updated
+     */
+    public boolean save(@NonNull UUID uuid, @NonNull String name) {
         return fPlayerDAO.insert(uuid, name);
     }
 
-    public void update(FPlayer fPlayer) {
+    /**
+     * Updates a player in the database.
+     *
+     * @param fPlayer the player to update
+     */
+    public void update(@NonNull FPlayer fPlayer) {
         fPlayerDAO.update(fPlayer);
     }
 
-    public void saveOrIgnore(FPlayer fPlayer) {
+    /**
+     * Saves a player or ignores if already exists.
+     *
+     * @param fPlayer the player to save
+     */
+    public void saveOrIgnore(@NonNull FPlayer fPlayer) {
         fPlayerDAO.insertOrIgnore(fPlayer);
     }
 
-    public void removeOffline(UUID uuid) {
+    /**
+     * Removes a player from the offline cache.
+     *
+     * @param uuid the player UUID
+     */
+    public void removeOffline(@NonNull UUID uuid) {
         offlinePlayersCache.invalidate(uuid);
     }
 
-    public void removeOnline(UUID uuid) {
+    /**
+     * Moves a player from online to offline cache.
+     *
+     * @param uuid the player UUID
+     */
+    public void removeOnline(@NonNull UUID uuid) {
         FPlayer fPlayer = onlinePlayers.get(uuid);
         if (fPlayer != null) {
             fPlayer.setOnline(false);
@@ -140,53 +204,113 @@ public class FPlayerRepository {
         onlinePlayers.remove(uuid);
     }
 
-    public void add(FPlayer fPlayer) {
+    /**
+     * Adds a player to the online cache.
+     *
+     * @param fPlayer the player to add
+     */
+    public void add(@NonNull FPlayer fPlayer) {
         onlinePlayers.put(fPlayer.getUuid(), fPlayer);
         offlinePlayersCache.invalidate(fPlayer.getUuid());
     }
 
+    /**
+     * Gets all players from the database.
+     *
+     * @return list of all players
+     */
     public List<FPlayer> getAllPlayersDatabase() {
         return fPlayerDAO.getFPlayers();
     }
 
+    /**
+     * Gets all online players from the database.
+     *
+     * @return list of online players
+     */
     public List<FPlayer> getOnlinePlayersDatabase() {
         return fPlayerDAO.getOnlineFPlayers();
     }
 
+    /**
+     * Gets all online players from the cache.
+     *
+     * @return list of online players
+     */
     public List<FPlayer> getOnlinePlayers() {
         return onlinePlayers.values().stream().filter(FPlayer::isOnline).toList();
     }
 
+    /**
+     * Gets all online players plus the console.
+     *
+     * @return list of online players and console
+     */
     public List<FPlayer> getOnlineFPlayersWithConsole() {
         return onlinePlayers.values().stream().filter(fPlayer -> fPlayer.isOnline() || fPlayer.isConsole()).toList();
     }
 
+    /**
+     * Clears all caches.
+     */
     public void clearCache() {
         onlinePlayers.clear();
         offlinePlayersCache.invalidateAll();
     }
 
-    public void loadColors(FPlayer fPlayer) {
+    /**
+     * Loads color settings for a player.
+     *
+     * @param fPlayer the player to load colors for
+     */
+    public void loadColors(@NonNull FPlayer fPlayer) {
         colorsDAO.load(fPlayer);
     }
 
-    public void saveColors(FPlayer fPlayer) {
+    /**
+     * Saves color settings for a player.
+     *
+     * @param fPlayer the player to save colors for
+     */
+    public void saveColors(@NonNull FPlayer fPlayer) {
         colorsDAO.save(fPlayer);
     }
 
-    public void saveSettings(FPlayer fPlayer) {
+    /**
+     * Saves all settings for a player.
+     *
+     * @param fPlayer the player to save settings for
+     */
+    public void saveSettings(@NonNull FPlayer fPlayer) {
         settingDAO.save(fPlayer);
     }
 
-    public void loadSettings(FPlayer fPlayer) {
+    /**
+     * Loads all settings for a player.
+     *
+     * @param fPlayer the player to load settings for
+     */
+    public void loadSettings(@NonNull FPlayer fPlayer) {
         settingDAO.load(fPlayer);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
+    /**
+     * Saves or updates a specific setting for a player.
+     *
+     * @param fPlayer the player
+     * @param setting the setting name
+     */
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting) {
         settingDAO.insertOrUpdate(fPlayer, setting);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, SettingText setting) {
+    /**
+     * Saves or updates a specific setting for a player.
+     *
+     * @param fPlayer the player
+     * @param setting the setting text
+     */
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting) {
         settingDAO.insertOrUpdate(fPlayer, setting);
     }
 }

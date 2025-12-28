@@ -20,6 +20,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configuration for message features in FlectonePulse.
+ * Contains settings for chat, formatting, visual elements, and notifications.
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @With
 @Builder(toBuilder = true)
 @Jacksonized

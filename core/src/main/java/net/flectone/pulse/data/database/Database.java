@@ -1,6 +1,5 @@
 package net.flectone.pulse.data.database;
 
-
 import com.alessiodp.libby.Library;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
@@ -33,13 +32,20 @@ import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 import org.jdbi.v3.core.statement.SqlStatements;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+/**
+ * Database for FlectonePulse.
+ * Handles database connection, configuration, and migrations.
+ *
+ * @author TheFaser
+ * @since 0.0.1
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class Database {
@@ -55,13 +61,23 @@ public class Database {
     private final Provider<VersionDAO> versionDAOProvider;
     private final BackupCreator backupCreator;
 
-    private HikariDataSource dataSource;
-    private Jdbi jdbi;
+    @Nullable private HikariDataSource dataSource;
+    @Nullable private Jdbi jdbi;
 
+    /**
+     * Gets the database configuration.
+     *
+     * @return the database configuration
+     */
     public Config.Database config() {
         return fileFacade.config().database();
     }
 
+    /**
+     * Connects to the database and initializes it.
+     *
+     * @throws IOException if connection fails
+     */
     public void connect() throws IOException {
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)
                 && config().type() == Type.SQLITE) {
@@ -93,17 +109,28 @@ public class Database {
         init();
     }
 
-    @NotNull
+    /**
+     * Gets the JDBI instance.
+     *
+     * @return the JDBI instance
+     * @throws IllegalStateException if JDBI is not initialized
+     */
     public Jdbi getJdbi() throws IllegalStateException {
         if (jdbi == null) throw new IllegalStateException("JDBI not initialized");
 
         return jdbi;
     }
 
+    /**
+     * Initializes the database connection.
+     */
     public void init() {
         fLogger.info(config().type() + " database connected");
     }
 
+    /**
+     * Disconnects from the database.
+     */
     public void disconnect() {
         if (dataSource != null) {
             dataSource.close();
@@ -261,7 +288,7 @@ public class Database {
         }
     }
 
-    public void downloadDriver() {
+    private void downloadDriver() {
         boolean needChecking = !config().ignoreExistingDriver();
         switch (config().type()) {
             case POSTGRESQL -> reflectionResolver.hasClassOrElse("org.postgresql.Driver", needChecking, libraryResolver ->
@@ -317,6 +344,9 @@ public class Database {
         }
     }
 
+    /**
+     * Database types supported by FlectonePulse.
+     */
     public enum Type {
         POSTGRESQL,
         H2,

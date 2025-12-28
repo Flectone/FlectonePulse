@@ -18,6 +18,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configuration for all commands in FlectonePulse.
+ * Contains nested record classes for individual command configurations.
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @With
 @Builder(toBuilder = true)
 @Jacksonized

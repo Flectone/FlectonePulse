@@ -7,13 +7,21 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.IgnoreSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * Data Access Object for player ignore data in FlectonePulse.
+ * Handles ignore relationships between players.
+ *
+ * @author TheFaser
+ * @since 0.9.0
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
+public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
 
     private final Database database;
 
@@ -27,8 +35,14 @@ public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
         return IgnoreSQL.class;
     }
 
-    @Nullable
-    public Ignore insert(FPlayer fSender, FPlayer fIgnored) {
+    /**
+     * Inserts or updates an ignore relationship between players.
+     *
+     * @param fSender the player who is ignoring
+     * @param fIgnored the player being ignored
+     * @return the ignore record, or null if players are unknown
+     */
+    public @Nullable Ignore insert(@NonNull FPlayer fSender, @NonNull FPlayer fIgnored) {
         if (fSender.isUnknown() || fIgnored.isUnknown()) return null;
 
         return inTransaction(sql -> {
@@ -44,11 +58,21 @@ public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
         });
     }
 
-    public void invalidate(Ignore ignore) {
+    /**
+     * Invalidates an ignore record.
+     *
+     * @param ignore the ignore record to invalidate
+     */
+    public void invalidate(@NonNull Ignore ignore) {
         useHandle(sql -> sql.invalidate(ignore.id()));
     }
 
-    public void load(FPlayer fPlayer) {
+    /**
+     * Loads ignore relationships for a player.
+     *
+     * @param fPlayer the player to load ignores for
+     */
+    public void load(@NonNull FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
         List<Ignore> ignores = withHandle(sql ->

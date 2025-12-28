@@ -3,6 +3,16 @@ package net.flectone.pulse.config.merger;
 import net.flectone.pulse.config.Command;
 import org.mapstruct.*;
 
+/**
+ * MapStruct mapper for merging {@link Command} configuration objects.
+ * <p>
+ * This interface defines mapping methods for deep merging command configurations,
+ * handling nested structures through builder patterns.
+ * </p>
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @Mapper(config = MapstructMergerConfig.class)
 public interface CommandMerger {
 

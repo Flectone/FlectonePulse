@@ -8,10 +8,18 @@ import net.flectone.pulse.data.database.sql.SettingSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.NonNull;
 
+/**
+ * Data Access Object for player settings in FlectonePulse.
+ * Handles saving and loading player preferences and configurations.
+ *
+ * @author TheFaser
+ * @since 1.6.0
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SettingDAO extends BaseDAO<SettingSQL> {
+public class SettingDAO implements BaseDAO<SettingSQL> {
 
     private final Database database;
     private final FLogger fLogger;
@@ -26,7 +34,12 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
         return SettingSQL.class;
     }
 
-    public void save(FPlayer player) {
+    /**
+     * Saves all settings for a player.
+     *
+     * @param player the player to save settings for
+     */
+    public void save(@NonNull FPlayer player) {
         useTransaction(sql -> {
             player.getSettingsBoolean().forEach((messageType, value) ->
                     insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
@@ -45,7 +58,12 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
         }
     }
 
-    public void load(FPlayer player) {
+    /**
+     * Loads all settings for a player.
+     *
+     * @param player the player to load settings for
+     */
+    public void load(@NonNull FPlayer player) {
         player.getSettingsBoolean().clear();
         player.getSettingsText().clear();
 
@@ -63,11 +81,24 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
         }));
     }
 
-    public void insertOrUpdate(FPlayer player, String setting) {
+    /**
+     * Inserts or updates a specific boolean setting for a player.
+     *
+     * @param player the player
+     * @param setting the setting name
+     */
+    public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting) {
         useHandle(sql -> insertOrUpdate(sql, player, setting, player.getSetting(setting)));
     }
 
-    public void insertOrUpdate(FPlayer player, SettingText settingText) {
+    /**
+     * Inserts or updates a specific text setting for a player.
+     *
+     * @param player the player
+     * @param settingText the setting text type
+     */
+    public void insertOrUpdate(@NonNull FPlayer player, SettingText settingText) {
         useHandle(sql -> insertOrUpdate(sql, player, settingText.name(), player.getSetting(settingText)));
     }
+
 }

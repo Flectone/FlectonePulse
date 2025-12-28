@@ -5,6 +5,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+/**
+ * MapStruct mapper for merging {@link Permission} configuration objects.
+ * <p>
+ * This interface defines mapping methods for deep merging permission configurations,
+ * handling nested structures through builder patterns.
+ * </p>
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @Mapper(config = MapstructMergerConfig.class)
 public interface PermissionMerger {
 
@@ -283,8 +293,6 @@ public interface PermissionMerger {
     Permission.Message.Update mergeMessageUpdate(@MappingTarget Permission.Message.Update.UpdateBuilder target, Permission.Message.Update update);
 
     Permission.Message.Vanilla mergeMessageVanilla(@MappingTarget Permission.Message.Vanilla.VanillaBuilder target, Permission.Message.Vanilla vanilla);
-
-    Permission.Message.Chat.Type mergeMessageChatType(@MappingTarget Permission.Message.Chat.Type.TypeBuilder target, Permission.Message.Chat.Type type);
 
     @Mapping(target = "fcolor", expression = "java(mergeMessageFormatFColor(target.build().fcolor().toBuilder(), source.fcolor()))")
     @Mapping(target = "fixation", expression = "java(mergeMessageFormatFixation(target.build().fixation().toBuilder(), source.fixation()))")

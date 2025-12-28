@@ -3,6 +3,16 @@ package net.flectone.pulse.config.merger;
 import net.flectone.pulse.config.Config;
 import org.mapstruct.*;
 
+/**
+ * MapStruct mapper for merging {@link Config} configuration objects.
+ * <p>
+ * This interface defines mapping methods for deep merging plugin configurations,
+ * handling nested structures through builder patterns.
+ * </p>
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @Mapper(config = MapstructMergerConfig.class)
 public interface ConfigMerger {
 

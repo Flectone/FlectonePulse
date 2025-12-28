@@ -3,6 +3,16 @@ package net.flectone.pulse.config.merger;
 import net.flectone.pulse.config.Integration;
 import org.mapstruct.*;
 
+/**
+ * MapStruct mapper for merging {@link Integration} configuration objects.
+ * <p>
+ * This interface defines mapping methods for deep merging plugin integration configurations,
+ * handling nested structures through builder patterns.
+ * </p>
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @Mapper(config = MapstructMergerConfig.class)
 public interface IntegrationMerger {
 
@@ -92,7 +102,5 @@ public interface IntegrationMerger {
     Integration.Vault mergeVault(@MappingTarget Integration.Vault.VaultBuilder target, Integration.Vault vault);
 
     Integration.Yandex mergeYandex(@MappingTarget Integration.Yandex.YandexBuilder target, Integration.Yandex yandex);
-
-    Integration.Command mergeIntegrationCommand(@MappingTarget Integration.Command.CommandBuilder target, Integration.Command command);
 
 }

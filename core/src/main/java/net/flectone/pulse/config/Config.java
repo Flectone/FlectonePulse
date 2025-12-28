@@ -12,6 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Configuration for the FlectonePulse.
+ * Contains all top-level configuration sections and settings.
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @With
 @Builder(toBuilder = true)
 @Jacksonized

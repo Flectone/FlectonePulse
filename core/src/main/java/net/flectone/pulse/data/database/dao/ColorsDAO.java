@@ -7,12 +7,20 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FColorSQL;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
+/**
+ * Data Access Object for color data operations in FlectonePulse.
+ * Handles persistence and retrieval of player color preferences.
+ *
+ * @author TheFaser
+ * @since 0.9.0
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ColorsDAO extends BaseDAO<FColorSQL> {
+public class ColorsDAO implements BaseDAO<FColorSQL> {
 
     private final Database database;
 
@@ -26,7 +34,12 @@ public class ColorsDAO extends BaseDAO<FColorSQL> {
         return FColorSQL.class;
     }
 
-    public void save(FPlayer fPlayer) {
+    /**
+     * Saves the player's color preferences to the database.
+     *
+     * @param fPlayer the player whose colors to save
+     */
+    public void save(@NonNull FPlayer fPlayer) {
         if (fPlayer.getFColors().isEmpty()) {
             delete(fPlayer);
             return;
@@ -37,11 +50,21 @@ public class ColorsDAO extends BaseDAO<FColorSQL> {
         );
     }
 
-    public void delete(FPlayer fPlayer) {
+    /**
+     * Deletes the player's color preferences from the database.
+     *
+     * @param fPlayer the player whose colors to delete
+     */
+    public void delete(@NonNull FPlayer fPlayer) {
         useHandle(sql -> sql.deleteFColors(fPlayer.getId()));
     }
 
-    public void load(FPlayer fPlayer) {
+    /**
+     * Loads the player's color preferences from the database.
+     *
+     * @param fPlayer the player whose colors to load
+     */
+    public void load(@NonNull FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
         fPlayer.getFColors().clear();

@@ -3,6 +3,16 @@ package net.flectone.pulse.config.merger;
 import net.flectone.pulse.config.Localization;
 import org.mapstruct.*;
 
+/**
+ * MapStruct mapper for merging {@link Localization} configuration objects.
+ * <p>
+ * This interface defines mapping methods for deep merging localization configurations,
+ * handling nested structures through builder patterns.
+ * </p>
+ *
+ * @author TheFaser
+ * @since 1.7.1
+ */
 @Mapper(config = MapstructMergerConfig.class)
 public interface LocalizationMerger {
 
