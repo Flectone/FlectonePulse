@@ -57,7 +57,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final RandomUtil randomUtil;
 
     @Override
-    public void dispatchCommand(String command) {
+    public void dispatchCommand(@NotNull String command) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return;
 
@@ -122,7 +122,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public PlatformType getPlatformType() {
+    public @NotNull PlatformType getPlatformType() {
         return PlatformType.FABRIC;
     }
 
@@ -137,7 +137,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public boolean hasProject(String projectName) {
+    public boolean hasProject(@NotNull String projectName) {
         return FabricLoader.getInstance().isModLoaded(projectName.toLowerCase());
     }
 
@@ -158,17 +158,17 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull String getItemName(Object item) {
+    public @NotNull String getItemName(@NotNull Object item) {
         return item instanceof net.minecraft.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
     }
 
     @Override
-    public @Nullable InputStream getResource(String path) {
+    public @Nullable InputStream getResource(@NotNull String path) {
         return getClass().getClassLoader().getResourceAsStream(path);
     }
 
     @Override
-    public void saveResource(String path) {
+    public void saveResource(@NotNull String path) {
         InputStream resource = getResource(path);
         if (resource == null) return;
 
@@ -191,7 +191,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable) {
+    public @NotNull Component translateItemName(@NotNull Object item, @NotNull UUID messageUUID, boolean translatable) {
         if (!(item instanceof net.minecraft.item.ItemStack itemStack)) return Component.empty();
         if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 
@@ -225,14 +225,14 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String lore) {
+    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, @NotNull String lore) {
         String[] stringsLore = lore.split("<br>");
 
         return buildItemStack(fPlayer, material, title, stringsLore.length == 0 ? new String[]{lore} : stringsLore);
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String[] lore) {
+    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, String[] lore) {
         ItemType itemMaterial = ItemTypes.getByName(material.toLowerCase());
         if (itemMaterial == null) {
             itemMaterial = ItemTypes.DIAMOND_BLOCK;

@@ -66,7 +66,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Sync
     @Override
-    public void dispatchCommand(String command) {
+    public void dispatchCommand(@NotNull String command) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
@@ -156,12 +156,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public PlatformType getPlatformType() {
+    public @NotNull PlatformType getPlatformType() {
         return PlatformType.BUKKIT;
     }
 
     @Override
-    public boolean hasProject(String projectName) {
+    public boolean hasProject(@NotNull String projectName) {
         return Bukkit.getPluginManager().getPlugin(projectName) != null;
     }
 
@@ -176,14 +176,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String lore) {
+    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, @NotNull String lore) {
         String[] stringsLore = lore.split("<br>");
 
         return buildItemStack(fPlayer, material, title, stringsLore.length == 0 ? new String[]{lore} : stringsLore);
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String[] lore) {
+    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, String[] lore) {
         Material itemMaterial;
         try {
             itemMaterial = Material.valueOf(material);
@@ -240,7 +240,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull String getItemName(@Nullable Object itemStack) {
+    public @NotNull String getItemName(@NotNull Object itemStack) {
         if (!(itemStack instanceof org.bukkit.inventory.ItemStack bukkitItem)) {
             return "";
         }
@@ -253,12 +253,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @Nullable InputStream getResource(String path) {
+    public @Nullable InputStream getResource(@NotNull String path) {
         return plugin.getResource(path);
     }
 
     @Override
-    public void saveResource(String path) {
+    public void saveResource(@NotNull String path) {
         plugin.saveResource(path, false);
     }
 
@@ -280,7 +280,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable) {
+    public @NotNull Component translateItemName(@NotNull Object item, @NotNull UUID messageUUID, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
         Component component = itemStack.getItemMeta() == null

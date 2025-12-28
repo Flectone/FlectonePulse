@@ -5,122 +5,168 @@ import com.google.gson.JsonElement;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.UUID;
 
+/**
+ * Platform adapter for server-related operations in FlectonePulse.
+ * Abstracts platform-specific server APIs for cross-platform compatibility.
+ *
+ * @author TheFaser
+ * @since 0.8.1
+ */
 public interface PlatformServerAdapter {
 
     /**
-     * Dispatches a command to the server console
+     * Dispatches a command to the server console.
      *
-     * @param command The command string to execute
+     * @param command the command string to execute
      */
-    void dispatchCommand(String command);
+    void dispatchCommand(@NonNull String command);
 
     /**
-     * Gets the current server TPS (ticks per second)
+     * Gets the current server TPS (ticks per second).
      *
-     * @return Formatted TPS string or empty string if unavailable
+     * @return formatted TPS string or empty string if unavailable
      */
-    @NotNull String getTPS();
+    @NonNull String getTPS();
 
     /**
-     * Gets the maximum player count for the server
+     * Gets the maximum player count for the server.
      *
-     * @return Maximum allowed players
+     * @return maximum allowed players
      */
     int getMaxPlayers();
 
     /**
-     * Gets the current online player count
+     * Gets the current online player count.
      *
-     * @return Number of online players
+     * @return number of online players
      */
     int getOnlinePlayerCount();
 
     /**
-     * Return new entity id
+     * Generates a new entity ID.
      *
-     * @return entity id
+     * @return entity ID
      */
     int generateEntityId();
 
     /**
-     * Returns the name of the server core
+     * Returns the name of the server core.
      *
-     * @return A string representing the name of the server core
+     * @return a string representing the name of the server core
      */
-    @NotNull String getServerCore();
+    @NonNull String getServerCore();
 
     /**
-     * Returns server UUID
+     * Returns server UUID.
      *
-     * @return A string representing server UUID
+     * @return a string representing server UUID
      */
-    @NotNull String getServerUUID();
-
-    PlatformType getPlatformType();
+    @NonNull String getServerUUID();
 
     /**
-     * Gets the server MOTD
+     * Gets the platform type.
+     *
+     * @return the platform type
+     */
+    @NonNull PlatformType getPlatformType();
+
+    /**
+     * Gets the server MOTD.
      *
      * @return MOTD as JsonElement
      */
-    @NotNull JsonElement getMOTD();
+    @NonNull JsonElement getMOTD();
 
     /**
-     * Checks if a project/resource is available on the server
+     * Checks if a project/resource is available on the server.
      *
-     * @param projectName Name of the project/resource to check
+     * @param projectName name of the project/resource to check
      * @return true if the project is available, false otherwise
      */
-    boolean hasProject(String projectName);
+    boolean hasProject(@NonNull String projectName);
 
     /**
-     * Checks if the server is currently in online mode
+     * Checks if the server is currently in online mode.
      *
-     * @return {@code true} if the server is in online mode, {@code false} otherwise
+     * @return true if the server is in online mode, false otherwise
      */
     boolean isOnlineMode();
 
+    /**
+     * Checks if the current thread is the primary server thread.
+     *
+     * @return true if on primary thread
+     */
     boolean isPrimaryThread();
 
     /**
-     * Gets the Minecraft name of an item
+     * Gets the Minecraft name of an item.
      *
-     * @param item The platform-specific item object
-     * @return Localized item name or empty string if invalid
+     * @param item the platform-specific item object
+     * @return localized item name or empty string if invalid
      */
-    @NotNull String getItemName(Object item);
-
+    @NonNull String getItemName(@NonNull Object item);
 
     /**
      * Gets an input stream for the specified resource path.
      *
-     * @param path Resource path (classpath relative)
+     * @param path resource path (classpath relative)
      * @return InputStream or null if not found
      */
-    @Nullable InputStream getResource(String path);
+    @Nullable InputStream getResource(@NonNull String path);
 
-    void saveResource(String path);
+    /**
+     * Saves a resource to the plugin data folder.
+     *
+     * @param path the resource path
+     */
+    void saveResource(@NonNull String path);
 
-    @NotNull Component translateItemName(Object item, UUID messageUUID, boolean translatable);
+    /**
+     * Translates an item name with optional localization.
+     *
+     * @param item the platform-specific item object
+     * @param messageUUID the message UUID for caching
+     * @param translatable whether the name should be translated
+     * @return translated item name component
+     */
+    @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable);
 
-    @NotNull ItemStack buildItemStack(
-            FPlayer fPlayer,
-            String material,
-            String title,
-            String lore
+    /**
+     * Builds an item stack with lore.
+     *
+     * @param fPlayer the player receiving the item
+     * @param material the item material
+     * @param title the item title
+     * @param lore the item lore
+     * @return the built item stack
+     */
+    @NonNull ItemStack buildItemStack(
+            @NonNull FPlayer fPlayer,
+            @NonNull String material,
+            @NonNull String title,
+            @NonNull String lore
     );
 
-    @NotNull ItemStack buildItemStack(
-            FPlayer fPlayer,
-            String material,
-            String title,
-            String[] lore
+    /**
+     * Builds an item stack with lore.
+     *
+     * @param fPlayer the player receiving the item
+     * @param material the item material
+     * @param title the item title
+     * @param lore the item lore lines
+     * @return the built item stack
+     */
+    @NonNull ItemStack buildItemStack(
+            @NonNull FPlayer fPlayer,
+            @NonNull String material,
+            @NonNull String title,
+            @NonNull String[] lore
     );
-
 }
