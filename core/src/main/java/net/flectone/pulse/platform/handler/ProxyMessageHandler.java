@@ -729,6 +729,8 @@ public class ProxyMessageHandler {
         String chatName = optionalChat.get().getKey();
         Message.Chat.Type chatType = optionalChat.get().getValue();
 
+        Chat playerChat = new Chat(chatName, chatType, chatModule.permission().types().get(chatName));
+
         chatModule.sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
@@ -739,7 +741,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(chatType.destination())
                 .message(message)
-                .sound(chatModule.soundOrThrow())
+                .sound(playerChat.sound())
                 .filter(chatModule.permissionFilter(chatName))
                 .build()
         );
