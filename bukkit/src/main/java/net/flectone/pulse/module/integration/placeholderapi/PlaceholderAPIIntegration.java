@@ -163,7 +163,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
                 message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
             }
 
-        } catch (NullPointerException | ClassCastException ignored) {
+        } catch (Exception ignored) {
             // ignore placeholderapi exceptions
         }
 
