@@ -150,8 +150,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .sender(fPlayer)
                 .format(localization -> localization.types().get(chatName))
                 .chat(playerChat)
-                .chatType(playerChat.config())
-                .chatName(playerChat.name())
                 .destination(playerChat.config().destination())
                 .range(playerChat.config().range())
                 .message(finalMessage)
