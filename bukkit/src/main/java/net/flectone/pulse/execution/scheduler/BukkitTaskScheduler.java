@@ -97,11 +97,15 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
+    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync) {
         if (disabled) return;
 
         if (!reflectionResolver.isFolia()) {
-            runAsync(runnable);
+            if (sync) {
+                runSync(runnable);
+            } else {
+                runAsync(runnable);
+            }
             return;
         }
 

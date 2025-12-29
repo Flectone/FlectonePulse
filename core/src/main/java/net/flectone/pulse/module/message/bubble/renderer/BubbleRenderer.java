@@ -81,9 +81,9 @@ public class BubbleRenderer {
         taskScheduler.runRegion(sender, () -> {
             Set<UUID> nearbyEntities = platformPlayerAdapter.findPlayersWhoCanSee(sender, viewDistance, viewDistance, viewDistance);
             nearbyEntitiesFuture.complete(nearbyEntities);
-        });
+        }, true);
 
-        nearbyEntitiesFuture.thenAccept(nearbyEntities -> nearbyEntities
+        nearbyEntitiesFuture.thenAcceptAsync(nearbyEntities -> nearbyEntities
                 .stream()
                 .map(fPlayerService::getFPlayer)
                 .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))

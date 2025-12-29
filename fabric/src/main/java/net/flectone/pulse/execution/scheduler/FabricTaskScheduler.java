@@ -128,7 +128,7 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
+    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync) {
         runAsync(runnable);
     }
 

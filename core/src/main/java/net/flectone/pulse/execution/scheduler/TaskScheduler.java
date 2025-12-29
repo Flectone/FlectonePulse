@@ -79,8 +79,9 @@ public interface TaskScheduler {
      *
      * @param fPlayer the player whose region to use
      * @param runnable the task to run
+     * @param sync otherwise executes sync or async
      */
-    void runRegion(FPlayer fPlayer, SchedulerRunnable runnable);
+    void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync);
 
     /**
      * Runs a task in the player's region after a delay.
@@ -122,6 +123,18 @@ public interface TaskScheduler {
      * @return wrapped runnable with exception handling
      */
     Runnable wrapExceptionRunnable(SchedulerRunnable runnable);
+
+    /**
+     * Runs a repeating task in the player's region.
+     * On Folia: executes in the player's region thread.
+     * Otherwise: executes asynchronously.
+     *
+     * @param fPlayer the player whose region to use
+     * @param runnable the task to run
+     */
+    default void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
+        runRegion(fPlayer, runnable, false);
+    }
 
     /**
      * Runs a task asynchronously with default independent flag (false).
