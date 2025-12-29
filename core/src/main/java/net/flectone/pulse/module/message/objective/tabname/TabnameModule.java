@@ -34,7 +34,7 @@ public class TabnameModule extends AbstractModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(TabnamePulseListener.class);

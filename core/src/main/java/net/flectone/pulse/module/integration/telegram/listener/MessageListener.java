@@ -4,10 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,10 +14,10 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -102,7 +101,6 @@ public class MessageListener extends EventListener {
         sendMessage(author, chat, text, reply);
     }
 
-    @Async
     public void sendMessage(User user, String chat, String message, Pair<String, String> reply) {
         String userName = StringUtils.defaultString(user.getUserName());
         String firstName = user.getFirstName();

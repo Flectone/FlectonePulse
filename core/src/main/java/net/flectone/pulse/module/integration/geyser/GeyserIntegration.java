@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration.geyser;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
@@ -14,6 +14,7 @@ import org.geysermc.geyser.api.GeyserApi;
 public class GeyserIntegration implements FIntegration {
 
     private final FLogger fLogger;
+    private final TaskScheduler taskScheduler;
 
     private GeyserApi geyserApi;
 
@@ -23,9 +24,8 @@ public class GeyserIntegration implements FIntegration {
         fLogger.info("✔ Geyser hooked");
     }
 
-    @Async(delay = 20)
     public void hookLater() {
-        hook();
+        taskScheduler.runAsyncLater(this::hook);
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.file.FileFacade;
@@ -44,24 +44,26 @@ public class MinecraftTranslationService {
     private final FileFacade fileFacade;
     private final WebUtil webUtil;
     private final FLogger fLogger;
+    private final TaskScheduler taskScheduler;
 
     private String language;
     private boolean isModern;
     private Translator translator;
 
-    @Async(independent = true)
     public void reload() {
-        String newLanguage = fileFacade.config().language().type().toLowerCase(Locale.ROOT);
-        if (newLanguage.equals(language) && !translations.isEmpty()) return;
+        taskScheduler.runAsync(() -> {
+            String newLanguage = fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+            if (newLanguage.equals(language) && !translations.isEmpty()) return;
 
-        language = newLanguage;
-        isModern = detectModernVersion();
-        translations.clear();
+            language = newLanguage;
+            isModern = detectModernVersion();
+            translations.clear();
 
-        if (downloadLocalizationFile()) {
-            loadTranslations();
-            initGlobalTranslator();
-        }
+            if (downloadLocalizationFile()) {
+                loadTranslations();
+                initGlobalTranslator();
+            }
+        }, true);
     }
 
     public String getVersion() {

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.maintenance;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
@@ -23,6 +24,7 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
@@ -46,6 +48,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final @Named("imagePath") Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
+    private final PacketSender packetSender;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
@@ -187,7 +190,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                 .filter(filter -> !permissionChecker.check(filter, permission().join()))
                 .forEach(fReceiver -> {
                     MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, localization(fReceiver).kick());
-                    fPlayerService.kick(fReceiver, messagePipeline.build(messageContext));
+                    packetSender.send(fReceiver, new WrapperPlayServerDisconnect(messagePipeline.build(messageContext)));
                 });
     }
 }

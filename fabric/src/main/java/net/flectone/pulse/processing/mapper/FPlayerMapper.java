@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,6 +19,7 @@ public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer>
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
     public @NotNull FPlayer map(@NotNull ServerCommandSource sender) {
@@ -33,7 +35,7 @@ public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer>
     public @NotNull ServerCommandSource reverse(@NotNull FPlayer mapped) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
 
-        Object obj = fPlayerService.toPlatformFPlayer(mapped);
+        Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);
         return obj instanceof ServerPlayerEntity player
                 ? player.getCommandSource()
                 : minecraftServer.getCommandSource();

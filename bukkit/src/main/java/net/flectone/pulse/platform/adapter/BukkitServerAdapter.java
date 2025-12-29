@@ -12,18 +12,18 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -61,13 +61,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final ReflectionResolver reflectionResolver;
     private final FileFacade fileFacade;
     private final PaperItemStackUtil paperItemStackUtil;
+    private final TaskScheduler taskScheduler;
 
     private Pair<MethodHandle, Object> getTPSMethodPair;
 
-    @Sync
     @Override
     public void dispatchCommand(@NotNull String command) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        taskScheduler.runSync(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulse;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -30,6 +30,7 @@ public class SkinsRestorerIntegration implements FIntegration {
     private final FlectonePulse flectonePulse;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Provider<SkinService> skinServiceProvider;
+    private final TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
     private SkinsRestorer skinsRestorer;
@@ -57,9 +58,8 @@ public class SkinsRestorerIntegration implements FIntegration {
         }
     }
 
-    @Async(delay = 20)
     public void hookLater() {
-        hook();
+        taskScheduler.runAsyncLater(this::hook);
     }
 
     @Override

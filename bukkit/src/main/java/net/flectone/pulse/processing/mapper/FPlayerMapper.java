@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class FPlayerMapper implements SenderMapper<CommandSender, FPlayer> {
 
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
     public @NotNull FPlayer map(@NotNull CommandSender sender) {
@@ -23,7 +25,7 @@ public class FPlayerMapper implements SenderMapper<CommandSender, FPlayer> {
 
     @Override
     public @NotNull CommandSender reverse(@NotNull FPlayer mapped) {
-        Object obj = fPlayerService.toPlatformFPlayer(mapped);
+        Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);
         return obj != null ? (CommandSender) obj : Bukkit.getConsoleSender();
     }
 }

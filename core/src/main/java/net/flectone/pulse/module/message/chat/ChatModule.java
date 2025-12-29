@@ -5,13 +5,14 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
@@ -51,6 +52,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final Provider<BubbleModule> bubbleModuleProvider;
     private final Provider<SpyModule> spyModuleProvider;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
     private final MuteSender muteSender;
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
@@ -142,7 +144,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         sendMessage(fPlayer, eventMessage, finalMessage, playerChat);
     }
 
-    @Async
     public void sendMessage(FPlayer fPlayer, String eventMessage, String finalMessage, Chat playerChat) {
         String chatName = playerChat.name();
 
@@ -167,7 +168,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         sendMessage(receivers, chatMetadata);
 
         // send null receiver message
-        checkReceiversLater(fPlayer, receivers, playerChat);
+        if (playerChat.config().destination().type() != Destination.Type.CHAT) {
+            checkReceiversLater(fPlayer, receivers, playerChat);
+        } else {
+            taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, receivers, playerChat), 1L);
+        }
 
         // send to spy module
         spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
@@ -176,8 +181,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         bubbleModuleProvider.get().add(fPlayer, eventMessage, receivers);
     }
 
-    @Async(delay = 1L)
-    public void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Chat playerChat) {
+    public Predicate<FPlayer> permissionFilter(String chatName) {
+        return fReceiver -> permissionChecker.check(fReceiver, permission().types().get(chatName));
+    }
+
+    private void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Chat playerChat) {
         if (!playerChat.config().nullReceiver().enable()) return;
         if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
 
@@ -189,10 +197,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                     .build()
             );
         }
-    }
-
-    public Predicate<FPlayer> permissionFilter(String chatName) {
-        return fReceiver -> permissionChecker.check(fReceiver, permission().types().get(chatName));
     }
 
     private boolean noLocalReceiversFor(FPlayer fPlayer, List<FPlayer> receivers) {

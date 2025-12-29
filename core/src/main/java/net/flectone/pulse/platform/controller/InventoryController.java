@@ -7,11 +7,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.ClickType;
 import net.flectone.pulse.model.inventory.Inventory;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
 
 import java.util.HashMap;
@@ -28,6 +28,7 @@ public class InventoryController {
 
     private final PacketSender packetSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final TaskScheduler taskScheduler;
 
     public Inventory get(UUID uuid) {
         return inventoryMap.get(uuid);
@@ -62,23 +63,24 @@ public class InventoryController {
         inventory.getClickConsumerMap().get(slot).accept(itemStack, inventory);
     }
 
-    @Async
     public void process(UUID uuid, WrapperPlayClientClickWindow wrapper) {
-        Inventory inventory = inventoryMap.get(uuid);
+        taskScheduler.runAsync(() -> {
+            Inventory inventory = inventoryMap.get(uuid);
 
-        ClickType clickType = getClickType(wrapper);
+            ClickType clickType = getClickType(wrapper);
 
-        boolean isWindowClicked = isWindowClick(inventory, clickType, wrapper);
+            boolean isWindowClicked = isWindowClick(inventory, clickType, wrapper);
 
-        if (isWindowClicked || clickType == ClickType.PICKUP) {
-            packetSender.send(uuid, new WrapperPlayServerWindowItems(wrapper.getWindowId(), 0, inventory.getWrapperItems().getItems(), null));
+            if (isWindowClicked || clickType == ClickType.PICKUP) {
+                packetSender.send(uuid, new WrapperPlayServerWindowItems(wrapper.getWindowId(), 0, inventory.getWrapperItems().getItems(), null));
 
-            if (isWindowClicked) {
-                click(inventory, wrapper.getSlot());
+                if (isWindowClicked) {
+                    click(inventory, wrapper.getSlot());
+                }
             }
-        }
 
-        platformPlayerAdapter.updateInventory(uuid);
+            platformPlayerAdapter.updateInventory(uuid);
+        });
     }
 
     public void changeItem(FPlayer fPlayer, Inventory inventory, int slot, ItemStack newItemStack) {

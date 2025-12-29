@@ -4,15 +4,15 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
@@ -33,6 +33,7 @@ public class BukkitBaseListener implements Listener {
     private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
+    private final TaskScheduler taskScheduler;
 
     @EventHandler
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
@@ -53,36 +54,30 @@ public class BukkitBaseListener implements Listener {
 
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        asyncProcessJoinEvent(event);
+        taskScheduler.runAsync(() -> {
+            Player player = event.getPlayer();
+            UUID uuid = player.getUniqueId();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
+                String locale = getPlayerLocale(player);
+                fPlayerService.updateLocale(fPlayer, locale);
+            }
+
+            eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
+        });
     }
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        asyncProcessQuitEvent(event);
-    }
+        taskScheduler.runAsync(() -> {
+            UUID uuid = event.getPlayer().getUniqueId();
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-    @Async
-    public void asyncProcessJoinEvent(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
-            String locale = getPlayerLocale(player);
-            fPlayerService.updateLocale(fPlayer, locale);
-        }
-
-        eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
-        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
-    }
-
-    @Async
-    public void asyncProcessQuitEvent(PlayerQuitEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-
-        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-        eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
+            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+        });
     }
 
     private String getPlayerLocale(Player player) {

@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.ban;
 
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
@@ -41,6 +43,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ProxySender proxySender;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
+    private final PacketSender packetSender;
 
     @Override
     public void onEnable() {
@@ -173,6 +176,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         MessageContext messageContext = messagePipeline.createContext(fModerator, fTarget, formatPlayer);
         Component kickMessage = messagePipeline.build(messageContext);
 
-        fPlayerService.kick(fTarget, kickMessage);
+        packetSender.send(fTarget, new WrapperPlayServerDisconnect(kickMessage));
     }
 }

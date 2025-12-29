@@ -19,11 +19,13 @@ public class ReflectionResolver {
 
     private final LibraryResolver libraryResolver;
     @Getter private final boolean paper;
+    @Getter private final boolean folia;
 
     @Inject
     public ReflectionResolver(LibraryResolver libraryResolver) {
         this.libraryResolver = libraryResolver;
         this.paper = hasClass("com.destroystokyo.paper.ParticleBuilder");
+        this.folia = hasClass("io.papermc.paper.threadedregions.RegionizedServer");
     }
 
     // relocation hack

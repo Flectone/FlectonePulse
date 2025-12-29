@@ -8,7 +8,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUp
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -23,9 +22,9 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;
@@ -50,7 +49,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(SidebarPulseListener.class);
@@ -112,39 +111,39 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         send(fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE);
     }
 
-    @Async
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, config().random());
-        if (format == null) return;
+            String format = getNextMessage(fPlayer, config().random());
+            if (format == null) return;
 
-        String[] lines = format.split("<br>");
-        if (lines.length == 0) return;
+            String[] lines = format.split("<br>");
+            if (lines.length == 0) return;
 
-        String objectiveName = createObjectiveName(fPlayer);
-        MessageContext titleContext = messagePipeline.createContext(fPlayer, lines[0]);
-        Component title = messagePipeline.build(titleContext);
+            String objectiveName = createObjectiveName(fPlayer);
+            MessageContext titleContext = messagePipeline.createContext(fPlayer, lines[0]);
+            Component title = messagePipeline.build(titleContext);
 
-        packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
-                objectiveName,
-                objectiveMode,
-                title,
-                WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
-                ScoreFormat.blankScore()
-        ));
+            packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
+                    objectiveName,
+                    objectiveMode,
+                    title,
+                    WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
+                    ScoreFormat.blankScore()
+            ));
 
-        packetSender.send(fPlayer, new WrapperPlayServerDisplayScoreboard(
-                1, // 1 = sidebar, 0 = list, 2 = belowName
-                objectiveName
-        ));
+            packetSender.send(fPlayer, new WrapperPlayServerDisplayScoreboard(
+                    1, // 1 = sidebar, 0 = list, 2 = belowName
+                    objectiveName
+            ));
 
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
-            modernSidebarLines(fPlayer, objectiveName, lines);
-        } else {
-            legacySidebarLines(fPlayer, objectiveName, lines);
-        }
-
+            if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+                modernSidebarLines(fPlayer, objectiveName, lines);
+            } else {
+                legacySidebarLines(fPlayer, objectiveName, lines);
+            }
+        });
     }
 
     private void modernSidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {

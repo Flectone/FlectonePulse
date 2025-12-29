@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.quit;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -24,6 +24,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -52,21 +53,22 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
         return fileFacade.localization(sender).message().quit();
     }
 
-    @Async
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
-                .sender(fPlayer)
-                .format(Localization.Message.Quit::format)
-                .ignoreVanish(ignoreVanish)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                .integration()
-                .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
-                .build()
-        );
+            sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Message.Quit::format)
+                    .ignoreVanish(ignoreVanish)
+                    .destination(config().destination())
+                    .range(config().range())
+                    .sound(soundOrThrow())
+                    .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                    .integration()
+                    .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
+                    .build()
+            );
+        });
     }
 }

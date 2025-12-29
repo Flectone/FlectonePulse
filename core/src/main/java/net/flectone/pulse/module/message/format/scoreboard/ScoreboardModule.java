@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTe
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -17,9 +16,9 @@ import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -48,17 +47,17 @@ public class ScoreboardModule extends AbstractModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runAsyncTimer(() -> uuidTeamMap.keySet().forEach(uuid -> {
-                FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            taskScheduler.runPlayerRegionTimer(fPlayer -> {
+                if (!uuidTeamMap.containsKey(fPlayer.getUuid())) return;
 
                 // new info
                 Team newTeam = createTeam(fPlayer);
                 sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
 
                 // update info
-                uuidTeamMap.put(uuid, newTeam);
+                uuidTeamMap.put(fPlayer.getUuid(), newTeam);
 
-            }), ticker.period());
+            }, ticker.period());
         }
 
         listenerRegistry.register(ScoreboardPulseListener.class);
@@ -82,35 +81,37 @@ public class ScoreboardModule extends AbstractModule {
         return fileFacade.permission().message().format().scoreboard();
     }
 
-    @Async
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        if (!skipCacheTeam) {
-            uuidTeamMap.values().forEach(cacheTeam ->
-                    packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
-            );
-        }
+            if (!skipCacheTeam) {
+                uuidTeamMap.values().forEach(cacheTeam ->
+                        packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
+                );
+            }
 
-        Team team = createTeam(fPlayer);
-        sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
+            Team team = createTeam(fPlayer);
+            sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
 
-        uuidTeamMap.put(fPlayer.getUuid(), team);
+            uuidTeamMap.put(fPlayer.getUuid(), team);
+        });
     }
 
     public boolean hasTeam(FPlayer fPlayer) {
         return uuidTeamMap.containsKey(fPlayer.getUuid());
     }
 
-    @Async
     public void remove(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runAsync(() -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        Team team = uuidTeamMap.get(fPlayer.getUuid());
-        if (team == null) return;
+            Team team = uuidTeamMap.get(fPlayer.getUuid());
+            if (team == null) return;
 
-        uuidTeamMap.remove(fPlayer.getUuid());
-        sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
+            uuidTeamMap.remove(fPlayer.getUuid());
+            sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
+        });
     }
 
     private Team createTeam(FPlayer fPlayer) {

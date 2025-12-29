@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -19,10 +18,10 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
@@ -43,7 +42,7 @@ public class WorldModule extends AbstractModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(WorldPacketListener.class);
@@ -76,20 +75,21 @@ public class WorldModule extends AbstractModule {
         });
     }
 
-    @Async
     public void update(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        String newWorldPrefix = config().mode() == Mode.TYPE
-                ? config().values().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
-                : config().values().get(platformPlayerAdapter.getWorldName(fPlayer));
+            String newWorldPrefix = config().mode() == Mode.TYPE
+                    ? config().values().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
+                    : config().values().get(platformPlayerAdapter.getWorldName(fPlayer));
 
-        String fPlayerWorldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
-        if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;
-        if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
+            String fPlayerWorldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
+            if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;
+            if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
 
-        fPlayer.setSetting(SettingText.WORLD_PREFIX, newWorldPrefix);
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.WORLD_PREFIX);
+            fPlayer.setSetting(SettingText.WORLD_PREFIX, newWorldPrefix);
+            fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.WORLD_PREFIX);
+        });
     }
 
     public enum Mode {

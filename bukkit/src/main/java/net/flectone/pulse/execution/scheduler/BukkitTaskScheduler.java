@@ -1,12 +1,20 @@
 package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.exception.SchedulerTaskException;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
+
+import java.util.function.Consumer;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -15,6 +23,10 @@ public class BukkitTaskScheduler implements TaskScheduler {
     private final Plugin plugin;
     private final com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler taskScheduler;
     private final FLogger fLogger;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
+    private final Provider<PlatformPlayerAdapter> platformPlayerAdapterProvider;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
+    private final ReflectionResolver reflectionResolver;
 
     private volatile boolean disabled = false;
 
@@ -33,124 +45,148 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsync(SchedulerRunnable runnable) {
+    public void runAsync(SchedulerRunnable runnable, boolean independent) {
         if (disabled) return;
 
-        taskScheduler.runTaskAsynchronously(() -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        });
+        if (!independent && isAsyncThread()) {
+            wrapExceptionRunnable(runnable).run();
+            return;
+        }
+
+        taskScheduler.runTaskAsynchronously(() -> wrapExceptionRunnable(runnable).run());
+    }
+
+    @Override
+    public void runAsyncLater(SchedulerRunnable runnable, long tick) {
+        if (disabled) return;
+
+        taskScheduler.runTaskLaterAsynchronously(() -> wrapExceptionRunnable(runnable).run(), tick);
     }
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
         if (disabled) return;
 
-        taskScheduler.runTaskTimerAsynchronously(() -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        }, tick, period);
-    }
-
-    @Override
-    public void runAsyncTimer(SchedulerRunnable runnable, long tick) {
-        runAsyncTimer(runnable, tick, tick);
-    }
-
-    @Override
-    public void runAsyncLater(SchedulerRunnable runnable, long tick) {
-        if (disabled) {
-            return;
-        }
-
-        taskScheduler.runTaskLaterAsynchronously(() -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        }, tick);
+        taskScheduler.runTaskTimerAsynchronously(() -> wrapExceptionRunnable(runnable).run(), tick, period);
     }
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
         if (disabled) return;
 
-        taskScheduler.runTask(() -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        });
-    }
-
-    @Override
-    public void runSyncRegion(Object entity, SchedulerRunnable runnable) {
-        if (disabled) return;
-
-        if (!(entity instanceof Entity bukkitEntity)) {
-            runSync(runnable);
+        if (!isAsyncThread() && !reflectionResolver.isFolia()) {
+            wrapExceptionRunnable(runnable).run();
             return;
         }
 
-        taskScheduler.runTask(bukkitEntity.getLocation(), () -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        });
-    }
-
-    @Override
-    public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
-        if (disabled) return;
-
-        taskScheduler.runTaskTimer(() -> {
-            try {
-                runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
-            }
-        }, tick, period);
-    }
-
-    @Override
-    public void runSyncTimer(SchedulerRunnable runnable, long tick) {
-        runSyncTimer(runnable, tick, tick);
+        taskScheduler.runTask(() -> wrapExceptionRunnable(runnable).run());
     }
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long tick) {
         if (disabled) return;
 
-        taskScheduler.runTaskLater(() -> {
+        taskScheduler.runTaskLater(() -> wrapExceptionRunnable(runnable).run(), tick);
+    }
+
+    @Override
+    public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) return;
+
+        taskScheduler.runTaskTimer(() -> wrapExceptionRunnable(runnable).run(), tick, period);
+    }
+
+    @Override
+    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
+        if (disabled) return;
+
+        if (!reflectionResolver.isFolia()) {
+            runAsync(runnable);
+            return;
+        }
+
+        if (platformServerAdapterProvider.get().isPrimaryThread()) {
             try {
                 runnable.run();
-            } catch (IllegalPluginAccessException ignored) {
-                // ignore this
-            } catch (Exception e) {
-                fLogger.warning(e);
+                return;
+            } catch (Exception ignored) {
+                // ignore exception
+            }
+        }
+
+        Object entity = platformPlayerAdapterProvider.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
+        if (!(entity instanceof Entity bukkitEntity)) {
+            runAsync(runnable);
+            return;
+        }
+
+        taskScheduler.runTask(bukkitEntity, () -> wrapExceptionRunnable(runnable).run());
+    }
+
+    @Override
+    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long tick) {
+        if (disabled) return;
+
+        if (!reflectionResolver.isFolia()) {
+            runAsyncLater(runnable, tick);
+            return;
+        }
+
+        Object entity = platformPlayerAdapterProvider.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
+        if (!(entity instanceof Entity bukkitEntity)) {
+            runAsyncLater(runnable, tick);
+            return;
+        }
+
+        taskScheduler.runTaskLater(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), tick);
+    }
+
+    @Override
+    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) return;
+
+        if (!reflectionResolver.isFolia()) {
+            runAsyncTimer(runnable, tick, period);
+            return;
+        }
+
+        Object entity = platformPlayerAdapterProvider.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
+        if (!(entity instanceof Entity bukkitEntity)) {
+            runAsyncTimer(runnable, tick, period);
+            return;
+        }
+
+        taskScheduler.runTaskTimer(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), tick, period);
+    }
+
+    @Override
+    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long tick) {
+        if (disabled) return;
+
+        runAsyncTimer(() -> {
+            for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
+                runRegion(fPlayer, () -> fPlayerConsumer.accept(fPlayer));
             }
         }, tick);
     }
+
+    @Override
+    public Runnable wrapExceptionRunnable(SchedulerRunnable runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (SchedulerTaskException e) {
+                fLogger.warning(e);
+            }
+        };
+    }
+
+    private FPlayer convertUnknownFPlayer(FPlayer fPlayer) {
+        return fPlayer.isUnknown() ? fPlayerServiceProvider.get().getRandomFPlayer() : fPlayer;
+    }
+
+    private boolean isAsyncThread() {
+        return !platformServerAdapterProvider.get().isPrimaryThread() && !isRestrictedAsyncThread();
+    }
+
 }

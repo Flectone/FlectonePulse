@@ -2,10 +2,10 @@ package net.flectone.pulse.module;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -39,6 +39,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     @Inject private RangeFilter rangeFilter;
     @Inject private MessagePipeline messagePipeline;
     @Inject private EventDispatcher eventDispatcher;
+    @Inject private TaskScheduler taskScheduler;
 
     public abstract MessageType messageType();
 
@@ -128,11 +129,14 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         sendMessage(messageType(), receivers, eventMetadata);
     }
 
-    @Async
     public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
         if (receivers.isEmpty()) return;
 
-        receivers.forEach(receiver -> {
+        FPlayer regionPlayer = eventMetadata.getSender() instanceof FPlayer fPlayer
+                ? fPlayer
+                : fPlayerService.getRandomFPlayer();
+
+        taskScheduler.runRegion(regionPlayer, () -> receivers.forEach(receiver -> {
             // example
             // format: TheFaser > <message>
             // message: hello world!
@@ -155,7 +159,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
                     subComponent,
                     eventMetadata
             ));
-        });
+        }));
     }
 
     public void sendErrorMessage(EventMetadata<M> eventMetadata) {

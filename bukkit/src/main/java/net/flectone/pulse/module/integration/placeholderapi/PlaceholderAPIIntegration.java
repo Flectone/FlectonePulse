@@ -7,7 +7,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
@@ -18,12 +18,12 @@ import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -43,6 +43,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final PlaceholderAPIModule placeholderAPIModule;
+    private final TaskScheduler taskScheduler;
     private final MuteModule muteModule;
     private final FLogger fLogger;
 
@@ -63,24 +64,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     @Override
     public void hook() {
-        syncHook();
+        taskScheduler.runSync(this::register);
         fLogger.info("✔ PlaceholderAPI hooked");
     }
 
     @Override
     public void unhook() {
-        syncUnhook();
+        taskScheduler.runSync(this::unregister);
         fLogger.info("✖ PlaceholderAPI unhooked");
-    }
-
-    @Sync
-    public void syncHook() {
-        register();
-    }
-
-    @Sync
-    public void syncUnhook() {
-        unregister();
     }
 
     @Override

@@ -78,7 +78,7 @@ public class BubbleRenderer {
 
         CompletableFuture<Set<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
 
-        taskScheduler.runSyncRegion(platformPlayerAdapter.convertToPlatformPlayer(sender), () -> {
+        taskScheduler.runRegion(sender, () -> {
             Set<UUID> nearbyEntities = platformPlayerAdapter.findPlayersWhoCanSee(sender, viewDistance, viewDistance, viewDistance);
             nearbyEntitiesFuture.complete(nearbyEntities);
         });

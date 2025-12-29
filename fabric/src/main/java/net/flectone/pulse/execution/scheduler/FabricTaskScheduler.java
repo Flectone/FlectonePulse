@@ -1,13 +1,18 @@
 package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.exception.SchedulerTaskException;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 @Singleton
 public class FabricTaskScheduler implements TaskScheduler {
@@ -15,13 +20,19 @@ public class FabricTaskScheduler implements TaskScheduler {
     private final AtomicLong currentTick = new AtomicLong(0L);
     private final ConcurrentSkipListMap<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
     private final FLogger logger;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
     private ExecutorService asyncExecutor;
     private volatile boolean disabled = false;
 
     @Inject
-    public FabricTaskScheduler(FLogger logger) {
+    public FabricTaskScheduler(FLogger logger,
+                               Provider<FPlayerService> fPlayerServiceProvider,
+                               Provider<PlatformServerAdapter> platformServerAdapterProvider) {
         this.logger = logger;
+        this.fPlayerServiceProvider = fPlayerServiceProvider;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
 
         createExecutorService();
     }
@@ -55,24 +66,15 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsync(SchedulerRunnable runnable) {
+    public void runAsync(SchedulerRunnable runnable, boolean independent) {
         if (disabled) return;
+
+        if (!independent && isAsyncThread()) {
+            wrapExceptionRunnable(runnable).run();
+            return;
+        }
 
         asyncExecutor.execute(wrapExceptionRunnable(runnable));
-    }
-
-    @Override
-    public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
-        if (disabled) return;
-
-        long firstTick = currentTick.get() + tick;
-        ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
-        registerTask(firstTick, task);
-    }
-
-    @Override
-    public void runAsyncTimer(SchedulerRunnable runnable, long tick) {
-        runAsyncTimer(runnable, tick, tick);
     }
 
     @Override
@@ -85,8 +87,22 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
+    public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) return;
+
+        long firstTick = currentTick.get() + tick;
+        ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
+        registerTask(firstTick, task);
+    }
+
+    @Override
     public void runSync(SchedulerRunnable runnable) {
         if (disabled) return;
+
+        if (!isAsyncThread()) {
+            wrapExceptionRunnable(runnable).run();
+            return;
+        }
 
         long firstTick = currentTick.get();
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
@@ -94,8 +110,12 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncRegion(Object entity, SchedulerRunnable runnable) {
-        runSync(runnable);
+    public void runSyncLater(SchedulerRunnable runnable, long tick) {
+        if (disabled) return;
+
+        long firstTick = currentTick.get() + tick;
+        ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
+        registerTask(firstTick, task);
     }
 
     @Override
@@ -108,17 +128,40 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncTimer(SchedulerRunnable runnable, long tick) {
-        runSyncTimer(runnable, tick, tick);
+    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
+        runAsync(runnable);
     }
 
     @Override
-    public void runSyncLater(SchedulerRunnable runnable, long tick) {
+    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long tick) {
+        runAsyncLater(runnable, tick);
+    }
+
+    @Override
+    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick, long period) {
+        runAsyncTimer(runnable, tick, period);
+    }
+
+    @Override
+    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long tick) {
         if (disabled) return;
 
-        long firstTick = currentTick.get() + tick;
-        ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
-        registerTask(firstTick, task);
+        runAsyncTimer(() -> {
+            for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
+                runAsync(() -> fPlayerConsumer.accept(fPlayer));
+            }
+        }, tick);
+    }
+
+    @Override
+    public Runnable wrapExceptionRunnable(SchedulerRunnable runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (SchedulerTaskException e) {
+                logger.warning(e);
+            }
+        };
     }
 
     public void onTick() {
@@ -126,6 +169,10 @@ public class FabricTaskScheduler implements TaskScheduler {
 
         long tick = currentTick.getAndIncrement();
         processTasks(tick);
+    }
+
+    private boolean isAsyncThread() {
+        return !platformServerAdapterProvider.get().isPrimaryThread() && !isRestrictedAsyncThread();
     }
 
     private void processTasks(long tick) {
@@ -165,16 +212,6 @@ public class FabricTaskScheduler implements TaskScheduler {
             v.add(task);
             return v;
         });
-    }
-
-    private Runnable wrapExceptionRunnable(SchedulerRunnable runnable) {
-        return () -> {
-            try {
-                runnable.run();
-            } catch (SchedulerTaskException e) {
-                logger.warning("Task error: " + e.getMessage());
-            }
-        };
     }
 
     private void createExecutorService() {

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -39,6 +40,7 @@ public class BukkitChatModule extends ChatModule {
                                Provider<BubbleModule> bubbleModuleProvider,
                                Provider<SpyModule> spyModuleProvider,
                                BukkitListenerRegistry listenerRegistry,
+                               TaskScheduler taskScheduler,
                                ReflectionResolver reflectionResolver,
                                MuteSender muteSender,
                                DisableSender disableSender,
@@ -46,8 +48,8 @@ public class BukkitChatModule extends ChatModule {
                                FLogger fLogger,
                                ProxyRegistry proxyRegistry) {
         super(fileFacade, fPlayerService, platformServerAdapter, permissionChecker,
-                integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry, muteSender,
-                disableSender, cooldownSender, proxyRegistry);
+                integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry,
+                taskScheduler, muteSender, disableSender, cooldownSender, proxyRegistry);
 
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;

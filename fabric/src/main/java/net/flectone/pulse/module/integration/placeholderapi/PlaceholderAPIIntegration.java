@@ -8,8 +8,8 @@ import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
@@ -18,15 +18,16 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -44,15 +45,17 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
     private final FLogger fLogger;
     private final PermissionChecker permissionChecker;
     private final MuteModule muteModule;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void hook() {
-        register();
+        taskScheduler.runAsyncLater(this::register);
     }
 
     @Override
@@ -77,8 +80,26 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         fLogger.info("✖ Text Placeholder API unhooked");
     }
 
-    @Async(delay = 20)
-    public void register() {
+    @Pulse(priority = Event.Priority.LOW)
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.context();
+        FEntity sender = messageContext.sender();
+        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return event;
+
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+        if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;
+        if (!(sender instanceof FPlayer fPlayer)) return event;
+
+        Object player = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
+        if (!(player instanceof ServerPlayerEntity playerEntity)) return event;
+
+        String message = messageContext.message();
+
+        Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
+        return event.withContext(messageContext.withMessage(text.getString()));
+    }
+
+    private void register() {
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
@@ -98,11 +119,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         );
 
         Arrays.stream(MessageType.values()).forEach(messageType ->
-            Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
-                FPlayer fPlayer = fPlayerMapper.map(context.source());
+                Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
+                    FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-                return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
-            })
+                    return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
+                })
         );
 
         Arrays.stream(SettingText.values()).forEach(settingText ->
@@ -140,25 +161,6 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         );
 
         fLogger.info("✔ Text Placeholder API hooked");
-    }
-
-    @Pulse(priority = Event.Priority.LOW)
-    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
-        FEntity sender = messageContext.sender();
-        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return event;
-
-        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;
-        if (!(sender instanceof FPlayer fPlayer)) return event;
-
-        Object player = fPlayerService.toPlatformFPlayer(fPlayer);
-        if (!(player instanceof ServerPlayerEntity playerEntity)) return event;
-
-        String message = messageContext.message();
-
-        Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
-        return event.withContext(messageContext.withMessage(text.getString()));
     }
 
     private PlaceholderResult fColorPlaceholder(PlaceholderContext context, String argument, FColor.Type... types) {

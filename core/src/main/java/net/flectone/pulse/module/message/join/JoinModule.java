@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.join;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -26,6 +26,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -54,13 +55,15 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
         return fileFacade.localization(sender).message().join();
     }
 
-    @Async(delay = 5)
     public void sendLater(FPlayer fPlayer) {
-        send(fPlayer, false);
+        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, false), 5L);
     }
 
-    @Async
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
+        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, ignoreVanish));
+    }
+
+    private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);

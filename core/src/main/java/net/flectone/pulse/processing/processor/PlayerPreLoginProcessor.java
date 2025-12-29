@@ -3,7 +3,6 @@ package net.flectone.pulse.processing.processor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
@@ -21,7 +20,6 @@ public class PlayerPreLoginProcessor {
     private final ProxyRegistry proxyRegistry;
     private final EventDispatcher eventDispatcher;
 
-    @Async
     public void processAsyncLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> allowedConsumer, Consumer<PlayerPreLoginEvent> kickConsumer) {
         processLogin(uuid, name, allowedConsumer, kickConsumer);
     }

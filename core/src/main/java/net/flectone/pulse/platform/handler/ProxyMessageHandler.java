@@ -8,9 +8,9 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
@@ -71,10 +71,10 @@ import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -85,7 +85,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -97,23 +96,25 @@ public class ProxyMessageHandler {
     private final FLogger fLogger;
     private final ModerationService moderationService;
     private final Gson gson;
+    private final TaskScheduler taskScheduler;
 
-    @Async
     public void handleProxyMessage(byte[] bytes) {
-        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-             DataInputStream input = new DataInputStream(byteStream)) {
+        taskScheduler.runAsync(() -> {
+            try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+                 DataInputStream input = new DataInputStream(byteStream)) {
 
-            MessageType tag = MessageType.fromProxyString(input.readUTF());
-            if (tag == null) return;
+                MessageType tag = MessageType.fromProxyString(input.readUTF());
+                if (tag == null) return;
 
-            switch (tag) {
-                case SYSTEM_ONLINE -> handleSystemOnline(input);
-                case SYSTEM_OFFLINE -> handleSystemOffline(input);
-                default -> handleTaggedMessage(input, tag);
+                switch (tag) {
+                    case SYSTEM_ONLINE -> handleSystemOnline(input);
+                    case SYSTEM_OFFLINE -> handleSystemOffline(input);
+                    default -> handleTaggedMessage(input, tag);
+                }
+            } catch (IOException e) {
+                fLogger.warning(e);
             }
-        } catch (IOException e) {
-            fLogger.warning(e);
-        }
+        });
     }
 
     private void handleSystemOnline(DataInputStream input) throws IOException {

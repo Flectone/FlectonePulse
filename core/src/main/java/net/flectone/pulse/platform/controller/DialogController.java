@@ -9,7 +9,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSh
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dialog.Dialog;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.sender.PacketSender;
@@ -27,6 +27,7 @@ public class DialogController {
     private final Map<UUID, Dialog> dialogMap = new ConcurrentHashMap<>();
 
     private final PacketSender packetSender;
+    private final TaskScheduler taskScheduler;
 
     public Dialog get(UUID uuid) {
         return dialogMap.get(uuid);
@@ -65,13 +66,13 @@ public class DialogController {
         dialog.getClickConsumerMap().get(key).accept(dialog, payload);
     }
 
-
-    @Async
     public void process(UUID uuid, String key, NBT payload) {
-        Dialog dialog = get(uuid);
-        if (dialog == null) return;
+        taskScheduler.runAsync(() -> {
+            Dialog dialog = get(uuid);
+            if (dialog == null) return;
 
-        click(dialog, key, payload);
+            click(dialog, key, payload);
+        });
     }
 
     public void changeButton(FPlayer fPlayer, Dialog dialog, String id, ActionButton actionButton) {

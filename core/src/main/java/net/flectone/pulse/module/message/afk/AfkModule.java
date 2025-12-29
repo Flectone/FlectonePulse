@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.afk;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -19,11 +18,11 @@ import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +51,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         super.onEnable();
 
         if (config().ticker().enable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), config().ticker().period());
+            taskScheduler.runPlayerRegionTimer(this::check, config().ticker().period());
         }
 
         listenerRegistry.register(AfkPulseListener.class);
@@ -101,21 +100,22 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         });
     }
 
-    @Async
     public void remove(@NotNull String action, FPlayer fPlayer) {
-        if (action.isEmpty()) {
-            fPlayer.removeSetting(SettingText.AFK_SUFFIX);
-            fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (action.isEmpty()) {
+                fPlayer.removeSetting(SettingText.AFK_SUFFIX);
+                fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
 
-            playersCoordinates.remove(fPlayer.getUuid());
-            return;
-        }
+                playersCoordinates.remove(fPlayer.getUuid());
+                return;
+            }
 
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (config().ignore().contains(action)) return;
+            if (isModuleDisabledFor(fPlayer)) return;
+            if (config().ignore().contains(action)) return;
 
-        playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
-        check(fPlayer);
+            playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
+            check(fPlayer);
+        });
     }
 
     private void check(@NotNull FPlayer fPlayer) {

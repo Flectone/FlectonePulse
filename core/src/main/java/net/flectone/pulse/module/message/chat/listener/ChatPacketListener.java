@@ -7,7 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCh
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -17,6 +17,7 @@ import net.flectone.pulse.service.FPlayerService;
 public class ChatPacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
+    private final TaskScheduler taskScheduler;
     private final ChatModule chatModule;
 
     @Override
@@ -31,11 +32,9 @@ public class ChatPacketListener implements PacketListener {
         String message = wrapper.getMessage();
 
         event.setCancelled(true);
-        asyncSend(fPlayer, message);
-    }
 
-    @Async
-    public void asyncSend(FPlayer fPlayer, String message) {
-        chatModule.handleChatEvent(fPlayer, message, () -> {}, (string, value) -> {});
+        taskScheduler.runAsync(() ->
+                chatModule.handleChatEvent(fPlayer, message, () -> {}, (string, value) -> {})
+        );
     }
 }

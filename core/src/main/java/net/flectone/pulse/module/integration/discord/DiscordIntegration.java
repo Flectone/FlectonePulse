@@ -23,6 +23,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -262,7 +263,7 @@ public class DiscordIntegration implements FIntegration {
 
         if (channelInfo.enable() && channelInfo.ticker().enable()) {
             long period = channelInfo.ticker().period();
-            taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
+            taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period, period);
             updateChannelInfo();
         }
 

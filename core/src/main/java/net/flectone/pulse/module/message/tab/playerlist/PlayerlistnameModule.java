@@ -11,10 +11,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -30,11 +29,11 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jetbrains.annotations.Nullable;
@@ -71,11 +70,9 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     public void onEnable() {
         super.onEnable();
 
-        fPlayerService.getPlatformFPlayers().forEach(this::send);
-
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);
@@ -101,14 +98,13 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         return fileFacade.localization(sender).message().tab().playerlistname();
     }
 
-    @Async
     public void update() {
         if (!isEnable()) return;
 
-        fPlayerService.getPlatformFPlayers().forEach(this::send);
+        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> taskScheduler.runRegion(fPlayer, () -> send(fPlayer)));
     }
 
-    public void send(FPlayer fPlayer) {
+    private void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 

@@ -41,7 +41,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(BelownamePulseListener.class);

@@ -9,10 +9,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FlectonePulse;
-import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -20,10 +20,10 @@ import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -49,6 +49,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final FLogger fLogger;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -127,15 +128,10 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         }
 
         if (config().executeInMainThread()) {
-            syncReload(fPlayer);
+            taskScheduler.runSync(() -> reload(fPlayer));
         } else {
             reload(fPlayer);
         }
-    }
-
-    @Sync
-    public void syncReload(FPlayer fPlayer) {
-        reload(fPlayer);
     }
 
     public void reload(FPlayer fPlayer) {

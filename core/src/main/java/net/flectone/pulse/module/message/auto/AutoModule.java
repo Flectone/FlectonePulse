@@ -40,7 +40,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
 
             Ticker ticker = value.ticker();
             if (ticker.enable()) {
-                taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.period());
+                taskScheduler.runPlayerRegionTimer(fPlayer -> send(fPlayer, key, value, sound), ticker.period());
             }
         });
     }

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
@@ -27,8 +28,9 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
                                        ReflectionResolver reflectionResolver,
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
+                                       TaskScheduler taskScheduler,
                                        FPlayerMapper fPlayerMapper) {
-        super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, fPlayerMapper);
+        super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, taskScheduler, fPlayerMapper);
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             manager.registerBrigadier();

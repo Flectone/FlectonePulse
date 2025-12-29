@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
@@ -35,15 +35,15 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     private final FLogger fLogger;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void hook() {
         fLogger.info("✔ MiniPlaceholders hooked");
     }
 
-    @Async(delay = 20)
     public void hookLater() {
-        hook();
+        taskScheduler.runAsyncLater(this::hook);
     }
 
     @Override

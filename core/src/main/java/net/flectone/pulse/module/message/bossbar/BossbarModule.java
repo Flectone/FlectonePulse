@@ -5,12 +5,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -18,9 +18,9 @@ import net.flectone.pulse.module.message.bossbar.listener.BossbarPacketListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -43,6 +43,7 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -76,49 +77,50 @@ public class BossbarModule extends AbstractModuleLocalization<Localization.Messa
         return fileFacade.localization(sender).message().bossbar();
     }
 
-    @Async
     public void send(UUID playerUUID, UUID bossbarUUID, String translationKey, boolean announce, Component oldTitle) {
         FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (!fPlayer.isSetting(MessageType.BOSSBAR)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
+            if (!fPlayer.isSetting(MessageType.BOSSBAR)) return;
 
-        String message = localization(fPlayer).types().get(translationKey);
-        if (StringUtils.isEmpty(message)) return;
+            String message = localization(fPlayer).types().get(translationKey);
+            if (StringUtils.isEmpty(message)) return;
 
-        // it looks strange, but this is the only way to make normal color and message support
-        // remaining_raiders fits into other messages under certain conditions,
-        // so we need to add it here as well
-        String raiders = extractRemainingRaiders(oldTitle);
-        if (StringUtils.isNotEmpty(raiders)) {
-            message = message + RAIDERS_PLACEHOLDER;
-        }
+            // it looks strange, but this is the only way to make normal color and message support
+            // remaining_raiders fits into other messages under certain conditions,
+            // so we need to add it here as well
+            String raiders = extractRemainingRaiders(oldTitle);
+            if (StringUtils.isNotEmpty(raiders)) {
+                message = message + RAIDERS_PLACEHOLDER;
+            }
 
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, message)
-                .addTagResolver(raidersTag(fPlayer, raiders));
+            MessageContext messageContext = messagePipeline.createContext(fPlayer, message)
+                    .addTagResolver(raidersTag(fPlayer, raiders));
 
-        Component title = messagePipeline.build(messageContext);
-        if (title.equals(oldTitle)) return;
+            Component title = messagePipeline.build(messageContext);
+            if (title.equals(oldTitle)) return;
 
-        WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(bossbarUUID, WrapperPlayServerBossBar.Action.UPDATE_TITLE);
-        wrapper.setTitle(title);
+            WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(bossbarUUID, WrapperPlayServerBossBar.Action.UPDATE_TITLE);
+            wrapper.setTitle(title);
 
-        packetSender.send(fPlayer, wrapper);
+            packetSender.send(fPlayer, wrapper);
 
-        Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
-        if (announce && messageAnnounce != null) {
-            sendMessage(metadataBuilder()
-                    .sender(FPlayer.UNKNOWN)
-                    .format(localization -> Strings.CS.replace(
-                            StringUtils.defaultString(localization.announce().get(translationKey)),
-                            RAIDERS_PLACEHOLDER,
-                            raiders
-                    ))
-                    .filterPlayer(fPlayer)
-                    .destination(messageAnnounce.destination())
-                    .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
-                    .build()
-            );
-        }
+            Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
+            if (announce && messageAnnounce != null) {
+                sendMessage(metadataBuilder()
+                        .sender(FPlayer.UNKNOWN)
+                        .format(localization -> Strings.CS.replace(
+                                StringUtils.defaultString(localization.announce().get(translationKey)),
+                                RAIDERS_PLACEHOLDER,
+                                raiders
+                        ))
+                        .filterPlayer(fPlayer)
+                        .destination(messageAnnounce.destination())
+                        .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
+                        .build()
+                );
+            }
+        });
     }
 
     private TagResolver raidersTag(FPlayer fPlayer, String raiders) {

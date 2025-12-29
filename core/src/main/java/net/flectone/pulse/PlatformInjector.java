@@ -8,26 +8,18 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.common.cache.Cache;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.SneakyThrows;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.constant.CacheName;
-import net.flectone.pulse.util.interceptor.AsyncInterceptor;
-import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -84,9 +76,6 @@ public abstract class PlatformInjector extends AbstractModule {
 
         // platform binding
         setupPlatform(reflectionResolver);
-
-        // Interceptors
-        setupInterceptors();
 
 //        try {
 //            Package[] packs = Package.getPackages();
@@ -173,24 +162,6 @@ public abstract class PlatformInjector extends AbstractModule {
     @Provides @Singleton @Named("translateMessage")
     public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.TRANSLATE_MESSAGE);
-    }
-
-    private void setupInterceptors() {
-        Provider<TaskScheduler> taskSchedulerProvider = getProvider(TaskScheduler.class);
-        Provider<PlatformServerAdapter> platformServerAdapterProvider = getProvider(PlatformServerAdapter.class);
-
-        AsyncInterceptor asyncInterceptor = new AsyncInterceptor(taskSchedulerProvider, platformServerAdapterProvider, fLogger);
-        bind(AsyncInterceptor.class).toInstance(asyncInterceptor);
-
-        SyncInterceptor syncInterceptor = new SyncInterceptor(taskSchedulerProvider, platformServerAdapterProvider, fLogger);
-        bind(SyncInterceptor.class).toInstance(syncInterceptor);
-
-        bindInterceptor(
-                Matchers.any(),
-                Matchers.annotatedWith(Sync.class).or(Matchers.annotatedWith(Async.class)),
-                asyncInterceptor,
-                syncInterceptor
-        );
     }
 
     private ObjectMapper createMapper() {

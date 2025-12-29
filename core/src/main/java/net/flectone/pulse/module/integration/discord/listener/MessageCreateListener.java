@@ -9,7 +9,6 @@ import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
@@ -79,7 +78,6 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         return Mono.empty();
     }
 
-    @Async
     public void sendMessage(Member member, String message, Pair<String, String> reply) {
         String globalName = member.getGlobalName().orElse("");
         String nickname = member.getNickname().orElse("");

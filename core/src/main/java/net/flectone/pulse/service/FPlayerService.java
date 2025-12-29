@@ -1,23 +1,21 @@
 package net.flectone.pulse.service;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.SettingText;
-import net.kyori.adventure.text.Component;
+import net.flectone.pulse.util.file.FileFacade;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -49,8 +47,9 @@ public class FPlayerService {
     private final SocialRepository socialRepository;
     private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
-    private final PacketSender packetSender;
     private final PacketProvider packetProvider;
+    private final TaskScheduler taskScheduler;
+    private final RandomUtil randomUtil;
 
     public void clear() {
         fPlayerRepository.clearCache();
@@ -113,13 +112,14 @@ public class FPlayerService {
         loadIgnores(fPlayer);
     }
 
-    @Async
     public void saveFPlayerData(FPlayer fPlayer) {
-        // skip offline FPlayer
-        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
+        taskScheduler.runAsync(() -> {
+            // skip offline FPlayer
+            if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
-        // update data in database
-        updateFPlayer(fPlayer);
+            // update data in database
+            updateFPlayer(fPlayer);
+        });
     }
 
     public int getPing(FPlayer player) {
@@ -210,8 +210,11 @@ public class FPlayerService {
         return fPlayer;
     }
 
-    public Object toPlatformFPlayer(FPlayer fPlayer) {
-        return platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
+    public FPlayer getRandomFPlayer() {
+        List<FPlayer> fPlayers = getOnlineFPlayers();
+        int randomIndex = randomUtil.nextInt(0, fPlayers.size());
+
+        return fPlayers.get(randomIndex);
     }
 
     public List<FPlayer> findAllFPlayers() {
@@ -248,11 +251,6 @@ public class FPlayerService {
 
     public List<FPlayer> getFPlayersWithConsole() {
         return fPlayerRepository.getOnlineFPlayersWithConsole();
-    }
-
-    public void kick(FPlayer fPlayer, Component reason) {
-        WrapperPlayServerDisconnect packet = new WrapperPlayServerDisconnect(reason);
-        packetSender.send(fPlayer, packet);
     }
 
     public void loadColors(FPlayer fPlayer) {
@@ -319,10 +317,11 @@ public class FPlayerService {
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 
-    @Async(delay = 40L)
     public void updateLocaleLater(UUID uuid, String wrapperLocale) {
-        FPlayer fPlayer = getFPlayer(uuid);
-        updateLocale(fPlayer, wrapperLocale);
+        taskScheduler.runAsyncLater(() -> {
+            FPlayer fPlayer = getFPlayer(uuid);
+            updateLocale(fPlayer, wrapperLocale);
+        }, 40L);
     }
 
     public void updateLocale(FPlayer fPlayer, String newLocale) {

@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.bubble;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.bubble.listener.BubblePacketListener;
@@ -24,6 +24,7 @@ public class BubbleModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -52,11 +53,12 @@ public class BubbleModule extends AbstractModule {
         return fileFacade.permission().message().bubble();
     }
 
-    @Async
     public void add(@NotNull FPlayer fPlayer, @NotNull String inputString, List<FPlayer> receivers) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        taskScheduler.runRegion(fPlayer, () -> {
+            if (isModuleDisabledFor(fPlayer)) return;
 
-        bubbleService.addMessage(fPlayer, inputString, receivers);
+            bubbleService.addMessage(fPlayer, inputString, receivers);
+        });
     }
 
     public enum Billboard {

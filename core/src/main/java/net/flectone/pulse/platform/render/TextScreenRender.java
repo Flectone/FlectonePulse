@@ -14,7 +14,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.TextScreen;
@@ -82,15 +81,16 @@ public class TextScreenRender {
         packetSender.send(uuid, new WrapperPlayServerSetPassengers(playerId, finalPassengers), silent);
     }
 
-    @Async
     public void updateAndRide(int playerId) {
-        UUID uuid = platformPlayerAdapter.getPlayerByEntityId(playerId);
-        if (uuid == null) return;
+        taskScheduler.runAsync(() -> {
+            UUID uuid = platformPlayerAdapter.getPlayerByEntityId(playerId);
+            if (uuid == null) return;
 
-        List<Integer> textScreenPassengers = getPassengers(uuid);
-        if (textScreenPassengers.isEmpty()) return;
+            List<Integer> textScreenPassengers = getPassengers(uuid);
+            if (textScreenPassengers.isEmpty()) return;
 
-        ride(uuid, playerId, textScreenPassengers, true);
+            ride(uuid, playerId, textScreenPassengers, true);
+        });
     }
 
     private Optional<Integer> spawn(FPlayer fPlayer, Component message, TextScreen textScreen) {

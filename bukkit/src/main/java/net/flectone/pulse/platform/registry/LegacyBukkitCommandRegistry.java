@@ -2,13 +2,13 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
-import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -28,6 +28,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
     private final Config config;
     private final Plugin plugin;
     private final ReflectionResolver reflectionResolver;
+    private final TaskScheduler taskScheduler;
     protected final LegacyPaperCommandManager<FPlayer> manager;
 
     @Inject
@@ -35,9 +36,11 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        ReflectionResolver reflectionResolver,
+                                       TaskScheduler taskScheduler,
                                        FPlayerMapper fPlayerMapper) {
         this.config = fileFacade.config();
         this.plugin = plugin;
+        this.taskScheduler = taskScheduler;
         this.reflectionResolver = reflectionResolver;
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
@@ -72,7 +75,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
         if (reflectionResolver.isPaper()) {
             registerCommand(command);
         } else {
-            syncRegisterCommand(command);
+            taskScheduler.runSync(() -> registerCommand(command));
         }
     }
 
@@ -81,7 +84,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
         if (reflectionResolver.isPaper()) {
             deleteRootCommand(name);
         } else {
-            syncDeleteRootCommand(name);
+            taskScheduler.runSync(() -> deleteRootCommand(name));
         }
     }
 
@@ -92,7 +95,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
         if (reflectionResolver.isPaper()) {
             unregisterCommands();
         } else {
-            syncUnregisterCommands();
+            taskScheduler.runSync(this::unregisterCommands);
         }
     }
 
@@ -100,18 +103,8 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
         manager.deleteRootCommand(name);
     }
 
-    @Sync
-    public void syncDeleteRootCommand(String name) {
-        deleteRootCommand(name);
-    }
-
     public void registerCommand(Command<FPlayer> command) {
         manager.command(command);
-    }
-
-    @Sync
-    public void syncRegisterCommand(Command<FPlayer> command) {
-        registerCommand(command);
     }
 
     public void unregisterCommands() {
@@ -119,11 +112,6 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
                 .map(command -> command.rootComponent().name())
                 .toList() // fix concurrent modification
                 .forEach(this::unregisterCommand);
-    }
-
-    @Sync
-    public void syncUnregisterCommands() {
-        unregisterCommands();
     }
 
 }

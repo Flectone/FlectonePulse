@@ -2,13 +2,13 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,16 +28,19 @@ public class BukkitSpyModule extends SpyModule {
 
     private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry bukkitListenerManager;
+    private final TaskScheduler taskScheduler;
 
     @Inject
     public BukkitSpyModule(FileFacade fileFacade,
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
-                           BukkitListenerRegistry bukkitListenerManager) {
+                           BukkitListenerRegistry bukkitListenerManager,
+                           TaskScheduler taskScheduler) {
         super(fileFacade, fPlayerService, permissionChecker);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -47,90 +50,95 @@ public class BukkitSpyModule extends SpyModule {
         bukkitListenerManager.register(SpyListener.class, Event.Priority.NORMAL);
     }
 
-    @Async
     public void check(PlayerCommandPreprocessEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().categories();
-        if (categories.get("command") == null) return;
+        taskScheduler.runAsync(() -> {
+            Map<String, List<String>> categories = config().categories();
+            if (categories.get("command") == null) return;
 
-        String action = event.getMessage();
-        if (!action.isEmpty()) {
-            action = action.split(" ")[0].substring(1);
-        }
+            String action = event.getMessage();
+            if (!action.isEmpty()) {
+                action = action.split(" ")[0].substring(1);
+            }
 
-        if (!categories.get("command").contains(action)) return;
+            if (!categories.get("command").contains(action)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
-        spy(fPlayer, action, event.getMessage());
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+            spy(fPlayer, action, event.getMessage());
+        });
     }
 
-    @Async
     public void check(InventoryClickEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().categories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains("anvil")) return;
-        if (event.isCancelled()) return;
-        if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
-        if (event.getSlot() != 2) return;
-        if (event.getCurrentItem() == null) return;
-        if (event.getCurrentItem().getItemMeta() == null) return;
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        taskScheduler.runAsync(() -> {
+            Map<String, List<String>> categories = config().categories();
+            if (categories.get("action") == null) return;
+            if (!categories.get("action").contains("anvil")) return;
+            if (event.isCancelled()) return;
+            if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
+            if (event.getSlot() != 2) return;
+            if (event.getCurrentItem() == null) return;
+            if (event.getCurrentItem().getItemMeta() == null) return;
+            if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(player);
+            FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
-        ItemStack itemStack = event.getCurrentItem();
-        ItemMeta itemMeta = itemStack.getItemMeta();
+            ItemStack itemStack = event.getCurrentItem();
+            ItemMeta itemMeta = itemStack.getItemMeta();
 
-        String itemName = itemMeta == null
-                ? itemStack.getType().name()
-                : itemMeta.getDisplayName();
+            String itemName = itemMeta == null
+                    ? itemStack.getType().name()
+                    : itemMeta.getDisplayName();
 
-        spy(fPlayer, "anvil", itemName);
+            spy(fPlayer, "anvil", itemName);
+        });
     }
 
-    @Async
     public void check(PlayerEditBookEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().categories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains("book")) return;
+        taskScheduler.runAsync(() -> {
+            Map<String, List<String>> categories = config().categories();
+            if (categories.get("action") == null) return;
+            if (!categories.get("action").contains("book")) return;
 
-        Player player = event.getPlayer();
-        FPlayer fPlayer = fPlayerService.getFPlayer(player);
+            Player player = event.getPlayer();
+            FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
-        BookMeta bookMeta = event.getNewBookMeta();
-        spy(fPlayer, "book", String.join(" ", bookMeta.getPages()));
+            BookMeta bookMeta = event.getNewBookMeta();
+            spy(fPlayer, "book", String.join(" ", bookMeta.getPages()));
 
-        if (bookMeta.getTitle() == null) return;
-        spy(fPlayer, "book", bookMeta.getTitle());
+            if (bookMeta.getTitle() == null) return;
+            spy(fPlayer, "book", bookMeta.getTitle());
+        });
     }
 
-    @Async
     public void check(SignChangeEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().categories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains("sign")) return;
+        taskScheduler.runAsync(() -> {
+            Map<String, List<String>> categories = config().categories();
+            if (categories.get("action") == null) return;
+            if (!categories.get("action").contains("sign")) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
-        String message = String.join(" ", event.getLines());
-        spy(fPlayer, "sign", message);
+            String message = String.join(" ", event.getLines());
+            spy(fPlayer, "sign", message);
+        });
     }
 
-    @Async
     public void check(AsyncPlayerChatEvent event) {
         if (!isEnable()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        taskScheduler.runAsync(() -> {
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
-        String message = event.getMessage();
+            String message = event.getMessage();
 
-        checkChat(fPlayer, "chat", message);
+            checkChat(fPlayer, "chat", message);
+        });
     }
 }

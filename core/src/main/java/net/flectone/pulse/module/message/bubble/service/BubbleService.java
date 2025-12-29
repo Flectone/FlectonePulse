@@ -49,7 +49,12 @@ public class BubbleService {
     private final MessagePipeline messagePipeline;
 
     public void startTicker() {
-        taskScheduler.runAsyncTimer(() -> playerBubbleQueues.forEach(this::processBubbleQueue), 5L, 5L);
+        taskScheduler.runPlayerRegionTimer(fPlayer -> {
+            Queue<Bubble> bubbles = playerBubbleQueues.get(fPlayer.getUuid());
+            if (bubbles == null) return;
+
+            processBubbleQueue(fPlayer.getUuid(), bubbles);
+        }, 5L);
     }
 
     public void addMessage(@NotNull FPlayer sender, @NotNull String message, List<FPlayer> receivers) {

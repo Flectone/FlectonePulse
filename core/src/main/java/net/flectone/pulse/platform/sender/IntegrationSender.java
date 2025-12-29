@@ -3,8 +3,8 @@ package net.flectone.pulse.platform.sender;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -42,10 +42,10 @@ public class IntegrationSender {
 
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
+    private final TaskScheduler taskScheduler;
 
-    @Async(independent = true)
     public void asyncSend(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
-        send(messageType, format, eventMetadata);
+        taskScheduler.runAsync(() -> send(messageType, format, eventMetadata), true);
     }
 
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {

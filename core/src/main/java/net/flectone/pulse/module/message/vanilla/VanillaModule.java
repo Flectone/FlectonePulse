@@ -4,12 +4,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
@@ -21,9 +20,9 @@ import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.TranslationArgument;
@@ -50,6 +49,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
+    private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
 
     @Override
@@ -81,8 +81,11 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
         return fileFacade.localization(sender).message().vanilla();
     }
 
-    @Async
     public void send(FPlayer fPlayer, ParsedComponent parsedComponent) {
+        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, parsedComponent));
+    }
+
+    private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         Range range = parsedComponent.vanillaMessage().range();
@@ -277,8 +280,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
         return null;
     }
 
-    @Sync
-    public void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component));
+    private void sendPersonalDeath(FPlayer fPlayer, Component component) {
+        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component)));
     }
 }

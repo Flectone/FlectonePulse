@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
@@ -50,6 +50,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final CooldownChecker cooldownChecker;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -164,7 +165,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         sendAnswerLater(sender, receiver, question);
     }
 
-    @Async(delay = 1L)
     private void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
         Message.Format.QuestionAnswer.Question questionMessage = config().questions().get(question);
         if (questionMessage == null) return;
@@ -176,7 +176,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
-        sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
+        taskScheduler.runAsyncLater(() -> sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .sender(sender)
                 .filterPlayer(fReceiver)
                 .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
@@ -184,6 +184,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
                 .destination(questionMessage.destination())
                 .sound(sound)
                 .build()
-        );
+        ), 1L);
     }
 }

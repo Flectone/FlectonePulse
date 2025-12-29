@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
@@ -58,6 +58,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
+    private final TaskScheduler taskScheduler;
     private final SoundPlayer soundPlayer;
     private final WebUtil webUtil;
     private final FLogger fLogger;
@@ -219,29 +220,30 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
         return fileFacade.localization(sender).command().sprite();
     }
 
-    @Async
-    public void lazyLoadLocalAtlases() {
-        File atlasesFolder = resolveAtlasesFolder().toFile();
-        if (!atlasesFolder.exists()) return;
+    private void lazyLoadLocalAtlases() {
+        taskScheduler.runAsync(() -> {
+            File atlasesFolder = resolveAtlasesFolder().toFile();
+            if (!atlasesFolder.exists()) return;
 
-        File[] atlases = atlasesFolder.listFiles();
-        if (atlases == null) return;
+            File[] atlases = atlasesFolder.listFiles();
+            if (atlases == null) return;
 
-        for (File atlas : atlases) {
-            String atlasName = StringUtils.replaceEach(
-                    atlas.getName(),
-                    new String[]{"minecraft_textures_atlas_", ".png.txt"},
-                    new String[]{"", ""}
-            );
+            for (File atlas : atlases) {
+                String atlasName = StringUtils.replaceEach(
+                        atlas.getName(),
+                        new String[]{"minecraft_textures_atlas_", ".png.txt"},
+                        new String[]{"", ""}
+                );
 
-            if (atlasSpritesMap.containsKey(atlasName)) continue;
+                if (atlasSpritesMap.containsKey(atlasName)) continue;
 
-            try (Stream<String> lines = Files.lines(atlas.toPath(), StandardCharsets.UTF_8)) {
-                atlasSpritesMap.put(atlasName, lines.map(string -> RegExUtils.replaceAll((CharSequence) string, SPRITE_PATTERN, "")).toList());
-            } catch (IOException e) {
-                fLogger.warning(e);
+                try (Stream<String> lines = Files.lines(atlas.toPath(), StandardCharsets.UTF_8)) {
+                    atlasSpritesMap.put(atlasName, lines.map(string -> RegExUtils.replaceAll((CharSequence) string, SPRITE_PATTERN, "")).toList());
+                } catch (IOException e) {
+                    fLogger.warning(e);
+                }
             }
-        }
+        });
     }
 
     private boolean downloadAtlasFile(String atlasName) {
