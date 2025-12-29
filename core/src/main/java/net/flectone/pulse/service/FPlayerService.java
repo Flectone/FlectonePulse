@@ -212,8 +212,9 @@ public class FPlayerService {
 
     public FPlayer getRandomFPlayer() {
         List<FPlayer> fPlayers = getOnlineFPlayers();
-        int randomIndex = randomUtil.nextInt(0, fPlayers.size());
+        if (fPlayers.isEmpty()) return FPlayer.UNKNOWN;
 
+        int randomIndex = randomUtil.nextInt(0, fPlayers.size());
         return fPlayers.get(randomIndex);
     }
 
