@@ -39,6 +39,7 @@ public class PlayerPreLoginProcessor {
             fPlayerService.loadData(fPlayer);
             allowedConsumer.accept(event);
         } else {
+            fPlayerService.invalidateOnline(fPlayer.getUuid());
             kickConsumer.accept(event);
         }
     }
