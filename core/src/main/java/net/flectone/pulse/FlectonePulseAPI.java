@@ -32,29 +32,65 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
+/**
+ * API entry point for FlectonePulse plugin integration.
+ * Provides static access to the main {@link FlectonePulse} instance and lifecycle management.
+ *
+ * @see FlectonePulse
+ * @since 0.1.0
+ */
 @Singleton
 public class FlectonePulseAPI  {
 
+    /**
+     * The main instance of the FlectonePulse.
+     * Provides access to dependency injection and functionality.
+     *
+     * @see FlectonePulse
+     */
     @Getter 
     private static FlectonePulse instance;
 
+    /**
+     * Constructs the API wrapper with dependency injection.
+     * This constructor is called internally by Google Guice.
+     *
+     * @param instance the main FlectonePulse implementation instance
+     */
     @Inject
     public FlectonePulseAPI(FlectonePulse instance) {
         FlectonePulseAPI.instance = instance;
     }
 
+    /**
+     * Configures PacketEvents system properties.
+     * Must be called before PacketEvents initialization.
+     */
     public static void configurePacketEvents() {
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
     }
 
-    // fix PacketEvents error when FlectonePulse failed to start
+    /**
+     * Terminates PacketEvents API if initialization failed.
+     * Prevents errors when FlectonePulse fails to start.
+     */
     public static void terminateFailedPacketEvents() {
-        PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-        if (!packetEventsAPI.isInitialized()) {
-            packetEventsAPI.getInjector().uninject();
+        try {
+            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
+            if (!packetEventsAPI.isInitialized()) {
+                packetEventsAPI.getInjector().uninject();
+            }
+        } catch (Exception ignored) {
+            // ignore
         }
     }
 
+    /**
+     * Initializes and enables the FlectonePulse .
+     * Called automatically by the platform on enable.
+     *
+     * @throws IllegalStateException if called when is already enabled
+     */
     @SneakyThrows
     public void onEnable() {
         if (!instance.isReady()) return;
@@ -110,6 +146,10 @@ public class FlectonePulseAPI  {
         fLogger.logEnabled();
     }
 
+    /**
+     * Shuts down the FlectonePulse .
+     * Called automatically by the platform on disable.
+     */
     public void onDisable() {
         terminateFailedPacketEvents();
 
@@ -159,6 +199,11 @@ public class FlectonePulseAPI  {
         fLogger.logDisabled();
     }
 
+    /**
+     * Reloads the plugin configuration and modules at runtime.
+     *
+     * @throws ReloadException if any error occurs during reload process
+     */
     public void reload() throws ReloadException {
         if (!instance.isReady()) return;
 
