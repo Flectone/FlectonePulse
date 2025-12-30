@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.objective;
 
+import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
@@ -44,7 +45,7 @@ public class ObjectiveModule extends AbstractModule {
         return fileFacade.permission().message().objective();
     }
 
-    public void createObjective(FPlayer fPlayer, @Nullable Component displayName, ScoreboardPosition scoreboardPosition) {
+    public void createObjective(FPlayer fPlayer, @Nullable Component displayName, @Nullable Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         removeObjective(fPlayer, scoreboardPosition);
 
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
@@ -52,9 +53,9 @@ public class ObjectiveModule extends AbstractModule {
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
                 WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE,
-                displayName == null ? Component.text(objectiveName) : displayName,
+                displayName != null ? displayName : Component.text(objectiveName),
                 WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
-                null
+                scoreFormat != null ? ScoreFormat.fixedScore(displayName) : null
         ));
 
         packetSender.send(fPlayer, new WrapperPlayServerDisplayScoreboard(
@@ -63,7 +64,7 @@ public class ObjectiveModule extends AbstractModule {
         ));
     }
 
-    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, ScoreboardPosition scoreboardPosition) {
+    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, @Nullable Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
 
         packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
@@ -72,7 +73,7 @@ public class ObjectiveModule extends AbstractModule {
                 objectiveName,
                 score,
                 Component.text(fPlayer.getName()),
-                null
+                scoreFormat != null ? ScoreFormat.fixedScore(scoreFormat) : null
         ));
     }
 

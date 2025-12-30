@@ -1090,13 +1090,21 @@ public record Localization(
         @Jacksonized
         public record Objective(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/belowname/")
-                Belowname belowname
+                Belowname belowname,
+
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/tabname/")
+                Tabname tabname
         ) implements LocalizationSetting {
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
             public record Belowname(String format) implements LocalizationSetting {}
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Tabname(String format) implements LocalizationSetting {}
         }
 
         @With

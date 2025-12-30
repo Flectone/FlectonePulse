@@ -553,6 +553,8 @@ message:
   objective:
     belowname:
       format: "<fcolor:1>ms"
+    tabname:
+      format: "<fcolor:1><score> ms"
   quit:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:

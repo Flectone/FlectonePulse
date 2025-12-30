@@ -73,6 +73,7 @@ public enum MessageType {
     NAME,
     NEWBIE,
     OBJECTIVE,
+    TABNAME,
     PLAYERS,
     PLAYERLISTNAME,
     QUESTION_ANSWER,

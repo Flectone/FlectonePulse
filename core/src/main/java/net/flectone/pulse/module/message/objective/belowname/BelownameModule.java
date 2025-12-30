@@ -80,7 +80,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
         MessageContext displayNameContext = messagePipeline.createContext(fPlayer, localization(fPlayer).format());
         Component displayName = messagePipeline.build(displayNameContext);
 
-        objectiveModule.createObjective(fPlayer, displayName, ScoreboardPosition.BELOWNAME);
+        objectiveModule.createObjective(fPlayer, displayName, null, ScoreboardPosition.BELOWNAME);
         update(fPlayer);
     }
 
@@ -89,7 +89,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().mode());
-            objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.BELOWNAME);
+            objectiveModule.updateObjective(fPlayer, fObjective, score, null, ScoreboardPosition.BELOWNAME);
         });
     }
 

@@ -269,9 +269,12 @@ public interface LocalizationMerger {
     Localization.Message.Join mergeJoin(@MappingTarget Localization.Message.Join.JoinBuilder target, Localization.Message.Join join);
 
     @Mapping(target = "belowname", expression = "java(mergeBelowname(target.build().belowname().toBuilder(), source.belowname()))")
+    @Mapping(target = "tabname", expression = "java(mergeTabname(target.build().tabname().toBuilder(), source.tabname()))")
     Localization.Message.Objective mergeObjective(@MappingTarget Localization.Message.Objective.ObjectiveBuilder target, Localization.Message.Objective source);
 
     Localization.Message.Objective.Belowname mergeBelowname(@MappingTarget Localization.Message.Objective.Belowname.BelownameBuilder target, Localization.Message.Objective.Belowname belowname);
+
+    Localization.Message.Objective.Tabname mergeTabname(@MappingTarget Localization.Message.Objective.Tabname.TabnameBuilder target, Localization.Message.Objective.Tabname tabname);
 
     Localization.Message.Quit mergeQuit(@MappingTarget Localization.Message.Quit.QuitBuilder target, Localization.Message.Quit quit);
 
