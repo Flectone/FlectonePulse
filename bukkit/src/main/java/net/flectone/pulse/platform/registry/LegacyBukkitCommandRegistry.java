@@ -23,7 +23,7 @@ import org.incendo.cloud.setting.ManagerSetting;
 import java.util.function.Function;
 
 @Singleton
-public class LegacyBukkitCommandRegistry extends CommandRegistry {
+public class LegacyBukkitCommandRegistry implements CommandRegistry {
 
     private final Config config;
     private final Plugin plugin;
