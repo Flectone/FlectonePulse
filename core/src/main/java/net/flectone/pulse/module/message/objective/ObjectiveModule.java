@@ -55,7 +55,7 @@ public class ObjectiveModule extends AbstractModule {
                 WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE,
                 displayName != null ? displayName : Component.text(objectiveName),
                 WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
-                scoreFormat != null ? ScoreFormat.fixedScore(displayName) : null
+                scoreFormat != null ? ScoreFormat.fixedScore(scoreFormat) : null
         ));
 
         packetSender.send(fPlayer, new WrapperPlayServerDisplayScoreboard(
