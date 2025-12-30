@@ -6,6 +6,7 @@ dependencies {
     compileOnly "org.jdbi:jdbi3-sqlobject:$jdbi3_core_version"
     compileOnly "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
     compileOnly "org.incendo:cloud-core:$cloud_core_version"
+    compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
     compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
     compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
     compileOnly "org.apache.logging.log4j:log4j-core:$log4j_core_version"
@@ -26,6 +27,7 @@ dependencies {
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
     compileOnly "org.geysermc.geyser:api:$geyser_version"
     compileOnly "org.geysermc.floodgate:api:$floodgate_version"
+    compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
 }
 
 tasks.named("buildFinalJar", Jar) {
