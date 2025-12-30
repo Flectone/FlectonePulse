@@ -3,16 +3,20 @@ package net.flectone.pulse;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.tree.CommandNode;
 import io.github.retrooper.packetevents.PacketEventsServerMod;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +74,10 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 	public void onEnable() {
 		if (!isReady()) return;
 
+        // idk why, but this does not work in ListenerRegistry,
+        // for some reason 5ms decide whether commands will be deleted normally
+        removeDefaultFabricCommands();
+
 		injector.getInstance(FlectonePulseAPI.class).onEnable();
 	}
 
@@ -89,4 +97,14 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 
 		injector.getInstance(FlectonePulseAPI.class).reload();
 	}
+
+    private void removeDefaultFabricCommands() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            CommandNode<ServerCommandSource> root = dispatcher.getRoot();
+
+            for (String command : injector.getInstance(FileFacade.class).config().command().disabledFabric()) {
+                root.getChildren().removeIf(node -> node.getName().equals(command));
+            }
+        });
+    }
 }

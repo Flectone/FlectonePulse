@@ -4,33 +4,26 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.tree.CommandNode;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.config.Config;
+import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.listener.FabricBaseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.logging.FLogger;
-import net.minecraft.server.command.ServerCommandSource;
 
 @Singleton
 public class FabricListenerRegistry extends ListenerRegistry {
 
-    private final Config config;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final Provider<FabricBaseListener> fabricBaseListenerProvider;
     private final FabricTaskScheduler fabricTaskScheduler;
     private final TpsTracker tpsTracker;
 
     @Inject
-    public FabricListenerRegistry(FileFacade fileFacade,
-                                  FabricFlectonePulse fabricFlectonePulse,
+    public FabricListenerRegistry(FabricFlectonePulse fabricFlectonePulse,
                                   Provider<FabricBaseListener> fabricBaseListenerProvider,
                                   FabricTaskScheduler fabricTaskScheduler,
                                   TpsTracker tpsTracker,
@@ -39,7 +32,6 @@ public class FabricListenerRegistry extends ListenerRegistry {
                                   PacketProvider packetProvider) {
         super(fLogger, injector, packetProvider);
 
-        this.config = fileFacade.config();
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fabricBaseListenerProvider = fabricBaseListenerProvider;
         this.fabricTaskScheduler = fabricTaskScheduler;
@@ -61,13 +53,5 @@ public class FabricListenerRegistry extends ListenerRegistry {
         FabricBaseListener fabricBaseListener = fabricBaseListenerProvider.get();
         ServerPlayConnectionEvents.JOIN.register(fabricBaseListener::asyncProcessJoinEvent);
         ServerPlayConnectionEvents.DISCONNECT.register(fabricBaseListener::asyncProcessQuitEvent);
-
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            CommandNode<ServerCommandSource> root = dispatcher.getRoot();
-
-            for (String command : config.command().disabledFabric()) {
-                root.getChildren().removeIf(node -> node.getName().equals(command));
-            }
-        });
     }
 }
