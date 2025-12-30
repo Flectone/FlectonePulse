@@ -3,10 +3,10 @@ package net.flectone.pulse.platform.registry;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
-import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.CloudCapability;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -36,6 +36,7 @@ public class FabricCommandRegistry extends CommandRegistry {
                                  FPlayerMapper fPlayerMapper) {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
+
         this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
@@ -45,6 +46,8 @@ public class FabricCommandRegistry extends CommandRegistry {
         manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
         manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
         manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
+
+        setupBrigadierManager(((FabricServerCommandManager<FPlayer>) manager).brigadierManager());
     }
 
     @Override
