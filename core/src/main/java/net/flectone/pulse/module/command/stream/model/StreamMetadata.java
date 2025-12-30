@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.EventMetadata;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Getter
 @SuperBuilder

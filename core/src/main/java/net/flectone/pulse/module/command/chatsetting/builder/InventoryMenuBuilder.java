@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;

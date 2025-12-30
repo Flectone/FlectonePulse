@@ -3,7 +3,6 @@ package net.flectone.pulse.module.command.sprite;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -30,6 +29,7 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;

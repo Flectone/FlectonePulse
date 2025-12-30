@@ -3,7 +3,7 @@ package net.flectone.pulse.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -16,8 +16,8 @@ public class FEntity {
 
     private final String name;
 
-    @Nullable
     @Setter
+    @Nullable
     private Component showEntityName;
 
     private final UUID uuid;

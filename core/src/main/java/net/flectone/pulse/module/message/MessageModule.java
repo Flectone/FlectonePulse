@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +28,7 @@ import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.util.file.FileFacade;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

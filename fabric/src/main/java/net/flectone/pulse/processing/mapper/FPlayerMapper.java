@@ -11,7 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.incendo.cloud.SenderMapper;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,7 +22,7 @@ public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer>
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
-    public @NotNull FPlayer map(@NotNull ServerCommandSource sender) {
+    public @NonNull FPlayer map(@NonNull ServerCommandSource sender) {
         ServerPlayerEntity player = sender.getPlayer();
         if (player != null) {
             return fPlayerService.getFPlayer(player.getUuid());
@@ -32,7 +32,7 @@ public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer>
     }
 
     @Override
-    public @NotNull ServerCommandSource reverse(@NotNull FPlayer mapped) {
+    public @NonNull ServerCommandSource reverse(@NonNull FPlayer mapped) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
 
         Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);

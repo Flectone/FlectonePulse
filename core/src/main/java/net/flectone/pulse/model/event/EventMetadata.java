@@ -2,7 +2,6 @@ package net.flectone.pulse.model.event;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
@@ -16,7 +15,8 @@ import net.flectone.pulse.util.SafeDataOutputStream;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.BiFunction;

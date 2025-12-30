@@ -9,7 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -45,8 +45,7 @@ public class TritonModule extends AbstractModule {
         return fileFacade.permission().integration().triton();
     }
 
-    @Nullable
-    public String getLocale(FPlayer fPlayer) {
+    public @Nullable String getLocale(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return null;
 
         return tritonIntegration.getLocale(fPlayer);

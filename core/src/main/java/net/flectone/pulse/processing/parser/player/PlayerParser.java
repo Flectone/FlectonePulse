@@ -3,7 +3,6 @@ package net.flectone.pulse.processing.parser.player;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,6 +17,7 @@ import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

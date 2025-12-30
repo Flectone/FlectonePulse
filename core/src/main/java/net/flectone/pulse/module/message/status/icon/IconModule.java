@@ -9,10 +9,10 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
-import org.jetbrains.annotations.Nullable;
+import net.flectone.pulse.util.file.FileFacade;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -85,8 +85,7 @@ public class IconModule extends AbstractModule {
         });
     }
 
-    @Nullable
-    public String next(FPlayer fPlayer) {
+    public @Nullable String next(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return null;
         if (iconList.isEmpty()) return null;
 

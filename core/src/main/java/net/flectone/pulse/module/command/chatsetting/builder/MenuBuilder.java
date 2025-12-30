@@ -3,7 +3,7 @@ package net.flectone.pulse.module.command.chatsetting.builder;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;

@@ -18,7 +18,7 @@ import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +57,7 @@ public class BubbleService {
         }, 5L);
     }
 
-    public void addMessage(@NotNull FPlayer sender, @NotNull String message, List<FPlayer> receivers) {
+    public void addMessage(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
         if (!bubbleRenderer.isCorrectPlayer(sender)) return;
 
         Queue<Bubble> bubbleQueue = playerBubbleQueues.computeIfAbsent(
@@ -71,7 +71,7 @@ public class BubbleService {
         bubbleQueue.addAll(bubbles);
     }
 
-    private List<Bubble> splitMessageToBubbles(@NotNull FPlayer sender, @NotNull String message, List<FPlayer> receivers) {
+    private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
         // default bubble

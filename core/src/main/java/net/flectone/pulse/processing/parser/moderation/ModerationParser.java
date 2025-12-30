@@ -1,6 +1,5 @@
 package net.flectone.pulse.processing.parser.moderation;
 
-import lombok.NonNull;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.service.ModerationService;
@@ -10,6 +9,7 @@ import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.jspecify.annotations.NonNull;
 
 public abstract class ModerationParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
 

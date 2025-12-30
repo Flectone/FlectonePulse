@@ -6,8 +6,8 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,7 +90,7 @@ public class FPlayer extends FEntity {
         this.constantName = constantName;
     }
 
-    public boolean isIgnored(@NotNull FPlayer fPlayer) {
+    public boolean isIgnored(@NonNull FPlayer fPlayer) {
         if (ignores.isEmpty()) return false;
 
         return ignores
@@ -106,18 +106,15 @@ public class FPlayer extends FEntity {
         settingsText.put(settingText, value);
     }
 
-    @Nullable
-    public String getSetting(SettingText settingText) {
+    public @Nullable String getSetting(SettingText settingText) {
         return settingsText.get(settingText);
     }
 
-    @NotNull
-    public String getSetting(MessageType messageType) {
+    public @NonNull String getSetting(MessageType messageType) {
         return getSetting(messageType.name());
     }
 
-    @NotNull
-    public String getSetting(String messageType) {
+    public @NonNull String getSetting(String messageType) {
         return isSetting(messageType) ? "1" : "0";
     }
 

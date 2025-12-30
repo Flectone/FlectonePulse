@@ -21,7 +21,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
@@ -138,8 +138,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
         }
     }
 
-    @Nullable
-    public String getMessage(UUID uuid) {
+    public @Nullable String getMessage(UUID uuid) {
         return messageCache.asMap().entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().equals(uuid))

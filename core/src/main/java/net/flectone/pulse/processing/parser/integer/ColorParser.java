@@ -2,7 +2,6 @@ package net.flectone.pulse.processing.parser.integer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
@@ -14,6 +13,7 @@ import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;

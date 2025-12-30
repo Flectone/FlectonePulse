@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.online;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
@@ -21,6 +20,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 

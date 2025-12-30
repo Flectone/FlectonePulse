@@ -2,7 +2,6 @@ package net.flectone.pulse.processing.parser.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -12,6 +11,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 public class PlatformPlayerParser extends PlayerParser {

@@ -10,7 +10,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -30,7 +30,7 @@ public class PlaceholderAPIModule extends AbstractModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NotNull PermissionSetting> permissionBuilder() {
+    public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
         return super.permissionBuilder().add(permission().use());
     }
 

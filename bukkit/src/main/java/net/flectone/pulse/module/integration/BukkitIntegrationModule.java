@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
 import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
@@ -31,6 +30,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Set;

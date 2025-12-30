@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
-import lombok.NonNull;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -27,6 +26,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Set;

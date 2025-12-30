@@ -6,9 +6,9 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Sound;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public record Chat(@Nullable String name, @Nullable Message.Chat.Type config, @Nullable Permission.Message.Chat.Type permission) {
+public record Chat(@Nullable String name, Message.Chat.@Nullable Type config, Permission.Message.Chat.@Nullable Type permission) {
 
     public Pair<Cooldown, PermissionSetting> cooldown() {
         if (config == null) return Pair.of(null, null);

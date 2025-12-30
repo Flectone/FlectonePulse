@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.Strings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,8 +30,7 @@ public class ColorConverter {
 
     private final FLogger fLogger;
 
-    @Nullable
-    public String isCorrect(String color) {
+    public @Nullable String isCorrect(String color) {
         if (color == null) return null;
 
         if (isHex(color)) {

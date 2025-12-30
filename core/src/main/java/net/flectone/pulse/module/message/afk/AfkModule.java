@@ -27,7 +27,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +100,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         });
     }
 
-    public void remove(@NotNull String action, FPlayer fPlayer) {
+    public void remove(@NonNull String action, @NonNull FPlayer fPlayer) {
         taskScheduler.runRegion(fPlayer, () -> {
             if (action.isEmpty()) {
                 fPlayer.removeSetting(SettingText.AFK_SUFFIX);
@@ -118,7 +118,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         });
     }
 
-    private void check(@NotNull FPlayer fPlayer) {
+    private void check(@NonNull FPlayer fPlayer) {
         if (!fPlayer.isOnline()) {
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
 

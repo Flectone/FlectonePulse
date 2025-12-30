@@ -15,8 +15,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translator;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -70,8 +70,7 @@ public class MinecraftTranslationService {
         return packetProvider.getServerVersion().getReleaseName();
     }
 
-    @Nullable
-    public String translate(String key) {
+    public @Nullable String translate(String key) {
         return translations.get(key);
     }
 
@@ -140,12 +139,12 @@ public class MinecraftTranslationService {
         return new Translator() {
 
             @Override
-            public @NotNull Key name() {
+            public @NonNull Key name() {
                 return Key.key("flectonepulse:translation");
             }
 
             @Override
-            public @Nullable MessageFormat translate(final @NotNull String key, final @NotNull Locale locale) {
+            public @Nullable MessageFormat translate(final @NonNull String key, final @NonNull Locale locale) {
                 String translated = translations.get(key);
                 if (translated == null) return null;
 
@@ -153,7 +152,7 @@ public class MinecraftTranslationService {
             }
 
             @Override
-            public @Nullable Component translate(@NotNull TranslatableComponent component, @NotNull Locale locale) {
+            public @Nullable Component translate(@NonNull TranslatableComponent component, @NonNull Locale locale) {
                 String translated = translations.get(component.key());
                 if (translated == null) return null;
 

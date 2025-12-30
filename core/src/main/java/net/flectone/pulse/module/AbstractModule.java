@@ -2,11 +2,11 @@ package net.flectone.pulse.module;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.function.BiPredicate;

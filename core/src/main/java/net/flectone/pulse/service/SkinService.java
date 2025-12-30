@@ -15,7 +15,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,8 +34,7 @@ public class SkinService {
         profilePropertyCache.put(uuid, profileProperty);
     }
 
-    @NotNull
-    public PlayerHeadObjectContents.ProfileProperty getProfilePropertyFromCache(FEntity entity) {
+    public PlayerHeadObjectContents.@NonNull ProfileProperty getProfilePropertyFromCache(FEntity entity) {
         PlayerHeadObjectContents.ProfileProperty profileProperty = profilePropertyCache.getIfPresent(entity.getUuid());
         if (profileProperty != null) return profileProperty;
 
@@ -50,8 +49,7 @@ public class SkinService {
         return profileProperty;
     }
 
-    @NotNull
-    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity entity) {
+    public PlayerHeadObjectContents.@NonNull ProfileProperty getProfileProperty(FEntity entity) {
         // get SkinsRestorer and other integration textures
         PlayerHeadObjectContents.ProfileProperty profileProperty = integrationModule.getProfileProperty(entity);
         if (profileProperty != null) return profileProperty;

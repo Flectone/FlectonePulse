@@ -13,7 +13,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -42,8 +42,7 @@ public class TritonIntegration implements Listener, FIntegration {
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
     }
 
-    @Nullable
-    public String getLocale(FPlayer fPlayer) {
+    public @Nullable String getLocale(FPlayer fPlayer) {
         LanguagePlayer languagePlayer = TritonAPI.getInstance().getPlayerManager().get(fPlayer.getUuid());
         if (languagePlayer == null) return null;
 

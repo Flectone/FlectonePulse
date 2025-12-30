@@ -9,7 +9,7 @@ import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.SenderMapper;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -19,12 +19,12 @@ public class FPlayerMapper implements SenderMapper<CommandSender, FPlayer> {
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
-    public @NotNull FPlayer map(@NotNull CommandSender sender) {
+    public @NonNull FPlayer map(@NonNull CommandSender sender) {
         return fPlayerService.getFPlayer(sender);
     }
 
     @Override
-    public @NotNull CommandSender reverse(@NotNull FPlayer mapped) {
+    public @NonNull CommandSender reverse(@NonNull FPlayer mapped) {
         Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);
         return obj != null ? (CommandSender) obj : Bukkit.getConsoleSender();
     }

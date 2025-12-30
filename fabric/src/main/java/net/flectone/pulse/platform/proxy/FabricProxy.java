@@ -17,7 +17,7 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -88,8 +88,7 @@ public class FabricProxy implements Proxy {
         return true;
     }
 
-    @Nullable
-    public String getChannel() {
+    public @Nullable String getChannel() {
         if (fileFacade.config().proxy().bungeecord()) {
             return "bungeecord:main";
         }

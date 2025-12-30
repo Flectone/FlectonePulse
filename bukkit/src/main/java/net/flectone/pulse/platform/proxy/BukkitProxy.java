@@ -7,12 +7,12 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -66,8 +66,7 @@ public class BukkitProxy implements Proxy {
         return true;
     }
 
-    @Nullable
-    public String getChannel() {
+    public @Nullable String getChannel() {
         if (fileFacade.config().proxy().bungeecord()) {
             return "BungeeCord";
         }

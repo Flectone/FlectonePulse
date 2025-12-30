@@ -1,6 +1,6 @@
 package net.flectone.pulse.util.constant;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -21,8 +21,8 @@ public enum SettingText {
                     settingText -> settingText
             ));
 
-    @Nullable
-    public static SettingText fromString(String string) {
+
+    public static @Nullable SettingText fromString(String string) {
         if (string == null || string.isEmpty()) return null;
 
         return ENUM_BY_KEY.get(string.toUpperCase());

@@ -6,7 +6,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -210,8 +210,7 @@ public class TicTacToe {
         field[rowColumn.first()][rowColumn.second()] = REMOVE_MULTIPLIER * currentPlayerValue;
     }
 
-    @Nullable
-    private Pair<Integer, Integer> parseMove(String move) {
+    private @Nullable Pair<Integer, Integer> parseMove(String move) {
         try {
             String[] stringMove = move.split("-");
 

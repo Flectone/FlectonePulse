@@ -13,7 +13,7 @@ import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class BubbleModule extends AbstractModule {
         return fileFacade.permission().message().bubble();
     }
 
-    public void add(@NotNull FPlayer fPlayer, @NotNull String inputString, List<FPlayer> receivers) {
+    public void add(@NonNull FPlayer fPlayer, @NonNull String inputString, List<FPlayer> receivers) {
         taskScheduler.runRegion(fPlayer, () -> {
             if (isModuleDisabledFor(fPlayer)) return;
 

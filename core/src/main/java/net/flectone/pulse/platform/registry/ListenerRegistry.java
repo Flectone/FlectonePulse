@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.*;
@@ -17,6 +16,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.command.mute.listener.MutePulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,8 +38,7 @@ public class ListenerRegistry implements Registry {
     private final Injector injector;
     private final PacketProvider packetProvider;
 
-    @NonNull
-    public Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
+    public @NonNull Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
         EnumMap<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
         if (enumMap != null) return new EnumMap<>(enumMap);
 

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +23,7 @@ public abstract class AbstractModuleListLocalization<M extends LocalizationSetti
                 .toList();
     }
 
-    @Nullable
-    public String getCurrentMessage(FPlayer fPlayer) {
+    public @Nullable String getCurrentMessage(FPlayer fPlayer) {
         List<String> messages = getAvailableMessages(fPlayer);
         if (messages.isEmpty()) return null;
 
@@ -34,23 +33,20 @@ public abstract class AbstractModuleListLocalization<M extends LocalizationSetti
         return messages.get(playerIndex);
     }
 
-    @Nullable
-    public String getNextMessage(FPlayer fPlayer, boolean random) {
+    public @Nullable String getNextMessage(FPlayer fPlayer, boolean random) {
         int id = fPlayer.getId();
         List<String> messages = getAvailableMessages(fPlayer);
 
         return incrementAndGetMessage(id, random, messages);
     }
 
-    @Nullable
-    public String getNextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
+    public @Nullable String getNextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
         int id = fPlayer.getId() + messages.hashCode();
 
         return incrementAndGetMessage(id, random, messages);
     }
 
-    @Nullable
-    private String incrementAndGetMessage(int id, boolean random, List<String> messages) {
+    private @Nullable String incrementAndGetMessage(int id, boolean random, List<String> messages) {
         if (messages.isEmpty()) return null;
 
         int playerIndex = messageIndexMap.getOrDefault(id, 0);

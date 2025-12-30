@@ -5,7 +5,6 @@ import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FlectonePulse;
@@ -29,6 +28,7 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.net.ServerSocket;

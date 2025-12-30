@@ -1,11 +1,10 @@
 package net.flectone.pulse.module.integration.telegram.model;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.EventMetadata;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Getter
 @SuperBuilder
@@ -14,10 +13,10 @@ public class TelegramMetadata<L extends LocalizationSetting> extends EventMetada
     @NonNull
     private final String userName;
 
-    @NotNull
+    @NonNull
     private final String firstName;
 
-    @NotNull
+    @NonNull
     private final String lastName;
 
     @NonNull

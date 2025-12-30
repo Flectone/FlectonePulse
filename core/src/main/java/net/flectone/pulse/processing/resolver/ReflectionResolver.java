@@ -3,8 +3,8 @@ package net.flectone.pulse.processing.resolver;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -55,11 +55,11 @@ public class ReflectionResolver {
         }
     }
 
-    public boolean hasMethod(@NotNull Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    public boolean hasMethod(@NonNull Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         return resolveMethod(clazz, methodName, parameterTypes) != null;
     }
 
-    public @Nullable Method resolveMethod(@NotNull Class<?> clazz, @NotNull String methodName, Class<?>... parameterTypes) {
+    public @Nullable Method resolveMethod(@NonNull Class<?> clazz, @NonNull String methodName, Class<?>... parameterTypes) {
         try {
             return clazz.getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException e) {
@@ -75,7 +75,7 @@ public class ReflectionResolver {
         return null;
     }
 
-    public @Nullable MethodHandle unreflectMethod(@NotNull Class<?> clazz, @NotNull String methodName, Class<?>... parameterTypes) {
+    public @Nullable MethodHandle unreflectMethod(@NonNull Class<?> clazz, @NonNull String methodName, Class<?>... parameterTypes) {
         return unreflectMethod(resolveMethod(clazz, methodName, parameterTypes));
     }
 

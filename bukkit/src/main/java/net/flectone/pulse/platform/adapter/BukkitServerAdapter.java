@@ -39,8 +39,8 @@ import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -66,12 +66,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private Pair<MethodHandle, Object> getTPSMethodPair;
 
     @Override
-    public void dispatchCommand(@NotNull String command) {
+    public void dispatchCommand(@NonNull String command) {
         taskScheduler.runSync(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
     }
 
     @Override
-    public @NotNull String getTPS() {
+    public @NonNull String getTPS() {
         if (getTPSMethodPair == null) {
             getTPSMethodPair = findGetTPSMethod();
         }
@@ -114,7 +114,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull JsonElement getMOTD() {
+    public @NonNull JsonElement getMOTD() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", Bukkit.getServer().getMotd());
         return jsonObject;
@@ -143,12 +143,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull String getServerCore() {
+    public @NonNull String getServerCore() {
         return Bukkit.getServer().getName();
     }
 
     @Override
-    public @NotNull String getServerUUID() {
+    public @NonNull String getServerUUID() {
         List<World> worlds = Bukkit.getWorlds();
         if (worlds.isEmpty()) return "";
 
@@ -156,12 +156,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull PlatformType getPlatformType() {
+    public @NonNull PlatformType getPlatformType() {
         return PlatformType.BUKKIT;
     }
 
     @Override
-    public boolean hasProject(@NotNull String projectName) {
+    public boolean hasProject(@NonNull String projectName) {
         return Bukkit.getPluginManager().getPlugin(projectName) != null;
     }
 
@@ -176,14 +176,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, @NotNull String lore) {
+    public @NonNull ItemStack buildItemStack(@NonNull FPlayer fPlayer, @NonNull String material, @NonNull String title, @NonNull String lore) {
         String[] stringsLore = lore.split("<br>");
 
         return buildItemStack(fPlayer, material, title, stringsLore.length == 0 ? new String[]{lore} : stringsLore);
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(@NotNull FPlayer fPlayer, @NotNull String material, @NotNull String title, String[] lore) {
+    public @NonNull ItemStack buildItemStack(@NonNull FPlayer fPlayer, @NonNull String material, @NonNull String title, String[] lore) {
         Material itemMaterial;
         try {
             itemMaterial = Material.valueOf(material);
@@ -210,13 +210,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         return buildLegacyItemStack(itemMaterial, componentName, componentLore);
     }
 
-    private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull String title) {
+    private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
         return title.isEmpty()
                 ? Component.empty()
                 : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
     }
 
-    private @NotNull ItemStack buildModernItemStack(@NotNull Material material, @NotNull Component name, @NotNull List<Component> lore) {
+    private @NonNull ItemStack buildModernItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
         return new ItemStack.Builder()
                 .type(SpigotConversionUtil.fromBukkitItemMaterial(material))
                 .component(ComponentTypes.ITEM_NAME, name)
@@ -224,7 +224,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 .build();
     }
 
-    private @NotNull ItemStack buildLegacyItemStack(@NotNull Material material, @NotNull Component name, @NotNull List<Component> lore) {
+    private @NonNull ItemStack buildLegacyItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
@@ -240,7 +240,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull String getItemName(@NotNull Object itemStack) {
+    public @NonNull String getItemName(@NonNull Object itemStack) {
         if (!(itemStack instanceof org.bukkit.inventory.ItemStack bukkitItem)) {
             return "";
         }
@@ -253,20 +253,20 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @Nullable InputStream getResource(@NotNull String path) {
+    public @Nullable InputStream getResource(@NonNull String path) {
         return plugin.getResource(path);
     }
 
     @Override
-    public void saveResource(@NotNull String path) {
+    public void saveResource(@NonNull String path) {
         plugin.saveResource(path, false);
     }
 
-    private @NotNull String getModernItemName(@NotNull Material material) {
+    private @NonNull String getModernItemName(@NonNull Material material) {
         return (material.isBlock() ? "block" : "item") + ".minecraft." + material.toString().toLowerCase();
     }
 
-    private @NotNull String getLegacyItemName(@NotNull org.bukkit.inventory.ItemStack itemStack) {
+    private @NonNull String getLegacyItemName(org.bukkit.inventory.@NonNull ItemStack itemStack) {
         try {
             Object nmsStack = itemStack.getClass()
                     .getMethod("asNMSCopy", org.bukkit.inventory.ItemStack.class)
@@ -280,7 +280,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(@NotNull Object item, @NotNull UUID messageUUID, boolean translatable) {
+    public @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
         Component component = itemStack.getItemMeta() == null

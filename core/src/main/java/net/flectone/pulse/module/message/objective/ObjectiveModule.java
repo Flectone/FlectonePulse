@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUp
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -17,7 +16,8 @@ import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

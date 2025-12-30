@@ -2,7 +2,8 @@ package net.flectone.pulse.util;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class SafeDataOutputStream extends DataOutputStream {
         this.gson = gson;
     }
 
-    public void writeAsJson(Object object) throws IOException {
+    public void writeAsJson(@NonNull Object object) throws IOException {
         String json = gson.toJson(object);
         super.writeUTF(json);
     }

@@ -4,7 +4,7 @@ import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.logging.adapters.LogAdapter;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -18,13 +18,12 @@ import static java.util.Objects.requireNonNull;
 
 public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
 
-    public BukkitIgnoreSnapshotLibraryManager(@NotNull Plugin plugin, @NotNull String directoryName, @NotNull LogAdapter logAdapter) {
+    public BukkitIgnoreSnapshotLibraryManager(@NonNull Plugin plugin, @NonNull String directoryName, @NonNull LogAdapter logAdapter) {
         super(plugin, directoryName, logAdapter);
     }
 
-    @NotNull
     @Override
-    public Path downloadLibrary(@NotNull Library library) {
+    public @NonNull Path downloadLibrary(@NonNull Library library) {
         Path file = saveDirectory.resolve(requireNonNull(library, "library").getPath());
         if (Files.exists(file)) {
             if (library.hasRelocations()) {

@@ -23,7 +23,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -37,23 +37,23 @@ public class MessagePipeline {
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
 
-    public MessageContext createContext(@NotNull String message) {
+    public MessageContext createContext(@NonNull String message) {
         return createContext(FPlayer.UNKNOWN, message);
     }
 
-    public MessageContext createContext(@NotNull FPlayer sender, @NotNull String message) {
+    public MessageContext createContext(@NonNull FPlayer sender, @NonNull String message) {
         return createContext(sender, sender, message);
     }
 
-    public MessageContext createContext(@NotNull FEntity sender, @NotNull FPlayer receiver) {
+    public MessageContext createContext(@NonNull FEntity sender, @NonNull FPlayer receiver) {
         return new MessageContext(UUID.randomUUID(), sender, receiver, null);
     }
 
-    public MessageContext createContext(@NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
+    public MessageContext createContext(@NonNull FEntity sender, @NonNull FPlayer receiver, @NonNull String message) {
         return new MessageContext(UUID.randomUUID(), sender, receiver, message);
     }
 
-    public MessageContext createContext(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
+    public MessageContext createContext(UUID messageUUID, @NonNull FEntity sender, @NonNull FPlayer receiver, @NonNull String message) {
         return new MessageContext(messageUUID, sender, receiver, message);
     }
 
@@ -102,7 +102,7 @@ public class MessagePipeline {
         return GsonComponentSerializer.gson().serializeToTree(build(context));
     }
 
-    public Optional<String> legacyFormat(@NotNull FPlayer fPlayer, @NotNull String message) {
+    public Optional<String> legacyFormat(@NonNull FPlayer fPlayer, @NonNull String message) {
         LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
 
         try {

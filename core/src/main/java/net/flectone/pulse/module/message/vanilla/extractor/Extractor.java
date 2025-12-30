@@ -16,7 +16,7 @@ import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -108,8 +108,7 @@ public class Extractor {
         return Optional.of(parsedComponent);
     }
 
-    @Nullable
-    public Object extractArgument(TranslatableComponent translatableComponent, int index) {
+    public @Nullable Object extractArgument(TranslatableComponent translatableComponent, int index) {
         return getComponent(translatableComponent, index).map(component -> {
             Optional<FEntity> firstFEntity = extractFEntity(component);
 

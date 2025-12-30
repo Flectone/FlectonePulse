@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,17 +48,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final FLogger fLogger;
 
     @Override
-    public @NotNull String getIdentifier() {
+    public @NonNull String getIdentifier() {
         return BuildConfig.PROJECT_NAME;
     }
 
     @Override
-    public @NotNull String getAuthor() {
+    public @NonNull String getAuthor() {
         return BuildConfig.PROJECT_AUTHOR;
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public @NonNull String getVersion() {
         return BuildConfig.PROJECT_VERSION;
     }
 
@@ -75,7 +75,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     }
 
     @Override
-    public String onRequest(OfflinePlayer player, @NotNull String params) {
+    public String onRequest(OfflinePlayer player, @NonNull String params) {
         if (player == null) return null;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
