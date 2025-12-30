@@ -103,7 +103,7 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
     private Component createTabName(FPlayer fPlayer, FPlayer fReceiver) {
         int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), config().mode());
 
-        MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fPlayer).format())
+        MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
                 .addTagResolver(Placeholder.parsed("score", String.valueOf(score)));
         return messagePipeline.build(tabNameContext);
     }
