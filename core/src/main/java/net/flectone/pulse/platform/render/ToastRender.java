@@ -17,12 +17,37 @@ import net.kyori.adventure.text.Component;
 
 import java.util.*;
 
+/**
+ * Renders toast notifications (advancement-style popups) to players.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * ToastRender toastRender = flectonePulse.get(ToastRender.class);
+ *
+ * Toast toast = new Toast(
+ *     Toast.Style.TASK,
+ *     "minecraft:diamond"
+ * );
+ *
+ * toastRender.render(player, Component.text("Achievement Unlocked!"), toast);
+ * }</pre>
+ *
+ * @since 1.7.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ToastRender {
 
     private final PacketProvider packetProvider;
 
+    /**
+     * Renders a toast notification to a player.
+     *
+     * @param fPlayer the player to receive the toast
+     * @param title the title component to display
+     * @param toast the toast configuration including style and icon
+     */
     public void render(FPlayer fPlayer, Component title, Toast toast) {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;

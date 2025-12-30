@@ -13,6 +13,22 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Sends ignore-related messages when players ignore each other.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * IgnoreSender ignoreSender = flectonePulse.get(IgnoreSender.class);
+ *
+ * // Check if players ignore each other
+ * if (ignoreSender.sendIfIgnored(sender, receiver)) {
+ *     // One player is ignoring the other
+ * }
+ * }</pre>
+ *
+ * @since 1.6.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreSender {
@@ -21,6 +37,13 @@ public class IgnoreSender {
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
 
+    /**
+     * Checks if two players ignore each other and sends notification to sender.
+     *
+     * @param sender the player attempting to send a message (receives notification)
+     * @param receiver the target player
+     * @return true if either player ignores the other, false otherwise
+     */
     public boolean sendIfIgnored(FPlayer sender, FPlayer receiver) {
         Localization.Command.Ignore localization = fileFacade.localization(sender).command().ignore();
 

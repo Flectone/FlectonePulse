@@ -14,6 +14,22 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Sends disable messages when chat features are disabled for players.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * DisableSender disableSender = flectonePulse.get(DisableSender.class);
+ *
+ * // Check if private messaging is disabled for receiver
+ * if (disableSender.sendIfDisabled(sender, receiver, MessageType.COMMAND_ME)) {
+ *     // Private messaging is disabled for receiver
+ * }
+ * }</pre>
+ *
+ * @since 1.6.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DisableSender {
@@ -22,6 +38,14 @@ public class DisableSender {
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
 
+    /**
+     * Checks if a message type is disabled for a receiver and sends appropriate message.
+     *
+     * @param entity the entity sending the message
+     * @param receiver the entity receiving the message
+     * @param messageType the type of message being sent
+     * @return true if message type is disabled for receiver, false otherwise
+     */
     public boolean sendIfDisabled(FEntity entity, FEntity receiver, MessageType messageType) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (fReceiver.isUnknown()) return false;

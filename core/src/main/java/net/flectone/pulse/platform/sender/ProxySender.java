@@ -21,6 +21,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Sends messages and data across proxy network connections.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * ProxySender proxySender = flectonePulse.get(ProxySender.class);
+ *
+ * // Send message across proxy network
+ * proxySender.send(MessageType.CHAT, eventMetadata);
+ *
+ * // Send custom data to proxy
+ * proxySender.send(sender, MessageType.CUSTOM, output -> {
+ *     output.writeUTF("custom data");
+ * }, UUID.randomUUID());
+ * }</pre>
+ *
+ * @since 1.0.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxySender {
@@ -31,6 +50,13 @@ public class ProxySender {
     private final Gson gson;
     private final FLogger fLogger;
 
+    /**
+     * Sends event metadata to proxy network.
+     *
+     * @param messageType the type of message being sent
+     * @param eventMetadata the event metadata containing sender and data
+     * @return true if message was sent to at least one proxy, false otherwise
+     */
     public boolean send(MessageType messageType, EventMetadata<?> eventMetadata) {
         ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();
         if (proxyConsumer == null) return false;
@@ -42,10 +68,26 @@ public class ProxySender {
         return send(sender, messageType, proxyConsumer, eventMetadata.getUuid());
     }
 
+    /**
+     * Sends a simple message to proxy network.
+     *
+     * @param sender the entity sending the message
+     * @param tag the message type tag
+     * @return true if message was sent to at least one proxy, false otherwise
+     */
     public boolean send(FEntity sender, MessageType tag) {
         return send(sender, tag, dataOutputStream -> {}, UUID.randomUUID());
     }
 
+    /**
+     * Sends custom data to proxy network.
+     *
+     * @param sender the entity sending the data
+     * @param tag the message type tag
+     * @param outputConsumer consumer to write custom data to output stream
+     * @param metadataUUID unique identifier for this metadata
+     * @return true if data was sent to at least one proxy, false otherwise
+     */
     public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
         boolean isPlayer = sender instanceof FPlayer;
 
@@ -81,11 +123,11 @@ public class ProxySender {
         return sent;
     }
 
-
     private String getConstantName(FPlayer sender) {
         String message = fileFacade.localization(sender).message().format().names().constant();
         if (message.isEmpty()) return "";
 
         return messagePipeline.buildDefault(messagePipeline.createContext(sender, message));
     }
+
 }

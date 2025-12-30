@@ -27,6 +27,20 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
+/**
+ * Sends formatted messages to external integrations (Discord, Telegram, Twitch, etc.)
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * IntegrationSender integrationSender = flectonePulse.get(IntegrationSender.class);
+ *
+ * // Send chat message to external integrations
+ * integrationSender.asyncSend(MessageType.CHAT, "<final_message>", eventMetadata);
+ * }</pre>
+ *
+ * @since 1.5.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IntegrationSender {
@@ -44,10 +58,24 @@ public class IntegrationSender {
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
 
+    /**
+     * Sends a message to integrations asynchronously.
+     *
+     * @param messageType the type of message being sent
+     * @param format the message format string
+     * @param eventMetadata the event metadata containing sender and message
+     */
     public void asyncSend(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
         taskScheduler.runAsync(() -> send(messageType, format, eventMetadata), true);
     }
 
+    /**
+     * Sends a message to integrations
+     *
+     * @param messageType the type of message being sent
+     * @param format the message format string
+     * @param eventMetadata the event metadata containing sender and message
+     */
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
         UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
         if (integrationOperator == null) return;

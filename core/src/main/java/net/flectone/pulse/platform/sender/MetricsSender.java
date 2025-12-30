@@ -13,6 +13,21 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * Sends anonymous metrics data to FlectonePulse servers.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * MetricsSender metricsSender = flectonePulse.get(MetricsSender.class);
+ *
+ * MetricsDTO metrics = ...;
+ *
+ * metricsSender.sendMetrics(metrics);
+ * }</pre>
+ *
+ * @since 0.8.1
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MetricsSender {
@@ -21,6 +36,12 @@ public class MetricsSender {
 
     private final Gson gson;
 
+    /**
+     * Sends metrics data to FlectonePulse API.
+     * Failures are silently ignored to prevent affecting server performance.
+     *
+     * @param metrics the metrics data to send
+     */
     public void sendMetrics(MetricsDTO metrics) {
         try {
             String jsonData = gson.toJson(metrics);

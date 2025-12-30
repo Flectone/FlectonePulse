@@ -21,6 +21,24 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
 
+/**
+ * Sends cooldown messages to players and checks cooldown bypass permissions.
+ *
+ * <p><b>Usage example:</b>
+ * <pre>{@code
+ * CooldownSender cooldownSender = flectonePulse.get(CooldownSender.class);
+ *
+ * Cooldown cooldown = new Cooldown(5000, true); // 5 second cooldown
+ * PermissionSetting permissionByPass = new PermissionSetting("myplugin.bypass", false);
+ *
+ * if (cooldownSender.sendIfCooldown(player, Pair.of(cooldown, permissionByPass))) {
+ *     // Player is on cooldown, action should be blocked
+ * }
+ * }</pre>
+ *
+ * @since 1.6.0
+ * @author TheFaser
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CooldownSender {
@@ -32,12 +50,27 @@ public class CooldownSender {
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
 
+    /**
+     * Checks if an entity is on cooldown and sends a cooldown message if applicable.
+     * Only sends messages to players, not other entities.
+     *
+     * @param entity the entity to check
+     * @param optionalCooldown optional pair of cooldown and permission settings
+     * @return true if cooldown message was sent, false otherwise
+     */
     public boolean sendIfCooldown(FEntity entity, Optional<Pair<Cooldown, PermissionSetting>> optionalCooldown) {
         return optionalCooldown
                 .filter(pair -> sendIfCooldown(entity, pair))
                 .isPresent();
     }
 
+    /**
+     * Checks if a player is on cooldown and sends a formatted cooldown message.
+     *
+     * @param entity the entity to check
+     * @param cooldownPermission pair of cooldown settings and bypass permission
+     * @return true if cooldown message was sent, false otherwise
+     */
     public boolean sendIfCooldown(FEntity entity, Pair<Cooldown, PermissionSetting> cooldownPermission) {
         Cooldown cooldown = cooldownPermission.first();
         if (cooldown == null || !cooldown.enable()) return false;
