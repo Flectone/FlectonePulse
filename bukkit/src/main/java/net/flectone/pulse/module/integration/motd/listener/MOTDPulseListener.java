@@ -8,8 +8,8 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
+import net.flectone.pulse.module.message.status.StatusModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,7 +22,7 @@ public class MOTDPulseListener implements PulseListener {
         if (!motdModule.isHooked()) return event;
 
         AbstractModule eventModule = event.module();
-        if (eventModule instanceof MaintenanceModule && motdModule.config().disableFlectonepulseStatus()) {
+        if (eventModule instanceof StatusModule && motdModule.config().disableFlectonepulseStatus()) {
             return event.withCancelled(true);
         }
 

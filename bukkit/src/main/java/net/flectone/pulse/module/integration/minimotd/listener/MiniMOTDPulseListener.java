@@ -8,8 +8,8 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
+import net.flectone.pulse.module.message.status.StatusModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,9 +22,7 @@ public class MiniMOTDPulseListener implements PulseListener {
         if (!miniMOTDModule.isHooked()) return event;
 
         AbstractModule eventModule = event.module();
-        if (eventModule instanceof MaintenanceModule
-                && miniMOTDModule.config().disableFlectonepulseStatus()
-                && miniMOTDModule.isHooked()) {
+        if (eventModule instanceof StatusModule && miniMOTDModule.config().disableFlectonepulseStatus()) {
             return event.withCancelled(true);
         }
 
