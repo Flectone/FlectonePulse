@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.floodgate.FloodgateModule;
 import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
+import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
@@ -62,6 +63,10 @@ public abstract class IntegrationModule extends AbstractModule {
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("MiniMOTD")) {
+            builder.add(MiniMOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("voicechat")) {

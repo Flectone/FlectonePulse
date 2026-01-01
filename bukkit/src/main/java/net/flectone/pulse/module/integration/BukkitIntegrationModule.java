@@ -4,18 +4,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
-import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
+import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
-import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
+import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
@@ -23,8 +21,9 @@ import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
-import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -93,10 +92,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("Maintenance")) {
             builder.add(MaintenanceModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("MiniMOTD")) {
-            builder.add(MiniMOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
