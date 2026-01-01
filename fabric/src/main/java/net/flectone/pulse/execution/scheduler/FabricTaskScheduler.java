@@ -78,19 +78,19 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsyncLater(SchedulerRunnable runnable, long tick) {
+    public void runAsyncLater(SchedulerRunnable runnable, long delay) {
         if (disabled) return;
 
-        long firstTick = currentTick.get() + tick;
+        long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, true);
         registerTask(firstTick, task);
     }
 
     @Override
-    public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
+    public void runAsyncTimer(SchedulerRunnable runnable, long delay, long period) {
         if (disabled) return;
 
-        long firstTick = currentTick.get() + tick;
+        long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
         registerTask(firstTick, task);
     }
@@ -110,19 +110,19 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncLater(SchedulerRunnable runnable, long tick) {
+    public void runSyncLater(SchedulerRunnable runnable, long delay) {
         if (disabled) return;
 
-        long firstTick = currentTick.get() + tick;
+        long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
         registerTask(firstTick, task);
     }
 
     @Override
-    public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
+    public void runSyncTimer(SchedulerRunnable runnable, long delay, long period) {
         if (disabled) return;
 
-        long firstTick = currentTick.get() + tick;
+        long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, false);
         registerTask(firstTick, task);
     }
@@ -133,24 +133,24 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long tick) {
-        runAsyncLater(runnable, tick);
+    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay) {
+        runAsyncLater(runnable, delay);
     }
 
     @Override
-    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick, long period) {
-        runAsyncTimer(runnable, tick, period);
+    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period) {
+        runAsyncTimer(runnable, delay, period);
     }
 
     @Override
-    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long tick) {
+    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
         if (disabled) return;
 
         runAsyncTimer(() -> {
             for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
                 runAsync(() -> fPlayerConsumer.accept(fPlayer));
             }
-        }, tick);
+        }, delay);
     }
 
     @Override

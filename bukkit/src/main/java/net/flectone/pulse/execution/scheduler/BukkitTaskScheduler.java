@@ -57,17 +57,17 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsyncLater(SchedulerRunnable runnable, long tick) {
+    public void runAsyncLater(SchedulerRunnable runnable, long delay) {
         if (disabled) return;
 
-        taskScheduler.runTaskLaterAsynchronously(() -> wrapExceptionRunnable(runnable).run(), tick);
+        taskScheduler.runTaskLaterAsynchronously(() -> wrapExceptionRunnable(runnable).run(), delay);
     }
 
     @Override
-    public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
+    public void runAsyncTimer(SchedulerRunnable runnable, long delay, long period) {
         if (disabled) return;
 
-        taskScheduler.runTaskTimerAsynchronously(() -> wrapExceptionRunnable(runnable).run(), tick, period);
+        taskScheduler.runTaskTimerAsynchronously(() -> wrapExceptionRunnable(runnable).run(), delay, period);
     }
 
     @Override
@@ -83,17 +83,17 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncLater(SchedulerRunnable runnable, long tick) {
+    public void runSyncLater(SchedulerRunnable runnable, long delay) {
         if (disabled) return;
 
-        taskScheduler.runTaskLater(() -> wrapExceptionRunnable(runnable).run(), tick);
+        taskScheduler.runTaskLater(() -> wrapExceptionRunnable(runnable).run(), delay);
     }
 
     @Override
-    public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
+    public void runSyncTimer(SchedulerRunnable runnable, long delay, long period) {
         if (disabled) return;
 
-        taskScheduler.runTaskTimer(() -> wrapExceptionRunnable(runnable).run(), tick, period);
+        taskScheduler.runTaskTimer(() -> wrapExceptionRunnable(runnable).run(), delay, period);
     }
 
     @Override
@@ -128,50 +128,50 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long tick) {
+    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay) {
         if (disabled) return;
 
         if (!reflectionResolver.isFolia()) {
-            runAsyncLater(runnable, tick);
+            runAsyncLater(runnable, delay);
             return;
         }
 
         Object entity = platformPlayerAdapterProvider.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
         if (!(entity instanceof Entity bukkitEntity)) {
-            runAsyncLater(runnable, tick);
+            runAsyncLater(runnable, delay);
             return;
         }
 
-        taskScheduler.runTaskLater(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), tick);
+        taskScheduler.runTaskLater(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), delay);
     }
 
     @Override
-    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick, long period) {
+    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period) {
         if (disabled) return;
 
         if (!reflectionResolver.isFolia()) {
-            runAsyncTimer(runnable, tick, period);
+            runAsyncTimer(runnable, delay, period);
             return;
         }
 
         Object entity = platformPlayerAdapterProvider.get().convertToPlatformPlayer(convertUnknownFPlayer(fPlayer));
         if (!(entity instanceof Entity bukkitEntity)) {
-            runAsyncTimer(runnable, tick, period);
+            runAsyncTimer(runnable, delay, period);
             return;
         }
 
-        taskScheduler.runTaskTimer(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), tick, period);
+        taskScheduler.runTaskTimer(bukkitEntity, () -> wrapExceptionRunnable(runnable).run(), delay, period);
     }
 
     @Override
-    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long tick) {
+    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
         if (disabled) return;
 
         runAsyncTimer(() -> {
             for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
                 runRegion(fPlayer, () -> fPlayerConsumer.accept(fPlayer));
             }
-        }, tick);
+        }, delay);
     }
 
     @Override

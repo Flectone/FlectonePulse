@@ -35,18 +35,18 @@ public interface TaskScheduler {
      * Runs a task asynchronously after a delay.
      *
      * @param runnable the task to run
-     * @param tick the delay in ticks (1 tick = 50ms)
+     * @param delay the delay in ticks (1 tick = 50ms)
      */
-    void runAsyncLater(SchedulerRunnable runnable, long tick);
+    void runAsyncLater(SchedulerRunnable runnable, long delay);
 
     /**
      * Runs a repeating task asynchronously.
      *
      * @param runnable the task to run
-     * @param tick the initial delay in ticks
+     * @param delay the initial delay in ticks
      * @param period the period between executions in ticks
      */
-    void runAsyncTimer(SchedulerRunnable runnable, long tick, long period);
+    void runAsyncTimer(SchedulerRunnable runnable, long delay, long period);
 
     /**
      * Runs a task synchronously on the main server thread.
@@ -59,18 +59,18 @@ public interface TaskScheduler {
      * Runs a task synchronously after a delay.
      *
      * @param runnable the task to run
-     * @param tick the delay in ticks
+     * @param delay the delay in ticks
      */
-    void runSyncLater(SchedulerRunnable runnable, long tick);
+    void runSyncLater(SchedulerRunnable runnable, long delay);
 
     /**
      * Runs a repeating task synchronously.
      *
      * @param runnable the task to run
-     * @param tick the initial delay in ticks
+     * @param delay the initial delay in ticks
      * @param period the period between executions in ticks
      */
-    void runSyncTimer(SchedulerRunnable runnable, long tick, long period);
+    void runSyncTimer(SchedulerRunnable runnable, long delay, long period);
 
     /**
      * Runs a task in the player's region.
@@ -90,9 +90,9 @@ public interface TaskScheduler {
      *
      * @param fPlayer the player whose region to use
      * @param runnable the task to run
-     * @param tick the delay in ticks
+     * @param delay the delay in ticks
      */
-    void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long tick);
+    void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay);
 
     /**
      * Runs a repeating task in the player's region.
@@ -101,10 +101,10 @@ public interface TaskScheduler {
      *
      * @param fPlayer the player whose region to use
      * @param runnable the task to run
-     * @param tick the initial delay in ticks
+     * @param delay the initial delay in ticks
      * @param period the period between executions in ticks
      */
-    void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick, long period);
+    void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period);
 
     /**
      * Runs a repeating task for all players in their respective regions.
@@ -112,9 +112,9 @@ public interface TaskScheduler {
      * Otherwise: executes asynchronously.
      *
      * @param fPlayerConsumer the consumer to apply to each player
-     * @param tick the period between executions in ticks
+     * @param delay the period between executions in ticks
      */
-    void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long tick);
+    void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay);
 
     /**
      * Wraps a runnable with exception handling.
