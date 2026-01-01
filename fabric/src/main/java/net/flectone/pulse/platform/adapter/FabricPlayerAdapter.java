@@ -275,9 +275,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean isConsole(@NonNull Object platformPlayer) {
-        return platformPlayer instanceof ServerCommandSource source
-                && source.getEntity() == null
-                && source.getServer().isDedicated();
+        return platformPlayer instanceof ServerCommandSource source && source.getPlayer() == null;
     }
 
     @Override

@@ -25,8 +25,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
@@ -208,7 +207,17 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean isConsole(@NonNull Object player) {
-        return player instanceof ConsoleCommandSender;
+        return switch (player) {
+            case ProxiedCommandSender proxiedCommandSender -> isConsoleSender(proxiedCommandSender.getCallee());
+            case CommandSender commandSender -> isConsoleSender(commandSender);
+            default -> false;
+        };
+    }
+
+    private boolean isConsoleSender(CommandSender commandSender) {
+        return commandSender instanceof ConsoleCommandSender
+                || commandSender instanceof RemoteConsoleCommandSender
+                || commandSender instanceof BlockCommandSender; // we cannot check whether block is a console or not, but its execution must mean a console
     }
 
     @Override
