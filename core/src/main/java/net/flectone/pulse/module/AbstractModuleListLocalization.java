@@ -6,16 +6,24 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractModuleListLocalization<M extends LocalizationSetting> extends AbstractModuleLocalization<M> {
 
-    private final HashMap<Integer, Integer> messageIndexMap = new HashMap<>();
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     @Inject private RandomUtil randomUtil;
 
     public abstract List<String> getAvailableMessages(FPlayer fPlayer);
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        messageIndexMap.clear();
+    }
 
     public List<String> joinMultiList(List<List<String>> values) {
         return values.stream()
