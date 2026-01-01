@@ -67,6 +67,15 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
             return;
         }
 
+        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+            sendErrorMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Kick::lowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
         String promptMessage = getPrompt(1);
         Optional<String> optionalReason = commandContext.optional(promptMessage);
         String reason = optionalReason.orElse(null);

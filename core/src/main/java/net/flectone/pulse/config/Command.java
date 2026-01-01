@@ -483,6 +483,7 @@ public record Command(
     @Jacksonized
     public record Kick(
             Boolean enable,
+            Boolean checkGroupWeight,
             Range range,
             List<String> aliases,
             Destination destination,

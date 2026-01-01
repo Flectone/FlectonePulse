@@ -448,6 +448,7 @@ public record Localization(
         @Jacksonized
         public record Kick(
                 String nullPlayer,
+                String lowerWeightGroup,
                 ReasonMap reasons,
                 String server,
                 String person

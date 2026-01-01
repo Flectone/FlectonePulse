@@ -224,6 +224,7 @@ command:
     footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot kick a player with equal or higher permissions"
     reasons:
       default: "Kicked by an operator"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>kicked <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"

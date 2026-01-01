@@ -224,6 +224,7 @@ command:
     footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь кикнуть игрока с такими же или большими правами"
     reasons:
       default: "Исключён модератором"
     server: "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> исключил <fcolor:2><player><fcolor:1> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"

@@ -505,6 +505,7 @@ ignorelist:
     enable: false
 kick:
   enable: true
+  check_group_weight: true
   range: "PROXY"
   aliases:
   - "kick"
