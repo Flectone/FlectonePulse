@@ -14,9 +14,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -29,7 +28,6 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
-    private final FPlayerService fPlayerService;
 
     @Override
     public void onEnable() {

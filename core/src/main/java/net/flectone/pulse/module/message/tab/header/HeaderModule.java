@@ -16,9 +16,8 @@ import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.tab.header.listener.HeaderPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,15 +28,12 @@ import java.util.List;
 public class HeaderModule extends AbstractModuleListLocalization<Localization.Message.Tab.Header> {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final PacketSender packetSender;
 
     @Override
     public void onEnable() {
-        fPlayerService.getPlatformFPlayers().forEach(this::send);
-
         super.onEnable();
 
         Ticker ticker = config().ticker();
