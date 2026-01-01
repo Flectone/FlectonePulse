@@ -93,7 +93,6 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
     public MessageContext addTag(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.DELETE.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
         FPlayer receiver = messageContext.receiver();

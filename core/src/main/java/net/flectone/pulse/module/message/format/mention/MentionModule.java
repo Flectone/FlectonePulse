@@ -18,6 +18,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -108,8 +109,6 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public MessageContext addTags(MessageContext messageContext) {
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.MENTION.getTagName())) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

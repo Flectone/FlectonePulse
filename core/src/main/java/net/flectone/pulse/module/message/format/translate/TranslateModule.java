@@ -88,8 +88,6 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public MessageContext addTag(MessageContext messageContext, UUID key) {
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.TRANSLATE.getTagName())) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

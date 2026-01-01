@@ -126,8 +126,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     public MessageContext addTags(MessageContext messageContext) {
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName())) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

@@ -81,7 +81,6 @@ public class ObjectModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public MessageContext addPlayerHeadTag(MessageContext messageContext) {
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName())) return messageContext;
         if (!config().playerHead()) return messageContext;
 
         FEntity sender = messageContext.sender();
@@ -141,7 +140,6 @@ public class ObjectModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.SPRITE.getTagName())) return messageContext;
         if (!config().sprite()) return messageContext;
 
         FEntity sender = messageContext.sender();

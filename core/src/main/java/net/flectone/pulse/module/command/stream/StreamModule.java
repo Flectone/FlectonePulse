@@ -167,7 +167,6 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     public MessageContext addTag(MessageContext messageContext) {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-        if (!messageContext.message().contains(MessagePipeline.ReplacementTag.STREAM_PREFIX.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
