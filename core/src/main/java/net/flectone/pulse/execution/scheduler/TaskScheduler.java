@@ -155,34 +155,34 @@ public interface TaskScheduler {
     }
 
     /**
-     * Runs a repeating task asynchronously with same initial delay and period.
+     * Runs a repeating task asynchronously with period.
      *
      * @param runnable the task to run
-     * @param tick both initial delay and period in ticks
+     * @param period period in ticks
      */
-    default void runAsyncTimer(SchedulerRunnable runnable, long tick) {
-        runAsyncTimer(runnable, tick, tick);
+    default void runAsyncTimer(SchedulerRunnable runnable, long period) {
+        runAsyncTimer(runnable, 0L, period);
     }
 
     /**
-     * Runs a repeating task synchronously with same initial delay and period.
+     * Runs a repeating task synchronously with period.
      *
      * @param runnable the task to run
-     * @param tick both initial delay and period in ticks
+     * @param period period in ticks
      */
-    default void runSyncTimer(SchedulerRunnable runnable, long tick) {
-        runSyncTimer(runnable, tick, tick);
+    default void runSyncTimer(SchedulerRunnable runnable, long period) {
+        runSyncTimer(runnable, 0L, period);
     }
 
     /**
-     * Runs a repeating task in the player's region with same initial delay and period.
+     * Runs a repeating task in the player's region with period.
      *
      * @param fPlayer the player whose region to use
      * @param runnable the task to run
-     * @param tick both initial delay and period in ticks
+     * @param period period in ticks
      */
-    default void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long tick) {
-        runRegionTimer(fPlayer, runnable, tick, tick);
+    default void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long period) {
+        runRegionTimer(fPlayer, runnable, 0L, period);
     }
 
     /**

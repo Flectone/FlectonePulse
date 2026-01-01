@@ -26,7 +26,7 @@ public class MetricsService {
     private final ModuleController moduleController;
 
     public void reload() {
-        taskScheduler.runAsyncTimer(this::send, 0L, 20L * 60 * 60);
+        taskScheduler.runAsyncTimer(this::send, 20L * 60 * 60);
     }
 
     public void send() {

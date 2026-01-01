@@ -263,7 +263,7 @@ public class DiscordIntegration implements FIntegration {
 
         if (channelInfo.enable() && channelInfo.ticker().enable()) {
             long period = channelInfo.ticker().period();
-            taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period, period);
+            taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period);
             updateChannelInfo();
         }
 
