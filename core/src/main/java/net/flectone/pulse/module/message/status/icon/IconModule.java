@@ -16,14 +16,14 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IconModule extends AbstractModule {
 
-    private final List<String> iconList = new ArrayList<>();
+    private final List<String> iconList = new CopyOnWriteArrayList<>();
 
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
