@@ -23,8 +23,10 @@
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.9.0",
-		"fabric-api-base": "*",
-		"packetevents": ">=2.11.0"
+      "fabricloader": ">=0.9.0",
+      "minecraft": "~1.21.11",
+      "java": ">=21",
+      "fabric-api-base": "*",
+      "packetevents": ">=2.11.1"
 	}
 }
