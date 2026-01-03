@@ -167,7 +167,7 @@ public class BubbleService {
         try {
             bubbleState.activeBubbles.removeIf(bubble -> {
                 if (!bubble.isExpired()) return false;
-                bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getId() == bubble.getId());
+                bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().equals(bubble));
                 return true;
             });
 
@@ -207,7 +207,7 @@ public class BubbleService {
         state.lock.lock();
         try {
             state.waitingQueue.clear();
-            state.activeBubbles.forEach(bubble -> bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getId() == bubble.getId()));
+            state.activeBubbles.forEach(bubble -> bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().equals(bubble)));
             state.activeBubbles.clear();
         } finally {
             state.lock.unlock();

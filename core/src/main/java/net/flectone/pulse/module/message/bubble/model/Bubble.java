@@ -41,4 +41,9 @@ public class Bubble {
     public boolean isExpired() {
         return System.currentTimeMillis() > creationTime + duration;
     }
+
+    public boolean equals(Bubble bubble) {
+        return this.id == bubble.getId();
+    }
+
 }
