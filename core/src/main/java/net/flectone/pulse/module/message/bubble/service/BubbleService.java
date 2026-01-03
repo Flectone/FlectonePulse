@@ -55,6 +55,7 @@ public class BubbleService {
 
             processBubbleQueue(fPlayer.getUuid(), bubbles);
         }, 5L);
+            }, bubbleTicker.period());
     }
 
     public void addMessage(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {

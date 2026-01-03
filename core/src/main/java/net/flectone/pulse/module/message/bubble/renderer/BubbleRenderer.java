@@ -86,6 +86,7 @@ public class BubbleRenderer {
         nearbyEntitiesFuture.thenAcceptAsync(nearbyEntities -> nearbyEntities
                 .stream()
                 .map(fPlayerService::getFPlayer)
+                .filter(fViewer -> config.visibleToSelf() || !fViewer.equals(sender))
                 .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !fViewer.isIgnored(sender))

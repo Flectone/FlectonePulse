@@ -177,6 +177,7 @@ public record Message(
     @Jacksonized
     public record Bubble(
             Boolean enable,
+            Boolean visibleToSelf,
             Integer maxCount,
             Integer maxLength,
             Float elevation,
@@ -185,7 +186,8 @@ public record Message(
             Double handicapChars,
             String wordBreakHint,
             Interaction interaction,
-            Modern modern
+            Modern modern,
+            Ticker ticker
     ) implements EnableSetting {
 
         @With
