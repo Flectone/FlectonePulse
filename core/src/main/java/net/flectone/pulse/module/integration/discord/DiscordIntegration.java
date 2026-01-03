@@ -192,13 +192,11 @@ public class DiscordIntegration implements FIntegration {
         }
 
         Localization.Integration.Discord.Embed.Author author = embed.author();
-        if (StringUtils.isNotEmpty(author.name())
-                || StringUtils.isNotEmpty(author.url())
-                || StringUtils.isNotEmpty(author.iconUrl())) {
+        if (author != null) {
             embedBuilder.author(
-                    discordString.apply(author.name()),
-                    replaceSkin.apply(author.url()),
-                    replaceSkin.apply(author.iconUrl())
+                    discordString.apply(StringUtils.defaultString(author.name())),
+                    replaceSkin.apply(StringUtils.defaultString(author.url())),
+                    replaceSkin.apply(StringUtils.defaultString(author.iconUrl()))
             );
         }
 
@@ -214,15 +212,15 @@ public class DiscordIntegration implements FIntegration {
             embedBuilder.image(replaceSkin.apply(embed.image()));
         }
 
-        if (embed.timestamp()) {
+        if (Boolean.TRUE.equals(embed.timestamp())) {
             embedBuilder.timestamp(Instant.now());
         }
 
         Localization.Integration.Discord.Embed.Footer footer = embed.footer();
-        if (StringUtils.isNotEmpty(footer.text()) || StringUtils.isNotEmpty(footer.iconUrl())) {
+        if (footer != null) {
             embedBuilder.footer(
-                    discordString.apply(footer.text()),
-                    replaceSkin.apply(footer.iconUrl())
+                    discordString.apply(StringUtils.defaultString(footer.text())),
+                    replaceSkin.apply(StringUtils.defaultString(footer.iconUrl()))
             );
         }
 
@@ -230,7 +228,7 @@ public class DiscordIntegration implements FIntegration {
             for (Localization.Integration.Discord.Embed.Field field : embed.fields()) {
                 if (StringUtils.isEmpty(field.name()) || StringUtils.isEmpty(field.value())) continue;
 
-                embedBuilder.addField(field.name(), field.value(), field.inline());
+                embedBuilder.addField(field.name(), field.value(), Boolean.TRUE.equals(field.inline()));
             }
         }
 
