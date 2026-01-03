@@ -15,14 +15,15 @@ import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -38,7 +39,13 @@ public class BubbleService {
             MessageFlag.REPLACE_DISABLED_TAGS, false
     );
 
-    private final Map<UUID, Queue<Bubble>> playerBubbleQueues = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerBubbleState> playerBubbleStates = new ConcurrentHashMap<>();
+
+    private record PlayerBubbleState(
+            Queue<Bubble> waitingQueue,
+            Queue<Bubble> activeBubbles,
+            ReentrantLock lock
+    ) {}
 
     private final FileFacade fileFacade;
     private final BubbleRenderer bubbleRenderer;
@@ -50,26 +57,25 @@ public class BubbleService {
 
     public void startTicker() {
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
-            Queue<Bubble> bubbles = playerBubbleQueues.get(fPlayer.getUuid());
-            if (bubbles == null) return;
+            PlayerBubbleState state = playerBubbleStates.get(fPlayer.getUuid());
+            if (state == null) return;
 
-            processBubbleQueue(fPlayer.getUuid(), bubbles);
-        }, 5L);
-            }, bubbleTicker.period());
+            processBubbleQueue(fPlayer.getUuid(), state);
+        }, 1L);
     }
 
     public void addMessage(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
         if (!bubbleRenderer.isCorrectPlayer(sender)) return;
 
-        Queue<Bubble> bubbleQueue = playerBubbleQueues.computeIfAbsent(
-                sender.getUuid(), 
-                uuid -> new ConcurrentLinkedQueue<>()
+        PlayerBubbleState state = playerBubbleStates.computeIfAbsent(
+                sender.getUuid(),
+                uuid -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
         );
 
         MessageContext messageContext = messagePipeline.createContext(sender, message).withFlags(PLAIN_MESSAGE_FLAGS);
         List<Bubble> bubbles = splitMessageToBubbles(sender, messagePipeline.buildPlain(messageContext), receivers);
 
-        bubbleQueue.addAll(bubbles);
+        state.waitingQueue.addAll(bubbles);
     }
 
     private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
@@ -155,42 +161,64 @@ public class BubbleService {
                 .build();
     }
 
-    private void processBubbleQueue(UUID playerUuid, Queue<Bubble> bubbleQueue) {
-        if (bubbleQueue == null || bubbleQueue.isEmpty()) {
-            playerBubbleQueues.remove(playerUuid);
-            return;
-        }
+    private void processBubbleQueue(UUID playerUuid, PlayerBubbleState bubbleState) {
+        if (!bubbleState.lock.tryLock()) return;
 
-        int maxCount = fileFacade.message().bubble().maxCount();
-
-        bubbleQueue.removeIf(bubble -> {
-            if (bubble.isExpired()) {
+        try {
+            bubbleState.activeBubbles.removeIf(bubble -> {
+                if (!bubble.isExpired()) return false;
                 bubbleRenderer.removeBubble(bubble);
                 return true;
+            });
+
+            int maxCount = fileFacade.message().bubble().maxCount();
+            if (bubbleState.activeBubbles.size() >= maxCount) {
+                return;
             }
 
-            return false;
-        });
+            Bubble nextBubble = bubbleState.waitingQueue.poll();
+            if (nextBubble != null && !nextBubble.isCreated()) {
+                bubbleRenderer.renderBubble(nextBubble);
+                bubbleState.activeBubbles.add(nextBubble);
+            }
 
-        bubbleQueue.stream()
-                .limit(maxCount)
-                .filter(bubble -> !bubble.isCreated())
-                .forEach(bubbleRenderer::renderBubble);
+            if (bubbleState.waitingQueue.isEmpty() && bubbleState.activeBubbles.isEmpty()) {
+                playerBubbleStates.remove(playerUuid);
+            }
+        } finally {
+            bubbleState.lock.unlock();
+        }
     }
 
     public void clear(FPlayer fPlayer) {
-        Queue<Bubble> bubbleQueue = playerBubbleQueues.get(fPlayer.getUuid());
-        if (bubbleQueue == null) return;
+        PlayerBubbleState state = playerBubbleStates.remove(fPlayer.getUuid());
+        if (state == null) return;
 
-        bubbleQueue.forEach(bubbleRenderer::removeBubble);
-        playerBubbleQueues.remove(fPlayer.getUuid());
+        state.lock.lock();
+        try {
+            state.waitingQueue.clear();
+            state.activeBubbles.forEach(bubbleRenderer::removeBubble);
+            state.activeBubbles.clear();
+        } finally {
+            state.lock.unlock();
+        }
     }
 
     public void clear() {
-        playerBubbleQueues.clear();
+        playerBubbleStates.forEach((uuid, state) -> {
+            state.lock.lock();
+            try {
+                state.waitingQueue.clear();
+                state.activeBubbles.forEach(bubbleRenderer::removeBubble);
+                state.activeBubbles.clear();
+            } finally {
+                state.lock.unlock();
+            }
+        });
+        playerBubbleStates.clear();
         bubbleRenderer.removeAllBubbles();
     }
-    
+
     private long calculateDuration(String message) {
         Message.Bubble config = fileFacade.message().bubble();
 
