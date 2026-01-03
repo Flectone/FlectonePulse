@@ -167,7 +167,7 @@ public class BubbleService {
         try {
             bubbleState.activeBubbles.removeIf(bubble -> {
                 if (!bubble.isExpired()) return false;
-                bubbleRenderer.removeBubble(bubble);
+                bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getId() == bubble.getId());
                 return true;
             });
 
@@ -194,29 +194,24 @@ public class BubbleService {
         PlayerBubbleState state = playerBubbleStates.remove(fPlayer.getUuid());
         if (state == null) return;
 
+        clearBubbleState(state);
+    }
+
+    public void clear() {
+        playerBubbleStates.forEach((uuid, state) -> clearBubbleState(state));
+        playerBubbleStates.clear();
+        bubbleRenderer.removeAllBubbles();
+    }
+
+    private void clearBubbleState(PlayerBubbleState state) {
         state.lock.lock();
         try {
             state.waitingQueue.clear();
-            state.activeBubbles.forEach(bubbleRenderer::removeBubble);
+            state.activeBubbles.forEach(bubble -> bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getId() == bubble.getId()));
             state.activeBubbles.clear();
         } finally {
             state.lock.unlock();
         }
-    }
-
-    public void clear() {
-        playerBubbleStates.forEach((uuid, state) -> {
-            state.lock.lock();
-            try {
-                state.waitingQueue.clear();
-                state.activeBubbles.forEach(bubbleRenderer::removeBubble);
-                state.activeBubbles.clear();
-            } finally {
-                state.lock.unlock();
-            }
-        });
-        playerBubbleStates.clear();
-        bubbleRenderer.removeAllBubbles();
     }
 
     private long calculateDuration(String message) {

@@ -92,7 +92,7 @@ public class TextScreenRender {
         int playerId = platformPlayerAdapter.getEntityId(fPlayer.getUuid());
 
         addAndRide(fPlayer.getUuid(), playerId, entityId);
-        bubbleRenderer.get().rideEntities(fPlayer, fPlayer);
+        bubbleRenderer.get().removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getSender().equals(fPlayer));
 
         if (textScreen.hasAnimation()) {
             animationSpawn(fPlayer, textScreen, entityId);

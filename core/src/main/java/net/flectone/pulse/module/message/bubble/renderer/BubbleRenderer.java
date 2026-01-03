@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Predicate;
 
 /**
  * Responsible for rendering bubbles above players' heads
@@ -119,12 +120,12 @@ public class BubbleRenderer {
         rideEntities(sender, fViewer);
     }
 
-    public void removeBubble(Bubble bubble) {
+    public void removeBubbleIf(Predicate<BubbleEntity> bubbleEntityPredicate) {
         activeBubbleEntities.forEach((uuid, bubbleEntities) -> {
             if (bubbleEntities.isEmpty()) return;
 
             List<BubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
-                    .filter(bubbleEntity -> bubbleEntity.getBubble().getId() == bubble.getId())
+                    .filter(bubbleEntityPredicate)
                     .toList();
 
             if (bubbleEntitiesToRemove.isEmpty()) return;
@@ -136,7 +137,9 @@ public class BubbleRenderer {
             bubbleEntities.removeAll(bubbleEntitiesToRemove);
 
             // remove space
-            rideEntities(bubble.getSender(), bubbleEntitiesToRemove.getFirst().getViewer());
+            BubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
+
+            rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
         });
     }
 
@@ -208,7 +211,7 @@ public class BubbleRenderer {
                 .addTagResolver(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
         );
     }
-    
+
     private BubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {
         int id = platformServerAdapter.generateEntityId();
 
@@ -290,7 +293,6 @@ public class BubbleRenderer {
         packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(bubbleEntity.getId(), metadataList));
     }
 
-
     private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity, boolean isFirstBubble) {
         List<EntityData<?>> metadataList = new ArrayList<>();
 
@@ -334,26 +336,17 @@ public class BubbleRenderer {
         }
 
         if (entityType == EntityTypes.AREA_EFFECT_CLOUD) {
-            // text
             metadataList.add(new EntityData<>(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(message)));
-
-            // custom name visible
-            boolean visibleName = bubbleEntity.isVisible();
-            metadataList.add(new EntityData<>(3, EntityDataTypes.BOOLEAN, visibleName));
-
-            // radius
+            metadataList.add(new EntityData<>(3, EntityDataTypes.BOOLEAN, bubbleEntity.isVisible()));
             metadataList.add(new EntityData<>(entityUtil.areaEffectCloudRadiusIndex(), EntityDataTypes.FLOAT, 0f));
 
             return metadataList;
         }
 
         if (entityType == EntityTypes.INTERACTION) {
-            // width
             metadataList.add(new EntityData<>(8, EntityDataTypes.FLOAT, (float) 0.000001));
 
             Bubble bubble = bubbleEntity.getBubble();
-
-            // height
             float height = isFirstBubble ? bubble.getElevation() : bubble.getInteractionHeight();
             metadataList.add(new EntityData<>(9, EntityDataTypes.FLOAT, height));
 
@@ -368,6 +361,7 @@ public class BubbleRenderer {
 
         return platformPlayerAdapter.getGamemode(sender) != GameMode.SPECTATOR
                 && !platformPlayerAdapter.hasPotionEffect(sender, PotionTypes.INVISIBILITY)
+                && textScreenRender.getPassengers(sender.getUuid()).isEmpty()
                 && passengers.isEmpty();
     }
 }
