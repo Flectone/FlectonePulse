@@ -50,15 +50,13 @@ public class SkinService {
     }
 
     public PlayerHeadObjectContents.@NonNull ProfileProperty getProfileProperty(FEntity entity) {
-        // get SkinsRestorer and other integration textures
-        PlayerHeadObjectContents.ProfileProperty profileProperty = integrationModule.getProfileProperty(entity);
+        // get Platform Player textures
+        PlayerHeadObjectContents.ProfileProperty profileProperty = platformPlayerAdapter.getTexture(entity.getUuid());
         if (profileProperty != null) return profileProperty;
 
-        // get Platform Player textures
-        profileProperty = platformPlayerAdapter.getTexture(entity.getUuid());
-        if (profileProperty != null) {
-            return profileProperty;
-        }
+        // get SkinsRestorer and other integration textures
+        profileProperty = integrationModule.getProfileProperty(entity);
+        if (profileProperty != null) return profileProperty;
 
         // get PacketEvents user textures
         User user = packetProvider.getUser(entity.getUuid());
