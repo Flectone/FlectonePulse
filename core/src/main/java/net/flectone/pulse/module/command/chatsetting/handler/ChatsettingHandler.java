@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -13,19 +13,23 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -36,6 +40,7 @@ public class ChatsettingHandler {
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
+    private final FLogger fLogger;
 
     public Permission.Message.Chat chatPermission() {
         return fileFacade.permission().message().chat();
@@ -106,11 +111,20 @@ public class ChatsettingHandler {
             return message;
         };
 
-        Consumer<SubMenuItem> onSelect = item -> fTarget.getFColors().put(type, item.colors().entrySet()
-                .stream()
-                .filter(entry -> !entry.getValue().isBlank())
-                .map(entry -> new FColor(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toSet())
+        // replace old fcolors to new and not save new empty fcolors
+        Consumer<SubMenuItem> onSelect = item -> fTarget.getFColors().put(type,
+                Stream.concat(fTarget.getFColors().getOrDefault(type, Set.of()).stream(), item.colors().entrySet().stream()
+                                .filter(entry -> StringUtils.isNotEmpty(entry.getValue()))
+                                .map(entry -> new FColor(entry.getKey(), entry.getValue()))
+                )
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toUnmodifiableMap(
+                                FColor::number,
+                                Function.identity(),
+                                (oldFColor, newFColor) -> newFColor
+                        ),
+                        map -> Set.copyOf(map.values())
+                ))
         );
 
         String headerStr = subMenu.inventory();
