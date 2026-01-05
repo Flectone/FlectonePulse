@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
+import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
@@ -58,6 +59,7 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
 
         extractor.reload();
 
+        listenerRegistry.register(VanillaPacketListener.class);
         listenerRegistry.register(VanillaPulseListener.class);
     }
 

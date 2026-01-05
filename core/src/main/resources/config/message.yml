@@ -407,8 +407,6 @@ vanilla:
     - "tile.bed.notSafe"
     - "tile.bed.notValid"
     - "tile.bed.occupied"
-    - "block.minecraft.spawn.not_valid"
-    - "block.minecraft.bed.not_valid"
     - "item.minecraft.debug_stick.empty"
     - "item.minecraft.debug_stick.select"
     - "item.minecraft.debug_stick.update"
