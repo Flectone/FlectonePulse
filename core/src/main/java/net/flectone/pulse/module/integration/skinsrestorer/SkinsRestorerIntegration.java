@@ -8,7 +8,9 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -21,15 +23,16 @@ import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.storage.PlayerStorage;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SkinsRestorerIntegration implements FIntegration {
 
     private final FlectonePulse flectonePulse;
+    private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Provider<SkinService> skinServiceProvider;
+    private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
@@ -43,10 +46,11 @@ public class SkinsRestorerIntegration implements FIntegration {
 
             if (!skinApplyEventSubscribed) {
                 skinsRestorer.getEventBus().subscribe(flectonePulse, SkinApplyEvent.class, event -> {
-                    UUID uuid = platformPlayerAdapter.getUUID(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
-                    if (uuid == null) return;
+                    FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
+                    if (fPlayer.isUnknown()) return;
 
-                    skinServiceProvider.get().updateProfilePropertyCache(uuid, convertToProfileProperty(event.getProperty()));
+                    skinServiceProvider.get().updateProfilePropertyCache(fPlayer.getUuid(), convertToProfileProperty(event.getProperty()));
+                    taskScheduler.runAsyncLater(() -> playerlistnameModuleProvider.get().send(fPlayer), 2L);
                 });
 
                 skinApplyEventSubscribed = true;

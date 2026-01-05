@@ -104,7 +104,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         fPlayerService.getPlatformFPlayers().forEach(fPlayer -> taskScheduler.runRegion(fPlayer, () -> send(fPlayer)));
     }
 
-    private void send(FPlayer fPlayer) {
+    public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
