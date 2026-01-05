@@ -174,7 +174,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     public boolean isProxyMode() {
-        return config().proxyMode() && proxyRegistry.hasEnabledProxy();
+        return isEnable() && config().proxyMode() && proxyRegistry.hasEnabledProxy();
     }
 
     private List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> getProxyPlayerInfos(FPlayer fReceiver) {
