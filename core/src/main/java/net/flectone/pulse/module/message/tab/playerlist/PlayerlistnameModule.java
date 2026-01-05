@@ -116,6 +116,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         if (!isProxyMode()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        if (fPlayer.isUnknown()) return;
 
         // platform players will be added automatically
         if (platformPlayerAdapter.isOnline(fPlayer)) return;
