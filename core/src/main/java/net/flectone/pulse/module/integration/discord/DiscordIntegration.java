@@ -261,7 +261,7 @@ public class DiscordIntegration implements FIntegration {
 
         if (channelInfo.enable() && channelInfo.ticker().enable()) {
             long period = channelInfo.ticker().period();
-            taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period);
+            taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period, period);
             updateChannelInfo();
         }
 
@@ -320,7 +320,6 @@ public class DiscordIntegration implements FIntegration {
 
     public void updateChannelInfo() {
         if (gateway == null) return;
-
         if (!config().channelInfo().enable()) return;
 
         Localization.Integration.Discord localization = fileFacade.localization().integration().discord();
@@ -330,19 +329,18 @@ public class DiscordIntegration implements FIntegration {
 
             Snowflake snowflake = Snowflake.of(id);
             gateway.getChannelById(snowflake)
-                    .blockOptional()
-                    .ifPresent(channel -> {
+                    .flatMap(channel -> {
                         MessageContext nameContext = messagePipeline.createContext(entry.getValue());
                         String name = messagePipeline.buildPlain(nameContext);
 
-                        channel.getRestChannel()
+                        return channel.getRestChannel()
                                 .modify(ChannelModifyRequest.builder()
                                                 .name(name)
                                                 .build(),
                                         null
-                                )
-                                .block();
-                    });
+                                );
+                    })
+                    .subscribe();
         }
     }
 
