@@ -120,6 +120,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
             action = Strings.CS.replace(action, "<message>", key.toString());
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
+                    .withFlags(messageContext.flags())
                     .withFlags(DEFAULT_TAG_FLAGS);
 
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));

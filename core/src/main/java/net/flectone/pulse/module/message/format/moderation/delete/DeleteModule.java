@@ -107,9 +107,11 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
                     messageUUID.toString()
             );
 
-            MessageContext placeholderContext = messagePipeline.createContext(sender, receiver, placeholder)
+            MessageContext newContext = messagePipeline.createContext(sender, receiver, placeholder)
+                    .withFlags(messageContext.flags())
                     .withFlags(DEFAULT_TAG_FLAGS);
-            Component componentPlaceholder = messagePipeline.build(placeholderContext);
+
+            Component componentPlaceholder = messagePipeline.build(newContext);
 
             return Tag.selfClosingInserting(componentPlaceholder);
         });

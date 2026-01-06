@@ -80,7 +80,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                     new String[]{"<name>", "<type>", "<uuid>"},
                                     new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
                             )
-                    );
+                    ).withFlags(messageContext.flags());
+
                     Component displayName = messagePipeline.build(displayContext);
 
                     return Tag.selfClosingInserting(displayName);
@@ -95,7 +96,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                         new String[]{sender.getType(), sender.getUuid().toString()}
                                 )
                         )
-                        .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)));
+                        .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
+                        .withFlags(messageContext.flags());
 
                 Component displayName = messagePipeline.build(displayContext);
                 return Tag.selfClosingInserting(displayName);
@@ -114,7 +116,9 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                 return Tag.selfClosingInserting(Component.empty());
                             }
 
-                            MessageContext constantContext = messagePipeline.createContext(fPlayer, constantName);
+                            MessageContext constantContext = messagePipeline.createContext(fPlayer, constantName)
+                                    .withFlags(messageContext.flags());
+
                             String serialized = messagePipeline.buildDefault(constantContext);
                             return Tag.preProcessParsed(serialized);
                         }),
@@ -124,7 +128,9 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                     ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
                                     : localization.display();
 
-                            MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName);
+                            MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
+                                    .withFlags(messageContext.flags());
+
                             Component displayNameComponent = messagePipeline.build(displayContext);
 
                             return Tag.selfClosingInserting(displayNameComponent);
@@ -133,7 +139,9 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             String prefix = integrationModule.getPrefix(fPlayer);
                             if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
 
-                            MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix);
+                            MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
+                                    .withFlags(messageContext.flags());
+
                             String text = messagePipeline.buildDefault(prefixContext);
                             return Tag.preProcessParsed(text);
                         }),
@@ -141,7 +149,9 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             String suffix = integrationModule.getSuffix(fPlayer);
                             if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
 
-                            MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix);
+                            MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
+                                    .withFlags(messageContext.flags());
+
                             String text = messagePipeline.buildDefault(suffixContext);
                             return Tag.preProcessParsed(text);
                         }),

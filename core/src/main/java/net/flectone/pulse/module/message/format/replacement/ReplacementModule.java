@@ -130,7 +130,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         if (isModuleDisabledFor(sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        boolean isTranslateItem = messageContext.isFlag(MessageFlag.TRANSLATE_ITEM);
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
             Tag.Argument argument = argumentQueue.peek();
@@ -149,27 +148,27 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             }
 
             return switch (name) {
-                case "ping" -> pingTag(sender, receiver);
-                case "tps" -> tpsTag(sender, receiver);
-                case "online" -> onlineTag(sender, receiver);
-                case "coords" -> coordsTag(sender, receiver);
-                case "stats" -> statsTag(sender, receiver);
-                case "skin" -> skinTag(sender, receiver);
-                case "item" -> itemTag(sender, receiver, messageContext.messageUUID(), isTranslateItem);
+                case "ping" -> pingTag(messageContext);
+                case "tps" -> tpsTag(messageContext);
+                case "online" -> onlineTag(messageContext);
+                case "coords" -> coordsTag(messageContext);
+                case "stats" -> statsTag(messageContext);
+                case "skin" -> skinTag(messageContext);
+                case "item" -> itemTag(messageContext);
                 case "url" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
-                    yield urlTag(sender, receiver, values.get(1));
+                    yield urlTag(messageContext, values.get(1));
                 }
                 case "image" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
-                    yield imageTag(sender, receiver, values.get(1));
+                    yield imageTag(messageContext, values.get(1));
                 }
                 case "spoiler" -> {
                     if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
 
-                    yield spoilerTag(sender, receiver, values.get(1), messageContext.flags());
+                    yield spoilerTag(messageContext, values.get(1));
                 }
                 default -> {
                     String[] searchList = new String[values.size()];
@@ -183,7 +182,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                     replacement = StringUtils.replaceEach(replacement, searchList, replacementList);
 
                     MessageContext componentContext = messagePipeline.createContext(sender, receiver, replacement)
+                            .withFlags(messageContext.flags())
                             .withFlag(MessageFlag.REPLACEMENT, false);
+
                     Component component = messagePipeline.build(componentContext);
 
                     yield Tag.selfClosingInserting(component);
@@ -242,88 +243,93 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private record MatchInfo(int start, int end, String replacement) {}
 
-    private Tag spoilerTag(FEntity sender, FPlayer receiver, String spoilerText, Map<MessageFlag, Boolean> flags) {
+    private Tag spoilerTag(MessageContext messageContext, String spoilerText) {
         // skip deprecated issue <spoiler:\>
         if (spoilerText.equals("\\")) return Tag.selfClosingInserting(Component.empty());
 
         // "." to have the original context like ||%stats%||
-        EnumMap<MessageFlag, Boolean> spoilerFlags = new EnumMap<>(flags);
-        spoilerFlags.put(MessageFlag.TRANSLATE_ITEM, false); // we don't need to double format "|| %item% ||"
-
-        MessageContext spoilerContext = messagePipeline.createContext(sender, receiver, "." + spoilerText)
-                .withFlags(spoilerFlags);
+        MessageContext spoilerContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), "." + spoilerText)
+                .withFlags(messageContext.flags())
+                .withFlag(MessageFlag.TRANSLATE_ITEM, false); // we don't need to double format "|| %item% ||"
         Component spoilerComponent = messagePipeline.build(spoilerContext);
 
         int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
-        Localization.Message.Format.Replacement replacement = localization(receiver);
+        Localization.Message.Format.Replacement replacement = localization(messageContext.receiver());
         String format = StringUtils.replaceEach(
                 replacement.values().getOrDefault("spoiler", ""),
                 new String[]{"<message_1>", "<symbols>"},
                 new String[]{spoilerText, StringUtils.repeat(replacement.spoilerSymbol(), length)}
         );
 
-        MessageContext formatContext = messagePipeline.createContext(sender, receiver, format);
-        // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+        MessageContext formatContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags()); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+
         Component component = messagePipeline.build(formatContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag pingTag(FEntity sender, FPlayer receiver) {
-        if (!(sender instanceof FPlayer fPlayer)) return Tag.selfClosingInserting(Component.empty());
+    private Tag pingTag(MessageContext messageContext) {
+        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return Tag.selfClosingInserting(Component.empty());
 
         int ping = fPlayerService.getPing(fPlayer);
 
         String format = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("ping", ""),
+                localization(messageContext.receiver()).values().getOrDefault("ping", ""),
                 "<value>",
                 String.valueOf(ping)
         );
 
-        MessageContext context = messagePipeline.createContext(fPlayer, receiver, format)
+        MessageContext newContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false);
-        Component component = messagePipeline.build(context);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag tpsTag(FEntity sender, FPlayer receiver) {
+    private Tag tpsTag(MessageContext messageContext) {
         String format = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("tps", ""),
+                localization(messageContext.receiver()).values().getOrDefault("tps", ""),
                 "<value>",
                 platformServerAdapter.getTPS()
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false);
-        Component component = messagePipeline.build(context);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag onlineTag(FEntity sender, FPlayer receiver) {
+    private Tag onlineTag(MessageContext messageContext) {
         String format = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("online", ""),
+                localization(messageContext.receiver()).values().getOrDefault("online", ""),
                 "<value>",
                 String.valueOf(platformServerAdapter.getOnlinePlayerCount())
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+        MessageContext context = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false);
+
         Component component = messagePipeline.build(context);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag coordsTag(FEntity sender, FPlayer receiver) {
+    private Tag coordsTag(MessageContext messageContext) {
         Component component = Component.empty();
 
-        PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
+        PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(messageContext.sender());
         if (coordinates != null) {
             String format = StringUtils.replaceEach(
-                    localization(receiver).values().getOrDefault("coords", ""),
+                    localization(messageContext.receiver()).values().getOrDefault("coords", ""),
                     new String[]{"<x>", "<y>", "<z>"},
                     new String[]{
                             String.valueOf(coordinates.x()),
@@ -332,41 +338,43 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                     }
             );
 
-            MessageContext context = messagePipeline.createContext(sender, receiver, format)
+            MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                    .withFlags(messageContext.flags())
                     .withFlag(MessageFlag.REPLACEMENT, false);
-            component = messagePipeline.build(context);
+
+            component = messagePipeline.build(newContext);
         }
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag statsTag(FEntity sender, FPlayer receiver) {
-        Component component = Component.empty();
+    private Tag statsTag(MessageContext messageContext) {
+        PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(messageContext.sender());
+        if (statistics == null) return Tag.selfClosingInserting(Component.empty());
 
-        PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
-        if (statistics != null) {
-            String format = StringUtils.replaceEach(
-                    localization(receiver).values().getOrDefault("stats", ""),
-                    new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
-                    new String[]{
-                            String.valueOf(statistics.health()),
-                            String.valueOf(statistics.armor()),
-                            String.valueOf(statistics.level()),
-                            String.valueOf(statistics.food()),
-                            String.valueOf(statistics.damage())
-                    }
-            );
+        String format = StringUtils.replaceEach(
+                localization(messageContext.receiver()).values().getOrDefault("stats", ""),
+                new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
+                new String[]{
+                        String.valueOf(statistics.health()),
+                        String.valueOf(statistics.armor()),
+                        String.valueOf(statistics.level()),
+                        String.valueOf(statistics.food()),
+                        String.valueOf(statistics.damage())
+                }
+        );
 
-            MessageContext context = messagePipeline.createContext(sender, receiver, format)
-                    .withFlag(MessageFlag.REPLACEMENT, false);
-            component = messagePipeline.build(context);
-        }
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
+                .withFlag(MessageFlag.REPLACEMENT, false);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag skinTag(FEntity sender, FPlayer receiver) {
-        String url = skinService.getBodyUrl(sender);
+    private Tag skinTag(MessageContext messageContext) {
+        String url = skinService.getBodyUrl(messageContext.sender());
 
         Component componentPixels;
         try {
@@ -376,51 +384,57 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String format = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("skin", ""),
+                localization(messageContext.receiver()).values().getOrDefault("skin", ""),
                 "<message_1>",
                 url
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false)
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
-        Component component = messagePipeline.build(context);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag itemTag(FEntity sender, FPlayer receiver, UUID messageUUID, boolean isTranslateItem) {
-        Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
-        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageUUID, isTranslateItem);
+    private Tag itemTag(MessageContext messageContext) {
+        Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().getUuid());
+        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.TRANSLATE_ITEM));
 
-        String format = localization(receiver).values().getOrDefault("item", "");
-        MessageContext context = messagePipeline.createContext(sender, receiver, format)
+        String format = localization(messageContext.receiver()).values().getOrDefault("item", "");
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false)
                 .addTagResolver(TagResolver.resolver("message_1", (argumentQueue, ctx) -> Tag.selfClosingInserting(componentItem)));
-        Component componentFormat = messagePipeline.build(context);
+
+        Component componentFormat = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(componentFormat);
     }
 
-    private Tag urlTag(FEntity sender, FPlayer receiver, String url) {
+    private Tag urlTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
         String string = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("url", ""),
+                localization(messageContext.receiver()).values().getOrDefault("url", ""),
                 "<message_1>",
                 url
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, string)
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false)
                 .withFlag(MessageFlag.LEGACY_COLORS, false);
-        Component component = messagePipeline.build(context);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }
 
-    private Tag imageTag(FEntity sender, FPlayer receiver, String url) {
+    private Tag imageTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
@@ -432,16 +446,18 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String string = Strings.CS.replace(
-                localization(receiver).values().getOrDefault("image", ""),
+                localization(messageContext.receiver()).values().getOrDefault("image", ""),
                 "<message_1>",
                 url
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, string)
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
+                .withFlags(messageContext.flags())
                 .withFlag(MessageFlag.REPLACEMENT, false)
                 .withFlag(MessageFlag.LEGACY_COLORS, false)
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
-        Component component = messagePipeline.build(context);
+
+        Component component = messagePipeline.build(newContext);
 
         return Tag.selfClosingInserting(component);
     }

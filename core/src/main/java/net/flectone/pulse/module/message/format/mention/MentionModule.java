@@ -6,9 +6,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -18,11 +18,10 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -127,7 +126,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             if (group.isPresent()) {
                 if (permissionChecker.check(sender, permission().group().name() + "." + group.get())) {
                     sendMention(processId, receiver);
-                    return mentionTag(sender, receiver, mention);
+                    return mentionTag(messageContext, mention);
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
@@ -136,7 +135,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                         sendMention(processId, mentionFPlayer);
                     }
 
-                    return mentionTag(sender, receiver, mention);
+                    return mentionTag(messageContext, mention);
                 }
             }
 
@@ -152,14 +151,16 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         return !fPlayer.isConsole();
     }
 
-    private Tag mentionTag(FEntity sender, FPlayer receiver, String mention) {
-        String format = StringUtils.replaceEach(localization(receiver).format(),
+    private Tag mentionTag(MessageContext messageContext, String mention) {
+        String format = StringUtils.replaceEach(localization(messageContext.receiver()).format(),
                 new String[]{ "<player>", "<target>" },
                 new String[]{ mention, mention }
         );
 
-        MessageContext context = messagePipeline.createContext(sender, receiver, format);
-        Component component = messagePipeline.build(context);
+        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
+                .withFlags(messageContext.flags());
+
+        Component component = messagePipeline.build(newContext);
         return Tag.selfClosingInserting(component);
     }
 

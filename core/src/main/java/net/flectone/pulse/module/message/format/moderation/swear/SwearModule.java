@@ -103,7 +103,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(contextMessage, () -> replace( contextMessage));
+            formattedMessage = messageCache.get(contextMessage, () -> replace(contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
             formattedMessage = replace(contextMessage);
@@ -128,7 +128,9 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
             String symbols = localization(receiver).symbol().repeat(swear.length());
 
-            MessageContext tagContext = messagePipeline.createContext(sender, receiver, symbols);
+            MessageContext tagContext = messagePipeline.createContext(sender, receiver, symbols)
+                    .withFlags(messageContext.flags());
+
             Component component = messagePipeline.build(tagContext);
 
             if (permissionChecker.check(receiver, permission().see())) {
