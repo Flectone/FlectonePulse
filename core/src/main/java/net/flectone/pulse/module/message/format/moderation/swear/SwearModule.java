@@ -99,13 +99,14 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
+        if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(contextMessage, () -> replace(sender, contextMessage));
+            formattedMessage = messageCache.get(contextMessage, () -> replace( contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            formattedMessage = replace(sender, contextMessage);
+            formattedMessage = replace(contextMessage);
         }
 
         return messageContext.withMessage(formattedMessage);
@@ -138,8 +139,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         });
     }
 
-    private String replace(FEntity sender, String string) {
-        if (permissionChecker.check(sender, permission().bypass())) return string;
+    private String replace(String string) {
         if (combinedPattern == null) return string;
 
         StringBuilder result = new StringBuilder();
