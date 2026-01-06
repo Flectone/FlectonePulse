@@ -58,6 +58,9 @@ public class MessagePipeline {
     }
 
     public Component build(MessageContext context) {
+        // no need to build empty message
+        if (StringUtils.isEmpty(context.message())) return Component.empty();
+
         MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(context));
         MessageContext eventContext = event.context();
 
