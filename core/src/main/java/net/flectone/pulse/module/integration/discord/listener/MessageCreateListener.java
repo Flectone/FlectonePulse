@@ -8,8 +8,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.*;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -17,10 +17,10 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -55,15 +55,21 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         if (channel == null) return Mono.empty();
         if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
 
-        Optional<Member> user = event.getMember();
-        if (user.isEmpty() || user.get().isBot()) return Mono.empty();
+        Optional<Member> optionalMember = event.getMember();
+        if (optionalMember.isEmpty()) return Mono.empty();
 
+        Member member = optionalMember.get();
+
+        // always ignore ourselves
+        if (member.isBot() && (config().ignoreAllBots() || member.getId().asLong() == discordIntegration.get().getClientID())) return Mono.empty();
+
+        // check command in message
         if (executeCommand(discordMessage)) return Mono.empty();
 
-        String message = getMessageContent(discordMessage);
-        if (message == null) return Mono.empty();
+        String content = getMessageContent(discordMessage);
+        if (content == null) return Mono.empty();
 
-        sendMessage(user.get(), message, retrieveReply(discordMessage).orElse(null));
+        sendMessage(optionalMember.get(), content, retrieveReply(discordMessage).orElse(null));
 
         return Mono.empty();
     }

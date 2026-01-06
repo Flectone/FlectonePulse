@@ -16,6 +16,7 @@ import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
@@ -58,7 +59,7 @@ public class DiscordIntegration implements FIntegration {
 
     private DiscordClient discordClient;
     private GatewayDiscordClient gateway;
-    private long clientID;
+    @Getter private long clientID;
 
     public Integration.Discord config() {
         return fileFacade.integration().discord();

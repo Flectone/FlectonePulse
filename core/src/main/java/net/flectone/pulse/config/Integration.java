@@ -146,6 +146,7 @@ public record Integration(
     @Jacksonized
     public record Discord(
             Boolean enable,
+            Boolean ignoreAllBots,
             String token,
             Map<String, Command> customCommand,
             Presence presence,

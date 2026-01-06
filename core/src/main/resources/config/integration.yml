@@ -12,6 +12,7 @@ deepl:
   auth_key: ""
 discord:
   enable: false
+  ignore_all_bots: true
   token: ""
   custom_command:
     ping:
