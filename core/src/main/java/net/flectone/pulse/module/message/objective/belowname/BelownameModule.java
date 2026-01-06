@@ -40,7 +40,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
+            taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
         }
 
         listenerRegistry.register(BelownamePulseListener.class);
@@ -77,20 +77,20 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
         if (isModuleDisabledFor(fPlayer)) return;
 
         Localization.Message.Objective.Belowname localization = localization(fPlayer);
-        Component display = objectiveModule.buildFormat(fPlayer, fPlayer, localization.display(), config().mode());
-        Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.format(), config().mode());
+        Component displayFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.displayFormat(), config().mode());
+        Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.scoreFormat(), config().mode());
 
-        objectiveModule.createObjective(fPlayer, display, scoreFormat, ScoreboardPosition.BELOWNAME);
-        update(fPlayer);
+        objectiveModule.createObjective(fPlayer, displayFormat, scoreFormat, ScoreboardPosition.BELOWNAME);
+        updateScore(fPlayer);
     }
 
-    public void update(FPlayer fPlayer) {
+    public void updateScore(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().mode());
 
-            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization(fPlayer).format(), config().mode());
+            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization(fPlayer).scoreFormat(), config().mode());
 
             objectiveModule.updateObjective(fPlayer, fObjective, score, scoreFormat, ScoreboardPosition.BELOWNAME);
         });

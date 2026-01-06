@@ -1100,12 +1100,12 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Belowname(String display, String format) implements LocalizationSetting {}
+            public record Belowname(String displayFormat, String scoreFormat) implements LocalizationSetting {}
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Tabname(String display, String format) implements LocalizationSetting {}
+            public record Tabname(String displayFormat, String scoreFormat) implements LocalizationSetting {}
         }
 
         @With
