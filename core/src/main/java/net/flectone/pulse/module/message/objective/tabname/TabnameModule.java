@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -17,12 +16,10 @@ import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -34,7 +31,6 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
     private final TaskScheduler taskScheduler;
     private final ObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
-    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -78,9 +74,11 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
     public void create(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        Component tabName = createTabName(fPlayer, fPlayer);
+        Localization.Message.Objective.Tabname localization = localization(fPlayer);
+        Component display = objectiveModule.buildFormat(fPlayer, fPlayer, localization.display(), config().mode());
+        Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.format(), config().mode());
 
-        objectiveModule.createObjective(fPlayer, null, tabName, ScoreboardPosition.TABLIST);
+        objectiveModule.createObjective(fPlayer, display, scoreFormat, ScoreboardPosition.TABLIST);
         update(fPlayer);
     }
 
@@ -89,8 +87,10 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().mode());
-            Component tabName = createTabName(fObjective, fPlayer);
-            objectiveModule.updateObjective(fPlayer, fObjective, score, tabName, ScoreboardPosition.TABLIST);
+
+            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization(fPlayer).format(), config().mode());
+
+            objectiveModule.updateObjective(fPlayer, fObjective, score, scoreFormat, ScoreboardPosition.TABLIST);
         });
     }
 
@@ -98,13 +98,5 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
         if (isModuleDisabledFor(fPlayer)) return;
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.TABLIST);
-    }
-
-    private Component createTabName(FPlayer fPlayer, FPlayer fReceiver) {
-        int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), config().mode());
-
-        MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
-                .addTagResolver(Placeholder.parsed("score", String.valueOf(score)));
-        return messagePipeline.build(tabNameContext);
     }
 }

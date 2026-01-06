@@ -10,15 +10,18 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -26,6 +29,8 @@ public class ObjectiveModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final PacketSender packetSender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
@@ -45,7 +50,7 @@ public class ObjectiveModule extends AbstractModule {
         return fileFacade.permission().message().objective();
     }
 
-    public void createObjective(FPlayer fPlayer, @Nullable Component displayName, @Nullable Component scoreFormat, ScoreboardPosition scoreboardPosition) {
+    public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         removeObjective(fPlayer, scoreboardPosition);
 
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
@@ -53,9 +58,9 @@ public class ObjectiveModule extends AbstractModule {
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
                 WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE,
-                displayName != null ? displayName : Component.text(objectiveName),
+                displayName,
                 WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
-                scoreFormat != null ? ScoreFormat.fixedScore(scoreFormat) : null
+                ScoreFormat.fixedScore(scoreFormat)
         ));
 
         packetSender.send(fPlayer, new WrapperPlayServerDisplayScoreboard(
@@ -64,7 +69,7 @@ public class ObjectiveModule extends AbstractModule {
         ));
     }
 
-    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, @Nullable Component scoreFormat, ScoreboardPosition scoreboardPosition) {
+    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
 
         packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
@@ -73,7 +78,7 @@ public class ObjectiveModule extends AbstractModule {
                 objectiveName,
                 score,
                 Component.text(fPlayer.getName()),
-                scoreFormat != null ? ScoreFormat.fixedScore(scoreFormat) : null
+                ScoreFormat.fixedScore(scoreFormat)
         ));
     }
 
@@ -87,6 +92,15 @@ public class ObjectiveModule extends AbstractModule {
                 null,
                 null
         ));
+    }
+
+    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String format, Mode mode) {
+        int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), mode);
+
+        MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, format)
+                .addTagResolver(Placeholder.parsed("score", String.valueOf(score)));
+
+        return messagePipeline.build(tabNameContext);
     }
 
     public enum Mode {

@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.objective.belowname;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -17,10 +17,9 @@ import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.belowname.listener.BelownamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -77,10 +76,11 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     public void create(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        MessageContext displayNameContext = messagePipeline.createContext(fPlayer, localization(fPlayer).format());
-        Component displayName = messagePipeline.build(displayNameContext);
+        Localization.Message.Objective.Belowname localization = localization(fPlayer);
+        Component display = objectiveModule.buildFormat(fPlayer, fPlayer, localization.display(), config().mode());
+        Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.format(), config().mode());
 
-        objectiveModule.createObjective(fPlayer, displayName, null, ScoreboardPosition.BELOWNAME);
+        objectiveModule.createObjective(fPlayer, display, scoreFormat, ScoreboardPosition.BELOWNAME);
         update(fPlayer);
     }
 
@@ -89,7 +89,10 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().mode());
-            objectiveModule.updateObjective(fPlayer, fObjective, score, null, ScoreboardPosition.BELOWNAME);
+
+            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization(fPlayer).format(), config().mode());
+
+            objectiveModule.updateObjective(fPlayer, fObjective, score, scoreFormat, ScoreboardPosition.BELOWNAME);
         });
     }
 
@@ -98,4 +101,6 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }
+
+
 }
