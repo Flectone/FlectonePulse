@@ -5,9 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Attachment;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.*;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -65,15 +63,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String message = getMessageContent(discordMessage);
         if (message == null) return Mono.empty();
 
-        Pair<String, String> reply = null;
-        if (discordMessage.getReferencedMessage().isPresent()) {
-            Message referencedMessage = discordMessage.getReferencedMessage().get();
-            if (referencedMessage.getAuthor().isPresent()) {
-                reply = Pair.of(referencedMessage.getAuthor().get().getUsername(), getMessageContent(referencedMessage));
-            }
-        }
-
-        sendMessage(user.get(), message, reply);
+        sendMessage(user.get(), message, retrieveReply(discordMessage).orElse(null));
 
         return Mono.empty();
     }
@@ -140,6 +130,28 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     @Override
     public Localization.Integration.Discord localization(FEntity sender) {
         return fileFacade.localization(sender).integration().discord();
+    }
+
+    private Optional<Pair<String, String>> retrieveReply(Message message) {
+        Optional<Message> optionalReferencedMessage = message.getReferencedMessage();
+        if (optionalReferencedMessage.isEmpty()) return Optional.empty();
+
+        Message referencedMessage = optionalReferencedMessage.get();
+
+        String content = getMessageContent(referencedMessage);
+
+        Optional<User> author = referencedMessage.getAuthor();
+        if (author.isPresent()) return Optional.of(Pair.of(author.get().getUsername(), content));
+
+        Optional<Snowflake> webhookId = referencedMessage.getWebhookId();
+        if (webhookId.isPresent()) {
+            Webhook webhook = referencedMessage.getWebhook().block();
+            if (webhook != null) {
+                return Optional.of(Pair.of(webhook.getName().orElse("Unknown"), content));
+            }
+        }
+
+        return Optional.of(Pair.of("Unknown", content));
     }
 
     private String getMessageContent(Message message) {
