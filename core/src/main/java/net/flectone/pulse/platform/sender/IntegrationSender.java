@@ -22,8 +22,7 @@ import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -103,18 +102,23 @@ public class IntegrationSender {
             );
         };
 
-        String messageName = createMessageName(messageType, eventMetadata);
-        integrationModule.sendMessage(sender, messageName, interfaceReplaceString);
+        for (String specificMessageName : createSpecificMessageNames(messageType, eventMetadata)) {
+            integrationModule.sendMessage(sender, specificMessageName, interfaceReplaceString);
+        }
+
+        integrationModule.sendMessage(sender, messageType.name(), interfaceReplaceString);
     }
 
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
         FEntity sender = eventMetadata.getSender();
-        MessageContext messageContext = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
+        MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
                 .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .withFlag(MessageFlag.TRANSLATE, false)
+                .withFlag(MessageFlag.OBJECT_PLAYER_HEAD, false)
+                .withFlag(MessageFlag.OBJECT_SPRITE, false)
                 .addTagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN));
 
-        return messagePipeline.build(messageContext);
+        return messagePipeline.build(context);
     }
 
     private Component createMessage(EventMetadata<?> eventMetadata) {
@@ -140,25 +144,25 @@ public class IntegrationSender {
         return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
     }
 
-    private String createMessageName(MessageType messageType, EventMetadata<?> eventMetadata) {
+    private Collection<String> createSpecificMessageNames(MessageType messageType, EventMetadata<?> eventMetadata) {
         return switch (messageType) {
             case CHAT -> {
-                if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield "UNKNOWN";
+                if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield Collections.emptyList();
 
                 Chat chat = chatMetadata.getChat();
-                if (chat.name() == null) yield messageType.name();
+                if (chat.name() == null) yield Collections.emptyList();
 
-                yield messageType.name() + "_" + chat.name().toUpperCase();
+                yield List.of((messageType.name() + "_" + chat.name()).toUpperCase());
             }
             case VANILLA -> {
-                if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield "UNKNOWN";
+                if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield Collections.emptyList();
 
                 String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().name();
-                if (vanillaMessageName.isEmpty()) yield messageType.name();
+                if (vanillaMessageName.isEmpty()) yield Collections.emptyList();
 
-                yield vanillaMessageName.toUpperCase();
+                yield List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.getParsedComponent().translationKey());
             }
-            default -> messageType.name();
+            default -> Collections.emptyList();
         };
     }
 
