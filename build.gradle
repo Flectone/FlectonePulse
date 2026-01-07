@@ -114,6 +114,7 @@ subprojects {
         relocate("com.fasterxml.jackson", "net.flectone.pulse.library.jackson")
         relocate("tools.jackson", "net.flectone.pulse.library.jackson")
         relocate("org.snakeyaml.engine", "net.flectone.pulse.library.snakeyaml")
+        relocate("io.lettuce", "net.flectone.pulse.library.lettuce")
 
         from(rootProject.file('LICENSE')) {
             into('/')

@@ -1,6 +1,7 @@
 package net.flectone.pulse.platform.registry;
 
 import com.alessiodp.libby.Library;
+import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -43,7 +44,7 @@ public class ProxyRegistry implements Registry {
         if (redis.enable()) {
             warnIfLocalDatabase();
 
-            reflectionResolver.hasClassOrElse("io.lettuce.core.RedisClient", this::loadLibraries);
+            reflectionResolver.hasClassOrElse("net.flectone.pulse.library.lettuce.core.RedisClient", this::loadLibraries);
 
             RedisProxy redisProxy = injector.getInstance(RedisProxy.class);
             redisProxy.onEnable();
@@ -77,6 +78,16 @@ public class ProxyRegistry implements Registry {
                 .version(BuildConfig.LETTUCE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("io{}lettuce")
+                        .relocatedPattern("net.flectone.pulse.library.lettuce")
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("io{}netty")
+                        .relocatedPattern("net.flectone.pulse.library.lettuce.netty")
+                        .build()
+                )
                 .build()
         );
     }
