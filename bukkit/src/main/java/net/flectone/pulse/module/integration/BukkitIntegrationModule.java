@@ -29,6 +29,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.permissions.Permissible;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
@@ -79,7 +80,12 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         if (platformServerAdapter.hasProject("ItemsAdder")) {
-            builder.add(ItemsAdderModule.class);
+            Class<?> fontImageWrapper = reflectionResolver.resolveClass("dev.lone.itemsadder.api.FontImages.FontImageWrapper");
+            if (fontImageWrapper != null && reflectionResolver.hasMethod(fontImageWrapper, "replaceFontImages", Permissible.class, String.class)) {
+                builder.add(ItemsAdderModule.class);
+            } else {
+                fLogger.warning("Update ItemsAdder to the latest version");
+            }
         }
 
         if (platformServerAdapter.hasProject("LibertyBans")) {
