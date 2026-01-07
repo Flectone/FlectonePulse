@@ -171,10 +171,10 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     private String buildMessage(FPlayer fPlayer, String localization) {
         MessageContext messageContext = messagePipeline.createContext(fPlayer, localization)
-                .withFlags(Map.of(
-                        MessageFlag.OBJECT_PLAYER_HEAD, false,
-                        MessageFlag.OBJECT_SPRITE, false
-                ));
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.OBJECT_PLAYER_HEAD, MessageFlag.OBJECT_SPRITE},
+                        new boolean[]{false, false}
+                );
 
         return messagePipeline.buildPlain(messageContext);
     }

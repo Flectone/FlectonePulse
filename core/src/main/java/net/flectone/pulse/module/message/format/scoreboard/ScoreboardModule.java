@@ -121,14 +121,14 @@ public class ScoreboardModule extends AbstractModule {
         Component prefix = Component.empty();
         if (!config().prefix().isEmpty()) {
             MessageContext prefixContext = messagePipeline.createContext(fPlayer, config().prefix())
-                    .withFlag(MessageFlag.INVISIBLE_NAME, false);
+                    .addFlag(MessageFlag.INVISIBLE_NAME, false);
             prefix = messagePipeline.build(prefixContext);
         }
 
         Component suffix = Component.empty();
         if (!config().suffix().isEmpty()) {
             MessageContext suffixContext = messagePipeline.createContext(fPlayer, config().suffix())
-                    .withFlag(MessageFlag.INVISIBLE_NAME, false);
+                    .addFlag(MessageFlag.INVISIBLE_NAME, false);
             suffix = messagePipeline.build(suffixContext);
         }
 

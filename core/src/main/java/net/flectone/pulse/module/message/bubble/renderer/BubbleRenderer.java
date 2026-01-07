@@ -51,12 +51,6 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleRenderer {
 
-    private static final Map<MessageFlag, Boolean> BUBBLE_MESSAGE_FLAGS = Map.of(
-            MessageFlag.MENTION, false,
-            MessageFlag.INTERACTIVE_CHAT, false,
-            MessageFlag.QUESTION, false
-    );
-
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
     
     private final FileFacade fileFacade;
@@ -198,13 +192,13 @@ public class BubbleRenderer {
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
         Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
 
-        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer)
-                .withFlags(BUBBLE_MESSAGE_FLAGS);
+        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.USER_MESSAGE},
+                        new boolean[]{false, false, false, true}
+                );
 
-        Component message = messagePipeline.build(messageContext
-                .withMessage(bubble.getRawMessage())
-                .withFlag(MessageFlag.USER_MESSAGE, true)
-        );
+        Component message = messagePipeline.build(messageContext);
 
         return messagePipeline.build(messageContext
                 .withMessage(localization.format())

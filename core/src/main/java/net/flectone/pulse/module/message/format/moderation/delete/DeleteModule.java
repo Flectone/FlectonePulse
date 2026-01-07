@@ -34,13 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeleteModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
-    private static final Map<MessageFlag, Boolean> DEFAULT_TAG_FLAGS = Map.of(
-            MessageFlag.MENTION, false,
-            MessageFlag.INTERACTIVE_CHAT, false,
-            MessageFlag.QUESTION, false,
-            MessageFlag.DELETE, false
-    );
-
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 
     // only for skipping FlectonePulse messages
@@ -109,7 +102,10 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
             MessageContext newContext = messagePipeline.createContext(sender, receiver, placeholder)
                     .withFlags(messageContext.flags())
-                    .withFlags(DEFAULT_TAG_FLAGS);
+                    .addFlags(
+                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.DELETE, MessageFlag.USER_MESSAGE},
+                            new boolean[]{false, false, false, false, false}
+                    );
 
             Component componentPlaceholder = messagePipeline.build(newContext);
 

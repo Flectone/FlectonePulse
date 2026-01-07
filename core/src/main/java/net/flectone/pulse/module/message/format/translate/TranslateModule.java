@@ -31,13 +31,6 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
-    private static final Map<MessageFlag, Boolean> DEFAULT_TAG_FLAGS = Map.of(
-            MessageFlag.MENTION, false,
-            MessageFlag.INTERACTIVE_CHAT, false,
-            MessageFlag.QUESTION, false,
-            MessageFlag.TRANSLATE, false
-    );
-
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -121,7 +114,10 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())
-                    .withFlags(DEFAULT_TAG_FLAGS);
+                    .addFlags(
+                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATE, MessageFlag.USER_MESSAGE},
+                            new boolean[]{false, false, false, false, false}
+                    );
 
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         });

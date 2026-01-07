@@ -183,7 +183,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
                     MessageContext componentContext = messagePipeline.createContext(sender, receiver, replacement)
                             .withFlags(messageContext.flags())
-                            .withFlag(MessageFlag.REPLACEMENT, false);
+                            .addFlags(
+                                    new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                                    new boolean[]{false, false}
+                            );
 
                     Component component = messagePipeline.build(componentContext);
 
@@ -250,7 +253,11 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         // "." to have the original context like ||%stats%||
         MessageContext spoilerContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), "." + spoilerText)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.TRANSLATE_ITEM, false); // we don't need to double format "|| %item% ||"
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATE_ITEM},
+                        new boolean[]{false, false} // we don't need to double format "|| %item% ||"
+                );
+
         Component spoilerComponent = messagePipeline.build(spoilerContext);
 
         int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
@@ -264,7 +271,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         );
 
         MessageContext formatContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags()); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+                .withFlags(messageContext.flags())
+                .addFlag(MessageFlag.USER_MESSAGE, false); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
 
         Component component = messagePipeline.build(formatContext);
 
@@ -284,7 +292,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false);
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                );
 
         Component component = messagePipeline.build(newContext);
 
@@ -300,7 +311,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false);
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                );
 
         Component component = messagePipeline.build(newContext);
 
@@ -316,7 +330,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext context = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false);
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                );
 
         Component component = messagePipeline.build(context);
 
@@ -340,7 +357,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
             MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                     .withFlags(messageContext.flags())
-                    .withFlag(MessageFlag.REPLACEMENT, false);
+                    .addFlags(
+                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                            new boolean[]{false, false}
+                    );
 
             component = messagePipeline.build(newContext);
         }
@@ -366,7 +386,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false);
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                );
 
         Component component = messagePipeline.build(newContext);
 
@@ -391,7 +414,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false)
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                )
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);
@@ -406,7 +432,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         String format = localization(messageContext.receiver()).values().getOrDefault("item", "");
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false)
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new boolean[]{false, false}
+                )
                 .addTagResolver(TagResolver.resolver("message_1", (argumentQueue, ctx) -> Tag.selfClosingInserting(componentItem)));
 
         Component componentFormat = messagePipeline.build(newContext);
@@ -426,8 +455,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false)
-                .withFlag(MessageFlag.LEGACY_COLORS, false);
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT, MessageFlag.LEGACY_COLORS},
+                        new boolean[]{false, false, false}
+                );
 
         Component component = messagePipeline.build(newContext);
 
@@ -453,8 +484,10 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
                 .withFlags(messageContext.flags())
-                .withFlag(MessageFlag.REPLACEMENT, false)
-                .withFlag(MessageFlag.LEGACY_COLORS, false)
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT, MessageFlag.LEGACY_COLORS},
+                        new boolean[]{false, false, false}
+                )
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);

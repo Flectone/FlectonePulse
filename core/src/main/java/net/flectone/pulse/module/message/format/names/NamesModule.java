@@ -80,7 +80,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                     new String[]{"<name>", "<type>", "<uuid>"},
                                     new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
                             )
-                    ).withFlags(messageContext.flags());
+                    ).withFlags(messageContext.flags()).addFlag(MessageFlag.USER_MESSAGE, false);
 
                     Component displayName = messagePipeline.build(displayContext);
 
@@ -97,7 +97,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                 )
                         )
                         .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
-                        .withFlags(messageContext.flags());
+                        .withFlags(messageContext.flags())
+                        .addFlag(MessageFlag.USER_MESSAGE, false);
 
                 Component displayName = messagePipeline.build(displayContext);
                 return Tag.selfClosingInserting(displayName);
@@ -117,7 +118,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             }
 
                             MessageContext constantContext = messagePipeline.createContext(fPlayer, constantName)
-                                    .withFlags(messageContext.flags());
+                                    .withFlags(messageContext.flags())
+                                    .addFlag(MessageFlag.USER_MESSAGE, false);
 
                             String serialized = messagePipeline.buildDefault(constantContext);
                             return Tag.preProcessParsed(serialized);
@@ -129,7 +131,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                                     : localization.display();
 
                             MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
-                                    .withFlags(messageContext.flags());
+                                    .withFlags(messageContext.flags())
+                                    .addFlag(MessageFlag.USER_MESSAGE, false);
 
                             Component displayNameComponent = messagePipeline.build(displayContext);
 
@@ -140,7 +143,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
 
                             MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
-                                    .withFlags(messageContext.flags());
+                                    .withFlags(messageContext.flags())
+                                    .addFlag(MessageFlag.USER_MESSAGE, false);
 
                             String text = messagePipeline.buildDefault(prefixContext);
                             return Tag.preProcessParsed(text);
@@ -150,7 +154,8 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
 
                             MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
-                                    .withFlags(messageContext.flags());
+                                    .withFlags(messageContext.flags())
+                                    .addFlag(MessageFlag.USER_MESSAGE, false);
 
                             String text = messagePipeline.buildDefault(suffixContext);
                             return Tag.preProcessParsed(text);

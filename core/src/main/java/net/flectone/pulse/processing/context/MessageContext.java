@@ -9,8 +9,10 @@ import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.CheckReturnValue;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -34,24 +36,35 @@ public record MessageContext(
     }
 
     public MessageContext(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
-        this(
-                new EnumMap<>(MessageFlag.class),
-                Set.of(),
-                sender,
-                receiver,
-                messageUUID,
-                message,
-                null
-        );
+        this(new EnumMap<>(MessageFlag.class), Set.of(), sender, receiver, messageUUID, message, null);
     }
 
     @CheckReturnValue
-    public MessageContext withFlag(MessageFlag flag, boolean value) {
-        Map<MessageFlag, Boolean> newFlags = this.flags.isEmpty()
-                ? new EnumMap<>(MessageFlag.class)
-                : new EnumMap<>(this.flags);
+    public MessageContext addFlag(MessageFlag flag, boolean value) {
+        Map<MessageFlag, Boolean> newFlags = newMutableFlags();
 
         newFlags.put(flag, value);
+
+        return withFlags(newFlags);
+    }
+
+    @CheckReturnValue
+    public MessageContext addFlags(MessageFlag @NonNull [] flags, boolean @NonNull [] values) {
+        if (ArrayUtils.isEmpty(flags) || ArrayUtils.isEmpty(values)) return this;
+
+        int flagsLength = flags.length;
+        int valuesLength = values.length;
+
+        if (flagsLength != valuesLength) {
+            throw new IllegalArgumentException("Flag and Value array lengths don't match: " + flagsLength + " vs " + valuesLength);
+        }
+
+        Map<MessageFlag, Boolean> newFlags = newMutableFlags();
+
+        for (int i = 0; i < flagsLength; i++) {
+            newFlags.put(flags[i], values[i]);
+        }
+
         return withFlags(newFlags);
     }
 
@@ -98,6 +111,12 @@ public record MessageContext(
 
     public boolean isFlag(MessageFlag flag) {
         return flags.getOrDefault(flag, flag.getDefaultValue());
+    }
+
+    public Map<MessageFlag, Boolean> newMutableFlags() {
+        return this.flags.isEmpty()
+                ? new EnumMap<>(MessageFlag.class)
+                : new EnumMap<>(this.flags);
     }
 
 }

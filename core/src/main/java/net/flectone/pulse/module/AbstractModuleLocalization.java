@@ -171,7 +171,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (destination.subtext().isEmpty()) return Component.empty();
 
         MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, destination.subtext())
-                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .addFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .addTagResolver(messageTag(message));
 
         return messagePipeline.build(context);
@@ -182,8 +182,10 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (StringUtils.isEmpty(message)) return Component.empty();
 
         MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, message)
-                .withFlag(MessageFlag.USER_MESSAGE, true)
-                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut());
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.SENDER_COLOR_OUT},
+                        new boolean[]{true, eventMetadata.isSenderColorOut()}
+                );
 
         return messagePipeline.build(context);
     }
@@ -195,14 +197,14 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         FEntity sender = eventMetadata.getSender();
 
         MessageContext messageContext = messagePipeline.createContext(eventMetadata.getUuid(), sender, receiver, formatContent)
-                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .addFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .addTagResolvers(eventMetadata.getTagResolvers(receiver))
                 .addTagResolver(messageTag(message));
 
         if (!receiver.isUnknown()) {
             messageContext = messageContext
                     .withUserMessage(eventMetadata.getMessage())
-                    .withFlag(MessageFlag.TRANSLATE, formatContent.contains("<translate"));
+                    .addFlag(MessageFlag.TRANSLATE, formatContent.contains("<translate"));
         }
 
         return messagePipeline.build(messageContext);

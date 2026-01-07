@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -158,7 +159,8 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         );
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags());
+                .withFlags(messageContext.flags())
+                .addFlag(MessageFlag.USER_MESSAGE, false);
 
         Component component = messagePipeline.build(newContext);
         return Tag.selfClosingInserting(component);

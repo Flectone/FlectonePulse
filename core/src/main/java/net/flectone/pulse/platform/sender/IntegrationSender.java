@@ -22,7 +22,10 @@ import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -45,13 +48,6 @@ import java.util.regex.Pattern;
 public class IntegrationSender {
 
     private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
-    private static final Map<MessageFlag, Boolean> DEFAULT_MESSAGE_FLAGS = Map.of(
-            MessageFlag.TRANSLATE, false,
-            MessageFlag.USER_MESSAGE, true,
-            MessageFlag.MENTION, false,
-            MessageFlag.INTERACTIVE_CHAT, false,
-            MessageFlag.QUESTION, false
-    );
 
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
@@ -112,10 +108,10 @@ public class IntegrationSender {
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
         FEntity sender = eventMetadata.getSender();
         MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
-                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .withFlag(MessageFlag.TRANSLATE, false)
-                .withFlag(MessageFlag.OBJECT_PLAYER_HEAD, false)
-                .withFlag(MessageFlag.OBJECT_SPRITE, false)
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.TRANSLATE, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD},
+                        new boolean[]{eventMetadata.isSenderColorOut(), false, false, false}
+                )
                 .addTagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN));
 
         return messagePipeline.build(context);
@@ -126,8 +122,10 @@ public class IntegrationSender {
         if (StringUtils.isEmpty(message)) return Component.empty();
 
         MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), FPlayer.UNKNOWN, message)
-                .withFlags(DEFAULT_MESSAGE_FLAGS)
-                .withFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut());
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.TRANSLATE, MessageFlag.USER_MESSAGE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
+                        new boolean[]{eventMetadata.isSenderColorOut(), false, false, false, false, false}
+                );
 
         return messagePipeline.build(context);
     }

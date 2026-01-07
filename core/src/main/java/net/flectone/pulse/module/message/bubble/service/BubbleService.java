@@ -29,16 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleService {
 
-    private static final Map<MessageFlag, Boolean> PLAIN_MESSAGE_FLAGS = Map.of(MessageFlag.USER_MESSAGE, true,
-            MessageFlag.MENTION, false,
-            MessageFlag.INTERACTIVE_CHAT, false,
-            MessageFlag.QUESTION, false,
-            MessageFlag.TRANSLATE_ITEM, false,
-            MessageFlag.OBJECT_SPRITE, false,
-            MessageFlag.OBJECT_PLAYER_HEAD, false,
-            MessageFlag.REPLACE_DISABLED_TAGS, false
-    );
-
     private final Map<UUID, PlayerBubbleState> playerBubbleStates = new ConcurrentHashMap<>();
 
     private record PlayerBubbleState(
@@ -72,7 +62,12 @@ public class BubbleService {
                 uuid -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
         );
 
-        MessageContext messageContext = messagePipeline.createContext(sender, message).withFlags(PLAIN_MESSAGE_FLAGS);
+        MessageContext messageContext = messagePipeline.createContext(sender, message)
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATE_ITEM, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD, MessageFlag.REPLACE_DISABLED_TAGS},
+                        new boolean[]{false, false, false, false, false, false, false}
+                );
+
         List<Bubble> bubbles = splitMessageToBubbles(sender, messagePipeline.buildPlain(messageContext), receivers);
 
         state.waitingQueue.addAll(bubbles);

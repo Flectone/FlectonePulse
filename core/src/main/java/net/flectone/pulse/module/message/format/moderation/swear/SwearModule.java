@@ -129,7 +129,8 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             String symbols = localization(receiver).symbol().repeat(swear.length());
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, symbols)
-                    .withFlags(messageContext.flags());
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.USER_MESSAGE, false);
 
             Component component = messagePipeline.build(tagContext);
 

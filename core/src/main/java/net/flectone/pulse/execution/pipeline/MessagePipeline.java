@@ -112,7 +112,7 @@ public class MessagePipeline {
             Component deserialized = legacyComponentSerializer.deserialize(message);
 
             MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
-                    .withFlag(MessageFlag.USER_MESSAGE, true);
+                    .addFlag(MessageFlag.USER_MESSAGE, true);
 
             Component component = build(context)
                     .applyFallbackStyle(deserialized.style())
