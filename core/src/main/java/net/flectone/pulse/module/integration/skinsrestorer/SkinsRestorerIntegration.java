@@ -18,7 +18,6 @@ import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.event.SkinApplyEvent;
-import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.storage.PlayerStorage;
 
@@ -94,7 +93,7 @@ public class SkinsRestorerIntegration implements FIntegration {
         try {
             Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.getUuid(), fPlayer.getName());
             return skin.orElse(null);
-        } catch (DataRequestException e) {
+        } catch (Exception e) {
             return null;
         }
     }
