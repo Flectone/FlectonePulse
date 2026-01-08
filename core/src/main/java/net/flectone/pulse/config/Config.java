@@ -27,28 +27,28 @@ public record Config(
         @JsonPropertyDescription(" Don't change it if you don't know what it is")
         String version,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/language/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/language")
         Language language,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/database/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/database")
         Database database,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy")
         Proxy proxy,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/command/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/command")
         Command command,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
         Module module,
 
-        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/editor/")
+        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/editor")
         Editor editor,
 
-        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger/")
+        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger")
         Logger logger,
 
-        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/cache/")
+        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/cache")
         Cache cache,
 
         @JsonPropertyDescription("Help us improve FlectonePulse! This collects basic, anonymous data like server version and module usage. \nNo personal data, No IPs, No player names. \nThis helps us understand what features matter most and focus development where it's needed. \nYou can see the public stats here: https://flectone.net/pulse/metrics/ \nThanks for supporting the project! ❤️")

@@ -1,5 +1,6 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
@@ -32,67 +33,67 @@ import java.util.Map;
 @Jacksonized
 public record Message(
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
         Boolean enable,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk")
         Afk afk,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/anvil/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/anvil")
         Anvil anvil,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto")
         Auto auto,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book")
         Book book,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar")
         Bossbar bossbar,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand")
         Brand brand,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble")
         Bubble bubble,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat")
         Chat chat,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format")
         Format format,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting")
         Greeting greeting,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
         Join join,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective")
         Objective objective,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
         Quit quit,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
         Rightclick rightclick,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar")
         Sidebar sidebar,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sign/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sign")
         Sign sign,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status")
         Status status,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab")
         Tab tab,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update")
         Update update,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla")
         Vanilla vanilla
 
 ) implements EnableSetting {
@@ -264,37 +265,38 @@ public record Message(
             Boolean convertLegacyColor,
             List<AdventureTag> adventureTags,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fcolor/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fcolor")
             FColor fcolor,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fixation/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fixation")
             Fixation fixation,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/mention/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/mention")
             Mention mention,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation")
             Moderation moderation,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/names/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/names")
             Names names,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/object/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/object")
             Object object,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/questionanswer/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/questionanswer")
+            @JsonProperty("question_answer")
             QuestionAnswer questionAnswer,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/replacement/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/replacement")
             Replacement replacement,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/scoreboard/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/scoreboard")
             Scoreboard scoreboard,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/translate/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/translate")
             Translate translate,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/world/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/world")
             World world
 
     ) implements EnableSetting {
@@ -337,19 +339,19 @@ public record Message(
         public record Moderation(
                 Boolean enable,
 
-                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/caps/")
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/caps")
                 Caps caps,
 
-                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/delete/")
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/delete")
                 Delete delete,
 
-                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/newbie/")
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/newbie")
                 Newbie newbie,
 
-                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/flood/")
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/flood")
                 Flood flood,
 
-                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/swear/")
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/moderation/swear")
                 Swear swear
 
         ) implements EnableSetting {
@@ -518,10 +520,10 @@ public record Message(
     public record Objective(
             Boolean enable,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/belowname/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/belowname")
             Belowname belowname,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/tabname/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/tabname")
             Tabname tabname
 
     ) implements EnableSetting {
@@ -594,16 +596,16 @@ public record Message(
     public record Status(
             Boolean enable,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/icon/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/icon")
             Icon icon,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/motd/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/motd")
             MOTD motd,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/players/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/players")
             Players players,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/version/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/status/version")
             Version version
 
     ) implements EnableSetting {
@@ -654,13 +656,13 @@ public record Message(
     public record Tab(
             Boolean enable,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/header/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/header")
             Header header,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/footer/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/footer")
             Footer footer,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/playerlistname/")
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/tab/playerlistname")
             Playerlistname playerlistname
 
     ) implements EnableSetting {

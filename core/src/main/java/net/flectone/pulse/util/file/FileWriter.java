@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.exception.FileWriteException;
 import net.flectone.pulse.model.file.FilePack;
-import org.apache.commons.lang3.Strings;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -81,10 +79,7 @@ public class FileWriter {
         if (pathToFile.toFile().lastModified() == LAST_MODIFIED_TIME) return;
 
         Map<String, String> comments = new LinkedHashMap<>();
-
-        boolean english = fileResource instanceof Localization localization
-                && !localization.language().equals("ru_ru");
-        collectDescriptions(fileResource.getClass(), "", comments, new HashSet<>(), english);
+        collectDescriptions(fileResource.getClass(), "", comments, new HashSet<>());
 
         try {
             String yaml = yamlMapper.writeValueAsString(fileResource);
@@ -98,7 +93,7 @@ public class FileWriter {
         }
     }
 
-    private void collectDescriptions(Class<?> clazz, String basePath, Map<String, String> out, Set<Class<?>> visited, boolean english) {
+    private void collectDescriptions(Class<?> clazz, String basePath, Map<String, String> out, Set<Class<?>> visited) {
         if (clazz == null || visited.contains(clazz)) return;
         visited.add(clazz);
 
@@ -114,16 +109,12 @@ public class FileWriter {
             JsonPropertyDescription propertyDescription = field.getAnnotation(JsonPropertyDescription.class);
             if (propertyDescription != null && propertyDescription.value() != null && !propertyDescription.value().isEmpty()) {
                 String comment = propertyDescription.value().trim();
-                if (english) {
-                    comment = Strings.CS.replace(comment, "https://flectone.net/pulse/", "https://flectone.net/en/pulse/");
-                }
-
                 out.put(path, comment);
             }
 
             Class<?> classField = field.getType();
             if (isUserType(classField)) {
-                collectDescriptions(classField, path, out, visited, english);
+                collectDescriptions(classField, path, out, visited);
             }
         }
     }

@@ -26,18 +26,18 @@ public record Localization(
         @JsonIgnore
         String language,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
         String cooldown,
 
         Time time,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command")
         Command command,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration")
         Integration integration,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
         Message message
 ) {
 
@@ -59,138 +59,138 @@ public record Localization(
             Exception exception,
             Prompt prompt,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/anon/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/anon")
             Anon anon,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ball/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ball")
             Ball ball,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ban/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ban")
             Ban ban,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/banlist/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/banlist")
             Banlist banlist,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/broadcast/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/broadcast")
             Broadcast broadcast,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatcolor/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatcolor")
             Chatcolor chatcolor,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatsetting/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatsetting")
             Chatsetting chatsetting,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearchat/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearchat")
             Clearchat clearchat,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearmail/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearmail")
             Clearmail clearmail,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/coin/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/coin")
             Coin coin,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/deletemessage/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/deletemessage")
             Deletemessage deletemessage,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/dice/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/dice")
             Dice dice,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do")
             @JsonProperty("do")
             CommandDo commandDo,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/emit/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/emit")
             Emit emit,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse")
             Flectonepulse flectonepulse,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/geolocate/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/geolocate")
             Geolocate geolocate,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/helper/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/helper")
             Helper helper,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignore/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignore")
             Ignore ignore,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignorelist/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignorelist")
             Ignorelist ignorelist,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/kick/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/kick")
             Kick kick,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mail/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mail")
             Mail mail,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/maintenance/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/maintenance")
             Maintenance maintenance,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me")
             Me me,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute")
             Mute mute,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist")
             Mutelist mutelist,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online")
             Online online,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ping/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ping")
             Ping ping,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/poll/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/poll")
             Poll poll,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/reply/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/reply")
             Reply reply,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors")
             Rockpaperscissors rockpaperscissors,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/sprite/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/sprite")
             Sprite sprite,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy")
             Spy spy,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/stream/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/stream")
             Stream stream,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/symbol/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/symbol")
             Symbol symbol,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tell/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tell")
             Tell tell,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe")
             Tictactoe tictactoe,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline")
             Toponline toponline,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/translateto/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/translateto")
             Translateto translateto,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/try/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/try")
             @JsonProperty("try")
             CommandTry commandTry,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unban/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unban")
             Unban unban,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unmute/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unmute")
             Unmute unmute,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unwarn/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unwarn")
             Unwarn unwarn,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warn/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warn")
             Warn warn,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist")
             Warnlist warnlist
     ) implements LocalizationSetting {
 
@@ -761,13 +761,13 @@ public record Localization(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Integration(
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord")
             Discord discord,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram")
             Telegram telegram,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch")
             Twitch twitch
     ) implements LocalizationSetting {
 
@@ -861,55 +861,55 @@ public record Localization(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Message(
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk")
             Afk afk,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto")
             Auto auto,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bossbar")
             Bossbar bossbar,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand")
             Brand brand,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble")
             Bubble bubble,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat")
             Chat chat,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format")
             Format format,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting")
             Greeting greeting,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective")
             Objective objective,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
             Rightclick rightclick,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar")
             Sidebar sidebar,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status")
             Status status,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab")
             Tab tab,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update")
             Update update,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla")
             Vanilla vanilla
     ) implements LocalizationSetting {
 
@@ -971,25 +971,25 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Format(
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement")
                 Replacement replacement,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/mention/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/mention")
                 Mention mention,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation")
                 Moderation moderation,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/names/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/names")
                 Names names,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer")
                 QuestionAnswer questionAnswer,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
                 Translate translate
         ) implements LocalizationSetting {
 
@@ -1020,13 +1020,13 @@ public record Localization(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Moderation(
-                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/delete/")
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/delete")
                     Delete delete,
 
-                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/newbie/")
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/newbie")
                     Newbie newbie,
 
-                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear/")
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear")
                     Swear swear
             ) implements LocalizationSetting {
 
@@ -1090,10 +1090,10 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Objective(
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/belowname/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/belowname")
                 Belowname belowname,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/tabname/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/tabname")
                 Tabname tabname
         ) implements LocalizationSetting {
 
@@ -1129,13 +1129,13 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Status(
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/motd/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/motd")
                 MOTD motd,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/players/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/players")
                 Players players,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/version/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/version")
                 Version version
         ) implements LocalizationSetting {
 
@@ -1173,13 +1173,13 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Tab(
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/header/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/header")
                 Header header,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/footer/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/footer")
                 Footer footer,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/playerlistname/")
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/playerlistname")
                 Playerlistname playerlistname
         ) implements LocalizationSetting {
 

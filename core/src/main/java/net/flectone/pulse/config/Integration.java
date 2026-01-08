@@ -25,85 +25,85 @@ import java.util.Map;
 @Jacksonized
 public record Integration(
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration")
         Boolean enable,
 
         String avatarApiUrl,
         String bodyApiUrl,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban")
         Advancedban advancedban,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl")
         Deepl deepl,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord")
         Discord discord,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/floodgate/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/floodgate")
         Floodgate floodgate,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser")
         Geyser geyser,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat")
         Interactivechat interactivechat,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder")
         Itemsadder itemsadder,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/libertybans")
         Libertybans libertybans,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans")
         Litebans litebans,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms")
         Luckperms luckperms,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance")
         Maintenance maintenance,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd")
         MiniMOTD minimotd,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders")
         MiniPlaceholders miniplaceholders,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd")
         MOTD motd,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi")
         Placeholderapi placeholderapi,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice")
         Plasmovoice plasmovoice,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice")
         Simplevoice simplevoice,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer")
         Skinsrestorer skinsrestorer,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish")
         Supervanish supervanish,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab")
         Tab tab,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram")
         Telegram telegram,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton")
         Triton triton,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch")
         Twitch twitch,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault")
         Vault vault,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex")
         Yandex yandex
 
 ) implements EnableSetting {
