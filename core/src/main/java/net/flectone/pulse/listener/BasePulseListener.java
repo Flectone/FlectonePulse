@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.sprite.SpriteModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.tab.TabModule;
@@ -108,6 +109,12 @@ public class BasePulseListener implements PulseListener {
         if (eventModule instanceof ToponlineModule
                 && platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             fLogger.warning("Toponline module is not supported on Fabric");
+            return event.withCancelled(true);
+        }
+
+        if (eventModule instanceof SpriteModule
+                && packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_21_9)) {
+            fLogger.warning("Sprite module command is not supported on this version of Minecraft");
             return event.withCancelled(true);
         }
 
