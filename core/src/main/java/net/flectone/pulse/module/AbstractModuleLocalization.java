@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -14,6 +15,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
@@ -132,11 +134,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
         if (receivers.isEmpty()) return;
 
-        FPlayer regionPlayer = eventMetadata.getSender() instanceof FPlayer fPlayer
-                ? fPlayer
-                : fPlayerService.getRandomFPlayer();
-
-        taskScheduler.runRegion(regionPlayer, () -> receivers.forEach(receiver -> {
+        SchedulerRunnable sendMessageRunnable = () -> receivers.forEach(receiver -> {
             // example
             // format: TheFaser > <message>
             // message: hello world!
@@ -159,7 +157,18 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
                     subComponent,
                     eventMetadata
             ));
-        }));
+        });
+
+        // fix Folia issue
+        if (eventMetadata instanceof QuitMetadata<M>) {
+            taskScheduler.runAsync(sendMessageRunnable);
+        } else {
+            FPlayer regionPlayer = eventMetadata.getSender() instanceof FPlayer fPlayer
+                    ? fPlayer
+                    : fPlayerService.getRandomFPlayer();
+
+            taskScheduler.runRegion(regionPlayer, sendMessageRunnable);
+        }
     }
 
     public void sendErrorMessage(EventMetadata<M> eventMetadata) {

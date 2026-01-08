@@ -54,7 +54,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (isModuleDisabledFor(fPlayer)) return;
 
             sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
