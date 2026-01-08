@@ -64,8 +64,8 @@ public class BubbleService {
 
         MessageContext messageContext = messagePipeline.createContext(sender, message)
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATE_ITEM, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD, MessageFlag.REPLACE_DISABLED_TAGS},
-                        new boolean[]{false, false, false, false, false, false, false}
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATE_ITEM, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD, MessageFlag.REPLACE_DISABLED_TAGS},
+                        new boolean[]{true, false, false, false, false, false, false, false}
                 );
 
         List<Bubble> bubbles = splitMessageToBubbles(sender, messagePipeline.buildPlain(messageContext), receivers);

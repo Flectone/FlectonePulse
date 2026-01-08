@@ -194,8 +194,8 @@ public class BubbleRenderer {
 
         MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.USER_MESSAGE},
-                        new boolean[]{false, false, false, true}
+                        new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
+                        new boolean[]{false, false, false}
                 );
 
         Component message = messagePipeline.build(messageContext);
