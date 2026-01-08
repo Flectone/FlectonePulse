@@ -123,8 +123,8 @@ public class IntegrationSender {
 
         MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), FPlayer.UNKNOWN, message)
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.TRANSLATE, MessageFlag.USER_MESSAGE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
-                        new boolean[]{eventMetadata.isSenderColorOut(), false, false, false, false, false}
+                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
+                        new boolean[]{eventMetadata.isSenderColorOut(), true, false, false, false, false}
                 );
 
         return messagePipeline.build(context);
