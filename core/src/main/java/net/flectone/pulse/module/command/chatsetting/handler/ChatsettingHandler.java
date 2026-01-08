@@ -17,19 +17,17 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -40,7 +38,6 @@ public class ChatsettingHandler {
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
-    private final FLogger fLogger;
 
     public Permission.Message.Chat chatPermission() {
         return fileFacade.permission().message().chat();
@@ -105,27 +102,38 @@ public class ChatsettingHandler {
             String message = subMenu.types().getOrDefault(item.name(), "");
             for (Map.Entry<Integer, String> entry : item.colors().entrySet()) {
                 String trigger = "<fcolor:" + entry.getKey() + ">";
-                String value = entry.getValue().isBlank() ? trigger : entry.getValue();
+
+                // "null" - skip color
+                // "" (empty) - default color
+                String value = StringUtils.isEmpty(entry.getValue())
+                        ? fileFacade.message().format().fcolor().defaultColors().getOrDefault(entry.getKey(), trigger)
+                        : "null".equals(entry.getValue()) ? trigger : entry.getValue();
+
                 message = Strings.CS.replace(message, trigger, value);
             }
             return message;
         };
 
-        // replace old fcolors to new and not save new empty fcolors
-        Consumer<SubMenuItem> onSelect = item -> fTarget.getFColors().put(type,
-                Stream.concat(fTarget.getFColors().getOrDefault(type, Set.of()).stream(), item.colors().entrySet().stream()
-                                .filter(entry -> StringUtils.isNotEmpty(entry.getValue()))
-                                .map(entry -> new FColor(entry.getKey(), entry.getValue()))
-                )
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toUnmodifiableMap(
-                                FColor::number,
-                                Function.identity(),
-                                (oldFColor, newFColor) -> newFColor
-                        ),
-                        map -> Set.copyOf(map.values())
-                ))
-        );
+        Consumer<SubMenuItem> onSelect = item -> {
+            Set<FColor> fColors = new HashSet<>(fTarget.getFColors().getOrDefault(type, Set.of()));
+
+            // skip "null" colors replace
+            item.colors().entrySet().stream()
+                    .filter(entry -> !"null".equals(entry.getValue()))
+                    .forEach(entry -> {
+                        Integer number = entry.getKey();
+                        String value = entry.getValue();
+
+                        fColors.removeIf(fColor -> fColor.number() == number);
+
+                        if (StringUtils.isNotEmpty(value)) {
+                            fColors.add(new FColor(number, value));
+                        }
+
+                    });
+
+            fTarget.getFColors().put(type, Set.copyOf(fColors));
+        };
 
         String headerStr = subMenu.inventory();
         MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, headerStr);

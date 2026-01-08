@@ -11,14 +11,14 @@ import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.constant.DefaultLocalization;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -477,6 +477,47 @@ public class FileMigrator {
         }
 
         return files.withLocalizations(newLocalizations);
+    }
+
+    public FilePack migration_1_7_4(FilePack files) {
+        Command.Chatsetting.Menu menu = files.command().chatsetting().menu();
+
+        UnaryOperator<List<Command.Chatsetting.Menu.Color.Type>> migrateTypeOperator = types -> {
+            List<Command.Chatsetting.Menu.Color.Type> newTypes = new LinkedList<>();
+
+            for (Command.Chatsetting.Menu.Color.Type type : types) {
+                if ("default".equals(type.name())) {
+                    newTypes.add(type);
+                    continue;
+                }
+
+                newTypes.add(Command.Chatsetting.Menu.Color.Type.builder()
+                        .name(type.name())
+                        .material(type.material())
+                        .colors(type.colors().entrySet().stream()
+                                .collect(Collectors.toMap(
+                                                Map.Entry::getKey,
+                                                entry -> StringUtils.isEmpty(entry.getValue()) ? "null" : entry.getValue(),
+                                                (object, object2) -> object,
+                                                LinkedHashMap::new
+                                        )
+                                ))
+                        .build()
+                );
+
+            }
+
+            return newTypes;
+        };
+
+        return files.withCommand(
+                files.command().withChatsetting(
+                        files.command().chatsetting().withMenu(menu
+                                .withSee(menu.see().withTypes(migrateTypeOperator.apply(menu.see().types())))
+                                .withOut(menu.out().withTypes(migrateTypeOperator.apply(menu.out().types())))
+                        )
+                )
+        );
     }
 
 }
