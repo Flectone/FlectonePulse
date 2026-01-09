@@ -200,9 +200,10 @@ public class FileLoader {
     }
 
     private Localization getDefaultLocalizationByLanguage(String language, Map<String, Localization> localizations) {
-        return language.toLowerCase().contains("ru")
+        return localizations.getOrDefault(language, language.toLowerCase().contains("ru")
                 ? localizations.get(DefaultLocalization.RUSSIAN.getName())
-                : localizations.get(DefaultLocalization.ENGLISH.getName());
+                : localizations.get(DefaultLocalization.ENGLISH.getName())
+        );
     }
 
 }
