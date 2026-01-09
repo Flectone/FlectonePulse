@@ -184,7 +184,7 @@ public class BubbleRenderer {
     }
 
     private int rideEntity(BubbleEntity nextBubbleEntity, int entityId, int[] passengersIds) {
-        packetSender.send(nextBubbleEntity.getViewer(), new WrapperPlayServerSetPassengers(entityId, passengersIds));
+        packetSender.send(nextBubbleEntity.getViewer(), new WrapperPlayServerSetPassengers(entityId, passengersIds), true);
 
         return nextBubbleEntity.getId();
     }
