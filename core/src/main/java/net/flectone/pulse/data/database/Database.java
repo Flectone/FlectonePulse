@@ -250,7 +250,17 @@ public class Database {
 
             if (line.endsWith(";")) {
                 String sql = builder.toString();
-                getJdbi().useHandle(handle -> handle.execute(sql));
+                getJdbi().useHandle(handle -> {
+                    try {
+                        handle.execute(sql);
+                    } catch (Exception e) {
+                        // skip MySQL "index already exists"
+                        if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists")) {
+                            throw e;
+                        }
+                    }
+                });
+
                 builder.setLength(0);
             }
         }
