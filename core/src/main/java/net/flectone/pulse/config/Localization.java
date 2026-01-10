@@ -987,6 +987,7 @@ public record Localization(
                 Names names,
 
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer")
+                @JsonProperty("question_answer")
                 QuestionAnswer questionAnswer,
 
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
