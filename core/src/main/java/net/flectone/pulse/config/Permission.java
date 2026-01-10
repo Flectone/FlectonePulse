@@ -24,7 +24,7 @@ import java.util.Map;
 @Jacksonized
 public record Permission(
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
         PermissionEntry module,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command")
