@@ -553,8 +553,8 @@ message:
     format_first_time: "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!"
   objective:
     belowname:
-      display_format: ""
-      score_format: "<fcolor:1><score> мс"
+      display_format: "<fcolor:1>мс"
+      score_format: "<fcolor:1><score>"
     tabname:
       display_format: ""
       score_format: "<fcolor:1><score> мс"
