@@ -1,4 +1,4 @@
-version: "1.7.4"
+version: "1.7.5-SNAPSHOT"
 language:
   type: "en_us"
   by_player: true
