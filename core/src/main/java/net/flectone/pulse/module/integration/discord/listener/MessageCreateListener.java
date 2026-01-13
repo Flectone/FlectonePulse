@@ -185,7 +185,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = FPlayer.UNKNOWN;
+            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
             Snowflake channel = message.getChannelId();
 
             if (command.needPlayer()) {
@@ -195,10 +195,12 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 }
 
                 String playerName = arguments.split(" ")[0];
-                fPlayer = fPlayerService.getFPlayer(playerName);
-                if (fPlayer.isUnknown()) {
+                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
+                if (argumentFPlayer.isUnknown()) {
                     sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
                     return true;
+                } else {
+                    fPlayer = argumentFPlayer;
                 }
             }
 

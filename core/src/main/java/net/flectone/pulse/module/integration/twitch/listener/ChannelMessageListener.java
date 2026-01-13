@@ -137,7 +137,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = FPlayer.UNKNOWN;
+            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
             String channel = event.getChannel().getName();
 
             if (command.needPlayer()) {
@@ -147,10 +147,12 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 }
 
                 String playerName = arguments.split(" ")[0];
-                fPlayer = fPlayerService.getFPlayer(playerName);
+                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
                 if (fPlayer.isUnknown()) {
                     sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
                     return true;
+                } else {
+                    fPlayer = argumentFPlayer;
                 }
             }
 

@@ -153,7 +153,7 @@ public class MessageListener extends EventListener {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = FPlayer.UNKNOWN;
+            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
 
             if (command.needPlayer()) {
                 if (arguments.isEmpty()) {
@@ -162,10 +162,12 @@ public class MessageListener extends EventListener {
                 }
 
                 String playerName = arguments.split(" ")[0];
-                fPlayer = fPlayerService.getFPlayer(playerName);
-                if (fPlayer.isUnknown()) {
+                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
+                if (argumentFPlayer.isUnknown()) {
                     sendMessageToTelegram(message, buildMessage(fPlayer, Localization.Integration.Telegram::nullPlayer));
                     return true;
+                } else {
+                    fPlayer = argumentFPlayer;
                 }
             }
 
