@@ -148,7 +148,10 @@ public abstract class IntegrationModule extends AbstractModule {
         if (!isEnable()) return false;
 
         if (containsChild(LuckPermsModule.class)) {
-            return injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
+            LuckPermsModule luckPermsModule = getInstance(LuckPermsModule.class);
+            if (luckPermsModule.isEnable()) {
+                return luckPermsModule.hasLuckPermission(fPlayer, permission);
+            }
         }
 
         return false;

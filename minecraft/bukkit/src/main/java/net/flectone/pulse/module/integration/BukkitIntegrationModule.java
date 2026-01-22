@@ -143,7 +143,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
         boolean value = super.hasFPlayerPermission(fPlayer, permission);
 
         if (containsChild(VaultModule.class)) {
-            value = value && getInstance(VaultModule.class).hasVaultPermission(fPlayer, permission);
+            VaultModule vaultModule = getInstance(VaultModule.class);
+            if (vaultModule.isEnable()) {
+                value = value && vaultModule.hasVaultPermission(fPlayer, permission);
+            }
         }
 
         return value;
