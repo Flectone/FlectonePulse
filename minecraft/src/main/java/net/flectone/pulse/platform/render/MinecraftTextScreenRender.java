@@ -13,9 +13,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.TextScreen;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
@@ -44,6 +46,8 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     private final RandomUtil randomUtil;
     private final EntityUtil entityUtil;
     private final Provider<BubbleRenderer> bubbleRenderer;
+    private final Provider<TitleRender> titleRender;
+    private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
     @Override
     public void clear() {
@@ -53,6 +57,12 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
     @Override
     public void render(FPlayer fPlayer, Component message, TextScreen textScreen) {
+        // fallback for legacy versions
+        if (!isNewerThanOrEqualsV_1_19_4) {
+            titleRender.get().render(fPlayer, message, Component.empty(), Destination.DEFAULT_TIMES);
+            return;
+        }
+
         Optional<Integer> optionalId = spawn(fPlayer, message, textScreen);
         if (optionalId.isEmpty()) return;
 
