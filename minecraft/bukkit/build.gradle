@@ -1,0 +1,51 @@
+dependencies {
+    implementation project(":minecraft")
+    implementation fileTree("library") { include "*.jar" }
+
+    compileOnly project(":core")
+    compileOnly project(":minecraft:paper")
+    compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
+    compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
+    compileOnly "org.spigotmc:spigot-api:$spigot_version"
+    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+    compileOnly "me.clip:placeholderapi:$placeholderapi_version"
+    compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
+    compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
+    compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
+    compileOnly "com.rexcantor64.triton:triton-api:$tritonapi_version"
+    compileOnly "com.gitlab.ruany:LiteBansAPI:$litebans_version"
+    compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
+    compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+    compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
+    compileOnly "com.mojang:authlib:$mojang_authlib_version"
+    compileOnly "space.arim.libertybans:bans-api:$libertybans_version"
+}
+
+shadowJar {
+    relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
+}
+
+processResources {
+    def props = [version: "$project_version", prefix: "$project_name", author: "$project_author", description: "$project_description", website: "$project_website"]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+
+tasks.named("buildFinalJar", Jar) {
+    def platforms = [project(":minecraft:paper"), project(":minecraft:bukkit"), project(":minecraft:velocity"), project(":minecraft:bungeecord")]
+
+    from {
+        platforms.collect { proj ->
+            zipTree(proj.tasks.named("shadeDowngradedApi").get().archiveFile.get().asFile)
+        }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
+}

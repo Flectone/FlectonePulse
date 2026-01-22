@@ -21,6 +21,8 @@ public interface PermissionChecker {
      * @param permission The permission object to verify
      * @return true if the entity has the permission, false otherwise
      */
-    boolean check(FEntity entity, PermissionSetting permission);
+    default boolean check(FEntity entity, PermissionSetting permission) {
+        return permission == null || check(entity, permission.name());
+    }
 
 }

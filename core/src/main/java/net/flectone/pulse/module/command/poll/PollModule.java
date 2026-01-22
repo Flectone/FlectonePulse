@@ -1,9 +1,7 @@
 package net.flectone.pulse.module.command.poll;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
@@ -16,11 +14,9 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
@@ -53,8 +49,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final TaskScheduler taskScheduler;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-    private final PacketProvider packetProvider;
-    private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
     private final FLogger fLogger;
 
     @Override
@@ -72,14 +66,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .required(promptMultipleVote, commandParserProvider.booleanParser())
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
-
-        if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
-            registerCustomCommand(manager ->
-                    manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
-                            .permission(permission().create().name())
-                            .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
-            );
-        }
 
         String promptId = addPrompt(4, Localization.Command.Prompt::id);
         String promptNumber = addPrompt(5, Localization.Command.Prompt::number);

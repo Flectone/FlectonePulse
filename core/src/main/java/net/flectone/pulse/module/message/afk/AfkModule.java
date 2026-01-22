@@ -112,7 +112,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             if (isModuleDisabledFor(fPlayer)) return;
             if (config().ignore().contains(action)) return;
 
-            playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
+            playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0, 0, 0)));
             check(fPlayer);
         });
     }

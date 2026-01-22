@@ -3,8 +3,6 @@ package net.flectone.pulse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.common.cache.Cache;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
@@ -68,9 +66,6 @@ public abstract class PlatformInjector extends AbstractModule {
         // bind paths
         setupPaths();
 
-        // bind booleans
-        setupBooleans();
-
         // create jackson mapper
         bind(ObjectMapper.class).toInstance(createMapper());
 
@@ -98,16 +93,6 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
         bind(Path.class).annotatedWith(Names.named("backupPath")).toInstance(projectPath.resolve("backups"));
         bind(Path.class).annotatedWith(Names.named("minecraftPath")).toInstance(projectPath.resolve("minecraft"));
-    }
-
-    private void setupBooleans() {
-        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-
-        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_14")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14));
-        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_16")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16));
-        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_19_4")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4));
-        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_6")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_6));
-        bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_9")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9));
     }
 
     @Provides @Singleton @Named("cooldown")

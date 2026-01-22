@@ -11,10 +11,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -25,15 +23,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
-    private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
-
-    @Override
-    public void onEnable() {
-        super.onEnable();
-
-        listenerRegistry.register(JoinPulseListener.class);
-    }
 
     @Override
     public MessageType messageType() {

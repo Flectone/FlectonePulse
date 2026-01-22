@@ -1,30 +1,23 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.chatsetting.builder.DialogMenuBuilder;
-import net.flectone.pulse.module.command.chatsetting.builder.InventoryMenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -36,9 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-@Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
+public abstract class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -46,10 +37,23 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final ProxyRegistry proxyRegistry;
-    private final Provider<DialogMenuBuilder> dialogMenuBuilderProvider;
-    private final Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider;
     private final SoundPlayer soundPlayer;
-    private final @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6;
+
+    protected ChatsettingModule(FileFacade fileFacade,
+                                FPlayerService fPlayerService,
+                                PermissionChecker permissionChecker,
+                                CommandParserProvider commandParserProvider,
+                                ProxySender proxySender,
+                                ProxyRegistry proxyRegistry,
+                                SoundPlayer soundPlayer) {
+        this.fileFacade = fileFacade;
+        this.fPlayerService = fPlayerService;
+        this.permissionChecker = permissionChecker;
+        this.commandParserProvider = commandParserProvider;
+        this.proxySender = proxySender;
+        this.proxyRegistry = proxyRegistry;
+        this.soundPlayer = soundPlayer;
+    }
 
     @Override
     public void onEnable() {
@@ -151,11 +155,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         saveSetting(fTarget, messageType);
     }
 
+    protected abstract MenuBuilder getMenuBuilder();
+
     private void open(FPlayer fPlayer, FPlayer fTarget) {
-        MenuBuilder menuBuilder = config().modern().enable() && isNewerThanOrEqualsV_1_21_6
-                ? dialogMenuBuilderProvider.get()
-                : inventoryMenuBuilderProvider.get();
-        menuBuilder.open(fPlayer, fTarget);
+        getMenuBuilder().open(fPlayer, fTarget);
     }
 
     public void saveSetting(FPlayer fPlayer, String messageType) {

@@ -1,7 +1,6 @@
 package net.flectone.pulse.platform.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -66,19 +65,11 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
-import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.module.message.vanilla.VanillaModule;
-import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
-import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
@@ -106,10 +97,12 @@ public class ProxyMessageHandler {
                 MessageType tag = MessageType.fromProxyString(input.readUTF());
                 if (tag == null) return;
 
+                UUID uuid = UUID.fromString(input.readUTF());
+
                 switch (tag) {
-                    case SYSTEM_ONLINE -> handleSystemOnline(input);
-                    case SYSTEM_OFFLINE -> handleSystemOffline(input);
-                    default -> handleTaggedMessage(input, tag);
+                    case SYSTEM_ONLINE -> handleSystemOnline(uuid);
+                    case SYSTEM_OFFLINE -> handleSystemOffline(uuid);
+                    default -> handleProxyMessage(input, uuid, tag);
                 }
             } catch (IOException e) {
                 fLogger.warning(e);
@@ -117,24 +110,15 @@ public class ProxyMessageHandler {
         });
     }
 
-    private void handleSystemOnline(DataInputStream input) throws IOException {
-        UUID uuid = UUID.fromString(input.readUTF());
-
+    public void handleSystemOnline(UUID uuid) throws IOException {
         fPlayerService.invalidateOffline(uuid);
-
-        injector.getInstance(PlayerlistnameModule.class).add(uuid);
     }
 
-    private void handleSystemOffline(DataInputStream input) throws IOException {
-        UUID uuid = UUID.fromString(input.readUTF());
-
+    public void handleSystemOffline(UUID uuid) throws IOException {
         fPlayerService.invalidateOnline(uuid);
-
-        injector.getInstance(PlayerlistnameModule.class).remove(uuid);
     }
 
-    private void handleTaggedMessage(DataInputStream input, MessageType tag) throws IOException {
-        UUID metadataUUID = UUID.fromString(input.readUTF());
+    public void handleProxyMessage(DataInputStream input, UUID metadataUUID, MessageType tag) throws IOException {
         Set<String> proxyClusters = gson.fromJson(input.readUTF(), new TypeToken<Set<String>>() {}.getType());
 
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
@@ -150,6 +134,10 @@ public class ProxyMessageHandler {
             return;
         }
 
+        handleModuleMessage(input, fEntity, metadataUUID, tag);
+    }
+
+    public void handleModuleMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID, MessageType tag) throws IOException {
         switch (tag) {
             case COMMAND_ANON -> handleAnonCommand(input, fEntity, metadataUUID);
             case COMMAND_ME -> handleMeCommand(input, fEntity, metadataUUID);
@@ -183,7 +171,6 @@ public class ProxyMessageHandler {
             case JOIN -> handleJoin(input, fEntity, metadataUUID);
             case QUIT -> handleQuit(input, fEntity, metadataUUID);
             case AFK -> handleAfk(input, fEntity, metadataUUID);
-            case VANILLA -> handleVanilla(input, fEntity, metadataUUID);
         }
     }
 
@@ -382,7 +369,9 @@ public class ProxyMessageHandler {
         if (module.isModuleDisabledFor(fEntity)) return;
 
         FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
-        Destination destination = gson.fromJson(input.readUTF(), Destination.class);
+
+        Map<String, Object> destinationMap = gson.fromJson(input.readUTF(), new TypeToken<Map<String, Object>>(){}.getType());
+        Destination destination = Destination.fromJson(destinationMap);
         String message = input.readUTF();
 
         if (fTarget.isConsole()) {
@@ -840,51 +829,11 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleVanilla(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        VanillaModule module = injector.getInstance(VanillaModule.class);
-        if (module.isModuleDisabledFor(fEntity)) return;
-
-        String translationKey = input.readUTF();
-        Map<Integer, Object> arguments = parseVanillaArguments(readAsJsonObject(input));
-
-        Message.Vanilla.VanillaMessage vanillaMessage = injector.getInstance(Extractor.class).getVanillaMessage(translationKey);
-
-        ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
-
-        String vanillaMessageName = vanillaMessage.name();
-
-        module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
-                .uuid(metadataUUID)
-                .parsedComponent(parsedComponent)
-                .sender(fEntity)
-                .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
-                .range(Range.get(Range.Type.SERVER))
-                .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                .destination(parsedComponent.vanillaMessage().destination())
-                .build()
-        );
-    }
-
-    private Map<Integer, Object> parseVanillaArguments(JsonObject jsonObject) {
-        Map<Integer, Object> result = new HashMap<>();
-
-        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            Integer key = Integer.parseInt(entry.getKey());
-            JsonObject argumentJson = entry.getValue().getAsJsonObject();
-
-            Optional<FEntity> entity = parseFEntity(argumentJson);
-            result.put(key, entity.isPresent() ? entity.get() : gson.fromJson(argumentJson, Component.class));
-        }
-
-        return result;
-    }
-
-    private JsonObject readAsJsonObject(DataInputStream input) throws IOException {
+    protected JsonObject readAsJsonObject(DataInputStream input) throws IOException {
         return gson.fromJson(input.readUTF(), JsonObject.class);
     }
 
-    private Optional<FEntity> parseFEntity(JsonObject jsonObject) {
+    protected Optional<FEntity> parseFEntity(JsonObject jsonObject) {
         if (jsonObject.has("name") && jsonObject.has("uuid") && jsonObject.has("type")) {
             boolean isPlayer =  "PLAYER".equals(jsonObject.get("type").getAsString());
             return Optional.of(gson.fromJson(jsonObject, isPlayer ? FPlayer.class : FEntity.class));

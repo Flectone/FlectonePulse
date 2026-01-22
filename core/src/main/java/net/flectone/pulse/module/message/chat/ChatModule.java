@@ -18,11 +18,8 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.chat.listener.ChatPacketListener;
 import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
@@ -30,7 +27,6 @@ import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -46,26 +42,15 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
-    private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
     private final Provider<BubbleModule> bubbleModuleProvider;
     private final Provider<SpyModule> spyModuleProvider;
-    private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MuteSender muteSender;
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
     private final ProxyRegistry proxyRegistry;
-
-    @Override
-    public void onEnable() {
-        super.onEnable();
-
-        if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
-            listenerRegistry.register(ChatPacketListener.class);
-        }
-    }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {

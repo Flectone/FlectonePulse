@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.Set;
 
 @Singleton
-public class BukkitIntegrationModule extends IntegrationModule {
+public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;

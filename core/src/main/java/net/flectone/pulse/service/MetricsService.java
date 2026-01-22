@@ -8,7 +8,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.MetricsSender;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -21,7 +20,6 @@ public class MetricsService {
     private final TaskScheduler taskScheduler;
     private final MetricsSender metricsSender;
     private final PlatformServerAdapter platformServerAdapter;
-    private final PacketProvider packetProvider;
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
 
@@ -35,7 +33,7 @@ public class MetricsService {
         MetricsDTO metricsDTO = MetricsDTO.builder()
                 .serverUUID(platformServerAdapter.getServerUUID())
                 .serverCore(platformServerAdapter.getServerCore())
-                .serverVersion(packetProvider.getServerVersion().getReleaseName())
+                .serverVersion(platformServerAdapter.getServerVersionName())
                 .osName(getOsName())
                 .osArchitecture(getOsArch())
                 .osVersion(getOsVersion())

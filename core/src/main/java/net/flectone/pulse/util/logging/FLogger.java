@@ -1,12 +1,10 @@
 package net.flectone.pulse.util.logging;
 
 import com.google.inject.Singleton;
-import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -129,10 +127,5 @@ public class FLogger extends Logger {
 
     public void warning(Throwable throwable) {
         warning("An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues", throwable);
-    }
-
-    public void warningTree(Component component) {
-        String json = GsonComponentSerializer.gson().serialize(component);
-        warning(json);
     }
 }

@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.format.names.listener;
 
-import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +33,6 @@ public class NamesPulseListener implements PulseListener {
 
     private boolean isInvisible(FEntity entity) {
         return namesModule.config().shouldCheckInvisibility()
-                && platformPlayerAdapter.hasPotionEffect(entity, PotionTypes.INVISIBILITY);
+                && platformPlayerAdapter.hasPotionEffect(entity, "INVISIBILITY");
     }
 }

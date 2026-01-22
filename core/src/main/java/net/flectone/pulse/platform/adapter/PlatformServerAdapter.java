@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.adapter;
 
-import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.gson.JsonElement;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -68,6 +67,13 @@ public interface PlatformServerAdapter {
      * @return a string representing server UUID
      */
     @NonNull String getServerUUID();
+
+    /**
+     * Returns server version.
+     *
+     * @return a string representing server version
+     */
+    String getServerVersionName();
 
     /**
      * Gets the platform type.
@@ -147,7 +153,7 @@ public interface PlatformServerAdapter {
      * @param lore the item lore
      * @return the built item stack
      */
-    @NonNull ItemStack buildItemStack(
+    @NonNull Object buildItemStack(
             @NonNull FPlayer fPlayer,
             @NonNull String material,
             @NonNull String title,
@@ -163,7 +169,7 @@ public interface PlatformServerAdapter {
      * @param lore the item lore lines
      * @return the built item stack
      */
-    @NonNull ItemStack buildItemStack(
+    @NonNull Object buildItemStack(
             @NonNull FPlayer fPlayer,
             @NonNull String material,
             @NonNull String title,

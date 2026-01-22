@@ -38,6 +38,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
-    private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
+    private final Map<String, Pattern> triggerPatterns = new ConcurrentHashMap<>();
     private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
 
     private final @Named("replacementMessage") Cache<String, String> messageCache;

@@ -1,6 +1,5 @@
 package net.flectone.pulse.service;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -47,7 +45,6 @@ public class FPlayerService {
     private final SocialRepository socialRepository;
     private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
-    private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
     private final RandomUtil randomUtil;
 
@@ -123,27 +120,7 @@ public class FPlayerService {
     }
 
     public int getPing(FPlayer player) {
-        Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(player);
-        if (platformPlayer == null) return 0;
-
-        return packetProvider.getPing(platformPlayer);
-    }
-
-    public String getSortedName(FPlayer fPlayer) {
-        int weight = integrationModule.getGroupWeight(fPlayer);
-
-        // 32767 limit
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-            String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
-            String paddedName = String.format("%-16s", fPlayer.getName());
-            return paddedRank + paddedName;
-        }
-
-        // 16 limit
-        String paddedRank = String.format("%06d", Integer.MAX_VALUE - weight);
-        String truncatedName = fPlayer.getName().substring(0, Math.min(fPlayer.getName().length(), 10));
-        String paddedName = String.format("%-10s", truncatedName);
-        return paddedRank + paddedName;
+        return platformPlayerAdapter.getPing(player);
     }
 
     public void invalidateOffline(UUID uuid) {

@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.command.kick;
 
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +12,9 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -32,11 +31,11 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-    private final PacketSender packetSender;
 
     @Override
     public void onEnable() {
@@ -129,6 +128,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).person(), fReceiver, kick);
         MessageContext messageContext = messagePipeline.createContext(fReceiver, format);
 
-        packetSender.send(fReceiver, new WrapperPlayServerDisconnect(messagePipeline.build(messageContext)));
+        platformPlayerAdapter.kick(fReceiver, messagePipeline.build(messageContext));
     }
 }

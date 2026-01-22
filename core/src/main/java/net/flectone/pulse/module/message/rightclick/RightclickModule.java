@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.rightclick;
 
-import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +10,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
-import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -28,15 +25,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
-
-    @Override
-    public void onEnable() {
-        super.onEnable();
-
-        listenerRegistry.register(RightclickPacketListener.class);
-    }
 
     @Override
     public MessageType messageType() {
@@ -70,7 +59,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
             FPlayer fTarget = fPlayerService.getFPlayer(targetUUID);
             if (fTarget.isUnknown()) return;
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
-            if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionTypes.INVISIBILITY)) return;
+            if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, "INVISIBILITY")) return;
 
             sendMessage(metadataBuilder()
                     .sender(fTarget)

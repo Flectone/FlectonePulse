@@ -1,0 +1,8 @@
+dependencies {
+    compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
+    compileOnly "io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT"
+    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+
+    compileOnly project(":minecraft")
+    compileOnly project(":core")
+}

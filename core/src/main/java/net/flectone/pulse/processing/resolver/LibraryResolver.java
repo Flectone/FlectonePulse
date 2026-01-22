@@ -3,19 +3,21 @@ package net.flectone.pulse.processing.resolver;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
 import com.alessiodp.libby.relocation.Relocation;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LibraryResolver {
+@Singleton
+public class LibraryResolver {
 
     private final List<Library> libraries = new ArrayList<>();
 
     @Getter private final LibraryManager libraryManager;
 
-    protected LibraryResolver(LibraryManager libraryManager) {
+    public LibraryResolver(LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
     }
 
@@ -60,6 +62,11 @@ public abstract class LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("com{}google{}common")
                         .relocatedPattern("net.flectone.pulse.library.guava")
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("com{}google{}gson")
+                        .relocatedPattern("net.flectone.pulse.library.gson")
                         .build()
                 )
                 .build()

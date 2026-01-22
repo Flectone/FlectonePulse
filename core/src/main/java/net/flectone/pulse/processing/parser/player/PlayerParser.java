@@ -1,6 +1,5 @@
 package net.flectone.pulse.processing.parser.player;
 
-import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +7,9 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
@@ -47,7 +46,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
 
     protected boolean isVisible(FPlayer sender, FPlayer fPlayer) {
         if (fileFacade.command().suggestInvisiblePlayers()) return true;
-        if (!platformPlayerAdapter.hasPotionEffect(fPlayer, PotionTypes.INVISIBILITY)) return true;
+        if (!platformPlayerAdapter.hasPotionEffect(fPlayer, "INVISIBILITY")) return true;
 
         return permissionChecker.check(sender, fileFacade.permission().command().seeInvisiblePlayersInSuggest());
     }

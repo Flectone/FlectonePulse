@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.format.world;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +9,9 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
 import net.flectone.pulse.module.message.format.world.listener.WorldPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
@@ -34,18 +30,11 @@ public class WorldModule extends AbstractModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
-    private final PacketProvider packetProvider;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        Ticker ticker = config().ticker();
-        if (ticker.enable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
-        }
-
-        listenerRegistry.register(WorldPacketListener.class);
         listenerRegistry.register(WorldPulseListener.class);
     }
 
@@ -95,4 +84,5 @@ public class WorldModule extends AbstractModule {
         TYPE,
         NAME
     }
+
 }

@@ -14,8 +14,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.WebUtil;
@@ -57,7 +57,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
-    private final PacketProvider packetProvider;
+    private final PlatformServerAdapter platformServerAdapter;
     private final TaskScheduler taskScheduler;
     private final SoundPlayer soundPlayer;
     private final WebUtil webUtil;
@@ -253,7 +253,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
         String url = StringUtils.replaceEach(
                 FLECTONEPULSE_ATLAS_API,
                 new String[]{"<version>", "<atlas>"},
-                new String[]{getVersion(), atlasName}
+                new String[]{platformServerAdapter.getServerVersionName(), atlasName}
         );
 
         return webUtil.downloadFile(url, outputPath);
@@ -261,12 +261,8 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
     private Path resolveAtlasesFolder() {
         return minecraftPath
-                .resolve(getVersion())
+                .resolve(platformServerAdapter.getServerVersionName())
                 .resolve("atlases");
-    }
-
-    private String getVersion() {
-        return packetProvider.getServerVersion().getReleaseName();
     }
 
 }

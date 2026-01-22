@@ -1,7 +1,6 @@
 package net.flectone.pulse.data.database;
 
 import com.alessiodp.libby.Library;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -18,12 +17,11 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.util.comparator.VersionComparator;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.creator.BackupCreator;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -56,7 +54,6 @@ public class Database {
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
-    private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
     private final Provider<VersionDAO> versionDAOProvider;
     private final BackupCreator backupCreator;
@@ -79,13 +76,6 @@ public class Database {
      * @throws IOException if connection fails
      */
     public void connect() throws IOException {
-        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)
-                && config().type() == Type.SQLITE) {
-            fLogger.warning("SQLite database is not supported on this version of Minecraft, H2 Database will be used");
-
-            fileFacade.updateFilePack(filePack -> filePack.withConfig(filePack.config().withDatabase(config().withType(Type.H2))));
-        }
-
         downloadDriver();
 
         HikariConfig hikariConfig = createHikariConfig();

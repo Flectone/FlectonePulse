@@ -5,7 +5,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import org.incendo.cloud.type.tuple.Pair;
 
 @With
 public record MessageReceiveEvent(
@@ -17,10 +16,6 @@ public record MessageReceiveEvent(
 
     public MessageReceiveEvent(FPlayer fPlayer, Component component, boolean overlay) {
         this(false, fPlayer, component, overlay);
-    }
-
-    public MessageReceiveEvent(FPlayer fPlayer, Pair<Component, Boolean> pair) {
-        this(fPlayer, pair.first(), pair.second());
     }
 
     public TranslatableComponent getTranslatableComponent() {

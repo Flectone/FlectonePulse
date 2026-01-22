@@ -10,23 +10,14 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
-import net.flectone.pulse.module.integration.floodgate.FloodgateModule;
-import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
-import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
-import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
-import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
-import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
@@ -36,20 +27,14 @@ import java.util.function.UnaryOperator;
 public abstract class IntegrationModule extends AbstractModule {
 
     private final FileFacade fileFacade;
-    private final FLogger fLogger;
     private final PlatformServerAdapter platformServerAdapter;
-    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     protected IntegrationModule(FileFacade fileFacade,
-                                FLogger fLogger,
                                 PlatformServerAdapter platformServerAdapter,
-                                ReflectionResolver reflectionResolver,
                                 Injector injector) {
         this.fileFacade = fileFacade;
-        this.fLogger = fLogger;
         this.platformServerAdapter = platformServerAdapter;
-        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
@@ -57,40 +42,8 @@ public abstract class IntegrationModule extends AbstractModule {
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
         ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
 
-        if (platformServerAdapter.hasProject("SkinsRestorer")) {
-            builder.add(SkinsRestorerModule.class);
-        }
-
         if (platformServerAdapter.hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("MiniMOTD")) {
-            builder.add(MiniMOTDModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("voicechat")) {
-            builder.add(SimpleVoiceModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("PlasmoVoice")) {
-            if (reflectionResolver.hasClass("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent")) {
-                builder.add(PlasmoVoiceModule.class);
-            } else {
-                fLogger.warning("Update PlasmoVoice to the latest version");
-            }
-        }
-
-        if (platformServerAdapter.hasProject("floodgate")) {
-            builder.add(FloodgateModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
-            if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
-                builder.add(GeyserModule.class);
-            } else {
-                fLogger.warning("Geyser hook is failed, check that Geyser is turned on and working");
-            }
         }
 
         return builder.add(
@@ -122,26 +75,14 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isMuted(FPlayer fPlayer);
 
+    public abstract boolean isBedrockPlayer(FEntity fPlayer);
+
     public abstract ExternalModeration getMute(FPlayer fPlayer);
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 
     public <T> T getInstance(Class<T> clazz) {
         return injector.getInstance(clazz);
-    }
-
-    public boolean isBedrockPlayer(FEntity fPlayer) {
-        if (!isEnable()) return false;
-
-        if (containsChild(FloodgateModule.class)) {
-            return injector.getInstance(FloodgateModule.class).isBedrockPlayer(fPlayer);
-        }
-
-        if (containsChild(GeyserModule.class)) {
-            return injector.getInstance(GeyserModule.class).isBedrockPlayer(fPlayer);
-        }
-
-        return false;
     }
 
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
@@ -155,22 +96,6 @@ public abstract class IntegrationModule extends AbstractModule {
         }
 
         return false;
-    }
-
-    public String getTextureUrl(FEntity sender) {
-        if (!isEnable()) return null;
-        if (!containsChild(SkinsRestorerModule.class)) return null;
-        if (!(sender instanceof FPlayer fPlayer)) return null;
-
-        return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
-    }
-
-    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
-        if (!isEnable()) return null;
-        if (!containsChild(SkinsRestorerModule.class)) return null;
-        if (!(sender instanceof FPlayer fPlayer)) return null;
-
-        return injector.getInstance(SkinsRestorerModule.class).getProfileProperty(fPlayer);
     }
 
     public String getPrefix(FPlayer fPlayer) {

@@ -1,8 +1,5 @@
 package net.flectone.pulse.platform.adapter;
 
-import com.github.retrooper.packetevents.protocol.player.GameMode;
-import com.github.retrooper.packetevents.protocol.potion.PotionType;
-import com.github.retrooper.packetevents.protocol.world.Location;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
@@ -31,7 +28,7 @@ public interface PlatformPlayerAdapter {
      * @param y the Y coordinate
      * @param z the Z coordinate
      */
-    record Coordinates(double x, double y, double z) {}
+    record Coordinates(double x, double y, double z, float yaw, float pitch) {}
 
     /**
      * Player statistics.
@@ -119,6 +116,8 @@ public interface PlatformPlayerAdapter {
      */
     @NonNull String getName(@NonNull Object platformPlayer);
 
+    int getPing(FPlayer fPlayer);
+
     /**
      * Gets the world name where the player is located.
      *
@@ -181,9 +180,9 @@ public interface PlatformPlayerAdapter {
      * @param uuid the player UUID
      * @return the game mode
      */
-    @NonNull GameMode getGamemode(@NonNull UUID uuid);
+    @NonNull String getGamemode(@NonNull UUID uuid);
 
-    default @NonNull GameMode getGamemode(@NonNull FEntity entity) {
+    default @NonNull String getGamemode(@NonNull FEntity entity) {
         return getGamemode(entity.getUuid());
     }
 
@@ -238,18 +237,6 @@ public interface PlatformPlayerAdapter {
 
     default @Nullable Coordinates getCoordinates(@NonNull FEntity entity) {
         return getCoordinates(entity.getUuid());
-    }
-
-    /**
-     * Gets player location.
-     *
-     * @param uuid the player UUID
-     * @return the location, or null if not available
-     */
-    @Nullable Location getLocation(@NonNull UUID uuid);
-
-    default @Nullable Location getLocation(@NonNull FEntity entity) {
-        return getLocation(entity.getUuid());
     }
 
     /**
@@ -316,9 +303,9 @@ public interface PlatformPlayerAdapter {
      * @param potionType the potion type
      * @return true if has the potion effect
      */
-    boolean hasPotionEffect(@NonNull UUID uuid, @NonNull PotionType potionType);
+    boolean hasPotionEffect(@NonNull UUID uuid, @NonNull String potionType);
 
-    default boolean hasPotionEffect(@NonNull FEntity entity, @NonNull PotionType potionType) {
+    default boolean hasPotionEffect(@NonNull FEntity entity, @NonNull String potionType) {
         return hasPotionEffect(entity.getUuid(), potionType);
     }
 
@@ -433,4 +420,6 @@ public interface PlatformPlayerAdapter {
      * @return list of players with played time
      */
     @NonNull List<PlayedTimePlayer> getPlayedTimePlayers();
+
+    void kick(FPlayer fPlayer, Component reason);
 }

@@ -2,10 +2,7 @@ package net.flectone.pulse.model.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
-import com.github.retrooper.packetevents.protocol.sound.Sounds;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -13,12 +10,11 @@ public record Sound(
         boolean enable,
         float volume,
         float pitch,
-        SoundCategory category,
-        String name,
-        com.github.retrooper.packetevents.protocol.sound.Sound packet
+        String category,
+        String name
 ) {
 
-    public static final Sound DEFAULT = new Sound(false, 1f, 1f, SoundCategory.BLOCK, "minecraft:block.note_block.bell", Sounds.getByNameOrCreate("minecraft:block.note_block.bell"));
+    public static final Sound DEFAULT = new Sound(false, 1f, 1f, "BLOCK", "minecraft:block.note_block.bell");
 
     @JsonValue
     public Map<String, Object> toJson() {
@@ -47,15 +43,12 @@ public record Sound(
         float floatPitch = pitch == null ? 1f : Float.parseFloat(String.valueOf(pitch));
 
         Object category = map.get("category");
-        SoundCategory stringCategory = category == null ? SoundCategory.BLOCK : Arrays.stream(SoundCategory.values())
-                .filter(categoryValue -> categoryValue.name().equalsIgnoreCase(String.valueOf(category)))
-                .findAny()
-                .orElse(SoundCategory.MASTER);
+        String stringCategory = category == null ? DEFAULT.category() : String.valueOf(category);
 
         Object name = map.get("name");
-        String stringName = name == null ? Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString() : String.valueOf(name);
+        String stringName = name == null ? DEFAULT.name() : String.valueOf(name);
 
-        return new Sound(true, floatVolume, floatPitch, stringCategory, stringName, Sounds.getByNameOrCreate(stringName));
+        return new Sound(true, floatVolume, floatPitch, stringCategory, stringName);
     }
 
 }

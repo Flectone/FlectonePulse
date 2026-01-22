@@ -11,7 +11,6 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
-import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -142,7 +141,7 @@ public class IntegrationSender {
         return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
     }
 
-    private Collection<String> createSpecificMessageNames(MessageType messageType, EventMetadata<?> eventMetadata) {
+    protected Collection<String> createSpecificMessageNames(MessageType messageType, EventMetadata<?> eventMetadata) {
         return switch (messageType) {
             case CHAT -> {
                 if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield Collections.emptyList();
@@ -151,14 +150,6 @@ public class IntegrationSender {
                 if (chat.name() == null) yield Collections.emptyList();
 
                 yield List.of((messageType.name() + "_" + chat.name()).toUpperCase());
-            }
-            case VANILLA -> {
-                if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield Collections.emptyList();
-
-                String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().name();
-                if (vanillaMessageName.isEmpty()) yield Collections.emptyList();
-
-                yield List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.getParsedComponent().translationKey());
             }
             default -> Collections.emptyList();
         };

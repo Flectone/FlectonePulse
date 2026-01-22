@@ -1,0 +1,17 @@
+dependencies {
+    implementation project(":core")
+
+    compileOnly "com.alessiodp.libby:libby-core:$libby_version"
+    compileOnly "net.kyori:adventure-text-serializer-ansi:$adventure_api"
+    compileOnly "org.incendo:cloud-core:$cloud_core_version"
+    compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
+    compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
+
+    compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
+    compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+    compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
+    compileOnly "org.geysermc.geyser:api:$geyser_version"
+    compileOnly "org.geysermc.floodgate:api:$floodgate_version"
+    compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
+}
