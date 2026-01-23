@@ -114,6 +114,11 @@ public class BukkitLibraryResolver extends LibraryResolver {
                         .relocatedPattern("net.flectone.pulse.library")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("com{}google{}gson")
+                        .relocatedPattern("net.flectone.pulse.library.gson")
+                        .build()
+                )
                 .build()
         );
 
