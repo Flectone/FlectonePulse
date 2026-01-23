@@ -14,15 +14,16 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
+import java.util.List;
 import java.util.Set;
 
 @Singleton
@@ -108,21 +109,27 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
         return messageContext
                 .addTagResolvers(
                         TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, context) -> {
-                            String constantName = fPlayer.getConstantName();
-                            if (constantName == null) {
-                                constantName = localization(fPlayer).constant();
+                            List<Component> constants = fPlayer.getConstants();
+                            if (constants.isEmpty()) {
+                                List<String> stringConstants = localization(fPlayer).constant();
+                                if (stringConstants.isEmpty()) {
+                                    return Tag.selfClosingInserting(Component.empty());
+                                }
+
+                                constants = stringConstants.stream()
+                                        .map(string -> messagePipeline.build(messagePipeline.createContext(fPlayer, string)))
+                                        .toList();
                             }
 
-                            if (constantName.isEmpty()) {
-                                return Tag.selfClosingInserting(Component.empty());
+                            int constantIndex = 0;
+                            if (argumentQueue.hasNext()) {
+                                constantIndex = argumentQueue.pop().asInt().orElse(0);
+                                if (constantIndex >= constants.size()) {
+                                    constantIndex = 0;
+                                }
                             }
 
-                            MessageContext constantContext = messagePipeline.createContext(fPlayer, constantName)
-                                    .withFlags(messageContext.flags())
-                                    .addFlag(MessageFlag.USER_MESSAGE, false);
-
-                            String serialized = messagePipeline.buildDefault(constantContext);
-                            return Tag.preProcessParsed(serialized);
+                            return Tag.inserting(constants.get(constantIndex));
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, context) -> {
                             Localization.Message.Format.Names localization = localization(receiver);

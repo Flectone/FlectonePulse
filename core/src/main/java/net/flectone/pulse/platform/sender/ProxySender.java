@@ -19,6 +19,7 @@ import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -89,12 +90,14 @@ public class ProxySender {
      * @return true if data was sent to at least one proxy, false otherwise
      */
     public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
-        boolean isPlayer = sender instanceof FPlayer;
-
-        if (isPlayer) {
-            FPlayer fPlayer = (FPlayer) sender;
-            String constantName = getConstantName(fPlayer);
-            fPlayer.setConstantName(constantName);
+        if (sender instanceof FPlayer fPlayer) {
+            List<String> constant = fileFacade.localization(sender).message().format().names().constant();
+            if (!constant.isEmpty()) {
+                fPlayer.setConstants(constant.stream()
+                        .map(string -> messagePipeline.build(messagePipeline.createContext(fPlayer, string)))
+                        .toList()
+                );
+            }
         }
 
         byte[] message;
@@ -121,13 +124,6 @@ public class ProxySender {
         }
 
         return sent;
-    }
-
-    private String getConstantName(FPlayer sender) {
-        String message = fileFacade.localization(sender).message().format().names().constant();
-        if (message.isEmpty()) return "";
-
-        return messagePipeline.buildDefault(messagePipeline.createContext(sender, message));
     }
 
 }

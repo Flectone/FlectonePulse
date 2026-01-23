@@ -1054,7 +1054,7 @@ public record Localization(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Names(
-                    String constant,
+                    List<String> constant,
                     String display,
                     String entity,
                     String unknown,

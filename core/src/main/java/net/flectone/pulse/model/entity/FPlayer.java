@@ -6,10 +6,12 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -35,10 +37,10 @@ public class FPlayer extends FEntity {
     private final Map<String, Boolean> settingsBoolean = new HashMap<>();
     private final Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
     private final List<Ignore> ignores = new ArrayList<>();
+    private final List<Component> constants = new CopyOnWriteArrayList<>();
 
     private boolean online;
     private String ip;
-    private String constantName;
 
     public FPlayer(int id, boolean console, String name, UUID uuid, String type) {
         super(name, uuid, type);
@@ -84,10 +86,11 @@ public class FPlayer extends FEntity {
         this.ip = ip;
     }
 
-    public void setConstantName(String constantName) {
+    public void setConstants(Collection<Component> constants) {
         if (isUnknown()) return;
 
-        this.constantName = constantName;
+        this.constants.clear();
+        this.constants.addAll(constants);
     }
 
     public boolean isIgnored(@NonNull FPlayer fPlayer) {
