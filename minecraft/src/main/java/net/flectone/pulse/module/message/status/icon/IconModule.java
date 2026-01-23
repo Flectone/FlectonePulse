@@ -62,12 +62,12 @@ public class IconModule extends AbstractModule {
         if (iconNames.isEmpty()) return;
 
         iconNames.forEach(iconName -> {
-            if (new File(iconPath.toString() + File.separator + iconName).exists()) return;
+            if (iconPath.resolve(iconName).toFile().exists()) return;
 
-            platformServerAdapter.saveResource("images" + File.separator + iconName);
+            platformServerAdapter.saveResource("images/" + iconName);
         });
 
-        File folder = new File(iconPath.toString());
+        File folder = iconPath.toFile();
         if (!folder.isDirectory()) return;
 
         File[] icons = folder.listFiles();

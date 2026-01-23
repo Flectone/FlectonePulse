@@ -59,7 +59,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         File file = iconPath.resolve("maintenance.png").toFile();
 
         if (!file.exists()) {
-            platformServerAdapter.saveResource("images" + File.separator + "maintenance.png");
+            platformServerAdapter.saveResource("images/maintenance.png");
         }
 
         icon = iconUtil.convertIcon(file);
