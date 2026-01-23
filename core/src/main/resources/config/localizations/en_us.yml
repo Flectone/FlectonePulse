@@ -68,11 +68,11 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Bans: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unban <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
       footer: "<br><fcolor:2>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ All bans: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unban <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   broadcast:
     format: "<br><color:#ffd500>│ 🕫 Message for everyone <br>│<br>│ Author <display_name> <br>│<br>│ <fcolor:1><message> <br>"
@@ -204,7 +204,7 @@ command:
   geolocate:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Problem receiving information, try again"
-    format: "<fcolor:1>Geolocation for <display_name><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>"
+    format: "<fcolor:1>Geolocation for <target><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>"
   helper:
     null_helper: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>There are no people who can help you"
     global: "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>"
@@ -214,14 +214,14 @@ command:
     myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't ignore yourself"
     he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because he ignore you"
     you: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You can't write to him because you ignore him"
-    format_true: "<color:#ff7171>☹ You ignore <display_name>"
-    format_false: "<color:#98FB98>☺ You unignore <display_name>"
+    format_true: "<color:#ff7171>☹ You ignore <target>"
+    format_false: "<color:#98FB98>☺ You unignore <target>"
   ignorelist:
     empty: "<color:#98FB98>☺ You don't ignore anyone"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
     header: "<fcolor:2>▋ Ignores: <count><br>"
-    line: "<hover:show_text:\"<fcolor:1>Click to unignore <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1>Date: <date>"
-    footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+    line: "<hover:show_text:\"<fcolor:1>Click to unignore <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1>Date: <date>"
+    footer: "<br><fcolor:2>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot kick a player with equal or higher permissions"
@@ -257,18 +257,18 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Mutes: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_localization.command:\"<localization.command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_localization.command:\"<localization.command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
       footer: "<br><fcolor:2>▋ <fcolor:2><click:run_localization.command:\"<localization.command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_localization.command:\"<localization.command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ All mutes: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   online:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
-    format_current: "<fcolor:1>⌛ <display_name> currently on server"
-    format_first: "<fcolor:1>⌛ <display_name> was first on server <time> ago"
-    format_last: "<fcolor:1>⌛ <display_name> <fcolor:1>was last on server <time> ago"
-    format_total: "<fcolor:1>⌛ <display_name> <fcolor:1>has spent a total of <time> on server"
+    format_current: "<fcolor:1>⌛ <target> currently on server"
+    format_first: "<fcolor:1>⌛ <target> was first on server <time> ago"
+    format_last: "<fcolor:1>⌛ <target> <fcolor:1>was last on server <time> ago"
+    format_total: "<fcolor:1>⌛ <target> <fcolor:1>has spent a total of <time> on server"
   ping:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:1>🖧 <display_name>'s ping is <replacement:ping>"
@@ -406,11 +406,11 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     global:
       header: "<fcolor:2>▋ Warns: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ All warns: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
 integration:
   discord:
@@ -535,7 +535,7 @@ message:
       swear:
         symbol: "❤"
     names:
-      constant: ""
+      constant: []
       display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
@@ -561,7 +561,7 @@ message:
   quit:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:
-    format: "<fcolor:1>◁ <display_name> ▷"
+    format: "<fcolor:1>◁ <target> ▷"
   sidebar:
     values:
     - - " "

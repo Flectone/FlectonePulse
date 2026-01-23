@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -89,7 +90,6 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .filterPlayer(fTarget)
                 .format(Localization.Command.Emit::format)
                 .message(message)
                 .destination(destination)
@@ -99,6 +99,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                     dataOutputStream.writeAsJson(destination);
                     dataOutputStream.writeString(message);
                 })
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                 .integration()
                 .build()
         );

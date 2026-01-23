@@ -520,4 +520,49 @@ public class FileMigrator {
         );
     }
 
+    public FilePack migration_1_7_5(FilePack files) {
+        Map<String, Localization> newLocalizations = new HashMap<>();
+
+        UnaryOperator<String> replaceDisplayName = string -> Strings.CS.replace(string, "<display_name>", "<target>");
+
+        for (Localization localization : files.localizations().values()) {
+            newLocalizations.put(localization.language(),
+                    localization
+                            .withCommand(
+                                    localization.command()
+                                            .withBanlist(localization.command().banlist()
+                                                    .withGlobal(localization.command().banlist().global().withLine(replaceDisplayName.apply(localization.command().banlist().global().line())))
+                                                    .withPlayer(localization.command().banlist().player().withLine(replaceDisplayName.apply(localization.command().banlist().player().line())))
+                                            )
+                                            .withGeolocate(localization.command().geolocate().withFormat(replaceDisplayName.apply(localization.command().geolocate().format())))
+                                            .withIgnore(localization.command().ignore()
+                                                    .withFormatFalse(replaceDisplayName.apply(localization.command().ignore().formatFalse()))
+                                                    .withFormatTrue(replaceDisplayName.apply(localization.command().ignore().formatTrue()))
+                                            )
+                                            .withIgnorelist(localization.command().ignorelist().withLine(replaceDisplayName.apply(localization.command().ignorelist().line())))
+                                            .withMutelist(localization.command().mutelist()
+                                                    .withGlobal(localization.command().mutelist().global().withLine(replaceDisplayName.apply(localization.command().mutelist().global().line())))
+                                                    .withPlayer(localization.command().mutelist().player().withLine(replaceDisplayName.apply(localization.command().mutelist().player().line())))
+                                            )
+                                            .withOnline(localization.command().online()
+                                                    .withFormatCurrent(replaceDisplayName.apply(localization.command().online().formatCurrent()))
+                                                    .withFormatFirst(replaceDisplayName.apply(localization.command().online().formatFirst()))
+                                                    .withFormatLast(replaceDisplayName.apply(localization.command().online().formatLast()))
+                                                    .withFormatTotal(replaceDisplayName.apply(localization.command().online().formatTotal()))
+                                            )
+                                            .withWarnlist(localization.command().warnlist()
+                                                    .withGlobal(localization.command().warnlist().global().withLine(replaceDisplayName.apply(localization.command().warnlist().global().line())))
+                                                    .withPlayer(localization.command().warnlist().player().withLine(replaceDisplayName.apply(localization.command().warnlist().player().line())))
+                                            )
+                            )
+                            .withMessage(
+                                    localization.message()
+                                            .withRightclick(localization.message().rightclick().withFormat(replaceDisplayName.apply(localization.message().rightclick().format())))
+                            )
+            );
+        }
+
+        return files.withLocalizations(newLocalizations);
+    }
+
 }

@@ -68,11 +68,11 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Блокировки: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Разблокировать <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ Все блокировки: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Разблокировать <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   broadcast:
     format: "<br><color:#ffd500>│ 🕫 Сообщение для всех <br>│<br>│ Автор <display_name> <br>│<br>│ <fcolor:1><message> <br>"
@@ -204,7 +204,7 @@ command:
   geolocate:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ошибка, попробуй чуть позже"
-    format: "<fcolor:1>Геолокация <display_name><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>"
+    format: "<fcolor:1>Геолокация <target><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>"
   helper:
     null_helper: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Сейчас нет людей, кто бы смог помочь"
     global: "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><message>"
@@ -214,14 +214,14 @@ command:
     myself: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Нельзя игнорировать самого себя"
     he: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Он тебя игнорирует"
     you: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты его игнорируешь"
-    format_true: "<color:#ff7171>☹ Ты игнорируешь <display_name>"
-    format_false: "<color:#98FB98>☺ Ты перестал игнорировать <display_name>"
+    format_true: "<color:#ff7171>☹ Ты игнорируешь <target>"
+    format_false: "<color:#98FB98>☺ Ты перестал игнорировать <target>"
   ignorelist:
     empty: "<color:#98FB98>☺ Игнорируемых игроков нет"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игнорирования: <count> <br>"
-    line: "<hover:show_text:\"<fcolor:1>Перестать игнорировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1>Дата: <date>"
-    footer: "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+    line: "<hover:show_text:\"<fcolor:1>Перестать игнорировать <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1>Дата: <date>"
+    footer: "<br><fcolor:2>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   kick:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь кикнуть игрока с такими же или большими правами"
@@ -257,18 +257,18 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Муты: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Размутить <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ Все муты: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Размутить <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
   online:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
-    format_current: "<fcolor:1>⌛ <display_name> сейчас на сервере"
-    format_first: "<fcolor:1>⌛ <display_name> впервые зашёл на сервер <time> назад"
-    format_last: "<fcolor:1>⌛ <display_name> <fcolor:1>последний раз был на сервере <time> назад"
-    format_total: "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>"
+    format_current: "<fcolor:1>⌛ <target> сейчас на сервере"
+    format_first: "<fcolor:1>⌛ <target> впервые зашёл на сервер <time> назад"
+    format_last: "<fcolor:1>⌛ <target> <fcolor:1>последний раз был на сервере <time> назад"
+    format_total: "<fcolor:1>⌛ <target> <fcolor:1>всего провёл на сервере <time>"
   ping:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format: "<fcolor:1>🖧 Пинг игрока <display_name> равен <replacement:ping>"
@@ -406,11 +406,11 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     global:
       header: "<fcolor:2>▋ Предупреждения: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Снять предупреждение <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
     player:
       header: "<fcolor:2>▋ Все предупреждения: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+      line: "<hover:show_text:\"<fcolor:1>Снять предупреждение <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
 integration:
   discord:
@@ -535,7 +535,7 @@ message:
       swear:
         symbol: "❤"
     names:
-      constant: ""
+      constant: []
       display: "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
@@ -561,7 +561,7 @@ message:
   quit:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:
-    format: "<fcolor:1>◁ <display_name> ▷"
+    format: "<fcolor:1>◁ <target> ▷"
   sidebar:
     values:
     - - " "

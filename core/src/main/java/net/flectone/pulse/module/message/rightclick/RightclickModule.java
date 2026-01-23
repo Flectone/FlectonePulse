@@ -14,6 +14,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.UUID;
 
@@ -62,8 +63,8 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, "INVISIBILITY")) return;
 
             sendMessage(metadataBuilder()
-                    .sender(fTarget)
-                    .filterPlayer(fPlayer)
+                    .sender(fPlayer)
+                    .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                     .format(Localization.Message.Rightclick::format)
                     .destination(config().destination())
                     .sound(soundOrThrow())

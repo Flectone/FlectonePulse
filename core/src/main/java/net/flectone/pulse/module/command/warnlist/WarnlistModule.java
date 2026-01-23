@@ -140,7 +140,9 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
             String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
-            MessageContext lineContext = messagePipeline.createContext(fTarget, fPlayer, line);
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
+                    .addTagResolver(targetTag(fPlayer, fTarget));
+
             component = component
                     .append(messagePipeline.build(lineContext))
                     .append(Component.newline());

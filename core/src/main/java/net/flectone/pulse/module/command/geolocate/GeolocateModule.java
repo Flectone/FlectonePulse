@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -80,8 +81,8 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         }
 
         sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
-                .sender(fTarget)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                 .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
                         new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
                         new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}

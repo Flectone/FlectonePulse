@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -75,8 +76,8 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
         }
 
         sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
-                .sender(targetFPlayer)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, targetFPlayer)})
                 .format(s -> switch (type) {
                     case "first" -> timeFormatter.format(
                             fPlayer,

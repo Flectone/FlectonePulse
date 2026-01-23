@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -85,12 +86,12 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         }
 
         sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()
-                .sender(fTarget)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
                 .ignore(metadataIgnore)
                 .ignored(optionalIgnore.isEmpty())
                 .destination(config().destination())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                 .sound(soundOrThrow())
                 .build()
         );

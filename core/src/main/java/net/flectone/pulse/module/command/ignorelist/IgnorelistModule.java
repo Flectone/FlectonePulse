@@ -11,15 +11,15 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -105,7 +105,9 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                     new String[]{"/ignore " + fTarget.getName(), timeFormatter.formatDate(ignore.date())}
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fTarget, fPlayer, line);
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
+                    .addTagResolver(targetTag(fPlayer, fTarget));
+
             component = component
                     .append(messagePipeline.build(lineContext))
                     .append(Component.newline());

@@ -90,13 +90,12 @@ public class MinecraftBossbarModule extends BossbarModule {
             Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
             if (announce && messageAnnounce != null) {
                 sendMessage(metadataBuilder()
-                        .sender(FPlayer.UNKNOWN)
+                        .sender(fPlayer)
                         .format(localization -> Strings.CS.replace(
                                 StringUtils.defaultString(localization.announce().get(translationKey)),
                                 RAIDERS_PLACEHOLDER,
                                 raiders
                         ))
-                        .filterPlayer(fPlayer)
                         .destination(messageAnnounce.destination())
                         .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
                         .build()
