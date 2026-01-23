@@ -701,13 +701,13 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        String proxyChatName = input.readUTF();
-        String message = input.readUTF();
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
+        if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         ChatModule chatModule = injector.getInstance(ChatModule.class);
         if (chatModule.isModuleDisabledFor(fPlayer)) return;
+
+        String proxyChatName = input.readUTF();
+        String message = input.readUTF();
 
         Optional<Map.Entry<String, Message.Chat.Type>> optionalChat = fileFacade.message().chat().types()
                 .entrySet()
@@ -736,10 +736,11 @@ public class ProxyMessageHandler {
     }
 
     private void handleClearchatCommand(FEntity fEntity) {
+        if (!(fEntity instanceof FPlayer fPlayer)) return;
+
         ClearchatModule module = injector.getInstance(ClearchatModule.class);
         if (!module.isEnable()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
         module.clearChat(fPlayer, false);
     }
 
