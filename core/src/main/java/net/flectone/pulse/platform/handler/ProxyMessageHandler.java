@@ -836,7 +836,7 @@ public class ProxyMessageHandler {
 
     protected Optional<FEntity> parseFEntity(JsonObject jsonObject) {
         if (jsonObject.has("name") && jsonObject.has("uuid") && jsonObject.has("type")) {
-            boolean isPlayer =  "PLAYER".equals(jsonObject.get("type").getAsString());
+            boolean isPlayer = jsonObject.has("id");
             return Optional.of(gson.fromJson(jsonObject, isPlayer ? FPlayer.class : FEntity.class));
         }
 
