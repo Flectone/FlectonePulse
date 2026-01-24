@@ -37,8 +37,6 @@ import java.util.Set;
 @Singleton
 public class MinecraftVanillaModule extends VanillaModule {
 
-    private static final String ARGUMENT = "argument";
-
     private final Extractor extractor;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;

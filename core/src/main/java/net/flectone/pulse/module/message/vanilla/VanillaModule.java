@@ -15,6 +15,8 @@ import net.flectone.pulse.util.file.FileFacade;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VanillaModule extends AbstractModuleLocalization<Localization.Message.Vanilla> {
 
+    public static final String ARGUMENT = "argument";
+
     private final FileFacade fileFacade;
 
     @Override
