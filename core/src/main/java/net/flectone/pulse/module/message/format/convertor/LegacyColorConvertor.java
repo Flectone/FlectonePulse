@@ -249,8 +249,14 @@ public class LegacyColorConvertor {
             }
 
             if (isHexColorStandalone(text, nextIndex)) {
-                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
-                index = nextIndex + 7;
+                // support CMI format
+                if (nextIndex > 0 && text.charAt(nextIndex - 1) == '{' && nextIndex + 7 < text.length() && text.charAt(nextIndex + 7) == '}') {
+                    result.append(text, index, nextIndex - 1).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                    index = nextIndex + 8;
+                } else {
+                    result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                    index = nextIndex + 7;
+                }
             } else {
                 result.append(text, index, nextIndex + 1);
                 index = nextIndex + 1;
