@@ -48,7 +48,7 @@ public class MessagePulseListener implements PulseListener {
             case BOSS_BAR -> bossBarRender.render(fReceiver, message, destination.bossBar());
             case TAB_HEADER -> listFooterRender.render(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));
             case TAB_FOOTER -> listFooterRender.render(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
-            case TOAST -> toastRender.render(fReceiver, message, destination.toast());
+            case TOAST -> toastRender.render(fReceiver, message, event.submessage(), destination.toast());
             case BRAND -> brandRender.render(fReceiver, message);
             case TEXT_SCREEN -> textScreenRender.render(fReceiver, message, destination.textScreen());
             default -> messageSender.sendMessage(fReceiver, message, false);

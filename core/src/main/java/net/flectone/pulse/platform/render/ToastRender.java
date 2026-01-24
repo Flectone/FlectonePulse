@@ -29,8 +29,9 @@ public interface ToastRender {
      *
      * @param fPlayer the player to receive the toast
      * @param title the title component to display
+     * @param description the description component to display
      * @param toast the toast configuration including style and icon
      */
-    void render(FPlayer fPlayer, Component title, Toast toast);
+    void render(FPlayer fPlayer, Component title, Component description, Toast toast);
 
 }

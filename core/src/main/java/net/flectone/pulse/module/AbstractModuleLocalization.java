@@ -145,8 +145,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
             // destination subtext
             Component subComponent = Component.empty();
             Destination destination = eventMetadata.getDestination();
-            if (destination.type() == Destination.Type.TITLE
-                    || destination.type() == Destination.Type.SUBTITLE) {
+            if (StringUtils.isNotEmpty(destination.subtext())) {
                 subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
             }
 

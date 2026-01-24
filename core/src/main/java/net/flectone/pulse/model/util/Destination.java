@@ -32,7 +32,7 @@ public record Destination(
     public static final Destination EMPTY_TAB_HEADER = new Destination(Type.TAB_HEADER);
     public static final Destination EMPTY_TAB_FOOTER = new Destination(Type.TAB_FOOTER);
     public static final Destination EMPTY_TEXT_SCREEN = new Destination(Type.TEXT_SCREEN, DEFAULT_TEXT_SCREEN);
-    public static final Destination EMPTY_TOAST = new Destination(Type.TOAST, DEFAULT_TOAST);
+    public static final Destination EMPTY_TOAST = new Destination(Type.TOAST, DEFAULT_TOAST, DEFAULT_SUBTEXT);
 
     public Destination {
         type = type != null ? type : DEFAULT_TYPE;
@@ -59,8 +59,8 @@ public record Destination(
         this(type, subtext, null, times, null, null);
     }
 
-    public Destination(Type type, Toast toast) {
-        this(type, null, null, null, toast, null);
+    public Destination(Type type, Toast toast, String subtext) {
+        this(type, subtext, null, null, toast, null);
     }
 
     public Destination(Type type, TextScreen textScreen) {
@@ -76,6 +76,7 @@ public record Destination(
             case TOAST -> {
                 Toast toast = this.toast != null ? this.toast : DEFAULT_TOAST;
                 map.put("icon", toast.icon());
+                map.put("subtext", this.subtext);
                 map.put("style", toast.style());
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
@@ -126,9 +127,10 @@ public record Destination(
         return switch (type) {
             case TOAST -> {
                 String icon = parseOrDefault(map.get("icon"), DEFAULT_TOAST.icon(), string -> string);
+                String subtext = parseOrDefault(map.get("subtext"), DEFAULT_SUBTEXT, string -> string);
                 Toast.Type style = parseOrDefault(map.get("style"), DEFAULT_TOAST.style(), Toast.Type::valueOf);
                 Toast toast = new Toast(icon, style);
-                yield toast.equals(DEFAULT_TOAST) ? EMPTY_TOAST : new Destination(Type.TOAST, toast);
+                yield toast.equals(DEFAULT_TOAST) ? EMPTY_TOAST : new Destination(Type.TOAST, toast, subtext);
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
                 Object mapTimes = map.get("times");

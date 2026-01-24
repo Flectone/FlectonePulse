@@ -24,7 +24,7 @@ public class MinecraftToastRender implements ToastRender {
     private final PacketProvider packetProvider;
 
     @Override
-    public void render(FPlayer fPlayer, Component title, Toast toast) {
+    public void render(FPlayer fPlayer, Component title, Component description, Toast toast) {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
