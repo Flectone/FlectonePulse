@@ -134,12 +134,19 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         FEntity sender = messageContext.sender();
         if (placeholderAPIModule.isModuleDisabledFor(sender)) return event;
 
-        FEntity fReceiver = messageContext.receiver();
+        FPlayer fReceiver = messageContext.receiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         if (!permissionChecker.check(sender, placeholderAPIModule.permission().use()) && isUserMessage) return event;
         if (!(sender instanceof FPlayer fPlayer)) return event;
 
         String message = messageContext.message();
+
+        // switch parsing
+        if (!messageContext.isFlag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS)) {
+            FPlayer tempFPlayer = fPlayer;
+            fPlayer = fReceiver;
+            fReceiver = tempFPlayer;
+        }
 
         try {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());

@@ -90,7 +90,10 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;
         if (!(sender instanceof FPlayer fPlayer)) return event;
 
-        Object player = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
+        Object player = platformPlayerAdapter.convertToPlatformPlayer(messageContext.isFlag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS)
+                ? fPlayer
+                : messageContext.receiver()
+        );
         if (!(player instanceof ServerPlayerEntity playerEntity)) return event;
 
         String message = messageContext.message();

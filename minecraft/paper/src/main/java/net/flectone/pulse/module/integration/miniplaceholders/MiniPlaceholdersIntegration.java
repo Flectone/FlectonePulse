@@ -4,6 +4,7 @@ import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -52,10 +53,21 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         Set<TagResolver> resolvers = new HashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
-        Audience sender = getAudienceOrDefault(messageContext.sender().getUuid(), null);
+        FEntity fSender = messageContext.sender();
+        FEntity fReceiver = messageContext.receiver();
+
+        // switch parsing
+        if (!messageContext.isFlag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS)) {
+            FEntity tempFPlayer = fSender;
+            fSender = fReceiver;
+            fReceiver = tempFPlayer;
+        }
+
+        Audience sender = getAudienceOrDefault(fSender.getUuid(), null);
         Audience receiver = null;
+
         if (sender != null) {
-            receiver = getAudienceOrDefault(messageContext.receiver().getUuid(), sender);
+            receiver = getAudienceOrDefault(fReceiver.getUuid(), sender);
 
             resolvers.add(MiniPlaceholders.audiencePlaceholders());
             resolvers.add(MiniPlaceholders.relationalPlaceholders());

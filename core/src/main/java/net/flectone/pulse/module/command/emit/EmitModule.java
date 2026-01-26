@@ -61,7 +61,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         if (targetName.equalsIgnoreCase("all")) {
             sendMessage(EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
-                    .flag(MessageFlag.PARSING_BY_SENDER, false)
+                    .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
                     .range(Range.get(Range.Type.PROXY))
                     .format(Localization.Command.Emit::format)
                     .message(message)
@@ -95,7 +95,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                 .sender(fPlayer)
                 .filterPlayer(fTarget)
                 .format(Localization.Command.Emit::format)
-                .flag(MessageFlag.PARSING_BY_SENDER, false)
+                .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
                 .message(message)
                 .destination(destination)
                 .sound(soundOrThrow())
