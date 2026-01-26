@@ -59,14 +59,14 @@ public class ProxySender {
      * @return true if message was sent to at least one proxy, false otherwise
      */
     public boolean send(MessageType messageType, EventMetadata<?> eventMetadata) {
-        ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();
+        ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.proxy();
         if (proxyConsumer == null) return false;
 
-        Range range = eventMetadata.getRange();
+        Range range = eventMetadata.range();
         if (!range.is(Range.Type.PROXY)) return false;
 
-        FEntity sender = eventMetadata.getSender();
-        return send(sender, messageType, proxyConsumer, eventMetadata.getUuid());
+        FEntity sender = eventMetadata.sender();
+        return send(sender, messageType, proxyConsumer, eventMetadata.uuid());
     }
 
     /**

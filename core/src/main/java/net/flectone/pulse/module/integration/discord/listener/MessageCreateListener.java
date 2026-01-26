@@ -13,6 +13,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
@@ -81,41 +82,44 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String userName = member.getUsername();
 
         sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
-                .sender(FPlayer.UNKNOWN)
-                .format(localization -> {
-                    Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
-                    if (channelEmbed == null) return "";
+                .base(EventMetadata.<Localization.Integration.Discord>builder()
+                        .sender(FPlayer.UNKNOWN)
+                        .format(localization -> {
+                            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+                            if (channelEmbed == null) return "";
 
-                    return StringUtils.replaceEach(
-                            channelEmbed.content(),
-                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                            new String[]{globalName, globalName, nickname, displayName, userName}
-                    );
-                })
+                            return StringUtils.replaceEach(
+                                    channelEmbed.content(),
+                                    new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                    new String[]{globalName, globalName, nickname, displayName, userName}
+                            );
+                        })
+                        .range(Range.get(Range.Type.PROXY))
+                        .destination(config().destination())
+                        .message(message)
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                            if (reply == null) return Tag.selfClosingInserting(Component.empty());
+
+                            MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
+                                    .addTagResolvers(
+                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                            TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                                    );
+
+                            return Tag.inserting(messagePipeline.build(tagContext));
+                        })})
+                        .integration(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                new String[]{globalName, globalName, nickname, displayName, userName}
+                        ))
+                        .build()
+                )
                 .globalName(globalName)
                 .nickname(nickname)
                 .displayName(displayName)
                 .userName(userName)
-                .range(Range.get(Range.Type.PROXY))
-                .destination(config().destination())
-                .message(message)
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
-                    if (reply == null) return Tag.selfClosingInserting(Component.empty());
-
-                    MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
-                            .addTagResolvers(
-                                    TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                    TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
-                            );
-
-                    return Tag.inserting(messagePipeline.build(tagContext));
-                })})
-                .integration(string -> StringUtils.replaceEach(
-                        string,
-                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                        new String[]{globalName, globalName, nickname, displayName, userName}
-                ))
                 .build()
         );
     }

@@ -49,8 +49,8 @@ public class BasePulseListener implements PulseListener {
     @Pulse
     public void onMessageSendEvent(MessageSendEvent event) {
         EventMetadata<?> eventMetadata = event.eventMetadata();
-        if (eventMetadata.getSound() != null) {
-            soundPlayer.play(eventMetadata.getSound(), eventMetadata.getSender(), event.receiver());
+        if (eventMetadata.sound() != null) {
+            soundPlayer.play(eventMetadata.sound(), eventMetadata.sender(), event.receiver());
         }
     }
 

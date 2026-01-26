@@ -11,6 +11,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
@@ -77,16 +78,19 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
             if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
             sendMessage(UpdateMessageMetadata.<Localization.Message.Update>builder()
-                    .sender(fPlayer)
-                    .format((fResolver, s) -> StringUtils.replaceEach(
-                            fResolver.isUnknown() ? s.formatConsole() : s.formatPlayer(),
-                            new String[]{"<current_version>", "<latest_version>"},
-                            new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
-                    ))
+                    .base(EventMetadata.<Localization.Message.Update>builder()
+                            .sender(fPlayer)
+                            .format((fResolver, s) -> StringUtils.replaceEach(
+                                    fResolver.isUnknown() ? s.formatConsole() : s.formatPlayer(),
+                                    new String[]{"<current_version>", "<latest_version>"},
+                                    new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
+                            ))
+                            .destination(config().destination())
+                            .sound(soundOrThrow())
+                            .build()
+                    )
                     .currentVersion(currentVersion)
                     .latestVersion(latestVersion)
-                    .destination(config().destination())
-                    .sound(soundOrThrow())
                     .build()
             );
         });

@@ -28,10 +28,10 @@ public class MinecraftIntegrationSender extends IntegrationSender {
         if (messageType == MessageType.VANILLA) {
             if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) return Collections.emptyList();
 
-            String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().name();
+            String vanillaMessageName = vanillaMetadata.parsedComponent().vanillaMessage().name();
             if (vanillaMessageName.isEmpty()) return Collections.emptyList();
 
-            return List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.getParsedComponent().translationKey());
+            return List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.parsedComponent().translationKey());
         }
 
         return createSpecificMessageNames(messageType, eventMetadata);

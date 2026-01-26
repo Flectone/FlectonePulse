@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.file.FileFacade;
@@ -38,7 +39,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
         String message = getArgument(commandContext, 0);
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Me>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Me::format)
                 .destination(config().destination())

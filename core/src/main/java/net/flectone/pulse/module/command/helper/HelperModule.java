@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -61,7 +62,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                     .noneMatch(online -> permissionChecker.check(online, permission().see()));
 
             if (nullHelper) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Helper>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Helper::nullHelper)
                         .build()
@@ -73,14 +74,14 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         String message = getArgument(commandContext, 0);
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Helper>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Helper::player)
                 .destination(config().destination())
                 .build()
         );
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Helper>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Helper::global)
                 .destination(config().destination())

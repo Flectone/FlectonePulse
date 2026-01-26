@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -42,7 +43,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
         String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
         if (receiverName == null) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Reply>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Reply::nullReceiver)
                     .build()

@@ -34,7 +34,7 @@ public class MessagePulseListener implements PulseListener {
 
         FPlayer fReceiver = event.receiver();
 
-        Destination destination = event.eventMetadata().getDestination();
+        Destination destination = event.eventMetadata().destination();
 
         if (fReceiver.isConsole() && destination.type() != Destination.Type.CHAT) {
             messageSender.sendToConsole(message);

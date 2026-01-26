@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
@@ -46,7 +47,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.getName().equalsIgnoreCase(targetName)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ignore>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::myself)
                     .build()
@@ -57,7 +58,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ignore>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::nullPlayer)
                     .build()
@@ -86,13 +87,16 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         }
 
         sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()
-                .sender(fPlayer)
-                .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
+                .base(EventMetadata.<Localization.Command.Ignore>builder()
+                        .sender(fPlayer)
+                        .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
+                        .destination(config().destination())
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .ignore(metadataIgnore)
                 .ignored(optionalIgnore.isEmpty())
-                .destination(config().destination())
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
-                .sound(soundOrThrow())
                 .build()
         );
     }

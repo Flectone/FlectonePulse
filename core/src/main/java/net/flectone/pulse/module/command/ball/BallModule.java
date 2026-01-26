@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -48,26 +49,29 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         String message = getArgument(commandContext, 0);
 
         sendMessage(BallMetadata.<Localization.Command.Ball>builder()
-                .sender(fPlayer)
-                .format(replaceAnswer(answer))
+                .base(EventMetadata.<Localization.Command.Ball>builder()
+                        .sender(fPlayer)
+                        .format(replaceAnswer(answer))
+                        .message(message)
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeInt(answer);
+                            dataOutputStream.writeString(message);
+                        })
+                        .integration(string -> {
+                            List<String> answers = localization().answers();
+
+                            String answerString = !answers.isEmpty()
+                                    ? answers.get(Math.min(answer, answers.size() - 1))
+                                    : StringUtils.EMPTY;
+
+                            return Strings.CS.replace(string, "<answer>", answerString);
+                        })
+                        .build()
+                )
                 .answer(answer)
-                .message(message)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeInt(answer);
-                    dataOutputStream.writeString(message);
-                })
-                .integration(string -> {
-                    List<String> answers = localization().answers();
-
-                    String answerString = !answers.isEmpty()
-                            ? answers.get(Math.min(answer, answers.size() - 1))
-                            : StringUtils.EMPTY;
-
-                    return Strings.CS.replace(string, "<answer>", answerString);
-                })
                 .build()
         );
     }

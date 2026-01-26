@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -85,7 +86,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::nullPlayer)
                     .build()
@@ -95,7 +96,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::lowerWeightGroup)
                     .build()
@@ -116,7 +117,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (bans.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::notBanned)
                     .build()
@@ -130,18 +131,21 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         proxySender.send(fTarget, MessageType.SYSTEM_BAN);
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
-                .sender(fTarget)
-                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                .base(EventMetadata.<Localization.Command.Unban>builder()
+                        .sender(fTarget)
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeAsJson(fPlayer);
+                            dataOutputStream.writeAsJson(bans);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .build()
+                )
                 .moderator(fPlayer)
                 .moderations(bans)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(fPlayer);
-                    dataOutputStream.writeAsJson(bans);
-                })
-                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }

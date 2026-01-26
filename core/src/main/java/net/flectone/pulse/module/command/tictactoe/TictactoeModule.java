@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
@@ -85,7 +86,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::nullPlayer)
                     .build()
@@ -95,7 +96,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (fReceiver.equals(fPlayer)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::myself)
                     .build()
@@ -113,12 +114,15 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.Tictactoe::sender)
+                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Command.Tictactoe::sender)
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .build()
+                )
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
 
@@ -162,13 +166,16 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .uuid(metadataUUID)
-                .sender(fPlayer)
-                .filterPlayer(fReceiver, false)
-                .format(message -> String.format(message.receiver(), ticTacToe.getId()))
+                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
+                        .uuid(metadataUUID)
+                        .sender(fPlayer)
+                        .filterPlayer(fReceiver, false)
+                        .format(message -> String.format(message.receiver(), ticTacToe.getId()))
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
-                .sound(soundOrThrow())
                 .build()
         );
     }
@@ -181,22 +188,28 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ticTacToe == null) return;
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .sender(fPlayer)
-                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
+                        .sender(fPlayer)
+                        .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .build()
+                )
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.MOVE)
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .uuid(metadataUUID)
-                .sender(fPlayer)
-                .filterPlayer(fReceiver, false)
-                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
+                        .uuid(metadataUUID)
+                        .sender(fPlayer)
+                        .filterPlayer(fReceiver, false)
+                        .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .build()
+                )
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.MOVE)
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }
@@ -207,7 +220,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         TicTacToe ticTacToe = tictactoeService.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::wrongGame)
                     .build()
@@ -217,7 +230,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (!ticTacToe.move(fPlayer, move)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::wrongMove)
                     .build()
@@ -229,7 +242,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::wrongByPlayer)
                     .build()

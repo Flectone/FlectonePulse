@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -50,18 +51,21 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
         String message = getArgument(commandContext, 0);
 
         sendMessage(TryMetadata.<Localization.Command.CommandTry>builder()
-                .sender(fPlayer)
-                .format(replacePercent(random))
+                .base(EventMetadata.<Localization.Command.CommandTry>builder()
+                        .sender(fPlayer)
+                        .format(replacePercent(random))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .message(message)
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeInt(random);
+                            dataOutputStream.writeString(message);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<percent>", String.valueOf(random)))
+                        .build()
+                )
                 .percent(random)
-                .range(config().range())
-                .destination(config().destination())
-                .message(message)
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeInt(random);
-                    dataOutputStream.writeString(message);
-                })
-                .integration(string -> Strings.CS.replace(string, "<percent>", String.valueOf(random)))
                 .build()
         );
     }

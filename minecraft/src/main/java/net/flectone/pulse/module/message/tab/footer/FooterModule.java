@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
@@ -86,7 +87,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Message.Tab.Footer>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(config().destination())

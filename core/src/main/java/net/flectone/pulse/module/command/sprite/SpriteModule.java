@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -93,7 +94,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
         String atlas = getArgument(commandContext, 0);
         if (!config().categories().contains(atlas)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Sprite>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Sprite::nullAtlas)
                     .build()
@@ -103,14 +104,14 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
         }
 
         if (!atlasSpritesMap.containsKey(atlas)) {
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Sprite>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.atlasDownloading(), "<atlas>", atlas))
                     .build()
             );
 
             if (!downloadAtlasFile(atlas)) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Sprite>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Sprite::downloadError)
                         .build()
@@ -123,7 +124,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
         List<String> sprites = atlasSpritesMap.get(atlas);
         if (sprites == null || sprites.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Sprite>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Sprite::nullAtlas)
                     .build()
@@ -142,7 +143,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Sprite>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Sprite::nullPage)
                     .build()

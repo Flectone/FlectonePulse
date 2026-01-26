@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.util.file.FileFacade;
@@ -41,18 +42,21 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 
         sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
-                .sender(fPlayer)
-                .format(replaceResult(percent))
+                .base(EventMetadata.<Localization.Command.Coin>builder()
+                        .sender(fPlayer)
+                        .format(replaceResult(percent))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .proxy(output -> output.writeInt(percent))
+                        .integration(string -> Strings.CS.replace(
+                                string,
+                                "<result>",
+                                percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
+                        ))
+                        .build()
+                )
                 .percent(percent)
-                .range(config().range())
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .proxy(output -> output.writeInt(percent))
-                .integration(string -> Strings.CS.replace(
-                        string,
-                        "<result>",
-                        percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
-                ))
                 .build()
         );
     }

@@ -8,11 +8,13 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -57,8 +59,9 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         String message = parseMessage(destination, typeWithMessage);
 
         if (targetName.equalsIgnoreCase("all")) {
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
+                    .flag(MessageFlag.PARSING_BY_SENDER, false)
                     .range(Range.get(Range.Type.PROXY))
                     .format(Localization.Command.Emit::format)
                     .message(message)
@@ -79,7 +82,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (!fTarget.isOnline()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Emit::nullPlayer)
                     .build()
@@ -88,9 +91,11 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
             return;
         }
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Emit>builder()
                 .sender(fPlayer)
+                .filterPlayer(fTarget)
                 .format(Localization.Command.Emit::format)
+                .flag(MessageFlag.PARSING_BY_SENDER, false)
                 .message(message)
                 .destination(destination)
                 .sound(soundOrThrow())

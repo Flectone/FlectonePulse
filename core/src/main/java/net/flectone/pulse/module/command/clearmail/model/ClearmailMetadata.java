@@ -1,17 +1,14 @@
 package net.flectone.pulse.module.command.clearmail.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.NonNull;
 
-@Getter
-@SuperBuilder
-public class ClearmailMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    @NonNull
-    private final Mail mail;
-
-}
+@Builder
+public record ClearmailMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        @NonNull Mail mail
+) implements EventMetadata<L> {}

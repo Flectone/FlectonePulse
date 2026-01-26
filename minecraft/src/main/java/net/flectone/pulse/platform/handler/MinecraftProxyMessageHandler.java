@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
@@ -89,14 +90,17 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
         String vanillaMessageName = vanillaMessage.name();
 
         module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
-                .uuid(metadataUUID)
+                .base(EventMetadata.<Localization.Message.Vanilla>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
+                        .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
+                        .range(Range.get(Range.Type.SERVER))
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        .destination(parsedComponent.vanillaMessage().destination())
+                        .build()
+                )
                 .parsedComponent(parsedComponent)
-                .sender(fEntity)
-                .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
-                .range(Range.get(Range.Type.SERVER))
-                .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                .destination(parsedComponent.vanillaMessage().destination())
                 .build()
         );
     }

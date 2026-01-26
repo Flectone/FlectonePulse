@@ -62,10 +62,10 @@ public class DeletePulseListener implements PulseListener {
     @Pulse(priority = Event.Priority.MONITOR)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
         EventMetadata<?> eventMetadata = event.eventMetadata();
-        if (eventMetadata.getDestination().type() != Destination.Type.CHAT) return;
+        if (eventMetadata.destination().type() != Destination.Type.CHAT) return;
 
         FPlayer fReceiver = event.receiver();
-        UUID messageUUID = eventMetadata.getUuid();
+        UUID messageUUID = eventMetadata.uuid();
         Component component = event.message();
 
         deleteModule.save(fReceiver, messageUUID, component, true);

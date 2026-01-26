@@ -11,6 +11,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
@@ -82,7 +83,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         String format = getNextMessage(fPlayer, type.random(), messages);
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Message.Auto>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(type.destination())

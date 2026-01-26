@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
@@ -70,7 +71,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Message.Brand>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(config().destination())

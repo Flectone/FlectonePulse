@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -69,7 +70,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Toponline>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Toponline::nullPage)
                     .build()

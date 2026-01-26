@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
@@ -58,15 +59,18 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
             if (isModuleDisabledFor(fPlayer)) return;
 
             sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Message.Quit::format)
+                    .base(EventMetadata.<Localization.Message.Quit>builder()
+                            .sender(fPlayer)
+                            .format(Localization.Message.Quit::format)
+                            .destination(config().destination())
+                            .range(config().range())
+                            .sound(soundOrThrow())
+                            .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                            .integration()
+                            .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
+                            .build()
+                    )
                     .ignoreVanish(ignoreVanish)
-                    .destination(config().destination())
-                    .range(config().range())
-                    .sound(soundOrThrow())
-                    .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                    .integration()
-                    .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
                     .build()
             );
         });

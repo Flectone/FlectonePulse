@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
@@ -66,19 +67,22 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
             List<String> pixels = fImage.convertImageUrl();
 
             sendMessage(GreetingMetadata.<Localization.Message.Greeting>builder()
-                    .sender(fPlayer)
-                    .format(s -> {
-                        String greetingMessage = String.join("<br>", localization(fPlayer).format());
+                    .base(EventMetadata.<Localization.Message.Greeting>builder()
+                            .sender(fPlayer)
+                            .format(s -> {
+                                String greetingMessage = String.join("<br>", localization(fPlayer).format());
 
-                        for (String pixel : pixels) {
-                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
-                        }
+                                for (String pixel : pixels) {
+                                    greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
+                                }
 
-                        return greetingMessage;
-                    })
+                                return greetingMessage;
+                            })
+                            .destination(config().destination())
+                            .sound(soundOrThrow())
+                            .build()
+                    )
                     .pixels(pixels)
-                    .destination(config().destination())
-                    .sound(soundOrThrow())
                     .build()
             );
 

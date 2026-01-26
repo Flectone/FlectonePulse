@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
@@ -95,11 +96,14 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         }
 
         sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
-                .sender(fPlayer)
-                .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())
+                .base(EventMetadata.<Localization.Command.Maintenance>builder()
+                        .sender(fPlayer)
+                        .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .turned(turned)
-                .destination(config().destination())
-                .sound(soundOrThrow())
                 .build()
         );
 

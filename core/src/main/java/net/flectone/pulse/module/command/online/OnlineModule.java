@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -66,7 +67,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Online>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Online::nullPlayer)
                     .build()
@@ -76,26 +77,29 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
         }
 
         sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
-                .sender(fPlayer)
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, targetFPlayer)})
-                .format(s -> switch (type) {
-                    case "first" -> timeFormatter.format(
-                            fPlayer,
-                            System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(targetFPlayer),
-                            s.formatFirst()
-                    );
-                    case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
-                            ? s.formatCurrent()
-                            : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.formatLast());
-                    case "total" -> timeFormatter.format(fPlayer,
-                            platformPlayerAdapter.getAllTimePlayed(targetFPlayer),
-                            s.formatTotal()
-                    );
-                    default -> "";
-                })
+                .base(EventMetadata.<Localization.Command.Online>builder()
+                        .sender(fPlayer)
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, targetFPlayer)})
+                        .format(s -> switch (type) {
+                            case "first" -> timeFormatter.format(
+                                    fPlayer,
+                                    System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(targetFPlayer),
+                                    s.formatFirst()
+                            );
+                            case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
+                                    ? s.formatCurrent()
+                                    : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.formatLast());
+                            case "total" -> timeFormatter.format(fPlayer,
+                                    platformPlayerAdapter.getAllTimePlayed(targetFPlayer),
+                                    s.formatTotal()
+                            );
+                            default -> "";
+                        })
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .type(type)
-                .destination(config().destination())
-                .sound(soundOrThrow())
                 .build()
         );
     }

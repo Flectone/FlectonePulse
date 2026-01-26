@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -58,7 +59,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullPlayer)
                     .build()
@@ -71,7 +72,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(IP_API_URL, "<ip>", ip));
         if (response.isEmpty() || response.get(0).equals("fail")) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullOrError)
                     .build()
@@ -81,15 +82,18 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         }
 
         sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
-                .sender(fPlayer)
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
-                .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
-                        new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
-                        new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}
-                ))
+                .base(EventMetadata.<Localization.Command.Geolocate>builder()
+                        .sender(fPlayer)
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                        .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
+                                new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
+                                new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}
+                        ))
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .response(response)
-                .destination(config().destination())
-                .sound(soundOrThrow())
                 .build()
         );
 

@@ -1,18 +1,14 @@
 package net.flectone.pulse.module.command.stream.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.EventMetadata;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-@Getter
-@SuperBuilder
-public class StreamMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    private final boolean turned;
-
-    @Nullable
-    private final String urls;
-
-}
+@Builder
+public record StreamMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        boolean turned,
+        @Nullable String urls
+) implements EventMetadata<L> {}

@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -83,7 +84,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendErrorMessage(metadataBuilder()
+                    sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
                             .sender(fPlayer)
                             .format(Localization.Command.Mutelist::nullPlayer)
                             .build()
@@ -102,7 +103,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 : moderationService.getValidMutes(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::empty)
                     .build()
@@ -116,7 +117,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::nullPage)
                     .build()

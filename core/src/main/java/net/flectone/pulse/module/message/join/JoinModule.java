@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
@@ -59,19 +60,22 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 
         sendMessage(JoinMetadata.<Localization.Message.Join>builder()
-                .sender(fPlayer)
-                .format(s -> hasPlayedBefore || !config().first() ? s.format() : s.formatFirstTime())
+                .base(EventMetadata.<Localization.Message.Join>builder()
+                        .sender(fPlayer)
+                        .format(s -> hasPlayedBefore || !config().first() ? s.format() : s.formatFirstTime())
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeBoolean(hasPlayedBefore);
+                            dataOutputStream.writeBoolean(ignoreVanish);
+                        })
+                        .integration()
+                        .build()
+                )
                 .ignoreVanish(ignoreVanish)
                 .playedBefore(hasPlayedBefore)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeBoolean(hasPlayedBefore);
-                    dataOutputStream.writeBoolean(ignoreVanish);
-                })
-                .integration()
                 .build()
         );
     }

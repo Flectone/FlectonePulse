@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -69,7 +70,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::nullTime)
                     .build()
@@ -80,7 +81,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::nullPlayer)
                     .build()
@@ -90,7 +91,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::lowerWeightGroup)
                     .build()
@@ -107,14 +108,17 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         proxySender.send(fTarget, MessageType.SYSTEM_WARN);
 
         sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
-                .sender(fTarget)
-                .format(buildFormat(warn))
+                .base(EventMetadata.<Localization.Command.Warn>builder()
+                        .sender(fTarget)
+                        .format(buildFormat(warn))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
+                        .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
+                        .build()
+                )
                 .moderation(warn)
-                .range(config().range())
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
-                .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
                 .build()
         );
 
@@ -160,7 +164,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Warn>builder()
                 .sender(fReceiver)
                 .format(s -> moderationMessageFormatter.replacePlaceholders(s.person(), fReceiver, warn))
                 .build()

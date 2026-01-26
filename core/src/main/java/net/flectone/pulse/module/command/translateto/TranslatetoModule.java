@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -77,7 +78,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Translateto>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Translateto::nullOrError)
                     .build()
@@ -88,20 +89,23 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String finalMessageToTranslate = messageToTranslate;
         sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
-                .sender(fPlayer)
-                .format(replaceLanguage(targetLang))
+                .base(EventMetadata.<Localization.Command.Translateto>builder()
+                        .sender(fPlayer)
+                        .format(replaceLanguage(targetLang))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .message(translatedMessage)
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeString(targetLang);
+                            dataOutputStream.writeString(message);
+                            dataOutputStream.writeString(finalMessageToTranslate);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
+                        .build()
+                )
                 .targetLanguage(targetLang)
                 .messageToTranslate(messageToTranslate)
-                .range(config().range())
-                .destination(config().destination())
-                .message(translatedMessage)
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(targetLang);
-                    dataOutputStream.writeString(message);
-                    dataOutputStream.writeString(finalMessageToTranslate);
-                })
-                .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
                 .build()
         );
     }

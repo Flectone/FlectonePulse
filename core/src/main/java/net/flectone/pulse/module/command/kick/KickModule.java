@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -57,7 +58,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            sendErrorMessage( metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Kick>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::nullPlayer)
                     .build()
@@ -67,7 +68,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Kick>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::lowerWeightGroup)
                     .build()
@@ -85,14 +86,17 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         kick(fPlayer, fTarget, kick);
 
         sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
-                .sender(fTarget)
-                .format(buildFormat(kick))
+                .base(EventMetadata.<Localization.Command.Kick>builder()
+                        .sender(fTarget)
+                        .format(buildFormat(kick))
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
+                        .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
+                        .build()
+                )
                 .moderation(kick)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
-                .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
                 .build()
         );
 

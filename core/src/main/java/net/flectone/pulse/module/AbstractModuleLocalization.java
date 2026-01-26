@@ -96,11 +96,6 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         ));
     }
 
-    @SuppressWarnings("unchecked")
-    public EventMetadata.EventMetadataBuilder<M, ?, ?> metadataBuilder() {
-        return (EventMetadata.EventMetadataBuilder<M, ?, ?>) EventMetadata.builder();
-    }
-
     public List<FPlayer> createReceivers(MessageType messageType, EventMetadata<M> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization());
 
@@ -109,11 +104,9 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         // if canceled, it means that message was sent to Proxy
         if (messagePrepareEvent.cancelled()) return Collections.emptyList();
 
-        FPlayer filterPlayer = eventMetadata.getFilterPlayer();
-
         return fPlayerService.getFPlayersWithConsole().stream()
-                .filter(eventMetadata.getFilter())
-                .filter(rangeFilter.createFilter(filterPlayer, eventMetadata.getRange()))
+                .filter(eventMetadata.filter())
+                .filter(rangeFilter.createFilter(eventMetadata.filterPlayer(), eventMetadata.range()))
                 .filter(fReceiver -> fReceiver.isSetting(messageType))
                 .toList();
     }
@@ -144,7 +137,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
             // destination subtext
             Component subComponent = Component.empty();
-            Destination destination = eventMetadata.getDestination();
+            Destination destination = eventMetadata.destination();
             if (StringUtils.isNotEmpty(destination.subtext())) {
                 subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
             }
@@ -162,7 +155,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (eventMetadata instanceof QuitMetadata<M>) {
             taskScheduler.runAsync(sendMessageRunnable);
         } else {
-            FPlayer regionPlayer = eventMetadata.getSender() instanceof FPlayer fPlayer
+            FPlayer regionPlayer = eventMetadata.sender() instanceof FPlayer fPlayer
                     ? fPlayer
                     : fPlayerService.getRandomFPlayer();
 
@@ -175,25 +168,22 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     }
 
     private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
-        Destination destination = eventMetadata.getDestination();
+        Destination destination = eventMetadata.destination();
         if (destination.subtext().isEmpty()) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, destination.subtext())
-                .addFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, destination.subtext())
+                .withFlags(eventMetadata.flags())
                 .addTagResolver(messageTag(message));
 
         return messagePipeline.build(context);
     }
 
     private Component buildMessageComponent(FPlayer receiver, EventMetadata<M> eventMetadata) {
-        String message = eventMetadata.getMessage();
+        String message = eventMetadata.message();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), receiver, message)
-                .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.SENDER_COLOR_OUT},
-                        new boolean[]{true, eventMetadata.isSenderColorOut()}
-                );
+        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, message)
+                .withFlags(eventMetadata.flags());
 
         return messagePipeline.build(context);
     }
@@ -202,16 +192,16 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         String formatContent = eventMetadata.resolveFormat(receiver, localization(receiver));
         if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
-        FEntity sender = eventMetadata.getSender();
+        FEntity sender = eventMetadata.sender();
 
-        MessageContext messageContext = messagePipeline.createContext(eventMetadata.getUuid(), sender, receiver, formatContent)
-                .addFlag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .addTagResolvers(eventMetadata.getTagResolvers(receiver))
+        MessageContext messageContext = messagePipeline.createContext(eventMetadata.uuid(), sender, receiver, formatContent)
+                .withFlags(eventMetadata.flags())
+                .addTagResolvers(eventMetadata.resolveTags(receiver))
                 .addTagResolver(messageTag(message));
 
         if (!receiver.isUnknown()) {
             messageContext = messageContext
-                    .withUserMessage(eventMetadata.getMessage())
+                    .withUserMessage(eventMetadata.message())
                     .addFlag(MessageFlag.TRANSLATE, formatContent.contains("<translate"));
         }
 

@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -68,7 +69,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Clearchat>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Clearchat::nullPlayer)
                         .build()
@@ -112,13 +113,13 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Clearchat>builder()
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
                 .build()
         );
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Clearchat>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Clearchat::format)
                 .destination(config().destination())

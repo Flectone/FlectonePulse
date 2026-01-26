@@ -1,8 +1,5 @@
 package net.flectone.pulse.model.event;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
@@ -12,128 +9,222 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-@Getter
-@SuperBuilder
-public class EventMetadata<L extends LocalizationSetting> {
+public interface EventMetadata<L extends LocalizationSetting> {
 
-    @Builder.Default
-    private final UUID uuid = UUID.randomUUID();
+    EventMetadata<L> base();
 
-    @NonNull
-    private final FEntity sender;
+    default @NonNull UUID uuid() {
+        return base().uuid();
+    }
 
-    @Nullable
-    private final FPlayer filterPlayer;
+    default @NonNull FEntity sender() {
+        return base().sender();
+    }
 
-    @Builder.Default
-    private final Predicate<FPlayer> filter = fPlayer -> true;
+    default @Nullable FPlayer filterPlayer() {
+        return base().filterPlayer();
+    }
 
-    @Builder.Default
-    private final boolean senderColorOut = true;
+    default @NonNull Predicate<FPlayer> filter() {
+        return base().filter();
+    }
 
-    @NonNull
-    private final BiFunction<FPlayer, L, String> format;
+    default @NonNull Map<MessageFlag, Boolean> flags() {
+        return base().flags();
+    }
 
-    @NonNull
-    @Builder.Default
-    private final Destination destination = Destination.EMPTY_CHAT;
+    default @NonNull BiFunction<FPlayer, L, String> format() {
+        return base().format();
+    }
 
-    @NonNull
-    private final Range range;
+    default @NonNull Destination destination() {
+        return base().destination();
+    }
 
-    @Nullable
-    private final Pair<Sound, PermissionSetting> sound;
+    default @NonNull Range range() {
+        return base().range();
+    }
 
-    @Nullable
-    private final String message;
+    default @Nullable Pair<Sound, PermissionSetting> sound() {
+        return base().sound();
+    }
 
-    @Nullable
-    private final Function<FPlayer, TagResolver[]> tagResolvers;
+    default @Nullable String message() {
+        return base().message();
+    }
 
-    @Nullable
-    private final ProxyDataConsumer<SafeDataOutputStream> proxy;
+    default @Nullable Function<FPlayer, TagResolver[]> tagResolvers() {
+        return base().tagResolvers();
+    }
 
-    @Nullable
-    private final UnaryOperator<String> integration;
+    default @Nullable ProxyDataConsumer<SafeDataOutputStream> proxy() {
+        return base().proxy();
+    }
 
-    public abstract static class EventMetadataBuilder<
-                L extends LocalizationSetting,
-                C extends EventMetadata<L>,
-                B extends EventMetadataBuilder<L, C, B>> {
+    default @Nullable UnaryOperator<String> integration() {
+        return base().integration();
+    }
 
-        public B proxy(ProxyDataConsumer<SafeDataOutputStream> proxy) {
-            this.proxy = proxy;
-            return self();
+    default @Nullable TagResolver[] resolveTags(FPlayer player) {
+        return base().resolveTags(player);
+    }
+
+    default @NonNull String resolveFormat(FPlayer player, L localization) {
+        return base().resolveFormat(player, localization);
+    }
+
+    static <L extends LocalizationSetting> Builder<L> builder() {
+        return new Builder<>();
+    }
+
+    final class Builder<L extends LocalizationSetting> {
+
+        private final Map<MessageFlag, Boolean> flags = new EnumMap<>(MessageFlag.class);
+
+        private UUID uuid = UUID.randomUUID();
+        private FEntity sender;
+        private FPlayer filterPlayer;
+        private Predicate<FPlayer> filter = p -> true;
+        private BiFunction<FPlayer, L, String> format;
+        private Destination destination = Destination.EMPTY_CHAT;
+        private Range range;
+        private Pair<Sound, PermissionSetting> sound;
+        private String message;
+        private Function<FPlayer, TagResolver[]> tagResolvers;
+        private ProxyDataConsumer<SafeDataOutputStream> proxy;
+        private UnaryOperator<String> integration;
+
+        private Builder() {
         }
 
-        public B proxy() {
-            return proxy(dataOutputStream -> {});
+        public Builder<L> uuid(UUID uuid) {
+            this.uuid = uuid;
+            return this;
         }
 
-        public B integration(UnaryOperator<String> integrationFunction) {
-            this.integration = integrationFunction;
-            return self();
-        }
-
-        public B integration() {
-            return integration(string -> string);
-        }
-
-        public B sender(FEntity sender) {
+        public Builder<L> sender(FEntity sender) {
             this.sender = sender;
-
             return filterPlayer(sender);
         }
 
-        public B filterPlayer(FEntity entity) {
+        public Builder<L> filterPlayer(FEntity entity) {
             this.range = Range.get(Range.Type.PLAYER);
-            this.filterPlayer = entity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
-
-            return self();
+            this.filterPlayer = (entity instanceof FPlayer fp) ? fp : FPlayer.UNKNOWN;
+            return this;
         }
 
-        public B filterPlayer(FPlayer receiver, boolean senderColorOut) {
-            return filterPlayer(receiver).senderColorOut(senderColorOut);
+        public Builder<L> filterPlayer(FPlayer player) {
+            this.filterPlayer = player;
+            return this;
         }
 
-        public B format(String format) {
-            this.format = (fPlayer, l) -> format;
-
-            return self();
+        public Builder<L> filterPlayer(FPlayer player, boolean senderColorOut) {
+            return filterPlayer(player).flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut);
         }
 
-        public B format(Function<L, String> format) {
-            this.format = (fResolver, s) -> format.apply(s);
-
-            return self();
+        public Builder<L> filter(Predicate<FPlayer> filter) {
+            this.filter = filter;
+            return this;
         }
 
-        public B format(BiFunction<FPlayer, L, String> format) {
-            this.format = format;
-
-            return self();
+        public Builder<L> flag(MessageFlag messageFlag, boolean value) {
+            flags.put(messageFlag, value);
+            return this;
         }
-    }
 
-    @Nullable
-    public TagResolver[] getTagResolvers(FPlayer fPlayer) {
-        return this.tagResolvers == null ? null : tagResolvers.apply(fPlayer);
-    }
+        public Builder<L> format(String staticFormat) {
+            this.format = (p, loc) -> staticFormat;
+            return this;
+        }
 
-    @NonNull
-    public String resolveFormat(FPlayer fPlayer, L localization) {
-        return StringUtils.defaultString(format.apply(fPlayer, localization));
+        public Builder<L> format(Function<L, String> formatFn) {
+            this.format = (p, loc) -> formatFn.apply(loc);
+            return this;
+        }
+
+        public Builder<L> format(BiFunction<FPlayer, L, String> formatFn) {
+            this.format = formatFn;
+            return this;
+        }
+
+        public Builder<L> destination(Destination destination) {
+            this.destination = destination;
+            return this;
+        }
+
+        public Builder<L> range(Range range) {
+            this.range = range;
+            return this;
+        }
+
+        public Builder<L> sound(Pair<Sound, PermissionSetting> sound) {
+            this.sound = sound;
+            return this;
+        }
+
+        public Builder<L> message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder<L> tagResolvers(Function<FPlayer, TagResolver[]> tagResolvers) {
+            this.tagResolvers = tagResolvers;
+            return this;
+        }
+
+        public Builder<L> proxy(ProxyDataConsumer<SafeDataOutputStream> proxy) {
+            this.proxy = proxy;
+            return this;
+        }
+
+        public Builder<L> proxy() {
+            this.proxy = out -> {};
+            return this;
+        }
+
+        public Builder<L> integration(UnaryOperator<String> integration) {
+            this.integration = integration;
+            return this;
+        }
+
+        public Builder<L> integration() {
+            this.integration = s -> s;
+            return this;
+        }
+
+        public EventMetadata<L> build() {
+            Objects.requireNonNull(sender);
+            Objects.requireNonNull(format);
+            Objects.requireNonNull(range);
+
+            return new BaseEventMetadata<>(
+                    uuid,
+                    sender,
+                    filterPlayer,
+                    filter,
+                    Collections.unmodifiableMap(flags),
+                    format,
+                    destination,
+                    range,
+                    sound,
+                    message,
+                    tagResolvers,
+                    proxy,
+                    integration
+            );
+        }
     }
 }
+

@@ -12,6 +12,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Destination;
@@ -67,6 +68,7 @@ import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -198,7 +200,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(module.metadataBuilder()
+        module.sendMessage(EventMetadata.<Localization.Command.Anon>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Anon::format)
@@ -216,7 +218,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(module.metadataBuilder()
+        module.sendMessage(EventMetadata.<Localization.Command.Me>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Me::format)
@@ -236,14 +238,17 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.sendMessage(BallMetadata.<Localization.Command.Ball>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replaceAnswer(answer))
+                .base(EventMetadata.<Localization.Command.Ball>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replaceAnswer(answer))
+                        .message(message)
+                        .destination(fileFacade.command().ball().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .answer(answer)
-                .message(message)
-                .destination(fileFacade.command().ball().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -259,13 +264,16 @@ public class ProxyMessageHandler {
         module.kick(fModerator, (FPlayer) fEntity, ban);
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.buildFormat(ban))
+                .base(EventMetadata.<Localization.Command.Ban>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.buildFormat(ban))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().ban().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderation(ban)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().ban().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -276,7 +284,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(module.metadataBuilder()
+        module.sendMessage(EventMetadata.<Localization.Command.Broadcast>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Broadcast::format)
@@ -309,13 +317,16 @@ public class ProxyMessageHandler {
         int percent = input.readInt();
 
         module.sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replaceResult(percent))
+                .base(EventMetadata.<Localization.Command.Coin>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replaceResult(percent))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().coin().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .percent(percent)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().coin().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -335,13 +346,16 @@ public class ProxyMessageHandler {
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
         module.sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(dice -> module.replaceResult(cubes, dice.symbols(), dice.format()))
+                .base(EventMetadata.<Localization.Command.Dice>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(dice -> module.replaceResult(cubes, dice.symbols(), dice.format()))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().dice().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .cubes(cubes)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().dice().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -352,7 +366,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(module.metadataBuilder()
+        module.sendMessage(EventMetadata.<Localization.Command.CommandDo>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.CommandDo::format)
@@ -375,9 +389,10 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         if (fTarget.isConsole()) {
-            module.sendMessage(module.metadataBuilder()
+            module.sendMessage(EventMetadata.<Localization.Command.Emit>builder()
                     .uuid(metadataUUID)
                     .sender(fEntity)
+                    .flag(MessageFlag.PARSING_BY_SENDER, false)
                     .range(Range.get(Range.Type.SERVER))
                     .format(Localization.Command.Emit::format)
                     .message(message)
@@ -386,10 +401,11 @@ public class ProxyMessageHandler {
                     .build()
             );
         } else {
-            module.sendMessage(module.metadataBuilder()
+            module.sendMessage(EventMetadata.<Localization.Command.Emit>builder()
                     .uuid(metadataUUID)
                     .sender(fEntity)
                     .filterPlayer(fTarget)
+                    .flag(MessageFlag.PARSING_BY_SENDER, false)
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
@@ -405,7 +421,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(module.metadataBuilder()
+        module.sendMessage(EventMetadata.<Localization.Command.Helper>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Helper::global)
@@ -427,13 +443,16 @@ public class ProxyMessageHandler {
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.buildFormat(mute))
+                .base(EventMetadata.<Localization.Command.Mute>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.buildFormat(mute))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().mute().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderation(mute)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().mute().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -449,14 +468,17 @@ public class ProxyMessageHandler {
         List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.getName()))
+                .base(EventMetadata.<Localization.Command.Unban>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.getName()))
+                        .destination(fileFacade.command().unban().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderator(fModerator)
                 .moderations(bans)
-                .destination(fileFacade.command().unban().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -470,14 +492,17 @@ public class ProxyMessageHandler {
         List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                .base(EventMetadata.<Localization.Command.Unmute>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                        .destination(fileFacade.command().unmute().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderator(fModerator)
                 .moderations(mutes)
-                .destination(fileFacade.command().unmute().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -491,14 +516,17 @@ public class ProxyMessageHandler {
         List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                .base(EventMetadata.<Localization.Command.Unwarn>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                        .destination(fileFacade.command().unwarn().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderator(fModerator)
                 .moderations(warns)
-                .destination(fileFacade.command().unwarn().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -514,13 +542,16 @@ public class ProxyMessageHandler {
                 module.saveAndUpdateLast(poll);
 
                 module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
-                        .uuid(metadataUUID)
-                        .sender(fEntity)
-                        .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
+                        .base(EventMetadata.<Localization.Command.Poll>builder()
+                                .uuid(metadataUUID)
+                                .sender(fEntity)
+                                .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
+                                .range(Range.get(Range.Type.SERVER))
+                                .message(poll.getTitle())
+                                .sound(module.soundOrThrow())
+                                .build()
+                        )
                         .poll(poll)
-                        .range(Range.get(Range.Type.SERVER))
-                        .message(poll.getTitle())
-                        .sound(module.soundOrThrow())
                         .build()
                 );
             }
@@ -536,15 +567,18 @@ public class ProxyMessageHandler {
         String string = input.readUTF();
 
         module.sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replaceAction(action))
+                .base(EventMetadata.<Localization.Command.Spy>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replaceAction(action))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().spy().destination())
+                        .message(string)
+                        .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN))
+                        .build()
+                )
                 .turned(true)
                 .action(action)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().spy().destination())
-                .message(string)
-                .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN))
                 .build()
         );
     }
@@ -556,14 +590,17 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replaceUrls(message))
+                .base(EventMetadata.<Localization.Command.Stream>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replaceUrls(message))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().stream().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .turned(true)
                 .urls(message)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().stream().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -593,15 +630,18 @@ public class ProxyMessageHandler {
         String messageToTranslate = input.readUTF();
 
         module.sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replaceLanguage(targetLang))
+                .base(EventMetadata.<Localization.Command.Translateto>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replaceLanguage(targetLang))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().translateto().destination())
+                        .message(message)
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .targetLanguage(targetLang)
                 .messageToTranslate(messageToTranslate)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().translateto().destination())
-                .message(message)
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -614,14 +654,17 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.sendMessage(TryMetadata.<Localization.Command.CommandTry>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.replacePercent(value))
+                .base(EventMetadata.<Localization.Command.CommandTry>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.replacePercent(value))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().commandTry().destination())
+                        .message(message)
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .percent(value)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().commandTry().destination())
-                .message(message)
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -635,13 +678,16 @@ public class ProxyMessageHandler {
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.buildFormat(warn))
+                .base(EventMetadata.<Localization.Command.Warn>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.buildFormat(warn))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.command().warn().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderation(warn)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.command().warn().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -657,13 +703,16 @@ public class ProxyMessageHandler {
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.buildFormat(kick))
+                .base(EventMetadata.<Localization.Command.Kick>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.buildFormat(kick))
+                        .destination(fileFacade.command().kick().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .moderation(kick)
-                .destination(fileFacade.command().kick().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
 
@@ -722,15 +771,18 @@ public class ProxyMessageHandler {
         Chat playerChat = new Chat(chatName, chatType, chatModule.permission().types().get(chatName));
 
         chatModule.sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
-                .uuid(metadataUUID)
-                .sender(fPlayer)
-                .format(s -> s.types().get(chatName))
+                .base(EventMetadata.<Localization.Message.Chat>builder()
+                        .uuid(metadataUUID)
+                        .sender(fPlayer)
+                        .format(s -> s.types().get(chatName))
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(chatType.destination())
+                        .message(message)
+                        .sound(playerChat.sound())
+                        .filter(chatModule.permissionFilter(chatName))
+                        .build()
+                )
                 .chat(playerChat)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(chatType.destination())
-                .message(message)
-                .sound(playerChat.sound())
-                .filter(chatModule.permissionFilter(chatName))
                 .build()
         );
     }
@@ -779,14 +831,17 @@ public class ProxyMessageHandler {
         Message.Join message = fileFacade.message().join();
 
         module.sendMessage(JoinMetadata.<Localization.Message.Join>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(s -> hasPlayedBefore || !message.first() ? s.format() : s.formatFirstTime())
+                .base(EventMetadata.<Localization.Message.Join>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(s -> hasPlayedBefore || !message.first() ? s.format() : s.formatFirstTime())
+                        .destination(message.destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .ignoreVanish(ignoreVanish)
                 .playedBefore(hasPlayedBefore)
-                .destination(message.destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -798,13 +853,16 @@ public class ProxyMessageHandler {
         boolean ignoreVanish = input.readBoolean();
 
         module.sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(Localization.Message.Quit::format)
+                .base(EventMetadata.<Localization.Message.Quit>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(Localization.Message.Quit::format)
+                        .destination(fileFacade.message().quit().destination())
+                        .range(Range.get(Range.Type.SERVER))
+                        .sound(module.soundOrThrow())
+                        .build()
+                )
                 .ignoreVanish(ignoreVanish)
-                .destination(fileFacade.message().quit().destination())
-                .range(Range.get(Range.Type.SERVER))
-                .sound(module.soundOrThrow())
                 .build()
         );
     }
@@ -816,16 +874,19 @@ public class ProxyMessageHandler {
         boolean isAfk = input.readBoolean();
 
         module.sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(s -> isAfk
-                        ? s.formatFalse().global()
-                        : s.formatTrue().global()
+                .base(EventMetadata.<Localization.Message.Afk>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(s -> isAfk
+                                ? s.formatFalse().global()
+                                : s.formatTrue().global()
+                        )
+                        .range(Range.get(Range.Type.SERVER))
+                        .destination(fileFacade.message().afk().destination())
+                        .sound(module.soundOrThrow())
+                        .build()
                 )
                 .newStatus(isAfk)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileFacade.message().afk().destination())
-                .sound(module.soundOrThrow())
                 .build()
         );
     }

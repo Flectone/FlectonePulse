@@ -24,7 +24,7 @@ public record MessageSendEvent(
                             Component message,
                             Component submessage,
                             EventMetadata<?> eventMetadata) {
-        this(false, messageType, eventMetadata.getSender(), receiver, message, submessage, eventMetadata);
+        this(false, messageType, eventMetadata.sender(), receiver, message, submessage, eventMetadata);
     }
 
     public MessageSendEvent(MessageType messageType,

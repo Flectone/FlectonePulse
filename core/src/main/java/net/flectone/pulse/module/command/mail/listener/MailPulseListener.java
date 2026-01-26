@@ -7,6 +7,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.MailModule;
@@ -34,13 +35,16 @@ public class MailPulseListener implements PulseListener {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
             mailModule.sendMessage(MailMetadata.<Localization.Command.Mail>builder()
-                    .sender(fPlayer)
-                    .filterPlayer(fReceiver, false)
-                    .format(Localization.Command.Mail::receiver)
-                    .destination(mailModule.config().destination())
+                    .base(EventMetadata.<Localization.Command.Mail>builder()
+                            .sender(fPlayer)
+                            .filterPlayer(fReceiver, false)
+                            .format(Localization.Command.Mail::receiver)
+                            .destination(mailModule.config().destination())
+                            .message(mail.message())
+                            .build()
+                    )
                     .mail(mail)
                     .target(fReceiver)
-                    .message(mail.message())
                     .build()
             );
 

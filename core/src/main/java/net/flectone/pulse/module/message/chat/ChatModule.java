@@ -12,6 +12,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -93,7 +94,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         Chat playerChat = getPlayerChat(fPlayer, eventMessage);
         if (playerChat.config() == null || !playerChat.config().enable()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Message.Chat>builder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::nullChat)
                     .build()
@@ -133,19 +134,22 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         String chatName = playerChat.name();
 
         ChatMetadata<Localization.Message.Chat> chatMetadata = ChatMetadata.<Localization.Message.Chat>builder()
-                .sender(fPlayer)
-                .format(localization -> localization.types().get(chatName))
+                .base(EventMetadata.<Localization.Message.Chat>builder()
+                        .sender(fPlayer)
+                        .format(localization -> localization.types().get(chatName))
+                        .destination(playerChat.config().destination())
+                        .range(playerChat.config().range())
+                        .message(finalMessage)
+                        .sound(playerChat.sound())
+                        .filter(permissionFilter(chatName))
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeString(chatName);
+                            dataOutputStream.writeString(finalMessage);
+                        })
+                        .integration()
+                        .build()
+                )
                 .chat(playerChat)
-                .destination(playerChat.config().destination())
-                .range(playerChat.config().range())
-                .message(finalMessage)
-                .sound(playerChat.sound())
-                .filter(permissionFilter(chatName))
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(chatName);
-                    dataOutputStream.writeString(finalMessage);
-                })
-                .integration()
                 .build();
 
         List<FPlayer> receivers = createReceivers(messageType(), chatMetadata);
@@ -175,7 +179,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Message.Chat>builder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::nullReceiver)
                     .destination(playerChat.config().nullReceiver().destination())

@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -75,7 +76,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String reason = timeReasonPair.second();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::nullTime)
                     .build()
@@ -112,7 +113,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::nullPlayer)
                     .build()
@@ -122,7 +123,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::lowerWeightGroup)
                     .build()
@@ -140,18 +141,21 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         kick(fPlayer, fTarget, ban);
 
         sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
-                .sender(fTarget)
-                .format(buildFormat(ban))
+                .base(EventMetadata.<Localization.Command.Ban>builder()
+                        .sender(fTarget)
+                        .format(buildFormat(ban))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream ->
+                                dataOutputStream.writeAsJson(ban)
+                        )
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
+                        )
+                        .build()
+                )
                 .moderation(ban)
-                .range(config().range())
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream ->
-                        dataOutputStream.writeAsJson(ban)
-                )
-                .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
-                )
                 .build()
         );
     }

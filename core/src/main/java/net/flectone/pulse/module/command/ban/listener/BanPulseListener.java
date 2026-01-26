@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.model.util.Moderation;
@@ -54,14 +55,17 @@ public class BanPulseListener implements PulseListener {
 
         if (banModule.config().showConnectionAttempts()) {
             banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
-                    .sender(fPlayer)
-                    .format((fReceiver, message) -> {
-                        String format = message.connectionAttempt();
-                        return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
-                    })
+                    .base(EventMetadata.<Localization.Command.Ban>builder()
+                            .sender(fPlayer)
+                            .format((fReceiver, message) -> {
+                                String format = message.connectionAttempt();
+                                return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
+                            })
+                            .range(Range.get(Range.Type.SERVER))
+                            .filter(filter -> permissionChecker.check(filter, banModule.permission()))
+                            .build()
+                    )
                     .moderation(ban)
-                    .range(Range.get(Range.Type.SERVER))
-                    .filter(filter -> permissionChecker.check(filter, banModule.permission()))
                     .build()
             );
         }

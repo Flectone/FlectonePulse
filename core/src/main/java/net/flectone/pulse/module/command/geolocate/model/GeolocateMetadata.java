@@ -1,18 +1,15 @@
 package net.flectone.pulse.module.command.geolocate.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-@Getter
-@SuperBuilder
-public class GeolocateMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    @NonNull
-    private final List<String> response;
-
-}
+@Builder
+public record GeolocateMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        @NonNull List<String> response
+) implements EventMetadata<L> {}

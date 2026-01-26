@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
@@ -62,7 +63,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, "INVISIBILITY")) return;
 
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Message.Rightclick>builder()
                     .sender(fPlayer)
                     .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                     .format(Localization.Message.Rightclick::format)

@@ -32,7 +32,7 @@ public class AfkPulseListener implements PulseListener {
         if (event.messageType() != MessageType.CHAT && !messageType.startsWith("COMMAND_")) return;
 
         EventMetadata<?> eventMetadata = event.eventMetadata();
-        if (!(eventMetadata.getSender() instanceof FPlayer fPlayer)) return;
+        if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) == null) return;
 
         int commandIndex = messageType.indexOf('_');

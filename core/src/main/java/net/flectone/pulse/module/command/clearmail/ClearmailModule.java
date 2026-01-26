@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -60,7 +61,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Clearmail>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Clearmail::nullMail)
                     .build()
@@ -74,13 +75,16 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
         fPlayerService.deleteMail(optionalMail.get());
 
         sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
-                .sender(fPlayer)
-                .format(string -> Strings.CS.replaceOnce(string.format(), "<id>", String.valueOf(mailID)))
+                .base(EventMetadata.<Localization.Command.Clearmail>builder()
+                        .sender(fPlayer)
+                        .format(string -> Strings.CS.replaceOnce(string.format(), "<id>", String.valueOf(mailID)))
+                        .destination(config().destination())
+                        .message(optionalMail.get().message())
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .build()
+                )
                 .mail(optionalMail.get())
-                .destination(config().destination())
-                .message(optionalMail.get().message())
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }

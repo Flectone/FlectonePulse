@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.util.file.FileFacade;
@@ -54,12 +55,15 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);
 
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
-                .sender(fPlayer)
-                .format(s -> !turnedBefore ? s.formatTrue() : s.formatFalse())
+                .base(EventMetadata.<Localization.Command.Spy>builder()
+                        .sender(fPlayer)
+                        .format(s -> !turnedBefore ? s.formatTrue() : s.formatFalse())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .turned(!turnedBefore)
                 .action("turning")
-                .destination(config().destination())
-                .sound(soundOrThrow())
                 .build()
         );
     }
@@ -98,19 +102,22 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         if (!isEnable()) return;
 
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
-                .sender(fPlayer)
-                .format(replaceAction(action))
+                .base(EventMetadata.<Localization.Command.Spy>builder()
+                        .sender(fPlayer)
+                        .format(replaceAction(action))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .message(message)
+                        .filter(createFilter(fPlayer))
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeString(action);
+                            dataOutputStream.writeString(message);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<action>", action))
+                        .build()
+                )
                 .turned(true)
                 .action(action)
-                .range(config().range())
-                .destination(config().destination())
-                .message(message)
-                .filter(createFilter(fPlayer))
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(action);
-                    dataOutputStream.writeString(message);
-                })
-                .integration(string -> Strings.CS.replace(string, "<action>", action))
                 .build()
         );
     }

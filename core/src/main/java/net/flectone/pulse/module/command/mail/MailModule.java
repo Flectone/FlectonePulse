@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.mail.listener.MailPulseListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -61,7 +62,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Mail>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mail::nullPlayer)
                     .build()
@@ -72,7 +73,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Mail::onlinePlayer)
                         .build()
@@ -97,14 +98,17 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         if (mail == null) return;
 
         sendMessage(MailMetadata.<Localization.Command.Mail>builder()
-                .sender(fPlayer)
-                .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))
+                .base(EventMetadata.<Localization.Command.Mail>builder()
+                        .sender(fPlayer)
+                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))
+                        .message(message)
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .build()
+                )
                 .mail(mail)
                 .target(fReceiver)
-                .message(message)
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }

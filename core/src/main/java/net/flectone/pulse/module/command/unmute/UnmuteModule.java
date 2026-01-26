@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -85,7 +86,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::nullPlayer)
                     .build()
@@ -95,7 +96,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::lowerWeightGroup)
                     .build()
@@ -115,7 +116,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (mutes.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::notMuted)
                     .build()
@@ -129,18 +130,21 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
-                .sender(fTarget)
-                .format(unmute -> Strings.CS.replace(unmute.format(), "<moderator>", fPlayer.getName()))
+                .base(EventMetadata.<Localization.Command.Unmute>builder()
+                        .sender(fTarget)
+                        .format(unmute -> Strings.CS.replace(unmute.format(), "<moderator>", fPlayer.getName()))
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeAsJson(fPlayer);
+                            dataOutputStream.writeAsJson(mutes);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .build()
+                )
                 .moderator(fPlayer)
                 .moderations(mutes)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(fPlayer);
-                    dataOutputStream.writeAsJson(mutes);
-                })
-                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }

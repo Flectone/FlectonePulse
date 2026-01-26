@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.twitch.TwitchIntegration;
 import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
@@ -75,34 +76,37 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     public void sendMessage(String nickname, String channel, String message, Pair<String, String> reply) {
         sendMessage(TwitchMetadata.<Localization.Integration.Twitch>builder()
-                .sender(FPlayer.UNKNOWN)
-                .format(localization -> StringUtils.replaceEach(
-                        StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
-                        new String[]{"<name>", "<channel>"},
-                        new String[]{String.valueOf(nickname), String.valueOf(channel)}
-                ))
+                .base(EventMetadata.<Localization.Integration.Twitch>builder()
+                        .sender(FPlayer.UNKNOWN)
+                        .format(localization -> StringUtils.replaceEach(
+                                StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
+                                new String[]{"<name>", "<channel>"},
+                                new String[]{String.valueOf(nickname), String.valueOf(channel)}
+                        ))
+                        .message(message)
+                        .range(Range.get(Range.Type.PROXY))
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                            if (reply == null) return Tag.selfClosingInserting(Component.empty());
+
+                            MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
+                                    .addTagResolvers(
+                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                            TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                                    );
+
+                            return Tag.inserting(messagePipeline.build(tagContext));
+                        })})
+                        .integration(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<channel>"},
+                                new String[]{nickname, channel}
+                        ))
+                        .build()
+                )
                 .nickname(nickname)
                 .channel(channel)
-                .message(message)
-                .range(Range.get(Range.Type.PROXY))
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
-                    if (reply == null) return Tag.selfClosingInserting(Component.empty());
-
-                    MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
-                            .addTagResolvers(
-                                    TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                    TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
-                            );
-
-                    return Tag.inserting(messagePipeline.build(tagContext));
-                })})
-                .integration(string -> StringUtils.replaceEach(
-                        string,
-                        new String[]{"<name>", "<channel>"},
-                        new String[]{nickname, channel}
-                ))
                 .build()
         );
     }

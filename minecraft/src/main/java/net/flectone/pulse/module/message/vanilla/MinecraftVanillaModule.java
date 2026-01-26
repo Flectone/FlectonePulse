@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
@@ -103,18 +104,21 @@ public class MinecraftVanillaModule extends VanillaModule {
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
         sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+                .base(EventMetadata.<Localization.Message.Vanilla>builder()
+                        .sender(fPlayer)
+                        .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
+                        .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
+                        .range(range)
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        .destination(parsedComponent.vanillaMessage().destination())
+                        .integration()
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeString(parsedComponent.translationKey());
+                            dataOutputStream.writeAsJson(parsedComponent.arguments());
+                        })
+                        .build()
+                )
                 .parsedComponent(parsedComponent)
-                .sender(fPlayer)
-                .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
-                .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
-                .range(range)
-                .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                .destination(parsedComponent.vanillaMessage().destination())
-                .integration()
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeString(parsedComponent.translationKey());
-                    dataOutputStream.writeAsJson(parsedComponent.arguments());
-                })
                 .build()
         );
     }

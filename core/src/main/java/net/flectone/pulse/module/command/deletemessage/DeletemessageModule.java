@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
@@ -44,7 +45,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Deletemessage>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Deletemessage::nullMessage)
                     .build()
@@ -59,11 +60,14 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
         );
 
         sendMessage(DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.Deletemessage::format)
+                .base(EventMetadata.<Localization.Command.Deletemessage>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Command.Deletemessage::format)
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .build()
+                )
                 .deletedUUID(uuid)
-                .destination(config().destination())
-                .sound(soundOrThrow())
                 .build()
         );
     }

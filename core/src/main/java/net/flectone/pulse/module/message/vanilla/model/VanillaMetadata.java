@@ -1,14 +1,12 @@
 package net.flectone.pulse.module.message.vanilla.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.EventMetadata;
+import org.jspecify.annotations.NonNull;
 
-@Getter
-@SuperBuilder
-public class VanillaMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    private final ParsedComponent parsedComponent;
-
-}
+@Builder
+public record VanillaMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        ParsedComponent parsedComponent
+) implements EventMetadata<L> {}

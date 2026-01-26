@@ -1,19 +1,14 @@
 package net.flectone.pulse.module.command.translateto.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import org.jspecify.annotations.NonNull;
 
-@Getter
-@SuperBuilder
-public class TranslatetoMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    @NonNull
-    private final String targetLanguage;
-
-    @NonNull
-    private final String messageToTranslate;
-
-}
+@Builder
+public record TranslatetoMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        @NonNull String targetLanguage,
+        @NonNull String messageToTranslate
+) implements EventMetadata<L> {}

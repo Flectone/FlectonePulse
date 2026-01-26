@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -66,7 +67,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         String category = getArgument(commandContext, 0);
         if (!config().categories().containsKey(category)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Symbol>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Symbol::nullCategory)
                     .build()
@@ -87,7 +88,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Symbol>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Symbol::nullPage)
                     .build()

@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -176,12 +177,15 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
         taskScheduler.runAsyncLater(() -> sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
-                .sender(sender)
-                .filterPlayer(fReceiver)
-                .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
+                .base(EventMetadata.<Localization.Message.Format.QuestionAnswer>builder()
+                        .sender(sender)
+                        .filterPlayer(fReceiver)
+                        .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
+                        .destination(questionMessage.destination())
+                        .sound(sound)
+                        .build()
+                )
                 .question(question)
-                .destination(questionMessage.destination())
-                .sound(sound)
                 .build()
         ), 1L);
     }

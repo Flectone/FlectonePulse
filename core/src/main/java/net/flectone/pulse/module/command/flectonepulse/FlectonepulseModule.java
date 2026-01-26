@@ -14,6 +14,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
@@ -82,7 +83,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
             if (fileFacade.config().editor().host().isEmpty()) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::nullHostEditor)
                         .build()
@@ -93,7 +94,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             int port = fileFacade.config().editor().port();
             if (!isPortAvailable(port)) {
-                sendErrorMessage(metadataBuilder()
+                sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                         .sender(fPlayer)
                         .format(localization -> Strings.CS.replace(localization.nullPortEditor(), "<port>", String.valueOf(port)))
                         .build()
@@ -102,7 +103,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 return;
             }
 
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatWebStarting)
                     .destination(config().destination())
@@ -116,7 +117,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             enableSpark();
 
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatEditor(), "<url>", url))
                     .destination(config().destination())
@@ -144,7 +145,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             String formattedTime = timeFormatter.format(fPlayer, Duration.between(start, end).toMillis());
 
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatTrue(), "<time>", formattedTime))
                     .destination(config().destination())
@@ -155,7 +156,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         } catch (Exception e) {
             fLogger.warning(e.getMessage());
 
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatFalse)
                     .message(e.getLocalizedMessage())

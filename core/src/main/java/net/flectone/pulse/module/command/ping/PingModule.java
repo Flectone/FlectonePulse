@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -50,7 +51,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Ping>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ping::nullPlayer)
                     .build()
@@ -59,7 +60,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
             return;
         }
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Ping>builder()
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
                 .format(Localization.Command.Ping::format)

@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -59,14 +60,17 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         }
 
         sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
-                .sender(fPlayer)
+                .base(EventMetadata.<Localization.Command.Dice>builder()
+                        .sender(fPlayer)
+                        .format(dice -> replaceResult(cubes, dice.symbols(), dice.format()))
+                        .range(config().range())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
+                        .integration(string -> replaceResult(cubes, localization().symbols(), string))
+                        .build()
+                )
                 .cubes(cubes)
-                .format(dice -> replaceResult(cubes, dice.symbols(), dice.format()))
-                .range(config().range())
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
-                .integration(string -> replaceResult(cubes, localization().symbols(), string))
                 .build()
         );
     }

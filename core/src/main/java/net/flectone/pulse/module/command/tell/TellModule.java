@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -94,7 +95,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (isModuleDisabledFor(fPlayer, true)) return;
 
         if (fPlayer.getName().equalsIgnoreCase(playerName)) {
-            sendMessage(metadataBuilder()
+            sendMessage(EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::myself)
                     .destination(config().destination())
@@ -110,7 +111,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         if (!fReceiver.isConsole()
                 && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::nullPlayer)
                     .build()
@@ -155,7 +156,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                      UUID metadataUUID) {
         boolean isSenderToSender = sender.equals(fReceiver);
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Tell>builder()
                 .uuid(metadataUUID)
                 .sender(sender)
                 .filterPlayer(fReceiver)

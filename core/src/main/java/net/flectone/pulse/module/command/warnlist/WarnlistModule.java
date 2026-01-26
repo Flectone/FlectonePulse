@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -83,7 +84,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendErrorMessage(metadataBuilder()
+                    sendErrorMessage(EventMetadata.<Localization.Command.Warnlist>builder()
                             .sender(fPlayer)
                             .format(Localization.Command.Warnlist::nullPlayer)
                             .build()
@@ -102,7 +103,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 : moderationService.getValidWarns(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Warnlist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warnlist::empty)
                     .build()
@@ -116,7 +117,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Warnlist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warnlist::nullPage)
                     .build()

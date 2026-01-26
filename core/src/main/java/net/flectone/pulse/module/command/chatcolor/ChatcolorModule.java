@@ -12,6 +12,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -84,7 +85,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission().colors().get(fColorType.get().name()))) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::nullType)
                     .build()
@@ -133,7 +134,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (newFColors.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::nullColor)
                     .build()
@@ -192,7 +193,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     }
 
     public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::format)

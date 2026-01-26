@@ -13,6 +13,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
@@ -212,7 +213,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         processedMentions.put(processId, true);
 
-        sendMessage(metadataBuilder()
+        sendMessage(EventMetadata.<Localization.Message.Format.Mention>builder()
                 .sender(fPlayer)
                 .format(Localization.Message.Format.Mention::person)
                 .destination(config().destination())

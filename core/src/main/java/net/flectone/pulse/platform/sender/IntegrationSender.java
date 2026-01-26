@@ -9,7 +9,6 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -71,11 +70,11 @@ public class IntegrationSender {
      * @param eventMetadata the event metadata containing sender and message
      */
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
-        UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
+        UnaryOperator<String> integrationOperator = eventMetadata.integration();
         if (integrationOperator == null) return;
         if (!integrationModule.hasMessenger()) return;
 
-        FEntity sender = eventMetadata.getSender();
+        FEntity sender = eventMetadata.sender();
 
         String plainFormat = plainSerialize(createFormat(format, eventMetadata));
         String plainMessage = plainSerialize(createMessage(eventMetadata));
@@ -105,25 +104,27 @@ public class IntegrationSender {
     }
 
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
-        FEntity sender = eventMetadata.getSender();
+        FEntity sender = eventMetadata.sender();
         MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
+                .withFlags(eventMetadata.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.TRANSLATE, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD},
-                        new boolean[]{eventMetadata.isSenderColorOut(), false, false, false}
+                        new MessageFlag[]{MessageFlag.TRANSLATE, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD},
+                        new boolean[]{false, false, false}
                 )
-                .addTagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN));
+                .addTagResolvers(eventMetadata.resolveTags(FPlayer.UNKNOWN));
 
         return messagePipeline.build(context);
     }
 
     private Component createMessage(EventMetadata<?> eventMetadata) {
-        String message = eventMetadata.getMessage();
+        String message = eventMetadata.message();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.getSender(), FPlayer.UNKNOWN, message)
+        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), FPlayer.UNKNOWN, message)
+                .withFlags(eventMetadata.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.SENDER_COLOR_OUT, MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
-                        new boolean[]{eventMetadata.isSenderColorOut(), true, false, false, false, false}
+                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATE, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
+                        new boolean[]{true, false, false, false, false}
                 );
 
         return messagePipeline.build(context);
@@ -142,17 +143,13 @@ public class IntegrationSender {
     }
 
     protected Collection<String> createSpecificMessageNames(MessageType messageType, EventMetadata<?> eventMetadata) {
-        return switch (messageType) {
-            case CHAT -> {
-                if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield Collections.emptyList();
+        if (messageType == MessageType.CHAT
+                && eventMetadata instanceof ChatMetadata<?> chatMetadata
+                && chatMetadata.chat().name() != null) {
+            return List.of((messageType.name() + "_" + chatMetadata.chat().name()).toUpperCase());
+        }
 
-                Chat chat = chatMetadata.getChat();
-                if (chat.name() == null) yield Collections.emptyList();
-
-                yield List.of((messageType.name() + "_" + chat.name()).toUpperCase());
-            }
-            default -> Collections.emptyList();
-        };
+        return Collections.emptyList();
     }
 
 }

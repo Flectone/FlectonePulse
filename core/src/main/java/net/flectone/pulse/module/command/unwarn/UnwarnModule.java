@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -85,7 +86,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::nullPlayer)
                     .build()
@@ -95,7 +96,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::lowerWeightGroup)
                     .build()
@@ -115,7 +116,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         }
 
         if (warns.isEmpty()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::notWarned)
                     .build()
@@ -129,18 +130,21 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         proxySender.send(fTarget, MessageType.SYSTEM_WARN);
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
-                .sender(fTarget)
-                .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                .base(EventMetadata.<Localization.Command.Unwarn>builder()
+                        .sender(fTarget)
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeAsJson(fPlayer);
+                            dataOutputStream.writeAsJson(warns);
+                        })
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .build()
+                )
                 .moderator(fPlayer)
                 .moderations(warns)
-                .destination(config().destination())
-                .range(config().range())
-                .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(fPlayer);
-                    dataOutputStream.writeAsJson(warns);
-                })
-                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }

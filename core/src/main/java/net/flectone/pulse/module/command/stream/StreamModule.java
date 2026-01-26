@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
@@ -84,7 +85,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         boolean isStream = localization().prefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Stream>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::already)
                     .build()
@@ -94,7 +95,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         }
 
         if (!isStream && !needStart) {
-            sendErrorMessage(metadataBuilder()
+            sendErrorMessage(EventMetadata.<Localization.Command.Stream>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::not)
                     .build()
@@ -118,23 +119,29 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .collect(Collectors.joining(" "));
 
             sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
-                    .sender(fPlayer)
-                    .format(replaceUrls(urls))
+                    .base(EventMetadata.<Localization.Command.Stream>builder()
+                            .sender(fPlayer)
+                            .format(replaceUrls(urls))
+                            .range(config().range())
+                            .destination(config().destination())
+                            .sound(soundOrThrow())
+                            .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
+                            .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
+                            .build()
+                    )
                     .turned(true)
                     .urls(urls)
-                    .range(config().range())
-                    .destination(config().destination())
-                    .sound(soundOrThrow())
-                    .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
-                    .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
                     .build()
             );
         } else {
             sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Stream::formatEnd)
+                    .base(EventMetadata.<Localization.Command.Stream>builder()
+                            .sender(fPlayer)
+                            .format(Localization.Command.Stream::formatEnd)
+                            .destination(config().destination())
+                            .build()
+                    )
                     .turned(false)
-                    .destination(config().destination())
                     .build()
             );
         }

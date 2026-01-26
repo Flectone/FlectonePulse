@@ -1,16 +1,13 @@
 package net.flectone.pulse.module.message.format.questionanswer.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import org.jspecify.annotations.NonNull;
 
-@Getter
-@SuperBuilder
-public class QuestionAnswerMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    @NonNull
-    private final String question;
-
-}
+@Builder
+public record QuestionAnswerMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        @NonNull String question
+) implements EventMetadata<L> {}

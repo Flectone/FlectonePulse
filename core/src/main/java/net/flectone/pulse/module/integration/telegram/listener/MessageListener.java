@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
@@ -107,36 +108,39 @@ public class MessageListener extends EventListener {
         String lastName = StringUtils.defaultString(user.getLastName());
 
         sendMessage(TelegramMetadata.<Localization.Integration.Telegram>builder()
-                .sender(FPlayer.UNKNOWN)
-                .format(localization -> StringUtils.replaceEach(
-                        StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name())),
-                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
-                ))
+                .base(EventMetadata.<Localization.Integration.Telegram>builder()
+                        .sender(FPlayer.UNKNOWN)
+                        .format(localization -> StringUtils.replaceEach(
+                                StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name())),
+                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                                new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
+                        ))
+                        .message(message)
+                        .range(Range.get(Range.Type.PROXY))
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                            if (reply == null) return Tag.selfClosingInserting(Component.empty());
+
+                            MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
+                                    .addTagResolvers(
+                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                            TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                                    );
+
+                            return Tag.inserting(messagePipeline.build(tagContext));
+                        })})
+                        .integration(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                                new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
+                        ))
+                        .build()
+                )
                 .userName(userName)
                 .firstName(firstName)
                 .lastName(lastName)
                 .chat(chat)
-                .message(message)
-                .range(Range.get(Range.Type.PROXY))
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
-                    if (reply == null) return Tag.selfClosingInserting(Component.empty());
-
-                    MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
-                            .addTagResolvers(
-                                    TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                    TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
-                            );
-
-                    return Tag.inserting(messagePipeline.build(tagContext));
-                })})
-                .integration(string -> StringUtils.replaceEach(
-                        string,
-                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
-                ))
                 .build()
         );
     }

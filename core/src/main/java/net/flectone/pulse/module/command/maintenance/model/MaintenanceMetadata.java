@@ -1,14 +1,12 @@
 package net.flectone.pulse.module.command.maintenance.model;
 
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.EventMetadata;
+import org.jspecify.annotations.NonNull;
 
-@Getter
-@SuperBuilder
-public class MaintenanceMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
-
-    private final boolean turned;
-
-}
+@Builder
+public record MaintenanceMetadata<L extends LocalizationSetting>(
+        @NonNull EventMetadata<L> base,
+        boolean turned
+) implements EventMetadata<L> {}
