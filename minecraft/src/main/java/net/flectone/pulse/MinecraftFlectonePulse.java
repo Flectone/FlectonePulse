@@ -26,6 +26,7 @@ import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.util.logging.filter.LogFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class MinecraftFlectonePulse {
         instance.get(ListenerRegistry.class).registerDefaultListeners();
 
         // setup filter
-        fLogger.setupFilter();
+        instance.get(LogFilter.class).setFilters(fileFacade.config().logger().filter());
 
         // test database connection
         instance.get(Database.class).connect();
@@ -227,8 +228,8 @@ public class MinecraftFlectonePulse {
         instance.get(PermissionRegistry.class).reload();
         instance.get(ProxyRegistry.class).reload();
 
-        // reload logger with new configuration
-        fLogger.setupFilter();
+        // reload logger filters
+        instance.get(LogFilter.class).setFilters(fileFacade.config().logger().filter());
 
         // terminate database
         database.disconnect();

@@ -1,5 +1,7 @@
-package net.flectone.pulse.util.logging;
+package net.flectone.pulse.util.logging.filter;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
@@ -19,10 +21,12 @@ import java.util.concurrent.TimeUnit;
  * @author Whitescan
  * @since 1.0.0
  */
+@Singleton
 public class LogFilter implements Filter {
 
     private final List<String> filters = new ArrayList<>();
 
+    @Inject
     public LogFilter() {
         ((Logger) LogManager.getRootLogger()).addFilter(this);
     }

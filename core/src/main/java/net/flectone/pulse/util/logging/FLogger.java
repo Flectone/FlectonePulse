@@ -5,10 +5,10 @@ import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.filter.LogFilter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class FLogger extends Logger {
 
     private final Consumer<LogRecord> logConsumer;
-    private final LogFilter logFilter = new LogFilter();
 
     @Setter private FileFacade fileFacade;
 
@@ -40,10 +39,6 @@ public class FLogger extends Logger {
 
     public Config.Logger config() {
         return fileFacade == null ? null : fileFacade.config().logger();
-    }
-
-    public void setupFilter() {
-        logFilter.setFilters(config() == null ? Collections.emptyList() : config().filter());
     }
 
     @Override
