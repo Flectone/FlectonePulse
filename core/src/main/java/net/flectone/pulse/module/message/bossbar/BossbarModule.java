@@ -1,6 +1,9 @@
 package net.flectone.pulse.module.message.bossbar;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -10,13 +13,11 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 
-public abstract class BossbarModule extends AbstractModuleLocalization<Localization.Message.Bossbar> {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BossbarModule extends AbstractModuleLocalization<Localization.Message.Bossbar> {
 
     private final FileFacade fileFacade;
-
-    protected BossbarModule(FileFacade fileFacade) {
-        this.fileFacade = fileFacade;
-    }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
