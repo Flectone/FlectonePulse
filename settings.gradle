@@ -10,12 +10,7 @@ pluginManagement {
 }
 
 include "core"
-include "fabric"
-include "bukkit"
-include "paper"
-include "velocity"
-include "bungeecord"
-
+include "hytale"
 include "minecraft"
 include "minecraft:fabric"
 include "minecraft:bukkit"

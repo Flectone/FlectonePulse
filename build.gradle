@@ -60,7 +60,9 @@ subprojects {
         maven { url = "https://repo.opencollab.dev/main/" }
         maven { url = "https://mvn-repo.arim.space/affero-gpl3/" }
         maven { url = "https://mvn-repo.arim.space/lesser-gpl3/" }
-        maven { url = "https://nexus.lucko.me/repository/maven-hytale/" }
+        maven { url = "https://repo.william278.net/releases/" }
+        maven { url = "https://maven.hytale.com/release" }
+        maven { url = "https://maven.hytale.com/pre-release" }
     }
 
     dependencies {

@@ -1,0 +1,22 @@
+{
+  "Group": "FlectonePulse",
+  "Name": "FlectonePulse",
+  "Version": "${version}",
+  "Description": "${description}",
+  "Authors": [
+    {
+      "Name": "TheFaser",
+      "Email": "artem.mochalin11@gmail.com",
+      "Url": "https://github.com/TheFaser"
+    }
+  ],
+  "Website": "https://flectone.net/pulse/",
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {
+    "LuckPerms:LuckPerms": "*"
+  },
+  "DisabledByDefault": false,
+  "IncludesAssetPack": false,
+  "Main": "net.flectone.pulse.HytaleFlectonePulse"
+}

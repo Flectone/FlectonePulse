@@ -1,0 +1,27 @@
+dependencies {
+    implementation fileTree("library") { include "*.jar" }
+    implementation project(":core")
+
+    compileOnly "com.alessiodp.libby:libby-core:$libby_version"
+    compileOnly "net.kyori:adventure-text-serializer-ansi:$adventure_api"
+    compileOnly "org.incendo:cloud-core:$cloud_core_version"
+    compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
+
+    compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
+    compileOnly "com.github.ArikSquad:adventure-platform-hytale:$adventure_platform_hytale_version"
+}
+
+processResources {
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description"]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('**/manifest.json') {
+        expand props
+    }
+}
+
+tasks.named("buildFinalJar", Jar) {
+    from(zipTree(tasks.shadowJar.archiveFile))
+
+    dependsOn tasks.shadowJar
+}
