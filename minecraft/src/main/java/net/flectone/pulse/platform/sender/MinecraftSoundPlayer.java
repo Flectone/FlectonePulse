@@ -26,6 +26,7 @@ public class MinecraftSoundPlayer implements SoundPlayer {
     private final PacketSender packetSender;
     private final PermissionChecker permissionChecker;
 
+    @Override
     public void play(Pair<Sound, PermissionSetting> soundPermission, FEntity sender, FPlayer receiver) {
         if (soundPermission == null) return;
 
