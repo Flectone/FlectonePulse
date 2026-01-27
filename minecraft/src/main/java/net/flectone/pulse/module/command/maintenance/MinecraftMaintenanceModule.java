@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.command.maintenance;
 
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,9 +11,9 @@ import com.google.inject.name.Named;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
@@ -29,8 +28,6 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
-    private final PermissionChecker permissionChecker;
-    private final PacketSender packetSender;
 
     @Inject
     public MinecraftMaintenanceModule(FileFacade fileFacade,
@@ -38,20 +35,17 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ListenerRegistry listenerRegistry,
                                       @Named("imagePath") Path iconPath,
                                       PlatformServerAdapter platformServerAdapter,
-                                      IconUtil iconUtil,
-                                      FLogger fLogger,
+                                      PlatformPlayerAdapter platformPlayerAdapter,
                                       FPlayerService fPlayerService,
                                       MessagePipeline messagePipeline,
-                                      PacketSender packetSender) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, iconUtil, fLogger);
+                                      IconUtil iconUtil,
+                                      FLogger fLogger) {
+        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, iconUtil, fLogger);
 
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
-        this.permissionChecker = permissionChecker;
-        this.packetSender = packetSender;
     }
 
-    @Override
     public void sendStatus(Object player) {
         if (!isEnable()) return;
         if (!config().turnedOn()) return;
@@ -97,14 +91,4 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
         return playersJson;
     }
 
-    @Override
-    protected void kickOnlinePlayers(FPlayer fSender) {
-        fPlayerService.getOnlineFPlayers()
-                .stream()
-                .filter(filter -> !permissionChecker.check(filter, permission().join()))
-                .forEach(fReceiver -> {
-                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, localization(fReceiver).kick());
-                    packetSender.send(fReceiver, new WrapperPlayServerDisconnect(messagePipeline.build(messageContext)));
-                });
-    }
 }

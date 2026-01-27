@@ -1,18 +1,25 @@
 package net.flectone.pulse.module.command.maintenance;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -23,30 +30,41 @@ import org.incendo.cloud.context.CommandContext;
 import java.io.File;
 import java.nio.file.Path;
 
-public abstract class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
+@Singleton
+public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final FPlayerService fPlayerService;
+    private final MessagePipeline messagePipeline;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
     protected String icon;
 
-    protected MaintenanceModule(FileFacade fileFacade,
-                                PermissionChecker permissionChecker,
-                                ListenerRegistry listenerRegistry,
-                                Path iconPath,
-                                PlatformServerAdapter platformServerAdapter,
-                                IconUtil iconUtil,
-                                FLogger fLogger) {
+    @Inject
+    public MaintenanceModule(FileFacade fileFacade,
+                             PermissionChecker permissionChecker,
+                             ListenerRegistry listenerRegistry,
+                             @Named("imagePath") Path iconPath,
+                             PlatformServerAdapter platformServerAdapter,
+                             PlatformPlayerAdapter platformPlayerAdapter,
+                             FPlayerService fPlayerService,
+                             MessagePipeline messagePipeline,
+                             IconUtil iconUtil,
+                             FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.permissionChecker = permissionChecker;
         this.listenerRegistry = listenerRegistry;
         this.iconPath = iconPath;
         this.platformServerAdapter = platformServerAdapter;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.fPlayerService = fPlayerService;
+        this.messagePipeline = messagePipeline;
         this.iconUtil = iconUtil;
         this.fLogger = fLogger;
     }
@@ -139,8 +157,14 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         return permissionChecker.check(fPlayer, permission().join());
     }
 
-    public abstract void sendStatus(Object player);
-
-    protected abstract void kickOnlinePlayers(FPlayer fSender);
+    public void kickOnlinePlayers(FPlayer fSender) {
+        fPlayerService.getOnlineFPlayers()
+                .stream()
+                .filter(filter -> !permissionChecker.check(filter, permission().join()))
+                .forEach(fReceiver -> {
+                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, localization(fReceiver).kick());
+                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(messageContext));
+                });
+    }
 
 }

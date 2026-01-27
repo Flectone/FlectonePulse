@@ -6,13 +6,13 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
+import net.flectone.pulse.module.command.maintenance.MinecraftMaintenanceModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenancePacketListener implements PacketListener {
 
-    private final MaintenanceModule maintenanceModule;
+    private final MinecraftMaintenanceModule maintenanceModule;
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
