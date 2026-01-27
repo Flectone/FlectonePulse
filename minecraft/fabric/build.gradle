@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-	id 'fabric-loom' version '1.14.10'
+	id 'fabric-loom' version '1.15.1'
 }
 
 dependencies {
