@@ -27,7 +27,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean fabric:buildFinalJar bukkit:buildFinalJar --no-daemon
+        run: ./gradlew clean fabric:buildFinalJar bukkit:buildFinalJar hytale:buildFinalJar --no-daemon
 
       - name: Publish artifact to GitHub
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
