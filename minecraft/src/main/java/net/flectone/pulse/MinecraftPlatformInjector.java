@@ -17,6 +17,8 @@ import net.flectone.pulse.module.message.bossbar.BossbarModule;
 import net.flectone.pulse.module.message.bossbar.MinecraftBossbarModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.MinecraftBubbleModule;
+import net.flectone.pulse.module.message.bubble.render.BubbleRender;
+import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
@@ -106,10 +108,10 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(TextScreenRender.class).to(MinecraftTextScreenRender.class);
         bind(TitleRender.class).to(MinecraftTitleRender.class);
         bind(ToastRender.class).to(MinecraftToastRender.class);
+        bind(BubbleRender.class).to(MinecraftBubbleRender.class);
 
         // senders
         bind(MessageSender.class).to(MinecraftMessageSender.class);
-        bind(IntegrationSender.class).to(MinecraftIntegrationSender.class);
         bind(SoundPlayer.class).to(MinecraftSoundPlayer.class);
 
         // others

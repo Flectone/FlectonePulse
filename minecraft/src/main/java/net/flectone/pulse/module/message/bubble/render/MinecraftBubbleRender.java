@@ -1,5 +1,6 @@
-package net.flectone.pulse.module.message.bubble.renderer;
+package net.flectone.pulse.module.message.bubble.render;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -25,6 +26,7 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -48,7 +50,7 @@ import java.util.function.Predicate;
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BubbleRenderer {
+public class MinecraftBubbleRender implements BubbleRender {
 
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
     
@@ -61,8 +63,10 @@ public class BubbleRenderer {
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final EntityUtil entityUtil;
+    private final PacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
 
+    @Override
     public void renderBubble(Bubble bubble) {
         FPlayer sender = bubble.getSender();
         if (!isCorrectPlayer(sender)) return;
@@ -113,12 +117,13 @@ public class BubbleRenderer {
         rideEntities(sender, fViewer);
     }
 
-    public void removeBubbleIf(Predicate<BubbleEntity> bubbleEntityPredicate) {
+    @Override
+    public void removeBubbleIf(Predicate<Bubble> bubbleEntityPredicate) {
         activeBubbleEntities.forEach((uuid, bubbleEntities) -> {
             if (bubbleEntities.isEmpty()) return;
 
             List<BubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
-                    .filter(bubbleEntityPredicate)
+                    .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
                     .toList();
 
             if (bubbleEntitiesToRemove.isEmpty()) return;
@@ -236,6 +241,7 @@ public class BubbleRenderer {
         taskScheduler.runAsyncLater(() -> packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerDestroyEntities(bubbleEntity.getId())), despawnDelay);
     }
 
+    @Override
     public void removeAllBubbles() {
         activeBubbleEntities.values().forEach(entities -> 
                 entities.forEach(this::despawnBubbleEntity));
@@ -349,6 +355,7 @@ public class BubbleRenderer {
         return metadataList;
     }
 
+    @Override
     public boolean isCorrectPlayer(FPlayer sender) {
         List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.getUuid());
 
@@ -357,4 +364,17 @@ public class BubbleRenderer {
                 && textScreenRender.getPassengers(sender.getUuid()).isEmpty()
                 && passengers.isEmpty();
     }
+
+    @Override
+    public boolean isModern() {
+        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
+                && fileFacade.message().bubble().modern().enable();
+    }
+
+    @Override
+    public boolean isInteractionRiding() {
+        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
+                && fileFacade.message().bubble().interaction().enable();
+    }
+
 }

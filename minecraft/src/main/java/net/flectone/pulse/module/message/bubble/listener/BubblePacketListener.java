@@ -11,7 +11,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
+import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
@@ -25,7 +25,7 @@ public class BubblePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final BubbleModule bubbleModule;
-    private final BubbleRenderer bubbleRenderer;
+    private final MinecraftBubbleRender bubbleRenderer;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ChatModule chatModule;
 
@@ -38,7 +38,7 @@ public class BubblePacketListener implements PacketListener {
         UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
         if (playerUUID == null) return;
 
-        bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().getSender().getUuid().equals(playerUUID));
+        bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().getUuid().equals(playerUUID));
     }
 
     @Override

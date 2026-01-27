@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.bubble.service;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
-import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.util.RandomUtil;
@@ -38,10 +36,9 @@ public class BubbleService {
     ) {}
 
     private final FileFacade fileFacade;
-    private final BubbleRenderer bubbleRenderer;
+    private final BubbleRender bubbleRender;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
-    private final PacketProvider packetProvider;
     private final RandomUtil randomUtil;
     private final MessagePipeline messagePipeline;
 
@@ -55,7 +52,7 @@ public class BubbleService {
     }
 
     public void addMessage(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
-        if (!bubbleRenderer.isCorrectPlayer(sender)) return;
+        if (!bubbleRender.isCorrectPlayer(sender)) return;
 
         PlayerBubbleState state = playerBubbleStates.computeIfAbsent(
                 sender.getUuid(),
@@ -83,8 +80,8 @@ public class BubbleService {
         float elevation = config.elevation();
         float interactionHeight = config.interaction().height();
 
-        boolean useModernBubble = isModern();
-        boolean useInteractionRiding = isInteractionRiding();
+        boolean useModernBubble = bubbleRender.isModern();
+        boolean useInteractionRiding = bubbleRender.isInteractionRiding();
 
         String wordBreakHint = config.wordBreakHint();
 
@@ -162,7 +159,7 @@ public class BubbleService {
         try {
             bubbleState.activeBubbles.removeIf(bubble -> {
                 if (!bubble.isExpired()) return false;
-                bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().equals(bubble));
+                bubbleRender.removeBubbleIf(filterBubble -> filterBubble.equals(bubble));
                 return true;
             });
 
@@ -173,7 +170,7 @@ public class BubbleService {
 
             Bubble nextBubble = bubbleState.waitingQueue.poll();
             if (nextBubble != null && !nextBubble.isCreated()) {
-                bubbleRenderer.renderBubble(nextBubble);
+                bubbleRender.renderBubble(nextBubble);
                 bubbleState.activeBubbles.add(nextBubble);
             }
 
@@ -195,14 +192,14 @@ public class BubbleService {
     public void clear() {
         playerBubbleStates.forEach((uuid, state) -> clearBubbleState(state));
         playerBubbleStates.clear();
-        bubbleRenderer.removeAllBubbles();
+        bubbleRender.removeAllBubbles();
     }
 
     private void clearBubbleState(PlayerBubbleState state) {
         state.lock.lock();
         try {
             state.waitingQueue.clear();
-            state.activeBubbles.forEach(bubble -> bubbleRenderer.removeBubbleIf(bubbleEntity -> bubbleEntity.getBubble().equals(bubble)));
+            state.activeBubbles.forEach(bubble -> bubbleRender.removeBubbleIf(filterBubble -> filterBubble.equals(bubble)));
             state.activeBubbles.clear();
         } finally {
             state.lock.unlock();
@@ -216,13 +213,4 @@ public class BubbleService {
         return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
     }
 
-    private boolean isModern() {
-        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
-                && fileFacade.message().bubble().modern().enable();
-    }
-
-    private boolean isInteractionRiding() {
-        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
-                && fileFacade.message().bubble().interaction().enable();
-    }
 }
