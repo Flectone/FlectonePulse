@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
           cache: gradle
 
       - name: Setup Gradle
@@ -27,7 +27,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean fabric:buildFinalJar bukkit:buildFinalJar hytale:buildFinalJar --no-daemon
+        run: ./gradlew clean minecraft:fabric:buildFinalJar minecraft:bukkit:buildFinalJar hytale:buildFinalJar --no-daemon
 
       - name: Publish artifact to GitHub
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
