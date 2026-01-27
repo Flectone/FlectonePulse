@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
+import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -38,7 +38,7 @@ import java.util.Set;
 @Singleton
 public class MinecraftVanillaModule extends VanillaModule {
 
-    private final Extractor extractor;
+    private final MinecraftComponentExtractor extractor;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -47,7 +47,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
-                                  Extractor extractor,
+                                  MinecraftComponentExtractor extractor,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
                                   FPlayerService fPlayerService,
@@ -132,6 +132,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         };
     }
 
+    @Override
     public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
         return TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());

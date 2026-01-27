@@ -9,7 +9,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
-import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
+import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
@@ -26,7 +26,7 @@ public class VanillaPacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final MinecraftVanillaModule vanillaModule;
-    private final Extractor extractor;
+    private final MinecraftComponentExtractor extractor;
     private final @Named("isNewerThanOrEqualsV_1_16") boolean isNewerThanOrEqualsV_1_16;
 
     @Override

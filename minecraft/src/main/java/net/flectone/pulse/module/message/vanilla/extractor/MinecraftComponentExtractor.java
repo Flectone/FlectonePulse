@@ -3,11 +3,8 @@ package net.flectone.pulse.module.message.vanilla.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Message;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.vanilla.model.Mapping;
-import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
@@ -21,8 +18,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class Extractor {
+public class MinecraftComponentExtractor extends ComponentExtractor<TranslatableComponent> {
 
     private static final Map<String, Mapping> LEGACY_TRANSLATION_MAPPINGS = new HashMap<>() {
         {
@@ -51,28 +47,42 @@ public class Extractor {
         }
     };
 
-    private final Map<String, Message.Vanilla.VanillaMessage> translationVanillaMessages = new HashMap<>();
-
     private final EntityUtil entityUtil;
     private final FPlayerService fPlayerService;
-    private final FileFacade fileFacade;
     private final PacketProvider packetProvider;
 
-    public void reload() {
-        translationVanillaMessages.clear();
+    @Inject
+    public MinecraftComponentExtractor(FileFacade fileFacade,
+                                       EntityUtil entityUtil,
+                                       FPlayerService fPlayerService,
+                                       PacketProvider packetProvider) {
+        super(fileFacade);
 
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = fileFacade.message().vanilla().types();
-
-        vanillaMessages.forEach(vanillaMessage -> vanillaMessage.translationKeys()
-                        .forEach(translationKey -> translationVanillaMessages.put(translationKey, vanillaMessage))
-        );
+        this.entityUtil = entityUtil;
+        this.fPlayerService = fPlayerService;
+        this.packetProvider = packetProvider;
     }
 
-    public String getOrLegacyMapping(String translationKey) {
+    @Override
+    public String extractTranslationKey(TranslatableComponent translatableComponent) {
+        String translationKey = translatableComponent.key();
+
         Mapping mapping = LEGACY_TRANSLATION_MAPPINGS.get(translationKey);
         if (mapping == null) return translationKey;
 
         return recursiveGetTranslationKey(mapping);
+    }
+
+    @Override
+    public Map<Integer, Object> extractArguments(TranslatableComponent translatableComponent) {
+        Map<Integer, Object> parsedArguments = new HashMap<>();
+
+        for (int i = 0; i < translatableComponent.arguments().size(); i++) {
+            Object argument = extractArgument(translatableComponent, i);
+            parsedArguments.put(i, argument);
+        }
+
+        return parsedArguments;
     }
 
     private String recursiveGetTranslationKey(Mapping mapping) {
@@ -83,29 +93,6 @@ public class Extractor {
         if (nextMapping == null) return "";
 
         return recursiveGetTranslationKey(mapping.orElse());
-    }
-
-    public Message.Vanilla.VanillaMessage getVanillaMessage(String translationKey) {
-        return translationVanillaMessages.getOrDefault(translationKey, Message.Vanilla.VanillaMessage.builder().build());
-    }
-
-    public Optional<ParsedComponent> extract(TranslatableComponent translatableComponent) {
-        String translationKey = getOrLegacyMapping(translatableComponent.key());
-
-        Map<String, String> localization = fileFacade.localization().message().vanilla().types();
-        if (!localization.containsKey(translationKey)) return Optional.empty();
-
-        Message.Vanilla.VanillaMessage vanillaMessage = getVanillaMessage(translationKey);
-
-        Map<Integer, Object> parsedArguments = new HashMap<>();
-
-        for (int i = 0; i < translatableComponent.arguments().size(); i++) {
-            Object argument = extractArgument(translatableComponent, i);
-            parsedArguments.put(i, argument);
-        }
-
-        ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, parsedArguments);
-        return Optional.of(parsedComponent);
     }
 
     public @Nullable Object extractArgument(TranslatableComponent translatableComponent, int index) {

@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -147,6 +148,13 @@ public class IntegrationSender {
                 && eventMetadata instanceof ChatMetadata<?> chatMetadata
                 && chatMetadata.chat().name() != null) {
             return List.of((messageType.name() + "_" + chatMetadata.chat().name()).toUpperCase());
+        } else if (messageType == MessageType.VANILLA) {
+            if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) return Collections.emptyList();
+
+            String vanillaMessageName = vanillaMetadata.parsedComponent().vanillaMessage().name();
+            if (vanillaMessageName.isEmpty()) return Collections.emptyList();
+
+            return List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.parsedComponent().translationKey());
         }
 
         return Collections.emptyList();

@@ -1,6 +1,7 @@
 package net.flectone.pulse.platform.handler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -66,12 +67,19 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
@@ -173,6 +181,7 @@ public class ProxyMessageHandler {
             case JOIN -> handleJoin(input, fEntity, metadataUUID);
             case QUIT -> handleQuit(input, fEntity, metadataUUID);
             case AFK -> handleAfk(input, fEntity, metadataUUID);
+            case VANILLA -> handleVanilla(input, fEntity, metadataUUID);
         }
     }
 
@@ -889,6 +898,49 @@ public class ProxyMessageHandler {
                 .newStatus(isAfk)
                 .build()
         );
+    }
+
+    private void handleVanilla(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        VanillaModule module = injector.getInstance(VanillaModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
+
+        String translationKey = input.readUTF();
+        Map<Integer, Object> arguments = parseVanillaArguments(readAsJsonObject(input));
+
+        Message.Vanilla.VanillaMessage vanillaMessage = injector.getInstance(ComponentExtractor.class).getVanillaMessage(translationKey);
+
+        ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
+
+        String vanillaMessageName = vanillaMessage.name();
+
+        module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+                .base(EventMetadata.<Localization.Message.Vanilla>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
+                        .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
+                        .range(Range.get(Range.Type.SERVER))
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        .destination(parsedComponent.vanillaMessage().destination())
+                        .build()
+                )
+                .parsedComponent(parsedComponent)
+                .build()
+        );
+    }
+
+    private Map<Integer, Object> parseVanillaArguments(JsonObject jsonObject) {
+        Map<Integer, Object> result = new HashMap<>();
+
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            Integer key = Integer.parseInt(entry.getKey());
+            JsonObject argumentJson = entry.getValue().getAsJsonObject();
+
+            Optional<FEntity> entity = parseFEntity(argumentJson);
+            result.put(key, entity.isPresent() ? entity.get() : gson.fromJson(argumentJson, Component.class));
+        }
+
+        return result;
     }
 
     protected JsonObject readAsJsonObject(DataInputStream input) throws IOException {

@@ -8,7 +8,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
-import net.flectone.pulse.module.message.vanilla.extractor.Extractor;
+import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class VanillaPulseListener implements PulseListener {
 
     private final MinecraftVanillaModule vanillaModule;
-    private final Extractor extractor;
+    private final MinecraftComponentExtractor extractor;
 
     @Pulse
     public Event onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
