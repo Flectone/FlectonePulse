@@ -46,7 +46,7 @@ dependencies {
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")
-    implementation project(":minecraft")
+    implementation project(":minecraft:common")
 }
 
 shadowJar {
@@ -65,7 +65,7 @@ shadowJar {
 		include(dependency("org.xerial:.*"))
 		include(dependency("net.kyori:.*"))
 		include(project(":core"))
-        include(project(":minecraft"))
+        include(project(":minecraft:common"))
 	}
 
 	minimize()

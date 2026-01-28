@@ -11,7 +11,7 @@ pluginManagement {
 
 include "core"
 include "hytale"
-include "minecraft"
+include "minecraft:common"
 include "minecraft:fabric"
 include "minecraft:bukkit"
 include "minecraft:paper"
