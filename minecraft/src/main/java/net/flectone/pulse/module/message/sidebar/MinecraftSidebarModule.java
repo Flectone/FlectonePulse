@@ -17,15 +17,19 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class MinecraftSidebarModule extends SidebarModule {
 
-    private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
+    private final List<UUID> playerSidebars = new CopyOnWriteArrayList<>();
+    private final Map<UUID, List<String>> playerLegacySidebarContent = new ConcurrentHashMap<>();
 
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
@@ -33,6 +37,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     private final PacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public MinecraftSidebarModule(FileFacade fileFacade,
@@ -41,7 +46,8 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   MessagePipeline messagePipeline,
                                   PacketSender packetSender,
                                   ListenerRegistry listenerRegistry,
-                                  PacketProvider packetProvider) {
+                                  PacketProvider packetProvider,
+                                  PermissionChecker permissionChecker) {
         super(fileFacade);
 
         this.fPlayerService = fPlayerService;
@@ -50,6 +56,7 @@ public class MinecraftSidebarModule extends SidebarModule {
         this.packetSender = packetSender;
         this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
+        this.permissionChecker = permissionChecker;
     }
 
     @Override
@@ -73,7 +80,11 @@ public class MinecraftSidebarModule extends SidebarModule {
     }
 
     public void remove(FPlayer fPlayer) {
-        packetSender.send(fPlayer,  new WrapperPlayServerScoreboardObjective(
+        if (!playerSidebars.contains(fPlayer.getUuid())) return;
+
+        playerSidebars.remove(fPlayer.getUuid());
+
+        packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 createObjectiveName(fPlayer),
                 WrapperPlayServerScoreboardObjective.ObjectiveMode.REMOVE,
                 null,
@@ -82,6 +93,10 @@ public class MinecraftSidebarModule extends SidebarModule {
     }
 
     public void update(FPlayer fPlayer) {
+        if (!playerSidebars.contains(fPlayer.getUuid())) {
+            create(fPlayer);
+        }
+
         send(fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode.UPDATE);
     }
 
@@ -92,11 +107,19 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     public void create(FPlayer fPlayer) {
         remove(fPlayer);
+
+        playerSidebars.add(fPlayer.getUuid());
+
         send(fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE);
     }
 
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
         taskScheduler.runRegion(fPlayer, () -> {
+            if (!permissionChecker.check(fPlayer, permission())) {
+                remove(fPlayer);
+                return;
+            }
+
             if (isModuleDisabledFor(fPlayer)) return;
 
             String format = getNextMessage(fPlayer, config().random());
@@ -151,10 +174,10 @@ public class MinecraftSidebarModule extends SidebarModule {
 
 
     private void legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> sidebars = playerSidebar.getOrDefault(fPlayer.getUuid(), new ArrayList<>(15));
+        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.getUuid(), new ArrayList<>(15));
 
-        for (int i = 0; i < sidebars.size(); i++) {
-            String oldLine = sidebars.get(i);
+        for (int i = 0; i < content.size(); i++) {
+            String oldLine = content.get(i);
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     oldLine,
                     WrapperPlayServerUpdateScore.Action.REMOVE_ITEM,
@@ -180,14 +203,14 @@ public class MinecraftSidebarModule extends SidebarModule {
                     null
             ));
 
-            if (lineIndex < sidebars.size()) {
-                sidebars.set(lineIndex, line);
+            if (lineIndex < content.size()) {
+                content.set(lineIndex, line);
             } else {
-                sidebars.add(line);
+                content.add(line);
             }
         }
 
-        playerSidebar.put(fPlayer.getUuid(), sidebars);
+        playerLegacySidebarContent.put(fPlayer.getUuid(), content);
     }
 
     private String createObjectiveName(FPlayer fPlayer) {
