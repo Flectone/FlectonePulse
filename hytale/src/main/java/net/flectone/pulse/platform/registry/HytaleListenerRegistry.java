@@ -28,6 +28,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
 
     private final FLogger fLogger;
     private final Injector injector;
+    private final JavaPlugin javaPlugin;
     private final EventRegistry eventRegistry;
 
     private boolean basePacketsRegistered;
@@ -40,6 +41,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
 
         this.fLogger = fLogger;
         this.injector = injector;
+        this.javaPlugin = javaPlugin;
         this.eventRegistry = javaPlugin.getEventRegistry();
     }
 
@@ -55,6 +57,10 @@ public class HytaleListenerRegistry extends ListenerRegistry {
             registerInboundWatcher(hytaleBaseListener.createUpdateLanguageWatcher());
             basePacketsRegistered = true;
         }
+    }
+
+    public void register(Consumer<JavaPlugin> javaPluginConsumer) {
+        javaPluginConsumer.accept(javaPlugin);
     }
 
     public void registerOutboundFilter(PlayerPacketFilter packetFilter) {
