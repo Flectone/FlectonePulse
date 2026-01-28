@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -40,7 +39,6 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     private final Provider<TwitchIntegration> twitchIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
-    private final TaskScheduler taskScheduler;
 
     public Class<ChannelMessageEvent> getEventType() {
         return ChannelMessageEvent.class;

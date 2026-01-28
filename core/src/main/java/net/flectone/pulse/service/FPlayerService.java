@@ -188,7 +188,7 @@ public class FPlayerService {
     }
 
     public FPlayer getRandomFPlayer() {
-        List<FPlayer> fPlayers = getOnlineFPlayers();
+        List<FPlayer> fPlayers = getPlatformFPlayers();
         if (fPlayers.isEmpty()) return FPlayer.UNKNOWN;
 
         int randomIndex = randomUtil.nextInt(0, fPlayers.size());
