@@ -220,23 +220,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public int getObjectiveScore(@NonNull UUID uuid, MinecraftObjectiveModule.@Nullable Mode mode) {
-        if (mode == null) return 0;
-
-        ServerPlayerEntity player = getPlayer(uuid);
-        if (player == null) return 0;
-
-        return switch (mode) {
-            case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
-            case LEVEL -> player.experienceLevel;
-            case FOOD -> player.getHungerManager().getFoodLevel();
-            case PING -> packetProvider.getPing(player);
-            case ARMOR -> player.getArmor();
-            case ATTACK -> player.getMainHandStack().getDamage();
-        };
-    }
-
-    @Override
     public @Nullable Statistics getStatistics(@NonNull UUID uuid) {
         ServerPlayerEntity player = getPlayer(uuid);
         if (player == null) return null;

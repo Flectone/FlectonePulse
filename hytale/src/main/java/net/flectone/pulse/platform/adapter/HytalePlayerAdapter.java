@@ -31,7 +31,6 @@ import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.HytaleBaseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -181,11 +180,6 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
         return Component.empty();
-    }
-
-    @Override
-    public int getObjectiveScore(@NonNull UUID uuid, ObjectiveModule.@Nullable Mode mode) {
-        return 0;
     }
 
     @Override

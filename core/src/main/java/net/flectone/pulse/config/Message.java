@@ -13,7 +13,6 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.util.constant.AdventureTag;
 
 import java.util.ArrayList;
@@ -533,7 +532,6 @@ public record Message(
         @Jacksonized
         public record Belowname(
                 Boolean enable,
-                ObjectiveModule.Mode mode,
                 Ticker ticker
         ) implements EnableSetting {
         }
@@ -543,7 +541,6 @@ public record Message(
         @Jacksonized
         public record Tabname(
                 Boolean enable,
-                ObjectiveModule.Mode mode,
                 Ticker ticker
         ) implements EnableSetting {
         }

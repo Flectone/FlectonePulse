@@ -310,22 +310,6 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public int getObjectiveScore(@NonNull UUID uuid, MinecraftObjectiveModule.@Nullable Mode objectiveValueType) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return 0;
-        if (objectiveValueType == null) return 0;
-
-        return switch (objectiveValueType) {
-            case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
-            case LEVEL -> player.getLevel();
-            case FOOD -> player.getFoodLevel();
-            case PING -> packetProvider.getPing(player);
-            case ARMOR -> (int) attributesProvider.getArmorValue(player);
-            case ATTACK -> (int) attributesProvider.getAttackDamage(player);
-        };
-    }
-
-    @Override
     public Statistics getStatistics(@NonNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return null;

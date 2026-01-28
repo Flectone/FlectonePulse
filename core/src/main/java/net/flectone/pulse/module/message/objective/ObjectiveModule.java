@@ -24,12 +24,4 @@ public class ObjectiveModule extends AbstractModule {
         return fileFacade.permission().message().objective();
     }
 
-    public enum Mode {
-        HEALTH,
-        LEVEL,
-        FOOD,
-        PING,
-        ARMOR,
-        ATTACK
-    }
 }

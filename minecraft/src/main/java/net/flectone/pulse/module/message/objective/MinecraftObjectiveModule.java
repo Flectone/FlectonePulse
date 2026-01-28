@@ -17,7 +17,8 @@ import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
@@ -65,14 +66,14 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
         ));
     }
 
-    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
+    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
 
         packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                 fObjective.getName(),
                 WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
                 objectiveName,
-                score,
+                -1,
                 Component.text(fPlayer.getName()),
                 ScoreFormat.fixedScore(scoreFormat)
         ));
@@ -90,11 +91,11 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
         ));
     }
 
-    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String format, Mode mode) {
-        int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), mode);
-
+    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format) {
         MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, format)
-                .addTagResolver(Placeholder.parsed("score", String.valueOf(score)));
+                .addTagResolvers(TagResolver.resolver("score", (argumentQueue, context) ->
+                        Tag.inserting(messagePipeline.build(messagePipeline.createContext(fPlayer, score)))
+                ));
 
         return messagePipeline.build(tabNameContext);
     }

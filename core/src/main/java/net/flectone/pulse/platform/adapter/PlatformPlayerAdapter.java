@@ -2,7 +2,6 @@ package net.flectone.pulse.platform.adapter;
 
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;
@@ -201,19 +200,6 @@ public interface PlatformPlayerAdapter {
      * @return the footer component
      */
     @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer);
-
-    /**
-     * Gets the objective score for a player.
-     *
-     * @param uuid the player UUID
-     * @param mode the objective mode
-     * @return the objective score
-     */
-    int getObjectiveScore(@NonNull UUID uuid, ObjectiveModule.@Nullable Mode mode);
-
-    default int getObjectiveScore(@NonNull FEntity entity, ObjectiveModule.@Nullable Mode mode) {
-        return getObjectiveScore(entity.getUuid(), mode);
-    }
 
     /**
      * Gets player statistics.
