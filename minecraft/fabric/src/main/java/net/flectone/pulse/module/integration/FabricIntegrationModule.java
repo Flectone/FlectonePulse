@@ -67,7 +67,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (containsChild(VanishModule.class)) {
+        if (containsEnabledChild(VanishModule.class)) {
             return injector.getInstance(VanishModule.class).isVanished(sender);
         }
 

@@ -91,11 +91,11 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (!isEnable()) return false;
 
-        if (containsChild(FloodgateModule.class)) {
+        if (containsEnabledChild(FloodgateModule.class)) {
             return injector.getInstance(FloodgateModule.class).isBedrockPlayer(fPlayer);
         }
 
-        if (containsChild(GeyserModule.class)) {
+        if (containsEnabledChild(GeyserModule.class)) {
             return injector.getInstance(GeyserModule.class).isBedrockPlayer(fPlayer);
         }
 
@@ -104,7 +104,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     public String getTextureUrl(FEntity sender) {
         if (!isEnable()) return null;
-        if (!containsChild(SkinsRestorerModule.class)) return null;
+        if (!containsEnabledChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
@@ -112,7 +112,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
         if (!isEnable()) return null;
-        if (!containsChild(SkinsRestorerModule.class)) return null;
+        if (!containsEnabledChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getProfileProperty(fPlayer);

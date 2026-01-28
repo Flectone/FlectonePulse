@@ -81,6 +81,12 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 
+    public boolean containsEnabledChild(Class<? extends AbstractModule> clazz) {
+        if (!containsChild(clazz)) return false;
+
+        return injector.getInstance(clazz).isEnable();
+    }
+
     public <T> T getInstance(Class<T> clazz) {
         return injector.getInstance(clazz);
     }
@@ -88,11 +94,8 @@ public abstract class IntegrationModule extends AbstractModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         if (!isEnable()) return false;
 
-        if (containsChild(LuckPermsModule.class)) {
-            LuckPermsModule luckPermsModule = getInstance(LuckPermsModule.class);
-            if (luckPermsModule.isEnable()) {
-                return luckPermsModule.hasLuckPermission(fPlayer, permission);
-            }
+        if (containsEnabledChild(LuckPermsModule.class)) {
+            return getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
         }
 
         return false;
@@ -101,7 +104,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public String getPrefix(FPlayer fPlayer) {
         if (!isEnable()) return null;
 
-        if (containsChild(LuckPermsModule.class)) {
+        if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
         }
 
@@ -111,7 +114,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public String getSuffix(FPlayer fPlayer) {
         if (!isEnable()) return null;
 
-        if (containsChild(LuckPermsModule.class)) {
+        if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
         }
 
@@ -121,7 +124,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public Set<String> getGroups() {
         if (!isEnable()) return Collections.emptySet();
 
-        if (containsChild(LuckPermsModule.class)) {
+        if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getGroups();
         }
 
@@ -130,21 +133,21 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public int getGroupWeight(FPlayer fPlayer) {
         if (!isEnable()) return 0;
-        if (!containsChild(LuckPermsModule.class)) return 0;
+        if (!containsEnabledChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
-        if (containsChild(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (containsChild(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (containsChild(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
         }
     }
@@ -164,7 +167,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (isModuleDisabledFor(sender)) return text;
-        if (containsChild(DeeplModule.class)) {
+        if (containsEnabledChild(DeeplModule.class)) {
             return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
         }
 
@@ -173,7 +176,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public String yandexTranslate(FPlayer sender, String source, String target, String text) {
         if (isModuleDisabledFor(sender)) return text;
-        if (containsChild(YandexModule.class)) {
+        if (containsEnabledChild(YandexModule.class)) {
             return injector.getInstance(YandexModule.class).translate(sender, source, target, text);
         }
 
