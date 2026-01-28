@@ -44,7 +44,7 @@ public class HytaleChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(ChatHytaleListener.class);
+        listenerRegistry.register(ChatHytaleListener.class, config().priority());
     }
 
 }
