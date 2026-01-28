@@ -116,6 +116,14 @@ public class LegacyColorConvertor {
                 index < length;
                 index++, nextIndex = text.indexOf('&', index)
         ) {
+            // escape ampersand
+            if (nextIndex > 0 && text.charAt(nextIndex - 1) == '\\') {
+                builder.append(text, index, nextIndex - 1);
+                builder.append('&');
+                index = nextIndex;
+                continue;
+            }
+
             if (nextIndex == -1) {
                 builder.append(text, index, length);
                 break;
