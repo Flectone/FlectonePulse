@@ -116,7 +116,13 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         if (worldUUID == null) return "";
 
         World world = universe.getWorld(worldUUID);
-        return world == null ? "" : world.getName();
+        if (world == null) return "";
+
+        String worldName = world.getName().toLowerCase();
+        if (worldName.contains("forgotten_temple")) return "forgotten_temple";
+        if (worldName.contains("portals")) return "portals";
+
+        return worldName;
     }
 
     @Override

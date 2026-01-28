@@ -250,7 +250,9 @@ format:
     ticker:
       enable: false
     values:
-      default: "<color:#98FB98>" #todo
+      default: "<color:#98FB98>"
+      portals: "<color:#F08080>"
+      forgotten_temple: "<color:#9370DB>"
 greeting:
   enable: false
   destination:
