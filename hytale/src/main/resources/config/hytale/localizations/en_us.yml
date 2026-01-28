@@ -576,7 +576,7 @@ message:
         - "<fcolor:1>TPS <replacement:tps>, Online <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow></!shadow><world_prefix>| <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<world_prefix>| <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <replacement:url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!"
     format_console: "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"

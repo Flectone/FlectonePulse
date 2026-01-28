@@ -250,7 +250,7 @@ format:
     ticker:
       enable: false
     values:
-      default: "<color:#98FB98>"
+      default: "<color:#98FB98>" #todo
 greeting:
   enable: false
   destination:
@@ -287,7 +287,7 @@ quit:
   sound:
     enable: false
 rightclick:
-  enable: true
+  enable: false
   should_check_sneaking: false
   hide_name_when_invisible: true
   range: "PLAYER"
