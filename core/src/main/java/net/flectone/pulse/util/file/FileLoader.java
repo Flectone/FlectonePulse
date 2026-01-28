@@ -1,6 +1,7 @@
 package net.flectone.pulse.util.file;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
@@ -9,8 +10,10 @@ import net.flectone.pulse.config.*;
 import net.flectone.pulse.config.merger.*;
 import net.flectone.pulse.exception.FileLoadException;
 import net.flectone.pulse.model.file.FilePack;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.constant.DefaultLocalization;
 import net.flectone.pulse.util.constant.FilePath;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 import tools.jackson.databind.ObjectMapper;
@@ -43,6 +46,7 @@ public class FileLoader {
     private final LocalizationMergerImpl localizationMerger;
     private final MessageMergerImpl messageMerger;
     private final PermissionMergerImpl permissionMerger;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
     @Getter
     private FilePack defaultFiles;
@@ -50,14 +54,14 @@ public class FileLoader {
     public void init() {
         if (defaultFiles != null) return;
 
-        Command command = loadFromResource(FilePath.COMMAND.getPath(), Command.class);
-        Config config = loadFromResource(FilePath.CONFIG.getPath(), Config.class);
-        Integration integration = loadFromResource(FilePath.INTEGRATION.getPath(), Integration.class);
-        Message message = loadFromResource(FilePath.MESSAGE.getPath(), Message.class);
-        Permission permission = loadFromResource(FilePath.PERMISSION.getPath(), Permission.class);
+        Command command = loadFromResource(resolveResourcePath(FilePath.COMMAND), Command.class);
+        Config config = loadFromResource(resolveResourcePath(FilePath.CONFIG), Config.class);
+        Integration integration = loadFromResource(resolveResourcePath(FilePath.INTEGRATION), Integration.class);
+        Message message = loadFromResource(resolveResourcePath(FilePath.MESSAGE), Message.class);
+        Permission permission = loadFromResource(resolveResourcePath(FilePath.PERMISSION), Permission.class);
 
-        Localization defaultEnglishLocalization = loadFromResource(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.ENGLISH.getName() + ".yml", Localization.class).withLanguage(DefaultLocalization.ENGLISH.getName());
-        Localization defaultRussianLocalization = loadFromResource(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.RUSSIAN.getName() + ".yml", Localization.class).withLanguage(DefaultLocalization.RUSSIAN.getName());
+        Localization defaultEnglishLocalization = loadFromResource(resolveResourcePath(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.ENGLISH.getName() + ".yml"), Localization.class).withLanguage(DefaultLocalization.ENGLISH.getName());
+        Localization defaultRussianLocalization = loadFromResource(resolveResourcePath(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.RUSSIAN.getName() + ".yml"), Localization.class).withLanguage(DefaultLocalization.RUSSIAN.getName());
 
         Map<String, Localization> localizations = new HashMap<>();
         localizations.put(DefaultLocalization.ENGLISH.getName(), defaultEnglishLocalization);
@@ -197,6 +201,18 @@ public class FileLoader {
         }
 
         return Optional.empty();
+    }
+
+    private String resolveResourcePath(FilePath filePath) {
+        return resolveResourcePath(filePath.getPath());
+    }
+
+    private String resolveResourcePath(String path) {
+        if (platformServerAdapterProvider.get().getPlatformType() == PlatformType.HYTALE) {
+            return "hytale/" + path;
+        }
+
+        return "minecraft/" + path;
     }
 
     private Localization getDefaultLocalizationByLanguage(String language, Map<String, Localization> localizations) {

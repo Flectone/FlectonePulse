@@ -1,0 +1,155 @@
+enable: true
+avatar_api_url: "https://mc-heads.net/avatar/<skin>/8.png"
+body_api_url: "https://mc-heads.net/player/<skin>/16.png"
+advancedban:
+  enable: true
+  disable_flectonepulse_ban: true
+  disable_flectonepulse_mute: true
+  disable_flectonepulse_warn: true
+  disable_flectonepulse_kick: true
+cmi:
+  enable: true
+  disable_flectonepulse_ban: true
+  disable_flectonepulse_mute: true
+  disable_flectonepulse_warn: true
+  disable_flectonepulse_kick: true
+deepl:
+  enable: false
+  auth_key: ""
+discord:
+  enable: false
+  ignore_all_bots: true
+  token: ""
+  custom_command:
+    ping:
+      need_player: true
+      aliases:
+      - "!ping"
+  presence:
+    enable: true
+    status: "ONLINE"
+    activity:
+      enable: true
+      type: "PLAYING"
+      name: "FlectonePulse"
+      url: "https://flectone.net/pulse/"
+  channel_info:
+    enable: false
+    ticker:
+      enable: true
+      period: 1200
+  message_channel:
+    FROM_DISCORD_TO_MINECRAFT:
+    - "123456"
+    CHAT_GLOBAL:
+    - "123456"
+  destination:
+    type: "CHAT"
+  sound:
+    enable: false
+floodgate:
+  enable: true
+geyser:
+  enable: true
+interactivechat:
+  enable: true
+itemsadder:
+  enable: true
+libertybans:
+  enable: true
+  disable_flectonepulse_ban: true
+  disable_flectonepulse_mute: true
+  disable_flectonepulse_warn: true
+  disable_flectonepulse_kick: true
+litebans:
+  enable: true
+  disable_flectonepulse_ban: true
+  disable_flectonepulse_mute: true
+  disable_flectonepulse_warn: true
+  disable_flectonepulse_kick: true
+luckperms:
+  enable: true
+  tab_sort: true
+maintenance:
+  enable: true
+  disable_flectonepulse_maintenance: true
+minimotd:
+  enable: true
+  disable_flectonepulse_status: true
+miniplaceholders:
+  enable: true
+motd:
+  enable: true
+  disable_flectonepulse_status: true
+placeholderapi:
+  enable: true
+plasmovoice:
+  enable: true
+simplevoice:
+  enable: true
+skinsrestorer:
+  enable: true
+supervanish:
+  enable: true
+tab:
+  enable: true
+  disable_flectonepulse_scoreboard: true
+  disable_flectonepulse_header: true
+  disable_flectonepulse_footer: true
+  disable_flectonepulse_playerlistname: false
+telegram:
+  enable: false
+  parse_mode: "NONE"
+  token: ""
+  custom_command:
+    id:
+      need_player: false
+      aliases:
+      - "!id"
+    ping:
+      need_player: true
+      aliases:
+      - "!ping"
+  channel_info:
+    enable: false
+    ticker:
+      enable: true
+      period: 1200
+  message_channel:
+    FROM_TELEGRAM_TO_MINECRAFT:
+    - "123456"
+    CHAT_GLOBAL:
+    - "123456"
+  destination:
+    type: "CHAT"
+  sound:
+    enable: false
+triton:
+  enable: true
+twitch:
+  enable: false
+  client_id: ""
+  token: ""
+  custom_command:
+    ping:
+      need_player: true
+      aliases:
+      - "!ping"
+  message_channel:
+    FROM_TWITCH_TO_MINECRAFT:
+    - "faseri4ka"
+    CHAT_GLOBAL:
+    - "faseri4ka"
+  follow_channel:
+    faseri4ka:
+    - "stream start https://twitch.tv/faseri4ka"
+  destination:
+    type: "CHAT"
+  sound:
+    enable: false
+vault:
+  enable: true
+yandex:
+  enable: false
+  token: ""
+  folder_id: ""

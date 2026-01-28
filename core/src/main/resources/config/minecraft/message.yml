@@ -303,13 +303,11 @@ objective:
   enable: true
   belowname:
     enable: false
-    mode: "PING"
     ticker:
       enable: true
       period: 100
   tabname:
     enable: false
-    mode: "PING"
     ticker:
       enable: true
       period: 100
