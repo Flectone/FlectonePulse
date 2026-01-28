@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.listener.DeathListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.registry.HytaleListenerRegistry;
@@ -39,12 +40,15 @@ public class HytaleVanillaModule extends VanillaModule {
                                MessagePipeline messagePipeline,
                                FPlayerService fPlayerService,
                                TaskScheduler taskScheduler,
-                               HytaleListenerRegistry hytaleListenerRegistry) {
+                               HytaleListenerRegistry hytaleListenerRegistry,
+                               DeathListener deathListener) {
         super(fileFacade);
 
         this.extractor = extractor;
         this.messagePipeline = messagePipeline;
         this.taskScheduler = taskScheduler;
+
+        hytaleListenerRegistry.register(javaPlugin -> javaPlugin.getEntityStoreRegistry().registerSystem(deathListener));
 
         hytaleListenerRegistry.registerOutboundFilter((playerRef, packet) -> {
             if (!isEnable()) return false;
