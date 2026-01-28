@@ -126,7 +126,6 @@ public class EditorController {
         return "{\"success\": true, \"redirect\": \"/?message=logged_out\"}";
     }
 
-
     private String getFileContent(String fileType, String fileName) throws IOException {
         if ("main".equals(fileType)) {
             Object file = configFiles.get(fileName);
@@ -138,7 +137,7 @@ public class EditorController {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    return Files.readString(filePathProvider.get(file));
+                    return Files.readString(filePathProvider.get(file.localization));
                 }
             }
         }
@@ -159,7 +158,7 @@ public class EditorController {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    Path pathToFile = filePathProvider.get(file);
+                    Path pathToFile = filePathProvider.get(file.localization);
                     Files.writeString(pathToFile, content);
                     fileFacade.reload();
                     return;
