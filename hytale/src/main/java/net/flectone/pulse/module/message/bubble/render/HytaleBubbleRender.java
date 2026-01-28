@@ -14,6 +14,7 @@ import com.hypixel.hytale.protocol.MountController;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
+import com.hypixel.hytale.server.core.modules.entity.DespawnComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
@@ -27,6 +28,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
+import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -36,6 +38,8 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +73,12 @@ public class HytaleBubbleRender implements BubbleRender {
     public void renderBubble(Bubble bubble) {
         FPlayer sender = bubble.getSender();
         if (!isCorrectPlayer(sender)) return;
+        if (!(bubble instanceof ModernBubble modernBubble)) return;
 
-        renderBubble(sender, sender, bubble);
+        renderBubble(sender, sender, modernBubble);
     }
 
-    private void renderBubble(FPlayer sender, FPlayer viewer, Bubble bubble) {
+    private void renderBubble(FPlayer sender, FPlayer viewer, ModernBubble bubble) {
         String playerKey = sender.getUuid().toString();
 
         Object playerObj = platformPlayerAdapter.convertToPlatformPlayer(sender);
@@ -101,7 +106,7 @@ public class HytaleBubbleRender implements BubbleRender {
                 TransformComponent transform = entityStore.getStore().getComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType());
                 if (transform != null) {
                     Vector3d currentPosition = transform.getPosition();
-                    Vector3d newPosition = new Vector3d(currentPosition.getX(), currentPosition.getY() + 0.5, currentPosition.getZ());
+                    Vector3d newPosition = new Vector3d(currentPosition.getX(), currentPosition.getY() + bubble.getInteractionHeight(), currentPosition.getZ());
                     TransformComponent newTransform = new TransformComponent(newPosition, transform.getRotation());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType(), newTransform);
                 }
@@ -109,7 +114,7 @@ public class HytaleBubbleRender implements BubbleRender {
                 MountedComponent mounted = entityStore.getStore().getComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType());
                 if (mounted != null) {
                     Vector3f currentOffset = mounted.getAttachmentOffset();
-                    Vector3f newOffset = new Vector3f(currentOffset.getX(), currentOffset.getY() + 0.5f, currentOffset.getZ());
+                    Vector3f newOffset = new Vector3f(currentOffset.getX(), currentOffset.getY() + bubble.getInteractionHeight(), currentOffset.getZ());
                     MountedComponent newMounted = new MountedComponent(playerRef.getReference(), newOffset, mounted.getControllerType());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType(), newMounted);
                 }
@@ -120,7 +125,7 @@ public class HytaleBubbleRender implements BubbleRender {
             ProjectileComponent projectileComponent = new ProjectileComponent("Projectile");
             holder.putComponent(ProjectileComponent.getComponentType(), projectileComponent);
 
-            double baseHeight = 2.0 + (bubble.getElevation() * 0.3);
+            double baseHeight = bubble.getElevation();
             holder.putComponent(TransformComponent.getComponentType(),
                     new TransformComponent(
                             playerTransform.getPosition().add(new Vector3d(0, baseHeight, 0)).clone(),
@@ -138,19 +143,24 @@ public class HytaleBubbleRender implements BubbleRender {
                 }
             }
 
+            Instant expireTimeInstant = Instant.now().plusMillis(bubble.getDuration());
+
+            // we will add despawn component automatically if our removal does not work correctly
+            holder.putComponent(DespawnComponent.getComponentType(), new DespawnComponent(expireTimeInstant.plus(5, ChronoUnit.SECONDS)));
+
             holder.putComponent(NetworkId.getComponentType(), new NetworkId((world.getEntityStore().getStore().getExternalData()).takeNextNetworkId()));
             holder.putComponent(Nameplate.getComponentType(), new Nameplate(PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer))));
             holder.putComponent(MountedComponent.getComponentType(),
                     new MountedComponent(
                             playerRef.getReference(),
-                            new Vector3f(0.0F, (float)baseHeight, 0.0F),
+                            new Vector3f(0.0F, (float) baseHeight, 0.0F),
                             MountController.Minecart
                     )
             );
 
             Ref<EntityStore> newBubbleRef = world.getEntityStore().getStore().addEntity(holder, AddReason.SPAWN);
 
-            BubbleEntity newBubbleData = new BubbleEntity(newBubbleRef, bubble, System.currentTimeMillis() + bubble.getDuration());
+            BubbleEntity newBubbleData = new BubbleEntity(newBubbleRef, bubble, expireTimeInstant.toEpochMilli());
 
             existingBubbles.addFirst(newBubbleData);
             activeBubbles.put(playerKey, existingBubbles);
