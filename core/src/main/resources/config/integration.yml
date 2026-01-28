@@ -7,6 +7,12 @@ advancedban:
   disable_flectonepulse_mute: true
   disable_flectonepulse_warn: true
   disable_flectonepulse_kick: true
+cmi:
+  enable: true
+  disable_flectonepulse_ban: true
+  disable_flectonepulse_mute: true
+  disable_flectonepulse_warn: true
+  disable_flectonepulse_kick: true
 deepl:
   enable: false
   auth_key: ""

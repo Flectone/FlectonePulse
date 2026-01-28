@@ -23,6 +23,7 @@ softdepend:
   - LibertyBans
   - LiteBans
   - AdvancedBan
+  - CMI
   - MOTD
   - MiniMOTD
   - ItemsAdder

@@ -34,6 +34,9 @@ public record Integration(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban")
         Advancedban advancedban,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/cmi")
+        CMI cmi,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl")
         Deepl deepl,
 
@@ -112,6 +115,18 @@ public record Integration(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Advancedban(
+            Boolean enable,
+            Boolean disableFlectonepulseBan,
+            Boolean disableFlectonepulseMute,
+            Boolean disableFlectonepulseWarn,
+            Boolean disableFlectonepulseKick
+    ) implements EnableSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record CMI(
             Boolean enable,
             Boolean disableFlectonepulseBan,
             Boolean disableFlectonepulseMute,

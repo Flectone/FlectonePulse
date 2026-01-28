@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
+import net.flectone.pulse.module.integration.cmi.CMIModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
 import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
@@ -61,6 +62,10 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
             builder.add(AdvancedBanModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("CMI")) {
+            builder.add(CMIModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlaceholderAPI")) {
@@ -217,6 +222,10 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
             return getInstance(AdvancedBanModule.class).isMuted(fPlayer);
         }
 
+        if (containsEnabledChild(CMIModule.class)) {
+            return getInstance(CMIModule.class).isMuted(fPlayer);
+        }
+
         if (containsEnabledChild(LibertyBansModule.class)) {
             return getInstance(LibertyBansModule.class).isMuted(fPlayer);
         }
@@ -232,6 +241,10 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
         if (containsEnabledChild(AdvancedBanModule.class)) {
             return getInstance(AdvancedBanModule.class).getMute(fPlayer);
+        }
+
+        if (containsEnabledChild(CMIModule.class)) {
+            return getInstance(CMIModule.class).getMute(fPlayer);
         }
 
         if (containsEnabledChild(LibertyBansModule.class)) {

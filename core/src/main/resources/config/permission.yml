@@ -525,6 +525,9 @@ integration:
   advancedban:
     name: "flectonepulse.module.integration.advancedban"
     type: "TRUE"
+  cmi:
+    name: "flectonepulse.module.integration.cmi"
+    type: "TRUE"
   deepl:
     name: "flectonepulse.module.integration.deepl"
     type: "TRUE"

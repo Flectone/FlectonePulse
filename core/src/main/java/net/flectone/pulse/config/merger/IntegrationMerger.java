@@ -17,6 +17,7 @@ import org.mapstruct.*;
 public interface IntegrationMerger {
 
     @Mapping(target = "advancedban", expression = "java(mergeAdvancedban(target.build().advancedban().toBuilder(), source.advancedban()))")
+    @Mapping(target = "cmi", expression = "java(mergeCmi(target.build().cmi().toBuilder(), source.cmi()))")
     @Mapping(target = "libertybans", expression = "java(mergeLibertybans(target.build().libertybans().toBuilder(), source.libertybans()))")
     @Mapping(target = "deepl", expression = "java(mergeDeepl(target.build().deepl().toBuilder(), source.deepl()))")
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
@@ -44,6 +45,8 @@ public interface IntegrationMerger {
     Integration merge(@MappingTarget Integration.IntegrationBuilder target, Integration source);
 
     Integration.Advancedban mergeAdvancedban(@MappingTarget Integration.Advancedban.AdvancedbanBuilder target, Integration.Advancedban advancedban);
+
+    Integration.CMI mergeCmi(@MappingTarget Integration.CMI.CMIBuilder target, Integration.CMI cmi);
 
     Integration.Libertybans mergeLibertybans(@MappingTarget Integration.Libertybans.LibertybansBuilder target, Integration.Libertybans libertybans);
 

@@ -20,6 +20,7 @@ dependencies {
     compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
     compileOnly "com.mojang:authlib:$mojang_authlib_version"
     compileOnly "space.arim.libertybans:bans-api:$libertybans_version"
+    compileOnly "com.github.Zrips:CMI-API:$cmi_api_version"
 }
 
 shadowJar {
