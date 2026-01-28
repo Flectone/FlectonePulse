@@ -92,17 +92,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 return;
             }
 
-            int port = fileFacade.config().editor().port();
-            if (!isPortAvailable(port)) {
-                sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
-                        .sender(fPlayer)
-                        .format(localization -> Strings.CS.replace(localization.nullPortEditor(), "<port>", String.valueOf(port)))
-                        .build()
-                );
-
-                return;
-            }
-
             sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatWebStarting)
@@ -114,6 +103,17 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             String url = urlService.generateUrl();
 
             reflectionResolver.hasClassOrElse(SPARK_CLASS, this::loadSparkLibrary);
+
+            int port = fileFacade.config().editor().port();
+            if (!isPortAvailable(port)) {
+                sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+                        .sender(fPlayer)
+                        .format(localization -> Strings.CS.replace(localization.nullPortEditor(), "<port>", String.valueOf(port)))
+                        .build()
+                );
+
+                return;
+            }
 
             enableSpark();
 
@@ -188,6 +188,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     public boolean isPortAvailable(int port) {
+        if (injector.getInstance(SparkServer.class).isEnable()) return true;
+
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             return true;
         } catch (IOException e) {
