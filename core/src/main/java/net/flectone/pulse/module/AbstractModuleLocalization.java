@@ -183,7 +183,8 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (StringUtils.isEmpty(message)) return Component.empty();
 
         MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, message)
-                .withFlags(eventMetadata.flags());
+                .withFlags(eventMetadata.flags())
+                .addFlag(MessageFlag.USER_MESSAGE, true);
 
         return messagePipeline.build(context);
     }
