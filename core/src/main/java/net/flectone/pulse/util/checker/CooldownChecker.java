@@ -70,8 +70,8 @@ public class CooldownChecker {
         taskScheduler.runAsync(() -> {
             if (proxyRegistry.hasEnabledProxy()) {
                 proxySender.send(FPlayer.UNKNOWN, MessageType.SYSTEM_COOLDOWN, dataOutputStream -> {
-                    dataOutputStream.writeAsJson(playerUUID);
-                    dataOutputStream.writeString(cooldownOwner);
+                    dataOutputStream.writeUTF(playerUUID.toString());
+                    dataOutputStream.writeUTF(cooldownOwner);
                     dataOutputStream.writeLong(newExpireTime);
                 }, UUID.randomUUID());
             }
