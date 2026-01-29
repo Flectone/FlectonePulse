@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
@@ -40,6 +41,7 @@ public class TelegramIntegration implements FIntegration {
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
 
+    @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private TelegramBotsLongPollingApplication botsApplication;
     private OkHttpTelegramClient telegramClient;
 
@@ -49,6 +51,8 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        sender = new FPlayer(fileFacade.localization().integration().telegram().senderName());
+
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 

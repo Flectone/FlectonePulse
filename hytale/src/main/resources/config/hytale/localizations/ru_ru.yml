@@ -415,6 +415,7 @@ command:
 integration:
   discord:
     null_player: "Игрок не найден"
+    sender_name: "Discord"
     format_reply: "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Ответ на @<reply_user>]</hover> "
     custom_command:
       ping:
@@ -428,6 +429,7 @@ integration:
         content: "<final_message>"
   telegram:
     null_player: "Игрок не найден"
+    sender_name: "Telegram"
     format_reply: "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Ответ на @<reply_user>]</hover> "
     custom_command:
       id: "Айди чата: <id>"
@@ -439,6 +441,7 @@ integration:
       CHAT_GLOBAL: "<final_message>"
   twitch:
     null_player: "Игрок не найден"
+    sender_name: "Twitch"
     format_reply: "<fcolor:4><hover:show_text:'<fcolor:4><reply_message>'>[Ответ на @<reply_user>]</hover> "
     custom_command:
       ping: "Пинг игрока <player> равен <replacement:ping>"

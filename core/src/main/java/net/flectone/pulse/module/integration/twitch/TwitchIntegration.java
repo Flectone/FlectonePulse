@@ -7,9 +7,11 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -31,10 +33,13 @@ public class TwitchIntegration implements FIntegration {
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
+    @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private TwitchClient twitchClient;
 
     @Override
     public void hook() {
+        sender = new FPlayer(fileFacade.localization().integration().twitch().senderName());
+
         Integration.Twitch integration = fileFacade.integration().twitch();
         String token = systemVariableResolver.substituteEnvVars(integration.token());
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.clientID());

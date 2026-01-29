@@ -83,7 +83,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
         sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
                 .base(EventMetadata.<Localization.Integration.Discord>builder()
-                        .sender(FPlayer.UNKNOWN)
+                        .sender(discordIntegration.get().getSender())
                         .format(localization -> {
                             Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
                             if (channelEmbed == null) return "";

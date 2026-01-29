@@ -57,6 +57,7 @@ public class DiscordIntegration implements FIntegration {
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
+    @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private DiscordClient discordClient;
     private GatewayDiscordClient gateway;
     @Getter private long clientID;
@@ -77,7 +78,7 @@ public class DiscordIntegration implements FIntegration {
             if (channel.isEmpty()) return;
 
             Localization.Integration.Discord localization = fileFacade.localization().integration().discord();
-            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null));
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null, null));
             sendMessage(sender, channel.get(), channelEmbed, discordString);
         });
     }
@@ -240,6 +241,8 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        sender = new FPlayer(fileFacade.localization().integration().discord().senderName());
+
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 

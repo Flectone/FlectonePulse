@@ -776,6 +776,7 @@ public record Localization(
         @Jacksonized
         public record Discord(
                 String nullPlayer,
+                String senderName,
                 String formatReply,
                 Map<String, ChannelEmbed> customCommand,
                 Map<String, String> infoChannel,
@@ -787,6 +788,7 @@ public record Localization(
             @Jacksonized
             public record ChannelEmbed(
                     String content,
+                    String webhookName,
                     String webhookAvatar,
                     Embed embed
             ) {}
@@ -840,6 +842,7 @@ public record Localization(
         @Jacksonized
         public record Telegram(
                 String nullPlayer,
+                String senderName,
                 String formatReply,
                 Map<String, String> customCommand,
                 Map<String, String> infoChannel,
@@ -851,6 +854,7 @@ public record Localization(
         @Jacksonized
         public record Twitch(
                 String nullPlayer,
+                String senderName,
                 String formatReply,
                 Map<String, String> customCommand,
                 Map<String, String> messageChannel
