@@ -9,13 +9,13 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.module.message.format.scoreboard.MinecraftScoreboardModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ScoreboardPulseListener implements PulseListener {
 
-    private final MinecraftScoreboardModule scoreboardModule;
+    private final ScoreboardModule scoreboardModule;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

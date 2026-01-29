@@ -10,7 +10,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -36,7 +35,6 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
-    private final ListenerRegistry listenerRegistry;
     private final Provider<IntegrationModule> integrationModuleProvider;
 
     @Inject
@@ -47,12 +45,11 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      PacketProvider packetProvider,
                                      ListenerRegistry listenerRegistry,
                                      Provider<IntegrationModule> integrationModuleProvider) {
-        super(fileFacade);
+        super(fileFacade, listenerRegistry);
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
-        this.listenerRegistry = listenerRegistry;
         this.integrationModuleProvider = integrationModuleProvider;
     }
 
@@ -74,8 +71,6 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
             }, ticker.period());
         }
-
-        listenerRegistry.register(ScoreboardPulseListener.class);
     }
 
     @Override
@@ -86,6 +81,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         uuidTeamMap.clear();
     }
 
+    @Override
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
 
         taskScheduler.runRegion(fPlayer, () -> {
@@ -108,6 +104,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         return uuidTeamMap.containsKey(fPlayer.getUuid());
     }
 
+    @Override
     public void remove(FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
             if (isModuleDisabledFor(fPlayer)) return;
