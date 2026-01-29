@@ -114,13 +114,8 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     }
 
     private IpResponse getGeolocation(String ip) {
-        try {
-            String url = IP_API_URL.replace("<ip>", ip);
-            String json = new Scanner(new URL(url).openStream(), StandardCharsets.UTF_8)
-                    .useDelimiter("\\A")
-                    .next();
-
-            return objectMapper.readValue(json, IpResponse.class);
+        try (Scanner scanner = new Scanner(new URL(IP_API_URL.replace("<ip>", ip)).openStream(), StandardCharsets.UTF_8).useDelimiter("\\A")) {
+            return objectMapper.readValue(scanner.next(), IpResponse.class);
         } catch (IOException e) {
             return null;
         }
