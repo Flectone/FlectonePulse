@@ -25,6 +25,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -185,11 +186,14 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Component getDefaultObjectComponent(MessageContext messageContext) {
+        String defaultSymbol = localization(messageContext.receiver()).defaultSymbol();
+        if (StringUtils.isEmpty(defaultSymbol)) return Component.empty();
+
         return Component.text(localization(messageContext.receiver()).defaultSymbol());
     }
 
     private Component addDefaultParametersIfNeeded(MessageContext messageContext, Component component) {
-        if (!Component.IS_NOT_EMPTY.test(component)) return component;
+        if (!Component.IS_NOT_EMPTY.test(component)) return Component.empty();
 
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().needExtraSpace()) {
             component = component.append(Component.space());
