@@ -68,6 +68,7 @@ public abstract class PlatformInjector extends AbstractModule {
 
         // create jackson mapper
         bind(ObjectMapper.class).toInstance(createMapper());
+        bind(ObjectMapper.class).annotatedWith(Names.named("defaultMapper")).toInstance(new ObjectMapper());
 
         // platform binding
         setupPlatform(reflectionResolver);

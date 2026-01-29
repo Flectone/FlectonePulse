@@ -37,8 +37,7 @@ public class MinecraftTranslationService implements TranslationService {
     private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
 
     private final Map<String, String> translations = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final @Named("defaultMapper") ObjectMapper objectMapper;
     private final @Named("minecraftPath") Path minecraftPath;
     private final PacketProvider packetProvider;
     private final FileFacade fileFacade;

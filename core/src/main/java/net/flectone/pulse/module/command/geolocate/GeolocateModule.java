@@ -39,8 +39,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     private static final String IP_API_URL = "http://ip-api.com/json/<ip>?fields=17031449";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final @Named("defaultMapper") ObjectMapper objectMapper;
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
