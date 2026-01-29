@@ -235,11 +235,11 @@ format:
       obfuscated: "(?<!\\S)\\?\\?([^\\?\\?\\n]+)\\?\\?(?!\\S)"
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   scoreboard:
-    enable: false
-    name_visible: false
+    enable: true
+    name_visible: true
     color: "<white>"
-    prefix: "<vault_prefix><stream_prefix>"
-    suffix: "<afk_suffix><vault_suffix>"
+    prefix: "<vault_prefix><stream_prefix> "
+    suffix: " <afk_suffix><vault_suffix>"
     ticker:
       enable: false
   translate:

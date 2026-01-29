@@ -13,6 +13,8 @@ import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.module.message.bubble.render.HytaleBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
+import net.flectone.pulse.module.message.format.scoreboard.HytaleScoreboardModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.HytaleWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.join.HytaleJoinModule;
@@ -84,7 +86,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(BubbleModule.class).to(HytaleBubbleModule.class);
         bind(ChatModule.class).to(HytaleChatModule.class);
 //        bind(ObjectModule.class).to(MinecraftObjectModule.class);
-//        bind(ScoreboardModule.class).to(MinecraftScoreboardModule.class);
+        bind(ScoreboardModule.class).to(HytaleScoreboardModule.class);
         bind(WorldModule.class).to(HytaleWorldModule.class);
         bind(JoinModule.class).to(HytaleJoinModule.class);
 //        bind(ObjectModule.class).to(MinecraftObjectModule.class);
