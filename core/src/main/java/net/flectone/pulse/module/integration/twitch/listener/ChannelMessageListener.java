@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -26,6 +27,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     private final Provider<TwitchIntegration> twitchIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final TaskScheduler taskScheduler;
 
     public Class<ChannelMessageEvent> getEventType() {
         return ChannelMessageEvent.class;
@@ -135,38 +138,43 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
         String commandName = parts[0];
         String arguments = parts.length > 1 ? parts[1] : "";
 
+        String channel = event.getChannel().getName();
+
         for (Map.Entry<String, Integration.Command> commandEntry : config().customCommand().entrySet()) {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
-            String channel = event.getChannel().getName();
-
-            if (command.needPlayer()) {
-                if (arguments.isEmpty()) {
-                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
-                    return true;
-                }
-
-                String playerName = arguments.split(" ")[0];
-                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
-                if (fPlayer.isUnknown()) {
-                    sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
-                    return true;
-                } else {
-                    fPlayer = argumentFPlayer;
-                }
-            }
+            FPlayer fPlayer = getFPlayerArgument(command, arguments, channel);
+            if (fPlayer == null) return true;
 
             String localizationString = localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            String formattedMessage = buildMessage(fPlayer, localizationString);
-            sendMessageToTwitch(channel, formattedMessage);
+            taskScheduler.runRegion(fPlayer, () -> sendMessageToTwitch(channel, buildMessage(fPlayer, localizationString)));
             return true;
         }
 
         return false;
+    }
+
+    @Nullable
+    private FPlayer getFPlayerArgument(Integration.Command command, String arguments, String channel) {
+        FPlayer fPlayer = fPlayerService.getRandomFPlayer();
+        if (Boolean.FALSE.equals(command.needPlayer())) return fPlayer;
+
+        if (arguments.isEmpty()) {
+            sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
+            return null;
+        }
+
+        String playerName = arguments.split(" ")[0];
+        FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
+        if (argumentFPlayer.isUnknown()) {
+            sendMessageToTwitch(channel, buildMessage(fPlayer, Localization.Integration.Twitch::nullPlayer));
+            return null;
+        }
+
+        return argumentFPlayer;
     }
 
     private String buildMessage(FPlayer fPlayer, Function<Localization.Integration.Twitch, String> stringFunction) {

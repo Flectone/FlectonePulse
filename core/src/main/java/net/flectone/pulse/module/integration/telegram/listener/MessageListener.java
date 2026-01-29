@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -25,6 +26,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -43,6 +45,7 @@ public class MessageListener extends EventListener {
     private final Provider<TelegramIntegration> telegramIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {}
@@ -157,33 +160,37 @@ public class MessageListener extends EventListener {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
-
-            if (command.needPlayer()) {
-                if (arguments.isEmpty()) {
-                    sendMessageToTelegram(message, buildMessage(fPlayer, Localization.Integration.Telegram::nullPlayer));
-                    return true;
-                }
-
-                String playerName = arguments.split(" ")[0];
-                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
-                if (argumentFPlayer.isUnknown()) {
-                    sendMessageToTelegram(message, buildMessage(fPlayer, Localization.Integration.Telegram::nullPlayer));
-                    return true;
-                } else {
-                    fPlayer = argumentFPlayer;
-                }
-            }
+            FPlayer fPlayer = getFPlayerArgument(command, arguments, message);
+            if (fPlayer == null) return true;
 
             String localizationString = localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            String formattedMessage = buildMessage(fPlayer, localizationString);
-            sendMessageToTelegram(message, formattedMessage);
+            taskScheduler.runRegion(fPlayer, () -> sendMessageToTelegram(message, buildMessage(fPlayer, localizationString)));
             return true;
         }
 
         return false;
+    }
+
+    @Nullable
+    private FPlayer getFPlayerArgument(Integration.Command command, String arguments, Message message) {
+        FPlayer fPlayer = fPlayerService.getRandomFPlayer();
+        if (Boolean.FALSE.equals(command.needPlayer())) return fPlayer;
+
+        if (arguments.isEmpty()) {
+            sendMessageToTelegram(message, buildMessage(fPlayer, Localization.Integration.Telegram::nullPlayer));
+            return null;
+        }
+
+        String playerName = arguments.split(" ")[0];
+        FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
+        if (argumentFPlayer.isUnknown()) {
+            sendMessageToTelegram(message, buildMessage(fPlayer, Localization.Integration.Telegram::nullPlayer));
+            return null;
+        }
+
+        return argumentFPlayer;
     }
 
     private boolean isRealReply(Message message) {

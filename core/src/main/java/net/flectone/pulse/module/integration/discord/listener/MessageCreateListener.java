@@ -11,12 +11,14 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -27,6 +29,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -40,8 +43,10 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final Provider<DiscordIntegration> discordIntegration;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public Class<MessageCreateEvent> getEventType() {
@@ -185,37 +190,43 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String commandName = parts[0];
         String arguments = parts.length > 1 ? parts[1] : "";
 
+        Snowflake channel = message.getChannelId();
+
         for (Map.Entry<String, Integration.Command> commandEntry : config().customCommand().entrySet()) {
             Integration.Command command = commandEntry.getValue();
             if (!command.aliases().contains(commandName)) continue;
 
-            FPlayer fPlayer = fPlayerService.getRandomFPlayer();
-            Snowflake channel = message.getChannelId();
-
-            if (command.needPlayer()) {
-                if (arguments.isEmpty()) {
-                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
-                    return true;
-                }
-
-                String playerName = arguments.split(" ")[0];
-                FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
-                if (argumentFPlayer.isUnknown()) {
-                    sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
-                    return true;
-                } else {
-                    fPlayer = argumentFPlayer;
-                }
-            }
+            FPlayer fPlayer = getFPlayerArgument(command, arguments, channel);
+            if (fPlayer == null) return true;
 
             Localization.Integration.Discord.ChannelEmbed channelEmbed = localization().customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
-            sendMessageToDiscord(fPlayer, channel, channelEmbed);
+            taskScheduler.runRegion(fPlayer, () -> sendMessageToDiscord(fPlayer, channel, channelEmbed));
             return true;
         }
 
         return false;
+    }
+
+    @Nullable
+    private FPlayer getFPlayerArgument(Integration.Command command, String arguments, Snowflake channel) {
+        FPlayer fPlayer = fPlayerService.getRandomFPlayer();
+        if (Boolean.FALSE.equals(command.needPlayer())) return fPlayer;
+
+        if (arguments.isEmpty()) {
+            sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
+            return null;
+        }
+
+        String playerName = arguments.split(" ")[0];
+        FPlayer argumentFPlayer = fPlayerService.getFPlayer(playerName);
+        if (argumentFPlayer.isUnknown()) {
+            sendMessageToDiscord(channel, buildMessage(fPlayer, Localization.Integration.Discord::nullPlayer));
+            return null;
+        }
+
+        return argumentFPlayer;
     }
 
     private String buildMessage(FPlayer fPlayer, Function<Localization.Integration.Discord, String> stringFunction) {
