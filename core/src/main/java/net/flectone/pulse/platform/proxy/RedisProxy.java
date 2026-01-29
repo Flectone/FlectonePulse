@@ -68,9 +68,6 @@ public class RedisProxy implements Proxy {
         this.pubSubConnection = redisClient.connectPubSub(new ByteArrayCodec());
 
         try {
-            pubSubConnection.sync().ping();
-            fLogger.info("Redis (Lettuce) connected");
-
             RedisPubSubAsyncCommands<byte[], byte[]> async = pubSubConnection.async();
             for (MessageType tag : MessageType.values()) {
                 async.subscribe(tag.name().getBytes(StandardCharsets.UTF_8));
@@ -78,8 +75,9 @@ public class RedisProxy implements Proxy {
 
             pubSubConnection.addListener(redisListenerProvider.get());
 
+            fLogger.info("Redis (Lettuce) connected");
         } catch (Exception e) {
-            fLogger.warning("Redis connection failed: " + e.getMessage());
+            fLogger.warning("Redis connection failed: ", e);
             onDisable();
         }
     }
@@ -89,6 +87,7 @@ public class RedisProxy implements Proxy {
         if (pubSubConnection != null) {
             pubSubConnection.close();
         }
+
         if (redisClient != null) {
             redisClient.shutdown();
         }
