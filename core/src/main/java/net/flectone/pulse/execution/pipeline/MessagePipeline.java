@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -64,24 +65,20 @@ public class MessagePipeline {
         MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(context));
         MessageContext eventContext = event.context();
 
-        MessageContext finalContext = eventContext;
-
-        if (finalContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !finalContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            finalContext = finalContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
-                    .filter(tag -> eventContext.tagResolvers()
-                            .stream()
+        if (eventContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            Set<TagResolver> tagResolvers = eventContext.tagResolvers();
+            eventContext = eventContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
+                    .filter(tag -> tagResolvers.stream()
                             .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
                             .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
                     )
-                    .map(ReplacementTag::empty).toList()
+                    .map(ReplacementTag::empty)
+                    .toList()
             );
         }
 
         try {
-            return miniMessage.deserialize(
-                    Strings.CS.replace(finalContext.message(), "§", "&"),
-                    finalContext.tagResolvers().toArray(new TagResolver[0])
-            );
+            return miniMessage.deserialize(eventContext.message(), TagResolver.resolver(eventContext.tagResolvers()));
         } catch (Exception e) {
             fLogger.warning(e);
         }
