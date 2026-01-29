@@ -127,7 +127,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
             Message.Format.QuestionAnswer.Question question = config().questions().get(entry.getKey());
             if (question != null
                     && (questionPermission != null && !permissionChecker.check(sender, questionPermission.cooldownBypass()))
-                    && cooldownChecker.check(sender.getUuid(), question.cooldown())) continue;
+                    && cooldownChecker.check(sender.getUuid(), question.cooldown(), this.getClass().getName() + entry.getKey())) continue;
 
             result.append("<question:'").append(entry.getKey()).append("'>");
         }

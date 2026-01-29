@@ -73,6 +73,7 @@ import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -98,6 +99,7 @@ public class ProxyMessageHandler {
     private final ModerationService moderationService;
     private final Gson gson;
     private final TaskScheduler taskScheduler;
+    private final CooldownChecker cooldownChecker;
 
     public void handleProxyMessage(byte[] bytes) {
         taskScheduler.runAsync(() -> {
@@ -133,6 +135,7 @@ public class ProxyMessageHandler {
 
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
         if (optionalFEntity.isEmpty()) return;
+        if (handleSystemCooldown(tag, input)) return;
 
         FEntity fEntity = optionalFEntity.get();
         if (handleModerationInvalidation(tag, fEntity)) {
@@ -201,6 +204,17 @@ public class ProxyMessageHandler {
             }
             default -> false;
         };
+    }
+
+    private boolean handleSystemCooldown(MessageType tag, DataInputStream input) throws IOException {
+        if (tag != MessageType.SYSTEM_COOLDOWN) return false;
+
+        UUID uuid = UUID.fromString(input.readUTF());
+        String cooldownClass = input.readUTF();
+        long newExpireTime = input.readLong();
+
+        cooldownChecker.updateCache(uuid, cooldownClass, newExpireTime);
+        return true;
     }
 
     private void handleAnonCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

@@ -56,11 +56,12 @@ public class CooldownSender {
      *
      * @param entity the entity to check
      * @param optionalCooldown optional pair of cooldown and permission settings
+     * @param cooldownOwner name of the owner that checks cooldown
      * @return true if cooldown message was sent, false otherwise
      */
-    public boolean sendIfCooldown(FEntity entity, Optional<Pair<Cooldown, PermissionSetting>> optionalCooldown) {
+    public boolean sendIfCooldown(FEntity entity, Optional<Pair<Cooldown, PermissionSetting>> optionalCooldown, String cooldownOwner) {
         return optionalCooldown
-                .filter(pair -> sendIfCooldown(entity, pair))
+                .filter(pair -> sendIfCooldown(entity, pair, cooldownOwner))
                 .isPresent();
     }
 
@@ -69,9 +70,10 @@ public class CooldownSender {
      *
      * @param entity the entity to check
      * @param cooldownPermission pair of cooldown settings and bypass permission
+     * @param cooldownOwner name of the owner that checks cooldown
      * @return true if cooldown message was sent, false otherwise
      */
-    public boolean sendIfCooldown(FEntity entity, Pair<Cooldown, PermissionSetting> cooldownPermission) {
+    public boolean sendIfCooldown(FEntity entity, Pair<Cooldown, PermissionSetting> cooldownPermission, String cooldownOwner) {
         Cooldown cooldown = cooldownPermission.first();
         if (cooldown == null || !cooldown.enable()) return false;
 
@@ -79,9 +81,9 @@ public class CooldownSender {
         if (!(entity instanceof FPlayer fPlayer)) return false;
 
         if (permissionChecker.check(fPlayer, cooldownPermission.second())) return false;
-        if (!cooldownChecker.check(fPlayer.getUuid(), cooldown)) return false;
+        if (!cooldownChecker.check(fPlayer.getUuid(), cooldown, cooldownOwner)) return false;
 
-        long timeLeft = cooldownChecker.getTimeLeft(fPlayer.getUuid(), cooldown);
+        long timeLeft = cooldownChecker.getTimeLeft(fPlayer.getUuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
         MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
         Component component = messagePipeline.build(cooldownContext);

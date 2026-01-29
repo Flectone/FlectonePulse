@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -26,8 +27,9 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
                                         FLogger fLogger,
                                         ModerationService moderationService,
                                         Gson gson,
-                                        TaskScheduler taskScheduler) {
-        super(injector, fileFacade, fPlayerService, fLogger, moderationService, gson, taskScheduler);
+                                        TaskScheduler taskScheduler,
+                                        CooldownChecker cooldownChecker) {
+        super(injector, fileFacade, fPlayerService, fLogger, moderationService, gson, taskScheduler, cooldownChecker);
 
         this.injector = injector;
     }

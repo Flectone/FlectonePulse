@@ -104,7 +104,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        if (cooldownSender.sendIfCooldown(fPlayer, playerChat.cooldown())) {
+        if (cooldownSender.sendIfCooldown(fPlayer, playerChat.cooldown(), this.getClass().getName() + playerChat.name())) {
             cancelEvent.run();
             return;
         }

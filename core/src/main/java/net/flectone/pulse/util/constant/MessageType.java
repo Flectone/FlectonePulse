@@ -93,6 +93,7 @@ public enum MessageType {
     SERVER_DISABLE,
 
     // only for invalidation cache
+    SYSTEM_COOLDOWN,
     SYSTEM_ONLINE,
     SYSTEM_OFFLINE,
     SYSTEM_BAN,

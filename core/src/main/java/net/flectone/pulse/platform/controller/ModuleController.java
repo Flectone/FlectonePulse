@@ -140,7 +140,7 @@ public class ModuleController {
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
             predicatesBuilder
                     .add((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()))
-                    .add((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.cooldown()))
+                    .add((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
                     .add((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
         }
 
