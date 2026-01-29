@@ -135,7 +135,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
 
     @Override
     public boolean isPrimaryThread() {
-        // TODO
+        // its ok?
         return false;
     }
 

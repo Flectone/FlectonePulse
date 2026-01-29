@@ -39,7 +39,7 @@ public class FileFacade {
         fileLoader.init();
 
         // this is to check FlectonePulse version
-        // mb in the future we should put version in a separate file, but I think it's not so important
+        // maybe in the future we should put version in a separate file, but I think it's not so important
         preInitVersion = fileLoader.loadAndMergeConfig(files).version();
         boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
 
