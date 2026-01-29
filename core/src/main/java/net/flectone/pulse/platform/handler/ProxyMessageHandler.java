@@ -10,6 +10,7 @@ import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -73,7 +74,6 @@ import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -99,7 +99,7 @@ public class ProxyMessageHandler {
     private final ModerationService moderationService;
     private final Gson gson;
     private final TaskScheduler taskScheduler;
-    private final CooldownChecker cooldownChecker;
+    private final CooldownRepository cooldownRepository;
 
     public void handleProxyMessage(byte[] bytes) {
         taskScheduler.runAsync(() -> {
@@ -213,7 +213,7 @@ public class ProxyMessageHandler {
         String cooldownClass = input.readUTF();
         long newExpireTime = input.readLong();
 
-        cooldownChecker.updateCache(uuid, cooldownClass, newExpireTime);
+        cooldownRepository.updateCache(uuid, cooldownClass, newExpireTime);
         return true;
     }
 

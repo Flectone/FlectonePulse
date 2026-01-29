@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -45,6 +46,7 @@ public class CooldownSender {
 
     private final PermissionChecker permissionChecker;
     private final CooldownChecker cooldownChecker;
+    private final CooldownRepository cooldownRepository;
     private final MessagePipeline messagePipeline;
     private final TimeFormatter timeFormatter;
     private final EventDispatcher eventDispatcher;
@@ -83,7 +85,7 @@ public class CooldownSender {
         if (permissionChecker.check(fPlayer, cooldownPermission.second())) return false;
         if (!cooldownChecker.check(fPlayer.getUuid(), cooldown, cooldownOwner)) return false;
 
-        long timeLeft = cooldownChecker.getTimeLeft(fPlayer.getUuid(), cooldown, cooldownOwner);
+        long timeLeft = cooldownRepository.getTimeLeft(fPlayer.getUuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
         MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
         Component component = messagePipeline.build(cooldownContext);

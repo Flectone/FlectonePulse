@@ -11,12 +11,12 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.SneakyThrows;
+import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -97,7 +97,7 @@ public abstract class PlatformInjector extends AbstractModule {
     }
 
     @Provides @Singleton @Named("cooldown")
-    public Cache<CooldownChecker.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
+    public Cache<CooldownRepository.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.COOLDOWN);
     }
 
