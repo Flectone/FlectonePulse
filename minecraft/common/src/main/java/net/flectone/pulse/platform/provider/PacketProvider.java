@@ -3,7 +3,6 @@ package net.flectone.pulse.platform.provider;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -60,12 +59,5 @@ public class PacketProvider {
         if (inetAddress == null) return null;
 
         return inetAddress.getHostAddress();
-    }
-
-    public boolean isNewerThanOrEquals(FPlayer fPlayer, ClientVersion clientVersion) {
-        User user = getUser(fPlayer);
-        if (user == null) return false;
-
-        return user.getPacketVersion().isNewerThanOrEquals(clientVersion);
     }
 }

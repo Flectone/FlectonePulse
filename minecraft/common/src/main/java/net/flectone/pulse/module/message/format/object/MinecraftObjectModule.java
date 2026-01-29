@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format.object;
 
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -25,7 +26,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -171,7 +171,8 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         // check player version
-        if (packetProvider.isNewerThanOrEquals(fReceiver, ClientVersion.V_1_21_9)) {
+        User user = packetProvider.getUser(fReceiver);
+        if (user != null && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
                 return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent));
@@ -186,9 +187,6 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Component getDefaultObjectComponent(MessageContext messageContext) {
-        String defaultSymbol = localization(messageContext.receiver()).defaultSymbol();
-        if (StringUtils.isEmpty(defaultSymbol)) return Component.empty();
-
         return Component.text(localization(messageContext.receiver()).defaultSymbol());
     }
 
