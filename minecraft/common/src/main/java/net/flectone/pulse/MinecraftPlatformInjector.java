@@ -49,7 +49,9 @@ import net.flectone.pulse.platform.sender.*;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.TranslationService;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.nio.file.Path;
@@ -118,6 +120,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
         // others
         bind(SkinService.class).to(MinecraftSkinService.class);
+        bind(TranslationService.class).to(MinecraftTranslationService.class);
         bind(ProxyMessageHandler.class).to(MinecraftProxyMessageHandler.class);
     }
 

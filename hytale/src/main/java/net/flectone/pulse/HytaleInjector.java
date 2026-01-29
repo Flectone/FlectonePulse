@@ -32,7 +32,9 @@ import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.HytaleSkinService;
+import net.flectone.pulse.service.HytaleTranslationService;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.TranslationService;
 import net.flectone.pulse.util.checker.HytalePermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.logging.FLogger;
@@ -108,6 +110,7 @@ public class HytaleInjector extends PlatformInjector {
 
         // others
         bind(SkinService.class).to(HytaleSkinService.class);
+        bind(TranslationService.class).to(HytaleTranslationService.class);
     }
 
 }

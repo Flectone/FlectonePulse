@@ -141,7 +141,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         // log plugin information
         fLogger.logDescription();
 
-        // load minecraft localizations
+        // load hytale localizations
         get(HytaleTranslationService.class).reload();
 
         // register default listeners
@@ -248,7 +248,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
             reloadException = new ReloadException(e);
         }
 
-        // load minecraft localizations
+        // load hytale localizations
         get(HytaleTranslationService.class).reload();
 
         // reload registries

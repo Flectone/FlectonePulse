@@ -5,45 +5,33 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HytaleTranslationService {
+public class HytaleTranslationService implements TranslationService {
 
-    private final Map<String, Map<String, String>> translations = new ConcurrentHashMap<>();
-
-    private final FLogger fLogger;
     private final TaskScheduler taskScheduler;
-
     private final FlectoneTranslator translator = new FlectoneTranslator();
 
+    @Override
     public void reload() {
-        taskScheduler.runAsync(() -> {
-            translations.clear();
-
-            initGlobalTranslator();
-        }, true);
+        taskScheduler.runAsync(this::initGlobalTranslator, true);
     }
 
-    public @Nullable String translate(String key, String language) {
-        return translator.tryTranslate(key, language);
-    }
-
+    @Override
     public void initGlobalTranslator() {
-//        GlobalTranslator.translator().removeSource(translator);
-//        GlobalTranslator.translator().addSource(translator);
+        GlobalTranslator.translator().removeSource(translator);
+        GlobalTranslator.translator().addSource(translator);
     }
 
     private static class FlectoneTranslator implements Translator {
@@ -66,7 +54,7 @@ public class HytaleTranslationService {
             String translated = tryTranslate(component.key(), locale.getDisplayName());
             if (translated == null) return null;
 
-            return Component.text(translated).style(component.style());
+            return Component.text(translated).mergeStyle(component);
         }
 
         public String tryTranslate(String key, String locale) {

@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftTranslationService {
+public class MinecraftTranslationService implements TranslationService {
 
     private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
 
@@ -46,36 +46,40 @@ public class MinecraftTranslationService {
     private final FLogger fLogger;
     private final TaskScheduler taskScheduler;
 
-    private String language;
-    private boolean isModern;
+    private String lastLanguage;
     private Translator translator;
 
+    @Override
     public void reload() {
         taskScheduler.runAsync(() -> {
-            String newLanguage = fileFacade.config().language().type().toLowerCase(Locale.ROOT);
-            if (newLanguage.equals(language) && !translations.isEmpty()) return;
+            String newLanguage = getLastLanguage();
+            if (newLanguage.equals(lastLanguage) && !translations.isEmpty()) return;
 
-            language = newLanguage;
-            isModern = detectModernVersion();
+            lastLanguage = newLanguage;
             translations.clear();
 
-            if (downloadLocalizationFile()) {
-                loadTranslations();
+            boolean isModern = detectModernVersion();
+            if (downloadLocalizationFile(isModern, lastLanguage)) {
+                loadTranslations(isModern);
                 initGlobalTranslator();
             }
+
         }, true);
     }
 
-    public String getVersion() {
-        return packetProvider.getServerVersion().getReleaseName();
+    @Override
+    public void initGlobalTranslator() {
+        if (translator != null) {
+            GlobalTranslator.translator().removeSource(translator);
+        }
+
+        translator = new FlectoneTranslator(translations);
+
+        GlobalTranslator.translator().addSource(translator);
     }
 
-    public @Nullable String translate(String key) {
-        return translations.get(key);
-    }
-
-    public boolean downloadLocalizationFile() {
-        Path outputPath = resolveLocalizationFile();
+    public boolean downloadLocalizationFile(boolean isModern, String language) {
+        Path outputPath = resolveLocalizationFile(isModern);
         if (Files.exists(outputPath)) return true;
 
         String formattedLanguage = isModern ? language : formatLegacyLanguage(language);
@@ -85,8 +89,8 @@ public class MinecraftTranslationService {
         return webUtil.downloadFile(url, outputPath);
     }
 
-    public void loadTranslations() {
-        Path localizationFile = resolveLocalizationFile();
+    public void loadTranslations(boolean isModern) {
+        Path localizationFile = resolveLocalizationFile(isModern);
         if (!Files.exists(localizationFile)) return;
 
         try {
@@ -101,22 +105,20 @@ public class MinecraftTranslationService {
         }
     }
 
-    public void initGlobalTranslator() {
-        if (translator != null) {
-            GlobalTranslator.translator().removeSource(translator);
-        }
-
-        translator = createFlectonePulseTranslator();
-
-        GlobalTranslator.translator().addSource(translator);
+    private String getLastLanguage() {
+        return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
     }
 
-    private Path resolveLocalizationFile() {
+    private String getVersion() {
+        return packetProvider.getServerVersion().getReleaseName();
+    }
+
+    private Path resolveLocalizationFile(boolean isModern) {
         String extension = isModern ? ".json" : ".lang";
         return minecraftPath
                 .resolve(getVersion())
                 .resolve("lang")
-                .resolve(language + extension);
+                .resolve(lastLanguage + extension);
     }
 
     private Map<String, String> loadJsonTranslations(Path file) {
@@ -133,33 +135,6 @@ public class MinecraftTranslationService {
         });
 
         return result;
-    }
-
-    private Translator createFlectonePulseTranslator() {
-        return new Translator() {
-
-            @Override
-            public @NonNull Key name() {
-                return Key.key("flectonepulse:translation");
-            }
-
-            @Override
-            public @Nullable MessageFormat translate(final @NonNull String key, final @NonNull Locale locale) {
-                String translated = translations.get(key);
-                if (translated == null) return null;
-
-                return new MessageFormat(translated, locale);
-            }
-
-            @Override
-            public @Nullable Component translate(@NonNull TranslatableComponent component, @NonNull Locale locale) {
-                String translated = translations.get(component.key());
-                if (translated == null) return null;
-
-                return Component.text(translated).style(component.style());
-            }
-
-        };
     }
 
     private String buildLocalizationUrl(String version, String language, String extension) {
@@ -185,5 +160,30 @@ public class MinecraftTranslationService {
         String[] parts = language.split("_");
         if (parts.length != 2) return null;
         return parts[0] + "_" + parts[1].toUpperCase(Locale.ROOT);
+    }
+
+    private record FlectoneTranslator(Map<String, String> translations) implements Translator {
+
+        @Override
+        public @NonNull Key name() {
+            return Key.key("flectonepulse:translation");
+        }
+
+        @Override
+        public @Nullable MessageFormat translate(final @NonNull String key, final @NonNull Locale locale) {
+            String translated = translations.get(key);
+            if (translated == null) return null;
+
+            return new MessageFormat(translated, locale);
+        }
+
+        @Override
+        public @Nullable Component translate(@NonNull TranslatableComponent component, @NonNull Locale locale) {
+            String translated = translations.get(component.key());
+            if (translated == null) return null;
+
+            return Component.text(translated).mergeStyle(component);
+        }
+
     }
 }
