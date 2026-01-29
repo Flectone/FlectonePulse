@@ -235,6 +235,9 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         // get file resolver for configuration
         FileFacade fileFacade = get(FileFacade.class);
 
+        // invalidate cache
+        get(CacheRegistry.class).invalidate();
+
         // get database
         Database database = get(Database.class);
 

@@ -455,7 +455,7 @@ public class FileMigrator {
             vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
         }
 
-        files.config().cache().types().put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(5, TimeUnit.HOURS, 5000));
+        files.config().cache().types().put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
 
         return files.withMessage(files.message().withVanilla(files.message().vanilla().withTypes(vanillaMessages)));
     }

@@ -25,6 +25,10 @@ public class CacheRegistry {
         Arrays.stream(CacheName.values()).forEach(this::create);
     }
 
+    public void invalidate() {
+        cacheMap.keySet().forEach(this::invalidate);
+    }
+
     public <K, V> void create(CacheName cacheName) {
         if (cacheMap.containsKey(cacheName)) {
             throw new IllegalArgumentException("Cache already created for " + cacheName);
@@ -45,6 +49,23 @@ public class CacheRegistry {
                 .build();
 
         cacheMap.put(cacheName, cache);
+    }
+
+    public void invalidate(CacheName cacheName) {
+        if (!cacheMap.containsKey(cacheName)) return;
+
+        Config.Cache.CacheSetting cacheSetting = fileFacade.config()
+                .cache()
+                .types()
+                .get(cacheName);
+
+        if (cacheSetting == null) {
+            throw new IllegalArgumentException("No cache setting for " + cacheName);
+        }
+
+        if (cacheSetting.invalidateOnReload()) {
+            cacheMap.get(cacheName).invalidateAll();
+        }
     }
 
     @SuppressWarnings("unchecked")

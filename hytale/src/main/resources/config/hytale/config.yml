@@ -66,46 +66,57 @@ logger:
 cache:
   types:
     COOLDOWN:
+      invalidate_on_reload: false
       duration: 5
       time_unit: "HOURS"
       size: 5000
     DIALOG_CLICK:
+      invalidate_on_reload: false
       duration: 1
       time_unit: "SECONDS"
       size: 100
     OFFLINE_PLAYERS:
+      invalidate_on_reload: false
       duration: 1
       time_unit: "HOURS"
       size: 1000
     MODERATION:
+      invalidate_on_reload: false
       duration: 1
       time_unit: "HOURS"
       size: 5000
     LEGACY_COLOR_MESSAGE:
+      invalidate_on_reload: false
       duration: 10
       time_unit: "MINUTES"
       size: 100000
     MENTION_MESSAGE:
+      invalidate_on_reload: false
       duration: 10
       time_unit: "MINUTES"
       size: 1000
     SWEAR_MESSAGE:
+      invalidate_on_reload: false
       duration: 10
       time_unit: "MINUTES"
       size: 100000
     REPLACEMENT_MESSAGE:
+      invalidate_on_reload: false
       duration: 10
       time_unit: "MINUTES"
       size: 100000
     REPLACEMENT_IMAGE:
+      invalidate_on_reload: false
       duration: 10
       time_unit: "MINUTES"
       size: 100
     TRANSLATE_MESSAGE:
+      invalidate_on_reload: false
       duration: 1
       time_unit: "HOURS"
       size: 5000
     PROFILE_PROPERTY:
+      invalidate_on_reload: false
       duration: 1
       time_unit: "HOURS"
       size: 1000

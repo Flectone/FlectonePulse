@@ -207,6 +207,9 @@ public class MinecraftFlectonePulse {
         // get file resolver for configuration
         FileFacade fileFacade = instance.get(FileFacade.class);
 
+        // invalidate cache
+        instance.get(CacheRegistry.class).invalidate();
+
         // get database
         Database database = instance.get(Database.class);
 
