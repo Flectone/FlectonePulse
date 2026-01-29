@@ -9,7 +9,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -19,10 +18,8 @@ public class HytaleMessageSender implements MessageSender {
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
-    public void sendToConsole(Component component) {
-        HytaleComponentSerializer hytaleComponentSerializer = HytaleComponentSerializer.get();
-        String consoleString = ANSIComponentSerializer.ansi().serialize(hytaleComponentSerializer.deserialize(hytaleComponentSerializer.serialize(component)));
-        fLogger.info(consoleString);
+    public void sendToConsole(String message) {
+        fLogger.info(message);
     }
 
     @Override

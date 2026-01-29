@@ -2,6 +2,10 @@ package net.flectone.pulse.platform.sender;
 
 import net.flectone.pulse.model.entity.FPlayer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
+
+import java.util.Locale;
 
 /**
  * Sends chat messages to players and console with proper version compatibility.
@@ -25,9 +29,19 @@ public interface MessageSender {
     /**
      * Sends a formatted message to the server console.
      *
+     * @param message the message to send to console
+     */
+    void sendToConsole(String message);
+
+    /**
+     * Sends a formatted message to the server console.
+     *
      * @param component the component to send to console
      */
-    void sendToConsole(Component component);
+    default void sendToConsole(Component component) {
+        String consoleString = ANSIComponentSerializer.ansi().serialize(GlobalTranslator.render(component, Locale.ROOT));
+        sendToConsole(consoleString);
+    }
 
     /**
      * Sends a chat message to a player.
