@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.geolocate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -18,6 +19,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
@@ -27,17 +29,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GeolocateModule extends AbstractModuleCommand<Localization.Command.Geolocate> {
 
-    private static final String IP_API_URL = "http://ip-api.com/json/<ip>?fields=17031449";
+    private static final String IP_API_URL = "http://ip-api.com/json/<ip>?fields=status,country,regionName,city,timezone,offset,mobile,proxy,hosting,query";
 
     private final @Named("defaultMapper") ObjectMapper objectMapper;
     private final FileFacade fileFacade;
@@ -45,6 +43,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
+    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
@@ -122,22 +121,15 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     private String getUserCurrentTime(IpResponse response) {
         try {
-            ZonedDateTime userTime;
-
-            if (response.timezone() != null && !response.timezone().isEmpty()) {
-                userTime = ZonedDateTime.now(ZoneId.of(response.timezone()));
-            } else if (response.offset() != null) {
-                ZoneOffset offset = ZoneOffset.ofTotalSeconds(response.offset());
-                userTime = Instant.now().atOffset(offset).toZonedDateTime();
-            } else {
-                userTime = ZonedDateTime.now(ZoneOffset.UTC);
+            if (response.offset() != null) {
+                int offsetSeconds = response.offset();
+                return timeFormatter.formatDate(Instant.now().plusSeconds(offsetSeconds).toEpochMilli());
             }
-
-            return timeFormatter.formatDate(userTime.toInstant().toEpochMilli());
-
         } catch (Exception e) {
-            return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
+            fLogger.warning(e);
         }
+
+        return timeFormatter.formatDate(Instant.now().toEpochMilli());
     }
 
     @Override

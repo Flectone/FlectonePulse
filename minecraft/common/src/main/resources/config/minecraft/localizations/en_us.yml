@@ -204,7 +204,7 @@ command:
   geolocate:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_or_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Problem receiving information, try again"
-    format: "<fcolor:1>Geolocation for <target><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Current time: <fcolor:2><current_time><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>"
+    format: "<fcolor:1>Geolocation for <target><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Current time (UTC): <fcolor:2><current_time><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>"
   helper:
     null_helper: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>There are no people who can help you"
     global: "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>"

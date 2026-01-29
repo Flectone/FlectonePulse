@@ -204,7 +204,7 @@ command:
   geolocate:
     null_player: "<color:#ff7171>Игрок не найден"
     null_or_error: "<color:#ff7171>Ошибка, попробуй чуть позже"
-    format: "<fcolor:1>Геолокация <target><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Текущее время: <fcolor:2><current_time><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>"
+    format: "<fcolor:1>Геолокация <target><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Текущее время (UTC): <fcolor:2><current_time><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>"
   helper:
     null_helper: "<color:#ff7171>Сейчас нет людей, кто бы смог помочь"
     global: "<fcolor:2>[&] <display_name> просит помощи => <fcolor:1><message>"
