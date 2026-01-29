@@ -125,7 +125,9 @@ public class DiscordIntegration implements FIntegration {
                 channelWebhooks.put(channelID, webhookData);
             }
 
-            String username = sender.getName();
+            String username = StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
+                    ? sender.getName()
+                    : messagePipeline.buildPlain(messagePipeline.createContext(sender, FPlayer.UNKNOWN, channelEmbed.webhookName()));
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
                     .allowedMentions(AllowedMentionsData.builder().build())
