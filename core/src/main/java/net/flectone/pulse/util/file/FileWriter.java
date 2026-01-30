@@ -3,6 +3,7 @@ package net.flectone.pulse.util.file;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.exception.FileWriteException;
@@ -41,7 +42,7 @@ public class FileWriter {
 
     private final ObjectMapper yamlMapper;
     private final FilePathProvider filePathProvider;
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
     public void save(FilePack files, boolean checkExist) {
         Path commandPath = filePathProvider.get(files.command());
@@ -113,7 +114,7 @@ public class FileWriter {
             JsonPropertyDescription propertyDescription = field.getAnnotation(JsonPropertyDescription.class);
             if (propertyDescription != null && propertyDescription.value() != null && !propertyDescription.value().isEmpty()) {
                 String comment = propertyDescription.value().trim();
-                if (platformServerAdapter.getPlatformType() == PlatformType.HYTALE) {
+                if (platformServerAdapterProvider.get().getPlatformType() == PlatformType.HYTALE) {
                     comment = Strings.CS.replace(comment, "/docs/", "/docs/hytale/");
                 }
 
