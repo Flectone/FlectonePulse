@@ -1,6 +1,6 @@
 enable: true
-avatar_api_url: "https://mc-heads.net/avatar/<skin>/8.png"
-body_api_url: "https://mc-heads.net/player/<skin>/16.png"
+avatar_api_url: ""
+body_api_url: ""
 advancedban:
   enable: true
   disable_flectonepulse_ban: true

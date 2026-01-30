@@ -692,8 +692,8 @@ stream:
     enable: true
     volume: 1.0
     pitch: 1.0
-    category: "BLOCK"
-    name: "minecraft:block.note_block.bell"
+    category: "UI"
+    name: "SFX_Avatar_Powers_Enable"
 symbol:
   enable: true
   per_page: 16

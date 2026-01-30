@@ -11,7 +11,7 @@ command:
     parse_number: "<color:#ff7171>Ожидался числовой аргумент, но ты ввёл <br><input>"
     parse_string: "<color:#ff7171>Ожидался строковый аргумент, но ты ввёл <br><input>"
     permission: "<color:#ff7171>У тебя нет прав на использование этой команды"
-    syntax: "<hover:show_text:\"<fcolor:2>Использовать <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Использование →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└"
+    syntax: "<hover:show_text:\"<fcolor:2>Использовать <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>-<br>| Использование -><br>| <fcolor:1>/<correct_syntax><br><fcolor:2>-"
   prompt:
     message: "сообщение"
     hard: "сложно?"
@@ -258,7 +258,7 @@ command:
     global:
       header: "<fcolor:2>| Муты: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
-      footer: "<br><fcolor:2>| <fcolor:2><click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
+      footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| Все муты: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
@@ -519,8 +519,8 @@ message:
       invisible: "<fcolor:2>[Invisible]"
     question_answer:
       questions:
-        server: "<fcolor:2>[Q&A] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!"
-        flectone: "<fcolor:2>[Q&A] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом"
+        server: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!"
+        flectone: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом"
     translate:
       action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>[<~>]"
   greeting:
