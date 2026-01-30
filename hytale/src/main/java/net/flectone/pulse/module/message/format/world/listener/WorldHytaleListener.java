@@ -33,7 +33,7 @@ public class WorldHytaleListener implements HytaleListener {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
             worldModule.update(fPlayer);
-        }, 10L);
+        }, 60L);
     }
 
 }
