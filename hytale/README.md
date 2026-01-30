@@ -45,26 +45,28 @@ join:
   format: "<gradient:#FF0000:#00FF00>&lHello</gradient> <rainbow><player></rainbow>!"
 ```
 
-![color](https://flectone.net/pulse/welcomemessage.png)
+![color](https://flectone.net/pulse/hytale/welcomemessage.png)
 
 ## 🧱 Message bubbles
 Visual message bubbles above players
 
-![Message Bubbles]()
+![Message Bubbles](https://flectone.net/pulse/hytale/bubble.gif)
 
 ## 🌍 Smart localization
+
+![Locale](https://flectone.net/pulse/hytale/locale.gif)
 
 ### How it works
 When `by_player: true` is enabled, FlectonePulse detects the client's language and displays messages in it. If no translation exists, the default from the config is used.
 
 ## ✨ Customizable elements
 
-| **Visual**                                                                | **Description** |  
-|---------------------------------------------------------------------------|-----------------|  
-| ![join](https://flectone.net/pulse/join.png)                              | **Join messages** <br> Greet players |  
-| ![death](https://flectone.net/pulse/deathserver.png)                      | **Death messages** <br> Make them fun with text or sounds |  
-| ![chat](https://flectone.net/pulse/chat.png)                              | **Chat formatting** <br> Enhance chat with colors, gradients and more |  
-| Full list in [documentation](https://flectone.net/pulse/docs/message/) 🔗 | ...                                                               |
+| **Visual**                                                                       | **Description** |  
+|----------------------------------------------------------------------------------|-----------------|  
+| ![join](https://flectone.net/pulse/hytale/join.png)                              | **Join messages** <br> Greet players |  
+| ![death](https://flectone.net/pulse/hytale/death.png)                            | **Death messages** <br> Make them fun with text or sounds |  
+| ![chat](https://flectone.net/pulse/hytale/chat.png)                              | **Chat formatting** <br> Enhance chat with colors, gradients and more |  
+| Full list in [documentation](https://flectone.net/pulse/docs/hytale/message/) 🔗 | ...                                                               |
 
 ## 🤝 Integrations
 
@@ -72,9 +74,9 @@ When `by_player: true` is enabled, FlectonePulse detects the client's language a
 
 | **Visual** | **Description**                                                          |  
 |---------|--------------------------------------------------------------------------|  
-| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/integration/discord/) | **Discord** <br> Sync server chat with Discord channels                  |  
-| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/integration/telegram/) | **Telegram** <br> Send messages via bot to Telegram and sync chats       |  
-| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/integration/twitch/) | **Twitch** <br> Stream notifications in Hytale chat and server chat sync |  
+| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/hytale/integration/discord/) | **Discord** <br> Sync server chat with Discord channels                  |  
+| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/hytale/integration/telegram/) | **Telegram** <br> Send messages via bot to Telegram and sync chats       |  
+| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/hytale/integration/twitch/) | **Twitch** <br> Stream notifications in Hytale chat and server chat sync |  
 
 ### Plugins
 
@@ -84,13 +86,12 @@ When `by_player: true` is enabled, FlectonePulse detects the client's language a
 
 ## 🎮 Over 30 commands
 
-| **Visual** | **Description** |  
-|--------------|------------------------|  
-| [![ball](https://flectone.net/pulse/commandball.png)](https://flectone.net/pulse/docs/command/) | **/ball** <br> Magic ball with many answers |  
-| [![tictactoe](https://flectone.net/pulse/commandtictactoe.png)](https://flectone.net/pulse/docs/command/) | **/tictactoe** <br> Tic-tac-toe |  
-| [![stream](https://flectone.net/pulse/commandstream.png)](https://flectone.net/pulse/docs/command/) | **/stream** <br> Stream notifications in chat |  
-| [![try](https://flectone.net/pulse/commandtry.png)](https://flectone.net/pulse/docs/command/) | **/try** <br> Test your luck from 0% to 100% |  
-| Full list in [documentation](https://flectone.net/pulse/docs/command/) 🔗              
+| **Visual**                                                                                                       | **Description** |  
+|------------------------------------------------------------------------------------------------------------------|------------------------|  
+| [![ball](https://flectone.net/pulse/hytale/commandball.png)](https://flectone.net/pulse/docs/hytale/command/)           | **/ball** <br> Magic ball with many answers |  
+| [![stream](https://flectone.net/pulse/hytale/commandstream.png)](https://flectone.net/pulse/docs/hytale/command/)       | **/stream** <br> Stream notifications in chat |  
+| [![try](https://flectone.net/pulse/hytale/commandtry.png)](https://flectone.net/pulse/docs/hytale/command/)             | **/try** <br> Test your luck from 0% to 100% |  
+| Full list in [documentation](https://flectone.net/pulse/docs/hytale/command/) 🔗                                        
 
 ## 🙏 Acknowledgments
 
@@ -102,7 +103,6 @@ FlectonePulse is built on these projects:
 - 🧙 **[Adventure Hytale](https://github.com/ArikSquad/adventure-platform-hytale)** — text formatting for Hytale
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — text formatting
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — commands with autocompletion
-- ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — task scheduling
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — symbols in chat
 - 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — legacy color conversion
 - 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — predecessor of FlectonePulse

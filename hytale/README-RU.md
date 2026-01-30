@@ -45,26 +45,28 @@ join:
   format: "<gradient:#FF0000:#00FF00>&lПривет</gradient> <rainbow><player></rainbow>!"
 ```
 
-![color](https://flectone.net/pulse/welcomemessage.png)
+![color](https://flectone.net/pulse/hytale/welcomemessage.png)
 
 ## 🧱 Сообщения над игроками
 Визуальные сообщения над головами игроков
 
-![Message Bubbles]()
+![Message Bubbles](https://flectone.net/pulse/hytale/bubble.gif)
 
 ## 🌍 Умная локализация
+
+![Locale](https://flectone.net/pulse/hytale/locale.gif)
 
 ### Как это работает
 При включённом `by_player: true` FlectonePulse определяет язык клиента и показывает сообщения на нём. Если перевода нет, будет использоваться дефолтный из конфига.
 
 ## ✨ Настраиваемые элементы
 
-| **Визуал**                                                                | **Описание** |  
-|---------------------------------------------------------------------------|-----------------|  
-| ![join](https://flectone.net/pulse/join.png)                              | **Сообщения о входе** <br> Приветствуйте игроков |  
-| ![death](https://flectone.net/pulse/deathserver.png)                      | **Сообщения о смерти** <br> Сделайте их забавными с текстом или звуками |  
-| ![chat](https://flectone.net/pulse/chat.png)                              | **Форматирование чата** <br> Улучшите чат с цветами, градиентами и другими возможностями |  
-| Полный список в [документации](https://flectone.net/pulse/docs/message/) 🔗 | ...                                                               |
+| **Визуал**                                                                         | **Описание** |  
+|------------------------------------------------------------------------------------|-----------------|  
+| ![join](https://flectone.net/pulse/hytale/join.png)                                | **Сообщения о входе** <br> Приветствуйте игроков |  
+| ![death](https://flectone.net/pulse/hytale/death.png)                              | **Сообщения о смерти** <br> Сделайте их забавными с текстом или звуками |  
+| ![chat](https://flectone.net/pulse/hytale/chat.png)                                | **Форматирование чата** <br> Улучшите чат с цветами, градиентами и другими возможностями |  
+| Полный список в [документации](https://flectone.net/pulse/docs/hytale/message/) 🔗 | ...                                                               |
 
 ## 🤝 Интеграции
 
@@ -72,9 +74,9 @@ join:
 
 | **Визуал** | **Описание** |  
 |---------|----------|  
-| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/integration/discord/) | **Discord** <br> Синхронизируйте чат сервера с каналами Discord |  
-| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/integration/telegram/) | **Telegram** <br> Отправляйте сообщения через бота в Telegram и синхронизируйте чаты |  
-| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/integration/twitch/) | **Twitch** <br> Уведомления о стримах в чате Hytale и синхронизация чата сервера |  
+| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/hytale/integration/discord/) | **Discord** <br> Синхронизируйте чат сервера с каналами Discord |  
+| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/hytale/integration/telegram/) | **Telegram** <br> Отправляйте сообщения через бота в Telegram и синхронизируйте чаты |  
+| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/hytale/integration/twitch/) | **Twitch** <br> Уведомления о стримах в чате Hytale и синхронизация чата сервера |  
 
 ### Плагины
 
@@ -86,11 +88,10 @@ join:
 
 | **Визуал** | **Описание** |  
 |--------------|------------------------|  
-| [![ball](https://flectone.net/pulse/commandball.png)](https://flectone.net/pulse/docs/command/) | **/ball** <br> Волшебный шар с множеством ответов |  
-| [![tictactoe](https://flectone.net/pulse/commandtictactoe.png)](https://flectone.net/pulse/docs/command/) | **/tictactoe** <br> Крестики-нолики |  
-| [![stream](https://flectone.net/pulse/commandstream.png)](https://flectone.net/pulse/docs/command/) | **/stream** <br> Уведомления о стримах в чате |  
-| [![try](https://flectone.net/pulse/commandtry.png)](https://flectone.net/pulse/docs/command/) | **/try** <br> Испытай удачу от 0% до 100% |  
-| Полный список в [документации](https://flectone.net/pulse/docs/command/) 🔗              
+| [![ball](https://flectone.net/pulse/hytale/commandball.png)](https://flectone.net/pulse/docs/hytale/command/) | **/ball** <br> Волшебный шар с множеством ответов |  
+| [![stream](https://flectone.net/pulse/hytale/commandstream.png)](https://flectone.net/pulse/docs/hytale/command/) | **/stream** <br> Уведомления о стримах в чате |  
+| [![try](https://flectone.net/pulse/hytale/commandtry.png)](https://flectone.net/pulse/docs/hytale/command/) | **/try** <br> Испытай удачу от 0% до 100% |  
+| Полный список в [документации](https://flectone.net/pulse/docs/hytale/command/) 🔗              
 
 ## 🙏 Благодарности
 
@@ -102,7 +103,6 @@ FlectonePulse Hytale основан на этих проектах:
 - 🧙 **[Adventure Hytale](https://github.com/ArikSquad/adventure-platform-hytale)** — форматирование текста для Hytale
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — форматирование текста
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — команды с автодополнением
-- ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — планирование задач
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — символы в чате
 - 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — конвертация устаревших цветов
 - 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — предок FlectonePulse
