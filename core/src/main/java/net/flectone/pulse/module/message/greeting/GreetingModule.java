@@ -12,7 +12,6 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
-import net.flectone.pulse.module.message.greeting.model.GreetingMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -61,28 +60,33 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
-
         try {
-            List<String> pixels = fImage.convertImageUrl();
 
-            sendMessage(GreetingMetadata.<Localization.Message.Greeting>builder()
-                    .base(EventMetadata.<Localization.Message.Greeting>builder()
-                            .sender(fPlayer)
-                            .format(s -> {
-                                String greetingMessage = String.join("<br>", localization(fPlayer).format());
+            sendMessage(EventMetadata.<Localization.Message.Greeting>builder()
+                    .sender(fPlayer)
+                    .format(s -> {
+                        String format = s.format();
+                        if (!format.contains("[#][#][#][#][#][#][#][#]")) return format;
 
-                                for (String pixel : pixels) {
-                                    greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
-                                }
+                        try {
+                            FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
 
-                                return greetingMessage;
-                            })
-                            .destination(config().destination())
-                            .sound(soundOrThrow())
-                            .build()
-                    )
-                    .pixels(pixels)
+                            List<String> pixels = fImage.convertImageUrl();
+
+                            String greetingMessage = String.join("<br>", s.format());
+
+                            for (String pixel : pixels) {
+                                greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
+                            }
+
+                            return greetingMessage;
+                        } catch (Exception ignored) {
+                            return format;
+                        }
+
+                    })
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
                     .build()
             );
 
