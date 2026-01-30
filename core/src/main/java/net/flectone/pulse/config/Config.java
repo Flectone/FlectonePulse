@@ -51,7 +51,7 @@ public record Config(
         @JsonPropertyDescription("https://flectone.net/pulse/docs/config/cache")
         Cache cache,
 
-        @JsonPropertyDescription("Help us improve FlectonePulse! This collects basic, anonymous data like server version and module usage. \nNo personal data, No IPs, No player names. \nThis helps us understand what features matter most and focus development where it's needed. \nYou can see the public stats here: https://flectone.net/pulse/metrics/ \nThanks for supporting the project! ❤️")
+        @JsonPropertyDescription("Help us improve FlectonePulse! This collects basic, anonymous data like server version and module usage. \nNo personal data, No IPs, No player names. \nThis helps us understand what features matter most and focus development where it's needed. \nYou can see the public stats here: https://flectone.net/pulse/docs/metrics/ \nThanks for supporting the project! ❤️")
         Metrics metrics
 
 ) {
