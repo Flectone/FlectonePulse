@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Scanner;
 
 @Singleton
@@ -123,7 +124,13 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         try {
             if (response.offset() != null) {
                 int offsetSeconds = response.offset();
-                return timeFormatter.formatDate(Instant.now().plusSeconds(offsetSeconds).toEpochMilli());
+                return timeFormatter.formatDate(Instant.now()
+                        .atZone(ZoneId.of("UTC"))
+                        .withZoneSameLocal(ZoneId.systemDefault())
+                        .plusSeconds(offsetSeconds)
+                        .toInstant()
+                        .toEpochMilli()
+                );
             }
         } catch (Exception e) {
             fLogger.warning(e);
