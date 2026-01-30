@@ -59,20 +59,20 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot ban a player with equal or higher permissions"
     reasons:
       default: "You have been banned from this server"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>has banned <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>has banned <fcolor:2><player> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] BAN<fcolor:1><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    connection_attempt: "<color:#ff7171>[!] Banned <fcolor:2><player> <fcolor:1>tried to log in <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    connection_attempt: "<color:#ff7171>[!] Banned <fcolor:2><player> <fcolor:1><br>Remaining time: <time_left>"
   banlist:
     empty: "<color:#98FB98>No bans found"
     null_page: "<color:#ff7171>This page doesn't exist"
     null_player: "<color:#ff7171>This player does not exist"
     global:
       header: "<fcolor:2>| Bans: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unban <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <fcolor:2><click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| All bans: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unban <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   broadcast:
     format: "<br><color:#ffd500>| [!] Message for everyone <br>|<br>| Author <display_name> <br>|<br>| <fcolor:1><message> <br>"
@@ -220,7 +220,7 @@ command:
     empty: "<color:#98FB98>[+] You don't ignore anyone"
     null_page: "<color:#ff7171>This page doesn't exist"
     header: "<fcolor:2>| Ignores: <count><br>"
-    line: "<hover:show_text:\"<fcolor:1>Click to unignore <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1>Date: <date>"
+    line: "<color:#ff7171>[X] <target> <fcolor:1>Date: <date>"
     footer: "<br><fcolor:2>| <fcolor:2><click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   kick:
     null_player: "<color:#ff7171>This player does not exist"
@@ -249,7 +249,7 @@ command:
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "You have been muted on this server"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>has muted <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>has muted <fcolor:2><player> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are muted, <time_left> left"
   mutelist:
     empty: "<color:#98FB98>No mutes found"
@@ -257,11 +257,11 @@ command:
     null_player: "<color:#ff7171>This player does not exist"
     global:
       header: "<fcolor:2>| Mutes: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_localization.command:\"<localization.command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <fcolor:2><click:run_localization.command:\"<localization.command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_localization.command:\"<localization.command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| All mutes: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   online:
     null_player: "<color:#ff7171>This player does not exist"
@@ -398,7 +398,7 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot warn a player with equal or higher permissions"
     reasons:
       default: "You have been warned on this server"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>gave a warning to <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>[!] <fcolor:2><moderator> <fcolor:1>gave a warning to <fcolor:2><player> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are warned a <time>"
   warnlist:
     empty: "<color:#98FB98>No warns found"
@@ -406,11 +406,11 @@ command:
     null_player: "<color:#ff7171>This player does not exist"
     global:
       header: "<fcolor:2>| Warns: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
     player:
       header: "<fcolor:2>| All warns: <count> <br>"
-      line: "<hover:show_text:\"<fcolor:1>Click to unwarn <target>\"><click:run_command:\"<command>\"><color:#ff7171>[X] <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+      line: "<color:#ff7171>[X] <target> Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
 integration:
   discord:
@@ -478,9 +478,9 @@ message:
       local: "<delete><display_name><fcolor:3>: <message>"
   format:
     object:
-      default_symbol: "[ ]"
+      default_symbol: ""
     replacement:
-      spoiler_symbol: "█"
+      spoiler_symbol: "-"
       values:
         ping: "<fcolor:2><value>"
         tps: "<fcolor:2><value>"

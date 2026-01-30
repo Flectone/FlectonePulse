@@ -238,7 +238,7 @@ format:
     enable: true
     name_visible: true
     color: "<white>"
-    prefix: "<vault_prefix><stream_prefix> "
+    prefix: "<vault_prefix><stream_prefix> <white>"
     suffix: " <afk_suffix><vault_suffix>"
     ticker:
       enable: false
