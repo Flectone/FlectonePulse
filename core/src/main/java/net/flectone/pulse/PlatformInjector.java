@@ -45,7 +45,7 @@ public abstract class PlatformInjector extends AbstractModule {
     private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
 
-    public PlatformInjector(Path projectPath, LibraryResolver libraryResolver, FLogger fLogger) {
+    protected PlatformInjector(Path projectPath, LibraryResolver libraryResolver, FLogger fLogger) {
         this.projectPath = projectPath;
         this.libraryResolver = libraryResolver;
         this.fLogger = fLogger;
