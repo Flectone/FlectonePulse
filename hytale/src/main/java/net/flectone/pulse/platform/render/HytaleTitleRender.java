@@ -27,9 +27,9 @@ public class HytaleTitleRender implements TitleRender {
                 HytaleComponentSerializer.get().serialize(subTitle),
                 true,
                 null,
-                times.stayTicks(),
-                times.fadeInTicks(),
-                times.fadeOutTicks()
+                (float) times.stayTicks() / 20,
+                (float) times.fadeInTicks() / 20,
+                (float) times.fadeOutTicks() / 20
         );
 
     }
