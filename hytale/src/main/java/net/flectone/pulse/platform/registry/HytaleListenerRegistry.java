@@ -55,7 +55,6 @@ public class HytaleListenerRegistry extends ListenerRegistry {
 
         if (!basePacketsRegistered) {
             HytaleBaseListener hytaleBaseListener = injector.getInstance(HytaleBaseListener.class);
-            registerInboundWatcher(hytaleBaseListener.createDisconnectWatcher());
             registerInboundWatcher(hytaleBaseListener.createUpdateLanguageWatcher());
             basePacketsRegistered = true;
         }

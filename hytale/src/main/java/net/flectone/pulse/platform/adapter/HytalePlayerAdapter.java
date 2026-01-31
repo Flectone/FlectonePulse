@@ -454,10 +454,6 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         if (playerRef == null) return;
 
         playerRef.getPacketHandler().disconnect(PlainTextComponentSerializer.plainText().serialize(reason));
-
-        // I don't understand why Disconnect packet doesn't call when a player kicks,
-        // so he will call it themselves
-        hytaleBaseListenerProvider.get().onPlayerDisconnect(fPlayer.getUuid());
     }
 
     @Nullable
