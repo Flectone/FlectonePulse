@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.PotionUtil;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -33,6 +34,6 @@ public class NamesPulseListener implements PulseListener {
 
     private boolean isInvisible(FEntity entity) {
         return namesModule.config().shouldCheckInvisibility()
-                && platformPlayerAdapter.hasPotionEffect(entity, "INVISIBILITY");
+                && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME);
     }
 }

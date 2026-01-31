@@ -33,6 +33,7 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -361,7 +362,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.getUuid());
 
         return !platformPlayerAdapter.getGamemode(sender).equals(GameMode.SPECTATOR.name())
-                && !platformPlayerAdapter.hasPotionEffect(sender, "INVISIBILITY")
+                && !platformPlayerAdapter.hasPotionEffect(sender, PotionUtil.INVISIBILITY_POTION_NAME)
                 && textScreenRender.getPassengers(sender.getUuid()).isEmpty()
                 && passengers.isEmpty();
     }

@@ -14,7 +14,6 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.AttributesProvider;
@@ -202,7 +201,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return false;
 
-        PotionType potion = PotionTypes.getByName(potionType);
+        PotionType potion = PotionTypes.getByName(potionType.toLowerCase());
         if (potion == null) return false;
 
         return player.hasPotionEffect(SpigotConversionUtil.toBukkitPotionEffectType(potion));

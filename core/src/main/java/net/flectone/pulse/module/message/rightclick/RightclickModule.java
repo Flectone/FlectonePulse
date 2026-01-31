@@ -14,6 +14,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -61,7 +62,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
             FPlayer fTarget = fPlayerService.getFPlayer(targetUUID);
             if (fTarget.isUnknown()) return;
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
-            if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, "INVISIBILITY")) return;
+            if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionUtil.INVISIBILITY_POTION_NAME)) return;
 
             sendMessage(EventMetadata.<Localization.Message.Rightclick>builder()
                     .sender(fPlayer)
