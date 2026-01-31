@@ -23,8 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BackupCreator {
 
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
-
+    private final SimpleDateFormat simpleDataFormat;
     private final SystemVariableResolver systemVariableResolver;
     private final @Named("projectPath") Path projectPath;
     private final @Named("backupPath") Path backupPath;
@@ -60,7 +59,7 @@ public class BackupCreator {
             }
             case MYSQL, MARIADB, POSTGRESQL -> {
                 try {
-                    String backupFileName = databaseName + "_" + SIMPLE_DATE_FORMAT.format(new Date()) + ".sql";
+                    String backupFileName = databaseName + "_" + simpleDataFormat.format(new Date()) + ".sql";
                     Path backupPath = resolveBackupPath(backupFileName);
 
                     String host = systemVariableResolver.substituteEnvVars(database.host());
@@ -136,7 +135,7 @@ public class BackupCreator {
     }
 
     private void backup(String fileName, Path pathToFile) {
-        String newFileName = fileName + "_" + SIMPLE_DATE_FORMAT.format(new Date());
+        String newFileName = fileName + "_" + simpleDataFormat.format(new Date());
         Path backupFilePath = resolveBackupPath(newFileName);
 
         try {

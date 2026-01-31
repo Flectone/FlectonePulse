@@ -36,6 +36,7 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -69,6 +70,9 @@ public abstract class PlatformInjector extends AbstractModule {
         // create jackson mapper
         bind(ObjectMapper.class).toInstance(createMapper());
         bind(ObjectMapper.class).annotatedWith(Names.named("defaultMapper")).toInstance(new ObjectMapper());
+
+        // bind date format
+        bind(SimpleDateFormat.class).toInstance(new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss"));
 
         // platform binding
         setupPlatform(reflectionResolver);
