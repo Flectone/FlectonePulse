@@ -195,6 +195,7 @@ format:
     player_head: true
     sprite: true
     need_extra_space: true
+    hide_invisible_player_head: false
   question_answer:
     enable: false
     questions:

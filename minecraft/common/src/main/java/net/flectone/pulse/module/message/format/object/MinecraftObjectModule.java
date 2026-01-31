@@ -10,12 +10,14 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -37,6 +39,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final MinecraftSkinService skinService;
     private final PacketProvider packetProvider;
     private final IntegrationModule integrationModule;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
@@ -46,6 +49,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  MinecraftSkinService skinService,
                                  PacketProvider packetProvider,
                                  IntegrationModule integrationModule,
+                                 PlatformPlayerAdapter platformPlayerAdapter,
                                  @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
         super(fileFacade);
 
@@ -54,7 +58,8 @@ public class MinecraftObjectModule extends ObjectModule {
         this.skinService = skinService;
         this.packetProvider = packetProvider;
         this.integrationModule = integrationModule;
-        isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
     }
 
     @Override
@@ -85,6 +90,10 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createPlayerHeadTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
+        if (config().hideInvisiblePlayerHead()
+                && !messageContext.isFlag(MessageFlag.USER_MESSAGE)
+                && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return Tag.selfClosingInserting(Component.empty());
+
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent);
         if (receiverVersionTag != null) return receiverVersionTag;
 

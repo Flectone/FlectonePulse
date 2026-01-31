@@ -425,7 +425,8 @@ public record Message(
                 Boolean enable,
                 Boolean playerHead,
                 Boolean sprite,
-                Boolean needExtraSpace
+                Boolean needExtraSpace,
+                Boolean hideInvisiblePlayerHead
         ) implements EnableSetting {
         }
 
