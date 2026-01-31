@@ -1,5 +1,6 @@
 package net.flectone.pulse;
 
+import com.google.inject.Injector;
 import net.flectone.pulse.exception.ReloadException;
 
 /**
@@ -26,31 +27,16 @@ import net.flectone.pulse.exception.ReloadException;
 public interface FlectonePulse {
 
     /**
-     * Retrieves an instance of the specified class through dependency injection.
-     * Uses Google Guice as the underlying dependency injection framework.
+     * Gets the Google Guice Injector instance used for dependency injection.
+     * This injector is responsible for creating and managing instances of
+     * FlectonePulse components and services.
      *
-     * <p><b>Note:</b> Most FlectonePulse classes (except models) are marked with {@code @Singleton}.
-     *
-     * @param <T> the type of instance to retrieve
-     * @param type the class of the instance to retrieve
-     * @return an instance of the requested type
-     * @throws IllegalStateException if the injector is not ready
+     * @return the Injector instance, or {@code null} if not initialized
      *
      * @see #isReady()
-     */
-    <T> T get(Class<T> type);
-
-    /**
-     * Checks if the dependency injector is ready to provide instances.
-     *
-     * <p><b>Important:</b> Always call this method before {@link #get(Class)}
-     * to ensure the injector has been properly initialized.
-     *
-     * @return {@code true} if the injector is ready, {@code false} otherwise
-     *
      * @see #get(Class)
      */
-    boolean isReady();
+    Injector getInjector();
 
     /**
      * Called when the FlectonePulse is enabled.
@@ -81,5 +67,62 @@ public interface FlectonePulse {
      * @see ReloadException
      */
     void reload() throws ReloadException;
+
+    /**
+     * Initialize the PacketAdapter API.
+     */
+    void initPacketAdapter();
+
+    /**
+     * Terminates PacketAdapter API if initialization failed.
+     * Prevents errors when FlectonePulse fails to start.
+     */
+    void terminateFailedPacketAdapter();
+
+    /**
+     * Terminates the PacketAdapter API and cleans up related resources.
+     */
+    void terminatePacketAdapter();
+
+    /**
+     * Closes all open user interfaces including inventories and dialogs.
+     */
+    void closeUIs();
+
+    /**
+     * Retrieves an instance of the specified class through dependency injection.
+     * Uses Google Guice as the underlying dependency injection framework.
+     *
+     * <p><b>Note:</b> Most FlectonePulse classes (except models) are marked with {@code @Singleton}.
+     *
+     * @param <T> the type of instance to retrieve
+     * @param type the class of the instance to retrieve
+     * @return an instance of the requested type
+     * @throws IllegalStateException if the injector is not ready
+     *
+     * @see #isReady()
+     */
+    default <T> T get(Class<T> type) {
+        Injector injector = getInjector();
+        if (injector == null) {
+            throw new IllegalStateException("FlectonePulse not initialized yet");
+        }
+
+        return injector.getInstance(type);
+    }
+
+    /**
+     * Checks if the dependency injector is ready to provide instances.
+     *
+     * <p><b>Important:</b> Always call this method before {@link #get(Class)}
+     * to ensure the injector has been properly initialized.
+     *
+     * @return {@code true} if the injector is ready, {@code false} otherwise
+     *
+     * @see #get(Class)
+     */
+    default boolean isReady() {
+        return getInjector() != null;
+    }
 
 }

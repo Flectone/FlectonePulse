@@ -1,12 +1,16 @@
 package net.flectone.pulse;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.Stage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
+import net.flectone.pulse.platform.controller.DialogController;
+import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -33,52 +37,67 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         libraryResolver.loadLibraries();
 
         // configure packetevents api
-        MinecraftFlectonePulse.configurePacketEvents();
+        System.setProperty("packetevents.nbt.default-max-size", "2097152");
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
 
         // create guice injector for dependency injection
-        injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
+        injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, this, libraryResolver, fLogger));
 
         PacketEvents.getAPI().load();
-    }
-
-    @Override
-    public <T> T get(Class<T> type) {
-        if (injector == null) {
-            throw new IllegalStateException("FlectonePulse not initialized yet");
-        }
-
-        return injector.getInstance(type);
-    }
-
-    @Override
-    public boolean isReady() {
-        return injector != null;
     }
 
     @Override
     public void onEnable() {
         if (!isReady()) return;
 
-        injector.getInstance(MinecraftFlectonePulse.class).onEnable();
+        get(FlectonePulseAPI.class).onEnable();
     }
 
     @Override
     public void onDisable() {
         if (!isReady()) {
-            MinecraftFlectonePulse.terminateFailedPacketEvents();
+            terminateFailedPacketAdapter();
             return;
         }
 
-        injector.getInstance(MinecraftFlectonePulse.class).onDisable();
+        get(FlectonePulseAPI.class).onDisable();
     }
 
     @Override
     public void reload() throws ReloadException {
         if (!isReady()) return;
 
-        injector.getInstance(MinecraftFlectonePulse.class).reload();
+        get(FlectonePulseAPI.class).reload();
+    }
+
+    @Override
+    public void initPacketAdapter() {
+        PacketEvents.getAPI().init();
+    }
+
+    @Override
+    public void terminateFailedPacketAdapter() {
+        try {
+            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
+            if (!packetEventsAPI.isInitialized()) {
+                packetEventsAPI.getInjector().uninject();
+            }
+        } catch (Exception ignored) {
+            // ignore
+        }
+    }
+
+    @Override
+    public void terminatePacketAdapter() {
+        PacketEvents.getAPI().terminate();
+    }
+
+    @Override
+    public void closeUIs() {
+        // close all open inventories
+        injector.getInstance(InventoryController.class).closeAll();
+        injector.getInstance(DialogController.class).closeAll();
     }
 
 }
