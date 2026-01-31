@@ -515,6 +515,7 @@ message:
         reason: "Ты ещё слишком новичок"
       swear:
         symbol: "*"
+        format_see: "<symbols>"
     names:
       constant: []
       display:

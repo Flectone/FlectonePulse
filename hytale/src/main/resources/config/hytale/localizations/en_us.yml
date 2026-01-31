@@ -512,6 +512,7 @@ message:
         reason: "You're still too new"
       swear:
         symbol: "*"
+        format_see: "<symbols>"
     names:
       constant: []
       display:

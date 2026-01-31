@@ -1055,7 +1055,7 @@ public record Localization(
                 @With
                 @Builder(toBuilder = true)
                 @Jacksonized
-                public record Swear(String symbol) implements LocalizationSetting {}
+                public record Swear(String symbol, String formatSee) implements LocalizationSetting {}
             }
 
             @With

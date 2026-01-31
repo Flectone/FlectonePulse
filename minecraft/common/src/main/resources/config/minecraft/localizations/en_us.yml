@@ -541,6 +541,7 @@ message:
         reason: "You're still too new"
       swear:
         symbol: "❤"
+        format_see: "<hover:show_text:\"<swear>\"><symbols></hover>"
     names:
       constant: []
       display:

@@ -24,8 +24,8 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Locale;
@@ -126,16 +126,21 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             String swear = swearTag.value();
             if (swear.isBlank()) return Tag.selfClosingInserting(Component.empty());
 
-            String symbols = localization(receiver).symbol().repeat(swear.length());
+            Localization.Message.Format.Moderation.Swear localization = localization(receiver);
+            String symbols = localization.symbol().repeat(swear.length());
 
-            MessageContext tagContext = messagePipeline.createContext(sender, receiver, symbols)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.USER_MESSAGE, false);
-
-            Component component = messagePipeline.build(tagContext);
-
+            Component component;
             if (permissionChecker.check(receiver, permission().see())) {
-                component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));
+                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, localization.formatSee())
+                        .withFlags(messageContext.flags())
+                        .addFlag(MessageFlag.USER_MESSAGE, false)
+                        .addTagResolvers(Placeholder.parsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                );
+            } else {
+                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, symbols)
+                        .withFlags(messageContext.flags())
+                        .addFlag(MessageFlag.USER_MESSAGE, false)
+                );
             }
 
             return Tag.selfClosingInserting(component);
