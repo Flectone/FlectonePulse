@@ -54,12 +54,10 @@ public class HytaleBaseListener implements HytaleListener {
     // PlayerReadyEvent is called every time you move from portal to portal, this causes duplication
     // then use PlayerConnectEvent
     public void onPlayerConnectEvent(PlayerConnectEvent event) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayerRef().getUuid());
+        PlayerRef playerRef = event.getPlayerRef();
+        FPlayer fPlayer = fPlayerService.getFPlayer(playerRef.getUuid());
 
-        Object player = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
-        if (player instanceof PlayerRef playerRef) {
-            fPlayerService.updateLocale(fPlayer, languageFormat(playerRef.getLanguage()));
-        }
+        fPlayerService.updateLocale(fPlayer, languageFormat(playerRef.getLanguage()));
 
         eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
         eventDispatcher.dispatch(new PlayerJoinEvent(fPlayer));
