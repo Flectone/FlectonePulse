@@ -132,10 +132,18 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             return Tag.inserting(constants.get(constantIndex));
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, context) -> {
+                            int displayNameIndex = 0;
+                            if (argumentQueue.hasNext()) {
+                                displayNameIndex = argumentQueue.pop().asInt().orElse(0);
+                                if (displayNameIndex > localization().display().size()) {
+                                    displayNameIndex = 0;
+                                }
+                            }
+
                             Localization.Message.Format.Names localization = localization(receiver);
-                            String displayName = fPlayer.isUnknown()
+                            String displayName = fPlayer.isUnknown() || localization.display().isEmpty()
                                     ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
-                                    : localization.display();
+                                    : localization.display().get(displayNameIndex);
 
                             MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
                                     .withFlags(messageContext.flags())

@@ -465,12 +465,12 @@ public class FileMigrator {
 
         for (Localization localization : files.localizations().values()) {
 
-            String newDisplay = Strings.CS.replace(localization.message().format().names().display(), "<player_head>", "<white><player_head></white>");
+            String newDisplay = Strings.CS.replace(localization.message().format().names().display().getFirst(), "<player_head>", "<white><player_head></white>");
             String newPlayerlistname = Strings.CS.replace(localization.message().tab().playerlistname().format(), "<player_head>", "<white><player_head></white>");
 
             newLocalizations.put(localization.language(),
                     localization.withMessage(localization.message()
-                            .withFormat(localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplay)))
+                            .withFormat(localization.message().format().withNames(localization.message().format().names().withDisplay(List.of(newDisplay))))
                             .withTab(localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerlistname)))
                     )
             );

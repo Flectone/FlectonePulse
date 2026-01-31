@@ -1059,7 +1059,7 @@ public record Localization(
             @Jacksonized
             public record Names(
                     List<String> constant,
-                    String display,
+                    List<String> display,
                     String entity,
                     String unknown,
                     String invisible

@@ -26,6 +26,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 
@@ -217,15 +218,21 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         if (!isEnable() || target == null) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            MessageContext messageContext = messagePipeline.createContext(target, receiver, formatTarget);
-            Component component = messagePipeline.build(messageContext);
+            int targetIndex = 0;
+            if (argumentQueue.hasNext()) {
+                targetIndex = argumentQueue.pop().asInt().orElse(0);
+            }
+            
+            MessageContext messageContext = messagePipeline.createContext(target, receiver,
+                    Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex))
+            );
 
-            return Tag.selfClosingInserting(component);
+            return Tag.selfClosingInserting(messagePipeline.build(messageContext));
         });
     }
 
     public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
-        return targetTag(tag, "<display_name>", receiver, target);
+        return targetTag(tag, "<display_name:<index>>", receiver, target);
     }
 
     public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
