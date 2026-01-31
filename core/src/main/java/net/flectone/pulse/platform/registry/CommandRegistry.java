@@ -30,6 +30,11 @@ import java.util.function.Function;
 public interface CommandRegistry extends Registry {
 
     /**
+     * Initializes the command manager and registers exception handlers.
+     */
+    void init();
+
+    /**
      * Registers a new command using the provided builder function.
      *
      * @param builder function that creates a command builder using the CommandManager

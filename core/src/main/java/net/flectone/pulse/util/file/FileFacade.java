@@ -4,7 +4,6 @@ package net.flectone.pulse.util.file;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.entity.FEntity;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FileFacade {
 
     private final FileLoader fileLoader;
@@ -34,6 +32,22 @@ public class FileFacade {
     private FilePack files;
     private Localization defaultLocalization;
 
+    @Inject
+    public FileFacade(FileLoader fileLoader,
+                      FileWriter fileWriter,
+                      FileMigrator fileMigrator,
+                      FilePathProvider filePathProvider,
+                      BackupCreator backupCreator,
+                      VersionComparator versionComparator) throws IOException {
+        this.fileLoader = fileLoader;
+        this.fileWriter = fileWriter;
+        this.fileMigrator = fileMigrator;
+        this.filePathProvider = filePathProvider;
+        this.backupCreator = backupCreator;
+        this.versionComparator = versionComparator;
+
+        reload();
+    }
 
     public void reload() throws IOException {
         fileLoader.init();

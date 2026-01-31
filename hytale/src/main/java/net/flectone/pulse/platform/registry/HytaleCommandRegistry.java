@@ -26,15 +26,25 @@ import java.util.function.Function;
 public class HytaleCommandRegistry implements CommandRegistry {
 
     private final PermissionChecker permissionChecker;
-    private final CommandManager<FPlayer> manager;
+    private final FPlayerMapper fPlayerMapper;
+    private final JavaPlugin javaPlugin;
+    private final CommandExceptionHandler commandExceptionHandler;
+
+    private CommandManager<FPlayer> manager;
 
     @Inject
     public HytaleCommandRegistry(PermissionChecker permissionChecker,
                                  FPlayerMapper fPlayerMapper,
-                                 CommandExceptionHandler commandExceptionHandler,
-                                 JavaPlugin javaPlugin) {
+                                 JavaPlugin javaPlugin,
+                                 CommandExceptionHandler commandExceptionHandler) {
         this.permissionChecker = permissionChecker;
+        this.fPlayerMapper = fPlayerMapper;
+        this.javaPlugin = javaPlugin;
+        this.commandExceptionHandler = commandExceptionHandler;
+    }
 
+    @Override
+    public void init() {
         this.manager = new HytaleCommandManager(ExecutionCoordinator.asyncCoordinator(), new HytaleRegistrationHandler(), fPlayerMapper, javaPlugin);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);

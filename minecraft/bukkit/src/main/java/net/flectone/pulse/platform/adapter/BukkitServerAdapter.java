@@ -59,7 +59,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
-    private final FileFacade fileFacade;
+    private final Provider<FileFacade> fileFacadeProvider;
     private final PaperItemStackUtil paperItemStackUtil;
     private final TaskScheduler taskScheduler;
 
@@ -301,7 +301,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         // This is a shitty Paper-only hack. No idea when it'll break. Admins can enable it, but it is disabled by default
         // Pray PacketEvents merges https://github.com/retrooper/packetevents/pull/1277
-        if (reflectionResolver.isPaper() && fileFacade.config().module().usePaperMessageSender() && translatable) {
+        if (reflectionResolver.isPaper() && fileFacadeProvider.get().config().module().usePaperMessageSender() && translatable) {
             String itemMark = paperItemStackUtil.saveItem(messageUUID, itemStack);
 
             return Component.text(itemMark)

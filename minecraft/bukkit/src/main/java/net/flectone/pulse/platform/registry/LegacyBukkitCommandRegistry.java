@@ -2,7 +2,6 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
@@ -25,11 +24,14 @@ import java.util.function.Function;
 @Singleton
 public class LegacyBukkitCommandRegistry implements MinecraftCommandRegistry {
 
-    private final Config config;
+    private final FileFacade fileFacade;
     private final Plugin plugin;
     private final ReflectionResolver reflectionResolver;
     private final TaskScheduler taskScheduler;
-    protected final LegacyPaperCommandManager<FPlayer> manager;
+    private final FPlayerMapper fPlayerMapper;
+    private final CommandExceptionHandler commandExceptionHandler;
+
+    protected LegacyPaperCommandManager<FPlayer> manager;
 
     @Inject
     public LegacyBukkitCommandRegistry(FileFacade fileFacade,
@@ -38,10 +40,16 @@ public class LegacyBukkitCommandRegistry implements MinecraftCommandRegistry {
                                        ReflectionResolver reflectionResolver,
                                        TaskScheduler taskScheduler,
                                        FPlayerMapper fPlayerMapper) {
-        this.config = fileFacade.config();
+        this.fileFacade = fileFacade;
         this.plugin = plugin;
+        this.fPlayerMapper = fPlayerMapper;
         this.taskScheduler = taskScheduler;
         this.reflectionResolver = reflectionResolver;
+        this.commandExceptionHandler = commandExceptionHandler;
+    }
+
+    @Override
+    public void init() {
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
@@ -63,7 +71,7 @@ public class LegacyBukkitCommandRegistry implements MinecraftCommandRegistry {
                 .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
 
         boolean needUnregister = plugin.getServer().getPluginCommand(commandName) != null
-                || config.command().unregisterOnReload() && isCloudCommand;
+                || fileFacade.config().command().unregisterOnReload() && isCloudCommand;
 
         if (needUnregister) {
             unregisterCommand(commandName);
@@ -90,7 +98,7 @@ public class LegacyBukkitCommandRegistry implements MinecraftCommandRegistry {
 
     @Override
     public void reload() {
-        if (!config.command().unregisterOnReload()) return;
+        if (!fileFacade.config().command().unregisterOnReload()) return;
 
         if (reflectionResolver.isPaper()) {
             unregisterCommands();

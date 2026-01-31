@@ -21,6 +21,11 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
                                        TaskScheduler taskScheduler,
                                        FPlayerMapper fPlayerMapper) {
         super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, taskScheduler, fPlayerMapper);
+    }
+
+    @Override
+    public void init() {
+        super.init();
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             manager.registerBrigadier();

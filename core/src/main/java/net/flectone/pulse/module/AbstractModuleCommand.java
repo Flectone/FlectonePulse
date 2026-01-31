@@ -1,6 +1,7 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.setting.CommandSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
@@ -23,13 +24,13 @@ public abstract class AbstractModuleCommand<M extends LocalizationSetting> exten
     private final List<String> prompts = new ArrayList<>();
 
     @Inject private FileFacade fileFacade;
-    @Inject private CommandRegistry commandParserProvider;
+    @Inject private Provider<CommandRegistry> commandRegistryProvider;
 
     protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
         List<String> aliases = config().aliases();
         String commandName = getCommandName();
 
-        commandParserProvider.registerCommand(manager ->
+        commandRegistryProvider.get().registerCommand(manager ->
                 commandBuilderOperator
                         .apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty()))
                         .handler(this)
@@ -37,7 +38,7 @@ public abstract class AbstractModuleCommand<M extends LocalizationSetting> exten
     }
 
     protected void registerCustomCommand(Function<CommandManager<FPlayer>, org.incendo.cloud.Command.Builder<FPlayer>> builder) {
-        commandParserProvider.registerCommand(builder);
+        commandRegistryProvider.get().registerCommand(builder);
     }
 
     // all prompt methods for solving the problems of a non-existent argument

@@ -4,7 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -14,12 +13,18 @@ import java.util.EnumMap;
 import java.util.Map;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CacheRegistry {
 
     private final Map<CacheName, Cache<?, ?>> cacheMap = new EnumMap<>(CacheName.class);
 
     private final FileFacade fileFacade;
+
+    @Inject
+    public CacheRegistry(FileFacade fileFacade) {
+        this.fileFacade = fileFacade;
+
+        init();
+    }
 
     public void init() {
         Arrays.stream(CacheName.values()).forEach(this::create);

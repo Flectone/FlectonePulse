@@ -27,7 +27,10 @@ public class FabricCommandRegistry implements MinecraftCommandRegistry {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PermissionChecker permissionChecker;
-    private final CommandManager<FPlayer> manager;
+    private final FPlayerMapper fPlayerMapper;
+    private final CommandExceptionHandler commandExceptionHandler;
+
+    private CommandManager<FPlayer> manager;
 
     @Inject
     public FabricCommandRegistry(FabricFlectonePulse fabricFlectonePulse,
@@ -36,7 +39,12 @@ public class FabricCommandRegistry implements MinecraftCommandRegistry {
                                  FPlayerMapper fPlayerMapper) {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
+        this.fPlayerMapper = fPlayerMapper;
+        this.commandExceptionHandler = commandExceptionHandler;
+    }
 
+    @Override
+    public void init() {
         this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
