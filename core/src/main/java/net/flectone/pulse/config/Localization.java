@@ -396,10 +396,14 @@ public record Localization(
         public record Flectonepulse(
                 String nullHostEditor,
                 String nullPortEditor,
+                String nullFile,
+                String fileExist,
+                String formatStarting,
                 String formatFalse,
                 String formatTrue,
-                String formatWebStarting,
-                String formatEditor
+                String formatEditor,
+                String formatExport,
+                String formatImport
         ) implements LocalizationSetting {}
 
         @With
