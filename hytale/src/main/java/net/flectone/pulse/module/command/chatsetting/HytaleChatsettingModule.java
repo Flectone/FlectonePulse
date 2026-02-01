@@ -1,7 +1,10 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.module.command.chatsetting.builder.HytaleMenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -14,6 +17,8 @@ import net.flectone.pulse.util.file.FileFacade;
 @Singleton
 public class HytaleChatsettingModule extends ChatsettingModule {
 
+    private final Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider;
+
     @Inject
     public HytaleChatsettingModule(FileFacade fileFacade,
                                    FPlayerService fPlayerService,
@@ -21,13 +26,17 @@ public class HytaleChatsettingModule extends ChatsettingModule {
                                    CommandParserProvider commandParserProvider,
                                    ProxySender proxySender,
                                    ProxyRegistry proxyRegistry,
-                                   SoundPlayer soundPlayer) {
-        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer);
+                                   SoundPlayer soundPlayer,
+                                   TaskScheduler taskScheduler,
+                                   Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider) {
+        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler);
+
+        this.hytaleMenuBuilderProvider = hytaleMenuBuilderProvider;
     }
 
     @Override
     protected MenuBuilder getMenuBuilder() {
-        return null;
+        return hytaleMenuBuilderProvider.get();
     }
 
 }

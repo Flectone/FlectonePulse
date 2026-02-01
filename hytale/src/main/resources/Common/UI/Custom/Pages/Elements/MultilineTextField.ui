@@ -1,0 +1,10 @@
+$C = "../../Common.ui";
+MultilineTextField #HyUIMultilineTextField {
+    Value: "";
+    // Some nice defaults.
+    ScrollbarStyle: $C.@DefaultScrollbarStyle;
+    Background: $C.@InputBoxBackground;
+    PlaceholderStyle: $C.@DefaultInputFieldPlaceholderStyle;
+    Style: $C.@DefaultInputFieldStyle;
+    ContentPadding: (Horizontal:10,Vertical:8);
+}

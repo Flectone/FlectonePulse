@@ -287,7 +287,11 @@ public record Command(
         @Jacksonized
         public record Modern(
                 Boolean enable,
+                Integer panelWidth,
+                Integer panelHeight,
                 Integer buttonWidth,
+                Integer buttonHeight,
+                Integer buttonPadding,
                 Integer columns
         ) {}
 

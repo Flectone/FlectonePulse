@@ -78,12 +78,16 @@ chatcolor:
   sound:
     enable: false
 chatsetting:
-  enable: false
+  enable: true
   aliases:
   - "chatsetting"
   modern:
     enable: true
-    button_width: 100
+    panel_width: 1700
+    panel_height: 430
+    button_width: 300
+    button_height: 40
+    button_padding: 10
     columns: 5
   checkbox:
     disabled_material: "RED_DYE"

@@ -1,0 +1,8 @@
+// ItemSlot renders slot background, quality overlay, and icon (64x64 inner)
+ItemSlot #HyUIItemSlot {
+  // Optionally can include height/width but defaults to 64x64.
+  //Anchor: (Full: 0);
+  ShowQualityBackground: true;
+  // ShowQuantity: boolean
+  // No style, no layout, no scrollbar style.
+}

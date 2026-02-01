@@ -140,7 +140,6 @@ public class HytaleLibraryResolver extends LibraryResolver {
                 .artifactId("adventure-platform-hytale")
                 .version("1.0.1")
                 .repository(BuildConfig.JITPACK_REPOSITORY)
-//                .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
@@ -151,6 +150,15 @@ public class HytaleLibraryResolver extends LibraryResolver {
                         .relocatedPattern("net.flectone.pulse.library.gson")
                         .build()
                 )
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("curse{}maven")
+                .artifactId("hyui-1431415")
+                .version(BuildConfig.HYUI_VERSION)
+                .repository("https://www.cursemaven.com")
+                .resolveTransitiveDependencies(true)
                 .build()
         );
 

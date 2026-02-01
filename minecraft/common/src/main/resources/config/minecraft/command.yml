@@ -83,7 +83,11 @@ chatsetting:
   - "chatsetting"
   modern:
     enable: true
+    panel_width: 1700
+    panel_height: 430
     button_width: 100
+    button_height: 40
+    button_padding: 10
     columns: 5
   checkbox:
     disabled_material: "RED_DYE"

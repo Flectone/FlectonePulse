@@ -63,6 +63,7 @@ subprojects {
         maven { url = "https://repo.william278.net/releases/" }
         maven { url = "https://maven.hytale.com/release" }
         maven { url = "https://maven.hytale.com/pre-release" }
+        maven { url = "https://www.cursemaven.com" }
     }
 
     dependencies {

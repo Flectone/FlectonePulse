@@ -1,0 +1,12 @@
+$C = "../../Common.ui";
+Sprite #HyUISprite {
+    // Anchor
+    // TexturePath (string) - spritemap.
+    // Frame (Width: int, Height: int, PerRow: int, Count: int) - frames to capture from spritemap
+    // This is assigned as Frame.Width, Frame.Height, Frame.PerRow, Frame.Count
+    // FramesPerSecond (int) - speed at which animation should play.
+    TexturePath: "Common/Spinner.png";
+    Frame: (Width: 32, Height: 32, PerRow: 8, Count: 72);
+    FramesPerSecond: 30;
+    Anchor: (Width: 32, Height: 32);
+}

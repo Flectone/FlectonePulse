@@ -16,7 +16,6 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -38,7 +37,6 @@ public class HytaleBaseListener implements HytaleListener {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public void onPlayerSetupConnectEvent(PlayerSetupConnectEvent event) {
         UUID uuid = event.getUuid();

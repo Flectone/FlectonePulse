@@ -7,7 +7,6 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.deletemessage.DeletemessageModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
@@ -44,7 +43,6 @@ public class HytaleBasePulseListener implements PulseListener {
             SignModule.class,
             StatusModule.class,
             TabModule.class,
-            ChatsettingModule.class,
             DeleteModule.class,
             DeletemessageModule.class,
             RockpaperscissorsModule.class,
