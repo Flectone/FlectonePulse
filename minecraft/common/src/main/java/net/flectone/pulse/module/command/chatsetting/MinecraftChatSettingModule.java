@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.chatsetting.builder.DialogMenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.builder.InventoryMenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
@@ -30,10 +31,11 @@ public class MinecraftChatSettingModule extends ChatsettingModule {
                                       ProxySender proxySender,
                                       ProxyRegistry proxyRegistry,
                                       SoundPlayer soundPlayer,
+                                      TaskScheduler taskScheduler,
                                       Provider<DialogMenuBuilder> dialogMenuBuilderProvider,
                                       Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider,
                                       @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6) {
-        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer);
+        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler);
 
         this.isNewerThanOrEqualsV_1_21_6 = isNewerThanOrEqualsV_1_21_6;
         this.dialogMenuBuilderProvider = dialogMenuBuilderProvider;

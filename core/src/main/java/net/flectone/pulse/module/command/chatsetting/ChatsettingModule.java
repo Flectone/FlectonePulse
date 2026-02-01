@@ -5,6 +5,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -38,6 +39,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     private final ProxySender proxySender;
     private final ProxyRegistry proxyRegistry;
     private final SoundPlayer soundPlayer;
+    private final TaskScheduler taskScheduler;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
@@ -45,7 +47,8 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                                 CommandParserProvider commandParserProvider,
                                 ProxySender proxySender,
                                 ProxyRegistry proxyRegistry,
-                                SoundPlayer soundPlayer) {
+                                SoundPlayer soundPlayer,
+                                TaskScheduler taskScheduler) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
@@ -53,6 +56,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         this.proxySender = proxySender;
         this.proxyRegistry = proxyRegistry;
         this.soundPlayer = soundPlayer;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -162,20 +166,23 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     }
 
     public void saveSetting(FPlayer fPlayer, String messageType) {
-        fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
+        taskScheduler.runAsync(() -> {
+            fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
 
-        if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
-        }
+            if (proxyRegistry.hasEnabledProxy()) {
+                proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
+            }
+        }, true);
     }
 
-
     public void saveSetting(FPlayer fPlayer, SettingText settingText) {
-        fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
+        taskScheduler.runAsync(() -> {
+            fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
 
-        if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
-        }
+            if (proxyRegistry.hasEnabledProxy()) {
+                proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
+            }
+        }, true);
     }
 
 
