@@ -8,13 +8,13 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.module.message.sidebar.MinecraftSidebarModule;
+import net.flectone.pulse.module.message.sidebar.SidebarModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SidebarPulseListener implements PulseListener {
 
-    private final MinecraftSidebarModule sidebarModule;
+    private final SidebarModule sidebarModule;
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
