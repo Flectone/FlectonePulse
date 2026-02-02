@@ -20,6 +20,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -30,6 +31,7 @@ public class WorldModule extends AbstractModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -57,9 +59,14 @@ public class WorldModule extends AbstractModule {
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
             String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
-            if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(worldPrefix)) return Tag.selfClosingInserting(Component.empty());
+            if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
-            return Tag.preProcessParsed(worldPrefix);
+            MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.USER_MESSAGE, false);
+
+            return Tag.preProcessParsed(messagePipeline.buildDefault(prefixContext));
         });
     }
 

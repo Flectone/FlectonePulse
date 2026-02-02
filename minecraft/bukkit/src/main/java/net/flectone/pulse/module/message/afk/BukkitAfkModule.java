@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
@@ -21,8 +22,9 @@ public class BukkitAfkModule extends AfkModule {
                            TaskScheduler taskScheduler,
                            IntegrationModule integrationModule,
                            PlatformPlayerAdapter platformPlayerAdapter,
-                           ListenerRegistry listenerRegistry) {
-        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry);
+                           ListenerRegistry listenerRegistry,
+                           MessagePipeline messagePipeline) {
+        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline);
 
         this.listenerRegistry = listenerRegistry;
     }

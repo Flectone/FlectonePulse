@@ -46,6 +46,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -95,8 +96,13 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
+            if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
 
-            return Tag.preProcessParsed(afkSuffix);
+            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.USER_MESSAGE, false);
+
+            return Tag.preProcessParsed(messagePipeline.buildDefault(afkContext));
         });
     }
 

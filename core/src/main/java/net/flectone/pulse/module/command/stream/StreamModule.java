@@ -46,6 +46,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -182,8 +183,13 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
+            if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 
-            return Tag.preProcessParsed(streamPrefix);
+            MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), streamPrefix)
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.USER_MESSAGE, false);
+
+            return Tag.preProcessParsed(messagePipeline.buildDefault(prefixContext));
         });
     }
 

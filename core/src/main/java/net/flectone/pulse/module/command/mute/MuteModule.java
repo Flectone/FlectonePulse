@@ -23,7 +23,9 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -42,6 +44,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final MuteChecker muteChecker;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -153,7 +156,14 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
-            return Tag.preProcessParsed(suffix);
+            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
+            if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
+
+            MessageContext suffixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), suffix)
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.USER_MESSAGE, false);
+
+            return Tag.preProcessParsed(messagePipeline.buildDefault(suffixContext));
         });
     }
 
