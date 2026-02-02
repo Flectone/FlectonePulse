@@ -14,10 +14,10 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.HytaleMessageUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.Map;
@@ -32,6 +32,7 @@ public class HytaleSidebarModule extends SidebarModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final HytaleMessageUtil hytaleMessageUtil;
 
     @Inject
     public HytaleSidebarModule(FileFacade fileFacade,
@@ -40,12 +41,14 @@ public class HytaleSidebarModule extends SidebarModule {
                                FPlayerService fPlayerService,
                                PlatformPlayerAdapter platformPlayerAdapter,
                                PermissionChecker permissionChecker,
-                               MessagePipeline messagePipeline) {
+                               MessagePipeline messagePipeline,
+                               HytaleMessageUtil hytaleMessageUtil) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
+        this.hytaleMessageUtil = hytaleMessageUtil;
     }
 
     @Override
@@ -119,7 +122,7 @@ public class HytaleSidebarModule extends SidebarModule {
             lineBuilder.addChild(LabelBuilder.label()
                     .withId(lineId)
                     .withText(PlainTextComponentSerializer.plainText().serialize(line))
-                    .withStyle(new HyUIStyle().setTextColor(findFirstColor(line).color().asHexString()))
+                    .withStyle(new HyUIStyle().setTextColor(hytaleMessageUtil.findFirstColor(line)))
                     .withPadding(new HyUIPadding(config().labelLeft(), config().labelTop(), 0, 0))
             );
         }
@@ -137,21 +140,6 @@ public class HytaleSidebarModule extends SidebarModule {
                         )
                         .addChild(lineBuilder)
                 );
-    }
-
-    private Component findFirstColor(Component component) {
-        if (component.color() != null) {
-            return component;
-        }
-
-        for (Component child : component.children()) {
-            Component colorComponent = findFirstColor(child);
-            if (colorComponent.color() != null) {
-                return colorComponent;
-            }
-        }
-
-        return Component.empty().color(NamedTextColor.WHITE);
     }
 
 }
