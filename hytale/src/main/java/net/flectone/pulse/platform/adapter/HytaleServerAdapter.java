@@ -135,8 +135,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
 
     @Override
     public boolean isPrimaryThread() {
-        // its ok?
-        return false;
+        return !Thread.currentThread().getName().contains("WorldThread");
     }
 
     @Override
