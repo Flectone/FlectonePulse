@@ -5,6 +5,7 @@ import au.ellie.hyui.elements.LayoutModeSupported;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -48,7 +51,10 @@ public class HytalyActionBarRender implements ActionBarRender {
 
         storeRef.getStore().getExternalData().getWorld().execute(() -> {
             HyUIHud hyUIHud = hudBuilder.show();
-            taskScheduler.runAsyncLater(hyUIHud::remove, stayTicks + 20L); // +20 because minecraft fade_out ticks = 20
+
+            // use the Hytale scheduler directly so that FlectonePulse reload can't break the removal
+            // and +20 because minecraft fade_out ticks = 20
+            HytaleServer.SCHEDULED_EXECUTOR.schedule(hyUIHud::remove, (stayTicks + 20L) * 50, TimeUnit.MILLISECONDS);
         });
     }
 
