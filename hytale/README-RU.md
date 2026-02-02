@@ -110,6 +110,7 @@ FlectonePulse Hytale основан на этих проектах:
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — форматирование текста
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — команды с автодополнением
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — символы в чате
+- 🖥️ **[HyUI](https://github.com/Elliesaur/HyUI)** — GUI-элементы
 - 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — конвертация устаревших цветов
 - 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — предок FlectonePulse
 

@@ -110,6 +110,7 @@ FlectonePulse is built on these projects:
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — text formatting
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — commands with autocompletion
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — symbols in chat
+- 🖥️ **[HyUI](https://github.com/Elliesaur/HyUI)** — GUI elements
 - 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — legacy color conversion
 - 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — predecessor of FlectonePulse
 
