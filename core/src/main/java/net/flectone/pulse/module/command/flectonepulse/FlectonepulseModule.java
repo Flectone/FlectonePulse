@@ -252,9 +252,9 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                         if (operation == Operation.EXPORT_ALL) return true;
 
                         String pathString = path.toString();
-                        return !pathString.contains("FlectonePulse" + File.separator + "libraries")
-                                && !pathString.contains("FlectonePulse" + File.separator + "backups")
-                                && !pathString.contains("FlectonePulse" + File.separator + "minecraft")
+                        return !pathString.contains(projectPath.getFileName() + File.separator + "libraries")
+                                && !pathString.contains(projectPath.getFileName() + File.separator + "backups")
+                                && !pathString.contains(projectPath.getFileName() + File.separator + "minecraft")
                                 && !path.getFileName().toString().endsWith(".db");
                     })
                     .forEach(path -> {
