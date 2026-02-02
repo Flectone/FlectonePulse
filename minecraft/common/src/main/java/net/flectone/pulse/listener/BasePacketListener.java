@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -60,7 +61,8 @@ public class BasePacketListener implements PacketListener {
         WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
         String wrapperLocale = wrapperPlayClientSettings.getLocale();
 
-        fPlayerService.updateLocale(fPlayer, wrapperLocale);
+        if (wrapperLocale.equals(fPlayer.getSetting(SettingText.LOCALE))) return;
+        if (fPlayerService.updateLocale(fPlayer, wrapperLocale)) return;
 
         // first time player joined, wait for it to be added
         fPlayerService.updateLocaleLater(uuid, wrapperLocale);

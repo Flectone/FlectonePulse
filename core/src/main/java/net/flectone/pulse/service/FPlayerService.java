@@ -302,17 +302,18 @@ public class FPlayerService {
         }, 40L);
     }
 
-    public void updateLocale(FPlayer fPlayer, String newLocale) {
+    public boolean updateLocale(FPlayer fPlayer, String newLocale) {
         String locale = integrationModule.getTritonLocale(fPlayer);
         if (locale == null) {
             locale = newLocale;
         }
 
-        if (locale.equals(fPlayer.getSetting(SettingText.LOCALE))) return;
-        if (fPlayer.isUnknown()) return;
+        if (locale.equals(fPlayer.getSetting(SettingText.LOCALE))) return false;
+        if (fPlayer.isUnknown()) return false;
 
         fPlayer.setSetting(SettingText.LOCALE, locale);
         saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
+        return true;
     }
 
     public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
