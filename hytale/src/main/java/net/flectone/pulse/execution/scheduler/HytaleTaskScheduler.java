@@ -5,7 +5,6 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.exception.SchedulerTaskException;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
@@ -23,7 +22,6 @@ public class HytaleTaskScheduler implements TaskScheduler {
     private final FLogger logger;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
-    private final Provider<PlatformPlayerAdapter> platformPlayerAdapterProvider;
 
     private ExecutorService asyncExecutor;
     private volatile boolean disabled = false;
@@ -31,12 +29,10 @@ public class HytaleTaskScheduler implements TaskScheduler {
     @Inject
     public HytaleTaskScheduler(FLogger logger,
                                Provider<FPlayerService> fPlayerServiceProvider,
-                               Provider<PlatformServerAdapter> platformServerAdapterProvider,
-                               Provider<PlatformPlayerAdapter> platformPlayerAdapterProvider) {
+                               Provider<PlatformServerAdapter> platformServerAdapterProvider) {
         this.logger = logger;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.platformServerAdapterProvider = platformServerAdapterProvider;
-        this.platformPlayerAdapterProvider = platformPlayerAdapterProvider;
 
         createExecutorService();
     }
@@ -51,7 +47,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
             if (!asyncExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
                 asyncExecutor.shutdownNow();
             }
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
             asyncExecutor.shutdownNow();
         }
 

@@ -13,7 +13,7 @@ public class HytaleBossBarRender implements BossBarRender {
 
     @Override
     public void render(FPlayer fPlayer, Component component, BossBar bossBar) {
-
+        // not supported
     }
 
 }

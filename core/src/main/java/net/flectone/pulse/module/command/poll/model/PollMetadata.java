@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.poll.model;
 
 import lombok.Builder;
 import net.flectone.pulse.config.setting.LocalizationSetting;
-import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.command.poll.PollModule;
 import org.jspecify.annotations.NonNull;

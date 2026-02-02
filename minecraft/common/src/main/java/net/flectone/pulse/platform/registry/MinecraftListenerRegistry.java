@@ -37,6 +37,7 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
         this.packetProvider = packetProvider;
     }
 
+    @Override
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
 

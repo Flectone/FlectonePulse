@@ -71,7 +71,9 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             } catch (NoSuchMethodException e) {
                 propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("getProperties"));
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+            // nothing
+        }
     }
 
     @Override

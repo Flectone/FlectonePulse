@@ -5,7 +5,6 @@ import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.filter.LogFilter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -12,7 +12,7 @@ public class HytaleBrandRender implements BrandRender {
 
     @Override
     public void render(FPlayer fPlayer, Component component) {
-
+        // not supported
     }
 
 }

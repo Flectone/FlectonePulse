@@ -91,5 +91,6 @@ public class FabricCommandRegistry implements MinecraftCommandRegistry {
 
     @Override
     public void reload() {
+        // nothing
     }
 }

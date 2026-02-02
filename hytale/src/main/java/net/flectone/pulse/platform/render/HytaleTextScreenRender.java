@@ -19,7 +19,7 @@ public class HytaleTextScreenRender implements TextScreenRender {
 
     @Override
     public void clear() {
-
+        // nothing
     }
 
     @Override
@@ -34,12 +34,12 @@ public class HytaleTextScreenRender implements TextScreenRender {
 
     @Override
     public void ride(UUID uuid, int playerId, List<Integer> textScreenPassengers, boolean silent) {
-
+        // nothing
     }
 
     @Override
     public void updateAndRide(int playerId) {
-
+        // nothing
     }
 
 }

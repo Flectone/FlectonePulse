@@ -47,7 +47,7 @@ public class FabricTaskScheduler implements TaskScheduler {
             if (!asyncExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
                 asyncExecutor.shutdownNow();
             }
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
             asyncExecutor.shutdownNow();
         }
 

@@ -287,9 +287,6 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean isSneaking(@NonNull UUID uuid) {
-        PlayerRef player = getPlayer(uuid);
-        if (player == null) return false;
-
         return false;
     }
 

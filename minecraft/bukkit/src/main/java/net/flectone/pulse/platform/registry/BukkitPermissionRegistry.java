@@ -31,6 +31,8 @@ public class BukkitPermissionRegistry implements PermissionRegistry {
     }
 
     @Override
-    public void reload() {}
+    public void reload() {
+        // nothing
+    }
 
 }

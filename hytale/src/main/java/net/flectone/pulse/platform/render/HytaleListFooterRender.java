@@ -12,7 +12,7 @@ public class HytaleListFooterRender implements ListFooterRender {
 
     @Override
     public void render(FPlayer fPlayer, Component header, Component footer) {
-
+        // not supported
     }
 
 }
