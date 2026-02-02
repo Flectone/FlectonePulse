@@ -311,7 +311,7 @@ sidebar:
   right: 5
   label_top: 0
   label_left: 4
-  background: "#1E1E1E77"
+  background: "#1E1E1E60"
   ticker:
     enable: true
     period: 100
