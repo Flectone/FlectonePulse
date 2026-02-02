@@ -7,8 +7,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.hypixel.hytale.common.plugin.PluginIdentifier;
 import com.hypixel.hytale.common.semver.SemverRange;
+import com.hypixel.hytale.common.util.java.ManifestUtil;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.HytaleServerConfig;
 import com.hypixel.hytale.server.core.auth.ServerAuthManager;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -100,7 +100,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
 
     @Override
     public String getServerVersionName() {
-        return "Hytale v" + HytaleServerConfig.VERSION;
+        return "Hytale " + ManifestUtil.getImplementationVersion();
     }
 
     @Override
