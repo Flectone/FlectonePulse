@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -23,7 +22,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -43,19 +41,11 @@ public class HytaleSoundPlayer implements SoundPlayer {
         Object player = platformPlayerAdapter.convertToPlatformPlayer(receiver);
         if (!(player instanceof PlayerRef playerRef)) return;
 
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return;
-
-        Universe universe = Universe.get();
-        if (universe == null) return;
-
-        World world = universe.getWorld(worldUUID);
-        if (world == null) return;
-
         Ref<EntityStore> playerStoreRef = playerRef.getReference();
         if (playerStoreRef == null) return;
 
-        EntityStore store = world.getEntityStore();
+        World world = playerStoreRef.getStore().getExternalData().getWorld();
+        EntityStore worldStore = world.getEntityStore();
 
         int index = SoundEvent.getAssetMap().getIndex(sound.name());
 
@@ -64,12 +54,12 @@ public class HytaleSoundPlayer implements SoundPlayer {
                 .findAny()
                 .orElse(SoundCategory.UI);
 
-        world.execute(() -> {
-            TransformComponent transform = store.getStore().getComponent(playerStoreRef, EntityModule.get().getTransformComponentType());
+        playerStoreRef.getStore().getExternalData().getWorld().execute(() -> {
+            TransformComponent transform = worldStore.getStore().getComponent(playerStoreRef, EntityModule.get().getTransformComponentType());
             if (transform == null) return;
 
             Vector3d position = transform.getPosition();
-            SoundUtil.playSoundEvent3dToPlayer(playerStoreRef, index, category, position.x, position.y, position.z, sound.volume(), sound.pitch(), store.getStore());
+            SoundUtil.playSoundEvent3dToPlayer(playerStoreRef, index, category, position.x, position.y, position.z, sound.volume(), sound.pitch(), worldStore.getStore());
         });
     }
 

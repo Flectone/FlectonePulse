@@ -19,7 +19,6 @@ import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.config.Localization;
@@ -43,7 +42,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -79,19 +77,16 @@ public class HytaleBubbleRender implements BubbleRender {
     }
 
     private void renderBubble(FPlayer sender, FPlayer viewer, ModernBubble bubble) {
+        if (!(platformPlayerAdapter.convertToPlatformPlayer(sender) instanceof PlayerRef playerRef)) return;
+
+        Ref<EntityStore> storeRef = playerRef.getReference();
+        if (storeRef == null) return;
+
+        World world = storeRef.getStore().getExternalData().getWorld();
+
         String playerKey = sender.getUuid().toString();
 
-        Object playerObj = platformPlayerAdapter.convertToPlatformPlayer(sender);
-        if (!(playerObj instanceof PlayerRef playerRef)) return;
-
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return;
-
-        Universe universe = Universe.get();
-        if (universe == null) return;
-
-        World world = universe.getWorld(worldUUID);
-        if (world == null) return;
+        String bubbleText = PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer));
 
         Transform playerTransform = playerRef.getTransform();
         world.execute(() -> {
@@ -149,7 +144,7 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(DespawnComponent.getComponentType(), new DespawnComponent(expireTimeInstant.plus(5, ChronoUnit.SECONDS)));
 
             holder.putComponent(NetworkId.getComponentType(), new NetworkId((world.getEntityStore().getStore().getExternalData()).takeNextNetworkId()));
-            holder.putComponent(Nameplate.getComponentType(), new Nameplate(PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer))));
+            holder.putComponent(Nameplate.getComponentType(), new Nameplate(bubbleText));
             holder.putComponent(MountedComponent.getComponentType(),
                     new MountedComponent(
                             playerRef.getReference(),

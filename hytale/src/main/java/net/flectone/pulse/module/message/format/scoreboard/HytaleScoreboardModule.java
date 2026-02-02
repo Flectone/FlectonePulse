@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -104,16 +102,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         Ref<EntityStore> storeRef = playerRef.getReference();
         if (storeRef == null) return;
 
-        UUID worldUUid = playerRef.getWorldUuid();
-        if (worldUUid == null) return;
-
-        Universe universe = Universe.get();
-        if (universe == null) return;
-
-        World world = universe.getWorld(worldUUid);
-        if (world == null) return;
-
-        world.execute(() -> {
+        storeRef.getStore().getExternalData().getWorld().execute(() -> {
             Nameplate nameplate = storeRef.getStore().getComponent(playerRef.getReference(), Nameplate.getComponentType());
             if (nameplate != null) {
                 nameplate.setText(newName);

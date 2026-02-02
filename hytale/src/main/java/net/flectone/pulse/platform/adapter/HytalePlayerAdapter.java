@@ -193,18 +193,12 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef playerRef = getPlayer(uuid);
         if (playerRef == null) return null;
 
-        Universe universe = Universe.get();
-        if (universe == null) return null;
-
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return null;
-
-        World world = universe.getWorld(worldUUID);
-        if (world == null) return null;
+        Ref<EntityStore> storeRef = playerRef.getReference();
+        if (storeRef == null) return null;
 
         CompletableFuture<Statistics> completableFuture = new CompletableFuture<>();
 
-        world.execute(() -> {
+        storeRef.getStore().getExternalData().getWorld().execute(() -> {
             if (playerRef.getReference() == null) {
                 completableFuture.complete(null);
                 return;
@@ -340,18 +334,12 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef playerRef = getPlayer(uuid);
         if (playerRef == null) return null;
 
-        Universe universe = Universe.get();
-        if (universe == null) return null;
-
-        UUID worldUUID = playerRef.getWorldUuid();
-        if (worldUUID == null) return null;
-
-        World world = universe.getWorld(worldUUID);
-        if (world == null) return null;
+        Ref<EntityStore> storeRef = playerRef.getReference();
+        if (storeRef == null) return null;
 
         CompletableFuture<Object> completableFuture = new CompletableFuture<>();
 
-        world.execute(() -> {
+        storeRef.getStore().getExternalData().getWorld().execute(() -> {
             if (playerRef.getReference() == null) {
                 completableFuture.complete(null);
                 return;
