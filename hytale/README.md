@@ -52,6 +52,12 @@ Visual message bubbles above players
 
 ![Message Bubbles](https://flectone.net/pulse/hytale/bubble.gif)
 
+## 🌈 Chat customization with /chatsetting
+
+![chatsetting](https://flectone.net/pulse/hytale/commandchatsetting.gif)
+
+The /chatsetting command opens a menu for quick message customization for each player. Choose colors, styles, and disable unnecessary messages
+
 ## 🌍 Smart localization
 
 ![Locale](https://flectone.net/pulse/hytale/locale.gif)

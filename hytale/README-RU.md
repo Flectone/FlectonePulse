@@ -52,6 +52,12 @@ join:
 
 ![Message Bubbles](https://flectone.net/pulse/hytale/bubble.gif)
 
+## 🌈 Настройка чата с /chatsetting
+
+![chatsetting](https://flectone.net/pulse/hytale/commandchatsetting.gif)
+
+Команда /chatsetting открывает меню для быстрой кастомизации сообщений каждому игроку. Выберите цвета, стили и отключите ненужные сообщения
+
 ## 🌍 Умная локализация
 
 ![Locale](https://flectone.net/pulse/hytale/locale.gif)
