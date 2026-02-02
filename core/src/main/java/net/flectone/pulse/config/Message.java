@@ -578,6 +578,13 @@ public record Message(
     public record Sidebar(
             Boolean enable,
             Boolean random,
+            Integer width,
+            Integer height,
+            Integer top,
+            Integer right,
+            Integer labelTop,
+            Integer labelLeft,
+            String background,
             Ticker ticker
     ) implements EnableSetting {
     }

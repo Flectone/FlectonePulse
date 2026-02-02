@@ -78,7 +78,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         PageBuilder pageBuilder = createPage(playerRef, header, gridGroup);
 
-        world.execute(() -> pageBuilder.open(playerRef.getReference().getStore()));
+        world.execute(() -> pageBuilder.open(refStore.getStore()));
     }
 
     private GridGroup createDialogCheckbox(FPlayer fPlayer, FPlayer fTarget, GridGroup gridGroup, String messageType) {
@@ -231,7 +231,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         PageBuilder pageBuilder = createPage(playerRef, header, gridGroup);
 
-        world.execute(() -> pageBuilder.open(playerRef.getReference().getStore()));
+        world.execute(() -> pageBuilder.open(refStore.getStore()));
     }
 
     private record GridGroup(

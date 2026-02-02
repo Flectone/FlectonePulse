@@ -19,6 +19,8 @@ import net.flectone.pulse.module.message.format.world.HytaleWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.join.HytaleJoinModule;
 import net.flectone.pulse.module.message.join.JoinModule;
+import net.flectone.pulse.module.message.sidebar.HytaleSidebarModule;
+import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.vanilla.HytaleVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.platform.adapter.HytalePlayerAdapter;
@@ -91,7 +93,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(JoinModule.class).to(HytaleJoinModule.class);
 //        bind(ObjectModule.class).to(MinecraftObjectModule.class);
 //        bind(RightclickModule.class).to(MinecraftRightClickModule.class);
-//        bind(SidebarModule.class).to(MinecraftSidebarModule.class);
+        bind(SidebarModule.class).to(HytaleSidebarModule.class);
 //        bind(StatusModule.class).to(MinecraftStatusModule.class);
 //        bind(TabModule.class).to(MinecraftTabModule.class);
         bind(VanillaModule.class).to(HytaleVanillaModule.class);

@@ -549,14 +549,13 @@ message:
     format: "<fcolor:1><- <target> ->"
   sidebar:
     values:
-      - - " "
-        - "<fcolor:1>Пинг <replacement:ping>"
-        - " "
-        - "<fcolor:1>FlectonePulse"
-      - - " "
-        - "<fcolor:2>ТПС <replacement:tps>"
-        - " "
-        - "<fcolor:2>FlectonePulse"
+    - - "<fcolor:1>FlectonePulse"
+      - " "
+      - "<fcolor:1>Привет, <player>!"
+      - "<fcolor:1>Пинг <replacement:ping> мс"
+    - - "<fcolor:2>FlectonePulse"
+      - " "
+      - "<fcolor:2>ТПС <replacement:tps>"
   status:
     motd:
       values:

@@ -20,7 +20,6 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
-import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
@@ -39,7 +38,6 @@ public class HytaleBasePulseListener implements PulseListener {
             ObjectModule.class,
             ObjectiveModule.class,
             RightclickModule.class,
-            SidebarModule.class,
             SignModule.class,
             StatusModule.class,
             TabModule.class,
