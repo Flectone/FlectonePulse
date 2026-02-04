@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.message.format.world.listener.WorldHytaleListener;
@@ -21,8 +22,9 @@ public class HytaleWorldModule extends WorldModule {
                              FPlayerService fPlayerService,
                              PlatformPlayerAdapter platformPlayerAdapter,
                              ListenerRegistry listenerRegistry,
-                             TaskScheduler taskScheduler) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler);
+                             TaskScheduler taskScheduler,
+                             MessagePipeline messagePipeline) {
+        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline);
 
         this.listenerRegistry = listenerRegistry;
         this.taskScheduler = taskScheduler;
