@@ -90,6 +90,7 @@ public class ProxySender {
      * @return true if data was sent to at least one proxy, false otherwise
      */
     public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
+        if (!proxyRegistry.hasEnabledProxy()) return false;
         if (sender instanceof FPlayer fPlayer) {
             List<String> constant = fileFacade.localization(sender).message().format().names().constant();
             if (!constant.isEmpty()) {
