@@ -2,7 +2,9 @@ package net.flectone.pulse;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.google.gson.Gson;
 import com.google.inject.name.Names;
+import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.MinecraftDatabase;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
@@ -43,9 +45,15 @@ import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.platform.handler.MinecraftProxyMessageHandler;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
-import net.flectone.pulse.platform.registry.*;
+import net.flectone.pulse.platform.registry.CommandRegistry;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.MinecraftCommandRegistry;
+import net.flectone.pulse.platform.registry.MinecraftListenerRegistry;
 import net.flectone.pulse.platform.render.*;
-import net.flectone.pulse.platform.sender.*;
+import net.flectone.pulse.platform.sender.MessageSender;
+import net.flectone.pulse.platform.sender.MinecraftMessageSender;
+import net.flectone.pulse.platform.sender.MinecraftSoundPlayer;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.MinecraftSkinService;
@@ -66,8 +74,9 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
     @Override
     public void setupPlatform(ReflectionResolver reflectionResolver) {
-        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
+        bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
+        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_14")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_16")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_16));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_19_4")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4));

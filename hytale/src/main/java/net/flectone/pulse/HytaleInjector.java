@@ -1,5 +1,6 @@
 package net.flectone.pulse;
 
+import com.google.gson.Gson;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -42,6 +43,7 @@ import net.flectone.pulse.service.TranslationService;
 import net.flectone.pulse.util.checker.HytalePermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.nio.file.Path;
 
@@ -63,6 +65,7 @@ public class HytaleInjector extends PlatformInjector {
         bind(FlectonePulse.class).toInstance(flectonePulse);
         bind(HytaleFlectonePulse.class).toInstance(flectonePulse);
         bind(JavaPlugin.class).toInstance(flectonePulse);
+        bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         // adapters
         bind(PlatformPlayerAdapter.class).to(HytalePlayerAdapter.class);

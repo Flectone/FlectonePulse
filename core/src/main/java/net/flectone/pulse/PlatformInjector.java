@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.google.common.cache.Cache;
-import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -23,7 +22,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.incendo.cloud.type.tuple.Pair;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 import tools.jackson.core.JsonParser;
@@ -58,14 +56,16 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(FLogger.class).toInstance(fLogger);
         bind(FlectonePulseAPI.class).asEagerSingleton();
         bind(LibraryResolver.class).toInstance(libraryResolver);
-        bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
         bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
 
         ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
         bind(ReflectionResolver.class).toInstance(reflectionResolver);
 
         // bind paths
-        setupPaths();
+        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
+        bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
+        bind(Path.class).annotatedWith(Names.named("backupPath")).toInstance(projectPath.resolve("backups"));
+        bind(Path.class).annotatedWith(Names.named("minecraftPath")).toInstance(projectPath.resolve("minecraft"));
 
         // create jackson mapper
         bind(ObjectMapper.class).toInstance(createMapper());
@@ -92,13 +92,6 @@ public abstract class PlatformInjector extends AbstractModule {
     }
 
     public abstract void setupPlatform(ReflectionResolver reflectionResolver);
-
-    private void setupPaths() {
-        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
-        bind(Path.class).annotatedWith(Names.named("imagePath")).toInstance(projectPath.resolve("images"));
-        bind(Path.class).annotatedWith(Names.named("backupPath")).toInstance(projectPath.resolve("backups"));
-        bind(Path.class).annotatedWith(Names.named("minecraftPath")).toInstance(projectPath.resolve("minecraft"));
-    }
 
     @Provides @Singleton @Named("cooldown")
     public Cache<CooldownRepository.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
