@@ -45,6 +45,8 @@ public class FabricCommandRegistry implements MinecraftCommandRegistry {
 
     @Override
     public void init() {
+        if (this.manager != null) return;
+
         this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
