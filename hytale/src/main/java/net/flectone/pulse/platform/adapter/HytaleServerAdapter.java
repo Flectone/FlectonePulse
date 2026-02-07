@@ -125,7 +125,12 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
         HytaleServer hytaleServer = HytaleServer.get();
         if (hytaleServer == null) return false;
 
-        return hytaleServer.getPluginManager().hasPlugin(PluginIdentifier.fromString(projectName + ":" + projectName), SemverRange.WILDCARD);
+        PluginIdentifier pluginIdentifier = PluginIdentifier.fromString(projectName.contains(":")
+                ? projectName
+                : projectName + ":" + projectName
+        );
+
+        return hytaleServer.getPluginManager().hasPlugin(pluginIdentifier, SemverRange.WILDCARD);
     }
 
     @Override
