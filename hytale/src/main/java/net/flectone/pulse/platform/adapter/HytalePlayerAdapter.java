@@ -1,7 +1,6 @@
 package net.flectone.pulse.platform.adapter;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Vector3d;
@@ -29,7 +28,6 @@ import com.hypixel.hytale.server.core.util.TargetUtil;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.listener.HytaleBaseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -46,8 +44,6 @@ import java.util.stream.Collectors;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePlayerAdapter implements PlatformPlayerAdapter {
-
-    private final Provider<HytaleBaseListener> hytaleBaseListenerProvider;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
