@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
@@ -44,6 +45,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
@@ -52,7 +54,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   MessagePipeline messagePipeline,
                                   FPlayerService fPlayerService,
                                   TaskScheduler taskScheduler,
-                                  PacketSender packetSender) {
+                                  PacketSender packetSender,
+                                  IntegrationModule integrationModule) {
         super(fileFacade);
 
         this.extractor = extractor;
@@ -61,6 +64,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
+        this.integrationModule = integrationModule;
     }
 
     @Override
@@ -109,7 +113,9 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
-                        .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver)
+                                && (vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        )
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration()
                         .proxy(dataOutputStream -> {
