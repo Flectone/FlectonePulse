@@ -56,6 +56,7 @@ public class HytaleSidebarModule extends SidebarModule {
         HyUIHud hyUIHud = playerSidebars.get(fPlayer.getUuid());
         if (hyUIHud != null)  {
             hyUIHud.remove();
+
             playerSidebars.remove(fPlayer.getUuid());
         }
     }
