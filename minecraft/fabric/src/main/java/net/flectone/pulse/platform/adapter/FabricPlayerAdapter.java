@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -73,7 +72,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return null;
 
-        return minecraftServer.getPlayerManager().getPlayerList()
+        PlayerManager playerManager = minecraftServer.getPlayerManager();
+        if (playerManager == null) return null;
+
+        return playerManager.getPlayerList()
                 .stream()
                 .filter(serverPlayerEntity -> serverPlayerEntity.getId() == entityId)
                 .findAny()
@@ -339,7 +341,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return Collections.emptyList();
 
-        return minecraftServer.getPlayerManager().getPlayerList()
+        PlayerManager playerManager = minecraftServer.getPlayerManager();
+        if (playerManager == null) return Collections.emptyList();
+
+        return playerManager.getPlayerList()
                 .stream()
                 .map(Entity::getUuid)
                 .toList();

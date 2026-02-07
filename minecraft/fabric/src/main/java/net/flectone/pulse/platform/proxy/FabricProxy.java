@@ -15,6 +15,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jspecify.annotations.Nullable;
@@ -77,9 +78,12 @@ public class FabricProxy implements Proxy {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        ServerPlayerEntity player = minecraftServer.getPlayerManager().getPlayer(sender.getUuid());
+        PlayerManager playerManager = minecraftServer.getPlayerManager();
+        if (playerManager == null) return false;
+
+        ServerPlayerEntity player = playerManager.getPlayer(sender.getUuid());
         if (player == null) {
-            player = Iterables.getFirst(minecraftServer.getPlayerManager().getPlayerList(), null);
+            player = Iterables.getFirst(playerManager.getPlayerList(), null);
         }
 
         if (player == null) return false;
