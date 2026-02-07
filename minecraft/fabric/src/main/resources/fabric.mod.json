@@ -13,14 +13,17 @@
 	},
 	"license": "GPL-3.0",
 	"icon": "assets/flectonepulse/icon.png",
-	"environment": "*",
+    "environment": "server",
 	"entrypoints": {
-		"main": [
-			"net.flectone.pulse.FabricFlectonePulse"
-		],
+        "preLaunch": [
+              "net.flectone.pulse.FabricFlectonePulse"
+        ],
+        "server": [
+              "net.flectone.pulse.FabricFlectonePulse"
+        ],
 		"voicechat": [
 			"net.flectone.pulse.module.integration.simplevoice.SimpleVoiceIntegration"
-		]
+        ]
 	},
 	"depends": {
       "fabricloader": ">=0.9.0",
