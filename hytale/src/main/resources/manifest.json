@@ -14,7 +14,8 @@
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {
-    "LuckPerms:LuckPerms": "*"
+    "LuckPerms:LuckPerms": "*",
+    "HelpChat:PlaceholderAPI": "*"
   },
   "DisabledByDefault": false,
   "IncludesAssetPack": true,

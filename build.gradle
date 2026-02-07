@@ -64,6 +64,7 @@ subprojects {
         maven { url = "https://maven.hytale.com/release" }
         maven { url = "https://maven.hytale.com/pre-release" }
         maven { url = "https://www.cursemaven.com" }
+        maven { url = "https://repo.helpch.at/releases/" }
     }
 
     dependencies {

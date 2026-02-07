@@ -10,6 +10,7 @@ dependencies {
     compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly "com.github.ArikSquad:adventure-platform-hytale:$adventure_platform_hytale_version"
     compileOnly "curse.maven:hyui-1431415:$hyui_version"
+    compileOnly "at.helpch:placeholderapi-hytale:$placeholderapi_hytale_version"
 }
 
 processResources {
