@@ -7,10 +7,9 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.mojang.brigadier.tree.CommandNode;
-import io.github.retrooper.packetevents.PacketEventsServerMod;
 import lombok.Getter;
 import lombok.Setter;
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
@@ -27,25 +26,23 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @Singleton
-public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer, FlectonePulse {
+public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServerModInitializer, FlectonePulse {
 
 	@Setter private MinecraftServer minecraftServer;
-
 	private FLogger fLogger;
 	private Injector injector;
 
 	@Override
 	public void onPreLaunch() {
-		// configure packetevents api
+        // configure packetevents api
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
 	}
 
 	@Override
-	public void onInitialize() {
-		// initialize custom logger
-		Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
-		fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
+	public void onInitializeServer() {
+        // initialize custom logger
+        Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
+        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
         fLogger.logEnabling();
 
 		// set up library resolver for dependency loading
@@ -57,15 +54,14 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
         // create guice injector for dependency injection
         injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, libraryResolver, fLogger));
 
-		onEnable();
+        // we need to call enable right now, because the commands must be registered before server is fully started
+        onEnable();
 	}
 
 	@Override
 	public void onEnable() {
 		if (!isReady()) return;
 
-        // idk why, but this does not work in ListenerRegistry,
-        // for some reason 5ms decide whether commands will be deleted normally
         removeDefaultFabricCommands();
 
 		injector.getInstance(FlectonePulseAPI.class).onEnable();
