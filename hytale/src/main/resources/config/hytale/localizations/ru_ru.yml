@@ -85,7 +85,7 @@ command:
     no_permission: "<color:#ff7171>Нет разрешения на изменение этой настройки"
     disabled_self: "<color:#ff7171>Эта функция отключена с помощью /chatsetting"
     disabled_other: "<color:#ff7171>Он отключил эту функцию с помощью /chatsetting"
-    inventory: "Настройки чата"
+    inventory: "Chat Setting"
     checkbox:
       enabled_color: "<color:#98FB98>"
       enabled_hover: "<color:#98FB98>Отображение включено"
@@ -119,14 +119,14 @@ command:
     menu:
       chat:
         item: "<fcolor:2>Тип чата <br><fcolor:1>Чат для просмотра и отправки сообщений <br><br><fcolor:1>Выбранный чат <fcolor:2><chat>"
-        inventory: "Чаты"
+        inventory: "Chats"
         types:
           default: "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все <fcolor:1>чаты и писать в любой чат"
           local: "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать в <fcolor:2>любой <fcolor:1>чат"
           global: "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный <fcolor:1>чат"
       see:
         item: "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений"
-        inventory: "Цвета"
+        inventory: "Colors"
         types:
           default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
           white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
@@ -147,7 +147,7 @@ command:
           pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
       out:
         item: "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений"
-        inventory: "Цвета"
+        inventory: "Colors"
         types:
           default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
           white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
@@ -253,7 +253,7 @@ command:
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "Ты был замучен на сервере"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> выдал мут игроку <fcolor:2><player><fcolor:1> <br>Айди: <id>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> выдал мут игроку <fcolor:2><player><fcolor:1> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     person: "<color:#ff7171>[!] Ты замучен, осталось <time_left>"
   mutelist:
     empty: "<color:#98FB98>Муты не найдены"
