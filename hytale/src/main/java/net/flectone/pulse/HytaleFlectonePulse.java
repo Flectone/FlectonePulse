@@ -24,7 +24,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 @Getter
 @Singleton
@@ -101,12 +100,20 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         LogAdapter logAdapter = new LogAdapter() {
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s) {
-                hytaleLogger.at(Level.parse(logLevel.name())).log(s);
+                switch (logLevel) {
+                    case INFO, DEBUG -> hytaleLogger.atInfo().log(s);
+                    case WARN -> hytaleLogger.atWarning().log(s);
+                    case ERROR -> hytaleLogger.atSevere().log(s);
+                }
             }
 
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
-                hytaleLogger.at(Level.parse(logLevel.name())).log(s, throwable);
+                switch (logLevel) {
+                    case INFO, DEBUG -> hytaleLogger.atInfo().log(s, throwable);
+                    case WARN -> hytaleLogger.atWarning().log(s, throwable);
+                    case ERROR -> hytaleLogger.atSevere().log(s, throwable);
+                }
             }
         };
 
