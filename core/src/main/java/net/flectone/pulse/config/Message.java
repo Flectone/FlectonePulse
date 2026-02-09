@@ -8,6 +8,7 @@ import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import net.flectone.pulse.config.setting.CooldownConfigSetting;
 import net.flectone.pulse.config.setting.EnableSetting;
+import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.SoundConfigSetting;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
@@ -264,6 +265,9 @@ public record Message(
             Boolean convertLegacyColor,
             List<AdventureTag> adventureTags,
 
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/animation")
+            Animation animation,
+
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fcolor")
             FColor fcolor,
 
@@ -299,6 +303,27 @@ public record Message(
             World world
 
     ) implements EnableSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Animation(
+                Boolean enable,
+                List<AnimationConfig> values
+        ) implements EnableSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record AnimationConfig(
+                    String name,
+                    String world,
+                    Boolean raw,
+                    Integer priority,
+                    Integer interval
+            ) implements LocalizationSetting {}
+
+        }
 
         @With
         @Builder(toBuilder = true)

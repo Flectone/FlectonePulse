@@ -8,6 +8,7 @@ public enum MessageType {
 
     AFK,
     ADVANCEMENT,
+    ANIMATION,
     AUTO,
     BOSSBAR,
     BRAND,

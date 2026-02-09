@@ -979,6 +979,9 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Format(
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/animation")
+                Animation animation,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
@@ -1001,6 +1004,23 @@ public record Localization(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
                 Translate translate
         ) implements LocalizationSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Animation(
+                    List<AnimationLocalization> values
+            ) implements LocalizationSetting {
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record AnimationLocalization(
+                        String name,
+                        List<String> texts
+                ) implements LocalizationSetting {}
+
+            }
 
             @With
             @Builder(toBuilder = true)

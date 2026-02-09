@@ -733,6 +733,13 @@ message:
       SHADOW_COLOR:
         name: "flectonepulse.module.message.format.shadow_color"
         type: "OP"
+    animation:
+      name: "flectonepulse.module.message.format.animation"
+      type: "TRUE"
+      values:
+        flectonepulse:
+          name: "flectonepulse.module.message.format.animation.flectonepulse"
+          type: "TRUE"
     fcolor:
       name: "flectonepulse.module.message.format.fcolor"
       type: "TRUE"

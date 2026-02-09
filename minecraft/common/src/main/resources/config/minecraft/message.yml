@@ -137,6 +137,11 @@ format:
   - "NBT"
   - "PRIDE"
   - "SHADOW_COLOR"
+  animation:
+    enable: true
+    values:
+    - name: "flectonepulse"
+      interval: 5
   fcolor:
     enable: true
     default_colors:

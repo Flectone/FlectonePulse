@@ -1108,6 +1108,9 @@ public record Permission(
                 PermissionEntry legacyColors,
                 Map<AdventureTag, PermissionEntry> adventureTags,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/animation")
+                Animation animation,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fcolor")
                 FColor fcolor,
 
@@ -1148,6 +1151,15 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/world")
                 World world
         ) implements PermissionSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Animation(
+                    String name,
+                    Permission.Type type,
+                    Map<String, PermissionEntry> values
+            ) implements PermissionSetting {}
 
             @With
             @Builder(toBuilder = true)

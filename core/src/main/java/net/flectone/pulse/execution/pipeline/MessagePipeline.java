@@ -159,6 +159,7 @@ public class MessagePipeline {
 
     public enum ReplacementTag {
         AFK_SUFFIX,
+        ANIMATION,
         MUTE_SUFFIX,
         STREAM_PREFIX,
         VAULT_SUFFIX,
