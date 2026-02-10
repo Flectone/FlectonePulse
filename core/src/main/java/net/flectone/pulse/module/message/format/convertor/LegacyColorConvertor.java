@@ -28,6 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -105,7 +106,7 @@ public class LegacyColorConvertor {
 
         final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
-        List<String> order = new ArrayList<>();
+        List<String> order = new ObjectArrayList<>();
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
@@ -190,7 +191,7 @@ public class LegacyColorConvertor {
                         builder.append("&@");
                         continue;
                     }
-                    List<String> colors = new ArrayList<>(split.length);
+                    List<String> colors = new ObjectArrayList<>(split.length);
                     for (String color : split) {
                         if (color.length() == 1) {
                             color = colorByChar(color.charAt(0));

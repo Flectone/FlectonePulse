@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.poll;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -79,7 +80,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         );
 
         taskScheduler.runAsyncTimer(() -> {
-            Set<Integer> toRemove = new HashSet<>();
+            Set<Integer> toRemove = new IntOpenHashSet();
 
             pollMap.forEach((id, poll) -> {
                 Status status = null;
@@ -185,7 +186,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int firstAnswerIndex = hasTitle ? 1 : 0;
         List<String> answers = parts.length > firstAnswerIndex
                 ? List.of(Arrays.copyOfRange(parts, firstAnswerIndex, parts.length))
-                : List.of();
+                : Collections.emptyList();
 
         createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
     }

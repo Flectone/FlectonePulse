@@ -3,6 +3,9 @@ package net.flectone.pulse.platform.registry;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
@@ -17,8 +20,8 @@ import org.jspecify.annotations.NonNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.UnaryOperator;
 
 @Getter
@@ -26,17 +29,21 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ListenerRegistry implements Registry {
 
-    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new ConcurrentHashMap<>();
-    private final Set<PulseListener> permanentListeners = new HashSet<>();
+    private final Map<Class<? extends Event>, EnumMap<Event.Priority, List<UnaryOperator<Event>>>> pulseListeners = new Object2ObjectOpenHashMap<>();
+    private final Set<PulseListener> permanentListeners = new ObjectOpenHashSet<>();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final FLogger fLogger;
     private final Injector injector;
 
     public @NonNull Map<Event.Priority, List<UnaryOperator<Event>>> getPulseListeners(Class<? extends Event> event) {
-        EnumMap<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
-        if (enumMap != null) return new EnumMap<>(enumMap);
-
-        return new EnumMap<>(Event.Priority.class);
+        lock.readLock().lock();
+        try {
+            Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
+            return enumMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(enumMap);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void registerPermanent(PulseListener pulseListener) {
@@ -82,35 +89,45 @@ public class ListenerRegistry implements Registry {
 
             try {
                 Object result = method.invoke(listener, event);
-
-                if (result instanceof Event newEvent) {
-                    return newEvent;
-                }
-
-                return event;
+                return result instanceof Event newEvent ? newEvent : event;
             } catch (IllegalAccessException | InvocationTargetException e) {
-                fLogger.warning("Failed to invoke @Pulse handler");
-                fLogger.warning(e);
+                fLogger.warning("Failed to invoke @Pulse handler", e);
                 return event;
             }
         });
     }
 
     public void register(Class<? extends Event> eventClass, Event.Priority priority, UnaryOperator<Event> handler) {
-        pulseListeners.computeIfAbsent(eventClass, k -> new EnumMap<>(Event.Priority.class))
-                .computeIfAbsent(priority, k -> new CopyOnWriteArrayList<>())
-                .add(handler);
+        lock.writeLock().lock();
+        try {
+            pulseListeners
+                    .computeIfAbsent(eventClass, k -> new EnumMap<>(Event.Priority.class))
+                    .computeIfAbsent(priority, k -> new ObjectArrayList<>())
+                    .add(handler);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public void unregisterAll() {
-        pulseListeners.clear();
+        lock.writeLock().lock();
+        try {
+            pulseListeners.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     @Override
     public void reload() {
         unregisterAll();
         registerDefaultListeners();
-        permanentListeners.forEach(this::register);
+        lock.writeLock().lock();
+        try {
+            permanentListeners.forEach(this::register);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public void registerDefaultListeners() {
@@ -118,5 +135,4 @@ public class ListenerRegistry implements Registry {
         register(MessagePulseListener.class);
         register(MutePulseListener.class);
     }
-
 }

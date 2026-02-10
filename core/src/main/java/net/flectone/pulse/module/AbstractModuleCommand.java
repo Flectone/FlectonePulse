@@ -2,6 +2,7 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.setting.CommandSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
@@ -21,7 +22,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class AbstractModuleCommand<M extends LocalizationSetting> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
 
-    private final List<String> prompts = new ArrayList<>();
+    private final List<String> prompts = new ObjectArrayList<>();
 
     @Inject private FileFacade fileFacade;
     @Inject private Provider<CommandRegistry> commandRegistryProvider;

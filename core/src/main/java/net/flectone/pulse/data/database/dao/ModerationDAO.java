@@ -10,6 +10,7 @@ import net.flectone.pulse.model.util.Moderation;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +44,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return list of moderation actions, empty list if player is unknown
      */
     public List<Moderation> get(@NonNull FPlayer player, Moderation.Type type) {
-        if (player.isUnknown()) return List.of();
+        if (player.isUnknown()) return Collections.emptyList();
         return withHandle(sql -> sql.findByPlayerAndType(player.getId(), type.ordinal()));
     }
 
@@ -55,7 +56,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return list of valid moderation actions, empty list if player is unknown
      */
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type) {
-        if (player.isUnknown()) return List.of();
+        if (player.isUnknown()) return Collections.emptyList();
         return withHandle(sql -> sql.findValidByPlayerAndType(
                 player.getId(),
                 type.ordinal(),

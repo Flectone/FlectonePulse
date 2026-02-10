@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.poll.model;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.flectone.pulse.model.entity.FEntity;
 
@@ -14,7 +15,7 @@ public class Poll {
     private final long repeatTime;
     private final boolean multipleVote;
     private final String title;
-    private final List<String> answers = new ArrayList<>();
+    private final List<String> answers = new ObjectArrayList<>();
     private final Map<UUID, boolean[]> votesMap = new HashMap<>();
 
     private long nextRepeat;

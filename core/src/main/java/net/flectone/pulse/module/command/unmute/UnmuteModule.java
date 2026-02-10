@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.unmute;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -14,14 +15,13 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,7 +104,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
             return;
         }
 
-        List<Moderation> mutes = new ArrayList<>();
+        List<Moderation> mutes = new ObjectArrayList<>();
 
         if (id == -1) {
             mutes.addAll(moderationService.getValidMutes(fTarget));

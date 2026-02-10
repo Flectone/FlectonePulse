@@ -1,5 +1,7 @@
 package net.flectone.pulse.model.util;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -7,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public record FImage(String link) {
         int x = 0;
         int y = 0;
 
-        List<String> pixels = new ArrayList<>();
+        List<String> pixels = new ObjectArrayList<>();
 
         while (y < height) {
             StringBuilder text = new StringBuilder();

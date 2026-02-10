@@ -4,16 +4,16 @@ import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
 public class LibraryResolver {
 
-    private final List<Library> libraries = new ArrayList<>();
+    private final List<Library> libraries = new ObjectArrayList<>();
 
     @Getter private final LibraryManager libraryManager;
 
@@ -117,6 +117,14 @@ public class LibraryResolver {
                         .relocatedPattern("net.flectone.pulse.library.gson")
                         .build()
                 )
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("it{}unimi{}dsi")
+                .artifactId("fastutil")
+                .version(BuildConfig.FASTUTIL_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 

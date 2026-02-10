@@ -1,5 +1,6 @@
 package net.flectone.pulse.processing.context;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.With;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -31,12 +32,12 @@ public record MessageContext(
 
     public MessageContext {
         flags = Map.copyOf(new EnumMap<>(flags != null && !flags.isEmpty() ? flags : new EnumMap<>(MessageFlag.class)));
-        tagResolvers = Set.copyOf(tagResolvers != null ? tagResolvers : Set.of());
+        tagResolvers = tagResolvers == null ? Collections.emptySet() : new ObjectOpenHashSet<>(tagResolvers);
         userMessage = StringUtils.defaultString(userMessage);
     }
 
     public MessageContext(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
-        this(new EnumMap<>(MessageFlag.class), Set.of(), sender, receiver, messageUUID, message, null);
+        this(new EnumMap<>(MessageFlag.class), Collections.emptySet(), sender, receiver, messageUUID, message, null);
     }
 
     @CheckReturnValue
@@ -70,7 +71,7 @@ public record MessageContext(
 
     @CheckReturnValue
     public MessageContext addTagResolver(TagResolver tagResolver) {
-        Set<TagResolver> newResolvers = new HashSet<>(this.tagResolvers);
+        Set<TagResolver> newResolvers = new ObjectOpenHashSet<>(this.tagResolvers);
         newResolvers.add(tagResolver);
 
         return withTagResolvers(newResolvers);
@@ -80,7 +81,7 @@ public record MessageContext(
     public MessageContext addTagResolvers(Collection<TagResolver> tagResolvers) {
         if (tagResolvers == null || tagResolvers.isEmpty()) return this;
 
-        Set<TagResolver> newResolvers = new HashSet<>(this.tagResolvers);
+        Set<TagResolver> newResolvers = new ObjectOpenHashSet<>(this.tagResolvers);
         newResolvers.addAll(tagResolvers);
 
         return withTagResolvers(newResolvers);

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -20,7 +21,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -56,7 +56,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        Set<TagResolver> resolvers = new HashSet<>();
+        Set<TagResolver> resolvers = new ObjectOpenHashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
         Audience sender = getAudienceOrDefault(messageContext.sender().getUuid(), null);

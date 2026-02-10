@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerSetupConnectEvent;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -25,13 +26,12 @@ import org.apache.commons.lang3.Strings;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytaleBaseListener implements HytaleListener {
 
-    private final Set<UUID> disconnectPlayers = new CopyOnWriteArraySet<>();
+    private final Set<UUID> disconnectPlayers = new ObjectOpenHashSet<>();
 
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
@@ -64,9 +64,12 @@ public class HytaleBaseListener implements HytaleListener {
     // PlayerDisconnectEvent can be called multiple times, so we need to keep first disconnect and remove it later
     public void onPlayerDisconnectEvent(PlayerDisconnectEvent event) {
         UUID playerUUID = event.getPlayerRef().getUuid();
-        if (disconnectPlayers.contains(playerUUID)) return;
 
-        disconnectPlayers.add(playerUUID);
+        synchronized (disconnectPlayers) {
+            if (!disconnectPlayers.add(playerUUID)) {
+                return;
+            }
+        }
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
@@ -75,7 +78,11 @@ public class HytaleBaseListener implements HytaleListener {
             eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
         });
 
-        taskScheduler.runAsyncLater(() -> disconnectPlayers.remove(playerUUID));
+        taskScheduler.runAsyncLater(() -> {
+            synchronized (disconnectPlayers) {
+                disconnectPlayers.remove(playerUUID);
+            }
+        });
     }
 
     public PlayerPacketWatcher createUpdateLanguageWatcher() {

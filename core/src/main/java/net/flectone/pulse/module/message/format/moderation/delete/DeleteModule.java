@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.moderation.delete;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -15,15 +16,14 @@ import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryM
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -122,7 +122,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         UUID playerUUID = receiver.getUuid();
         HistoryMessage historyMessage = new HistoryMessage(messageUUID, component);
 
-        List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, k -> new ArrayList<>());
+        List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, k -> new ObjectArrayList<>());
 
         if (history.size() >= config().historyLength()) {
             history.removeFirst();

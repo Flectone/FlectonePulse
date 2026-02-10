@@ -83,6 +83,7 @@ subprojects {
         compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
         compileOnly "org.apache.commons:commons-text:$apache_commons_text_version"
+        compileOnly "it.unimi.dsi:fastutil:$fastutil_version"
     }
 
     buildConfig {

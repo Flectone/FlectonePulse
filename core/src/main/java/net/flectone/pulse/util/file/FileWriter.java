@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.exception.FileWriteException;
 import net.flectone.pulse.model.file.FilePack;
@@ -84,7 +87,7 @@ public class FileWriter {
         if (pathToFile.toFile().lastModified() == LAST_MODIFIED_TIME) return;
 
         Map<String, String> comments = new LinkedHashMap<>();
-        collectDescriptions(fileResource.getClass(), "", comments, new HashSet<>());
+        collectDescriptions(fileResource.getClass(), "", comments, new ObjectOpenHashSet<>());
 
         try {
             String yaml = yamlMapper.writeValueAsString(fileResource);
@@ -139,13 +142,13 @@ public class FileWriter {
 
     private String addCommentsToYaml(String yaml, Map<String, String> comments) {
         String[] lines = yaml.split("\n", -1);
-        List<String> out = new ArrayList<>(lines.length * 2);
+        List<String> out = new ObjectArrayList<>(lines.length * 2);
 
         int indentUnit = detectIndentUnit(lines);
         if (indentUnit <= 0) indentUnit = 2;
 
         Map<Integer, String> pathAtDepth = new HashMap<>();
-        Set<String> alreadyInserted = new HashSet<>();
+        Set<String> alreadyInserted = new ObjectOpenHashSet<>();
 
         for (String line : lines) {
             String trimmed = line.trim();
@@ -187,7 +190,7 @@ public class FileWriter {
             pathAtDepth.keySet().removeIf(d -> d > depth);
 
             // build dotted path
-            List<String> parts = new ArrayList<>();
+            List<String> parts = new ObjectArrayList<>();
             for (int d = 0; d <= depth; d++) {
                 String p = pathAtDepth.get(d);
                 if (p != null && !p.isEmpty()) parts.add(p);
@@ -212,7 +215,7 @@ public class FileWriter {
     }
 
     private int detectIndentUnit(String[] lines) {
-        List<Integer> numbers = new ArrayList<>();
+        List<Integer> numbers = new IntArrayList();
         for (String line : lines) {
             String trimmed = line.trim();
             if (trimmed.isEmpty()) continue;

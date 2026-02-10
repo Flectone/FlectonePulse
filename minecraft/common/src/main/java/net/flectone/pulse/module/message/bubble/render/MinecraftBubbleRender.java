@@ -14,6 +14,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -280,7 +281,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     private void interpolate(BubbleEntity bubbleEntity, ModernBubble bubble, Vector3f scale) {
-        List<EntityData<?>> metadataList = new ArrayList<>();
+        List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         // interpolation delay
         metadataList.add(new EntityData<>(8, EntityDataTypes.INT, -1));
@@ -295,7 +296,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity, boolean isFirstBubble) {
-        List<EntityData<?>> metadataList = new ArrayList<>();
+        List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         EntityType entityType = bubbleEntity.getEntityType();
 

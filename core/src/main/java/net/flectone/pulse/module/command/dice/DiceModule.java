@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.dice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -12,13 +13,12 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,7 +54,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
 
         int number = optionalNumber.orElse(min);
 
-        List<Integer> cubes = new ArrayList<>();
+        List<Integer> cubes = new ObjectArrayList<>();
         for (int i = 0; i < number; i++) {
             cubes.add(randomUtil.nextInt(min, max + 1));
         }

@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -56,7 +57,7 @@ public class DialogMenuBuilder implements MenuBuilder {
                 false,
                 DialogAction.CLOSE,
                 List.of(dialogBody),
-                List.of()
+                Collections.emptyList()
         );
 
         Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns());
@@ -209,7 +210,7 @@ public class DialogMenuBuilder implements MenuBuilder {
                 false,
                 DialogAction.CLOSE,
                 List.of(dialogBody),
-                List.of()
+                Collections.emptyList()
         );
 
         Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns())

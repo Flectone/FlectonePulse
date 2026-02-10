@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.tictactoe.model;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,7 +19,7 @@ public class TicTacToe {
     private static final int REMOVE_MULTIPLIER = -1;
     private static final int WIN_OFFSET = 5;
 
-    private final Map<Integer, Queue<String>> movesMap = new HashMap<>();
+    private final Map<Integer, Queue<String>> movesMap = new Int2ObjectArrayMap<>();
 
     private final int id;
     private final boolean hard;

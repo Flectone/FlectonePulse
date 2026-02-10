@@ -2,6 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FColorSQL;
@@ -86,7 +87,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             return;
         }
 
-        List<Integer> fColorsToDelete = new ArrayList<>(oldFColors.stream()
+        List<Integer> fColorsToDelete = new ObjectArrayList<>(oldFColors.stream()
                 .map(FColor::number)
                 .toList()
         );

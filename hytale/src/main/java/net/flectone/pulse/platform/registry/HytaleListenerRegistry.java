@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.HytaleBaseListener;
 import net.flectone.pulse.listener.HytaleBasePulseListener;
 import net.flectone.pulse.listener.HytaleListener;
@@ -17,7 +18,6 @@ import net.flectone.pulse.util.logging.FLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class HytaleListenerRegistry extends ListenerRegistry {
 
     // don't clear these listeners
-    private final List<HytaleListener> listeners = new ArrayList<>();
+    private final List<HytaleListener> listeners = new ObjectArrayList<>();
 
     private final FLogger fLogger;
     private final Injector injector;

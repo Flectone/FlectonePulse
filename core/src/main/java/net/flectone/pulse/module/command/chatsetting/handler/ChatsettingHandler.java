@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.chatsetting.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -23,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,7 +117,7 @@ public class ChatsettingHandler {
         };
 
         Consumer<SubMenuItem> onSelect = item -> {
-            Set<FColor> fColors = new HashSet<>(fTarget.getFColors().getOrDefault(type, Set.of()));
+            Set<FColor> fColors = new ObjectOpenHashSet<>(fTarget.getFColors().getOrDefault(type, Collections.emptySet()));
 
             // skip "null" colors replace
             item.colors().entrySet().stream()

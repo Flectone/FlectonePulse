@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
@@ -125,7 +126,7 @@ public class FileLoader {
     }
 
     public Map<String, Localization> loadLocalizationFiles(Config config, Map<String, Localization> localizations, boolean merge) {
-        Set<String> languages = new HashSet<>(Arrays.stream(DefaultLocalization.values()).map(DefaultLocalization::getName).toList());
+        Set<String> languages = new ObjectOpenHashSet<>(Arrays.stream(DefaultLocalization.values()).map(DefaultLocalization::getName).toList());
         languages.add(config.language().type());
 
         try (Stream<Path> paths = Files.walk(projectPath.resolve(Localization.FOLDER_NAME))) {

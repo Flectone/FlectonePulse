@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.bubble.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -97,7 +98,7 @@ public class BubbleService {
 
         int maxLength = fileFacade.message().bubble().maxLength();
 
-        List<Bubble> bubbles = new ArrayList<>();
+        List<Bubble> bubbles = new ObjectArrayList<>();
 
         StringBuilder line = new StringBuilder();
         for (char symbol : message.toCharArray()) {

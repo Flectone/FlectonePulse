@@ -7,6 +7,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -19,18 +21,15 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class MinecraftSidebarModule extends SidebarModule {
 
-    private final List<UUID> playerSidebars = new CopyOnWriteArrayList<>();
-    private final Map<UUID, List<String>> playerLegacySidebarContent = new ConcurrentHashMap<>();
+    private final List<UUID> playerSidebars = new ObjectArrayList<>();
+    private final Map<UUID, List<String>> playerLegacySidebarContent = new Object2ObjectOpenHashMap<>();
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -147,9 +146,8 @@ public class MinecraftSidebarModule extends SidebarModule {
         }
     }
 
-
     private void legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.getUuid(), new ArrayList<>(15));
+        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.getUuid(), new ObjectArrayList<>(15));
 
         for (int i = 0; i < content.size(); i++) {
             String oldLine = content.get(i);

@@ -8,13 +8,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dialog.Dialog;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.sender.PacketSender;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -79,7 +79,7 @@ public class DialogController {
         WrapperPlayServerShowDialog showDialog = dialog.getWrapperDialog();
         if (showDialog == null || !(showDialog.getDialog() instanceof MultiActionDialog multiActionDialog)) return;
 
-        List<ActionButton> actionButtons = new ArrayList<>(multiActionDialog.getActions());
+        List<ActionButton> actionButtons = new ObjectArrayList<>(multiActionDialog.getActions());
         for (int i = 0; i < actionButtons.size(); i++) {
             ActionButton button = actionButtons.get(i);
             if (button.getAction() instanceof DynamicCustomAction dynamicCustomAction

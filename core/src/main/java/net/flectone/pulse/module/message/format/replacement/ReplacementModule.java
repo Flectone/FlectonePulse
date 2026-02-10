@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -142,7 +143,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             String replacement = localization(receiver).values().get(name);
             if (replacement == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-            List<String> values = new ArrayList<>();
+            List<String> values = new ObjectArrayList<>();
             while (argumentQueue.hasNext()) {
                 Tag.Argument groupArg = argumentQueue.pop();
                 values.add(StringEscapeUtils.unescapeJava(groupArg.value()));
@@ -198,7 +199,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     private String processMessage(FEntity sender, String message) {
-        List<MatchInfo> matches = new ArrayList<>();
+        List<MatchInfo> matches = new ObjectArrayList<>();
 
         for (Map.Entry<String, Pattern> entry : triggerPatterns.entrySet()) {
             String name = entry.getKey();

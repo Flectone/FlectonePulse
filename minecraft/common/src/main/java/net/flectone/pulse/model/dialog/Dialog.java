@@ -5,10 +5,10 @@ import com.github.retrooper.packetevents.protocol.dialog.MultiActionDialog;
 import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public class Dialog {
 
     private final Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap = new HashMap<>();
-    private final List<Consumer<Dialog>> closeConsumerList = new ArrayList<>();
+    private final List<Consumer<Dialog>> closeConsumerList = new ObjectArrayList<>();
 
     @Setter private WrapperPlayServerShowDialog wrapperDialog;
 
@@ -37,8 +37,7 @@ public class Dialog {
         private final int columns;
         private final Map<Integer, ActionButton> buttonMap = new HashMap<>();
         private final Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap = new HashMap<>();
-        private final List<Consumer<Dialog>> closeConsumerList = new ArrayList<>();
-
+        private final List<Consumer<Dialog>> closeConsumerList = new ObjectArrayList<>();
 
         public Builder(CommonDialogData commonDialogData, int columns) {
             this.commonDialogData = commonDialogData;

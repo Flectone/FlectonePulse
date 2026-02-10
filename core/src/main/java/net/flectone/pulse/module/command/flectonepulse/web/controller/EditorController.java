@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
@@ -40,7 +41,7 @@ public class EditorController {
         configFiles.put("permissions.yml", fileFacade.permission());
 
         Map<String, Localization> localizationMap = fileFacade.localizations();
-        localizationFiles.put("localizations", new ArrayList<>());
+        localizationFiles.put("localizations", new ObjectArrayList<>());
 
         for (Map.Entry<String, Localization> entry : localizationMap.entrySet()) {
             String lang = entry.getKey();

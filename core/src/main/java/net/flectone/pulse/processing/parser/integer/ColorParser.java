@@ -2,11 +2,12 @@ package net.flectone.pulse.processing.parser.integer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
@@ -15,7 +16,6 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
             return Collections.emptyList();
         }
 
-        List<String> suggestions = new ArrayList<>();
+        List<String> suggestions = new ObjectArrayList<>();
 
         // basic suggestions
         List<String> constants = List.of("clear", "<gradient:#", "<", "#", "&");

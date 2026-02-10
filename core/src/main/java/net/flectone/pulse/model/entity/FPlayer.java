@@ -1,5 +1,8 @@
 package net.flectone.pulse.model.entity;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanArrayMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -12,7 +15,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
  * This is a platform-dynamic, Flectone player. All actions done through Flectone involving a player most likely are done through FPlayer.
@@ -34,9 +36,9 @@ public class FPlayer extends FEntity {
     private final int id;
     private final boolean console;
     private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
-    private final Map<String, Boolean> settingsBoolean = new HashMap<>();
+    private final Map<String, Boolean> settingsBoolean = new Object2BooleanArrayMap<>();
     private final Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
-    private final List<Ignore> ignores = new ArrayList<>();
+    private final List<Ignore> ignores = new ObjectArrayList<>();
     private final List<Component> constants = new CopyOnWriteArrayList<>();
 
     private boolean online;
@@ -44,7 +46,6 @@ public class FPlayer extends FEntity {
 
     public FPlayer(int id, boolean console, String name, UUID uuid, String type) {
         super(name, uuid, type);
-
         this.id = id;
         this.console = console;
     }
@@ -66,7 +67,7 @@ public class FPlayer extends FEntity {
     }
 
     public FPlayer(String name) {
-        this(-1,  false, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
+        this(-1, false, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
     }
 
     @Override
@@ -76,29 +77,23 @@ public class FPlayer extends FEntity {
 
     public void setOnline(boolean online) {
         if (isUnknown()) return;
-
         this.online = online;
     }
 
     public void setIp(String ip) {
         if (isUnknown()) return;
-
         this.ip = ip;
     }
 
-    public void setConstants(Collection<Component> constants) {
+    public void setConstants(List<Component> constants) {
         if (isUnknown()) return;
-
         this.constants.clear();
         this.constants.addAll(constants);
     }
 
     public boolean isIgnored(@NonNull FPlayer fPlayer) {
         if (ignores.isEmpty()) return false;
-
-        return ignores
-                .stream()
-                .anyMatch(ignore -> ignore.target() == fPlayer.getId());
+        return ignores.stream().anyMatch(ignore -> ignore.target() == fPlayer.getId());
     }
 
     public void setSetting(String messageType, boolean value) {
@@ -152,8 +147,17 @@ public class FPlayer extends FEntity {
     }
 
     public Map<Integer, String> getFColors(FColor.Type type) {
-        return fColors.getOrDefault(type, Collections.emptySet())
-                .stream()
-                .collect(Collectors.toMap(FColor::number, FColor::name));
+        Set<FColor> colors = fColors.get(type);
+        if (colors == null || colors.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Int2ObjectArrayMap<String> result = new Int2ObjectArrayMap<>(colors.size());
+        for (FColor color : colors) {
+            result.put(color.number(), color.name());
+        }
+
+        return result;
     }
+
 }

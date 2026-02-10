@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.BasePacketListener;
 import net.flectone.pulse.listener.DialogPacketListener;
 import net.flectone.pulse.listener.InventoryPacketListener;
@@ -16,13 +17,12 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
 public class MinecraftListenerRegistry extends ListenerRegistry {
 
-    private final List<PacketListenerCommon> packetListeners = new ArrayList<>();
+    private final List<PacketListenerCommon> packetListeners = new ObjectArrayList<>();
 
     private final Injector injector;
     private final PacketProvider packetProvider;

@@ -3,6 +3,7 @@ package net.flectone.pulse.util.file;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.FColor;
@@ -435,7 +436,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_1(FilePack files) {
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();
+        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ObjectArrayList<>();
 
         for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
             if (!vanillaMessage.name().equals("DEATH")) {
@@ -443,7 +444,7 @@ public class FileMigrator {
                 continue;
             }
 
-            List<String> translationKeys = new ArrayList<>(vanillaMessage.translationKeys());
+            List<String> translationKeys = new ObjectArrayList<>(vanillaMessage.translationKeys());
             if (!translationKeys.contains("death.attack.spear")) {
                 translationKeys.add("death.attack.spear");
             }

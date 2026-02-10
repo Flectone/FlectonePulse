@@ -3,12 +3,12 @@ package net.flectone.pulse.module.message.vanilla.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.protocol.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +65,7 @@ public class HytaleComponentExtractor extends ComponentExtractor<FormattedMessag
         }
 
         if (message.messageParams != null) {
-            List<String> sortedKeys = new ArrayList<>(message.messageParams.keySet());
+            List<String> sortedKeys = new ObjectArrayList<>(message.messageParams.keySet());
 
             for (String key : sortedKeys) {
                 Object value = extractFormattedMessageValue(message.messageParams.get(key));
@@ -76,7 +76,7 @@ public class HytaleComponentExtractor extends ComponentExtractor<FormattedMessag
         }
 
         if (message.params != null) {
-            List<String> sortedKeys = new ArrayList<>(message.params.keySet());
+            List<String> sortedKeys = new ObjectArrayList<>(message.params.keySet());
 
             for (String key : sortedKeys) {
                 Object value = extractParamValue(message.params.get(key));

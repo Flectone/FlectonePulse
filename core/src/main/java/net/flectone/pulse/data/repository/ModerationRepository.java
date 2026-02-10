@@ -11,6 +11,7 @@ import net.flectone.pulse.model.util.Moderation;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,7 +53,7 @@ public class ModerationRepository {
             return valid;
 
         } catch (Exception e) {
-            return List.of();
+            return Collections.emptyList();
         }
     }
 

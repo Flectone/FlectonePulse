@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.emit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -218,7 +219,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     }
 
     private List<String> splitKeyValuePairs(String content) {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ObjectArrayList<>();
         StringBuilder current = new StringBuilder();
 
         int depth = 0;

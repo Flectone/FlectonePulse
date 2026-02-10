@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -124,7 +125,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
                 entityId, UUID.randomUUID(), entityType, location, 0, 0, null
         ));
 
-        List<EntityData<?>> metadataList = new ArrayList<>();
+        List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         Vector3f translation = new Vector3f(textScreen.offsetX(), textScreen.offsetY(), textScreen.offsetZ());
         metadataList.add(new EntityData<>(entityUtil.displayOffset() + 2, EntityDataTypes.VECTOR3F, translation));
@@ -202,7 +203,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     }
 
     private void interpolate(FPlayer fPlayer, TextScreen textScreen, int entityId, float scale) {
-        List<EntityData<?>> metadataList = new ArrayList<>();
+        List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         // interpolation delay
         metadataList.add(new EntityData<>(8, EntityDataTypes.INT, -1));

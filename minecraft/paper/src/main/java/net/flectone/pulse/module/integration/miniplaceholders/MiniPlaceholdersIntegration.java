@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -17,7 +18,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -50,7 +50,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        Set<TagResolver> resolvers = new HashSet<>();
+        Set<TagResolver> resolvers = new ObjectOpenHashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
         FEntity fSender = messageContext.sender();

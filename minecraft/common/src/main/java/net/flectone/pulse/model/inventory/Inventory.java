@@ -3,11 +3,11 @@ package net.flectone.pulse.model.inventory;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class Inventory {
 
     private final int size;
     private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new HashMap<>();
-    private final List<Consumer<Inventory>> closeConsumerList = new ArrayList<>();
+    private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
     private final WrapperPlayServerOpenWindow wrapperWindow;
 
     @Setter private WrapperPlayServerWindowItems wrapperItems;
@@ -42,7 +42,7 @@ public class Inventory {
         private int size;
         private final Map<Integer, ItemStack> itemMap = new HashMap<>();
         private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new HashMap<>();
-        private final List<Consumer<Inventory>> closeConsumerList = new ArrayList<>();
+        private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
 
         public Builder name(Component name) {
             this.name = name;
@@ -74,7 +74,7 @@ public class Inventory {
                     ? new WrapperPlayServerOpenWindow(126, size >= 24 ? 5 : size, name)
                     : new WrapperPlayServerOpenWindow(126, "chest", name, size, 0);
 
-            List<ItemStack> items = new ArrayList<>(size);
+            List<ItemStack> items = new ObjectArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 items.add(itemMap.getOrDefault(i, ItemStack.EMPTY));
             }
