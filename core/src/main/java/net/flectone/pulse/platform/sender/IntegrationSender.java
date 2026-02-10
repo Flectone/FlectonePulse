@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
@@ -76,6 +77,7 @@ public class IntegrationSender {
         if (!integrationModule.hasMessenger()) return;
 
         FEntity sender = eventMetadata.sender();
+        if (eventMetadata instanceof VanishMetadata<?> vanishMetadata && !vanishMetadata.ignoreVanish() && integrationModule.isVanished(sender)) return;
 
         String plainFormat = plainSerialize(createFormat(format, eventMetadata));
         String plainMessage = plainSerialize(createMessage(eventMetadata));
