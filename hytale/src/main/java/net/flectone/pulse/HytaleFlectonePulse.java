@@ -24,6 +24,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @Getter
 @Singleton
@@ -48,7 +49,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryManager libraryManager = getLibraryManager(hytaleLogger);
+        LibraryManager libraryManager = getLibraryManager(fLogger);
         LibraryResolver libraryResolver = new HytaleLibraryResolver(libraryManager);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
@@ -96,23 +97,23 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @NotNull
-    private LibraryManager getLibraryManager(HytaleLogger hytaleLogger) {
+    private LibraryManager getLibraryManager(FLogger fLogger) {
         LogAdapter logAdapter = new LogAdapter() {
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s) {
                 switch (logLevel) {
-                    case INFO, DEBUG -> hytaleLogger.atInfo().log(s);
-                    case WARN -> hytaleLogger.atWarning().log(s);
-                    case ERROR -> hytaleLogger.atSevere().log(s);
+                    case INFO, DEBUG -> fLogger.log(Level.INFO, s);
+                    case WARN -> fLogger.log(Level.WARNING, s);
+                    case ERROR -> fLogger.log(Level.SEVERE, s);
                 }
             }
 
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
                 switch (logLevel) {
-                    case INFO, DEBUG -> hytaleLogger.atInfo().log(s, throwable);
-                    case WARN -> hytaleLogger.atWarning().log(s, throwable);
-                    case ERROR -> hytaleLogger.atSevere().log(s, throwable);
+                    case INFO, DEBUG -> fLogger.log(Level.INFO, s, throwable);
+                    case WARN -> fLogger.log(Level.WARNING, s, throwable);
+                    case ERROR -> fLogger.log(Level.SEVERE, s, throwable);
                 }
             }
         };
