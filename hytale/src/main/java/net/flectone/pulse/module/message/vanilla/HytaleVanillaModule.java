@@ -104,6 +104,7 @@ public class HytaleVanillaModule extends VanillaModule {
                         .build()
                 )
                 .parsedComponent(parsedComponent)
+                .ignoreVanish(false)
                 .build()
         );
     }

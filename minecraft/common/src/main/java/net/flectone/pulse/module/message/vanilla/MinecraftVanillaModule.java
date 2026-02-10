@@ -125,6 +125,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .build()
                 )
                 .parsedComponent(parsedComponent)
+                .ignoreVanish(false)
                 .build()
         );
     }
