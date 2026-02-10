@@ -136,10 +136,10 @@ public class HytaleLibraryResolver extends LibraryResolver {
         );
 
         addLibrary(Library.builder()
-                .groupId("com{}github{}ArikSquad")
+                .groupId("eu{}mikart{}adventure")
                 .artifactId("adventure-platform-hytale")
-                .version("1.0.1")
-                .repository(BuildConfig.JITPACK_REPOSITORY)
+                .version(BuildConfig.ADVENTURE_PLATFORM_HYTALE_VERSION)
+                .repository("https://repo.codemc.io/repository/ArikSquad/")
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")

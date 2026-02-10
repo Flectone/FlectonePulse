@@ -44,8 +44,8 @@ subprojects {
         maven { url = "https://oss.sonatype.org/content/groups/public/" }
         maven { url = "https://repo.aikar.co/content/groups/aikar/" }
         maven { url = "https://repo.codemc.io/repository/maven-releases/" }
+        maven { url = "https://repo.codemc.io/repository/ArikSquad/" }
         maven { url = "https://repo.helpch.at/releases/" }
-        maven { url = "https://repo.minebench.de" }
         maven { url = "https://repo.alessiodp.com/snapshots" }
         maven { url = "https://libraries.minecraft.net" }
         maven { url = "https://maven.maxhenkel.de/repository/public" }
@@ -65,6 +65,7 @@ subprojects {
         maven { url = "https://maven.hytale.com/release" }
         maven { url = "https://maven.hytale.com/pre-release" }
         maven { url = "https://www.cursemaven.com" }
+        maven { url = "https://repo.papermc.io/repository/maven-public/" }
     }
 
     dependencies {
