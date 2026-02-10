@@ -19,7 +19,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 
@@ -86,17 +85,17 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
         if (isModuleDisabledFor(messageContext.sender())) return messageContext;
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.ANIMATION, (argumentQueue, context) -> {
-            if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String animation = argumentQueue.pop().value();
-            if (!permissionChecker.check(messageContext.receiver(), permission().values().get(animation))) return Tag.selfClosingInserting(Component.empty());
+            if (!permissionChecker.check(messageContext.receiver(), permission().values().get(animation))) return MessagePipeline.ReplacementTag.emptyTag();
 
             Localization.Message.Format.Animation.AnimationLocalization animationLocalization = localization(messageContext.receiver()).values().stream()
                     .filter(localization -> animation.equals(localization.name()))
                     .filter(localization -> localization.texts() != null && !localization.texts().isEmpty())
                     .findAny()
                     .orElse(null);
-            if (animationLocalization == null) return Tag.selfClosingInserting(Component.empty());
+            if (animationLocalization == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             Message.Format.Animation.AnimationConfig animationConfig = config().values().stream()
                     .filter(config -> animation.equals(config.name()))
@@ -109,7 +108,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
                             .interval(0)
                             .build()
                     );
-            if (animationConfig.interval() < 0) return Tag.selfClosingInserting(Component.empty());
+            if (animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
 
             UUID player = messageContext.receiver().getUuid();
             int playerIndex = increment(player, animation, animationConfig.interval(), animationLocalization.texts().size());
@@ -123,7 +122,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
 
                 return Tag.inserting(messagePipeline.build(textContext));
             } catch (IndexOutOfBoundsException e) { // reload safety
-                return Tag.selfClosingInserting(Component.empty());
+                return MessagePipeline.ReplacementTag.emptyTag();
             }
         });
     }

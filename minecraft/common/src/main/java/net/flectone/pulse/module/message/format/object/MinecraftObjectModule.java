@@ -92,7 +92,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag createPlayerHeadTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         if (config().hideInvisiblePlayerHead()
                 && !messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return Tag.selfClosingInserting(Component.empty());
+                && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent);
         if (receiverVersionTag != null) return receiverVersionTag;
@@ -155,7 +155,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent);
         if (receiverVersionTag != null) return receiverVersionTag;
-        if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+        if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
         Key sprite = Key.key(argumentQueue.pop().value());
         Tag.Argument secondArgument = argumentQueue.peek();
@@ -176,7 +176,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
             return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent));
         } else if (fReceiver.isUnknown()) {
-            return Tag.selfClosingInserting(Component.empty());
+            return MessagePipeline.ReplacementTag.emptyTag();
         }
 
         // check player version
@@ -192,7 +192,7 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         // for old client
-        return Tag.selfClosingInserting(Component.empty());
+        return MessagePipeline.ReplacementTag.emptyTag();
     }
 
     private Component getDefaultObjectComponent(MessageContext messageContext) {

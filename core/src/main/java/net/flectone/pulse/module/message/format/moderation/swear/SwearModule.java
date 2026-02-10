@@ -121,10 +121,10 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
             Tag.Argument swearTag = argumentQueue.peek();
-            if (swearTag == null) return Tag.selfClosingInserting(Component.empty());
+            if (swearTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String swear = swearTag.value();
-            if (swear.isBlank()) return Tag.selfClosingInserting(Component.empty());
+            if (swear.isBlank()) return MessagePipeline.ReplacementTag.emptyTag();
 
             Localization.Message.Format.Moderation.Swear localization = localization(receiver);
             String symbols = localization.symbol().repeat(swear.length());

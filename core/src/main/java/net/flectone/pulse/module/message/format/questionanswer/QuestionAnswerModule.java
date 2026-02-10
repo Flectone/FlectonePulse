@@ -146,14 +146,14 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {
             Tag.Argument questionTag = argumentQueue.peek();
-            if (questionTag == null) return Tag.selfClosingInserting(Component.empty());
+            if (questionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String questionKey = questionTag.value();
-            if (questionKey.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (questionKey.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             sendAnswer(processId, sender, receiver, questionKey);
 
-            return Tag.selfClosingInserting(Component.empty());
+            return MessagePipeline.ReplacementTag.emptyTag();
         });
     }
 

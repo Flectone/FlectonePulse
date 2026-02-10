@@ -59,7 +59,7 @@ public class WorldModule extends AbstractModule {
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
             String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
-            if (StringUtils.isEmpty(worldPrefix)) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
             MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)

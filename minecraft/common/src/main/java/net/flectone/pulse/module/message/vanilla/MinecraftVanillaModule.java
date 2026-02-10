@@ -141,13 +141,13 @@ public class MinecraftVanillaModule extends VanillaModule {
     @Override
     public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
         return TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
-            if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt numberArgument = argumentQueue.pop().asInt();
-            if (numberArgument.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (numberArgument.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             int number = numberArgument.getAsInt();
-            if (number > parsedComponent.arguments().size()) return Tag.selfClosingInserting(Component.empty());
+            if (number > parsedComponent.arguments().size()) return MessagePipeline.ReplacementTag.emptyTag();
 
             Object replacement = parsedComponent.arguments().get(number);
 
@@ -155,7 +155,7 @@ public class MinecraftVanillaModule extends VanillaModule {
             if (!argumentQueue.hasNext()) return argumentResolver(fResolver, replacement);
 
             // <argument:...:...>
-            if (!(replacement instanceof Component component)) return Tag.selfClosingInserting(Component.empty());
+            if (!(replacement instanceof Component component)) return MessagePipeline.ReplacementTag.emptyTag();
 
             String type = argumentQueue.pop().lowerValue();
             return switch (type) {
@@ -168,7 +168,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                 // <argument:...:hover_text:...>, <argument:...:hover_style>
                 case "hover_text", "hover_style" -> {
                     HoverEvent<?> hoverEvent = findFirstHoverEvent(component);
-                    if (hoverEvent == null) yield Tag.selfClosingInserting(Component.empty());
+                    if (hoverEvent == null) yield MessagePipeline.ReplacementTag.emptyTag();
 
                     // <argument:...:hover_style>
                     if (type.equals("hover_style")) yield Tag.styling(style -> style.hoverEvent(hoverEvent));
@@ -190,7 +190,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         default -> Component.empty();
                     });
                 }
-                default -> Tag.selfClosingInserting(Component.empty());
+                default -> MessagePipeline.ReplacementTag.emptyTag();
             };
         });
     }
@@ -234,7 +234,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
                 yield Tag.selfClosingInserting(component.color(color));
             }
-            default -> Tag.selfClosingInserting(Component.empty());
+            default -> MessagePipeline.ReplacementTag.emptyTag();
         };
     }
 

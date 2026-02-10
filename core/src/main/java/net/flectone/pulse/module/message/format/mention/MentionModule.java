@@ -117,7 +117,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
-            if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
+            if (mentionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String mention = mentionTag.value();
             if (mention.isEmpty()) {

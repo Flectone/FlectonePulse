@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.emptyResolver;
 
 public abstract class AbstractModuleLocalization<M extends LocalizationSetting> extends AbstractModule {
 
@@ -215,7 +215,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
     }
 
     public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
-        if (!isEnable() || target == null) return empty(tag);
+        if (!isEnable() || target == null) return emptyResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             int targetIndex = 0;

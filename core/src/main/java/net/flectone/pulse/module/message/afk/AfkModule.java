@@ -95,7 +95,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
-            if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
 
             MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)

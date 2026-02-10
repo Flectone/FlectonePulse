@@ -111,13 +111,13 @@ public class HytaleVanillaModule extends VanillaModule {
     @Override
     public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
         return TagResolver.resolver(ARGUMENT, (argumentQueue, context) -> {
-            if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt numberArgument = argumentQueue.pop().asInt();
-            if (numberArgument.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (numberArgument.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             int number = numberArgument.getAsInt();
-            if (number > parsedComponent.arguments().size()) return Tag.selfClosingInserting(Component.empty());
+            if (number > parsedComponent.arguments().size()) return MessagePipeline.ReplacementTag.emptyTag();
 
             Object replacement = parsedComponent.arguments().get(number);
 

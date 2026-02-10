@@ -182,7 +182,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
-            if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 
             MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), streamPrefix)

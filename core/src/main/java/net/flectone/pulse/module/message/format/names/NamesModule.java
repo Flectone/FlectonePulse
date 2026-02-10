@@ -112,9 +112,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             List<Component> constants = fPlayer.getConstants();
                             if (constants.isEmpty()) {
                                 List<String> stringConstants = localization(fPlayer).constant();
-                                if (stringConstants.isEmpty()) {
-                                    return Tag.selfClosingInserting(Component.empty());
-                                }
+                                if (stringConstants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
                                 constants = stringConstants.stream()
                                         .map(string -> messagePipeline.build(messagePipeline.createContext(fPlayer, string)))
@@ -155,7 +153,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.VAULT_PREFIX.getTagName(), (argumentQueue, context) -> {
                             String prefix = integrationModule.getPrefix(fPlayer);
-                            if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
+                            if (StringUtils.isEmpty(prefix)) return MessagePipeline.ReplacementTag.emptyTag();
 
                             MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
                                     .withFlags(messageContext.flags())
@@ -166,7 +164,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.VAULT_SUFFIX.getTagName(), (argumentQueue, context) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
-                            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
+                            if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
 
                             MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
                                     .withFlags(messageContext.flags())

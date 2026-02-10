@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -17,13 +17,12 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
-import net.kyori.adventure.text.Component;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
@@ -156,7 +155,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
-            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
 
             MessageContext suffixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), suffix)

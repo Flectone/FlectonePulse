@@ -134,13 +134,13 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
             Tag.Argument argument = argumentQueue.peek();
-            if (argument == null) return Tag.selfClosingInserting(Component.empty());
+            if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String name = argument.value();
-            if (!permissionChecker.check(sender, permission().values().get(name))) return Tag.selfClosingInserting(Component.empty());
+            if (!permissionChecker.check(sender, permission().values().get(name))) return MessagePipeline.ReplacementTag.emptyTag();
 
             String replacement = localization(receiver).values().get(name);
-            if (replacement == null) return Tag.selfClosingInserting(Component.empty());
+            if (replacement == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             List<String> values = new ArrayList<>();
             while (argumentQueue.hasNext()) {
@@ -157,17 +157,17 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 case "skin" -> skinTag(messageContext);
                 case "item" -> itemTag(messageContext);
                 case "url" -> {
-                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
 
                     yield urlTag(messageContext, values.get(1));
                 }
                 case "image" -> {
-                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
 
                     yield imageTag(messageContext, values.get(1));
                 }
                 case "spoiler" -> {
-                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+                    if (values.size() < 2) yield MessagePipeline.ReplacementTag.emptyTag();
 
                     yield spoilerTag(messageContext, values.get(1));
                 }
@@ -249,7 +249,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag spoilerTag(MessageContext messageContext, String spoilerText) {
         // skip deprecated issue <spoiler:\>
-        if (spoilerText.equals("\\")) return Tag.selfClosingInserting(Component.empty());
+        if (spoilerText.equals("\\")) return MessagePipeline.ReplacementTag.emptyTag();
 
         // "." to have the original context like ||%stats%||
         MessageContext spoilerContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), "." + spoilerText)
@@ -281,7 +281,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     private Tag pingTag(MessageContext messageContext) {
-        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return Tag.selfClosingInserting(Component.empty());
+        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return MessagePipeline.ReplacementTag.emptyTag();
 
         int ping = fPlayerService.getPing(fPlayer);
 
@@ -371,7 +371,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag statsTag(MessageContext messageContext) {
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(messageContext.sender());
-        if (statistics == null) return Tag.selfClosingInserting(Component.empty());
+        if (statistics == null) return MessagePipeline.ReplacementTag.emptyTag();
 
         String format = StringUtils.replaceEach(
                 localization(messageContext.receiver()).values().getOrDefault("stats", ""),
@@ -404,7 +404,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         try {
             componentPixels = createImageComponent(url);
         } catch (ExecutionException ignored) {
-            return Tag.selfClosingInserting(Component.empty());
+            return MessagePipeline.ReplacementTag.emptyTag();
         }
 
         String format = Strings.CS.replace(
@@ -446,7 +446,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag urlTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
-        if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+        if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
         String string = Strings.CS.replace(
                 localization(messageContext.receiver()).values().getOrDefault("url", ""),
@@ -468,13 +468,13 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag imageTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
-        if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+        if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
         Component componentPixels;
         try {
             componentPixels = createImageComponent(url);
         } catch (ExecutionException ignored) {
-            return Tag.selfClosingInserting(Component.empty());
+            return MessagePipeline.ReplacementTag.emptyTag();
         }
 
         String string = Strings.CS.replace(

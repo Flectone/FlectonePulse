@@ -104,7 +104,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                         .message(message)
                         .sound(soundOrThrow())
                         .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
-                            if (reply == null) return Tag.selfClosingInserting(Component.empty());
+                            if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                             MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
                                     .addTagResolvers(

@@ -8,10 +8,12 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
@@ -20,7 +22,6 @@ import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
-import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
@@ -33,7 +34,6 @@ import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -169,10 +169,10 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     private TagResolver bedrockGradientTag() {
         return TagResolver.resolver( "gradient", (argumentQueue, context) -> {
             Tag.Argument argument = argumentQueue.peek();
-            if (argument == null) return Tag.selfClosingInserting(Component.empty());
+            if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             TextColor textColor = TextColor.fromHexString(argument.value());
-            if (textColor == null) return Tag.selfClosingInserting(Component.empty());
+            if (textColor == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             return Tag.styling(textColor);
         });

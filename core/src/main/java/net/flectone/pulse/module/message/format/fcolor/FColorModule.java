@@ -92,10 +92,10 @@ public class FColorModule extends AbstractModule {
         colorsMap.forEach((integer, string) -> colorsMap.put(integer, legacyColorConvertor.convert(string)));
 
         messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
-            if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt number = argumentQueue.pop().asInt();
-            if (number.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (number.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             return Tag.preProcessParsed(colorsMap.getOrDefault(number.getAsInt(), ""));
         });

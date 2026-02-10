@@ -108,11 +108,11 @@ public class MinecraftBossbarModule extends BossbarModule {
 
     private TagResolver raidersTag(FPlayer fPlayer, String raiders) {
         String tag = "raiders";
-        if (StringUtils.isEmpty(raiders)) return MessagePipeline.ReplacementTag.empty(tag);
+        if (StringUtils.isEmpty(raiders)) return MessagePipeline.ReplacementTag.emptyResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
-            if (StringUtils.isEmpty(raidersRemaining)) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(raidersRemaining)) return MessagePipeline.ReplacementTag.emptyTag();
 
             String replaced = Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders);
             MessageContext tagContext = messagePipeline.createContext(fPlayer, replaced);

@@ -72,7 +72,7 @@ public class MessagePipeline {
                             .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
                             .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
                     )
-                    .map(ReplacementTag::empty)
+                    .map(ReplacementTag::emptyResolver)
                     .toList()
             );
         }
@@ -185,14 +185,19 @@ public class MessagePipeline {
             return name().toLowerCase();
         }
 
-        public TagResolver empty() {
-            return ReplacementTag.empty(getTagName());
+        public TagResolver emptyResolver() {
+            return ReplacementTag.emptyResolver(getTagName());
         }
 
-        public static TagResolver empty(@TagPattern String tag) {
+        public static TagResolver emptyResolver(@TagPattern String tag) {
             return TagResolver.resolver(tag, (argumentQueue, context) ->
                     Tag.selfClosingInserting(Component.empty())
             );
         }
+
+        public static Tag emptyTag() {
+            return Tag.selfClosingInserting(Component.empty());
+        }
+
     }
 }
