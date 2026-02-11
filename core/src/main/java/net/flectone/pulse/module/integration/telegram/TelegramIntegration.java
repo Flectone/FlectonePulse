@@ -51,7 +51,7 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = new FPlayer(fileFacade.localization().integration().telegram().senderName());
+        sender = FPlayer.builder().name(fileFacade.localization().integration().telegram().senderName()).build();
 
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;

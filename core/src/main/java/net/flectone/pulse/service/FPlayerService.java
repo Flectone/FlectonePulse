@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -54,7 +55,7 @@ public class FPlayerService {
 
     public void reload() {
         // invalidate and load console FPlayer to reload name
-        fPlayerRepository.invalid(getConsole().getUuid());
+        fPlayerRepository.invalid(getConsole().uuid());
         addConsole();
 
         // invalidate and load all platform players
@@ -62,16 +63,23 @@ public class FPlayerService {
             fPlayerRepository.invalid(uuid);
 
             String name = platformPlayerAdapter.getName(uuid);
-            FPlayer fPlayer = addFPlayer(uuid, name);
-            loadData(fPlayer);
-            saveFPlayerData(fPlayer);
+            saveFPlayerData(loadData(addFPlayer(uuid, name)));
         });
     }
 
     public void addConsole() {
-        FPlayer console = new FPlayer(true, fileFacade.config().logger().console());
+        FPlayer console = FPlayer.builder()
+                .console(true)
+                .name(fileFacade.config().logger().console())
+                .build();
+
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
+    }
+
+    public FPlayer updateCache(FPlayer fPlayer) {
+        fPlayerRepository.updateCache(fPlayer);
+        return fPlayer;
     }
 
     public FPlayer addFPlayer(UUID uuid, String name) {
@@ -83,18 +91,18 @@ public class FPlayerService {
         // player can be in cache and be unknown
         // or uuid and name can be invalid
         FPlayer fPlayer = fPlayerRepository.get(uuid);
-        if (fPlayer.isUnknown() || !fPlayer.getUuid().equals(uuid) || !fPlayer.getName().equals(name)) {
+        if (fPlayer.isUnknown() || !fPlayer.uuid().equals(uuid) || !fPlayer.name().equals(name)) {
             fPlayerRepository.invalid(uuid);
             fPlayer = fPlayerRepository.get(uuid);
         }
 
         // most often this is not a real IP (this is server ip) on login,
         // need to update it before calling saveFPlayerData from PlayerJoinEvent
-        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
+        fPlayer = fPlayer.withIp(platformPlayerAdapter.getIp(fPlayer));
 
         // player is not fully online on server,
         // but it should already be
-        fPlayer.setOnline(true);
+        fPlayer = fPlayer.withOnline(true);
 
         // add player to online cache and remove from offline
         fPlayerRepository.add(fPlayer);
@@ -103,10 +111,8 @@ public class FPlayerService {
     }
 
     // load player data
-    public void loadData(FPlayer fPlayer) {
-        loadSettings(fPlayer);
-        loadColors(fPlayer);
-        loadIgnores(fPlayer);
+    public FPlayer loadData(FPlayer fPlayer) {
+        return loadIgnores(loadColors(loadSettings(fPlayer)));
     }
 
     public void saveFPlayerData(FPlayer fPlayer) {
@@ -119,10 +125,6 @@ public class FPlayerService {
         });
     }
 
-    public int getPing(FPlayer player) {
-        return platformPlayerAdapter.getPing(player);
-    }
-
     public void invalidateOffline(UUID uuid) {
         fPlayerRepository.removeOffline(uuid);
     }
@@ -131,19 +133,22 @@ public class FPlayerService {
         fPlayerRepository.removeOnline(uuid);
     }
 
-    public void clearAndSave(FPlayer fPlayer) {
-        fPlayer.setOnline(false);
-        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
-        invalidateOnline(fPlayer.getUuid());
+    public FPlayer clearAndSave(FPlayer fPlayer) {
+        fPlayer = fPlayer.toBuilder()
+                .online(false)
+                .ip(platformPlayerAdapter.getIp(fPlayer))
+                .build();
+
+        fPlayerRepository.removeOnline(fPlayer);
+
         updateFPlayer(fPlayer);
+
+        return fPlayer;
     }
 
     public void updateFPlayer(FPlayer fPlayer) {
+        updateCache(fPlayer);
         fPlayerRepository.update(fPlayer);
-    }
-
-    public int getEntityId(FPlayer fPlayer) {
-        return platformPlayerAdapter.getEntityId(fPlayer.getUuid());
     }
 
     public FPlayer getFPlayer(int id) {
@@ -166,6 +171,10 @@ public class FPlayerService {
         return fPlayerRepository.get(uuid);
     }
 
+    public FPlayer getFPlayer(FEntity fEntity) {
+        return getFPlayer(fEntity.uuid());
+    }
+
     public FPlayer getFPlayer(Object player) {
         String name = platformPlayerAdapter.getName(player);
         if (name.isEmpty()) return FPlayer.UNKNOWN;
@@ -176,12 +185,16 @@ public class FPlayerService {
                 return getFPlayer(-1);
             }
 
-            return new FPlayer(name);
+            return FPlayer.builder().name(name).build();
         }
 
         FPlayer fPlayer = getFPlayer(uuid);
         if (fPlayer.isUnknown()) {
-            return new FPlayer(name, uuid, platformPlayerAdapter.getEntityTranslationKey(player));
+            return FPlayer.builder()
+                    .name(name)
+                    .uuid(uuid)
+                    .type(platformPlayerAdapter.getEntityTranslationKey(player))
+                    .build();
         }
 
         return fPlayer;
@@ -231,32 +244,33 @@ public class FPlayerService {
         return fPlayerRepository.getOnlineFPlayersWithConsole();
     }
 
-    public void loadColors(FPlayer fPlayer) {
-        fPlayerRepository.loadColors(fPlayer);
+    public FPlayer loadColors(FPlayer fPlayer) {
+        return fPlayerRepository.loadColors(fPlayer);
     }
 
     public void saveColors(FPlayer fPlayer) {
+        updateCache(fPlayer);
         fPlayerRepository.saveColors(fPlayer);
     }
 
-    public void loadIgnoresIfOffline(FPlayer fPlayer) {
-        if (platformPlayerAdapter.isOnline(fPlayer)) return;
+    public FPlayer loadIgnoresIfOffline(FPlayer fPlayer) {
+        if (platformPlayerAdapter.isOnline(fPlayer)) return fPlayer;
 
-        loadIgnores(fPlayer);
+        return loadIgnores(fPlayer);
     }
 
-    public void loadIgnores(FPlayer fPlayer) {
-        socialRepository.loadIgnores(fPlayer);
+    public FPlayer loadIgnores(FPlayer fPlayer) {
+        return socialRepository.loadIgnores(fPlayer);
     }
 
-    public void loadSettingsIfOffline(FPlayer fPlayer) {
-        if (platformPlayerAdapter.isOnline(fPlayer)) return;
+    public FPlayer loadSettingsIfOffline(FPlayer fPlayer) {
+        if (platformPlayerAdapter.isOnline(fPlayer)) return fPlayer;
 
-        loadSettings(fPlayer);
+        return loadSettings(fPlayer);
     }
 
-    public void loadSettings(FPlayer fPlayer) {
-        fPlayerRepository.loadSettings(fPlayer);
+    public FPlayer loadSettings(FPlayer fPlayer) {
+        return fPlayerRepository.loadSettings(fPlayer);
     }
 
     public List<Mail> getReceiverMails(FPlayer fPlayer) {
@@ -267,31 +281,33 @@ public class FPlayerService {
         return socialRepository.getSenderMails(fPlayer);
     }
 
-    public Ignore saveAndGetIgnore(FPlayer fPlayer, FPlayer fTarget) {
-        return socialRepository.saveAndGetIgnore(fPlayer, fTarget);
+    public FPlayer saveIgnore(FPlayer fPlayer, FPlayer fTarget) {
+        Ignore ignore = socialRepository.saveAndGetIgnore(fPlayer, fTarget);
+        if (ignore == null) return fPlayer;
+
+        return updateCache(fPlayer.withIgnore(ignore));
     }
 
-    public Mail saveAndGetMail(FPlayer fPlayer, FPlayer fTarget, String message) {
+    public Mail saveMail(FPlayer fPlayer, FPlayer fTarget, String message) {
         return socialRepository.saveAndGetMail(fPlayer, fTarget, message);
     }
 
-    public void deleteIgnore(Ignore ignore) {
+    public FPlayer deleteIgnore(FPlayer fPlayer, Ignore ignore) {
         socialRepository.deleteIgnore(ignore);
+        return updateCache(fPlayer.withoutIgnore(ignore));
     }
 
     public void deleteMail(Mail mail) {
         socialRepository.deleteMail(mail);
     }
 
-    public void saveSettings(FPlayer fPlayer) {
-        fPlayerRepository.saveSettings(fPlayer);
-    }
-
     public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
+        updateCache(fPlayer);
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 
     public void saveOrUpdateSetting(FPlayer fPlayer, SettingText setting) {
+        updateCache(fPlayer);
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 
@@ -308,11 +324,11 @@ public class FPlayerService {
             locale = newLocale;
         }
 
-        if (locale.equals(fPlayer.getSetting(SettingText.LOCALE))) return false;
+        SettingText settingName = SettingText.LOCALE;
+        if (locale.equals(fPlayer.getSetting(settingName))) return false;
         if (fPlayer.isUnknown()) return false;
 
-        fPlayer.setSetting(SettingText.LOCALE, locale);
-        saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
+        saveOrUpdateSetting(fPlayer.withSetting(settingName, locale), settingName);
         return true;
     }
 

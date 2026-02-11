@@ -2,6 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.SettingSQL;
@@ -9,6 +10,10 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Data Access Object for player settings in FlectonePulse.
@@ -41,20 +46,20 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      */
     public void save(@NonNull FPlayer player) {
         useTransaction(sql -> {
-            player.getSettingsBoolean().forEach((messageType, value) ->
+            player.settingsBoolean().forEach((messageType, value) ->
                     insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
             );
 
-            player.getSettingsText().forEach((settingText, string) ->
+            player.settingsText().forEach((settingText, string) ->
                     insertOrUpdate(sql, player, settingText.name(), string)
             );
         });
     }
 
     private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
-        int updated = sql.update(player.getId(), type, value);
+        int updated = sql.update(player.id(), type, value);
         if (updated == 0) {
-            sql.insert(player.getId(), type, value);
+            sql.insert(player.id(), type, value);
         }
     }
 
@@ -62,23 +67,32 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * Loads all settings for a player.
      *
      * @param player the player to load settings for
+     * @return new FPlayer with settings
      */
-    public void load(@NonNull FPlayer player) {
-        player.getSettingsBoolean().clear();
-        player.getSettingsText().clear();
+    public FPlayer load(@NonNull FPlayer player) {
+        int id = player.id();
 
-        useHandle(sql -> sql.findByPlayer(player.getId()).forEach((string, value) -> {
-            SettingText settingText = SettingText.fromString(string);
-            if (settingText == null) {
-                try {
-                    player.setSetting(string.toUpperCase(), value.equals("1"));
-                } catch (IllegalArgumentException e) {
-                    fLogger.warning(e);
-                }
-            } else {
-                player.setSetting(settingText, value);
+        Map<String, Boolean> settingsBoolean = new Object2BooleanOpenHashMap<>();
+        Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
+
+        withHandle(sql -> sql.findByPlayer(id)).forEach((key, value) -> {
+            SettingText setting = SettingText.fromString(key);
+            if (setting != null) {
+                settingsText.put(setting, value);
+                return;
             }
-        }));
+
+            try {
+                settingsBoolean.put(key.toUpperCase(), "1".equals(value));
+            } catch (IllegalArgumentException e) {
+                fLogger.warning(e);
+            }
+        });
+
+        return player.toBuilder()
+                .settingsText(Collections.unmodifiableMap(settingsText))
+                .settingsBoolean(Collections.unmodifiableMap(settingsBoolean))
+                .build();
     }
 
     /**

@@ -47,13 +47,13 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
 
         return inTransaction(sql -> {
             long currentTime = System.currentTimeMillis();
-            int updated = sql.update(currentTime, fSender.getId(), fIgnored.getId());
+            int updated = sql.update(currentTime, fSender.id(), fIgnored.id());
 
             if (updated == 0) {
-                int insertedId = sql.insert(currentTime, fSender.getId(), fIgnored.getId());
-                return new Ignore(insertedId, currentTime, fIgnored.getId());
+                int insertedId = sql.insert(currentTime, fSender.id(), fIgnored.id());
+                return new Ignore(insertedId, currentTime, fIgnored.id());
             } else {
-                return sql.findByInitiatorAndTarget(fSender.getId(), fIgnored.getId()).orElseThrow();
+                return sql.findByInitiatorAndTarget(fSender.id(), fIgnored.id()).orElseThrow();
             }
         });
     }
@@ -71,14 +71,15 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * Loads ignore relationships for a player.
      *
      * @param fPlayer the player to load ignores for
+     * @return new FPlayer with ignores
      */
-    public void load(@NonNull FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return;
+    public FPlayer load(@NonNull FPlayer fPlayer) {
+        if (fPlayer.isUnknown()) return fPlayer;
 
         List<Ignore> ignores = withHandle(sql ->
-                sql.findByInitiator(fPlayer.getId())
+                sql.findByInitiator(fPlayer.id())
         );
 
-        fPlayer.getIgnores().addAll(ignores);
+        return fPlayer.withIgnores(ignores);
     }
 }

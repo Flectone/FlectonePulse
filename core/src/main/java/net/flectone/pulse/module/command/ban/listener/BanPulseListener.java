@@ -45,7 +45,7 @@ public class BanPulseListener implements PulseListener {
 
         Moderation ban = bans.getFirst();
         FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
-        fPlayerService.loadColors(fPlayer);
+        fPlayer = fPlayerService.loadColors(fPlayer);
 
         Localization.Command.Ban localization = banModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
@@ -70,7 +70,7 @@ public class BanPulseListener implements PulseListener {
             );
         }
 
-        return event.withAllowed(false).withKickReason(reason);
+        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }
 
 }

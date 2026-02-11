@@ -41,7 +41,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
         return playerService.findOnlineFPlayers().stream()
                 .filter(player -> integrationModule.canSeeVanished(player, context.sender()))
                 .filter(fPlayer -> isVisible(context.sender(), fPlayer))
-                .map(FEntity::getName)
+                .map(FEntity::name)
                 .toList();
     }
 

@@ -37,13 +37,14 @@ public class TritonIntegration implements Listener, FIntegration {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getLanguagePlayer().getUUID());
+        String newLanguage = event.getNewLanguage().getLanguageId();
 
-        fPlayer.setSetting(SettingText.LOCALE, event.getNewLanguage().getLanguageId());
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
+        SettingText setting = SettingText.LOCALE;
+        fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(setting, newLanguage), setting);
     }
 
     public @Nullable String getLocale(FPlayer fPlayer) {
-        LanguagePlayer languagePlayer = TritonAPI.getInstance().getPlayerManager().get(fPlayer.getUuid());
+        LanguagePlayer languagePlayer = TritonAPI.getInstance().getPlayerManager().get(fPlayer.uuid());
         if (languagePlayer == null) return null;
 
         return languagePlayer.getLanguageId();

@@ -24,6 +24,7 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
@@ -44,9 +45,10 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private final MessagePipeline messagePipeline;
     private final ChatsettingHandler chatsettingHandler;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final FPlayerService fPlayerService;
 
     @Override
-    public void open(FPlayer fPlayer, FPlayer fTarget) {
+    public void open(FPlayer fPlayer, UUID fTargetUUID) {
         Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
         if (!(platformPlayer instanceof PlayerRef playerRef)) return;
 
@@ -61,6 +63,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         World world = universe.getWorld(worldUUID);
         if (world == null) return;
+
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
@@ -103,14 +107,15 @@ public class HytaleMenuBuilder implements MenuBuilder {
             ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
             if (status == ChatsettingHandler.Status.DENIED) return;
 
+            FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
             boolean currentEnabled = status.toBoolean();
 
             String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-            MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, fTarget, invertTitle);
+            MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, finalFTarget, invertTitle);
             Component componentInvertTitle = messagePipeline.build(invertTitleContext);
 
             String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-            MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, fTarget, invertLore);
+            MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, finalFTarget, invertLore);
             Component componentInvertLore = messagePipeline.build(invertLoreContext);
 
             uiContext.getById(id, ButtonBuilder.class).ifPresent(buttonBuilder -> buttonBuilder
@@ -120,7 +125,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
             uiContext.updatePage(true);
 
-            chatsettingModule.saveSetting(fPlayer, messageType);
+            chatsettingModule.saveSetting(finalFTarget, messageType);
         }));
     }
 
@@ -184,10 +189,14 @@ public class HytaleMenuBuilder implements MenuBuilder {
     }
 
     @Override
-    public void openSubMenu(FPlayer fPlayer, FPlayer fTarget, Component header,
-                            Runnable closeConsumer, List<SubMenuItem> items,
+    public void openSubMenu(FPlayer fPlayer,
+                            UUID fTargetUUID,
+                            Component header,
+                            Runnable closeConsumer,
+                            List<SubMenuItem> items,
                             Function<SubMenuItem, String> getItemMessage,
-                            Consumer<SubMenuItem> onSelect, String id) {
+                            Consumer<SubMenuItem> onSelect,
+                            String id) {
         Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(fPlayer);
         if (!(platformPlayer instanceof PlayerRef playerRef)) return;
 
@@ -204,6 +213,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
         if (world == null) return;
 
         GridGroup gridGroup = new GridGroup(config().columns());
+
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         for (int i = 0; i < items.size(); i++) {
             SubMenuItem item = items.get(i);
@@ -225,7 +236,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
                     chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                         onSelect.accept(item);
                         closeConsumer.run();
-                        open(fPlayer, fTarget);
+                        open(fPlayer, fTargetUUID);
                     })));
         }
 

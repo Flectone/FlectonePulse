@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
@@ -40,6 +41,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final PlaceholderAPIModule placeholderAPIModule;
@@ -119,9 +121,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         }
 
         return switch (params) {
-            case "player" -> fPlayer.getName();
-            case "ip" -> fPlayer.getIp();
-            case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
+            case "player" -> fPlayer.name();
+            case "ip" -> fPlayer.ip();
+            case "ping" -> String.valueOf(platformPlayerAdapter.getPing(fPlayer));
             case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
             case "tps" -> platformServerAdapter.getTPS();
             default -> null;
@@ -149,11 +151,11 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         }
 
         try {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
 
             if (fPlayer.isOnline()) {
-                Player receiver = Bukkit.getPlayer(fReceiver.getUuid());
+                Player receiver = Bukkit.getPlayer(fReceiver.uuid());
                 if (receiver == null) {
                     receiver = offlinePlayer.getPlayer();
                 }

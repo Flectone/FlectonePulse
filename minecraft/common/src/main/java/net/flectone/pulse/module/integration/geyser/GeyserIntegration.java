@@ -36,6 +36,6 @@ public class GeyserIntegration implements FIntegration {
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (geyserApi == null) return false;
 
-        return geyserApi.isBedrockPlayer(fPlayer.getUuid());
+        return geyserApi.isBedrockPlayer(fPlayer.uuid());
     }
 }

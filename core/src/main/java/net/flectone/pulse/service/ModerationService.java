@@ -92,7 +92,7 @@ public class ModerationService {
     }
 
     public Moderation add(FPlayer fPlayer, long time, String reason, int moderator, Moderation.Type type) {
-        moderationRepository.invalidate(fPlayer.getUuid(), type);
+        moderationRepository.invalidate(fPlayer.uuid(), type);
 
         return moderationRepository.save(fPlayer, time, reason, moderator, type);
     }
@@ -100,7 +100,7 @@ public class ModerationService {
     public void remove(FPlayer fPlayer, List<Moderation> moderations) {
         if (moderations.isEmpty()) return;
 
-        moderationRepository.invalidate(fPlayer.getUuid(), moderations.getFirst().type());
+        moderationRepository.invalidate(fPlayer.uuid(), moderations.getFirst().type());
 
         for (Moderation moderation : moderations) {
             moderationRepository.updateValid(moderation.withValid(false));

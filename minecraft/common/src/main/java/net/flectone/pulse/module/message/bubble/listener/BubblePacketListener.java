@@ -38,7 +38,7 @@ public class BubblePacketListener implements PacketListener {
         UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
         if (playerUUID == null) return;
 
-        bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().getUuid().equals(playerUUID));
+        bubbleRenderer.removeBubbleIf(bubble -> bubble.getSender().uuid().equals(playerUUID));
     }
 
     @Override

@@ -46,7 +46,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         String targetName = getArgument(commandContext, 0);
 
-        if (fPlayer.getName().equalsIgnoreCase(targetName)) {
+        if (fPlayer.name().equalsIgnoreCase(targetName)) {
             sendErrorMessage(EventMetadata.<Localization.Command.Ignore>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::myself)
@@ -67,23 +67,19 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
             return;
         }
 
-        Optional<Ignore> optionalIgnore = fPlayer.getIgnores()
+        Optional<Ignore> optionalIgnore = fPlayer.ignores()
                 .stream()
-                .filter(i -> i.target() == fTarget.getId())
+                .filter(i -> i.target() == fTarget.id())
                 .findFirst();
 
-        Ignore metadataIgnore;
-
+        Ignore metadataIgnore = optionalIgnore.orElse(null);
         if (optionalIgnore.isPresent()) {
-            metadataIgnore = optionalIgnore.get();
-            fPlayer.getIgnores().remove(optionalIgnore.get());
-            fPlayerService.deleteIgnore(optionalIgnore.get());
+            fPlayer = fPlayerService.deleteIgnore(fPlayer, optionalIgnore.get());
         } else {
-            Ignore newIgnore = fPlayerService.saveAndGetIgnore(fPlayer, fTarget);
-            if (newIgnore == null) return;
+            fPlayer = fPlayerService.saveIgnore(fPlayer, fTarget);
 
-            metadataIgnore = newIgnore;
-            fPlayer.getIgnores().add(newIgnore);
+            if (fPlayer.ignores().isEmpty()) return;
+            metadataIgnore = fPlayer.ignores().getLast();
         }
 
         sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()

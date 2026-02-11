@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -38,7 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -56,7 +57,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
-    private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SkinService skinService;
@@ -284,7 +284,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private Tag pingTag(MessageContext messageContext) {
         if (!(messageContext.sender() instanceof FPlayer fPlayer)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        int ping = fPlayerService.getPing(fPlayer);
+        int ping = platformPlayerAdapter.getPing(fPlayer);
 
         String format = Strings.CS.replace(
                 localization(messageContext.receiver()).values().getOrDefault("ping", ""),
@@ -428,7 +428,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     private Tag itemTag(MessageContext messageContext) {
-        Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().getUuid());
+        Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.TRANSLATE_ITEM));
 
         String format = localization(messageContext.receiver()).values().getOrDefault("item", "");

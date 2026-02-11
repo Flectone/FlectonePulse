@@ -34,7 +34,7 @@ public class OfflinePlayerParser extends PlayerParser {
         return fPlayerService.findAllFPlayers().stream()
                 .filter(player -> !player.isUnknown())
                 .filter(fPlayer -> isVisible(context.sender(), fPlayer))
-                .map(FEntity::getName)
+                .map(FEntity::name)
                 .toList();
     }
 }

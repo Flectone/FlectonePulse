@@ -63,11 +63,11 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
             fReceiver = tempFPlayer;
         }
 
-        Audience sender = getAudienceOrDefault(fSender.getUuid(), null);
+        Audience sender = getAudienceOrDefault(fSender.uuid(), null);
         Audience receiver = null;
 
         if (sender != null) {
-            receiver = getAudienceOrDefault(fReceiver.getUuid(), sender);
+            receiver = getAudienceOrDefault(fReceiver.uuid(), sender);
 
             resolvers.add(MiniPlaceholders.audiencePlaceholders());
             resolvers.add(MiniPlaceholders.relationalPlaceholders());

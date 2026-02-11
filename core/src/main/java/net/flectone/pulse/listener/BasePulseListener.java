@@ -31,19 +31,19 @@ public class BasePulseListener implements PulseListener {
     private final SoundPlayer soundPlayer;
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
-    public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.player();
-
-        // set correct ip
-        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
+    public PlayerJoinEvent onPlayerJoinEvent(PlayerJoinEvent event) {
+        FPlayer fPlayer = event.player().withIp(platformPlayerAdapter.getIp(event.player()));
 
         fPlayerService.saveFPlayerData(fPlayer);
+
+        return event.withPlayer(fPlayer);
     }
 
     @Pulse
-    public void onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
-        FPlayer fPlayer = event.player();
-        fPlayerService.clearAndSave(fPlayer);
+    public PlayerPersistAndDisposeEvent onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
+        FPlayer fPlayer = fPlayerService.clearAndSave(event.player());
+
+        return event.withPlayer(fPlayer);
     }
 
     @Pulse

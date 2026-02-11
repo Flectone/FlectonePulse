@@ -93,7 +93,7 @@ public class MinecraftStatusModule extends StatusModule {
         FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.loadColors(fPlayer);
+        fPlayer = fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 
@@ -176,8 +176,8 @@ public class MinecraftStatusModule extends StatusModule {
             if ("<players>".equalsIgnoreCase(sample.name())) {
                 onlineFPlayers.forEach(player -> {
                     JsonObject playerObject = new JsonObject();
-                    playerObject.addProperty("name", player.getName());
-                    playerObject.addProperty("id", player.getUuid().toString());
+                    playerObject.addProperty("name", player.name());
+                    playerObject.addProperty("id", player.uuid().toString());
                     jsonArray.add(playerObject);
                 });
 
@@ -188,7 +188,7 @@ public class MinecraftStatusModule extends StatusModule {
 
             MessageContext sampleContext = messagePipeline.createContext(fPlayer, sample.name());
             playerObject.addProperty("name", messagePipeline.buildLegacy(sampleContext));
-            playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.id());
+            playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).uuid().toString() : sample.id());
 
             jsonArray.add(playerObject);
         });

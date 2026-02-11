@@ -42,7 +42,7 @@ public class AdvancedBanIntegration implements FIntegration {
         if (punishment == null) return null;
 
         return new ExternalModeration(
-                fEntity.getName(),
+                fEntity.name(),
                 punishment.getOperator(),
                 punishment.getReason(),
                 punishment.getId(),
@@ -53,6 +53,6 @@ public class AdvancedBanIntegration implements FIntegration {
     }
 
     private String getUUID(FEntity fEntity) {
-        return UUIDManager.get().getUUID(fEntity.getName());
+        return UUIDManager.get().getUUID(fEntity.name());
     }
 }

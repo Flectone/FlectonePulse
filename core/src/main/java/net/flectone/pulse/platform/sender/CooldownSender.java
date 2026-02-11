@@ -83,9 +83,9 @@ public class CooldownSender {
         if (!(entity instanceof FPlayer fPlayer)) return false;
 
         if (permissionChecker.check(fPlayer, cooldownPermission.second())) return false;
-        if (!cooldownChecker.check(fPlayer.getUuid(), cooldown, cooldownOwner)) return false;
+        if (!cooldownChecker.check(fPlayer.uuid(), cooldown, cooldownOwner)) return false;
 
-        long timeLeft = cooldownRepository.getTimeLeft(fPlayer.getUuid(), cooldown, cooldownOwner);
+        long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
         MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
         Component component = messagePipeline.build(cooldownContext);

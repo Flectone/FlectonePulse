@@ -49,8 +49,8 @@ public class MailDAO implements BaseDAO<MailSQL> {
 
         return inTransaction(mailSQL -> {
             long date = System.currentTimeMillis();
-            int id = mailSQL.insert(date, sender.getId(), receiver.getId(), message);
-            return new Mail(id, date, sender.getId(), receiver.getId(), message);
+            int id = mailSQL.insert(date, sender.id(), receiver.id(), message);
+            return new Mail(id, date, sender.id(), receiver.id(), message);
         });
     }
 
@@ -72,7 +72,7 @@ public class MailDAO implements BaseDAO<MailSQL> {
     public List<Mail> getReceiver(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return Collections.emptyList();
 
-        return withHandle(sql -> sql.findByReceiver(fPlayer.getId()));
+        return withHandle(sql -> sql.findByReceiver(fPlayer.id()));
     }
 
     /**
@@ -84,7 +84,7 @@ public class MailDAO implements BaseDAO<MailSQL> {
     public List<Mail> getSender(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return Collections.emptyList();
 
-        return withHandle(sql -> sql.findBySender(fPlayer.getId()));
+        return withHandle(sql -> sql.findBySender(fPlayer.id()));
     }
 
 }

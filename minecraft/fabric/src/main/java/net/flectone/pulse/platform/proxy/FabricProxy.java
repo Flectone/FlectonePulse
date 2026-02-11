@@ -81,7 +81,7 @@ public class FabricProxy implements Proxy {
         PlayerManager playerManager = minecraftServer.getPlayerManager();
         if (playerManager == null) return false;
 
-        ServerPlayerEntity player = playerManager.getPlayer(sender.getUuid());
+        ServerPlayerEntity player = playerManager.getPlayer(sender.uuid());
         if (player == null) {
             player = Iterables.getFirst(playerManager.getPlayerList(), null);
         }

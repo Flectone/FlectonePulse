@@ -16,10 +16,10 @@ import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -42,7 +42,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final MinecraftComponentExtractor extractor;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
-    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
     private final IntegrationModule integrationModule;
@@ -52,7 +52,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   MinecraftComponentExtractor extractor,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
-                                  FPlayerService fPlayerService,
+                                  PlatformPlayerAdapter platformPlayerAdapter,
                                   TaskScheduler taskScheduler,
                                   PacketSender packetSender,
                                   IntegrationModule integrationModule) {
@@ -61,7 +61,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.extractor = extractor;
         this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
-        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
         this.integrationModule = integrationModule;
@@ -241,7 +241,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
-        String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
+        String formatTarget = fTarget.type().equals(FPlayer.TYPE)
                 ? localization.formatPlayer()
                 : localization.formatEntity();
 
@@ -284,6 +284,6 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component)));
+        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component)));
     }
 }

@@ -17,12 +17,14 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -35,10 +37,13 @@ public class InventoryMenuBuilder implements MenuBuilder {
     private final MessagePipeline messagePipeline;
     private final InventoryController inventoryController;
     private final ChatsettingHandler chatsettingHandler;
+    private final FPlayerService fPlayerService;
     private final @Named("isNewerThanOrEqualsV_1_14") boolean isNewerThanOrEqualsV_1_14;
 
     @Override
-    public void open(FPlayer fPlayer, FPlayer fTarget) {
+    public void open(FPlayer fPlayer, UUID fTargetUUID) {
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
+
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory());
         Component header = messagePipeline.build(headerContext);
@@ -76,15 +81,17 @@ public class InventoryMenuBuilder implements MenuBuilder {
                     ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
                     if (status == ChatsettingHandler.Status.DENIED) return;
 
+                    FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
                     boolean currentEnabled = status.toBoolean();
+
                     String invertMaterial = chatsettingModule.getCheckboxMaterial(!currentEnabled);
                     String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
 
-                    ItemStack newItemStack = (ItemStack) platformServerAdapter.buildItemStack(fTarget, invertMaterial, invertTitle, invertLore);
+                    ItemStack newItemStack = (ItemStack) platformServerAdapter.buildItemStack(finalFTarget, invertMaterial, invertTitle, invertLore);
                     inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
 
-                    chatsettingModule.saveSetting(fPlayer, messageType);
+                    chatsettingModule.saveSetting(finalFTarget, messageType);
                 });
     }
 
@@ -137,7 +144,8 @@ public class InventoryMenuBuilder implements MenuBuilder {
     }
 
     @Override
-    public void openSubMenu(FPlayer fPlayer, FPlayer fTarget,
+    public void openSubMenu(FPlayer fPlayer,
+                            UUID fTargetUUID,
                             Component header,
                             Runnable closeConsumer,
                             List<SubMenuItem> items,
@@ -148,6 +156,8 @@ public class InventoryMenuBuilder implements MenuBuilder {
                 .name(header)
                 .size(54)
                 .addCloseConsumer(inventory -> closeConsumer.run());
+
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         for (int i = 0; i < items.size(); i++) {
             SubMenuItem item = items.get(i);
@@ -162,8 +172,8 @@ public class InventoryMenuBuilder implements MenuBuilder {
             inventoryBuilder.addItem(i, (ItemStack) platformServerAdapter.buildItemStack(fTarget, material, title, lore));
             inventoryBuilder.addClickHandler(i, (itemStack, inventory) -> chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                 onSelect.accept(item);
-                inventoryController.close(fPlayer.getUuid());
-                open(fPlayer, fTarget);
+                inventoryController.close(fPlayer.uuid());
+                open(fPlayer, fTargetUUID);
             }));
         }
 

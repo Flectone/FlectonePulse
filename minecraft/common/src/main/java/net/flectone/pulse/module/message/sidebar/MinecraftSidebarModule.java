@@ -57,9 +57,9 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     @Override
     public void remove(FPlayer fPlayer) {
-        if (!playerSidebars.contains(fPlayer.getUuid())) return;
+        if (!playerSidebars.contains(fPlayer.uuid())) return;
 
-        playerSidebars.remove(fPlayer.getUuid());
+        playerSidebars.remove(fPlayer.uuid());
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 getObjectiveName(fPlayer),
@@ -71,7 +71,7 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     @Override
     public void update(FPlayer fPlayer) {
-        if (!playerSidebars.contains(fPlayer.getUuid())) {
+        if (!playerSidebars.contains(fPlayer.uuid())) {
             create(fPlayer);
         }
 
@@ -82,7 +82,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     public void create(FPlayer fPlayer) {
         remove(fPlayer);
 
-        playerSidebars.add(fPlayer.getUuid());
+        playerSidebars.add(fPlayer.uuid());
 
         send(fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE);
     }
@@ -147,7 +147,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     }
 
     private void legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
-        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.getUuid(), new ObjectArrayList<>(15));
+        List<String> content = playerLegacySidebarContent.getOrDefault(fPlayer.uuid(), new ObjectArrayList<>(15));
 
         for (int i = 0; i < content.size(); i++) {
             String oldLine = content.get(i);
@@ -183,6 +183,6 @@ public class MinecraftSidebarModule extends SidebarModule {
             }
         }
 
-        playerLegacySidebarContent.put(fPlayer.getUuid(), content);
+        playerLegacySidebarContent.put(fPlayer.uuid(), content);
     }
 }

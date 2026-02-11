@@ -127,7 +127,7 @@ public class DiscordIntegration implements FIntegration {
             }
 
             String username = StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
-                    ? sender.getName()
+                    ? sender.name()
                     : messagePipeline.buildPlain(messagePipeline.createContext(sender, FPlayer.UNKNOWN, channelEmbed.webhookName()));
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
@@ -241,7 +241,7 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = new FPlayer(fileFacade.localization().integration().discord().senderName());
+        sender = FPlayer.builder().name(fileFacade.localization().integration().discord().senderName()).build();
 
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;

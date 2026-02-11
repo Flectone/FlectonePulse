@@ -43,7 +43,7 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
         if (!isHooked()) return event;
 
         FEntity fPlayer = messageContext.sender();
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return event;
 
         String message = FontImageWrapper.replaceFontImages(player, messageContext.message());

@@ -213,7 +213,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
         Poll poll = new Poll(config().lastId(),
-                fPlayer.getId(),
+                fPlayer.id(),
                 endTimeValue + System.currentTimeMillis(),
                 repeatTimeValue,
                 multipleValue,

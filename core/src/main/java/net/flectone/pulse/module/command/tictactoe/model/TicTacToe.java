@@ -144,7 +144,7 @@ public class TicTacToe {
     }
 
     public boolean contains(FPlayer fPlayer) {
-        return movesMap.containsKey(fPlayer.getId());
+        return movesMap.containsKey(fPlayer.id());
     }
 
     public void setNextPlayer() {
@@ -152,11 +152,11 @@ public class TicTacToe {
     }
 
     public boolean move(FPlayer fPlayer, String move) {
-        if (nextPlayer != fPlayer.getId()) {
+        if (nextPlayer != fPlayer.id()) {
             return false;
         }
 
-        Queue<String> moves = movesMap.get(fPlayer.getId());
+        Queue<String> moves = movesMap.get(fPlayer.id());
         if (movesMap.values().stream().allMatch(Collection::isEmpty) && (move == null || move.equals("create"))) {
             setNextPlayer();
             created = true;
@@ -174,9 +174,9 @@ public class TicTacToe {
         }
 
         moves.add(move);
-        movesMap.put(fPlayer.getId(), moves);
+        movesMap.put(fPlayer.id(), moves);
 
-        int currentPlayerValue = firstPlayer == fPlayer.getId()
+        int currentPlayerValue = firstPlayer == fPlayer.id()
                 ? FIRST_VALUE
                 : SECOND_VALUE;
 

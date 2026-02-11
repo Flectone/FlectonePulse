@@ -59,10 +59,10 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         Set<TagResolver> resolvers = new ObjectOpenHashSet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
-        Audience sender = getAudienceOrDefault(messageContext.sender().getUuid(), null);
+        Audience sender = getAudienceOrDefault(messageContext.sender().uuid(), null);
         Audience receiver = null;
         if (sender != null) {
-            receiver = getAudienceOrDefault(messageContext.receiver().getUuid(), sender);
+            receiver = getAudienceOrDefault(messageContext.receiver().uuid(), sender);
 
             resolvers.add(MiniPlaceholders.audiencePlaceholders());
             resolvers.add(MiniPlaceholders.relationalPlaceholders());

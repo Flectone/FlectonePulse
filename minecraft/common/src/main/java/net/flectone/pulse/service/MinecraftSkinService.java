@@ -35,7 +35,7 @@ public class MinecraftSkinService implements SkinService {
     }
 
     public PlayerHeadObjectContents.@NonNull ProfileProperty getProfilePropertyFromCache(FEntity entity) {
-        PlayerHeadObjectContents.ProfileProperty profileProperty = profilePropertyCache.getIfPresent(entity.getUuid());
+        PlayerHeadObjectContents.ProfileProperty profileProperty = profilePropertyCache.getIfPresent(entity.uuid());
         if (profileProperty != null) return profileProperty;
 
         profileProperty = getProfileProperty(entity);
@@ -45,13 +45,13 @@ public class MinecraftSkinService implements SkinService {
             return profileProperty;
         }
 
-        profilePropertyCache.put(entity.getUuid(), profileProperty);
+        profilePropertyCache.put(entity.uuid(), profileProperty);
         return profileProperty;
     }
 
     public PlayerHeadObjectContents.@NonNull ProfileProperty getProfileProperty(FEntity entity) {
         // get Platform Player textures
-        PlayerHeadObjectContents.ProfileProperty profileProperty = platformPlayerAdapter.getTexture(entity.getUuid());
+        PlayerHeadObjectContents.ProfileProperty profileProperty = platformPlayerAdapter.getTexture(entity.uuid());
         if (profileProperty != null) return profileProperty;
 
         // get SkinsRestorer and other integration textures
@@ -59,7 +59,7 @@ public class MinecraftSkinService implements SkinService {
         if (profileProperty != null) return profileProperty;
 
         // get PacketEvents user textures
-        User user = packetProvider.getUser(entity.getUuid());
+        User user = packetProvider.getUser(entity.uuid());
         if (user != null) {
             List<TextureProperty> textureProperties = user.getProfile().getTextureProperties();
             if (!textureProperties.isEmpty()) {
@@ -73,7 +73,7 @@ public class MinecraftSkinService implements SkinService {
         }
 
         // empty textures
-        return PlayerHeadObjectContents.property(entity.getName(), "");
+        return PlayerHeadObjectContents.property(entity.name(), "");
     }
 
     public String getAvatarUrl(FEntity entity) {
@@ -86,7 +86,7 @@ public class MinecraftSkinService implements SkinService {
 
     public String getSkin(FEntity entity) {
         String texture = integrationModule.getTextureUrl(entity);
-        return texture != null ? texture : entity.getUuid().toString();
+        return texture != null ? texture : entity.uuid().toString();
     }
 
 }

@@ -26,13 +26,13 @@ public class MaintenancePulseListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (maintenanceModule.isAllowed(fPlayer)) return event;
 
-        fPlayerService.loadColors(fPlayer);
+        fPlayer = fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = maintenanceModule.localization(fPlayer).kick();
         MessageContext messageContext = messagePipeline.createContext(fPlayer, reasonMessage);
         Component reason = messagePipeline.build(messageContext);
 
-        return event.withAllowed(false).withKickReason(reason);
+        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }
 
 }

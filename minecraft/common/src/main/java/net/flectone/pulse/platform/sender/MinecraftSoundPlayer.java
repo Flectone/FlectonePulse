@@ -37,7 +37,7 @@ public class MinecraftSoundPlayer implements SoundPlayer {
         packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(
                 Sounds.getByNameOrCreate(sound.name()),
                 SoundCategory.valueOf(sound.category()),
-                platformPlayerAdapter.getEntityId(receiver.getUuid()),
+                platformPlayerAdapter.getEntityId(receiver.uuid()),
                 sound.volume(),
                 sound.pitch()
         ));

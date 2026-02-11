@@ -63,7 +63,7 @@ public class MinecraftMessageSender implements MessageSender {
             chatPacket = new WrapperPlayServerChatMessage(message);
         }
 
-        packetSender.send(fPlayer.getUuid(), chatPacket, silent);
+        packetSender.send(fPlayer.uuid(), chatPacket, silent);
     }
 
 }

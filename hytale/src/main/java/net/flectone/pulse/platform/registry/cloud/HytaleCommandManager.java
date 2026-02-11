@@ -28,7 +28,7 @@ public class HytaleCommandManager extends CommandManager<FPlayer> {
 
     @Override
     public boolean hasPermission(@NonNull FPlayer sender, @NonNull String permission) {
-        return PermissionsModule.get().hasPermission(sender.getUuid(), permission);
+        return PermissionsModule.get().hasPermission(sender.uuid(), permission);
     }
 
 }

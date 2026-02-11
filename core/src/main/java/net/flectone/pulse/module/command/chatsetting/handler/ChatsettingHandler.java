@@ -69,15 +69,18 @@ public class ChatsettingHandler {
                 "<chat>", item.name()
         );
 
-        Consumer<SubMenuItem> onSelect = item -> fTarget.setSetting(SettingText.CHAT_NAME, "default".equalsIgnoreCase(item.name()) ? null : item.name());
+        Consumer<SubMenuItem> onSelect = item -> {
+            String chatName = "default".equalsIgnoreCase(item.name()) ? null : item.name();
+            fPlayerService.updateCache(syncFPlayer(fTarget).withSetting(SettingText.CHAT_NAME, chatName));
+        };
 
         String headerStr = localization.menu().chat().inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, headerStr);
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
         Component header = messagePipeline.build(headerContext);
 
-        Runnable closeConsumer = () -> chatsettingModule.saveSetting(fTarget, SettingText.CHAT_NAME);
+        Runnable closeConsumer = () -> chatsettingModule.saveSetting(syncFPlayer(fTarget), SettingText.CHAT_NAME);
 
-        menuBuilder.openSubMenu(fPlayer, fTarget, header, closeConsumer, items, getItemMessage, onSelect, id);
+        menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
 
     public void handleFColorMenu(FPlayer fPlayer,
@@ -117,7 +120,7 @@ public class ChatsettingHandler {
         };
 
         Consumer<SubMenuItem> onSelect = item -> {
-            Set<FColor> fColors = new ObjectOpenHashSet<>(fTarget.getFColors().getOrDefault(type, Collections.emptySet()));
+            Set<FColor> fColors = new ObjectOpenHashSet<>(syncFPlayer(fTarget).fColors().getOrDefault(type, Collections.emptySet()));
 
             // skip "null" colors replace
             item.colors().entrySet().stream()
@@ -134,16 +137,16 @@ public class ChatsettingHandler {
 
                     });
 
-            fTarget.getFColors().put(type, Set.copyOf(fColors));
+            fPlayerService.updateCache(syncFPlayer(fTarget).withFColors(type, fColors));
         };
 
         String headerStr = subMenu.inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, headerStr);
+        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
         Component header = messagePipeline.build(headerContext);
 
-        Runnable closeConsumer = () -> fPlayerService.saveColors(fTarget);
+        Runnable closeConsumer = () -> fPlayerService.saveColors(syncFPlayer(fTarget));
 
-        menuBuilder.openSubMenu(fPlayer, fTarget, header, closeConsumer, items, getItemMessage, onSelect, id);
+        menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
 
     public void handleSubMenu(FPlayer fPlayer, SubMenuItem item, Runnable successRunnable) {
@@ -169,8 +172,9 @@ public class ChatsettingHandler {
             return Status.DENIED;
         }
 
+        fTarget = syncFPlayer(fTarget);
         boolean currentEnabled = fTarget.isSetting(messageType);
-        fTarget.setSetting(messageType, !currentEnabled);
+        fPlayerService.updateCache(fTarget.withSetting(messageType, !currentEnabled));
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
     }
@@ -187,6 +191,10 @@ public class ChatsettingHandler {
                 default -> throw new IllegalArgumentException();
             };
         }
+    }
+
+    private FPlayer syncFPlayer(FPlayer fPlayer) {
+        return fPlayerService.getFPlayer(fPlayer);
     }
 
 }

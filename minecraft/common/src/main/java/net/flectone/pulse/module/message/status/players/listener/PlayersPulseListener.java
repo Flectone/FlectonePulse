@@ -27,13 +27,13 @@ public class PlayersPulseListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (playersModule.isAllowed(fPlayer)) return event;
 
-        fPlayerService.loadColors(fPlayer);
+        fPlayer = fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = playersModule.localization(fPlayer).full();
         MessageContext reasonContext = messagePipeline.createContext(fPlayer, reasonMessage);
         Component reason = messagePipeline.build(reasonContext);
 
-        return event.withAllowed(false).withKickReason(reason);
+        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }
 
 }

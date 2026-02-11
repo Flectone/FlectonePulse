@@ -133,7 +133,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
+        Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.id());
         if (ban == null) return;
 
         proxySender.send(fTarget, MessageType.SYSTEM_BAN);

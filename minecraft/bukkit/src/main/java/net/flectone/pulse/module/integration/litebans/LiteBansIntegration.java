@@ -32,15 +32,15 @@ public class LiteBansIntegration implements FIntegration {
     }
 
     public boolean isMuted(FEntity fEntity) {
-        return Database.get().isPlayerMuted(fEntity.getUuid(), null);
+        return Database.get().isPlayerMuted(fEntity.uuid(), null);
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        Entry mute = Database.get().getMute(fEntity.getUuid(), null, null);
+        Entry mute = Database.get().getMute(fEntity.uuid(), null, null);
         if (mute == null) return null;
 
         return new ExternalModeration(
-                fEntity.getName(),
+                fEntity.name(),
                 mute.getExecutorName(),
                 mute.getReason(),
                 mute.getId(),

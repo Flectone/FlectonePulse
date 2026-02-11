@@ -22,7 +22,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -149,8 +148,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     }
 
     public void setStreamPrefix(FPlayer fPlayer, String prefix) {
-        fPlayer.setSetting(SettingText.STREAM_PREFIX, prefix);
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.STREAM_PREFIX);
+        fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.STREAM_PREFIX, prefix), SettingText.STREAM_PREFIX);
     }
 
     @Override

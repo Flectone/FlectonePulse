@@ -51,8 +51,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
         if (!config().turnedOn()) return;
         if (!(player instanceof User user)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
-        fPlayerService.loadColors(fPlayer);
+        FPlayer fPlayer = fPlayerService.loadColors(fPlayerService.getFPlayer(user.getAddress().getAddress()));
 
         JsonObject responseJson = new JsonObject();
 

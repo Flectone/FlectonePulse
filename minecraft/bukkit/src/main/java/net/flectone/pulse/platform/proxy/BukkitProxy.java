@@ -55,7 +55,7 @@ public class BukkitProxy implements Proxy {
         if (!isEnable()) return false;
         if (tag == null) return false;
 
-        Player player = Bukkit.getPlayer(sender.getUuid());
+        Player player = Bukkit.getPlayer(sender.uuid());
         if (player == null) {
             player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
         }

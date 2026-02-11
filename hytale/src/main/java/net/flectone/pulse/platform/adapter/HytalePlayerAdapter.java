@@ -91,7 +91,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public int getPing(FPlayer fPlayer) {
-        PlayerRef player = getPlayer(fPlayer.getUuid());
+        PlayerRef player = getPlayer(fPlayer.uuid());
         if (player == null) return 0;
 
         PacketHandler.PingInfo pingInfo = player.getPacketHandler().getPingInfo(PongType.Direct);
@@ -431,7 +431,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public void kick(FPlayer fPlayer, Component reason) {
-        PlayerRef playerRef = getPlayer(fPlayer.getUuid());
+        PlayerRef playerRef = getPlayer(fPlayer.uuid());
         if (playerRef == null) return;
 
         playerRef.getPacketHandler().disconnect(PlainTextComponentSerializer.plainText().serialize(reason));

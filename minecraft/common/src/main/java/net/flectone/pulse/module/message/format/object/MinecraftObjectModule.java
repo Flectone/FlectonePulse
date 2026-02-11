@@ -106,8 +106,8 @@ public class MinecraftObjectModule extends ObjectModule {
 
             Component playerHeadComponent = Component.object().contents(
                     playerHeadBuilderComponent
-                            .name(sender.getName())
-                            .id(sender.getUuid())
+                            .name(sender.name())
+                            .id(sender.uuid())
                             .profileProperty(profileProperty)
                             .build()
             ).build();

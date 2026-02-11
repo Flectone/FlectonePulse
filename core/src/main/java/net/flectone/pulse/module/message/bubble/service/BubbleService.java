@@ -45,10 +45,10 @@ public class BubbleService {
 
     public void startTicker() {
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
-            PlayerBubbleState state = playerBubbleStates.get(fPlayer.getUuid());
+            PlayerBubbleState state = playerBubbleStates.get(fPlayer.uuid());
             if (state == null) return;
 
-            processBubbleQueue(fPlayer.getUuid(), state);
+            processBubbleQueue(fPlayer.uuid(), state);
         }, 1L);
     }
 
@@ -56,7 +56,7 @@ public class BubbleService {
         if (!bubbleRender.isCorrectPlayer(sender)) return;
 
         PlayerBubbleState state = playerBubbleStates.computeIfAbsent(
-                sender.getUuid(),
+                sender.uuid(),
                 uuid -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
         );
 
@@ -184,7 +184,7 @@ public class BubbleService {
     }
 
     public void clear(FPlayer fPlayer) {
-        PlayerBubbleState state = playerBubbleStates.remove(fPlayer.getUuid());
+        PlayerBubbleState state = playerBubbleStates.remove(fPlayer.uuid());
         if (state == null) return;
 
         clearBubbleState(state);

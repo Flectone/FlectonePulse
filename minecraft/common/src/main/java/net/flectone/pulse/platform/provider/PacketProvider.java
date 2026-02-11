@@ -34,7 +34,7 @@ public class PacketProvider {
     }
 
     public User getUser(FPlayer fPlayer) {
-        return getUser(fPlayer.getUuid());
+        return getUser(fPlayer.uuid());
     }
 
     public int getPing(Object player) {

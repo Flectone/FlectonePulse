@@ -41,13 +41,13 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
      * @param fPlayer the player whose colors to save
      */
     public void save(@NonNull FPlayer fPlayer) {
-        if (fPlayer.getFColors().isEmpty()) {
+        if (fPlayer.fColors().isEmpty()) {
             delete(fPlayer);
             return;
         }
 
-        useTransaction(sql ->
-                Arrays.stream(FColor.Type.values()).forEach(type -> saveType(sql, fPlayer, type))
+        useTransaction(sql -> Arrays.stream(FColor.Type.values())
+                .forEach(type -> saveType(sql, fPlayer, type))
         );
     }
 
@@ -57,33 +57,37 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
      * @param fPlayer the player whose colors to delete
      */
     public void delete(@NonNull FPlayer fPlayer) {
-        useHandle(sql -> sql.deleteFColors(fPlayer.getId()));
+        useHandle(sql -> sql.deleteFColors(fPlayer.id()));
     }
 
     /**
      * Loads the player's color preferences from the database.
      *
      * @param fPlayer the player whose colors to load
+     * @return new FPlayer with colors
      */
-    public void load(@NonNull FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return;
+    public FPlayer load(@NonNull FPlayer fPlayer) {
+        if (fPlayer.isUnknown()) return fPlayer;
 
-        fPlayer.getFColors().clear();
+        return withHandle(sql -> {
+            FPlayer newFPlayer = fPlayer;
+            for (FColor.Type type : FColor.Type.values()) {
+                newFPlayer = loadType(sql, fPlayer, type);
+            }
 
-        useHandle(sql ->
-                Arrays.stream(FColor.Type.values()).forEach(type -> loadType(sql, fPlayer, type))
-        );
+            return newFPlayer;
+        });
     }
 
     private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
-        Set<FColor> newFColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
-        Set<FColor> oldFColors = sql.findFColors(fPlayer.getId(), type.name());
+        Set<FColor> newFColors = fPlayer.fColors().getOrDefault(type, Collections.emptySet());
+        Set<FColor> oldFColors = sql.findFColors(fPlayer.id(), type.name());
         if (newFColors.equals(oldFColors)) {
             return;
         }
 
         if (newFColors.isEmpty()) {
-            sql.deleteFColors(fPlayer.getId(), type.name());
+            sql.deleteFColors(fPlayer.id(), type.name());
             return;
         }
 
@@ -103,21 +107,19 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             int fColorId = sql.findFColorIdByName(newFColor.name()).orElseGet(() -> sql.insertFColor(newFColor.name()));
 
             if (optionalOldFColor.isPresent()) {
-                sql.updateFColor(fPlayer.getId(), newFColor.number(), fColorId, type.name());
+                sql.updateFColor(fPlayer.id(), newFColor.number(), fColorId, type.name());
             } else {
-                sql.insertFColor(fPlayer.getId(), newFColor.number(), fColorId, type.name());
+                sql.insertFColor(fPlayer.id(), newFColor.number(), fColorId, type.name());
             }
         });
 
         if (!fColorsToDelete.isEmpty()) {
-            sql.deleteFColors(fPlayer.getId(), type.name(), fColorsToDelete);
+            sql.deleteFColors(fPlayer.id(), type.name(), fColorsToDelete);
         }
     }
 
-    private void loadType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
-        Set<FColor> newFColors = sql.findFColors(fPlayer.getId(), type.name());
-        if (!newFColors.isEmpty()) {
-            fPlayer.getFColors().put(type, newFColors);
-        }
+    private FPlayer loadType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
+        Set<FColor> newFColors = sql.findFColors(fPlayer.id(), type.name());
+        return fPlayer.withFColors(type, newFColors);
     }
 }

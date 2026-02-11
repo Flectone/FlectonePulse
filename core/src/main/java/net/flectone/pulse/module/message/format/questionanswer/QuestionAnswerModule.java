@@ -26,7 +26,6 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -127,7 +126,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
             Message.Format.QuestionAnswer.Question question = config().questions().get(entry.getKey());
             if (question != null
                     && (questionPermission != null && !permissionChecker.check(sender, questionPermission.cooldownBypass()))
-                    && cooldownChecker.check(sender.getUuid(), question.cooldown(), this.getClass().getName() + entry.getKey())) continue;
+                    && cooldownChecker.check(sender.uuid(), question.cooldown(), this.getClass().getName() + entry.getKey())) continue;
 
             result.append("<question:'").append(entry.getKey()).append("'>");
         }

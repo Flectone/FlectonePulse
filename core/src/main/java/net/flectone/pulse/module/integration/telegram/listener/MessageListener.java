@@ -20,7 +20,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;

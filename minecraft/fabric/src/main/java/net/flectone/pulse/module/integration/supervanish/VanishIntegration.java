@@ -54,6 +54,6 @@ public class VanishIntegration implements FIntegration {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        return VanishAPI.isVanished(minecraftServer, sender.getUuid());
+        return VanishAPI.isVanished(minecraftServer, sender.uuid());
     }
 }

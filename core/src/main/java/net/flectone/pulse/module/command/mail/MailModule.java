@@ -86,15 +86,15 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
             return;
         }
 
-        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        fPlayerService.loadSettingsIfOffline(fReceiver);
+        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         String message = getArgument(commandContext, 1);
 
-        Mail mail = fPlayerService.saveAndGetMail(fPlayer, fReceiver, message);
+        Mail mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
         if (mail == null) return;
 
         sendMessage(MailMetadata.<Localization.Command.Mail>builder()
@@ -104,7 +104,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                         .message(message)
                         .destination(config().destination())
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, finalFReceiver)})
                         .build()
                 )
                 .mail(mail)

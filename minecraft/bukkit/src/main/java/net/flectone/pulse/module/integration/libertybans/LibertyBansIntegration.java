@@ -65,8 +65,8 @@ public class LibertyBansIntegration implements FIntegration {
                 : fPlayerService.getConsole();
 
         return new ExternalModeration(
-                fEntity.getName(),
-                operator.getName(),
+                fEntity.name(),
+                operator.name(),
                 punishment.getReason(),
                 punishment.getIdentifier(),
                 punishment.getStartDate().toEpochMilli(),
@@ -79,8 +79,8 @@ public class LibertyBansIntegration implements FIntegration {
         if (!(fEntity instanceof FPlayer fPlayer) || !isHooked()) return Optional.empty();
 
         try {
-            UUID uuid = fPlayer.getUuid();
-            InetAddress ip = InetAddress.getByName(fPlayer.getIp());
+            UUID uuid = fPlayer.uuid();
+            InetAddress ip = InetAddress.getByName(fPlayer.ip());
 
             return libertyBans.getSelector()
                     .selectionByApplicabilityBuilder(uuid, ip)

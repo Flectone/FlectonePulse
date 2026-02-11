@@ -217,8 +217,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
             // check proxy players only if no online server receivers found
             for (FPlayer fReceiver : proxyReceivers) {
-                fPlayerService.loadIgnores(fReceiver);
-                fPlayerService.loadSettings(fReceiver);
+                fReceiver = fPlayerService.loadSettings(fPlayerService.loadIgnores(fReceiver));
                 if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
                     return false;
                 }

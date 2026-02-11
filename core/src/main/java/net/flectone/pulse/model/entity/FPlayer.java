@@ -3,7 +3,8 @@ package net.flectone.pulse.model.entity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.With;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.service.FPlayerService;
@@ -14,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * This is a platform-dynamic, Flectone player. All actions done through Flectone involving a player most likely are done through FPlayer.
@@ -27,137 +28,312 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @see FPlayerService
  */
-@Getter
-public class FPlayer extends FEntity {
+public interface FPlayer extends FEntity {
 
-    public static final FPlayer UNKNOWN = new FPlayer(FEntity.UNKNOWN_NAME);
-    public static final String TYPE = "PLAYER";
+    String TYPE = "PLAYER";
 
-    private final int id;
-    private final boolean console;
-    private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
-    private final Map<String, Boolean> settingsBoolean = new Object2BooleanArrayMap<>();
-    private final Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
-    private final List<Ignore> ignores = new ObjectArrayList<>();
-    private final List<Component> constants = new CopyOnWriteArrayList<>();
+    FPlayer UNKNOWN = FPlayer.builder().build();
 
-    private boolean online;
-    private String ip;
+    Integer id();
 
-    public FPlayer(int id, boolean console, String name, UUID uuid, String type) {
-        super(name, uuid, type);
-        this.id = id;
-        this.console = console;
-    }
+    boolean isConsole();
 
-    public FPlayer(int id, String name, UUID uuid, String type) {
-        this(id, false, name, uuid, type);
-    }
+    boolean isOnline();
 
-    public FPlayer(int id, String name, UUID uuid) {
-        this(id, name, uuid, FPlayer.TYPE);
-    }
+    String ip();
 
-    public FPlayer(String name, UUID uuid, String type) {
-        this(-1, false, name, uuid, type);
-    }
+    Map<FColor.Type, Set<FColor>> fColors();
 
-    public FPlayer(boolean console, String name) {
-        this(-1, console, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
-    }
+    Map<String, Boolean> settingsBoolean();
 
-    public FPlayer(String name) {
-        this(-1, false, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
-    }
+    Map<SettingText, String> settingsText();
 
-    @Override
-    public boolean isUnknown() {
-        return this.getId() == -1;
-    }
+    List<Ignore> ignores();
 
-    public void setOnline(boolean online) {
-        if (isUnknown()) return;
-        this.online = online;
-    }
+    List<Component> constants();
 
-    public void setIp(String ip) {
-        if (isUnknown()) return;
-        this.ip = ip;
-    }
+    FPlayer withOnline(boolean online);
 
-    public void setConstants(List<Component> constants) {
-        if (isUnknown()) return;
-        this.constants.clear();
-        this.constants.addAll(constants);
-    }
+    FPlayer withIp(String ip);
 
-    public boolean isIgnored(@NonNull FPlayer fPlayer) {
-        if (ignores.isEmpty()) return false;
-        return ignores.stream().anyMatch(ignore -> ignore.target() == fPlayer.getId());
-    }
+    boolean isIgnored(@NonNull FPlayer fPlayer);
 
-    public void setSetting(String messageType, boolean value) {
-        settingsBoolean.put(messageType, value);
-    }
+    FPlayer withSetting(String messageType, boolean value);
 
-    public void setSetting(SettingText settingText, String value) {
-        settingsText.put(settingText, value);
-    }
+    FPlayer withSetting(SettingText settingText, String value);
 
-    public @Nullable String getSetting(SettingText settingText) {
-        return settingsText.get(settingText);
-    }
+    FPlayer withIgnore(Ignore ignore);
 
-    public @NonNull String getSetting(MessageType messageType) {
-        return getSetting(messageType.name());
-    }
+    @Nullable String getSetting(SettingText settingText);
 
-    public @NonNull String getSetting(String messageType) {
-        return isSetting(messageType) ? "1" : "0";
-    }
+    @NonNull String getSetting(MessageType messageType);
 
-    public boolean isSetting(MessageType messageType) {
-        return isSetting(messageType.name());
-    }
+    @NonNull String getSetting(String messageType);
 
-    public boolean isSetting(String messageType) {
-        Boolean value = settingsBoolean.get(messageType);
-        return value == null || value;
-    }
+    boolean isSetting(MessageType messageType);
 
-    public void removeSetting(SettingText settingText) {
-        settingsText.remove(settingText);
-    }
+    boolean isSetting(String messageType);
 
-    public void removeSetting(String messageType) {
-        settingsBoolean.remove(messageType);
-    }
+    FPlayer withoutSetting(SettingText settingText);
 
-    public void removeSetting(MessageType messageType) {
-        removeSetting(messageType.name());
+    FPlayer withoutSetting(String messageType);
+
+    FPlayer withoutSetting(MessageType messageType);
+
+    FPlayer withoutIgnore(Ignore ignore);
+
+    Map<Integer, String> getFColors(FColor.Type type);
+
+    FPlayer withFColors(FColor.Type type, Set<FColor> fColors);
+
+    FPlayer withIgnores(List<Ignore> ignores);
+
+    FPlayer withConstants(List<Component> constants);
+
+    FPlayerImpl.FPlayerImplBuilder toBuilder();
+
+    static FPlayerImpl.FPlayerImplBuilder builder() {
+        return new FPlayerImpl.FPlayerImplBuilder();
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-
-        FPlayer fPlayer = (FPlayer) object;
-        return this.id == fPlayer.getId();
+    default boolean isUnknown() {
+        return id() == -1;
     }
 
-    public Map<Integer, String> getFColors(FColor.Type type) {
-        Set<FColor> colors = fColors.get(type);
-        if (colors == null || colors.isEmpty()) {
-            return Collections.emptyMap();
+    @Builder(toBuilder = true)
+    @With
+    record FPlayerImpl(
+            String name,
+            UUID uuid,
+            String type,
+            @Nullable Component showEntityName,
+            Integer id,
+            boolean console,
+            boolean online,
+            String ip,
+            Map<FColor.Type, Set<FColor>> fColors,
+            Map<String, Boolean> settingsBoolean,
+            Map<SettingText, String> settingsText,
+            List<Ignore> ignores,
+            List<Component> constants
+    ) implements FPlayer {
+
+        public FPlayerImpl {
+            if (name == null) name = FEntity.UNKNOWN_NAME;
+            if (uuid == null) uuid = FEntity.UNKNOWN_UUID;
+            if (type == null) type = TYPE;
+            if (id == null) id = -1;
+            if (fColors == null) fColors = Collections.emptyMap();
+            if (settingsBoolean == null) settingsBoolean = Collections.emptyMap();
+            if (settingsText == null) settingsText = Collections.emptyMap();
+            if (ignores == null) ignores = Collections.emptyList();
+            if (constants == null) constants = Collections.emptyList();
         }
 
-        Int2ObjectArrayMap<String> result = new Int2ObjectArrayMap<>(colors.size());
-        for (FColor color : colors) {
-            result.put(color.number(), color.name());
+        @Override
+        public boolean isConsole() {
+            return console;
         }
 
-        return result;
+        @Override
+        public boolean isOnline() {
+            return online;
+        }
+
+        @Override
+        public boolean isIgnored(@NonNull FPlayer fPlayer) {
+            if (ignores.isEmpty()) return false;
+
+            return ignores.stream().anyMatch(ignore -> ignore.target() == fPlayer.id());
+        }
+
+        @Override
+        public FPlayer withSetting(@NonNull String messageType, boolean value) {
+            Map<String, Boolean> newSettings = new Object2BooleanArrayMap<>(this.settingsBoolean);
+
+            newSettings.put(messageType, value);
+
+            return toBuilder()
+                    .settingsBoolean(Collections.unmodifiableMap(newSettings))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withSetting(@NonNull SettingText settingText, @Nullable String value) {
+            Map<SettingText, String> newSettings = this.settingsText.isEmpty()
+                    ? new EnumMap<>(SettingText.class)
+                    : new EnumMap<>(this.settingsText);
+
+            newSettings.put(settingText, value);
+
+            return toBuilder()
+                    .settingsText(Collections.unmodifiableMap(newSettings))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withIgnore(@Nullable Ignore ignore) {
+            if (ignore == null) return this;
+
+            List<Ignore> newIgnores = new ObjectArrayList<>(this.ignores);
+            newIgnores.add(ignore);
+
+            return toBuilder()
+                    .ignores(Collections.unmodifiableList(newIgnores))
+                    .build();
+        }
+
+        @Override
+        public @Nullable String getSetting(@Nullable SettingText settingText) {
+            return this.settingsText.get(settingText);
+        }
+
+        @Override
+        public @NonNull String getSetting(@NonNull MessageType messageType) {
+            return getSetting(messageType.name());
+        }
+
+        @Override
+        public @NonNull String getSetting(@Nullable String messageType) {
+            return isSetting(messageType) ? "1" : "0";
+        }
+
+        @Override
+        public boolean isSetting(@NonNull MessageType messageType) {
+            return isSetting(messageType.name());
+        }
+
+        @Override
+        public boolean isSetting(@Nullable String messageType) {
+            Boolean value = this.settingsBoolean.get(messageType);
+            return value == null || value;
+        }
+
+        @Override
+        public FPlayer withoutSetting(@Nullable SettingText settingText) {
+            if (!this.settingsText.containsKey(settingText)) return this;
+
+            Map<SettingText, String> newSettings = this.settingsText.isEmpty()
+                    ? new EnumMap<>(SettingText.class)
+                    : new EnumMap<>(this.settingsText);
+
+            newSettings.remove(settingText);
+
+            return toBuilder()
+                    .settingsText(Collections.unmodifiableMap(newSettings))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withoutSetting(@Nullable String messageType) {
+            if (!this.settingsBoolean.containsKey(messageType)) return this;
+
+            Map<String, Boolean> newSettings = new Object2BooleanArrayMap<>(this.settingsBoolean);
+
+            newSettings.remove(messageType);
+
+            return toBuilder()
+                    .settingsBoolean(Collections.unmodifiableMap(newSettings))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withoutSetting(@NonNull MessageType messageType) {
+            return withoutSetting(messageType.name());
+        }
+
+        @Override
+        public FPlayer withoutIgnore(@Nullable Ignore ignore) {
+            if (ignore == null || this.ignores.isEmpty()) return this;
+
+            List<Ignore> newIgnores = new ObjectArrayList<>(this.ignores);
+            newIgnores.removeIf(filter -> filter.id() == ignore.id());
+
+            return toBuilder()
+                    .ignores(Collections.unmodifiableList(newIgnores))
+                    .build();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (!(object instanceof FPlayer fPlayer)) return false;
+
+            return this.id == fPlayer.id();
+        }
+
+        @Override
+        public int hashCode() {
+            return uuid.hashCode();
+        }
+
+        @Override
+        public Map<Integer, String> getFColors(FColor.@NonNull Type type) {
+            Set<FColor> colors = fColors.get(type);
+            if (colors == null || colors.isEmpty()) return Collections.emptyMap();
+
+            Map<Integer, String> result = colors.stream()
+                    .collect(Collectors.toMap(
+                            FColor::number,
+                            FColor::name,
+                            (v1, v2) -> v1,
+                            Int2ObjectArrayMap::new
+                    ));
+
+            return Collections.unmodifiableMap(result);
+        }
+
+        @Override
+        public FPlayer withFColors(FColor.@NonNull Type type, @Nullable Set<FColor> fColors) {
+            boolean newFColorsEmpty = fColors == null || fColors.isEmpty();
+            boolean oldFColorsEmpty = this.fColors.isEmpty();
+            if (newFColorsEmpty && oldFColorsEmpty) return this;
+
+            Map<FColor.Type, Set<FColor>> fColorMap = oldFColorsEmpty
+                    ? new EnumMap<>(FColor.Type.class)
+                    : new EnumMap<>(this.fColors);
+
+            if (newFColorsEmpty) {
+                fColorMap.remove(type);
+            } else {
+                fColorMap.put(type, Collections.unmodifiableSet(fColors));
+            }
+
+            return toBuilder()
+                    .fColors(Collections.unmodifiableMap(fColorMap))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withIgnores(@Nullable List<Ignore> ignores) {
+            if (ignores == null || ignores.isEmpty()) {
+                if (this.ignores.isEmpty()) return this;
+
+                return toBuilder()
+                        .ignores(Collections.emptyList())
+                        .build();
+            }
+
+            return toBuilder()
+                    .ignores(Collections.unmodifiableList(ignores))
+                    .build();
+        }
+
+        @Override
+        public FPlayer withConstants(@Nullable List<Component> constants) {
+            if (constants == null || constants.isEmpty()) {
+                if (this.constants.isEmpty()) return this;
+
+                return toBuilder()
+                        .constants(Collections.emptyList())
+                        .build();
+            }
+
+            return toBuilder()
+                    .constants(Collections.unmodifiableList(constants))
+                    .build();
+        }
+
     }
-
 }

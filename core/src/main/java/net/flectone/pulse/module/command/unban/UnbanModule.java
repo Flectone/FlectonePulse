@@ -133,7 +133,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .sender(fTarget)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.name()))
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
@@ -141,7 +141,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                             dataOutputStream.writeAsJson(fPlayer);
                             dataOutputStream.writeAsJson(bans);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.name()))
                         .build()
                 )
                 .moderator(fPlayer)

@@ -48,7 +48,7 @@ public class SkinsRestorerIntegration implements FIntegration {
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 
-                    skinServiceProvider.get().updateProfilePropertyCache(fPlayer.getUuid(), convertToProfileProperty(event.getProperty()));
+                    skinServiceProvider.get().updateProfilePropertyCache(fPlayer.uuid(), convertToProfileProperty(event.getProperty()));
                     taskScheduler.runAsyncLater(() -> playerlistnameModuleProvider.get().send(fPlayer), 2L);
                 });
 
@@ -91,7 +91,7 @@ public class SkinsRestorerIntegration implements FIntegration {
 
         PlayerStorage storage = skinsRestorer.getPlayerStorage();
         try {
-            Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.getUuid(), fPlayer.getName());
+            Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
             return skin.orElse(null);
         } catch (Exception e) {
             return null;

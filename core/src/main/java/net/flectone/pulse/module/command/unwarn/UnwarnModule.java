@@ -132,7 +132,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .sender(fTarget)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.getName()))
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.name()))
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
@@ -140,7 +140,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                             dataOutputStream.writeAsJson(fPlayer);
                             dataOutputStream.writeAsJson(warns);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.name()))
                         .build()
                 )
                 .moderator(fPlayer)

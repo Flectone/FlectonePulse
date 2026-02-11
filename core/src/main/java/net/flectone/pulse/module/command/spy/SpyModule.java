@@ -47,9 +47,9 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
         boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
         if (turnedBefore) {
-            fPlayer.removeSetting(SettingText.SPY_STATUS);
+            fPlayer = fPlayer.withoutSetting(SettingText.SPY_STATUS);
         } else {
-            fPlayer.setSetting(SettingText.SPY_STATUS, "1");
+            fPlayer = fPlayer.withSetting(SettingText.SPY_STATUS, "1");
         }
 
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);

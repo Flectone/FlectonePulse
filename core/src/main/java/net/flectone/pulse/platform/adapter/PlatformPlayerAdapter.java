@@ -57,7 +57,7 @@ public interface PlatformPlayerAdapter {
     int getEntityId(@NonNull UUID uuid);
 
     default int getEntityId(@NonNull FEntity entity) {
-        return getEntityId(entity.getUuid());
+        return getEntityId(entity.uuid());
     }
 
     /**
@@ -92,7 +92,7 @@ public interface PlatformPlayerAdapter {
     @Nullable Object convertToPlatformPlayer(@NonNull UUID uuid);
 
     default @Nullable Object convertToPlatformPlayer(@NonNull FEntity entity) {
-        return convertToPlatformPlayer(entity.getUuid());
+        return convertToPlatformPlayer(entity.uuid());
     }
 
     /**
@@ -104,7 +104,7 @@ public interface PlatformPlayerAdapter {
     @NonNull String getName(@NonNull UUID uuid);
 
     default @NonNull String getName(@NonNull FEntity entity) {
-        return getName(entity.getUuid());
+        return getName(entity.uuid());
     }
 
     /**
@@ -126,7 +126,7 @@ public interface PlatformPlayerAdapter {
     @NonNull String getWorldName(@NonNull UUID uuid);
 
     default @NonNull String getWorldName(@NonNull FEntity entity) {
-        return getWorldName(entity.getUuid());
+        return getWorldName(entity.uuid());
     }
 
     /**
@@ -138,7 +138,7 @@ public interface PlatformPlayerAdapter {
     @NonNull String getWorldEnvironment(@NonNull UUID uuid);
 
     default @NonNull String getWorldEnvironment(@NonNull FEntity entity) {
-        return getWorldEnvironment(entity.getUuid());
+        return getWorldEnvironment(entity.uuid());
     }
 
     /**
@@ -150,7 +150,7 @@ public interface PlatformPlayerAdapter {
     @Nullable String getIp(@NonNull UUID uuid);
 
     default @Nullable String getIp(@NonNull FEntity entity) {
-        return getIp(entity.getUuid());
+        return getIp(entity.uuid());
     }
 
     /**
@@ -170,7 +170,7 @@ public interface PlatformPlayerAdapter {
     PlayerHeadObjectContents.@Nullable ProfileProperty getTexture(@NonNull UUID uuid);
 
     default PlayerHeadObjectContents.@Nullable ProfileProperty getTexture(@NonNull FEntity entity) {
-        return getTexture(entity.getUuid());
+        return getTexture(entity.uuid());
     }
 
     /**
@@ -182,7 +182,7 @@ public interface PlatformPlayerAdapter {
     @NonNull String getGamemode(@NonNull UUID uuid);
 
     default @NonNull String getGamemode(@NonNull FEntity entity) {
-        return getGamemode(entity.getUuid());
+        return getGamemode(entity.uuid());
     }
 
     /**
@@ -210,7 +210,7 @@ public interface PlatformPlayerAdapter {
     @Nullable Statistics getStatistics(@NonNull UUID uuid);
 
     default @Nullable Statistics getStatistics(@NonNull FEntity entity) {
-        return getStatistics(entity.getUuid());
+        return getStatistics(entity.uuid());
     }
 
     /**
@@ -222,7 +222,7 @@ public interface PlatformPlayerAdapter {
     @Nullable Coordinates getCoordinates(@NonNull UUID uuid);
 
     default @Nullable Coordinates getCoordinates(@NonNull FEntity entity) {
-        return getCoordinates(entity.getUuid());
+        return getCoordinates(entity.uuid());
     }
 
     /**
@@ -235,7 +235,7 @@ public interface PlatformPlayerAdapter {
     double distance(@NonNull UUID first, @NonNull UUID second);
 
     default double distance(@NonNull FEntity first, @NonNull FEntity second) {
-        return distance(first.getUuid(), second.getUuid());
+        return distance(first.uuid(), second.uuid());
     }
 
     /**
@@ -255,7 +255,7 @@ public interface PlatformPlayerAdapter {
     boolean isOperator(@NonNull UUID uuid);
 
     default boolean isOperator(@NonNull FEntity entity) {
-        return isOperator(entity.getUuid());
+        return isOperator(entity.uuid());
     }
 
     /**
@@ -267,7 +267,7 @@ public interface PlatformPlayerAdapter {
     boolean isSneaking(@NonNull UUID uuid);
 
     default boolean isSneaking(@NonNull FEntity entity) {
-        return isSneaking(entity.getUuid());
+        return isSneaking(entity.uuid());
     }
 
     /**
@@ -279,7 +279,7 @@ public interface PlatformPlayerAdapter {
     boolean hasPlayedBefore(@NonNull UUID uuid);
 
     default boolean hasPlayedBefore(@NonNull FEntity entity) {
-        return hasPlayedBefore(entity.getUuid());
+        return hasPlayedBefore(entity.uuid());
     }
 
     /**
@@ -292,7 +292,7 @@ public interface PlatformPlayerAdapter {
     boolean hasPotionEffect(@NonNull UUID uuid, @NonNull String potionType);
 
     default boolean hasPotionEffect(@NonNull FEntity entity, @NonNull String potionType) {
-        return hasPotionEffect(entity.getUuid(), potionType);
+        return hasPotionEffect(entity.uuid(), potionType);
     }
 
     /**
@@ -304,7 +304,7 @@ public interface PlatformPlayerAdapter {
     boolean isOnline(@NonNull UUID uuid);
 
     default boolean isOnline(@NonNull FEntity entity) {
-        return isOnline(entity.getUuid());
+        return isOnline(entity.uuid());
     }
 
     /**
@@ -316,7 +316,7 @@ public interface PlatformPlayerAdapter {
     long getFirstPlayed(@NonNull UUID uuid);
 
     default long getFirstPlayed(@NonNull FEntity entity) {
-        return getFirstPlayed(entity.getUuid());
+        return getFirstPlayed(entity.uuid());
     }
 
     /**
@@ -328,7 +328,7 @@ public interface PlatformPlayerAdapter {
     long getLastPlayed(@NonNull UUID uuid);
 
     default long getLastPlayed(@NonNull FEntity entity) {
-        return getLastPlayed(entity.getUuid());
+        return getLastPlayed(entity.uuid());
     }
 
     /**
@@ -340,7 +340,7 @@ public interface PlatformPlayerAdapter {
     long getAllTimePlayed(@NonNull UUID uuid);
 
     default long getAllTimePlayed(@NonNull FEntity entity) {
-        return getAllTimePlayed(entity.getUuid());
+        return getAllTimePlayed(entity.uuid());
     }
 
     /**
@@ -351,7 +351,7 @@ public interface PlatformPlayerAdapter {
     void updateInventory(@NonNull UUID uuid);
 
     default void updateInventory(@NonNull FEntity entity) {
-        updateInventory(entity.getUuid());
+        updateInventory(entity.uuid());
     }
 
     /**
@@ -363,7 +363,7 @@ public interface PlatformPlayerAdapter {
     @Nullable Object getItem(@NonNull UUID uuid);
 
     default @Nullable Object getItem(@NonNull FEntity entity) {
-        return getItem(entity.getUuid());
+        return getItem(entity.uuid());
     }
 
     /**
@@ -385,7 +385,7 @@ public interface PlatformPlayerAdapter {
     @NonNull Set<UUID> findPlayersWhoCanSee(UUID uuid, double x, double y, double z);
 
     default @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull FEntity entity, double x, double y, double z) {
-        return findPlayersWhoCanSee(entity.getUuid(), x, y, z);
+        return findPlayersWhoCanSee(entity.uuid(), x, y, z);
     }
 
     /**
@@ -397,7 +397,7 @@ public interface PlatformPlayerAdapter {
     @NonNull List<Integer> getPassengers(UUID uuid);
 
     default @NonNull List<Integer> getPassengers(@NonNull FEntity entity) {
-        return getPassengers(entity.getUuid());
+        return getPassengers(entity.uuid());
     }
 
     /**

@@ -18,13 +18,11 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +41,6 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final Provider<DiscordIntegration> discordIntegration;
     private final TaskScheduler taskScheduler;

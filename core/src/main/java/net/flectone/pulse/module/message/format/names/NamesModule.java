@@ -73,13 +73,13 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
             return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
                 Localization.Message.Format.Names localizationName = localization(receiver);
 
-                Component showEntityName = sender.getShowEntityName();
+                Component showEntityName = sender.showEntityName();
                 if (showEntityName == null) {
                     MessageContext displayContext = messagePipeline.createContext(sender, receiver,
                             StringUtils.replaceEach(
-                                    sender.getType().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
+                                    sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
                                     new String[]{"<name>", "<type>", "<uuid>"},
-                                    new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
+                                    new String[]{"<lang:'" + sender.type() + "'>", sender.type(), sender.uuid().toString()}
                             )
                     ).withFlags(messageContext.flags()).addFlag(MessageFlag.USER_MESSAGE, false);
 
@@ -89,12 +89,12 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                 }
 
                 MessageContext displayContext = messagePipeline.createContext(sender, receiver,
-                                sender.getType().equals(FEntity.UNKNOWN_TYPE)
+                                sender.type().equals(FEntity.UNKNOWN_TYPE)
                                         ? localizationName.unknown()
                                         : StringUtils.replaceEach(
                                         localizationName.entity(),
                                         new String[]{"<type>", "<uuid>"},
-                                        new String[]{sender.getType(), sender.getUuid().toString()}
+                                        new String[]{sender.type(), sender.uuid().toString()}
                                 )
                         )
                         .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
@@ -109,7 +109,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
         return messageContext
                 .addTagResolvers(
                         TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, context) -> {
-                            List<Component> constants = fPlayer.getConstants();
+                            List<Component> constants = fPlayer.constants();
                             if (constants.isEmpty()) {
                                 List<String> stringConstants = localization(fPlayer).constant();
                                 if (stringConstants.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
@@ -140,7 +140,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                             Localization.Message.Format.Names localization = localization(receiver);
                             String displayName = fPlayer.isUnknown() || localization.display().isEmpty()
-                                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.getName())
+                                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.name())
                                     : localization.display().get(displayNameIndex);
 
                             MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
@@ -174,7 +174,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             return Tag.preProcessParsed(text);
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (argumentQueue, context) ->
-                                Tag.preProcessParsed(fPlayer.getName())
+                                Tag.preProcessParsed(fPlayer.name())
                         )
                 );
     }

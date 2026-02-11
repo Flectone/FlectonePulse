@@ -81,7 +81,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public void clearHistory(FPlayer fPlayer) {
-        playersHistory.remove(fPlayer.getUuid());
+        playersHistory.remove(fPlayer.uuid());
     }
 
     public MessageContext addTag(MessageContext messageContext) {
@@ -119,7 +119,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         // skip offline history
         if (!receiver.isOnline()) return;
 
-        UUID playerUUID = receiver.getUuid();
+        UUID playerUUID = receiver.uuid();
         HistoryMessage historyMessage = new HistoryMessage(messageUUID, component);
 
         List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, k -> new ObjectArrayList<>());

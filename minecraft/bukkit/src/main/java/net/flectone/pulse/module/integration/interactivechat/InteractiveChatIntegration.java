@@ -49,7 +49,7 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
     // why AsyncPlayerChatEvent?
     // ...
     public String checkMention(FEntity fSender, String message) {
-        Player sender = Bukkit.getPlayer(fSender.getUuid());
+        Player sender = Bukkit.getPlayer(fSender.uuid());
         if (sender == null) return message;
 
         PlayerDataManager.PlayerData data = InteractiveChat.playerDataManager.getPlayerData(sender);
@@ -73,8 +73,8 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
 
     // https://github.com/LOOHP/InteractiveChat/issues/164
     private String markSender(FEntity fSender, String message) {
-        UUID sender = fSender.getUuid();
-        if (Bukkit.getPlayer(fSender.getUuid()) == null) return message;
+        UUID sender = fSender.uuid();
+        if (Bukkit.getPlayer(fSender.uuid()) == null) return message;
 
         StringBuilder stringBuilder = new StringBuilder();
         for (String string : message.split(" ")) {
@@ -95,7 +95,7 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
     // InteractiveChat uses ProtocolLib, so it doesn't see messages from PacketEvents
     // when support PacketEvents?
     public boolean sendMessage(FEntity fReceiver, Component message) {
-        Player receiver = Bukkit.getPlayer(fReceiver.getUuid());
+        Player receiver = Bukkit.getPlayer(fReceiver.uuid());
         if (receiver == null) return false;
 
         try {

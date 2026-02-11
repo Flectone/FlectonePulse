@@ -84,7 +84,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         World world = storeRef.getStore().getExternalData().getWorld();
 
-        String playerKey = sender.getUuid().toString();
+        String playerKey = sender.uuid().toString();
 
         String bubbleText = PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer));
 
@@ -257,7 +257,7 @@ public class HytaleBubbleRender implements BubbleRender {
         Object playerObj = platformPlayerAdapter.convertToPlatformPlayer(sender);
         if (!(playerObj instanceof PlayerRef)) return false;
 
-        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.getUuid());
+        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.uuid());
         return passengers.isEmpty();
     }
 

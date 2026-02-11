@@ -23,6 +23,7 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
@@ -41,9 +42,12 @@ public class DialogMenuBuilder implements MenuBuilder {
     private final MessagePipeline messagePipeline;
     private final DialogController dialogController;
     private final ChatsettingHandler chatsettingHandler;
+    private final FPlayerService fPlayerService;
 
     @Override
-    public void open(FPlayer fPlayer, FPlayer fTarget) {
+    public void open(FPlayer fPlayer, UUID fTargetUUID) {
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
+
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
         Component header = messagePipeline.build(headerContext);
@@ -102,14 +106,15 @@ public class DialogMenuBuilder implements MenuBuilder {
                     ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
                     if (status == ChatsettingHandler.Status.DENIED) return;
 
+                    FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
                     boolean currentEnabled = status.toBoolean();
 
                     String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-                    MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, fTarget, invertTitle);
+                    MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, finalFTarget, invertTitle);
                     Component componentInvertTitle = messagePipeline.build(invertTitleContext);
 
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-                    MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, fTarget, invertLore);
+                    MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, finalFTarget, invertLore);
                     Component componentInvertLore = messagePipeline.build(invertLoreContext);
 
                     ActionButton invertButton = new ActionButton(
@@ -119,7 +124,7 @@ public class DialogMenuBuilder implements MenuBuilder {
 
                     dialogController.changeButton(fPlayer, dialog, id, invertButton);
 
-                    chatsettingModule.saveSetting(fPlayer, messageType);
+                    chatsettingModule.saveSetting(finalFTarget, messageType);
                 });
     }
 
@@ -195,7 +200,7 @@ public class DialogMenuBuilder implements MenuBuilder {
 
     @Override
     public void openSubMenu(FPlayer fPlayer,
-                            FPlayer fTarget,
+                            UUID fTargetUUID,
                             Component header,
                             Runnable closeConsumer,
                             List<SubMenuItem> items,
@@ -215,6 +220,8 @@ public class DialogMenuBuilder implements MenuBuilder {
 
         Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns())
                 .addCloseConsumer(dialog -> closeConsumer.run());
+
+        FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         for (int i = 0; i < items.size(); i++) {
             SubMenuItem item = items.get(i);
@@ -240,8 +247,8 @@ public class DialogMenuBuilder implements MenuBuilder {
             dialogBuilder.addButton(i, button);
             dialogBuilder.addClickHandler(subId, dialog -> chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                 onSelect.accept(item);
-                dialogController.close(fPlayer.getUuid());
-                open(fPlayer, fTarget);
+                dialogController.close(fPlayer.uuid());
+                open(fPlayer, fTargetUUID);
             }));
         }
 

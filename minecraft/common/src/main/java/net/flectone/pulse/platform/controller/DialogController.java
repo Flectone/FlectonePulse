@@ -49,13 +49,13 @@ public class DialogController {
 
     public void open(FPlayer fPlayer, Dialog dialog, boolean reopen) {
         if (reopen) {
-            Dialog oldDialog = dialogMap.get(fPlayer.getUuid());
+            Dialog oldDialog = dialogMap.get(fPlayer.uuid());
             if (oldDialog != null) {
                 oldDialog.getCloseConsumerList().forEach(closeConsumer -> closeConsumer.accept(oldDialog));
             }
         }
 
-        dialogMap.put(fPlayer.getUuid(), dialog);
+        dialogMap.put(fPlayer.uuid(), dialog);
 
         packetSender.send(fPlayer, dialog.getWrapperDialog());
     }

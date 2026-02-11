@@ -56,6 +56,6 @@ public class SuperVanishIntegration implements Listener, FIntegration {
     }
 
     public boolean isVanished(FEntity sender) {
-        return VanishAPI.isInvisibleOffline(sender.getUuid());
+        return VanishAPI.isInvisibleOffline(sender.uuid());
     }
 }

@@ -19,7 +19,7 @@ public class TictactoeService {
     private final RandomUtil randomUtil;
 
     public TicTacToe create(int id, FPlayer fPlayer, FPlayer fReceiver, boolean hard) {
-        TicTacToe ticTacToe = new TicTacToe(id, fPlayer.getId(), fReceiver.getId(), hard);
+        TicTacToe ticTacToe = new TicTacToe(id, fPlayer.id(), fReceiver.id(), hard);
         ticTacToeMap.put(ticTacToe.getId(), ticTacToe);
         return ticTacToe;
     }

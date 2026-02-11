@@ -36,7 +36,7 @@ public class FloodgateIntegration implements FIntegration {
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (floodgateApi == null) return false;
 
-        return floodgateApi.isFloodgatePlayer(fPlayer.getUuid());
+        return floodgateApi.isFloodgatePlayer(fPlayer.uuid());
     }
 
 }

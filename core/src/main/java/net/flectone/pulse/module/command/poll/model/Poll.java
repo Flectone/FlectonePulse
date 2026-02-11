@@ -32,14 +32,14 @@ public class Poll {
     }
 
     public int vote(FEntity fPlayer, int numberVote) {
-        boolean[] votes = votesMap.getOrDefault(fPlayer.getUuid(), new boolean[answers.size()]);
+        boolean[] votes = votesMap.getOrDefault(fPlayer.uuid(), new boolean[answers.size()]);
 
         for (int x = 0; x < answers.size(); x++) {
             if (votes[x] && !multipleVote) return -1;
         }
 
         votes[numberVote] = !votes[numberVote];
-        votesMap.put(fPlayer.getUuid(), votes);
+        votesMap.put(fPlayer.uuid(), votes);
         return votes[numberVote] ? 1 : 0;
     }
 

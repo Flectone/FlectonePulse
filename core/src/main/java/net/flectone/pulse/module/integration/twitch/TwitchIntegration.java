@@ -38,7 +38,7 @@ public class TwitchIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = new FPlayer(fileFacade.localization().integration().twitch().senderName());
+        sender = FPlayer.builder().name(fileFacade.localization().integration().twitch().senderName()).build();
 
         Integration.Twitch integration = fileFacade.integration().twitch();
         String token = systemVariableResolver.substituteEnvVars(integration.token());

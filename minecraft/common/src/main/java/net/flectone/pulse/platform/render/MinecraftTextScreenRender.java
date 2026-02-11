@@ -68,9 +68,9 @@ public class MinecraftTextScreenRender implements TextScreenRender {
         if (optionalId.isEmpty()) return;
 
         int entityId = optionalId.get();
-        int playerId = platformPlayerAdapter.getEntityId(fPlayer.getUuid());
+        int playerId = platformPlayerAdapter.getEntityId(fPlayer.uuid());
 
-        addAndRide(fPlayer.getUuid(), playerId, entityId);
+        addAndRide(fPlayer.uuid(), playerId, entityId);
         bubbleRenderer.get().removeBubbleIf(bubble -> bubble.getSender().equals(fPlayer));
 
         if (textScreen.hasAnimation()) {
@@ -191,8 +191,8 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     }
 
     private void destroy(FPlayer fPlayer, int entityId) {
-        destroy(fPlayer.getUuid(), entityId);
-        livingEntities.computeIfPresent(fPlayer.getUuid(), (integer, integers) -> {
+        destroy(fPlayer.uuid(), entityId);
+        livingEntities.computeIfPresent(fPlayer.uuid(), (integer, integers) -> {
             integers.remove((Integer) entityId);
             return integers;
         });

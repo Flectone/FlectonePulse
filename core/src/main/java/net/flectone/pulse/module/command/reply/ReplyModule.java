@@ -41,7 +41,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
+        String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.uuid());
         if (receiverName == null) {
             sendErrorMessage(EventMetadata.<Localization.Command.Reply>builder()
                     .sender(fPlayer)

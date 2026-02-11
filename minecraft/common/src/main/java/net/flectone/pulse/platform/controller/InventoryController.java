@@ -49,7 +49,7 @@ public class InventoryController {
     }
 
     public void open(FPlayer fPlayer, Inventory inventory) {
-        inventoryMap.put(fPlayer.getUuid(), inventory);
+        inventoryMap.put(fPlayer.uuid(), inventory);
 
         packetSender.send(fPlayer, inventory.getWrapperWindow());
         packetSender.send(fPlayer, inventory.getWrapperItems());

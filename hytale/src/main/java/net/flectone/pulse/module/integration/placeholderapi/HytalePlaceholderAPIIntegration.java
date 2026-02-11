@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
@@ -39,6 +40,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final HytalePlaceholderAPIModule placeholderAPIModule;
@@ -119,9 +121,9 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
         }
 
         return switch (params) {
-            case "player" -> fPlayer.getName();
-            case "ip" -> fPlayer.getIp();
-            case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
+            case "player" -> fPlayer.name();
+            case "ip" -> fPlayer.ip();
+            case "ping" -> String.valueOf(platformPlayerAdapter.getPing(fPlayer));
             case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
             case "tps" -> platformServerAdapter.getTPS();
             default -> null;
@@ -151,11 +153,11 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
         try {
             Universe universe = Universe.get();
             if (universe != null) {
-                PlayerRef offlinePlayer = universe.getPlayer(fPlayer.getUuid());
+                PlayerRef offlinePlayer = universe.getPlayer(fPlayer.uuid());
                 message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
 
                 if (fPlayer.isOnline()) {
-                    PlayerRef receiver = universe.getPlayer(fReceiver.getUuid());
+                    PlayerRef receiver = universe.getPlayer(fReceiver.uuid());
                     if (receiver == null) {
                         receiver = offlinePlayer;
                     }

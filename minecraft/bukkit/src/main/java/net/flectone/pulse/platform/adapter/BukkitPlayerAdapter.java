@@ -279,7 +279,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             }
         }
 
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return Component.empty();
 
         header = player.getPlayerListHeader();
@@ -301,7 +301,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             }
         }
 
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return Component.empty();
 
         footer = player.getPlayerListFooter();

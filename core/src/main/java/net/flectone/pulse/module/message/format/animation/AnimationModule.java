@@ -110,7 +110,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
                     );
             if (animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
 
-            UUID player = messageContext.receiver().getUuid();
+            UUID player = messageContext.receiver().uuid();
             int playerIndex = increment(player, animation, animationConfig.interval(), animationLocalization.texts().size());
 
             try {

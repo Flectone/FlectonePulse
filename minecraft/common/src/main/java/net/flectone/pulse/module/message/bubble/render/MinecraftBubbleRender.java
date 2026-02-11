@@ -99,7 +99,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         Component formattedMessage = createFormattedMessage(bubble, fViewer);
 
         FPlayer sender = bubble.getSender();
-        String key = sender.getUuid().toString() + fViewer.getUuid();
+        String key = sender.uuid().toString() + fViewer.uuid();
         Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
 
         // create bubble entity
@@ -144,7 +144,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     public void rideEntities(FPlayer sender, FPlayer viewer) {
-        Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.get(sender.getUuid().toString() + viewer.getUuid());
+        Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.get(sender.uuid().toString() + viewer.uuid());
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
@@ -153,7 +153,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;
 
-        int playerId = platformPlayerAdapter.getEntityId(sender.getUuid());
+        int playerId = platformPlayerAdapter.getEntityId(sender.uuid());
         int lastID = playerId;
 
         for (BubbleEntity bubbleEntity : bubbleEntities) {
@@ -176,7 +176,7 @@ public class MinecraftBubbleRender implements BubbleRender {
 
             int[] passengers = new int[]{bubbleEntity.getId()};
 
-            List<Integer> textScreenPassengers = textScreenRender.getPassengers(viewer.getUuid());
+            List<Integer> textScreenPassengers = textScreenRender.getPassengers(viewer.uuid());
             if (!textScreenPassengers.isEmpty() && playerId == lastID) {
                 passengers = ArrayUtils.add(textScreenPassengers.stream().mapToInt(Integer::intValue).toArray(), bubbleEntity.getId());
             }
@@ -360,11 +360,11 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public boolean isCorrectPlayer(FPlayer sender) {
-        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.getUuid());
+        List<Integer> passengers = platformPlayerAdapter.getPassengers(sender.uuid());
 
         return !platformPlayerAdapter.getGamemode(sender).equals(GameMode.SPECTATOR.name())
                 && !platformPlayerAdapter.hasPotionEffect(sender, PotionUtil.INVISIBILITY_POTION_NAME)
-                && textScreenRender.getPassengers(sender.getUuid()).isEmpty()
+                && textScreenRender.getPassengers(sender.uuid()).isEmpty()
                 && passengers.isEmpty();
     }
 

@@ -95,7 +95,7 @@ public class IntegrationSender {
             return StringUtils.replaceEach(
                     plainSerialize(createFormat(input, eventMetadata)),
                     new String[]{"<player>", "<message>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.getName(), plainMessage,  finalMessage, clearMessage(finalMessage)}
+                    new String[]{sender.name(), plainMessage,  finalMessage, clearMessage(finalMessage)}
             );
         };
 

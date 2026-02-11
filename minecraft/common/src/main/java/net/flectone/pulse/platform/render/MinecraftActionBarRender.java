@@ -37,7 +37,7 @@ public class MinecraftActionBarRender implements ActionBarRender{
         } else if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
             packetSender.send(fPlayer, new WrapperPlayServerActionBar(component));
         } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_16)) {
-            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessage_v1_16(component, ChatTypes.GAME_INFO, fPlayer.getUuid())));
+            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessage_v1_16(component, ChatTypes.GAME_INFO, fPlayer.uuid())));
         } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_8_8)) {
             packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(component, ChatTypes.GAME_INFO)));
         } else { // PacketEvents issue https://github.com/retrooper/packetevents/issues/1241

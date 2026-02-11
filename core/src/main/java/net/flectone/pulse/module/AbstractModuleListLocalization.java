@@ -35,21 +35,21 @@ public abstract class AbstractModuleListLocalization<M extends LocalizationSetti
         List<String> messages = getAvailableMessages(fPlayer);
         if (messages.isEmpty()) return null;
 
-        int fPlayerID = fPlayer.getId();
+        int fPlayerID = fPlayer.id();
         int playerIndex = messageIndexMap.getOrDefault(fPlayerID, 0) % messages.size();
 
         return messages.get(playerIndex);
     }
 
     public @Nullable String getNextMessage(FPlayer fPlayer, boolean random) {
-        int id = fPlayer.getId();
+        int id = fPlayer.id();
         List<String> messages = getAvailableMessages(fPlayer);
 
         return incrementAndGetMessage(id, random, messages);
     }
 
     public @Nullable String getNextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
-        int id = fPlayer.getId() + messages.hashCode();
+        int id = fPlayer.id() + messages.hashCode();
 
         return incrementAndGetMessage(id, random, messages);
     }

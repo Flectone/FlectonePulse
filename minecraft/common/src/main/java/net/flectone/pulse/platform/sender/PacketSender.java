@@ -71,7 +71,7 @@ public class PacketSender {
      * @param silent whether to send silently
      */
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper, boolean silent) {
-        send(fPlayer.getUuid(), packetWrapper, silent);
+        send(fPlayer.uuid(), packetWrapper, silent);
     }
 
     /**
@@ -91,7 +91,7 @@ public class PacketSender {
      * @param packetWrapper the packet to send
      */
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
-        send(fPlayer.getUuid(), packetWrapper, false);
+        send(fPlayer.uuid(), packetWrapper, false);
     }
 
     /**

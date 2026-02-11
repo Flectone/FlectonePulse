@@ -36,7 +36,7 @@ public class FabricPermissionChecker implements PermissionChecker {
         Integer fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);
         boolean value = (fabricPermission != null && fabricPermission == 0) || fabricPlayerAdapter.isOperator(fPlayer);
 
-        ServerPlayerEntity player = fabricPlayerAdapter.getPlayer(entity.getUuid());
+        ServerPlayerEntity player = fabricPlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {
             value = value && player.getPermissions().hasPermission(TRUE_PERMISSION);
         }

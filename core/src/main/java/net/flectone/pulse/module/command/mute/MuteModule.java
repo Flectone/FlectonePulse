@@ -104,7 +104,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         long databaseTime = time + System.currentTimeMillis();
         String reason = timeReasonPair.second();
 
-        Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
+        Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.id());
         if (mute == null) return;
 
         proxySender.send(fTarget, MessageType.SYSTEM_MUTE);

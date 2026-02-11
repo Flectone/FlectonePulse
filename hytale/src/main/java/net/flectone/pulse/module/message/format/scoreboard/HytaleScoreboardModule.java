@@ -52,12 +52,12 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(fPlayer -> {
-                if (!uuidTeamMap.containsKey(fPlayer.getUuid())) return;
+                if (!uuidTeamMap.containsKey(fPlayer.uuid())) return;
 
                 CustomName customName = createNameplate(fPlayer);
-                sendPacket(fPlayer.getUuid(), customName.value());
+                sendPacket(fPlayer.uuid(), customName.value());
 
-                uuidTeamMap.put(fPlayer.getUuid(), customName);
+                uuidTeamMap.put(fPlayer.uuid(), customName);
 
             }, ticker.period());
         }
@@ -77,9 +77,9 @@ public class HytaleScoreboardModule extends ScoreboardModule {
             if (isModuleDisabledFor(fPlayer)) return;
 
             CustomName customName = createNameplate(fPlayer);
-            sendPacket(fPlayer.getUuid(), customName.value());
+            sendPacket(fPlayer.uuid(), customName.value());
 
-            uuidTeamMap.put(fPlayer.getUuid(), customName);
+            uuidTeamMap.put(fPlayer.uuid(), customName);
         });
     }
 
@@ -88,11 +88,11 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         taskScheduler.runAsync(() -> {
             if (isModuleDisabledFor(fPlayer)) return;
 
-            CustomName customName = uuidTeamMap.get(fPlayer.getUuid());
+            CustomName customName = uuidTeamMap.get(fPlayer.uuid());
             if (customName == null) return;
 
-            uuidTeamMap.remove(fPlayer.getUuid());
-            sendPacket(fPlayer.getUuid(), customName.original());
+            uuidTeamMap.remove(fPlayer.uuid());
+            sendPacket(fPlayer.uuid(), customName.original());
         });
     }
 
@@ -114,9 +114,9 @@ public class HytaleScoreboardModule extends ScoreboardModule {
 
     private CustomName createNameplate(FPlayer fPlayer) {
         // invisible name
-        if (!config().nameVisible()) return new CustomName(fPlayer.getName(), "");
+        if (!config().nameVisible()) return new CustomName(fPlayer.name(), "");
 
-        Component displayName = Component.text(fPlayer.getName());
+        Component displayName = Component.text(fPlayer.name());
 
         Component prefix = Component.empty();
         if (!config().prefix().isEmpty()) {
@@ -132,6 +132,6 @@ public class HytaleScoreboardModule extends ScoreboardModule {
             suffix = messagePipeline.build(suffixContext);
         }
 
-        return new CustomName(fPlayer.getName(), PlainTextComponentSerializer.plainText().serialize(prefix.append(displayName).append(suffix)));
+        return new CustomName(fPlayer.name(), PlainTextComponentSerializer.plainText().serialize(prefix.append(displayName).append(suffix)));
     }
 }

@@ -90,11 +90,11 @@ public abstract class SidebarModule extends AbstractModuleListLocalization<Local
     public abstract void create(FPlayer fPlayer);
 
     protected String getObjectiveName(FPlayer fPlayer) {
-        return "sb_" + fPlayer.getUuid();
+        return "sb_" + fPlayer.uuid();
     }
 
     protected String getLineId(int index, FPlayer fPlayer) {
-        return "ln_" + index + "_" + fPlayer.getUuid();
+        return "ln_" + index + "_" + fPlayer.uuid();
     }
 
 }

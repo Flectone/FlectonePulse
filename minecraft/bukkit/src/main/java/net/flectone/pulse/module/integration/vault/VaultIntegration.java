@@ -52,12 +52,12 @@ public class VaultIntegration implements FIntegration {
         if (permission == null) return false;
         if (permissionName == null) return false;
 
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player != null) {
             return permission.has(player, permissionName);
         }
 
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
         World world = Bukkit.getWorlds().getFirst();
 
         return permission.playerHas(world.getName(), offlinePlayer, permissionName);
@@ -66,7 +66,7 @@ public class VaultIntegration implements FIntegration {
     public String getSuffix(FPlayer fPlayer) {
         if (chat == null) return null;
 
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return null;
 
         return chat.getPlayerSuffix(player);
@@ -75,7 +75,7 @@ public class VaultIntegration implements FIntegration {
     public String getPrefix(FPlayer fPlayer) {
         if (chat == null) return null;
 
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return null;
 
         return chat.getPlayerPrefix(player);

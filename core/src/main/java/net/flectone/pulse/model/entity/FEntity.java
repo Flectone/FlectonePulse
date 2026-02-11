@@ -1,49 +1,65 @@
 package net.flectone.pulse.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
-@Getter
-public class FEntity {
+public interface FEntity {
 
-    public static final UUID UNKNOWN_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    public static final String UNKNOWN_NAME = "UNKNOWN_FLECTONEPULSE";
-    public static final String UNKNOWN_TYPE = "UNKNOWN";
+    UUID UNKNOWN_UUID = new UUID(0, 0);
 
-    private final String name;
+    String UNKNOWN_NAME = "UNKNOWN_FLECTONEPULSE";
 
-    @Setter
-    @Nullable
-    private Component showEntityName;
+    String UNKNOWN_TYPE = "UNKNOWN";
 
-    private final UUID uuid;
-    private final String type;
+    String name();
 
-    public FEntity(String name, UUID uuid, String type) {
-        this.name = name == null ? UNKNOWN_NAME : name;
-        this.type = type;
-        this.uuid = uuid;
+    UUID uuid();
+
+    String type();
+
+    @Nullable Component showEntityName();
+
+    static FEntityImpl.FEntityImplBuilder builder() {
+        return FEntityImpl.builder();
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-
-        FEntity fEntity = (FEntity) object;
-        return this.uuid.equals(fEntity.getUuid());
+    static FEntity unknown() {
+        return FEntityImpl.builder().build();
     }
 
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
+    default boolean isUnknown() {
+        return uuid().equals(UNKNOWN_UUID);
     }
 
-    public boolean isUnknown() {
-        return this.uuid.equals(UNKNOWN_UUID);
+    @Builder
+    record FEntityImpl(
+            String name,
+            UUID uuid,
+            String type,
+            @Nullable Component showEntityName
+    ) implements FEntity {
+
+        public FEntityImpl {
+            if (uuid == null) uuid = UNKNOWN_UUID;
+            if (name == null) name = UNKNOWN_NAME;
+            if (type == null) type = UNKNOWN_TYPE;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (!(object instanceof FEntity fEntity)) return false;
+
+            return this.uuid.equals(fEntity.uuid());
+        }
+
+        @Override
+        public int hashCode() {
+            return uuid.hashCode();
+        }
+
     }
 }

@@ -196,7 +196,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
             return getInstance(SuperVanishModule.class).isVanished(sender);
         }
 
-        Player player = Bukkit.getPlayer(sender.getUuid());
+        Player player = Bukkit.getPlayer(sender.uuid());
         if (player == null) return false;
 
         return player.getMetadata("vanished")
@@ -206,7 +206,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean hasSeeVanishPermission(FEntity sender) {
-        Player player = Bukkit.getPlayer(sender.getUuid());
+        Player player = Bukkit.getPlayer(sender.uuid());
         if (player == null) return false;
 
         return player.hasPermission("sv.see") || player.hasPermission("cmi.seevanished");

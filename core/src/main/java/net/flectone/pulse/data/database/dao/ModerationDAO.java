@@ -45,7 +45,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      */
     public List<Moderation> get(@NonNull FPlayer player, Moderation.Type type) {
         if (player.isUnknown()) return Collections.emptyList();
-        return withHandle(sql -> sql.findByPlayerAndType(player.getId(), type.ordinal()));
+        return withHandle(sql -> sql.findByPlayerAndType(player.id(), type.ordinal()));
     }
 
     /**
@@ -58,7 +58,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type) {
         if (player.isUnknown()) return Collections.emptyList();
         return withHandle(sql -> sql.findValidByPlayerAndType(
-                player.getId(),
+                player.id(),
                 type.ordinal(),
                 System.currentTimeMillis()
         ));
@@ -106,7 +106,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
         return inTransaction(sql -> {
             long date = System.currentTimeMillis();
             int id = sql.insert(
-                    target.getId(),
+                    target.id(),
                     date,
                     time,
                     reason,
@@ -116,7 +116,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
 
             return new Moderation(
                     id,
-                    target.getId(),
+                    target.id(),
                     date,
                     time,
                     reason,

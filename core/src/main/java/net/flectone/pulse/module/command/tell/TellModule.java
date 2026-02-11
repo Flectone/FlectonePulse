@@ -94,7 +94,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     public void send(FPlayer fPlayer, String playerName, String message) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        if (fPlayer.getName().equalsIgnoreCase(playerName)) {
+        if (fPlayer.name().equalsIgnoreCase(playerName)) {
             sendMessage(EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::myself)
@@ -120,17 +120,17 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        fPlayerService.loadSettingsIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         // save for sender
-        senderReceiverMap.put(fPlayer.getUuid(), fReceiver.getName());
+        senderReceiverMap.put(fPlayer.uuid(), fReceiver.name());
 
         if (!fPlayer.isConsole() && !fReceiver.isConsole()) {
-            String receiverUUID = fReceiver.getUuid().toString();
+            String receiverUUID = fReceiver.uuid().toString();
 
             UUID metadataUUID = UUID.randomUUID();
             boolean isSent = proxySender.send(fPlayer, messageType(), dataOutputStream -> {
@@ -169,7 +169,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         );
 
         if (!isSenderToSender) {
-            senderReceiverMap.put(fReceiver.getUuid(), sender.getName());
+            senderReceiverMap.put(fReceiver.uuid(), sender.name());
         }
     }
 }

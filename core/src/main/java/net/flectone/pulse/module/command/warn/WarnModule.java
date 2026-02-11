@@ -102,7 +102,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long databaseTime = time + System.currentTimeMillis();
         String reason = timeReasonPair.second();
 
-        Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
+        Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
         if (warn == null) return;
 
         proxySender.send(fTarget, MessageType.SYSTEM_WARN);
@@ -134,7 +134,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         String action = config().actions().get(countWarns);
         if (StringUtils.isEmpty(action)) return;
 
-        platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.getName()));
+        platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.name()));
     }
 
     @Override

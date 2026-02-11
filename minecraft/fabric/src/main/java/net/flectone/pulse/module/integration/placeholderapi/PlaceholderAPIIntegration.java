@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -43,7 +42,6 @@ import java.util.Map;
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
@@ -142,17 +140,17 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
-            return PlaceholderResult.value(fPlayer.getName());
+            return PlaceholderResult.value(fPlayer.name());
         });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
-            return PlaceholderResult.value(fPlayer.getIp());
+            return PlaceholderResult.value(fPlayer.ip());
         });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
-            return PlaceholderResult.value(String.valueOf(fPlayerService.getPing(fPlayer)));
+            return PlaceholderResult.value(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
         });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"), (context, argument) ->

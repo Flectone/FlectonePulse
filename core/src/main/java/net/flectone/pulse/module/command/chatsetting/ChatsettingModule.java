@@ -133,7 +133,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
-        fPlayerService.loadSettings(fTarget);
+        fTarget = fPlayerService.loadSettings(fTarget);
 
         String promptType = getPrompt(1);
         Optional<String> optionalType = commandContext.optional(promptType);
@@ -148,21 +148,18 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
             String promptValue = getPrompt(2);
             Optional<String> optionalValue = commandContext.optional(promptValue);
 
-            fTarget.setSetting(settingText, optionalValue.orElse(null));
-            saveSetting(fTarget, settingText);
+            saveSetting(fTarget.withSetting(settingText, optionalValue.orElse(null)), settingText);
             return;
         }
 
         String messageType = optionalType.get().toUpperCase();
-
-        fTarget.setSetting(messageType, !fTarget.isSetting(messageType));
-        saveSetting(fTarget, messageType);
+        saveSetting(fTarget.withSetting(messageType, !fTarget.isSetting(messageType)), messageType);
     }
 
     protected abstract MenuBuilder getMenuBuilder();
 
     private void open(FPlayer fPlayer, FPlayer fTarget) {
-        getMenuBuilder().open(fPlayer, fTarget);
+        getMenuBuilder().open(fPlayer, fTarget.uuid());
     }
 
     public void saveSetting(FPlayer fPlayer, String messageType) {

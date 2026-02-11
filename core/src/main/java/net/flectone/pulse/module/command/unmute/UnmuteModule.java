@@ -132,7 +132,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .sender(fTarget)
-                        .format(unmute -> Strings.CS.replace(unmute.format(), "<moderator>", fPlayer.getName()))
+                        .format(unmute -> Strings.CS.replace(unmute.format(), "<moderator>", fPlayer.name()))
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
@@ -140,7 +140,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                             dataOutputStream.writeAsJson(fPlayer);
                             dataOutputStream.writeAsJson(mutes);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
+                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.name()))
                         .build()
                 )
                 .moderator(fPlayer)

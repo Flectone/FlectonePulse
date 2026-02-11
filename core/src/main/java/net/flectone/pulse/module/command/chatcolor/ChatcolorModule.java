@@ -116,8 +116,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         Map<Integer, FColor> newFColors = new HashMap<>();
-        fTarget.getFColors().getOrDefault(fColorType.get(), Collections.emptySet())
-                .forEach(c -> newFColors.put(c.number(), c));
+        fTarget.fColors().getOrDefault(fColorType.get(), Collections.emptySet())
+                .forEach(fColor -> newFColors.put(fColor.number(), fColor));
 
         for (int i = 0; i < fColorConfig().defaultColors().size(); i++) {
             Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
@@ -172,18 +172,13 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     }
 
     private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
-        Map<FColor.Type, Set<FColor>> fColors = fPlayer.getFColors();
+        Map<FColor.Type, Set<FColor>> fColors = fPlayer.fColors();
         Set<FColor> oldFColors = fColors.getOrDefault(type, Collections.emptySet());
 
         UUID metadataUUID = UUID.randomUUID();
 
         if (!oldFColors.equals(newFColors)) {
-            if (newFColors.isEmpty()) {
-                fColors.remove(type);
-            }  else {
-                fColors.put(type, newFColors);
-            }
-
+            fPlayer = fPlayer.withFColors(type, newFColors);
             fPlayerService.saveColors(fPlayer);
 
             // update proxy players

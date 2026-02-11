@@ -60,14 +60,14 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(fPlayer -> {
-                if (!uuidTeamMap.containsKey(fPlayer.getUuid())) return;
+                if (!uuidTeamMap.containsKey(fPlayer.uuid())) return;
 
                 // new info
                 Team newTeam = createTeam(fPlayer);
                 sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
 
                 // update info
-                uuidTeamMap.put(fPlayer.getUuid(), newTeam);
+                uuidTeamMap.put(fPlayer.uuid(), newTeam);
 
             }, ticker.period());
         }
@@ -96,12 +96,12 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
             Team team = createTeam(fPlayer);
             sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
 
-            uuidTeamMap.put(fPlayer.getUuid(), team);
+            uuidTeamMap.put(fPlayer.uuid(), team);
         });
     }
 
     public boolean hasTeam(FPlayer fPlayer) {
-        return uuidTeamMap.containsKey(fPlayer.getUuid());
+        return uuidTeamMap.containsKey(fPlayer.uuid());
     }
 
     @Override
@@ -109,10 +109,10 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         taskScheduler.runAsync(() -> {
             if (isModuleDisabledFor(fPlayer)) return;
 
-            Team team = uuidTeamMap.get(fPlayer.getUuid());
+            Team team = uuidTeamMap.get(fPlayer.uuid());
             if (team == null) return;
 
-            uuidTeamMap.remove(fPlayer.getUuid());
+            uuidTeamMap.remove(fPlayer.uuid());
             sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
         });
     }
@@ -156,7 +156,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 optionData
         );
 
-        return new Team(teamName, fPlayer.getName(), info);
+        return new Team(teamName, fPlayer.name(), info);
     }
 
     private void sendPacket(Team team, WrapperPlayServerTeams.TeamMode teamMode) {
@@ -169,13 +169,13 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         // 32767 limit
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
             String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
-            String paddedName = String.format("%-16s", fPlayer.getName());
+            String paddedName = String.format("%-16s", fPlayer.name());
             return paddedRank + paddedName;
         }
 
         // 16 limit
         String paddedRank = String.format("%06d", Integer.MAX_VALUE - weight);
-        String truncatedName = fPlayer.getName().substring(0, Math.min(fPlayer.getName().length(), 10));
+        String truncatedName = fPlayer.name().substring(0, Math.min(fPlayer.name().length(), 10));
         String paddedName = String.format("%-10s", truncatedName);
         return paddedRank + paddedName;
     }

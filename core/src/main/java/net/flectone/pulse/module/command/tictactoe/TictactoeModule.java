@@ -105,10 +105,10 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        fPlayerService.loadSettingsIfOffline(fReceiver);
+        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
@@ -118,7 +118,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                         .sender(fPlayer)
                         .format(Localization.Command.Tictactoe::sender)
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, finalFReceiver)})
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -129,7 +129,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.CREATE.name());
-            dataOutputStream.writeUTF(gson.toJson(fReceiver));
+            dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
         }, metadataUUID);
@@ -317,7 +317,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                     new String[]{"<title>", "<symbol>", "<move>"},
                     new String[]{
                             title,
-                            ticTacToe.getFirstPlayer() == fPlayer.getId() ? symbolFirst : symbolSecond,
+                            ticTacToe.getFirstPlayer() == fPlayer.id() ? symbolFirst : symbolSecond,
                             move
                     }
             );

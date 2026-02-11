@@ -39,7 +39,7 @@ public class PlatformPlayerParser extends PlayerParser {
                 .map(fPlayerService::getFPlayer)
                 .filter(player -> integrationModule.canSeeVanished(player, context.sender()))
                 .filter(fPlayer -> isVisible(context.sender(), fPlayer))
-                .map(FEntity::getName)
+                .map(FEntity::name)
                 .toList();
     }
 }

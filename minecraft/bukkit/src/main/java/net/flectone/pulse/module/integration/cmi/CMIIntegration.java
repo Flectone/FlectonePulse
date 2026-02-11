@@ -35,7 +35,7 @@ public class CMIIntegration implements FIntegration {
     public boolean isMuted(FEntity fEntity) {
         if (cmi == null) return false;
 
-        CMIUser user = cmi.getPlayerManager().getUser(fEntity.getName());
+        CMIUser user = cmi.getPlayerManager().getUser(fEntity.name());
         if (user == null) return false;
 
         return user.isMuted();
@@ -44,12 +44,12 @@ public class CMIIntegration implements FIntegration {
     public ExternalModeration getMute(FEntity fEntity) {
         if (cmi == null) return null;
 
-        CMIUser user = cmi.getPlayerManager().getUser(fEntity.getUuid());
+        CMIUser user = cmi.getPlayerManager().getUser(fEntity.uuid());
         if (user == null) return null;
 
         return new ExternalModeration(
-                fEntity.getName(),
-                fPlayerServiceProvider.get().getConsole().getName(),
+                fEntity.name(),
+                fPlayerServiceProvider.get().getConsole().name(),
                 user.getMutedReason(),
                 0,
                 Math.max(user.getMutedUntil() - System.currentTimeMillis(), System.currentTimeMillis()),

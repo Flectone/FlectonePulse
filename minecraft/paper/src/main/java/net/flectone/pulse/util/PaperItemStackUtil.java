@@ -43,7 +43,7 @@ public class PaperItemStackUtil {
     }
 
     public void sendMessage(FPlayer fPlayer, String serialized) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        Player player = Bukkit.getPlayer(fPlayer.uuid());
         if (player == null) return;
 
         Component component = AdventureSerializer.serializer().gson().deserialize(serialized);

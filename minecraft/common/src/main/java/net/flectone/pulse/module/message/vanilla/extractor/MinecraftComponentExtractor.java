@@ -121,7 +121,7 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
     }
 
     private boolean isValid(FEntity entity) {
-        return entity != null && (!entity.isUnknown() || entity.getShowEntityName() != null);
+        return entity != null && (!entity.isUnknown() || entity.showEntityName() != null);
     }
 
     public Optional<FEntity> extractFEntity(Component component) {
@@ -138,8 +138,11 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
 
             String type = entityUtil.resolveEntityTranslationKey(rawType);
 
-            FEntity fEntity = new FEntity(FEntity.UNKNOWN_NAME, uuid, type);
-            fEntity.setShowEntityName(showEntity.name());
+            FEntity fEntity = FEntity.builder()
+                    .uuid(uuid)
+                    .type(type)
+                    .showEntityName(showEntity.name())
+                    .build();
 
             return Optional.of(fEntity);
         }

@@ -80,7 +80,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         Optional<String> optionalReason = commandContext.optional(promptMessage);
         String reason = optionalReason.orElse(null);
 
-        Moderation kick = moderationService.kick(fTarget, reason, fPlayer.getId());
+        Moderation kick = moderationService.kick(fTarget, reason, fPlayer.id());
         if (kick == null) return;
 
         kick(fPlayer, fTarget, kick);

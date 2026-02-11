@@ -64,7 +64,7 @@ public class ModerationMessageFormatter {
                 ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.getRemainingTime());
 
-        return replacePlaceholders(message, fTarget.getName(), fModerator.getName(),
+        return replacePlaceholders(message, fTarget.name(), fModerator.name(),
                 String.valueOf(moderation.id()), reason, date, time, timeLeft
         );
     }

@@ -153,7 +153,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
                     true,
-                    fPlayerService.getPing(fPlayer),
+                    platformPlayerAdapter.getPing(fPlayer),
                     GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer)),
                     name,
                     null
@@ -167,7 +167,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
                 name,
                 user.getProfile(),
                 GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer)),
-                fPlayerService.getPing(fPlayer)
+                platformPlayerAdapter.getPing(fPlayer)
         );
 
         packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
@@ -182,7 +182,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
         return fPlayerService.findOnlineFPlayers()
                 .stream()
-                .filter(fPlayer -> !currentServerPlayers.contains(fPlayer.getUuid()))
+                .filter(fPlayer -> !currentServerPlayers.contains(fPlayer.uuid()))
                 .filter(fPlayer -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .map(fPlayer -> createPlayerInfo(fPlayer, fReceiver, null))
                 .toList();
@@ -190,7 +190,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
         // 3 - offline client, 4 - official client
-        boolean offlineClient = fReceiver.getUuid().version() == 3;
+        boolean offlineClient = fReceiver.uuid().version() == 3;
 
         MessageContext messageContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
                 .addFlag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient); // disable player_head for official client
@@ -214,8 +214,8 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     private UserProfile createUserProfile(FPlayer fPlayer) {
-        if (fPlayer.getSettingsText().isEmpty()) {
-            fPlayerService.loadSettings(fPlayer);
+        if (fPlayer.settingsText().isEmpty()) {
+            fPlayer = fPlayerService.loadSettings(fPlayer);
         }
 
         if (!scoreboardModule.hasTeam(fPlayer)) {
@@ -224,7 +224,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fPlayer);
         List<TextureProperty> textureProperties = List.of(new TextureProperty(profileProperty.name(), profileProperty.value(), profileProperty.signature()));
-        return new UserProfile(fPlayer.getUuid(), fPlayer.getName(), textureProperties);
+        return new UserProfile(fPlayer.uuid(), fPlayer.name(), textureProperties);
     }
 
 }

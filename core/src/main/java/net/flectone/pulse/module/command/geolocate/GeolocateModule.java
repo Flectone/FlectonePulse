@@ -73,7 +73,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.getIp();
+        String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.ip();
         if (StringUtils.isEmpty(ip)) {
             sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)

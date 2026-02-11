@@ -30,9 +30,10 @@ public class SocialRepository {
      * Loads ignore relationships for a player.
      *
      * @param fPlayer the player to load ignores for
+     * @return new FPlayer with ignores
      */
-    public void loadIgnores(FPlayer fPlayer) {
-        ignoreDAO.load(fPlayer);
+    public FPlayer loadIgnores(FPlayer fPlayer) {
+        return ignoreDAO.load(fPlayer);
     }
 
     /**

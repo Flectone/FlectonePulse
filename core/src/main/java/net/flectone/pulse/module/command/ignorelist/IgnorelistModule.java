@@ -56,7 +56,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        List<Ignore> ignoreList = fPlayer.getIgnores();
+        List<Ignore> ignoreList = fPlayer.ignores();
         if (ignoreList.isEmpty()) {
             sendErrorMessage(EventMetadata.<Localization.Command.Ignorelist>builder()
                     .sender(fPlayer)
@@ -103,7 +103,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             String line = StringUtils.replaceEach(
                     localization.line(),
                     new String[]{"<command>", "<date>"},
-                    new String[]{"/ignore " + fTarget.getName(), timeFormatter.formatDate(ignore.date())}
+                    new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date())}
             );
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)

@@ -56,13 +56,13 @@ public class FPlayerRepository {
     public FPlayer get(int id) {
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
-                .filter(p -> p.getId() == id)
+                .filter(fPlayer -> fPlayer.id() == id)
                 .findFirst();
         if (onlinePlayer.isPresent()) return onlinePlayer.get();
 
         Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
                 .stream()
-                .filter(p -> p.getId() == id)
+                .filter(fPlayer -> fPlayer.id() == id)
                 .findFirst();
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
@@ -83,13 +83,13 @@ public class FPlayerRepository {
 
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
-                .filter(p -> ip.equals(p.getIp()))
+                .filter(fPlayer -> ip.equals(fPlayer.ip()))
                 .findFirst();
         if (onlinePlayer.isPresent()) return onlinePlayer.get();
 
         Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
                 .stream()
-                .filter(p -> ip.equals(p.getIp()))
+                .filter(fPlayer -> ip.equals(fPlayer.ip()))
                 .findFirst();
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
@@ -127,13 +127,13 @@ public class FPlayerRepository {
     public FPlayer get(@NonNull String playerName) {
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
-                .filter(p -> p.getName().equalsIgnoreCase(playerName))
+                .filter(fPlayer -> fPlayer.name().equalsIgnoreCase(playerName))
                 .findFirst();
         if (onlinePlayer.isPresent()) return onlinePlayer.get();
 
         Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
                 .stream()
-                .filter(p -> p.getName().equalsIgnoreCase(playerName))
+                .filter(fPlayer -> fPlayer.name().equalsIgnoreCase(playerName))
                 .findFirst();
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
@@ -145,9 +145,9 @@ public class FPlayerRepository {
 
     private void saveToCache(FPlayer fPlayer) {
         if (fPlayer.isOnline()) {
-            onlinePlayers.put(fPlayer.getUuid(), fPlayer);
+            onlinePlayers.put(fPlayer.uuid(), fPlayer);
         } else {
-            offlinePlayersCache.put(fPlayer.getUuid(), fPlayer);
+            offlinePlayersCache.put(fPlayer.uuid(), fPlayer);
         }
     }
 
@@ -197,11 +197,16 @@ public class FPlayerRepository {
     public void removeOnline(@NonNull UUID uuid) {
         FPlayer fPlayer = onlinePlayers.get(uuid);
         if (fPlayer != null) {
-            fPlayer.setOnline(false);
-            offlinePlayersCache.put(uuid, fPlayer);
+            offlinePlayersCache.put(uuid, fPlayer.withOnline(false));
         }
 
         onlinePlayers.remove(uuid);
+    }
+
+    public void removeOnline(@NonNull FPlayer fPlayer) {
+        onlinePlayers.remove(fPlayer.uuid());
+
+        offlinePlayersCache.put(fPlayer.uuid(), fPlayer.isOnline() ? fPlayer.withOnline(false) : fPlayer);
     }
 
     /**
@@ -210,8 +215,8 @@ public class FPlayerRepository {
      * @param fPlayer the player to add
      */
     public void add(@NonNull FPlayer fPlayer) {
-        onlinePlayers.put(fPlayer.getUuid(), fPlayer);
-        offlinePlayersCache.invalidate(fPlayer.getUuid());
+        onlinePlayers.put(fPlayer.uuid(), fPlayer);
+        offlinePlayersCache.invalidate(fPlayer.uuid());
     }
 
     /**
@@ -262,9 +267,10 @@ public class FPlayerRepository {
      * Loads color settings for a player.
      *
      * @param fPlayer the player to load colors for
+     * @return new FPlayer with colors
      */
-    public void loadColors(@NonNull FPlayer fPlayer) {
-        colorsDAO.load(fPlayer);
+    public FPlayer loadColors(@NonNull FPlayer fPlayer) {
+        return colorsDAO.load(fPlayer);
     }
 
     /**
@@ -290,8 +296,8 @@ public class FPlayerRepository {
      *
      * @param fPlayer the player to load settings for
      */
-    public void loadSettings(@NonNull FPlayer fPlayer) {
-        settingDAO.load(fPlayer);
+    public FPlayer loadSettings(@NonNull FPlayer fPlayer) {
+        return settingDAO.load(fPlayer);
     }
 
     /**
@@ -312,5 +318,22 @@ public class FPlayerRepository {
      */
     public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting) {
         settingDAO.insertOrUpdate(fPlayer, setting);
+    }
+
+    /**
+     * Updates the cache with the latest player data
+     *
+     * @param fPlayer the player data to update in cache
+     */
+    public void updateCache(FPlayer fPlayer) {
+        if (onlinePlayers.containsKey(fPlayer.uuid())) {
+            onlinePlayers.put(fPlayer.uuid(), fPlayer);
+            return;
+        }
+
+        FPlayer offlineFPlayer = offlinePlayersCache.getIfPresent(fPlayer.uuid());
+        if (offlineFPlayer != null) {
+            offlinePlayersCache.put(fPlayer.uuid(), fPlayer.isOnline() ? fPlayer.withOnline(false) : fPlayer);
+        }
     }
 }

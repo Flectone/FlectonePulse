@@ -191,15 +191,15 @@ public class ProxyMessageHandler {
     private boolean handleModerationInvalidation(MessageType tag, FEntity fEntity) {
         return switch (tag) {
             case SYSTEM_BAN -> {
-                moderationService.invalidateBans(fEntity.getUuid());
+                moderationService.invalidateBans(fEntity.uuid());
                 yield true;
             }
             case SYSTEM_MUTE -> {
-                moderationService.invalidateMutes(fEntity.getUuid());
+                moderationService.invalidateMutes(fEntity.uuid());
                 yield true;
             }
             case SYSTEM_WARN -> {
-                moderationService.invalidateWarns(fEntity.getUuid());
+                moderationService.invalidateWarns(fEntity.uuid());
                 yield true;
             }
             default -> false;
@@ -320,8 +320,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
-        fPlayerService.loadColors(fPlayer);
+        FPlayer fPlayer = fPlayerService.updateCache(fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity)));
 
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!module.isEnable()) return;
@@ -330,7 +329,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {
-        fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity.getUuid()));
+        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity)));
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -494,7 +493,7 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.getName()))
+                        .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.name()))
                         .destination(fileFacade.command().unban().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
@@ -518,7 +517,7 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.name()))
                         .destination(fileFacade.command().unmute().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
@@ -542,7 +541,7 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.getName()))
+                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.name()))
                         .destination(fileFacade.command().unwarn().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
@@ -900,9 +899,9 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Message.Afk>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(s -> isAfk
-                                ? s.formatFalse().global()
-                                : s.formatTrue().global()
+                        .format(localization -> isAfk
+                                ? localization.formatTrue().global()
+                                : localization.formatFalse().global()
                         )
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.message().afk().destination())

@@ -102,8 +102,8 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
             case PLAYED_TIME -> System.currentTimeMillis() + (timeout - platformPlayerAdapter.getAllTimePlayed(fPlayer));
         };
 
-        return new ExternalModeration(fPlayer.getName(),
-                FPlayer.UNKNOWN.getName(),
+        return new ExternalModeration(fPlayer.name(),
+                FPlayer.UNKNOWN_NAME,
                 localization().reason(),
                 1,
                 firstPlayed,

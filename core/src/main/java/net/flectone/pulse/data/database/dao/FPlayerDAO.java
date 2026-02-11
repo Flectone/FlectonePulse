@@ -104,10 +104,10 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      */
     public void insertOrIgnore(@NonNull FPlayer fPlayer) {
         useHandle(sql -> {
-            Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.getUuid().toString());
+            Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.uuid().toString());
 
             if (existingPlayer.isEmpty()) {
-                sql.insertWithId(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
+                sql.insertWithId(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name());
             }
         });
     }
@@ -121,11 +121,11 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
         if (fPlayer.isUnknown()) return;
 
         useHandle(sql -> sql.update(
-                fPlayer.getId(),
+                fPlayer.id(),
                 fPlayer.isOnline(),
-                fPlayer.getUuid().toString(),
-                fPlayer.getName(),
-                fPlayer.getIp()
+                fPlayer.uuid().toString(),
+                fPlayer.name(),
+                fPlayer.ip()
         ));
     }
 
@@ -209,15 +209,15 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     private FPlayer convertToFPlayer(PlayerInfo info, boolean loadSetting) {
-        FPlayer fPlayer = new FPlayer(info.id(), info.name(), UUID.fromString(info.uuid()));
-        fPlayer.setOnline(info.online());
-        fPlayer.setIp(info.ip());
+        FPlayer fPlayer = FPlayer.builder()
+                .id(info.id())
+                .name(info.name())
+                .uuid(UUID.fromString(info.uuid()))
+                .online(info.online())
+                .ip(info.ip())
+                .build();
 
-        if (loadSetting) {
-            settingDAOProvider.get().load(fPlayer);
-        }
-
-        return fPlayer;
+        return loadSetting ? settingDAOProvider.get().load(fPlayer) : fPlayer;
     }
 
     private List<FPlayer> convertToFPlayers(List<PlayerInfo> entities) {

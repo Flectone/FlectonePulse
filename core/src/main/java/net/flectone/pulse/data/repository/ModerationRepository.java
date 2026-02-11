@@ -38,7 +38,7 @@ public class ModerationRepository {
      */
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type) {
         try {
-            Pair<UUID, Moderation.Type> key = Pair.of(player.getUuid(), type);
+            Pair<UUID, Moderation.Type> key = Pair.of(player.uuid(), type);
             List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type));
             if (cached.stream().anyMatch(Moderation::isActive)) {
                 return cached;

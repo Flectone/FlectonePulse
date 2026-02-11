@@ -53,21 +53,21 @@ public class HytaleSidebarModule extends SidebarModule {
 
     @Override
     public void remove(FPlayer fPlayer) {
-        HyUIHud hyUIHud = playerSidebars.get(fPlayer.getUuid());
+        HyUIHud hyUIHud = playerSidebars.get(fPlayer.uuid());
         if (hyUIHud != null)  {
             hyUIHud.remove();
 
-            playerSidebars.remove(fPlayer.getUuid());
+            playerSidebars.remove(fPlayer.uuid());
         }
     }
 
     @Override
     public void update(FPlayer fPlayer) {
-        if (!playerSidebars.containsKey(fPlayer.getUuid())) {
+        if (!playerSidebars.containsKey(fPlayer.uuid())) {
             create(fPlayer);
         }
 
-        HyUIHud hyUIHud = playerSidebars.get(fPlayer.getUuid());
+        HyUIHud hyUIHud = playerSidebars.get(fPlayer.uuid());
         if (hyUIHud == null) return;
         if (!(platformPlayerAdapter.convertToPlatformPlayer(fPlayer) instanceof PlayerRef playerRef)) return;
 
@@ -99,7 +99,7 @@ public class HytaleSidebarModule extends SidebarModule {
         HudBuilder hudBuilder = createHudBuilder(fPlayer, playerRef);
         if (hudBuilder == null) return;
 
-        refStore.getStore().getExternalData().getWorld().execute(() -> playerSidebars.put(fPlayer.getUuid(), hudBuilder.show()));
+        refStore.getStore().getExternalData().getWorld().execute(() -> playerSidebars.put(fPlayer.uuid(), hudBuilder.show()));
     }
 
     private HudBuilder createHudBuilder(FPlayer fPlayer, PlayerRef playerRef) {

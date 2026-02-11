@@ -151,7 +151,7 @@ public class HytaleVanillaModule extends VanillaModule {
 
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
-        String formatTarget = fTarget.getType().equals(FPlayer.TYPE)
+        String formatTarget = fTarget.type().equals(FPlayer.TYPE)
                 ? localization.formatPlayer()
                 : localization.formatEntity();
 

@@ -59,7 +59,8 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
             afkMessageModule.remove("afk", fPlayer);
         } else {
-            afkMessageModule.setAfk(fPlayer);
+            afkMessageModule.setAfkSuffix(fPlayer);
+            afkMessageModule.sendAfkMessage(fPlayer.uuid(), true);
         }
 
         soundPlayer.play(soundOrThrow(), fPlayer);
