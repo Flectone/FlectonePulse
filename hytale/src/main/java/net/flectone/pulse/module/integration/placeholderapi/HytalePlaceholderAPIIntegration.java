@@ -65,8 +65,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     @Override
     public void hook() {
-        // idk why PlaceholderAPI can't register even though FlectonePulse sees it
-        taskScheduler.runSyncLater(this::register, 20L);
+        taskScheduler.runSync(this::register);
         fLogger.info("✔ PlaceholderAPI hooked");
     }
 
