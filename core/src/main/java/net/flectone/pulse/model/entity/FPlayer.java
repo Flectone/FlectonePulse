@@ -214,10 +214,7 @@ public interface FPlayer extends FEntity {
         public FPlayer withoutSetting(@Nullable SettingText settingText) {
             if (!this.settingsText.containsKey(settingText)) return this;
 
-            Map<SettingText, String> newSettings = this.settingsText.isEmpty()
-                    ? new EnumMap<>(SettingText.class)
-                    : new EnumMap<>(this.settingsText);
-
+            Map<SettingText, String> newSettings = new EnumMap<>(this.settingsText);
             newSettings.remove(settingText);
 
             return toBuilder()
@@ -260,7 +257,7 @@ public interface FPlayer extends FEntity {
             if (this == object) return true;
             if (!(object instanceof FPlayer fPlayer)) return false;
 
-            return this.id == fPlayer.id();
+            return Objects.equals(this.id, fPlayer.id());
         }
 
         @Override
