@@ -9,8 +9,10 @@ import net.flectone.pulse.data.database.sql.SettingSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
@@ -59,7 +61,13 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
     private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
         int updated = sql.update(player.id(), type, value);
         if (updated == 0) {
-            sql.insert(player.id(), type, value);
+            try {
+                sql.insert(player.id(), type, value);
+            } catch (UnableToExecuteStatementException e) {
+                if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
+                    sql.update(player.id(), type, value);
+                } else throw e;
+            }
         }
     }
 
