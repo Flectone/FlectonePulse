@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
@@ -115,7 +116,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         try {
             MessageType messageType = MessageType.valueOf(params.toUpperCase());
-            return String.valueOf(fPlayer.isSetting(messageType));
+            return fPlayer.isSetting(messageType) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
         } catch (IllegalArgumentException ignored) {
             // ignore exception
         }

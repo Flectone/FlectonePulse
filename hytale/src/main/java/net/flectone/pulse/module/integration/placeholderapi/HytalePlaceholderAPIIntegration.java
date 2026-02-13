@@ -114,7 +114,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
 
         try {
             MessageType messageType = MessageType.valueOf(params.toUpperCase());
-            return String.valueOf(fPlayer.isSetting(messageType));
+            return PlaceholderAPI.booleanValue(fPlayer.isSetting(messageType));
         } catch (IllegalArgumentException ignored) {
             // ignore exception
         }
