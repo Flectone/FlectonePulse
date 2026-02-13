@@ -65,7 +65,7 @@ public interface IgnoreSQL extends SQL {
      * @param targetId the ID of the player being ignored
      * @return optional containing the ignore record if found
      */
-    @SqlQuery("SELECT * FROM `fp_ignore` WHERE `initiator` = :initiator AND `target` = :target AND `valid` = true")
+    @SqlQuery("SELECT * FROM `fp_ignore` WHERE `initiator` = :initiator AND `target` = :target AND `valid` = true LIMIT 1")
     Optional<Ignore> findByInitiatorAndTarget(@Bind("initiator") int initiatorId, @Bind("target") int targetId);
 
 }
