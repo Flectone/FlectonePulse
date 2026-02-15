@@ -7,11 +7,9 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
-import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.util.constant.MessageFlag;
-
-import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,12 +20,9 @@ public class TranslatePulseListener implements PulseListener {
     @Pulse
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.TRANSLATE)) return event;
+        if (!messageContext.isFlag(MessageFlag.TRANSLATION)) return event;
 
-        String messageToTranslate = messageContext.userMessage();
-        UUID key = translateModule.saveMessage(messageToTranslate);
-
-        return event.withContext(translateModule.addTag(messageContext, key));
+        return event.withContext(translateModule.addTag(messageContext));
     }
 
 }

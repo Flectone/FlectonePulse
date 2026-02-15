@@ -566,4 +566,26 @@ public class FileMigrator {
         return files.withLocalizations(newLocalizations);
     }
 
+    public FilePack migration_1_8_2(FilePack files) {
+        Map<String, Localization> newLocalizations = new HashMap<>();
+
+        for (Localization localization : files.localizations().values()) {
+
+            Map<String, String> newChats = new HashMap<>(localization.message().chat().types());
+            newChats.forEach((key, value) ->
+                    newChats.put(key, Strings.CS.replace(value, "<translate>", "<translation>"))
+            );
+
+            newLocalizations.put(localization.language(),
+                    localization.withMessage(
+                            localization.message().withChat(
+                                    localization.message().chat().withTypes(newChats)
+                            )
+                    )
+            );
+        }
+
+        return files.withLocalizations(newLocalizations);
+    }
+
 }

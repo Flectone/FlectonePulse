@@ -168,7 +168,7 @@ public class MessagePipeline {
         MENTION,
         SWEAR,
         QUESTION,
-        TRANSLATE,
+        TRANSLATION,
         WORLD_PREFIX,
         PLAYER_HEAD,
         PLAYER_HEAD_OR,

@@ -11,10 +11,10 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
@@ -24,7 +24,6 @@ import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -80,13 +79,15 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
         return uuid;
     }
 
-    public MessageContext addTag(MessageContext messageContext, UUID key) {
+    public MessageContext addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.TRANSLATE), (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, context) -> {
             String firstLang = "auto";
             String secondLang = receiver.getSetting(SettingText.LOCALE);
 
@@ -110,12 +111,12 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
             String action = localization(receiver).action();
             action = Strings.CS.replaceOnce(action, "<language>", firstLang);
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
-            action = Strings.CS.replace(action, "<message>", key.toString());
+            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())
                     .addFlags(
-                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATE, MessageFlag.USER_MESSAGE},
+                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATION, MessageFlag.USER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
                     );
 

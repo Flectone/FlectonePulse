@@ -508,8 +508,8 @@ message:
     null_chat: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Chat is disabled on this server"
     null_receiver: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Nobody heard you"
     types:
-      global: "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>"
-      local: "<delete><display_name><fcolor:3>: <message><reset><translate>"
+      global: "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translation>"
+      local: "<delete><display_name><fcolor:3>: <message><reset><translation>"
   format:
     animation:
       values:

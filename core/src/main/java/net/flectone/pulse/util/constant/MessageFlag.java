@@ -10,7 +10,7 @@ public enum MessageFlag {
     REPLACE_DISABLED_TAGS(true),
     FIXATION(true),
     QUESTION(true),
-    TRANSLATE(false),
+    TRANSLATION(true),
     TRANSLATE_ITEM(true),
     SWEAR(true),
     CAPS(true),

@@ -203,8 +203,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
         if (!receiver.isUnknown()) {
             messageContext = messageContext
-                    .withUserMessage(eventMetadata.message())
-                    .addFlag(MessageFlag.TRANSLATE, formatContent.contains("<translate"));
+                    .withUserMessage(eventMetadata.message());
         }
 
         return messagePipeline.build(messageContext);

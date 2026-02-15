@@ -176,8 +176,12 @@ public class FileFacade {
             files = fileMigrator.migration_1_7_4(files);
         }
 
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.5")) {
+        if (versionComparator.isOlderThan(preInitVersion, "1.7.5")) { // 1.7.5 == 1.8.0
             files = fileMigrator.migration_1_7_5(files);
+        }
+
+        if (versionComparator.isOlderThan(preInitVersion, "1.8.2")) {
+            files = fileMigrator.migration_1_8_2(files);
         }
 
         files = files.withConfig(files.config().withVersion(BuildConfig.PROJECT_VERSION));
