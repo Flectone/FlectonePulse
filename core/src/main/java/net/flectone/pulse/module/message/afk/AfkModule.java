@@ -229,6 +229,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                         .build()
                 )
                 .newStatus(isAfk)
+                .ignoreVanish(false)
                 .build()
         );
     }
