@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;

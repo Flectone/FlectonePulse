@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.flood.listener.FloodPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;

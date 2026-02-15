@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;

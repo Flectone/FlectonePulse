@@ -18,7 +18,7 @@ import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;

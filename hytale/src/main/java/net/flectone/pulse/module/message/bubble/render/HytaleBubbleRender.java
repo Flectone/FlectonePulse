@@ -30,7 +30,7 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;

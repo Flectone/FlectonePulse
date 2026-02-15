@@ -15,7 +15,7 @@ import net.flectone.pulse.module.message.format.moderation.delete.listener.Delet
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;

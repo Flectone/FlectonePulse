@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.vanilla.listener.DeathListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.registry.HytaleListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;

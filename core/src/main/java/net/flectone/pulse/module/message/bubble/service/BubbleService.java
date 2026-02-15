@@ -12,7 +12,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.render.BubbleRender;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageFlag;

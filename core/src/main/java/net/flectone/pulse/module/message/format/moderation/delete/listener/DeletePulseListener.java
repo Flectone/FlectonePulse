@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 

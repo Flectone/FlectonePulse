@@ -6,7 +6,7 @@ import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;

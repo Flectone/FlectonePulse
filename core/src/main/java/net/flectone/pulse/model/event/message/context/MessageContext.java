@@ -1,4 +1,4 @@
-package net.flectone.pulse.processing.context;
+package net.flectone.pulse.model.event.message.context;
 
 import lombok.With;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;

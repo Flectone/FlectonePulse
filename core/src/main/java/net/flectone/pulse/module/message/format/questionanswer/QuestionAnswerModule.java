@@ -19,7 +19,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;

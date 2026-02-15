@@ -20,7 +20,7 @@ import net.flectone.pulse.platform.provider.AttributesProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.provider.PassengersProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;

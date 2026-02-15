@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;

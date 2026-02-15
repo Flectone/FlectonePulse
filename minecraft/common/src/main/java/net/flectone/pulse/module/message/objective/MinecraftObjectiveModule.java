@@ -14,7 +14,7 @@ import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;

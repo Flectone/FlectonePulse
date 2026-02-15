@@ -1,7 +1,7 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.With;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.Event;
 
 @With

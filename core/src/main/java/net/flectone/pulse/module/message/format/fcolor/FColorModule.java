@@ -15,7 +15,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;

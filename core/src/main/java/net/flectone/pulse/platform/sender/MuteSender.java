@@ -9,7 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;

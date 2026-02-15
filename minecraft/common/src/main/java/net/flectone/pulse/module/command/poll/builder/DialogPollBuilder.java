@@ -25,7 +25,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.NBTPoll;
 import net.flectone.pulse.platform.controller.DialogController;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 

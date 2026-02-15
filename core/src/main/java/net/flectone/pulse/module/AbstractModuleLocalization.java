@@ -17,7 +17,7 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.filter.RangeFilter;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
