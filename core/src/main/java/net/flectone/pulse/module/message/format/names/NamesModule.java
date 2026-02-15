@@ -12,10 +12,12 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -33,6 +35,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
 
     @Override
@@ -195,4 +198,10 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                 }
         );
     }
+
+    public boolean isInvisible(FEntity entity) {
+        return config().shouldCheckInvisibility()
+                && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME);
+    }
+
 }
