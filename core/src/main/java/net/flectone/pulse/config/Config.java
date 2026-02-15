@@ -109,7 +109,8 @@ public record Config(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Module(Boolean enable,
-                         Boolean usePaperMessageSender) implements EnableSetting {
+                         Boolean usePaperMessageSender,
+                         Boolean useBukkitPreLoginListener) implements EnableSetting {
     }
 
     @With

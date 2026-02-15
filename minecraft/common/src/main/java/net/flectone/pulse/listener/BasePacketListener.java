@@ -20,12 +20,15 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -38,12 +41,14 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BasePacketListener implements PacketListener {
 
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TextScreenRender textScreenRender;
+    private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
 
     @Override
@@ -72,11 +77,14 @@ public class BasePacketListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
 
-        // only for 1.20.2 and newer versions
-        // because there is a configuration stage and there are no problems with evet.setСancelled(True)
-        if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS
-                && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+        boolean usePacketPreLoginListener =
+                // only for 1.20.2 and newer versions
+                // because there is a configuration stage and there are no problems with evet.setСancelled(True)
+                event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)
+                // or maybe it's enabled in config, it only works for Bukkit
+                && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().module().useBukkitPreLoginListener());
 
+        if (usePacketPreLoginListener) {
             WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
             UserProfile userProfile = wrapper.getUserProfile();
 

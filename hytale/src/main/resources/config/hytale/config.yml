@@ -37,6 +37,7 @@ command:
 module:
   enable: true
   use_paper_message_sender: false
+  use_bukkit_pre_login_listener: false
 editor:
   host: ""
   https: false
