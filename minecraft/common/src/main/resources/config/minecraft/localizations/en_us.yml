@@ -80,7 +80,7 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_type: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect type entered"
     null_color: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect colors entered"
-    format: "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br>"
+    format: "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world! <br>"
   chatsetting:
     no_permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>No permission to change this setting"
     disabled_self: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This feature is disabled via /chatsetting"
@@ -125,47 +125,47 @@ command:
           local: "<fcolor:2>Local chat<br><fcolor:1>You can write to <fcolor:2>any <fcolor:1>chats"
           global: "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global <fcolor:1>chat"
       see:
-        item: "<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages"
+        item: "<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages"
         inventory: "Colors"
         types:
-          default: "<gradient:#70C7EF:#37B1F2>Default colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          white: "<gradient:#D4E4FF:#B8D2FF>White colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          light_gray: "<gradient:#B5B9BD:#9DA2A6>Light gray colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          gray: "<gradient:#4A5054:#3A3F42>Gray colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          black: "<gradient:#17191A:#0D0E0F>Black colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          brown: "<gradient:#7A5A40:#634A34>Brown colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          red: "<gradient:#D63E3E:#C12B2B>Red colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          orange: "<gradient:#FF8C00:#E67E00>Orange colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          yellow: "<gradient:#FFE83D:#FFD900>Yellow colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          lime: "<gradient:#8EE53F:#7ACC29>Lime colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          green: "<gradient:#4BB54B:#3AA33A>Green colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          cyan: "<gradient:#3ECFDF:#2AB7C9>Cyan colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          light_blue: "<gradient:#6BB6FF:#4DA6FF>Light blue colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          blue: "<gradient:#3A75FF:#1F5AFF>Blue colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          purple: "<gradient:#A368C7:#8A4DBF>Purple colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          magenta: "<gradient:#FF5CD9:#FF3DCF>Magenta colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          pink: "<gradient:#FF80B7:#FF66A6>Pink colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
+          default: "<gradient:#70C7EF:#37B1F2>Default colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          white: "<gradient:#D4E4FF:#B8D2FF>White colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          light_gray: "<gradient:#B5B9BD:#9DA2A6>Light gray colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          gray: "<gradient:#4A5054:#3A3F42>Gray colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          black: "<gradient:#17191A:#0D0E0F>Black colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          brown: "<gradient:#7A5A40:#634A34>Brown colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          red: "<gradient:#D63E3E:#C12B2B>Red colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          orange: "<gradient:#FF8C00:#E67E00>Orange colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          yellow: "<gradient:#FFE83D:#FFD900>Yellow colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          lime: "<gradient:#8EE53F:#7ACC29>Lime colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          green: "<gradient:#4BB54B:#3AA33A>Green colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          cyan: "<gradient:#3ECFDF:#2AB7C9>Cyan colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          light_blue: "<gradient:#6BB6FF:#4DA6FF>Light blue colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          blue: "<gradient:#3A75FF:#1F5AFF>Blue colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          purple: "<gradient:#A368C7:#8A4DBF>Purple colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          magenta: "<gradient:#FF5CD9:#FF3DCF>Magenta colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          pink: "<gradient:#FF80B7:#FF66A6>Pink colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
       out:
-        item: "<fcolor:2>Colors \"out\" <br><fcolor:1>Colors for /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br><br><u><color:#ff7171>Everyone sees it in your messages"
+        item: "<fcolor:2>Colors \"out\" <br><fcolor:1>Colors for /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world! <br><br><u><color:#ff7171>Everyone sees it in your messages"
         inventory: "Colors"
         types:
-          default: "<gradient:#70C7EF:#37B1F2>Default colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          white: "<gradient:#D4E4FF:#B8D2FF>White colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          light_gray: "<gradient:#B5B9BD:#9DA2A6>Light gray colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          gray: "<gradient:#4A5054:#3A3F42>Gray colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          black: "<gradient:#17191A:#0D0E0F>Black colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          brown: "<gradient:#7A5A40:#634A34>Brown colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          red: "<gradient:#D63E3E:#C12B2B>Red colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          orange: "<gradient:#FF8C00:#E67E00>Orange colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          yellow: "<gradient:#FFE83D:#FFD900>Yellow colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          lime: "<gradient:#8EE53F:#7ACC29>Lime colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          green: "<gradient:#4BB54B:#3AA33A>Green colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          cyan: "<gradient:#3ECFDF:#2AB7C9>Cyan colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          light_blue: "<gradient:#6BB6FF:#4DA6FF>Light blue colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          blue: "<gradient:#3A75FF:#1F5AFF>Blue colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          purple: "<gradient:#A368C7:#8A4DBF>Purple colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          magenta: "<gradient:#FF5CD9:#FF3DCF>Magenta colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
-          pink: "<gradient:#FF80B7:#FF66A6>Pink colors<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!"
+          default: "<gradient:#70C7EF:#37B1F2>Default colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          white: "<gradient:#D4E4FF:#B8D2FF>White colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          light_gray: "<gradient:#B5B9BD:#9DA2A6>Light gray colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          gray: "<gradient:#4A5054:#3A3F42>Gray colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          black: "<gradient:#17191A:#0D0E0F>Black colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          brown: "<gradient:#7A5A40:#634A34>Brown colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          red: "<gradient:#D63E3E:#C12B2B>Red colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          orange: "<gradient:#FF8C00:#E67E00>Orange colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          yellow: "<gradient:#FFE83D:#FFD900>Yellow colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          lime: "<gradient:#8EE53F:#7ACC29>Lime colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          green: "<gradient:#4BB54B:#3AA33A>Green colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          cyan: "<gradient:#3ECFDF:#2AB7C9>Cyan colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          light_blue: "<gradient:#6BB6FF:#4DA6FF>Light blue colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          blue: "<gradient:#3A75FF:#1F5AFF>Blue colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          purple: "<gradient:#A368C7:#8A4DBF>Purple colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          magenta: "<gradient:#FF5CD9:#FF3DCF>Magenta colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
+          pink: "<gradient:#FF80B7:#FF66A6>Pink colors<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: hello world!"
   clearchat:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:1>💬 Chat is cleared"
@@ -267,6 +267,12 @@ command:
       header: "<fcolor:2>▋ All mutes: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+  nickname:
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
+    null_nickname: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This nickname cannot be used"
+    display: "<value><gray>*</gray>"
+    display_see: "(<player>) <value><gray>*</gray>"
+    format: "<fcolor:1>✎ Nickname was changed to <fcolor:2><nick>"
   online:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format_current: "<fcolor:1>⌛ <target> currently on server"
@@ -468,10 +474,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <player> is now afk"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> is now afk"
       local: "<gradient:#ffd500:#FFFF00>⌚ Now you're afk"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <player> isn't afk now"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> isn't afk now"
       local: "<gradient:#ffd500:#FFFF00>⌚ Now you're not afk"
   auto:
     types:
@@ -574,7 +580,7 @@ message:
     names:
       constant: []
       display:
-        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
+        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <white><player_head></white><nickname>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>👻 Invisible"
@@ -585,7 +591,7 @@ message:
     translate:
       action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
-    format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
+    format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <nickname><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:
     format: "<color:#4eff52>→ <display_name>"
     format_first_time: "<color:#4eff52>→ <display_name> <fcolor:1>welcome!"
@@ -637,13 +643,13 @@ message:
     footer:
       lists:
       - - " "
-        - "<fcolor:1>Hello <fcolor:2><player><fcolor:1>!"
+        - "<fcolor:1>Hello <fcolor:2><nickname><fcolor:1>!"
         - " "
       - - " "
         - "<fcolor:1>TPS <replacement:tps>, Online <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><mute_suffix><vault_suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <replacement:url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!"
     format_console: "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"

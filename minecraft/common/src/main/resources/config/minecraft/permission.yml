@@ -345,6 +345,21 @@ command:
     sound:
       name: "flectonepulse.module.command.mutelist.sound"
       type: "TRUE"
+  nickname:
+    name: "flectonepulse.module.command.nickname"
+    type: "OP"
+    see:
+      name: "flectonepulse.module.command.nickname.see"
+      type: "FALSE"
+    other:
+      name: "flectonepulse.module.command.nickname.other"
+      type: "OP"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.nickname.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.nickname.sound"
+      type: "TRUE"
   online:
     name: "flectonepulse.module.command.online"
     type: "TRUE"

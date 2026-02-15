@@ -575,6 +575,17 @@ mutelist:
     enable: false
   sound:
     enable: false
+nickname:
+  enable: true
+  allowed_input: ""
+  aliases:
+    - "nickname"
+  destination:
+    type: "CHAT"
+  cooldown:
+    enable: false
+  sound:
+    enable: false
 online:
   enable: false
   suggest_offline_players: true

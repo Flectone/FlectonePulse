@@ -42,6 +42,7 @@ public interface CommandMerger {
     @Mapping(target = "me", expression = "java(mergeMe(target.build().me().toBuilder(), source.me()))")
     @Mapping(target = "mute", expression = "java(mergeMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
+    @Mapping(target = "nickname", expression = "java(mergeNickname(target.build().nickname().toBuilder(), source.nickname()))")
     @Mapping(target = "online", expression = "java(mergeOnline(target.build().online().toBuilder(), source.online()))")
     @Mapping(target = "ping", expression = "java(mergePing(target.build().ping().toBuilder(), source.ping()))")
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
@@ -130,6 +131,8 @@ public interface CommandMerger {
     Command.Mute mergeMute(@MappingTarget Command.Mute.MuteBuilder target, Command.Mute mute);
 
     Command.Mutelist mergeMutelist(@MappingTarget Command.Mutelist.MutelistBuilder target, Command.Mutelist mutelist);
+
+    Command.Nickname mergeNickname(@MappingTarget Command.Nickname.NicknameBuilder target, Command.Nickname nickname);
 
     Command.Online mergeOnline(@MappingTarget Command.Online.OnlineBuilder target, Command.Online online);
 

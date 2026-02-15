@@ -13,7 +13,8 @@ public enum SettingText {
     WORLD_PREFIX,
     STREAM_PREFIX,
     SPY_STATUS,
-    AFK_SUFFIX;
+    AFK_SUFFIX,
+    NICKNAME;
 
     private static final Map<String, SettingText> ENUM_BY_KEY = Arrays.stream(SettingText.values())
             .collect(Collectors.toUnmodifiableMap(

@@ -22,7 +22,8 @@ public enum MessageFlag {
     INTERACTIVE_CHAT(true),
     INVISIBLE_NAME(true),
     OBJECT_PLAYER_HEAD(true),
-    OBJECT_SPRITE(true);
+    OBJECT_SPRITE(true),
+    NICKNAME(true);
 
     private final boolean defaultValue;
 

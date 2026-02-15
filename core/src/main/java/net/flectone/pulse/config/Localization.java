@@ -135,6 +135,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist")
             Mutelist mutelist,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/nickname")
+            Nickname nickname,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online")
             Online online,
 
@@ -506,6 +509,17 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
+        ) implements LocalizationSetting {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Nickname(
+                String nullPlayer,
+                String nullNickname,
+                String display,
+                String displaySee,
+                String format
         ) implements LocalizationSetting {}
 
         @With

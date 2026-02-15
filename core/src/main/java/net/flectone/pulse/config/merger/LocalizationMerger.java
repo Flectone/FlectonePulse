@@ -51,6 +51,7 @@ public interface LocalizationMerger {
     @Mapping(target = "me", expression = "java(mergeMe(target.build().me().toBuilder(), source.me()))")
     @Mapping(target = "mute", expression = "java(mergeMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
+    @Mapping(target = "nickname", expression = "java(mergeNickname(target.build().nickname().toBuilder(), source.nickname()))")
     @Mapping(target = "online", expression = "java(mergeOnline(target.build().online().toBuilder(), source.online()))")
     @Mapping(target = "ping", expression = "java(mergePing(target.build().ping().toBuilder(), source.ping()))")
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
@@ -140,6 +141,8 @@ public interface LocalizationMerger {
     @Mapping(target = "global", expression = "java(mergeListTypeMessage(target.build().global().toBuilder(), mutelist.global()))")
     @Mapping(target = "player", expression = "java(mergeListTypeMessage(target.build().player().toBuilder(), mutelist.player()))")
     Localization.Command.Mutelist mergeMutelist(@MappingTarget Localization.Command.Mutelist.MutelistBuilder target, Localization.Command.Mutelist mutelist);
+
+    Localization.Command.Nickname mergeNickname(@MappingTarget Localization.Command.Nickname.NicknameBuilder target, Localization.Command.Nickname nickname);
 
     Localization.Command.Online mergeOnline(@MappingTarget Localization.Command.Online.OnlineBuilder target, Localization.Command.Online online);
 

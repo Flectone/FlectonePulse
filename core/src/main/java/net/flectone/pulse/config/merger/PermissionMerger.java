@@ -52,6 +52,7 @@ public interface PermissionMerger {
     @Mapping(target = "me", expression = "java(mergeMe(target.build().me().toBuilder(), source.me()))")
     @Mapping(target = "mute", expression = "java(mergeMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
+    @Mapping(target = "nickname", expression = "java(mergeNickname(target.build().nickname().toBuilder(), source.nickname()))")
     @Mapping(target = "online", expression = "java(mergeOnline(target.build().online().toBuilder(), source.online()))")
     @Mapping(target = "ping", expression = "java(mergePing(target.build().ping().toBuilder(), source.ping()))")
     @Mapping(target = "poll", expression = "java(mergePoll(target.build().poll().toBuilder(), source.poll()))")
@@ -124,6 +125,8 @@ public interface PermissionMerger {
     Permission.Command.Mute mergeMute(@MappingTarget Permission.Command.Mute.MuteBuilder target, Permission.Command.Mute mute);
 
     Permission.Command.Mutelist mergeMutelist(@MappingTarget Permission.Command.Mutelist.MutelistBuilder target, Permission.Command.Mutelist mutelist);
+
+    Permission.Command.Nickname mergeNickname(@MappingTarget Permission.Command.Nickname.NicknameBuilder target, Permission.Command.Nickname nickname);
 
     Permission.Command.Online mergeOnline(@MappingTarget Permission.Command.Online.OnlineBuilder target, Permission.Command.Online online);
 

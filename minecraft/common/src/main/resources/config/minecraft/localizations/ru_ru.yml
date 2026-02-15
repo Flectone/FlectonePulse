@@ -80,7 +80,7 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     null_type: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Тип введён неверно"
     null_color: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Цвета введены неверно"
-    format: "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br>"
+    format: "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир! <br>"
   chatsetting:
     no_permission: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Нет разрешения на изменение этой настройки"
     disabled_self: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Эта функция отключена с помощью /chatsetting"
@@ -125,47 +125,47 @@ command:
           local: "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать в <fcolor:2>любой <fcolor:1>чат"
           global: "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный <fcolor:1>чат"
       see:
-        item: "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений"
+        item: "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений"
         inventory: "Цвета"
         types:
-          default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          light_gray: "<gradient:#B5B9BD:#9DA2A6>Светло-серые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          gray: "<gradient:#4A5054:#3A3F42>Серые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          black: "<gradient:#17191A:#0D0E0F>Черные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          brown: "<gradient:#7A5A40:#634A34>Коричневые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          red: "<gradient:#D63E3E:#C12B2B>Красные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          orange: "<gradient:#FF8C00:#E67E00>Оранжевые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          yellow: "<gradient:#FFE83D:#FFD900>Желтые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          lime: "<gradient:#8EE53F:#7ACC29>Лаймовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          green: "<gradient:#4BB54B:#3AA33A>Зеленые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          cyan: "<gradient:#3ECFDF:#2AB7C9>Бирюзовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          light_blue: "<gradient:#6BB6FF:#4DA6FF>Голубые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          blue: "<gradient:#3A75FF:#1F5AFF>Синие цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          purple: "<gradient:#A368C7:#8A4DBF>Фиолетовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          magenta: "<gradient:#FF5CD9:#FF3DCF>Пурпурные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
+          default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          light_gray: "<gradient:#B5B9BD:#9DA2A6>Светло-серые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          gray: "<gradient:#4A5054:#3A3F42>Серые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          black: "<gradient:#17191A:#0D0E0F>Черные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          brown: "<gradient:#7A5A40:#634A34>Коричневые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          red: "<gradient:#D63E3E:#C12B2B>Красные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          orange: "<gradient:#FF8C00:#E67E00>Оранжевые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          yellow: "<gradient:#FFE83D:#FFD900>Желтые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          lime: "<gradient:#8EE53F:#7ACC29>Лаймовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          green: "<gradient:#4BB54B:#3AA33A>Зеленые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          cyan: "<gradient:#3ECFDF:#2AB7C9>Бирюзовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          light_blue: "<gradient:#6BB6FF:#4DA6FF>Голубые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          blue: "<gradient:#3A75FF:#1F5AFF>Синие цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          purple: "<gradient:#A368C7:#8A4DBF>Фиолетовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          magenta: "<gradient:#FF5CD9:#FF3DCF>Пурпурные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
       out:
-        item: "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений"
+        item: "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений"
         inventory: "Цвета"
         types:
-          default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          light_gray: "<gradient:#B5B9BD:#9DA2A6>Светло-серые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          gray: "<gradient:#4A5054:#3A3F42>Серые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          black: "<gradient:#17191A:#0D0E0F>Черные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          brown: "<gradient:#7A5A40:#634A34>Коричневые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          red: "<gradient:#D63E3E:#C12B2B>Красные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          orange: "<gradient:#FF8C00:#E67E00>Оранжевые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          yellow: "<gradient:#FFE83D:#FFD900>Желтые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          lime: "<gradient:#8EE53F:#7ACC29>Лаймовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          green: "<gradient:#4BB54B:#3AA33A>Зеленые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          cyan: "<gradient:#3ECFDF:#2AB7C9>Бирюзовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          light_blue: "<gradient:#6BB6FF:#4DA6FF>Голубые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          blue: "<gradient:#3A75FF:#1F5AFF>Синие цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          purple: "<gradient:#A368C7:#8A4DBF>Фиолетовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          magenta: "<gradient:#FF5CD9:#FF3DCF>Пурпурные цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
-          pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!"
+          default: "<gradient:#70C7EF:#37B1F2>Стандартные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          white: "<gradient:#D4E4FF:#B8D2FF>Белые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          light_gray: "<gradient:#B5B9BD:#9DA2A6>Светло-серые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          gray: "<gradient:#4A5054:#3A3F42>Серые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          black: "<gradient:#17191A:#0D0E0F>Черные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          brown: "<gradient:#7A5A40:#634A34>Коричневые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          red: "<gradient:#D63E3E:#C12B2B>Красные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          orange: "<gradient:#FF8C00:#E67E00>Оранжевые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          yellow: "<gradient:#FFE83D:#FFD900>Желтые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          lime: "<gradient:#8EE53F:#7ACC29>Лаймовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          green: "<gradient:#4BB54B:#3AA33A>Зеленые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          cyan: "<gradient:#3ECFDF:#2AB7C9>Бирюзовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          light_blue: "<gradient:#6BB6FF:#4DA6FF>Голубые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          blue: "<gradient:#3A75FF:#1F5AFF>Синие цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          purple: "<gradient:#A368C7:#8A4DBF>Фиолетовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          magenta: "<gradient:#FF5CD9:#FF3DCF>Пурпурные цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
+          pink: "<gradient:#FF80B7:#FF66A6>Розовые цвета<br><fcolor:1>(local) <fcolor:2><nickname><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><nickname><fcolor:4>: привет мир!"
   clearchat:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format: "<fcolor:1>💬 Чат очищен"
@@ -267,6 +267,12 @@ command:
       header: "<fcolor:2>▋ Все муты: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Размутить <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+  nickname:
+    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
+    null_nickname: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Этот ник нельзя использовать"
+    display: "<value><gray>*</gray>"
+    display_see: "(<player>) <value><gray>*</gray>"
+    format: "<fcolor:1>✎ Ник был изменён на <fcolor:2><nickname>"
   online:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     format_current: "<fcolor:1>⌛ <target> сейчас на сервере"
@@ -468,10 +474,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> отошёл"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> вернулся"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру"
   auto:
     types:
@@ -574,7 +580,7 @@ message:
     names:
       constant: []
       display:
-        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><player>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>"
+        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><nickname>\"><white><player_head></white><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><vault_suffix></hover></click>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>👻 Невидимка"
@@ -585,7 +591,7 @@ message:
     translate:
       action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
-    format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
+    format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <nickname><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:
     format: "<color:#4eff52>→ <display_name>"
     format_first_time: "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!"
@@ -637,13 +643,13 @@ message:
     footer:
       lists:
       - - " "
-        - "<fcolor:1>Привет <fcolor:2><player><fcolor:1>!"
+        - "<fcolor:1>Привет <fcolor:2><nickname><fcolor:1>!"
         - " "
       - - " "
         - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<!shadow><white><player_head></white></!shadow><world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><mute_suffix><vault_suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"

@@ -125,6 +125,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist")
             Mutelist mutelist,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/nickname")
+            Nickname nickname,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online")
             Online online,
 
@@ -456,6 +459,18 @@ public record Permission(
         public record Mutelist(
                 String name,
                 Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Nickname(
+                String name,
+                Permission.Type type,
+                PermissionEntry see,
+                PermissionEntry other,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
         ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {}

@@ -167,6 +167,7 @@ public class MessagePipeline {
         DELETE,
         DISPLAY_NAME,
         PLAYER,
+        NICKNAME,
         CONSTANT,
         REPLACEMENT,
         MENTION,

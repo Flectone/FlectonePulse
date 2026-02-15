@@ -166,6 +166,7 @@ public class ProxyMessageHandler {
             case COMMAND_EMIT -> handleEmitCommand(input, fEntity, metadataUUID);
             case COMMAND_HELPER -> handleHelperCommand(input, fEntity, metadataUUID);
             case COMMAND_MUTE -> handleMuteCommand(input, fEntity, metadataUUID);
+            case COMMAND_NICKNAME -> handleNicknameCommand(fEntity);
             case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
             case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity, metadataUUID);
             case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity, metadataUUID);
@@ -479,6 +480,10 @@ public class ProxyMessageHandler {
         );
 
         module.sendForTarget(fModerator, (FPlayer) fEntity, mute);
+    }
+
+    private void handleNicknameCommand(FEntity fEntity) {
+        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity)));
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

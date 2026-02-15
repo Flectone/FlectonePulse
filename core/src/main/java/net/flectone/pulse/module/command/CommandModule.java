@@ -34,6 +34,7 @@ import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.command.me.MeModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.mutelist.MutelistModule;
+import net.flectone.pulse.module.command.nickname.NicknameModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.ping.PingModule;
 import net.flectone.pulse.module.command.poll.PollModule;
@@ -91,6 +92,7 @@ public class CommandModule extends AbstractModule {
                 MeModule.class,
                 MuteModule.class,
                 MutelistModule.class,
+                NicknameModule.class,
                 OnlineModule.class,
                 PingModule.class,
                 PollModule.class,

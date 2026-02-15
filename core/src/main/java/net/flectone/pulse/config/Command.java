@@ -114,6 +114,9 @@ public record Command(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist")
         Mutelist mutelist,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/nickname")
+        Nickname nickname,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online")
         Online online,
 
@@ -552,6 +555,18 @@ public record Command(
             Boolean enable,
             Integer perPage,
             List<String> aliases,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Nickname(
+            Boolean enable,
+            String allowedInput,
+            List<String> aliases,
+            Destination destination,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {}
