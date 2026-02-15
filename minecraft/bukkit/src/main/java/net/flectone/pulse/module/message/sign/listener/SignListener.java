@@ -23,7 +23,7 @@ public class SignListener implements Listener {
     public void signChangeEvent(SignChangeEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
         for (int x = 0; x < event.getLines().length; x++) {
             String string = event.getLine(x);

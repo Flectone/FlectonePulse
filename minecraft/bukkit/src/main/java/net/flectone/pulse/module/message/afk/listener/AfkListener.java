@@ -20,14 +20,14 @@ public class AfkListener implements Listener {
 
     @EventHandler
     public void asyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
         afkModule.remove("chat", fPlayer);
     }
 
     @EventHandler
     public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
         String message = event.getMessage();
         if (!message.isEmpty()) {

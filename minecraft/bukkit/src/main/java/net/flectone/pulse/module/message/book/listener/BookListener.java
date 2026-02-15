@@ -24,7 +24,7 @@ public class BookListener implements Listener {
     public void playerEditBookEvent(PlayerEditBookEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
         BookMeta bookMeta = event.getNewBookMeta();
 

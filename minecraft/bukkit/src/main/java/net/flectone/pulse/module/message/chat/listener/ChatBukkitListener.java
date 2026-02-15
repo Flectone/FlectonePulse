@@ -26,7 +26,7 @@ public class ChatBukkitListener implements Listener {
         if (!event.getFormat().equals("<%1$s> %2$s")) return;
         if (!chatModule.isEnable()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         if (chatModule.isModuleDisabledFor(fPlayer)) return;
 
         Runnable cancelRunnable = () -> {

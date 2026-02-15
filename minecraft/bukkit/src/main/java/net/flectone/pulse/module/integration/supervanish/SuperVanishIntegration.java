@@ -39,7 +39,7 @@ public class SuperVanishIntegration implements Listener, FIntegration {
     public void onHide(PlayerHideEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         quitModule.send(fPlayer, true);
 
         event.setSilent(true);
@@ -49,7 +49,7 @@ public class SuperVanishIntegration implements Listener, FIntegration {
     public void onShow(PlayerShowEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         joinModule.send(fPlayer, true);
 
         event.setSilent(true);

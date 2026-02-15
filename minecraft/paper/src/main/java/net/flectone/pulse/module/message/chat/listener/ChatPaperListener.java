@@ -28,7 +28,7 @@ public class ChatPaperListener implements Listener {
         if (event.isCancelled()) return;
         if (!chatModule.isEnable()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         if (chatModule.isModuleDisabledFor(fPlayer)) return;
 
         String format = plainSerializer.serialize(event.message());

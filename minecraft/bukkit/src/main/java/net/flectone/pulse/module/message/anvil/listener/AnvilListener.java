@@ -32,7 +32,7 @@ public class AnvilListener implements Listener {
         if (event.getCurrentItem().getItemMeta() == null) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
         ItemStack itemStack = event.getCurrentItem();
         ItemMeta itemMeta = itemStack.getItemMeta();
