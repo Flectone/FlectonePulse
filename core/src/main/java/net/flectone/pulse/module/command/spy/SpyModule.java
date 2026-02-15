@@ -90,6 +90,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     public void check(FPlayer fPlayer, String chat, String message, List<FPlayer> receivers) {
         if (!isEnable()) return;
+        if (!needToSpy("action", chat)) return;
 
         spy(fPlayer, chat, message, receivers);
     }
@@ -130,7 +131,12 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 && fReceiver.isOnline();
     }
 
-    public Function<Localization.Command.Spy, String> replaceAction(String action) {
-        return message -> Strings.CS.replace(message.formatLog(), "<action>", action);
+    protected boolean needToSpy(String category, String value) {
+        Map<String, List<String>> categories = config().categories();
+
+        List<String> values = categories.get(category);
+
+        return values != null && values.contains(value);
     }
+
 }

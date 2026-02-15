@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.module.command.spy.listener.BukkitSpyListener;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -20,8 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class BukkitSpyModule extends SpyModule {
@@ -47,25 +48,23 @@ public class BukkitSpyModule extends SpyModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerManager.register(SpyListener.class, Event.Priority.NORMAL);
+        bukkitListenerManager.register(BukkitSpyListener.class, Event.Priority.NORMAL);
     }
 
     public void check(PlayerCommandPreprocessEvent event) {
         if (!isEnable()) return;
 
         taskScheduler.runAsync(() -> {
-            Map<String, List<String>> categories = config().categories();
-            if (categories.get("command") == null) return;
+            String rawInput = event.getMessage();
+            String[] arguments = rawInput.split(" ");
 
-            String action = event.getMessage();
-            if (!action.isEmpty()) {
-                action = action.split(" ")[0].substring(1);
-            }
+            String commandName = arguments.length != 0 ? arguments[0].substring(1) : "";
+            if (!needToSpy("command", commandName)) return;
 
-            if (!categories.get("command").contains(action)) return;
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
+            FPlayer fReceiver = arguments.length > 1 ? fPlayerService.getFPlayer(arguments[1]) : FPlayer.UNKNOWN;
 
-            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
-            spy(fPlayer, action, event.getMessage());
+            spy(fPlayer, commandName, event.getMessage(), fReceiver.isUnknown() ? Collections.emptyList() : List.of(fReceiver));
         });
     }
 
@@ -73,9 +72,7 @@ public class BukkitSpyModule extends SpyModule {
         if (!isEnable()) return;
 
         taskScheduler.runAsync(() -> {
-            Map<String, List<String>> categories = config().categories();
-            if (categories.get("action") == null) return;
-            if (!categories.get("action").contains("anvil")) return;
+            if (!needToSpy("action", "anvil")) return;
             if (event.isCancelled()) return;
             if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
             if (event.getSlot() != 2) return;
@@ -83,7 +80,7 @@ public class BukkitSpyModule extends SpyModule {
             if (event.getCurrentItem().getItemMeta() == null) return;
             if (!(event.getWhoClicked() instanceof Player player)) return;
 
-            FPlayer fPlayer = fPlayerService.getFPlayer(player);
+            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
             ItemStack itemStack = event.getCurrentItem();
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -100,18 +97,16 @@ public class BukkitSpyModule extends SpyModule {
         if (!isEnable()) return;
 
         taskScheduler.runAsync(() -> {
-            Map<String, List<String>> categories = config().categories();
-            if (categories.get("action") == null) return;
-            if (!categories.get("action").contains("book")) return;
+            if (!needToSpy("action", "book")) return;
 
-            Player player = event.getPlayer();
-            FPlayer fPlayer = fPlayerService.getFPlayer(player);
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
             BookMeta bookMeta = event.getNewBookMeta();
             spy(fPlayer, "book", String.join(" ", bookMeta.getPages()));
 
-            if (bookMeta.getTitle() == null) return;
-            spy(fPlayer, "book", bookMeta.getTitle());
+            if (bookMeta.getTitle() != null) {
+                spy(fPlayer, "book", bookMeta.getTitle());
+            }
         });
     }
 
@@ -119,11 +114,9 @@ public class BukkitSpyModule extends SpyModule {
         if (!isEnable()) return;
 
         taskScheduler.runAsync(() -> {
-            Map<String, List<String>> categories = config().categories();
-            if (categories.get("action") == null) return;
-            if (!categories.get("action").contains("sign")) return;
+            if (!needToSpy("action", "sign")) return;
 
-            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
             String message = String.join(" ", event.getLines());
             spy(fPlayer, "sign", message);
@@ -134,11 +127,14 @@ public class BukkitSpyModule extends SpyModule {
         if (!isEnable()) return;
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
             String message = event.getMessage();
 
-            checkChat(fPlayer, "chat", message);
+            check(fPlayer, "chat", message, event.getRecipients().stream()
+                    .map(player -> fPlayerService.getFPlayer(player.getUniqueId()))
+                    .toList()
+            );
         });
     }
 }
