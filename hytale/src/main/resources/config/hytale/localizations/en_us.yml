@@ -268,11 +268,11 @@ command:
       line: "<color:#ff7171>[X] <target> <fcolor:1>Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   nickname:
-    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
-    null_nickname: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This nickname cannot be used"
+    null_player: "<color:#ff7171>This player does not exist"
+    null_nickname: "<color:#ff7171>This nickname cannot be used"
     display: "<value><gray>*</gray>"
     display_see: "(<player>) <value><gray>*</gray>"
-    format: "<fcolor:1>✎ Nickname was changed to <fcolor:2><nick>"
+    format: "<fcolor:1>[>] Nickname was changed to <fcolor:2><nick>"
   online:
     null_player: "<color:#ff7171>This player does not exist"
     format_current: "<fcolor:1>[/] <target> currently on server"

@@ -268,11 +268,11 @@ command:
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
   nickname:
-    null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
-    null_nickname: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Этот ник нельзя использовать"
+    null_player: "<color:#ff7171>Игрок не найден"
+    null_nickname: "<color:#ff7171>Этот ник нельзя использовать"
     display: "<value><gray>*</gray>"
     display_see: "(<player>) <value><gray>*</gray>"
-    format: "<fcolor:1>✎ Ник был изменён на <fcolor:2><nickname>"
+    format: "<fcolor:1>[>] Ник был изменён на <fcolor:2><nickname>"
   online:
     null_player: "<color:#ff7171>Игрок не найден"
     format_current: "<fcolor:1>[/] <target> сейчас на сервере"
