@@ -26,7 +26,15 @@ public class BukkitPermissionChecker implements PermissionChecker {
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission bukkitPermission = Bukkit.getPluginManager().getPermission(permission);
-        boolean value = (bukkitPermission != null && bukkitPermission.getDefault() == PermissionDefault.TRUE) || platformPlayerAdapter.isOperator(fPlayer);
+
+        boolean value;
+        if (bukkitPermission != null) {
+            PermissionDefault permissionDefault = bukkitPermission.getDefault();
+            value = permissionDefault != PermissionDefault.FALSE &&
+                    (permissionDefault == PermissionDefault.TRUE || platformPlayerAdapter.isOperator(fPlayer) && permissionDefault != PermissionDefault.NOT_OP);
+        } else {
+            value = platformPlayerAdapter.isOperator(fPlayer);
+        }
 
         Player player = Bukkit.getPlayer(entity.uuid());
         if (player != null) {

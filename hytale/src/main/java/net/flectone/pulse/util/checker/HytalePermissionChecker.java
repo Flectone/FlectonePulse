@@ -27,7 +27,14 @@ public class HytalePermissionChecker implements PermissionChecker {
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission.Type hytalePermission = hytalePermissionRegistry.getPermissions().get(permission);
-        boolean value = hytalePermission == Permission.Type.TRUE || hytalePlayerAdapter.isOperator(fPlayer);
+
+        boolean value;
+        if (hytalePermission != null) {
+            value = hytalePermission != Permission.Type.FALSE &&
+                    (hytalePermission == Permission.Type.TRUE || hytalePlayerAdapter.isOperator(fPlayer) && hytalePermission != Permission.Type.NOT_OP);
+        } else {
+            value = hytalePlayerAdapter.isOperator(fPlayer);
+        }
 
         PlayerRef player = hytalePlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
@@ -33,8 +34,15 @@ public class FabricPermissionChecker implements PermissionChecker {
         if (minecraftServer == null) return true;
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
-        Integer fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);
-        boolean value = (fabricPermission != null && fabricPermission == 0) || fabricPlayerAdapter.isOperator(fPlayer);
+        Permission.Type fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);
+
+        boolean value;
+        if (fabricPermission != null) {
+            value = fabricPermission != Permission.Type.FALSE &&
+                    (fabricPermission == Permission.Type.TRUE || fabricPlayerAdapter.isOperator(fPlayer) && fabricPermission != Permission.Type.NOT_OP);
+        } else {
+            value = fabricPlayerAdapter.isOperator(fPlayer);
+        }
 
         ServerPlayerEntity player = fabricPlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {
