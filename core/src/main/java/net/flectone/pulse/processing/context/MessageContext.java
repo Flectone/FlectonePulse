@@ -1,6 +1,5 @@
 package net.flectone.pulse.processing.context;
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.With;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @With
 public record MessageContext(
         Map<MessageFlag, Boolean> flags,
-        Set<TagResolver> tagResolvers,
+        TagResolver tagResolver,
         FEntity sender,
         FPlayer receiver,
         UUID messageUUID,
@@ -32,12 +32,12 @@ public record MessageContext(
 
     public MessageContext {
         flags = Map.copyOf(new EnumMap<>(flags != null && !flags.isEmpty() ? flags : new EnumMap<>(MessageFlag.class)));
-        tagResolvers = tagResolvers == null ? Collections.emptySet() : new ObjectOpenHashSet<>(tagResolvers);
+        tagResolver = tagResolver == null ? TagResolver.builder().build() : tagResolver;
         userMessage = StringUtils.defaultString(userMessage);
     }
 
     public MessageContext(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
-        this(new EnumMap<>(MessageFlag.class), Collections.emptySet(), sender, receiver, messageUUID, message, null);
+        this(new EnumMap<>(MessageFlag.class), null, sender, receiver, messageUUID, message, null);
     }
 
     @CheckReturnValue
@@ -70,39 +70,37 @@ public record MessageContext(
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolver(TagResolver tagResolver) {
-        Set<TagResolver> newResolvers = new ObjectOpenHashSet<>(this.tagResolvers);
-        newResolvers.add(tagResolver);
+    public MessageContext addTagResolver(@Nullable TagResolver tagResolver) {
+        if (tagResolver == null) return this;
 
-        return withTagResolvers(newResolvers);
+        return withTagResolver(TagResolver.resolver(this.tagResolver, tagResolver));
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolvers(Collection<TagResolver> tagResolvers) {
+    public MessageContext addTagResolvers(@Nullable Collection<TagResolver> tagResolvers) {
         if (tagResolvers == null || tagResolvers.isEmpty()) return this;
 
-        Set<TagResolver> newResolvers = new ObjectOpenHashSet<>(this.tagResolvers);
-        newResolvers.addAll(tagResolvers);
-
-        return withTagResolvers(newResolvers);
+        return withTagResolver(TagResolver.resolver(this.tagResolver, TagResolver.resolver(tagResolvers)));
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolvers(TagResolver... resolvers) {
+    public MessageContext addTagResolvers(@Nullable TagResolver... resolvers) {
         if (resolvers == null || resolvers.length == 0) return this;
 
         return addTagResolvers(Arrays.asList(resolvers));
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolver(MessagePipeline.ReplacementTag replacementTag,
-                                         BiFunction<ArgumentQueue, Context, Tag> handler) {
+    public MessageContext addTagResolver(MessagePipeline.@NonNull ReplacementTag replacementTag,
+                                         @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
         return addTagResolver(TagResolver.resolver(replacementTag.getTagName(), handler));
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolver(Set<MessagePipeline.ReplacementTag> replacementTags,
-                                         BiFunction<ArgumentQueue, Context, Tag> handler) {
+    public MessageContext addTagResolver(@NonNull Set<MessagePipeline.ReplacementTag> replacementTags,
+                                         @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
+        if (replacementTags.isEmpty()) return this;
+
         Set<String> tags = replacementTags.stream()
                 .map(MessagePipeline.ReplacementTag::getTagName)
                 .collect(Collectors.toSet());

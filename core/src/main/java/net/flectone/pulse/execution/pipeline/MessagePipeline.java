@@ -16,7 +16,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -27,7 +26,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -66,19 +64,16 @@ public class MessagePipeline {
         MessageContext eventContext = event.context();
 
         if (eventContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            Set<TagResolver> tagResolvers = eventContext.tagResolvers();
+            TagResolver tagResolver = eventContext.tagResolver();
             eventContext = eventContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
-                    .filter(tag -> tagResolvers.stream()
-                            .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
-                            .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
-                    )
+                    .filter(tag -> !tagResolver.has(tag.getTagName()))
                     .map(ReplacementTag::emptyResolver)
                     .toList()
             );
         }
 
         try {
-            return miniMessage.deserialize(eventContext.message(), TagResolver.resolver(eventContext.tagResolvers()));
+            return miniMessage.deserialize(eventContext.message(), eventContext.tagResolver());
         } catch (Exception e) {
             fLogger.warning(e);
         }
