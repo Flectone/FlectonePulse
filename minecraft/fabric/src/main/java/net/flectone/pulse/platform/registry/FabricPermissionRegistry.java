@@ -15,14 +15,14 @@ import java.util.Map;
 public class FabricPermissionRegistry implements PermissionRegistry {
 
     @Getter
-    private final Map<String, Integer> permissions = new HashMap<>();
+    private final Map<String, Permission.Type> permissions = new HashMap<>();
 
     @Override
     public void register(String name, Permission.Type type) {
         if (StringUtils.isEmpty(name)) return;
         if (type == null) return;
 
-        permissions.put(name, type.ordinal());
+        permissions.put(name, type);
     }
 
     @Override
