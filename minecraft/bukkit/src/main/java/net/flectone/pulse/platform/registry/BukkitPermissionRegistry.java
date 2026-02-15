@@ -17,17 +17,22 @@ public class BukkitPermissionRegistry implements PermissionRegistry {
         if (StringUtils.isEmpty(name)) return;
         if (type == null) return;
 
-        String stringType = type.name();
+        PermissionDefault permissionDefault = switch (type) {
+            case TRUE -> PermissionDefault.TRUE;
+            case FALSE -> PermissionDefault.FALSE;
+            case OP -> PermissionDefault.OP;
+            case NOT_OP -> PermissionDefault.NOT_OP;
+        };
 
         Permission permission = Bukkit.getPluginManager().getPermission(name);
         if (permission != null) {
-            if (permission.getDefault().name().equalsIgnoreCase(stringType)) return;
+            if (permission.getDefault() == permissionDefault) return;
 
             // does not always work correctly, requires a full restart
             Bukkit.getPluginManager().removePermission(permission);
         }
 
-        Bukkit.getPluginManager().addPermission(new Permission(name, PermissionDefault.getByName(stringType)));
+        Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
     @Override
