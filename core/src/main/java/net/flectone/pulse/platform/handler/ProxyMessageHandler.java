@@ -592,7 +592,7 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(module.replaceAction(action))
+                        .format(Localization.Command.Spy::formatLog)
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.command().spy().destination())
                         .message(string)

@@ -11,17 +11,18 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
-import org.apache.commons.lang3.Strings;
+import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 @Singleton
@@ -57,7 +58,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .sender(fPlayer)
-                        .format(s -> !turnedBefore ? s.formatTrue() : s.formatFalse())
+                        .format(localization -> !turnedBefore ? localization.formatTrue() : localization.formatFalse())
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .build()
@@ -105,7 +106,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .sender(fPlayer)
-                        .format(replaceAction(action))
+                        .format(Localization.Command.Spy::formatLog)
                         .range(config().range())
                         .destination(config().destination())
                         .message(message)
@@ -114,7 +115,10 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                             dataOutputStream.writeString(action);
                             dataOutputStream.writeString(message);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<action>", action))
+                        .tagResolvers(fReceiver -> new TagResolver[]{
+                                Placeholder.parsed("action", localization(fReceiver).actions().getOrDefault(action, action))
+                        })
+                        .integration()
                         .build()
                 )
                 .turned(true)

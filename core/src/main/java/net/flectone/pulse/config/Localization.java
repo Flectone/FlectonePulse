@@ -610,7 +610,8 @@ public record Localization(
         public record Spy(
                 String formatTrue,
                 String formatFalse,
-                String formatLog
+                String formatLog,
+                Map<String, String> actions
         ) implements LocalizationSetting {}
 
         @With
