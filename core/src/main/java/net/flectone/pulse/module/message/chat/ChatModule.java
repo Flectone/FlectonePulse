@@ -164,7 +164,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         }
 
         // send to spy module
-        spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
+        spyModuleProvider.get().check(fPlayer, chatName, finalMessage, receivers);
 
         // send to bubble module
         bubbleModuleProvider.get().add(fPlayer, eventMessage, receivers);

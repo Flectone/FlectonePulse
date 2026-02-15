@@ -88,17 +88,17 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         return fileFacade.localization(sender).command().spy();
     }
 
-    public void checkChat(FPlayer fPlayer, String chat, String message) {
+    public void check(FPlayer fPlayer, String chat, String message, List<FPlayer> receivers) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = config().categories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains(chat)) return;
-
-        spy(fPlayer, chat, message);
+        spy(fPlayer, chat, message, receivers);
     }
 
     public void spy(FPlayer fPlayer, String action, String message) {
+        spy(fPlayer, action, message, Collections.emptyList());
+    }
+
+    public void spy(FPlayer fPlayer, String action, String message, List<FPlayer> receivers) {
         if (!isEnable()) return;
 
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
@@ -108,7 +108,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                         .range(config().range())
                         .destination(config().destination())
                         .message(message)
-                        .filter(createFilter(fPlayer))
+                        .filter(createFilter(fPlayer, receivers))
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(action);
                             dataOutputStream.writeString(message);
@@ -122,8 +122,9 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         );
     }
 
-    public Predicate<FPlayer> createFilter(FPlayer fPlayer) {
+    public Predicate<FPlayer> createFilter(FPlayer fPlayer, List<FPlayer> receivers) {
         return fReceiver -> !fPlayer.equals(fReceiver)
+                && !receivers.contains(fReceiver)
                 && permissionChecker.check(fReceiver, permission())
                 && fReceiver.getSetting(SettingText.SPY_STATUS) != null
                 && fReceiver.isOnline();

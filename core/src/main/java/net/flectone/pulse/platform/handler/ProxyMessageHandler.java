@@ -596,7 +596,7 @@ public class ProxyMessageHandler {
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.command().spy().destination())
                         .message(string)
-                        .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN))
+                        .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Collections.emptyList()))
                         .build()
                 )
                 .turned(true)
