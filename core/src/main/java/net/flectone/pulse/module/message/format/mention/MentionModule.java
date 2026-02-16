@@ -168,7 +168,8 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     private String replace(String message) {
-        String[] words = message.split(" ");
+        if (!message.contains(config().trigger())) return message;
+
         String[] words = message.split(" ", -1);
 
         for (int i = 0; i < words.length; i++) {
