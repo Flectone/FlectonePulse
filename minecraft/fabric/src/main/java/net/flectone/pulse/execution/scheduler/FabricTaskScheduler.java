@@ -10,6 +10,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 public class FabricTaskScheduler implements TaskScheduler {
 
     private final AtomicLong currentTick = new AtomicLong(0L);
-    private final ConcurrentSkipListMap<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
+    private final Map<Long, List<ScheduledTask>> scheduledTasks = new ConcurrentSkipListMap<>();
     private final FLogger logger;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;

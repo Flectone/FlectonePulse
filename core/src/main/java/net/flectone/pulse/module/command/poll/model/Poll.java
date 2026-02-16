@@ -1,10 +1,13 @@
 package net.flectone.pulse.module.command.poll.model;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.flectone.pulse.model.entity.FEntity;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 public class Poll {
@@ -16,7 +19,7 @@ public class Poll {
     private final boolean multipleVote;
     private final String title;
     private final List<String> answers = new ObjectArrayList<>();
-    private final Map<UUID, boolean[]> votesMap = new HashMap<>();
+    private final Map<UUID, boolean[]> votesMap = new Object2ObjectArrayMap<>();
 
     private long nextRepeat;
 

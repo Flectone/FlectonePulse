@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -147,7 +148,7 @@ public class FileWriter {
         int indentUnit = detectIndentUnit(lines);
         if (indentUnit <= 0) indentUnit = 2;
 
-        Map<Integer, String> pathAtDepth = new HashMap<>();
+        Map<Integer, String> pathAtDepth = new Int2ObjectOpenHashMap<>();
         Set<String> alreadyInserted = new ObjectOpenHashSet<>();
 
         for (String line : lines) {

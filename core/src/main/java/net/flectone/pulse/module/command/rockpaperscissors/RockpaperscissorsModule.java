@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.rockpaperscissors;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -17,23 +18,26 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
 
-    private final Map<UUID, RockPaperScissors> gameMap = new HashMap<>();
+    private final Map<UUID, RockPaperScissors> gameMap = new Object2ObjectArrayMap<>();
 
     private final FileFacade fileFacade;
     private final ProxySender proxySender;

@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerSetupConnectEvent;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytaleBaseListener implements HytaleListener {
 
-    private final Set<UUID> disconnectPlayers = new ObjectOpenHashSet<>();
+    private final Set<UUID> disconnectPlayers = new ObjectArraySet<>();
 
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
@@ -29,7 +30,6 @@ import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.jspecify.annotations.NonNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +60,7 @@ public class ModuleController {
     public Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
-        Map<String, String> modules = new HashMap<>();
+        Map<String, String> modules = new Object2ObjectArrayMap<>();
 
         modules.put(clazz.getSimpleName(), module.isEnable() ? "true" : "false");
 

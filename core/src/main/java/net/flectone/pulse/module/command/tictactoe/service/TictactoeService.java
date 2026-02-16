@@ -2,19 +2,19 @@ package net.flectone.pulse.module.command.tictactoe.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.util.RandomUtil;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeService {
 
-    private final Map<Integer, TicTacToe> ticTacToeMap = new HashMap<>();
+    private final Map<Integer, TicTacToe> ticTacToeMap = new Int2ObjectArrayMap<>();
 
     private final RandomUtil randomUtil;
 

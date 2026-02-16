@@ -3,12 +3,12 @@ package net.flectone.pulse.model.inventory;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 public class Inventory {
 
     private final int size;
-    private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new HashMap<>();
+    private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
     private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
     private final WrapperPlayServerOpenWindow wrapperWindow;
 
@@ -40,8 +40,8 @@ public class Inventory {
 
         private Component name = Component.empty();
         private int size;
-        private final Map<Integer, ItemStack> itemMap = new HashMap<>();
-        private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new HashMap<>();
+        private final Map<Integer, ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
+        private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
         private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
 
         public Builder name(Component name) {

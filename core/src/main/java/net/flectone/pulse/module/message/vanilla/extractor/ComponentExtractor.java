@@ -1,18 +1,18 @@
 package net.flectone.pulse.module.message.vanilla.extractor;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public abstract class ComponentExtractor<T> {
 
-    private final Map<String, Message.Vanilla.VanillaMessage> translationVanillaMessages = new HashMap<>();
+    private final Map<String, Message.Vanilla.VanillaMessage> translationVanillaMessages = new Object2ObjectOpenHashMap<>();
 
     private final FileFacade fileFacade;
 

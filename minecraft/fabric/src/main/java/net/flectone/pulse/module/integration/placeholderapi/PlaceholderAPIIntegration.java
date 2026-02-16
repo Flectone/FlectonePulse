@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
@@ -16,11 +17,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -34,7 +35,6 @@ import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -170,7 +170,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-        Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
+        Map<Integer, String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }

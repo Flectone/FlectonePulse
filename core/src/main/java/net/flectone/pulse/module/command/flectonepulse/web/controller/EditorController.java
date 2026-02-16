@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
@@ -23,8 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EditorController {
 
-    private final Map<String, Object> configFiles = new LinkedHashMap<>();
-    private final Map<String, List<LocalizationFile>> localizationFiles = new HashMap<>();
+    private final Map<String, Object> configFiles = new Object2ObjectArrayMap<>();
+    private final Map<String, List<LocalizationFile>> localizationFiles = new Object2ObjectArrayMap<>();
 
     private final UrlService urlService;
     private final FileFacade fileFacade;

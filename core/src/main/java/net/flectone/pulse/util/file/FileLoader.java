@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public class FileLoader {
         Localization defaultEnglishLocalization = loadFromResource(resolveResourcePath(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.ENGLISH.getName() + ".yml"), Localization.class).withLanguage(DefaultLocalization.ENGLISH.getName());
         Localization defaultRussianLocalization = loadFromResource(resolveResourcePath(FilePath.LOCALIZATION_FOLDER.getPath() + DefaultLocalization.RUSSIAN.getName() + ".yml"), Localization.class).withLanguage(DefaultLocalization.RUSSIAN.getName());
 
-        Map<String, Localization> localizations = new HashMap<>();
+        Map<String, Localization> localizations = new Object2ObjectArrayMap<>();
         localizations.put(DefaultLocalization.ENGLISH.getName(), defaultEnglishLocalization);
         localizations.put(DefaultLocalization.RUSSIAN.getName(), defaultRussianLocalization);
         for (Localization localization : loadLocalizationFiles(config, localizations, false).values()) {

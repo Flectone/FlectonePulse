@@ -3,7 +3,7 @@ package net.flectone.pulse.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.util.constant.AdventureTag;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -787,7 +788,7 @@ public record Message(
 
             @Override
             public List<String> translationKeys() {
-                return translationKeys != null ? new ObjectArrayList<>(translationKeys) : new ObjectArrayList<>();
+                return translationKeys != null ? new ObjectImmutableList<>(translationKeys) : Collections.emptyList();
             }
 
             @JsonValue

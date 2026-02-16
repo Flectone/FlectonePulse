@@ -3,6 +3,8 @@ package net.flectone.pulse.module.message.vanilla.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.vanilla.model.Mapping;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -20,7 +22,7 @@ import java.util.*;
 @Singleton
 public class MinecraftComponentExtractor extends ComponentExtractor<TranslatableComponent> {
 
-    private static final Map<String, Mapping> LEGACY_TRANSLATION_MAPPINGS = new HashMap<>() {
+    private static final Map<String, Mapping> LEGACY_TRANSLATION_MAPPINGS = new Object2ObjectArrayMap<>() {
         {
             put("commands.setblock.success",
                     new Mapping(serverVersion -> serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4), "commands.setblock.success",
@@ -75,7 +77,7 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
 
     @Override
     public Map<Integer, Object> extractArguments(TranslatableComponent translatableComponent) {
-        Map<Integer, Object> parsedArguments = new HashMap<>();
+        Map<Integer, Object> parsedArguments = new Object2ObjectOpenHashMap<>();
 
         for (int i = 0; i < translatableComponent.arguments().size(); i++) {
             Object argument = extractArgument(translatableComponent, i);

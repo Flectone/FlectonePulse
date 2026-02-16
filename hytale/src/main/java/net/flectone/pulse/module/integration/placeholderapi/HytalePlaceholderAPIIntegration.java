@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
@@ -16,11 +17,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -31,7 +32,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -91,7 +91,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
-            Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
+            Map<Integer, String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
                 colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {

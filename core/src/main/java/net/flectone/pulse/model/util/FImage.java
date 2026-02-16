@@ -1,6 +1,7 @@
 package net.flectone.pulse.model.util;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -72,7 +73,7 @@ public record FImage(String link) {
             x = 0;
         }
 
-        return pixels;
+        return new ObjectImmutableList<>(pixels);
     }
 
     private int clamp(int value, int max) {

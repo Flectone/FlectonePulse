@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.questionanswer;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -13,13 +14,13 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -29,7 +30,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.type.tuple.Pair;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 public class QuestionAnswerModule extends AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
-    private final Map<String, Pattern> patternMap = new HashMap<>();
+    private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
 
     private final FileFacade fileFacade;
     private final FLogger fLogger;

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.chatcolor;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
@@ -115,7 +116,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        Map<Integer, FColor> newFColors = new HashMap<>();
+        Map<Integer, FColor> newFColors = new Int2ObjectArrayMap<>();
         fTarget.fColors().getOrDefault(fColorType.get(), Collections.emptySet())
                 .forEach(fColor -> newFColors.put(fColor.number(), fColor));
 

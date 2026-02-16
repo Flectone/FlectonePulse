@@ -16,6 +16,8 @@ import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
@@ -47,7 +49,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiscordIntegration implements FIntegration {
 
-    private final Map<Long, WebhookData> channelWebhooks = new HashMap<>();
+    private final Map<Long, WebhookData> channelWebhooks = new Long2ObjectArrayMap<>();
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;

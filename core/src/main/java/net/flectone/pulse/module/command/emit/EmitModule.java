@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.emit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
@@ -164,7 +165,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
             }
 
             String type = string.substring(0, startIndexBracket);
-            Map<String, Object> destination = new HashMap<>();
+            Map<String, Object> destination = new Object2ObjectArrayMap<>();
             destination.put("type", type);
 
             String content = string.substring(startIndexBracket + 1, endIndexBracket);
@@ -186,7 +187,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                 String value = keyValue[1].trim();
 
                 if (value.startsWith("{") && value.endsWith("}")) {
-                    Map<String, Object> nestedMap = new HashMap<>();
+                    Map<String, Object> nestedMap = new Object2ObjectArrayMap<>();
                     parseContent(value.substring(1, value.length() - 1), nestedMap);
                     map.put(key, nestedMap);
                 } else if (value.startsWith("\"") && value.endsWith("\"")) {

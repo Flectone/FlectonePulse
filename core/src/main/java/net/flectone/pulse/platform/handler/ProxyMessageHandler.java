@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -948,7 +949,7 @@ public class ProxyMessageHandler {
     }
 
     private Map<Integer, Object> parseVanillaArguments(JsonObject jsonObject) {
-        Map<Integer, Object> result = new HashMap<>();
+        Map<Integer, Object> result = new Int2ObjectOpenHashMap<>();
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             Integer key = Integer.parseInt(entry.getKey());

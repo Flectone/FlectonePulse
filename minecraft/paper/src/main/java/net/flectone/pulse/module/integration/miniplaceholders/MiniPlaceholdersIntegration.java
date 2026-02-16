@@ -2,7 +2,7 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -50,7 +50,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        Set<TagResolver> resolvers = new ObjectOpenHashSet<>();
+        Set<TagResolver> resolvers = new ObjectArraySet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
         FEntity fSender = messageContext.sender();

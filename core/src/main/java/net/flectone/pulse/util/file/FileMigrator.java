@@ -3,6 +3,8 @@ package net.flectone.pulse.util.file;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
@@ -88,7 +90,7 @@ public class FileMigrator {
         }
 
         Map<String, Integer> types = files.command().chatsetting().checkbox().types();
-        Map<String, Integer> oldTypes = new HashMap<>(types);
+        Map<String, Integer> oldTypes = new Object2ObjectOpenHashMap<>(types);
         types.clear();
 
         if (oldTypes.containsKey("AFK")) {
@@ -212,7 +214,7 @@ public class FileMigrator {
         settings.put(MessageType.QUIT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.quit", Permission.Type.TRUE));
         settings.put(MessageType.SLEEP.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.sleep", Permission.Type.TRUE));
 
-        Map<String, Localization> newLocalizations = new HashMap<>();
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         for (Localization localization : files.localizations().values()) {
             Map<String, String> localizationTypes = localization.command().chatsetting().checkbox().types();
@@ -307,7 +309,7 @@ public class FileMigrator {
 
         Map<String, String> triggers = files.message().format().replacement().triggers();
 
-        Map<String, String> updates = new HashMap<>();
+        Map<String, String> updates = new Object2ObjectOpenHashMap<>();
         updates.put("smile", ":-?\\)");
         updates.put("big_smile", ":-?D");
         updates.put("sad", ":-?\\(");
@@ -354,7 +356,7 @@ public class FileMigrator {
             files = files.withMessage(files.message().withBubble(files.message().bubble().withElevation(0.4f)));
         }
 
-        Map<String, Localization> newLocalizations = new HashMap<>();
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         for (Localization localization : files.localizations().values()) {
             Localization.Integration localizationIntegration = localization.integration();
@@ -462,7 +464,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_2(FilePack files) {
-        Map<String, Localization> newLocalizations = new HashMap<>();
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         for (Localization localization : files.localizations().values()) {
 
@@ -522,7 +524,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_5(FilePack files) {
-        Map<String, Localization> newLocalizations = new HashMap<>();
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         UnaryOperator<String> replaceDisplayName = string -> Strings.CS.replace(string, "<display_name>", "<target>");
 
@@ -567,11 +569,11 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_8_2(FilePack files) {
-        Map<String, Localization> newLocalizations = new HashMap<>();
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         for (Localization localization : files.localizations().values()) {
 
-            Map<String, String> newChats = new HashMap<>(localization.message().chat().types());
+            Map<String, String> newChats = new Object2ObjectOpenHashMap<>(localization.message().chat().types());
             newChats.forEach((key, value) ->
                     newChats.put(key, Strings.CS.replace(value, "<translate>", "<translation>"))
             );

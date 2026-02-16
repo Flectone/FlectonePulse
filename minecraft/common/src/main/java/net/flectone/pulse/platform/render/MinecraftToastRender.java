@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAdvancements;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Toast;
@@ -62,7 +63,7 @@ public class MinecraftToastRender implements ToastRender {
                 new AdvancementHolder(advancementId, advancement)
         );
 
-        Map<String, AdvancementProgress.CriterionProgress> progressMap = new HashMap<>();
+        Map<String, AdvancementProgress.CriterionProgress> progressMap = new Object2ObjectArrayMap<>();
         progressMap.put(criterionName, new AdvancementProgress.CriterionProgress(System.currentTimeMillis()));
 
         AdvancementProgress progress = new AdvancementProgress(progressMap);

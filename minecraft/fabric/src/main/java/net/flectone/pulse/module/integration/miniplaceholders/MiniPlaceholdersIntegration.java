@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -56,7 +56,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        Set<TagResolver> resolvers = new ObjectOpenHashSet<>();
+        Set<TagResolver> resolvers = new ObjectArraySet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
         Audience sender = getAudienceOrDefault(messageContext.sender().uuid(), null);

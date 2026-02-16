@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.poll;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
@@ -43,7 +44,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
 
-    private final HashMap<Integer, Poll> pollMap = new HashMap<>();
+    private final Map<Integer, Poll> pollMap = new Int2ObjectArrayMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

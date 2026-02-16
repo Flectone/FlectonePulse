@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
@@ -15,11 +16,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -33,7 +34,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -93,7 +93,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
-            Map<Integer, String> colorsMap = new HashMap<>(fileFacade.message().format().fcolor().defaultColors());
+            Map<Integer, String> colorsMap = new Object2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
                 colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {

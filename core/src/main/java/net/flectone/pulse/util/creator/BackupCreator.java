@@ -3,6 +3,7 @@ package net.flectone.pulse.util.creator;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.flectone.pulse.config.Config;
@@ -16,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -67,7 +67,7 @@ public class BackupCreator {
                     String user = systemVariableResolver.substituteEnvVars(database.user());
                     String password = systemVariableResolver.substituteEnvVars(database.password());
 
-                    Map<String, String> env = new HashMap<>(System.getenv());
+                    Map<String, String> env = new Object2ObjectArrayMap<>(System.getenv());
                     ProcessBuilder processBuilder;
                     if (databaseType == Database.Type.MYSQL || databaseType == Database.Type.MARIADB) {
                         env.put("MYSQL_PWD", password);

@@ -3,6 +3,7 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -25,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -125,7 +125,7 @@ public class MinecraftTranslationService implements TranslationService {
     }
 
     private Map<String, String> loadLegacyTranslations(Path file) throws IOException {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new Object2ObjectOpenHashMap<>();
         Files.readAllLines(file).forEach(line -> {
             String[] parts = line.split("=", 2);
             if (parts.length == 2) {

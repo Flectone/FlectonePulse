@@ -2,7 +2,7 @@ package net.flectone.pulse.module.command.tell;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -18,13 +18,14 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
+import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -32,7 +33,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TellModule extends AbstractModuleCommand<Localization.Command.Tell> {
 
-    @Getter private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
+    private final Map<UUID, String> senderReceiverMap = new Object2ObjectOpenHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
