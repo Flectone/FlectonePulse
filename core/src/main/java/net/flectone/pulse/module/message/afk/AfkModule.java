@@ -102,7 +102,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
-            return Tag.preProcessParsed(messagePipeline.buildDefault(afkContext));
+            return Tag.inserting(messagePipeline.build(afkContext));
         });
     }
 

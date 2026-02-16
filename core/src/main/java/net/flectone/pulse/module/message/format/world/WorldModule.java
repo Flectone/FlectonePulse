@@ -61,11 +61,11 @@ public class WorldModule extends AbstractModule {
             if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
+            MessageContext worldContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
-            return Tag.preProcessParsed(messagePipeline.buildDefault(prefixContext));
+            return Tag.inserting(messagePipeline.build(worldContext));
         });
     }
 

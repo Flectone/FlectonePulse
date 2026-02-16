@@ -187,7 +187,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
-            return Tag.preProcessParsed(messagePipeline.buildDefault(prefixContext));
+            return Tag.inserting(messagePipeline.build(prefixContext));
         });
     }
 

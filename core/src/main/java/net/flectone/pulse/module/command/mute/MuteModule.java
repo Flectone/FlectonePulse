@@ -162,7 +162,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
-            return Tag.preProcessParsed(messagePipeline.buildDefault(suffixContext));
+            return Tag.inserting(messagePipeline.build(suffixContext));
         });
     }
 
