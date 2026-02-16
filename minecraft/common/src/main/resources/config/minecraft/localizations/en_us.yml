@@ -272,7 +272,7 @@ command:
     null_nickname: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This nickname cannot be used"
     display: "<value><gray>*</gray>"
     display_see: "(<player>) <value><gray>*</gray>"
-    format: "<fcolor:1>✎ Nickname was changed to <fcolor:2><nick>"
+    format: "<fcolor:1>✎ Nickname was changed to <fcolor:2><nickname>"
   online:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format_current: "<fcolor:1>⌛ <target> currently on server"
