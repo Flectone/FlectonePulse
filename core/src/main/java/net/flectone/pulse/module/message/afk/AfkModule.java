@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -18,7 +19,6 @@ import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -108,24 +108,30 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     public void remove(@NonNull String action, @NonNull FPlayer fPlayer) {
         taskScheduler.runRegion(fPlayer, () -> {
+            // sync fPlayer
+            FPlayer syncFPlayer = fPlayerService.getFPlayer(fPlayer);
+
             // skip empty afk suffix
-            if (StringUtils.isEmpty(fPlayerService.getFPlayer(fPlayer).getSetting(SettingText.AFK_SUFFIX))) return;
+            if (StringUtils.isEmpty(syncFPlayer.getSetting(SettingText.AFK_SUFFIX))) {
+                playersCoordinates.remove(syncFPlayer.uuid());
+                return;
+            }
 
             // always delete afk suffix if action is empty
             if (action.isEmpty()) {
-                removeAfkSuffix(fPlayer);
+                removeAfkSuffix(syncFPlayer);
                 return;
             }
 
             // base module checks
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (isModuleDisabledFor(syncFPlayer)) return;
 
             // skip ignored action
             if (config().ignore().contains(action)) return;
 
             // just remove afk suffix and send message
-            removeAfkSuffix(fPlayer);
-            sendAfkMessage(fPlayer.uuid(), false);
+            removeAfkSuffix(syncFPlayer);
+            sendAfkMessage(syncFPlayer.uuid(), false);
         });
     }
 
