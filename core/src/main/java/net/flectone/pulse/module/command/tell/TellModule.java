@@ -172,4 +172,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             senderReceiverMap.put(fReceiver.uuid(), sender.name());
         }
     }
+
+    public @Nullable String getReceiverFor(FPlayer fPlayer) {
+        return senderReceiverMap.get(fPlayer.uuid());
+    }
+
 }
