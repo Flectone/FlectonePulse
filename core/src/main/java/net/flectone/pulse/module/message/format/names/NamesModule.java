@@ -9,12 +9,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -79,12 +79,17 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                 Component showEntityName = sender.showEntityName();
                 if (showEntityName == null) {
                     MessageContext displayContext = messagePipeline.createContext(sender, receiver,
-                            StringUtils.replaceEach(
-                                    sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
-                                    new String[]{"<name>", "<type>", "<uuid>"},
-                                    new String[]{"<lang:'" + sender.type() + "'>", sender.type(), sender.uuid().toString()}
+                                StringUtils.replaceEach(
+                                        sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
+                                        new String[]{"<name>", "<type>", "<uuid>"},
+                                        new String[]{"<lang:'" + sender.type() + "'>", sender.type(), sender.uuid().toString()}
+                                )
                             )
-                    ).withFlags(messageContext.flags()).addFlag(MessageFlag.USER_MESSAGE, false);
+                            .withFlags(messageContext.flags())
+                            .addFlags(
+                                    new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                    new boolean[]{false, false}
+                            );
 
                     Component displayName = messagePipeline.build(displayContext);
 
@@ -102,7 +107,10 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                         )
                         .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
                         .withFlags(messageContext.flags())
-                        .addFlag(MessageFlag.USER_MESSAGE, false);
+                        .addFlags(
+                                new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                new boolean[]{false, false}
+                        );
 
                 Component displayName = messagePipeline.build(displayContext);
                 return Tag.selfClosingInserting(displayName);
@@ -148,7 +156,10 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                             MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
                                     .withFlags(messageContext.flags())
-                                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                                    .addFlags(
+                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new boolean[]{false, false}
+                                    );
 
                             Component displayNameComponent = messagePipeline.build(displayContext);
 
@@ -160,7 +171,10 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                             MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
                                     .withFlags(messageContext.flags())
-                                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                                    .addFlags(
+                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new boolean[]{false, false}
+                                    );
 
                             Component prefixComponent = messagePipeline.build(prefixContext);
                             return Tag.inserting(prefixComponent);
@@ -171,7 +185,10 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                             MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
                                     .withFlags(messageContext.flags())
-                                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                                    .addFlags(
+                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new boolean[]{false, false}
+                                    );
 
                             Component suffixComponent = messagePipeline.build(suffixContext);
                             return Tag.inserting(suffixComponent);
