@@ -82,15 +82,15 @@ public class MessagePipeline {
     }
 
     public String buildDefault(MessageContext context) {
-        return addTrailingSpaces(context.message(), MiniMessage.miniMessage().serialize(build(context)));
+        return MiniMessage.miniMessage().serialize(build(context));
     }
 
     public String buildPlain(MessageContext context) {
-        return addTrailingSpaces(context.message(), PlainTextComponentSerializer.plainText().serialize(build(context)));
+        return PlainTextComponentSerializer.plainText().serialize(build(context));
     }
 
     public String buildLegacy(MessageContext context) {
-        return addTrailingSpaces(context.message(), LegacyComponentSerializer.legacySection().serialize(build(context)));
+        return LegacyComponentSerializer.legacySection().serialize(build(context));
     }
 
     public JsonElement buildJson(MessageContext context) {
@@ -120,36 +120,6 @@ public class MessagePipeline {
         }
 
         return Optional.empty();
-    }
-
-    public String addTrailingSpaces(String rawString, String finalString) {
-        if (StringUtils.isEmpty(rawString)) return finalString;
-
-        int countRawSpaces = countTrailingSpaces(rawString);
-        if (countRawSpaces == 0) return finalString;
-
-        int countFinalSpaces = countTrailingSpaces(finalString);
-
-        if (countRawSpaces > countFinalSpaces) {
-            finalString = finalString + " ".repeat(countRawSpaces - countFinalSpaces);
-        }
-
-        return finalString;
-    }
-
-    public int countTrailingSpaces(String string) {
-        if (StringUtils.isEmpty(string)) return 0;
-
-        int count = 0;
-        for (int i = string.length() - 1; i >= 0; i--) {
-            if (string.charAt(i) != ' ') {
-                break;
-            }
-
-            count++;
-        }
-
-        return count;
     }
 
     public enum ReplacementTag {
