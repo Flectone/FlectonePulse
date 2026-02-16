@@ -270,8 +270,8 @@ command:
   nickname:
     null_player: "<color:#ff7171>Игрок не найден"
     null_nickname: "<color:#ff7171>Этот ник нельзя использовать"
-    display: "<value><gray>*</gray>"
-    display_see: "(<player>) <value><gray>*</gray>"
+    display: "<value><gray>~</gray>"
+    display_see: "(<player>) <value><gray>~</gray>"
     format: "<fcolor:1>[>] Ник был изменён на <fcolor:2><nickname>"
   online:
     null_player: "<color:#ff7171>Игрок не найден"
