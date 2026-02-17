@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -45,6 +46,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
             MessageContext messageContext = messageFormattingEvent.context();
             FEntity sender = messageContext.sender();
             if (isModuleDisabledFor(sender)) return event;
+            if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
             return miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
         });

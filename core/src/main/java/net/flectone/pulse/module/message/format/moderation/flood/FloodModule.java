@@ -8,13 +8,12 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.flood.listener.FloodPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -48,8 +47,6 @@ public class FloodModule extends AbstractModule {
     }
 
     public MessageContext format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
         if (permissionChecker.check(sender, permission().bypass())) return messageContext;

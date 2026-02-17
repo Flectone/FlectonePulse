@@ -80,8 +80,6 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

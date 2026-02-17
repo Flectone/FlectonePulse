@@ -10,13 +10,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.animation.listener.AnimationPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -80,8 +79,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
         return super.permissionBuilder().addAll(permission().values().values());
     }
 
-    public MessageContext addAnimationTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
+    public MessageContext addTag(MessageContext messageContext) {
         if (isModuleDisabledFor(messageContext.sender())) return messageContext;
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.ANIMATION, (argumentQueue, context) -> {

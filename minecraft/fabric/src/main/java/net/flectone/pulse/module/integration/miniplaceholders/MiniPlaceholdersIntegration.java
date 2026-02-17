@@ -11,10 +11,9 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -53,12 +52,10 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.context();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
-
         Set<TagResolver> resolvers = new ObjectArraySet<>();
         resolvers.add(MiniPlaceholders.globalPlaceholders());
 
+        MessageContext messageContext = event.context();
         Audience sender = getAudienceOrDefault(messageContext.sender().uuid(), null);
         Audience receiver = null;
         if (sender != null) {

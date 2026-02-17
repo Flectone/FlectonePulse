@@ -14,4 +14,8 @@ public record MessageFormattingEvent(
         this(false, context);
     }
 
+    public MessageFormattingEvent withContext(MessageContext context) {
+        return this.context == context ? this : new MessageFormattingEvent(this.cancelled, context);
+    }
+
 }

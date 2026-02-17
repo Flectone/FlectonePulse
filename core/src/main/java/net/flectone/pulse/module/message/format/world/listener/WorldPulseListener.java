@@ -8,9 +8,11 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -34,6 +36,9 @@ public class WorldPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        return event.withContext(worldModule.addTag(event.context()));
+        MessageContext messageContext = event.context();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+
+        return event.withContext(worldModule.addTag(messageContext));
     }
 }

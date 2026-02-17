@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 
@@ -62,8 +63,9 @@ public class AfkPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = afkModule.addTag(event.context());
+        MessageContext messageContext = event.context();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        return event.withContext(messageContext);
+        return event.withContext(afkModule.addTag(messageContext));
     }
 }

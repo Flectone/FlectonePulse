@@ -67,7 +67,6 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext addTags(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
         if (isModuleDisabledFor(sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
@@ -201,7 +200,6 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext addInvisibleTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
         if (isModuleDisabledFor(sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();

@@ -23,7 +23,6 @@ import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAns
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -108,8 +107,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     }
 
     public MessageContext format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 
@@ -135,8 +132,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

@@ -21,6 +21,7 @@ public class FloodPulseListener implements PulseListener {
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.FLOOD)) return event;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
         return event.withContext(floodModule.format(messageContext));
     }

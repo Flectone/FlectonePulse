@@ -95,7 +95,6 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
 
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
@@ -113,8 +112,6 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

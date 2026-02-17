@@ -21,6 +21,7 @@ public class TranslatePulseListener implements PulseListener {
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.TRANSLATION)) return event;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
         return event.withContext(translateModule.addTag(messageContext));
     }

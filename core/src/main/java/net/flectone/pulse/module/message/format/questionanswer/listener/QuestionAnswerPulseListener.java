@@ -21,6 +21,7 @@ public class QuestionAnswerPulseListener implements PulseListener {
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.QUESTION)) return event;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
         messageContext = questionAnswerModule.format(messageContext);
         messageContext = questionAnswerModule.addTag(messageContext);

@@ -6,12 +6,11 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.fixation.listener.FixationPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -38,8 +37,6 @@ public class FixationModule extends AbstractModule {
     }
 
     public MessageContext format(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
 

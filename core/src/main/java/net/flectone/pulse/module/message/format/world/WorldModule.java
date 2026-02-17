@@ -50,8 +50,6 @@ public class WorldModule extends AbstractModule {
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         FEntity sender = messageContext.sender();
         if (isModuleDisabledFor(sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;

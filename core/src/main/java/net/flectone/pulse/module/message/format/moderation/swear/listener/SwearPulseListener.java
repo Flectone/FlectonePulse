@@ -21,6 +21,7 @@ public class SwearPulseListener implements PulseListener {
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.SWEAR)) return event;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
         messageContext = swearModule.format(messageContext);
         messageContext = swearModule.addTag(messageContext);

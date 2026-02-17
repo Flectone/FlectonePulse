@@ -176,8 +176,6 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return messageContext;
-
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (argumentQueue, context) -> {
             String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
             if (value == null) return Tag.preProcessParsed(messageContext.sender().name());
