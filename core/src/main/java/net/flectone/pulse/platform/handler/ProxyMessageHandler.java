@@ -949,10 +949,10 @@ public class ProxyMessageHandler {
     }
 
     private Map<Integer, Object> parseVanillaArguments(JsonObject jsonObject) {
-        Map<Integer, Object> result = new Int2ObjectOpenHashMap<>();
+        Int2ObjectOpenHashMap<Object> result = new Int2ObjectOpenHashMap<>();
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            Integer key = Integer.parseInt(entry.getKey());
+            int key = Integer.parseInt(entry.getKey());
             JsonObject argumentJson = entry.getValue().getAsJsonObject();
 
             Optional<FEntity> entity = parseFEntity(argumentJson);

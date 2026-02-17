@@ -32,8 +32,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Map;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
@@ -91,7 +89,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
-            Map<Integer, String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
+            Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
                 colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {

@@ -10,7 +10,6 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -18,14 +17,14 @@ import java.util.function.Consumer;
 public class Inventory {
 
     private final int size;
-    private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
     private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
     private final WrapperPlayServerOpenWindow wrapperWindow;
 
     @Setter private WrapperPlayServerWindowItems wrapperItems;
 
     public Inventory(int size,
-                     Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap,
+                     Int2ObjectOpenHashMap<BiConsumer<ItemStack, Inventory>> clickConsumerMap,
                      List<Consumer<Inventory>> closeConsumerList,
                      WrapperPlayServerOpenWindow wrapperWindow,
                      WrapperPlayServerWindowItems wrapperItems) {
@@ -40,8 +39,8 @@ public class Inventory {
 
         private Component name = Component.empty();
         private int size;
-        private final Map<Integer, ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
-        private final Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
+        private final Int2ObjectOpenHashMap<ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
+        private final Int2ObjectOpenHashMap<BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
         private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
 
         public Builder name(Component name) {

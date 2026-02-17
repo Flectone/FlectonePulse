@@ -29,7 +29,10 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,7 +83,7 @@ public class FileLoader {
                 integration,
                 message,
                 permission,
-                Collections.unmodifiableMap(localizations)
+                Map.copyOf(localizations)
         );
 
         fileWriter.save(defaultFiles, true);

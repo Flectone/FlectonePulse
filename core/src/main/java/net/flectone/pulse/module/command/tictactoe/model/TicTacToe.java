@@ -19,7 +19,7 @@ public class TicTacToe {
     private static final int REMOVE_MULTIPLIER = -1;
     private static final int WIN_OFFSET = 5;
 
-    private final Map<Integer, Queue<String>> movesMap = new Int2ObjectArrayMap<>();
+    private final Int2ObjectArrayMap<Queue<String>> movesMap = new Int2ObjectArrayMap<>();
 
     private final int id;
     private final boolean hard;

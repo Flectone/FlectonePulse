@@ -44,7 +44,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
 
-    private final Map<Integer, Poll> pollMap = new Int2ObjectArrayMap<>();
+    private final Int2ObjectArrayMap<Poll> pollMap = new Int2ObjectArrayMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -81,7 +81,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         );
 
         taskScheduler.runAsyncTimer(() -> {
-            Set<Integer> toRemove = new IntOpenHashSet();
+            IntOpenHashSet toRemove = new IntOpenHashSet();
 
             pollMap.forEach((id, poll) -> {
                 Status status = null;

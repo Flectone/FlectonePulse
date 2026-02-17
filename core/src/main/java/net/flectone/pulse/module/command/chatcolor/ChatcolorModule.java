@@ -116,7 +116,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        Map<Integer, FColor> newFColors = new Int2ObjectArrayMap<>();
+        Int2ObjectArrayMap<FColor> newFColors = new Int2ObjectArrayMap<>();
         fTarget.fColors().getOrDefault(fColorType.get(), Collections.emptySet())
                 .forEach(fColor -> newFColors.put(fColor.number(), fColor));
 

@@ -36,7 +36,7 @@ public class Dialog {
 
         private final CommonDialogData commonDialogData;
         private final int columns;
-        private final Map<Integer, ActionButton> buttonMap = new Int2ObjectOpenHashMap<>();
+        private final Int2ObjectOpenHashMap<ActionButton> buttonMap = new Int2ObjectOpenHashMap<>();
         private final Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap = new Object2ObjectOpenHashMap<>();
         private final List<Consumer<Dialog>> closeConsumerList = new ObjectArrayList<>();
 

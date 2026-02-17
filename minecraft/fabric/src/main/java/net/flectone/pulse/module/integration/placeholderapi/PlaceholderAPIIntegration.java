@@ -35,7 +35,6 @@ import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
-import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -170,7 +169,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-        Map<Integer, String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
+        Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }

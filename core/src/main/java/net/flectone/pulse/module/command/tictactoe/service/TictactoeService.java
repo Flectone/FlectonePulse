@@ -8,13 +8,11 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.util.RandomUtil;
 
-import java.util.Map;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeService {
 
-    private final Map<Integer, TicTacToe> ticTacToeMap = new Int2ObjectArrayMap<>();
+    private final Int2ObjectArrayMap<TicTacToe> ticTacToeMap = new Int2ObjectArrayMap<>();
 
     private final RandomUtil randomUtil;
 

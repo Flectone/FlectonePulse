@@ -2,7 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FColorSQL;
@@ -10,7 +10,10 @@ import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Data Access Object for color data operations in FlectonePulse.
@@ -91,13 +94,13 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             return;
         }
 
-        List<Integer> fColorsToDelete = new ObjectArrayList<>(oldFColors.stream()
+        IntArrayList fColorsToDelete = new IntArrayList(oldFColors.stream()
                 .map(FColor::number)
                 .toList()
         );
 
         newFColors.forEach(newFColor -> {
-            fColorsToDelete.remove((Integer) newFColor.number());
+            fColorsToDelete.removeInt(newFColor.number());
 
             Optional<FColor> optionalOldFColor = oldFColors.stream()
                     .filter(oldFColor -> oldFColor.number() == newFColor.number())

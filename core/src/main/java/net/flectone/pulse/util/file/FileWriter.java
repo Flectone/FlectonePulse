@@ -148,7 +148,7 @@ public class FileWriter {
         int indentUnit = detectIndentUnit(lines);
         if (indentUnit <= 0) indentUnit = 2;
 
-        Map<Integer, String> pathAtDepth = new Int2ObjectOpenHashMap<>();
+        Int2ObjectOpenHashMap<String> pathAtDepth = new Int2ObjectOpenHashMap<>();
         Set<String> alreadyInserted = new ObjectOpenHashSet<>();
 
         for (String line : lines) {
@@ -216,7 +216,7 @@ public class FileWriter {
     }
 
     private int detectIndentUnit(String[] lines) {
-        List<Integer> numbers = new IntArrayList();
+        IntArrayList numbers = new IntArrayList();
         for (String line : lines) {
             String trimmed = line.trim();
             if (trimmed.isEmpty()) continue;
