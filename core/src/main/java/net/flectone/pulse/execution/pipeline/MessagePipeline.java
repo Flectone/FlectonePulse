@@ -123,12 +123,12 @@ public class MessagePipeline {
     }
 
     public enum ReplacementTag {
-        AFK_SUFFIX,
+        AFK,
         ANIMATION,
-        MUTE_SUFFIX,
-        STREAM_PREFIX,
-        VAULT_SUFFIX,
-        VAULT_PREFIX,
+        MUTE,
+        STREAM,
+        SUFFIX,
+        PREFIX,
         DELETE,
         DISPLAY_NAME,
         PLAYER,
@@ -139,7 +139,7 @@ public class MessagePipeline {
         SWEAR,
         QUESTION,
         TRANSLATION,
-        WORLD_PREFIX,
+        WORLD,
         PLAYER_HEAD,
         PLAYER_HEAD_OR,
         SPRITE,

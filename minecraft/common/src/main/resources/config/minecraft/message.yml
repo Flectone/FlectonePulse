@@ -270,8 +270,8 @@ format:
     enable: true
     name_visible: false
     color: "<white>"
-    prefix: "<vault_prefix><stream_prefix>"
-    suffix: "<afk_suffix><vault_suffix>"
+    prefix: "<prefix><stream>"
+    suffix: "<afk><suffix>"
     ticker:
       enable: false
   translate:

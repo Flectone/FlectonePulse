@@ -499,7 +499,7 @@ message:
     null_chat: "<color:#ff7171>На сервер выключен чат"
     null_receiver: "<color:#ff7171>Тебя никто не услышал"
     types:
-      global: "<delete><display_name> <world_prefix>»<fcolor:4> <message>"
+      global: "<delete><display_name> <world>»<fcolor:4> <message>"
       local: "<delete><display_name><fcolor:3>: <message>"
   format:
     animation:
@@ -554,7 +554,7 @@ message:
     names:
       constant: []
       display:
-        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <nickname>\"><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><vault_suffix></hover></click>"
+        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <nickname>\"><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>[Invisible]"
@@ -622,7 +622,7 @@ message:
           - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
           - " "
     playerlistname:
-      format: "<world_prefix>| <reset><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<world>| <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Твоя версия <fcolor:2><current_version><fcolor:1> устарела! Обновись до <fcolor:2><latest_version><fcolor:1> с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version><fcolor:1> устарела! Обновись до <fcolor:2><latest_version><fcolor:1> с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"

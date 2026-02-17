@@ -90,7 +90,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         if (isModuleDisabledFor(sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK, (argumentQueue, context) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();

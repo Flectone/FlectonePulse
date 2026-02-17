@@ -54,7 +54,7 @@ public class WorldModule extends AbstractModule {
         if (isModuleDisabledFor(sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WORLD, (argumentQueue, context) -> {
             String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
             if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);

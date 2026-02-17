@@ -571,18 +571,35 @@ public class FileMigrator {
     public FilePack migration_1_8_2(FilePack files) {
         Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
+        UnaryOperator<String> replaceOldTags = string -> StringUtils.replaceEach(string,
+                new String[]{"<afk_suffix>", "<world_prefix>", "<mute_suffix>", "<stream_prefix>", "<vault_suffix>", "<vault_prefix>", "<translate>"},
+                new String[]{"<afk>", "<world>", "<mute>", "<stream>", "<suffix>", "<prefix>", "<translation>"}
+        );
+
         for (Localization localization : files.localizations().values()) {
 
             Map<String, String> newChats = new Object2ObjectOpenHashMap<>(localization.message().chat().types());
             newChats.forEach((key, value) ->
-                    newChats.put(key, Strings.CS.replace(value, "<translate>", "<translation>"))
+                    newChats.put(key, replaceOldTags.apply(value))
             );
+
+            List<String> newDisplays = new ObjectArrayList<>(localization.message().format().names().display());
+            newDisplays.replaceAll(replaceOldTags);
+
+            String newPlayerListname = replaceOldTags.apply(localization.message().tab().playerlistname().format());
 
             newLocalizations.put(localization.language(),
                     localization.withMessage(
-                            localization.message().withChat(
-                                    localization.message().chat().withTypes(newChats)
-                            )
+                            localization.message()
+                                    .withChat(
+                                            localization.message().chat().withTypes(newChats)
+                                    )
+                                    .withFormat(
+                                            localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplays))
+                                    )
+                                    .withTab(
+                                            localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerListname))
+                                    )
                     )
             );
         }

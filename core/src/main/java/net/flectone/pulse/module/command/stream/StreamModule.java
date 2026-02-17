@@ -176,7 +176,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
         if (isModuleDisabledFor(fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);

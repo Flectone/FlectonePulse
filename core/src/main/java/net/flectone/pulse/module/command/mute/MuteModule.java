@@ -151,7 +151,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE_SUFFIX, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE, (argumentQueue, context) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
             if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);

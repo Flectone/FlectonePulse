@@ -496,7 +496,7 @@ message:
     null_chat: "<color:#ff7171>Chat is disabled on this server"
     null_receiver: "<color:#ff7171>Nobody heard you"
     types:
-      global: "<delete><display_name> <world_prefix>»<fcolor:4> <message>"
+      global: "<delete><display_name> <world>»<fcolor:4> <message>"
       local: "<delete><display_name><fcolor:3>: <message>"
   format:
     animation:
@@ -551,7 +551,7 @@ message:
     names:
       constant: []
       display:
-        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <nickname>\"><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><vault_suffix></hover></click>"
+        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <nickname>\"><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><name></hover>"
       unknown: "<fcolor:2><name>"
       invisible: "<fcolor:2>[Invisible]"
@@ -619,7 +619,7 @@ message:
         - "<fcolor:1>TPS <replacement:tps>, Online <replacement:online>"
         - " "
     playerlistname:
-      format: "<world_prefix>| <reset><vault_prefix><stream_prefix><fcolor:2><nickname><afk_suffix><mute_suffix><vault_suffix>"
+      format: "<world>| <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <replacement:url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!"
     format_console: "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"
