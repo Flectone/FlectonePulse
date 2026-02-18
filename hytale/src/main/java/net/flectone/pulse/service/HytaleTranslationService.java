@@ -43,7 +43,7 @@ public class HytaleTranslationService implements TranslationService {
 
         @Override
         public @Nullable MessageFormat translate(final @NonNull String key, final @NonNull Locale locale) {
-            String translated = tryTranslate(key, locale.getDisplayName());
+            String translated = tryTranslate(key, toI18nModuleFormat(locale));
             if (translated == null) return null;
 
             return new MessageFormat(translated, locale);
@@ -51,10 +51,21 @@ public class HytaleTranslationService implements TranslationService {
 
         @Override
         public @Nullable Component translate(@NonNull TranslatableComponent component, @NonNull Locale locale) {
-            String translated = tryTranslate(component.key(), locale.getDisplayName());
+            String translated = tryTranslate(component.key(), toI18nModuleFormat(locale));
             if (translated == null) return null;
 
             return Component.text(translated).mergeStyle(component);
+        }
+
+        public String toI18nModuleFormat(Locale locale) {
+            String language = locale.getLanguage();
+            String country = locale.getCountry();
+
+            if (country.isEmpty()) {
+                return language;
+            }
+
+            return language + "-" + country;
         }
 
         public String tryTranslate(String key, String locale) {
