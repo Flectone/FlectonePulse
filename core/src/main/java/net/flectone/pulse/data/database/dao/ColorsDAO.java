@@ -100,7 +100,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
         );
 
         newFColors.forEach(newFColor -> {
-            fColorsToDelete.removeInt(newFColor.number());
+            fColorsToDelete.rem(newFColor.number());
 
             Optional<FColor> optionalOldFColor = oldFColors.stream()
                     .filter(oldFColor -> oldFColor.number() == newFColor.number())
