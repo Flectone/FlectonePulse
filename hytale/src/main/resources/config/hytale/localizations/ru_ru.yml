@@ -792,3 +792,5 @@ message:
       server.world.notFound: "<fcolor:1>Не удалось найти мир '<fcolor:2><argument:0><fcolor:1>'!<fcolor:1>"
       server.death.player: "<fcolor:2><argument:0><fcolor:1> умер"
       server.death.player.killedBy: "<fcolor:2><argument:0><fcolor:1> был убит благодаря <fcolor:2><argument:1>"
+      server.assetModule.outOfDatePacks: ""
+      server.pluginManager.outOfDatePlugins: ""

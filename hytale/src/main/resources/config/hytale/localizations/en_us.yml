@@ -789,3 +789,5 @@ message:
       server.world.notFound: "<fcolor:1>Couldn't find world '<fcolor:2><argument:0><fcolor:1>'!<fcolor:1>"
       server.death.player: "<fcolor:2><argument:0><fcolor:1> died"
       server.death.player.killedBy: "<fcolor:2><argument:0><fcolor:1> killed by <fcolor:2><argument:1>"
+      server.assetModule.outOfDatePacks: ""
+      server.pluginManager.outOfDatePlugins: ""

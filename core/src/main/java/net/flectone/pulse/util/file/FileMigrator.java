@@ -10,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.file.FilePack;
-import net.flectone.pulse.util.constant.CacheName;
-import net.flectone.pulse.util.constant.DefaultLocalization;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.constant.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -28,6 +26,7 @@ import java.util.stream.Collectors;
 public class FileMigrator {
 
     private final Provider<FileLoader> fileLoaderProvider;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
     public FilePack migration_1_4_3(FilePack files) {
         Permission.Message.Update update = files.permission().message().update();
@@ -576,6 +575,8 @@ public class FileMigrator {
                 new String[]{"<afk>", "<world>", "<mute>", "<stream>", "<suffix>", "<prefix>", "<translation>"}
         );
 
+        boolean isHytale = platformServerAdapterProvider.get().getPlatformType() == PlatformType.HYTALE;
+
         for (Localization localization : files.localizations().values()) {
 
             Map<String, String> newChats = new Object2ObjectOpenHashMap<>(localization.message().chat().types());
@@ -588,20 +589,32 @@ public class FileMigrator {
 
             String newPlayerListname = replaceOldTags.apply(localization.message().tab().playerlistname().format());
 
-            newLocalizations.put(localization.language(),
-                    localization.withMessage(
-                            localization.message()
-                                    .withChat(
-                                            localization.message().chat().withTypes(newChats)
-                                    )
-                                    .withFormat(
-                                            localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplays))
-                                    )
-                                    .withTab(
-                                            localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerListname))
-                                    )
-                    )
+            localization = localization.withMessage(
+                    localization.message()
+                            .withChat(
+                                    localization.message().chat().withTypes(newChats)
+                            )
+                            .withFormat(
+                                    localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplays))
+                            )
+                            .withTab(
+                                    localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerListname))
+                            )
             );
+
+            if (isHytale) {
+                Map<String, String> types = new Object2ObjectOpenHashMap<>(localization.message().vanilla().types());
+                types.put("server.assetModule.outOfDatePacks", "");
+                types.put("server.pluginManager.outOfDatePlugins", "");
+
+                localization = localization.withMessage(
+                        localization.message().withVanilla(
+                                localization.message().vanilla().withTypes(types)
+                        )
+                );
+            }
+
+            newLocalizations.put(localization.language(), localization);
         }
 
         return files.withLocalizations(newLocalizations);
