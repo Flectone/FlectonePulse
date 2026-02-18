@@ -145,7 +145,7 @@ subprojects {
 
         outputs.cacheIf { true }
 
-//        minimize()
+        minimize()
     }
 
     mavenPublishing {
