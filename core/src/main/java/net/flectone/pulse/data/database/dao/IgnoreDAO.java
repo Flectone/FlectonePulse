@@ -7,9 +7,11 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.IgnoreSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -50,11 +52,17 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
             int updated = sql.update(currentTime, fSender.id(), fIgnored.id());
 
             if (updated == 0) {
-                int insertedId = sql.insert(currentTime, fSender.id(), fIgnored.id());
-                return new Ignore(insertedId, currentTime, fIgnored.id());
-            } else {
-                return sql.findByInitiatorAndTarget(fSender.id(), fIgnored.id()).orElseThrow();
+                try {
+                    int insertedId = sql.insert(currentTime, fSender.id(), fIgnored.id());
+                    return new Ignore(insertedId, currentTime, fIgnored.id());
+                } catch (UnableToExecuteStatementException e) {
+                    if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
+                        sql.update(currentTime, fSender.id(), fIgnored.id());
+                    } else throw e;
+                }
             }
+
+            return sql.findByInitiatorAndTarget(fSender.id(), fIgnored.id()).orElseThrow();
         });
     }
 

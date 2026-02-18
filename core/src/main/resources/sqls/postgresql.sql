@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS "fp_ignore" (
     "target" INTEGER NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY("initiator") REFERENCES "fp_player"("id"),
-    FOREIGN KEY("target") REFERENCES "fp_player"("id")
+    FOREIGN KEY("target") REFERENCES "fp_player"("id"),
+    UNIQUE("initiator", "target")
 );
 
 CREATE TABLE IF NOT EXISTS "fp_moderation" (
