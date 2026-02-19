@@ -1,72 +1,57 @@
 package net.flectone.pulse.util.logging;
 
 import com.google.inject.Singleton;
-import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 @Singleton
-public class FLogger extends Logger {
+public record FLogger(
+        Consumer<LogRecord> logConsumer,
+        Supplier<FileFacade> fileFacadeSupplier
+) {
 
-    private final Consumer<LogRecord> logConsumer;
-
-    @Setter private FileFacade fileFacade;
-
-    public FLogger(Consumer<LogRecord> logConsumer) {
-        super("", null);
-
-        this.logConsumer = logConsumer;
-    }
-
-    public FLogger(Logger logger) {
-        super("", null);
-
-        logger.setLevel(Level.OFF);
-        setParent(logger);
-        setLevel(Level.ALL);
-
-        logConsumer = super::log;
-    }
+    private static final boolean ANSI_SUPPORTED = isAnsiSupported();
 
     public Config.Logger config() {
-        return fileFacade == null ? null : fileFacade.config().logger();
+        return fileFacadeSupplier.get() == null ? null : fileFacadeSupplier.get().config().logger();
     }
 
-    @Override
     public void log(LogRecord logRecord) {
-        if (config() == null) {
+        Config.Logger config = config();
+        if (config == null) {
             logRecord.setLoggerName("FlectonePulse");
             logConsumer.accept(logRecord);
             return;
         }
 
-        String prefix = config().prefix();
+        String color = "";
+        if (ANSI_SUPPORTED) {
+            color = switch (logRecord.getLevel().intValue()) {
+                case 900 -> config.warn();
+                case 800 -> config.info();
+                default -> "";
+            };
+        }
 
-        String color = switch (logRecord.getLevel().intValue()) {
-            case 900 -> config().warn();
-            case 800 -> config().info();
-            default -> "";
-        };
+        String prefix = config.prefix();
+
+        if (ANSI_SUPPORTED && !color.isEmpty()) {
+            logRecord.setMessage(prefix + color + logRecord.getMessage() + "\033[0m");
+        } else {
+            logRecord.setMessage(prefix + logRecord.getMessage());
+        }
 
         logRecord.setLoggerName("");
-        logRecord.setMessage(prefix + color + logRecord.getMessage() + "\033[0m");
-
         logConsumer.accept(logRecord);
-    }
-
-    @Override
-    public void info(String msg) {
-        LogRecord logRecord = new LogRecord(Level.INFO, msg);
-
-        log(logRecord);
     }
 
     public void logEnabling() {
@@ -103,11 +88,16 @@ public class FLogger extends Logger {
         });
     }
 
-    @Override
-    public void warning(String exception) {
-        LogRecord logRecord = new LogRecord(Level.WARNING, exception);
+    public void info(String string) {
+        log(new LogRecord(Level.INFO, string));
+    }
 
-        log(logRecord);
+    public void warning(String string) {
+        log(new LogRecord(Level.WARNING, string));
+    }
+
+    public void warning(Throwable throwable) {
+        warning("An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues", throwable);
     }
 
     public void warning(String exception, Throwable throwable) {
@@ -115,11 +105,22 @@ public class FLogger extends Logger {
         PrintWriter printWriter = new PrintWriter(stringWriter);
         throwable.printStackTrace(printWriter);
 
-        LogRecord logRecord = new LogRecord(Level.WARNING, exception + "\n" + stringWriter);
-        log(logRecord);
+        log(new LogRecord(Level.WARNING, exception + "\n" + stringWriter));
     }
 
-    public void warning(Throwable throwable) {
-        warning("An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues", throwable);
+    // Idea taken from net.kyori.ansi.ColorLevel
+    private static boolean isAnsiSupported() {
+        if (System.console() == null) return false;
+
+        String colorterm = System.getenv("COLORTERM");
+        if (colorterm != null && (colorterm.contains("truecolor") || colorterm.contains("24bit"))) return true;
+
+        String term = System.getenv("TERM");
+        if (term != null && (term.contains("truecolor") || term.contains("direct") || term.contains("256color"))) return true;
+        if (System.getenv("WT_SESSION") != null) return true;
+
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        return !os.contains("win");
     }
+
 }

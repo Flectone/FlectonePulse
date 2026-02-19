@@ -42,7 +42,10 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
 	public void onInitializeServer() {
         // initialize custom logger
         Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
-        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
+        fLogger = new FLogger(
+                logRecord -> logger.info(logRecord.getMessage()),
+                () -> injector == null ? null : injector.getInstance(FileFacade.class)
+        );
         fLogger.logEnabling();
 
 		// set up library resolver for dependency loading

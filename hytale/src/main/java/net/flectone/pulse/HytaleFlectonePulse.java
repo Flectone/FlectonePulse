@@ -17,6 +17,7 @@ import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
 import net.flectone.pulse.processing.resolver.HytaleLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,11 +46,14 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
     protected void setup() {
         // initialize custom logger
         HytaleLogger hytaleLogger = this.getLogger();
-        fLogger = new FLogger(logRecord -> hytaleLogger.at(logRecord.getLevel()).log(logRecord.getMessage()));
+        fLogger = new FLogger(
+                logRecord -> hytaleLogger.at(logRecord.getLevel()).log(logRecord.getMessage()),
+                () -> injector == null ? null : injector.getInstance(FileFacade.class)
+        );
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryManager libraryManager = getLibraryManager(fLogger);
+        LibraryManager libraryManager = getLibraryManager(hytaleLogger);
         LibraryResolver libraryResolver = new HytaleLibraryResolver(libraryManager);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
@@ -97,23 +101,23 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @NotNull
-    private LibraryManager getLibraryManager(FLogger fLogger) {
+    private LibraryManager getLibraryManager(HytaleLogger hytaleLogger) {
         LogAdapter logAdapter = new LogAdapter() {
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s) {
                 switch (logLevel) {
-                    case INFO, DEBUG -> fLogger.log(Level.INFO, s);
-                    case WARN -> fLogger.log(Level.WARNING, s);
-                    case ERROR -> fLogger.log(Level.SEVERE, s);
+                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s);
+                    case WARN -> hytaleLogger.at(Level.WARNING).log(s);
+                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s);
                 }
             }
 
             @Override
             public void log(@NotNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
                 switch (logLevel) {
-                    case INFO, DEBUG -> fLogger.log(Level.INFO, s, throwable);
-                    case WARN -> fLogger.log(Level.WARNING, s, throwable);
-                    case ERROR -> fLogger.log(Level.SEVERE, s, throwable);
+                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s, throwable);
+                    case WARN -> hytaleLogger.at(Level.WARNING).log(s, throwable);
+                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s, throwable);
                 }
             }
         };

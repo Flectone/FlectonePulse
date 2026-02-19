@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,11 +28,14 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void onLoad() {
         // initialize custom logger
-        fLogger = new FLogger(this.getLogger());
+        fLogger = new FLogger(
+                logRecord -> this.getLogger().log(logRecord),
+                () -> injector == null ? null : injector.getInstance(FileFacade.class)
+        );
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        libraryResolver = new BukkitLibraryResolver(this, fLogger);
+        libraryResolver = new BukkitLibraryResolver(this);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();

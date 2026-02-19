@@ -75,9 +75,6 @@ public class FlectonePulseAPI {
         // get fLogger
         FLogger fLogger = instance.get(FLogger.class);
 
-        // set file resolver
-        fLogger.setFileFacade(fileFacade);
-
         // log plugin information
         fLogger.logDescription();
 

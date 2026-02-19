@@ -19,13 +19,12 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
     @Override
     public void onEnable() {
-        fLogger = new FLogger(this.getLogger());
+        fLogger = new FLogger(logRecord -> this.getLogger().log(logRecord), () -> null);
 
         fLogger.logEnabling();
 
         registerChannel();
 
-        fLogger.logDescription();
         fLogger.logEnabled();
     }
 

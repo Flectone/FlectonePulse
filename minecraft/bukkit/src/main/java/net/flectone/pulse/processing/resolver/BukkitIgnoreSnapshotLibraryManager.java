@@ -2,7 +2,6 @@ package net.flectone.pulse.processing.resolver;
 
 import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
-import com.alessiodp.libby.logging.adapters.LogAdapter;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NonNull;
 
@@ -20,8 +19,8 @@ import static java.util.Objects.requireNonNull;
 
 public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
 
-    public BukkitIgnoreSnapshotLibraryManager(@NonNull Plugin plugin, @NonNull String directoryName, @NonNull LogAdapter logAdapter) {
-        super(plugin, directoryName, logAdapter);
+    public BukkitIgnoreSnapshotLibraryManager(@NonNull Plugin plugin, @NonNull String directoryName) {
+        super(plugin, directoryName);
     }
 
     @Override

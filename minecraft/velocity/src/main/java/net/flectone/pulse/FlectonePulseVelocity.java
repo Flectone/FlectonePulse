@@ -34,7 +34,7 @@ public class FlectonePulseVelocity {
     public FlectonePulseVelocity(ProxyServer proxyServer,
                                  Logger logger) {
         this.proxyServer = proxyServer;
-        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
+        this.fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()), () -> null);
     }
 
     @Subscribe
@@ -43,7 +43,6 @@ public class FlectonePulseVelocity {
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
 
-        fLogger.logDescription();
         fLogger.logEnabled();
     }
 
