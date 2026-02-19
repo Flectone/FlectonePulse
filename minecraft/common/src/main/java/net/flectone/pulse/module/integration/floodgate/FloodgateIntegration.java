@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.floodgate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,24 +14,24 @@ import org.geysermc.floodgate.api.FloodgateApi;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FloodgateIntegration implements FIntegration {
 
-    private final FLogger fLogger;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
 
     private FloodgateApi floodgateApi;
 
     @Override
+    public String getIntegrationName() {
+        return "Floodgate";
+    }
+
+    @Override
     public void hook() {
         this.floodgateApi = FloodgateApi.getInstance();
-        fLogger.info("✔ Floodgate hooked");
+        logHook();
     }
 
     public void hookLater() {
         taskScheduler.runAsyncLater(this::hook);
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Floodgate unhooked");
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {

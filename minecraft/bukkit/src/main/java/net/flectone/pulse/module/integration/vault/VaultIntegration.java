@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.vault;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -23,10 +24,15 @@ import java.util.Set;
 public class VaultIntegration implements FIntegration {
 
     private final Plugin plugin;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private Chat chat;
     private Permission permission;
+
+    @Override
+    public String getIntegrationName() {
+        return "Vault";
+    }
 
     @Override
     public void hook() {
@@ -40,12 +46,7 @@ public class VaultIntegration implements FIntegration {
             this.chat = chatProvider.getProvider();
         }
 
-        fLogger.info("✔ Vault hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Vault unhooked");
+        logHook();
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permissionName) {

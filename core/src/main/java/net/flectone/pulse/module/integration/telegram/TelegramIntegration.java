@@ -36,10 +36,10 @@ public class TelegramIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
     private final SystemVariableResolver systemVariableResolver;
-    private final FLogger fLogger;
     private final MessageListener messageListener;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
 
     @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private TelegramBotsLongPollingApplication botsApplication;
@@ -47,6 +47,11 @@ public class TelegramIntegration implements FIntegration {
 
     public Integration.Telegram config() {
         return fileFacade.integration().telegram();
+    }
+
+    @Override
+    public String getIntegrationName() {
+        return "Telegram";
     }
 
     @Override
@@ -70,8 +75,7 @@ public class TelegramIntegration implements FIntegration {
                 updateChannelInfo();
             }
 
-            fLogger.info("✔ Telegram integration enabled");
-
+            logHook();
         } catch (Exception e) {
             fLogger.warning(e);
         }
@@ -124,7 +128,7 @@ public class TelegramIntegration implements FIntegration {
             fLogger.warning(e);
         }
 
-        fLogger.info("✖ Telegram integration disabled");
+        logUnhook();
     }
 
     public void updateChannelInfo() {

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.skinsrestorer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -33,10 +34,15 @@ public class SkinsRestorerIntegration implements FIntegration {
     private final Provider<MinecraftSkinService> skinServiceProvider;
     private final Provider<PlayerlistnameModule> playerlistnameModuleProvider;
     private final TaskScheduler taskScheduler;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private SkinsRestorer skinsRestorer;
     private boolean skinApplyEventSubscribed;
+
+    @Override
+    public String getIntegrationName() {
+        return "SkinsRestorer";
+    }
 
     @Override
     public void hook() {
@@ -55,7 +61,7 @@ public class SkinsRestorerIntegration implements FIntegration {
                 skinApplyEventSubscribed = true;
             }
 
-            fLogger.info("✔ SkinsRestorer hooked");
+            logHook();
         } catch (Exception e) {
             fLogger.warning("SkinsRestorer hook is failed, check https://skinsrestorer.net/docs/installation");
         }
@@ -63,11 +69,6 @@ public class SkinsRestorerIntegration implements FIntegration {
 
     public void hookLater() {
         taskScheduler.runAsyncLater(this::hook);
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ SkinsRestorer unhooked");
     }
 
     public String getTextureUrl(FPlayer fPlayer) {

@@ -5,6 +5,7 @@ import com.deepl.api.DeepLClientOptions;
 import com.deepl.api.DeepLException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.file.FileFacade;
@@ -15,7 +16,7 @@ import net.flectone.pulse.util.logging.FLogger;
 public class DeeplIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private DeepLClient client;
 
@@ -29,19 +30,19 @@ public class DeeplIntegration implements FIntegration {
     }
 
     @Override
+    public String getIntegrationName() {
+        return "Deepl";
+    }
+
+    @Override
     public void hook() {
         try {
             client = new DeepLClient(fileFacade.integration().deepl().authKey(), new DeepLClientOptions());
 
-            fLogger.info("✔ Deepl integration enabled");
+            logHook();
         } catch (Exception e) {
             fLogger.warning(e);
         }
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Deepl integration disabled");
     }
 
 }

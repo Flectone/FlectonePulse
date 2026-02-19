@@ -16,21 +16,25 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AdvancedBanIntegration implements FIntegration {
 
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
-    @Getter
-    private boolean hooked;
+    @Getter private boolean hooked;
+
+    @Override
+    public String getIntegrationName() {
+        return "AdvancedBan";
+    }
 
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("✔ AdvancedBan hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         hooked = false;
-        fLogger.info("✖ AdvancedBan unhooked");
+        logUnhook();
     }
 
     public boolean isMuted(FEntity fEntity) {

@@ -5,6 +5,7 @@ import com.Zrips.CMI.Containers.CMIUser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.util.ExternalModeration;
@@ -16,20 +17,20 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CMIIntegration implements FIntegration {
 
-    private final FLogger fLogger;
     private final Provider<FPlayerService> fPlayerServiceProvider;
+    @Getter private final FLogger fLogger;
 
     private CMI cmi;
 
     @Override
-    public void hook() {
-        cmi = CMI.getInstance();
-        fLogger.info("✔ CMI hooked");
+    public String getIntegrationName() {
+        return "CMI";
     }
 
     @Override
-    public void unhook() {
-        fLogger.info("✖ CMI unhooked");
+    public void hook() {
+        cmi = CMI.getInstance();
+        logHook();
     }
 
     public boolean isMuted(FEntity fEntity) {

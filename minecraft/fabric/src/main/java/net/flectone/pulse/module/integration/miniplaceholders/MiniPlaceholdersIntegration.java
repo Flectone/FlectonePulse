@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -31,23 +32,18 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
 
     private static final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
 
-    private final FLogger fLogger;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
 
     @Override
-    public void hook() {
-        fLogger.info("✔ MiniPlaceholders hooked");
+    public String getIntegrationName() {
+        return "MiniPlaceholders";
     }
 
     public void hookLater() {
         taskScheduler.runAsyncLater(this::hook);
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ MiniPlaceholders unhooked");
     }
 
     @Pulse(priority = Event.Priority.HIGH)

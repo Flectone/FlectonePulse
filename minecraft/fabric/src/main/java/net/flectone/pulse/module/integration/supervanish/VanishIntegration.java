@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.drex.vanish.api.VanishAPI;
 import me.drex.vanish.api.VanishEvents;
 import net.flectone.pulse.FabricFlectonePulse;
@@ -18,7 +19,7 @@ import net.minecraft.server.MinecraftServer;
 public class VanishIntegration implements FIntegration {
 
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Inject
     public VanishIntegration(FabricFlectonePulse fabricFlectonePulse,
@@ -41,13 +42,8 @@ public class VanishIntegration implements FIntegration {
     }
 
     @Override
-    public void hook() {
-        fLogger.info("✔ Vanish hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Vanish unhooked");
+    public String getIntegrationName() {
+        return "Vanish";
     }
 
     public boolean isVanished(FEntity sender) {
@@ -56,4 +52,5 @@ public class VanishIntegration implements FIntegration {
 
         return VanishAPI.isVanished(minecraftServer, sender.uuid());
     }
+
 }

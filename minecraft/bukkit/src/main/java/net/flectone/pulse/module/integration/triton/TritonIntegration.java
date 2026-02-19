@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
 import com.rexcantor64.triton.api.players.LanguagePlayer;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -20,16 +21,11 @@ import org.jspecify.annotations.Nullable;
 public class TritonIntegration implements Listener, FIntegration {
 
     private final FPlayerService fPlayerService;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Override
-    public void hook() {
-        fLogger.info("✔ Triton hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Triton unhooked");
+    public String getIntegrationName() {
+        return "Triton";
     }
 
     @EventHandler
@@ -49,4 +45,5 @@ public class TritonIntegration implements Listener, FIntegration {
 
         return languagePlayer.getLanguageId();
     }
+
 }

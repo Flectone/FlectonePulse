@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.geyser;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,24 +14,24 @@ import org.geysermc.geyser.api.GeyserApi;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GeyserIntegration implements FIntegration {
 
-    private final FLogger fLogger;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
 
     private GeyserApi geyserApi;
 
     @Override
+    public String getIntegrationName() {
+        return "Geyser";
+    }
+
+    @Override
     public void hook() {
         this.geyserApi = GeyserApi.api();
-        fLogger.info("✔ Geyser hooked");
+        logHook();
     }
 
     public void hookLater() {
         taskScheduler.runAsyncLater(this::hook);
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Geyser unhooked");
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {

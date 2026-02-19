@@ -9,6 +9,7 @@ import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
@@ -32,16 +33,11 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InteractiveChatIntegration implements FIntegration, PulseListener {
 
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Override
-    public void hook() {
-        fLogger.info("✔ InteractiveChat hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ InteractiveChat unhooked");
+    public String getIntegrationName() {
+        return "InteractiveChat";
     }
 
     // from InteractiveChat
@@ -121,4 +117,5 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
 
         return event.withContext(messageContext.withMessage(message));
     }
+
 }

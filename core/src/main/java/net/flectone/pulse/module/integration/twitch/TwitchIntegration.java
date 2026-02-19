@@ -31,10 +31,15 @@ public class TwitchIntegration implements FIntegration {
     private final ChannelMessageListener channelMessageListener;
     private final PlatformServerAdapter platformServerAdapter;
     private final SystemVariableResolver systemVariableResolver;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private TwitchClient twitchClient;
+
+    @Override
+    public String getIntegrationName() {
+        return "Twitch";
+    }
 
     @Override
     public void hook() {
@@ -79,7 +84,7 @@ public class TwitchIntegration implements FIntegration {
             twitchClient.getEventManager().onEvent(channelMessageListener.getEventType(), channelMessageListener::execute);
         }
 
-        fLogger.info("✔ Twitch integration enabled");
+        logHook();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
@@ -108,6 +113,6 @@ public class TwitchIntegration implements FIntegration {
 
         twitchClient.close();
 
-        fLogger.info("✖ Twitch integration disabled");
+        logUnhook();
     }
 }

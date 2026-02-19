@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.plasmovoice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -35,20 +36,25 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     private final MuteChecker muteChecker;
     private final BrandRender brandRender;
     private final MessagePipeline messagePipeline;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private boolean enable;
 
     @Override
+    public String getIntegrationName() {
+        return "PlasmoVoice";
+    }
+
+    @Override
     public void hook() {
         enable = true;
-        fLogger.info("✔ PlasmoVoice hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         enable = false;
-        fLogger.info("✖ PlasmoVoice unhooked");
+        logUnhook();
     }
 
     @EventSubscribe

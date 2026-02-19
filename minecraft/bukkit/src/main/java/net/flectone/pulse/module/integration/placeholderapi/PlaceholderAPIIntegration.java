@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.placeholderapi;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
@@ -48,7 +49,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final PlaceholderAPIModule placeholderAPIModule;
     private final TaskScheduler taskScheduler;
     private final MuteModule muteModule;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Override
     public @NonNull String getIdentifier() {
@@ -66,15 +67,20 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     }
 
     @Override
+    public String getIntegrationName() {
+        return "PlaceholderAPI";
+    }
+
+    @Override
     public void hook() {
         taskScheduler.runSync(this::register);
-        fLogger.info("✔ PlaceholderAPI hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         taskScheduler.runSync(this::unregister);
-        fLogger.info("✖ PlaceholderAPI unhooked");
+        logUnhook();
     }
 
     @Override

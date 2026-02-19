@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.luckperms;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,24 +21,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LuckPermsIntegration implements FIntegration {
 
-    private final FLogger fLogger;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
 
     private LuckPerms luckPerms;
 
     @Override
+    public String getIntegrationName() {
+        return "LuckPerms";
+    }
+
+    @Override
     public void hook() {
         this.luckPerms = LuckPermsProvider.get();
-        fLogger.info("✔ LuckPerms hooked");
+        logHook();
     }
 
     public void hookLater() {
         taskScheduler.runAsyncLater(this::hook);
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ LuckPerms unhooked");
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permission) {

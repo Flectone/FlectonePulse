@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.VanishAPI;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -23,16 +24,11 @@ public class SuperVanishIntegration implements Listener, FIntegration {
     private final FPlayerService fPlayerService;
     private final QuitModule quitModule;
     private final JoinModule joinModule;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Override
-    public void hook() {
-        fLogger.info("✔ SuperVanish hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ SuperVanish unhooked");
+    public String getIntegrationName() {
+        return "SuperVanish";
     }
 
     @EventHandler
@@ -58,4 +54,5 @@ public class SuperVanishIntegration implements Listener, FIntegration {
     public boolean isVanished(FEntity sender) {
         return VanishAPI.isInvisibleOffline(sender.uuid());
     }
+
 }

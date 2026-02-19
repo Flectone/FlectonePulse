@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import lombok.Getter;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -27,22 +28,17 @@ import java.util.regex.Pattern;
 public class MiniPlaceholdersIntegration implements FIntegration, PulseListener {
 
     private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
-
-    private final FLogger fLogger;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
+
+    @Getter private final FLogger fLogger;
 
     public MiniPlaceholdersIntegration(FLogger fLogger) {
         this.fLogger = fLogger;
     }
 
     @Override
-    public void hook() {
-        fLogger.info("✔ MiniPlaceholders hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ MiniPlaceholders unhooked");
+    public String getIntegrationName() {
+        return "MiniPlaceholders";
     }
 
     @Pulse(priority = Event.Priority.HIGH)
@@ -100,4 +96,5 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         matcher.appendTail(result);
         return result.toString();
     }
+
 }

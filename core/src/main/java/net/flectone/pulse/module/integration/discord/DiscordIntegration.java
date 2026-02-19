@@ -56,7 +56,7 @@ public class DiscordIntegration implements FIntegration {
     private final MessageCreateListener messageCreateListener;
     private final MessagePipeline messagePipeline;
     private final SystemVariableResolver systemVariableResolver;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private DiscordClient discordClient;
@@ -241,6 +241,11 @@ public class DiscordIntegration implements FIntegration {
     }
 
     @Override
+    public String getIntegrationName() {
+        return "Discord";
+    }
+
+    @Override
     public void hook() {
         sender = FPlayer.builder().name(fileFacade.localization().integration().discord().senderName()).build();
 
@@ -312,7 +317,7 @@ public class DiscordIntegration implements FIntegration {
             }
         }
 
-        fLogger.info("Discord integration enabled");
+        logHook();
     }
 
     @Override
@@ -322,7 +327,7 @@ public class DiscordIntegration implements FIntegration {
         gateway.logout().block();
         channelWebhooks.clear();
 
-        fLogger.info("Discord integration disabled");
+        logUnhook();
     }
 
     public void updateChannelInfo() {

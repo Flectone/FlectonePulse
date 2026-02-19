@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
@@ -44,7 +45,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final HytalePlaceholderAPIModule placeholderAPIModule;
     private final TaskScheduler taskScheduler;
     private final MuteModule muteModule;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Override
     public @NonNull String getIdentifier() {
@@ -62,15 +63,20 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     }
 
     @Override
+    public String getIntegrationName() {
+        return "PlaceholderAPI";
+    }
+
+    @Override
     public void hook() {
         taskScheduler.runSync(this::register);
-        fLogger.info("✔ PlaceholderAPI hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         taskScheduler.runSync(this::unregister);
-        fLogger.info("✖ PlaceholderAPI unhooked");
+        logUnhook();
     }
 
     @Override

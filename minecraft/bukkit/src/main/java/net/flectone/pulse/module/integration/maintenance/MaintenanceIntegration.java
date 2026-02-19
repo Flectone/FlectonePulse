@@ -13,23 +13,28 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceIntegration implements FIntegration {
 
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
+
+    @Getter private boolean hooked;
 
     private Maintenance maintenance;
 
-    @Getter private boolean hooked;
+    @Override
+    public String getIntegrationName() {
+        return "Maintenance";
+    }
 
     @Override
     public void hook() {
         hooked = true;
         maintenance = MaintenanceProvider.get();
-        fLogger.info("✔ Maintenance hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         hooked = false;
-        fLogger.info("✖ Maintenance unhooked");
+        logUnhook();
     }
 
     public boolean isMaintenance() {

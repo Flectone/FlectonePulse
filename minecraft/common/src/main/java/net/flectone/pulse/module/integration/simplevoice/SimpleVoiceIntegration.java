@@ -7,6 +7,7 @@ import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -28,7 +29,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final MuteChecker muteChecker;
     private final BrandRender brandRender;
     private final MessagePipeline messagePipeline;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private boolean enable;
 
@@ -52,15 +53,20 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     }
 
     @Override
+    public String getIntegrationName() {
+        return "SimpleVoice";
+    }
+
+    @Override
     public void hook() {
         enable = true;
-        fLogger.info("✔ SimpleVoice hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         enable = false;
-        fLogger.info("✖ SimpleVoice unhooked");
+        logUnhook();
     }
 
     public void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {

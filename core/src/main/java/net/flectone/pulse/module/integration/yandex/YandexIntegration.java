@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.yandex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.file.FileFacade;
@@ -18,7 +19,7 @@ import java.time.Duration;
 public class YandexIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     private ServiceFactory factory;
 
@@ -38,6 +39,11 @@ public class YandexIntegration implements FIntegration {
     }
 
     @Override
+    public String getIntegrationName() {
+        return "Yandex";
+    }
+
+    @Override
     public void hook() {
         try {
             factory = ServiceFactory.builder()
@@ -45,14 +51,10 @@ public class YandexIntegration implements FIntegration {
                     .requestTimeout(Duration.ofMinutes(1))
                     .build();
 
-            fLogger.info("✔ Yandex integration enabled");
+            logHook();
         } catch (Exception e) {
             fLogger.warning(e);
         }
     }
 
-    @Override
-    public void unhook() {
-        fLogger.info("✖ Yandex integration disabled");
-    }
 }

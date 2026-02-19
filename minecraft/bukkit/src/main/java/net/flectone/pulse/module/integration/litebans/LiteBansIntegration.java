@@ -15,20 +15,25 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LiteBansIntegration implements FIntegration {
 
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
 
     @Override
+    public String getIntegrationName() {
+        return "LiteBans";
+    }
+
+    @Override
     public void hook() {
         hooked = true;
-        fLogger.info("✔ LiteBans hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         hooked = false;
-        fLogger.info("✖ LiteBans unhooked");
+        logUnhook();
     }
 
     public boolean isMuted(FEntity fEntity) {

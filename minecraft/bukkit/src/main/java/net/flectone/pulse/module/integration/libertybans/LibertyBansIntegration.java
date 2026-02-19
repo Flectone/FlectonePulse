@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.libertybans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -25,10 +26,15 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LibertyBansIntegration implements FIntegration {
 
-    private final FLogger fLogger;
     private final FPlayerService fPlayerService;
+    @Getter private final FLogger fLogger;
 
     private LibertyBans libertyBans;
+
+    @Override
+    public String getIntegrationName() {
+        return "LibertyBans";
+    }
 
     @Override
     public void hook() {
@@ -38,12 +44,7 @@ public class LibertyBansIntegration implements FIntegration {
 
         libertyBans = optionalLibertyBans.get();
 
-        fLogger.info("✔ LibertyBans hooked");
-    }
-
-    @Override
-    public void unhook() {
-        fLogger.info("✖ LibertyBans unhooked");
+        logHook();
     }
 
     public boolean isHooked() {

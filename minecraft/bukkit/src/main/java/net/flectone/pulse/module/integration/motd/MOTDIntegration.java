@@ -11,20 +11,24 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MOTDIntegration implements FIntegration {
 
-    private final FLogger fLogger;
+    @Getter private final FLogger fLogger;
 
-    @Getter
-    private boolean hooked;
+    @Getter private boolean hooked;
+
+    @Override
+    public String getIntegrationName() {
+        return "MOTD";
+    }
 
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("✔ MOTD hooked");
+        logHook();
     }
 
     @Override
     public void unhook() {
         hooked = false;
-        fLogger.info("✖ MOTD unhooked");
+        logUnhook();
     }
 }

@@ -7,6 +7,7 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
@@ -45,10 +46,15 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
-    private final FLogger fLogger;
     private final PermissionChecker permissionChecker;
     private final MuteModule muteModule;
     private final TaskScheduler taskScheduler;
+    @Getter private final FLogger fLogger;
+
+    @Override
+    public String getIntegrationName() {
+        return "TextPlaceholderAPI";
+    }
 
     @Override
     public void hook() {
@@ -74,7 +80,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"));
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"));
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "tps"));
-        fLogger.info("✖ Text Placeholder API unhooked");
+
+        logUnhook();
     }
 
     @Pulse(priority = Event.Priority.LOW)
@@ -160,7 +167,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 PlaceholderResult.value(platformServerAdapter.getTPS())
         );
 
-        fLogger.info("✔ Text Placeholder API hooked");
+        logHook();
     }
 
     private PlaceholderResult fColorPlaceholder(PlaceholderContext context, String argument, FColor.Type... types) {
