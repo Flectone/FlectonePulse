@@ -617,7 +617,16 @@ public class FileMigrator {
             newLocalizations.put(localization.language(), localization);
         }
 
-        return files.withLocalizations(newLocalizations);
+        return files
+                .withLocalizations(newLocalizations)
+                .withMessage(files.message().withFormat(
+                        files.message().format().withScoreboard(
+                                files.message().format().scoreboard()
+                                        .withPrefix(replaceOldTags.apply(files.message().format().scoreboard().prefix()))
+                                        .withSuffix(replaceOldTags.apply(files.message().format().scoreboard().suffix()))
+                                )
+                        )
+                );
     }
 
 }
