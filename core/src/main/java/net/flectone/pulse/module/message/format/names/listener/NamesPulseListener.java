@@ -8,8 +8,8 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
-import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton

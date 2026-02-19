@@ -1,10 +1,12 @@
 package net.flectone.pulse;
 
+import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.event.*;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;

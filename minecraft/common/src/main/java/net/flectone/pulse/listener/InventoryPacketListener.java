@@ -9,8 +9,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.model.inventory.Inventory;
+import net.flectone.pulse.platform.controller.InventoryController;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

@@ -9,7 +9,9 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 @Getter
 public class TicTacToe {

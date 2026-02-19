@@ -13,8 +13,8 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
 

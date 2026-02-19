@@ -6,8 +6,8 @@ import litebans.api.Database;
 import litebans.api.Entry;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
 

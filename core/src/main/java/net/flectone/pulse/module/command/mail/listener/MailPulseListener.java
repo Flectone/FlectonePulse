@@ -9,8 +9,8 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
-import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.MailModule;
+import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.service.FPlayerService;
 

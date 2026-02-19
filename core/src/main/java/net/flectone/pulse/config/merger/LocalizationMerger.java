@@ -1,7 +1,9 @@
 package net.flectone.pulse.config.merger;
 
 import net.flectone.pulse.config.Localization;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 /**
  * MapStruct mapper for merging {@link Localization} configuration objects.

@@ -25,7 +25,10 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

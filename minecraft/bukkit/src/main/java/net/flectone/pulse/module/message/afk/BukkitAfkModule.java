@@ -3,13 +3,13 @@ package net.flectone.pulse.module.message.afk;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 public class BukkitAfkModule extends AfkModule {

@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.join;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
