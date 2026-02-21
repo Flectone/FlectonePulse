@@ -164,7 +164,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
                             return Tag.selfClosingInserting(displayNameComponent);
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.PREFIX.getTagName(), (argumentQueue, context) -> {
+                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (argumentQueue, context) -> {
                             String prefix = integrationModule.getPrefix(fPlayer);
                             if (StringUtils.isEmpty(prefix)) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -178,7 +178,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
                             Component prefixComponent = messagePipeline.build(prefixContext);
                             return Tag.inserting(prefixComponent);
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), (argumentQueue, context) -> {
+                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (argumentQueue, context) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
                             if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
 

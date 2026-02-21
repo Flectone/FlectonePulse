@@ -23,6 +23,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -34,6 +35,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -176,7 +178,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
         if (isModuleDisabledFor(fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.STREAM, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
@@ -186,7 +188,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(prefixContext));
-        });
+        }));
     }
 
     public Function<Localization.Command.Stream, String> replaceUrls(String string) {

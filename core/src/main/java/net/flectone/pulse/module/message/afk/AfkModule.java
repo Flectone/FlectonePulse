@@ -25,11 +25,13 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -90,7 +92,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         if (isModuleDisabledFor(sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.AFK, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (argumentQueue, context) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();
@@ -101,7 +103,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(afkContext));
-        });
+        }));
     }
 
     public void remove(@NonNull String action, @NonNull FPlayer fPlayer) {

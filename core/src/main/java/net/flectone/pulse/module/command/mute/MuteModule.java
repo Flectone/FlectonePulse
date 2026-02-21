@@ -24,12 +24,14 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 @Singleton
@@ -151,7 +153,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MUTE, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.MUTE.getTagName(), "mute_suffix"), (argumentQueue, context) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
             if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
@@ -161,7 +163,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(suffixContext));
-        });
+        }));
     }
 
     public String getMuteSuffix(FPlayer fPlayer, FPlayer fReceiver) {
