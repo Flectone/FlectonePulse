@@ -161,7 +161,7 @@ public interface TaskScheduler {
      * @param period period in ticks
      */
     default void runAsyncTimer(SchedulerRunnable runnable, long period) {
-        runAsyncTimer(runnable, 0L, period);
+        runAsyncTimer(runnable, 5L, period);
     }
 
     /**
@@ -171,7 +171,7 @@ public interface TaskScheduler {
      * @param period period in ticks
      */
     default void runSyncTimer(SchedulerRunnable runnable, long period) {
-        runSyncTimer(runnable, 0L, period);
+        runSyncTimer(runnable, 5L, period);
     }
 
     /**
@@ -182,7 +182,7 @@ public interface TaskScheduler {
      * @param period period in ticks
      */
     default void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long period) {
-        runRegionTimer(fPlayer, runnable, 0L, period);
+        runRegionTimer(fPlayer, runnable, 5L, period);
     }
 
     /**
