@@ -87,9 +87,9 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(ProxyRegistry.class).to(BukkitProxyRegistry.class);
 
         if (reflectionResolver.hasClass("com.mojang.brigadier.arguments.ArgumentType")) {
-            bind(MinecraftCommandRegistry.class).to(ModernBukkitCommandRegistry.class);
+            bind(CommandRegistry.class).to(ModernBukkitCommandRegistry.class);
         } else {
-            bind(MinecraftCommandRegistry.class).to(LegacyBukkitCommandRegistry.class);
+            bind(CommandRegistry.class).to(LegacyBukkitCommandRegistry.class);
         }
 
         // Checkers and utilities

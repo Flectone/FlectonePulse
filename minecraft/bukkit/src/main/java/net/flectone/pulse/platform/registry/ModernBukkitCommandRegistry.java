@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities;
 
 @Singleton
-public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
+public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry implements BrigadierCommandRegistry {
 
     @Inject
     public ModernBukkitCommandRegistry(FileFacade fileFacade,

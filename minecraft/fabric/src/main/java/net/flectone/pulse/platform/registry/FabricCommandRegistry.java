@@ -23,7 +23,7 @@ import org.incendo.cloud.setting.ManagerSetting;
 import java.util.function.Function;
 
 @Singleton
-public class FabricCommandRegistry implements MinecraftCommandRegistry {
+public class FabricCommandRegistry implements BrigadierCommandRegistry {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PermissionChecker permissionChecker;

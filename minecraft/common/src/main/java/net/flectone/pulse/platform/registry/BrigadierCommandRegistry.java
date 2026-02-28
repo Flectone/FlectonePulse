@@ -11,7 +11,7 @@ import org.incendo.cloud.brigadier.BrigadierSetting;
 import org.incendo.cloud.brigadier.CloudBrigadierManager;
 import org.incendo.cloud.parser.standard.StringParser;
 
-public interface MinecraftCommandRegistry extends CommandRegistry {
+public interface BrigadierCommandRegistry extends CommandRegistry {
 
     /**
      * Configures Brigadier mappings for custom argument parsers.

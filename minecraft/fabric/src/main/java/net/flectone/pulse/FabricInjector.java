@@ -45,7 +45,7 @@ public class FabricInjector extends MinecraftPlatformInjector {
         bind(PermissionRegistry.class).to(FabricPermissionRegistry.class);
         bind(ProxyRegistry.class).to(FabricProxyRegistry.class);
         bind(MinecraftListenerRegistry.class).to(FabricListenerRegistry.class);
-        bind(MinecraftCommandRegistry.class).to(FabricCommandRegistry.class);
+        bind(CommandRegistry.class).to(FabricCommandRegistry.class);
 
         // checkers and utilities
         bind(PermissionChecker.class).to(FabricPermissionChecker.class);

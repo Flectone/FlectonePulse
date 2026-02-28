@@ -22,7 +22,7 @@ import org.incendo.cloud.setting.ManagerSetting;
 import java.util.function.Function;
 
 @Singleton
-public class LegacyBukkitCommandRegistry implements MinecraftCommandRegistry {
+public class LegacyBukkitCommandRegistry implements CommandRegistry {
 
     private final FileFacade fileFacade;
     private final Plugin plugin;
