@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
@@ -48,7 +50,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final PermissionChecker permissionChecker;
     private final PlaceholderAPIModule placeholderAPIModule;
     private final TaskScheduler taskScheduler;
-    private final MuteModule muteModule;
+    private final Provider<MuteModule> muteModuleProvider;
+    private final Provider<LuckPermsModule> luckPermsModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -91,7 +94,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         params = params.toLowerCase();
         if (params.equalsIgnoreCase("mute_suffix")) {
-            return muteModule.getMuteSuffix(fPlayer, fPlayer);
+            return muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer);
+        }
+
+        if (params.startsWith("weight_replacement")) {
+            String weightReplacement = params.substring(params.lastIndexOf("_") + 1);
+            if (StringUtils.isEmpty(weightReplacement)) return null;
+
+            return luckPermsModuleProvider.get().getReplacementValue(fPlayer, weightReplacement);
         }
 
         if (params.startsWith("fcolor")) {

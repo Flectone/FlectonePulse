@@ -115,7 +115,14 @@ public class LuckPermsModule extends AbstractModule {
     }
 
     @Nullable
-    private String getReplacementValue(FPlayer fPlayer, FPlayer fReceiver, String name) {
+    public String getReplacementValue(FPlayer fPlayer, String name) {
+        return getReplacementValue(fPlayer, fPlayer, name);
+    }
+
+    @Nullable
+    public String getReplacementValue(FPlayer fPlayer, FPlayer fReceiver, String name) {
+        if (!isEnable()) return null;
+
         Map<Integer, String> weightReplacement = fileFacade.localization(fReceiver).integration().luckperms().weightReplacement().get(name);
         if (weightReplacement == null || weightReplacement.isEmpty()) return null;
 

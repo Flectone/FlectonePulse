@@ -21,6 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
@@ -47,7 +48,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final PlatformServerAdapter platformServerAdapter;
     private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
     private final PermissionChecker permissionChecker;
-    private final MuteModule muteModule;
+    private final Provider<MuteModule> muteModuleProvider;
+    private final Provider<LuckPermsModule> luckPermsModuleProvider;
     private final TaskScheduler taskScheduler;
     @Getter private final FLogger fLogger;
 
@@ -110,8 +112,12 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-            return PlaceholderResult.value(muteModule.getMuteSuffix(fPlayer, fPlayer));
+            return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
         });
+
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "weight_replacement"), (context, argument) ->
+                PlaceholderResult.value(luckPermsModuleProvider.get().getReplacementValue(fPlayerMapper.map(context.source()), argument))
+        );
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)
