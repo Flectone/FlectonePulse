@@ -140,6 +140,7 @@ public class MessagePipeline {
         QUESTION,
         TRANSLATION,
         WORLD,
+        WEIGHT_REPLACEMENT,
         PLAYER_HEAD,
         PLAYER_HEAD_OR,
         SPRITE,

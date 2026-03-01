@@ -70,6 +70,7 @@ litebans:
 luckperms:
   enable: true
   tab_sort: true
+  use_weight_replacement: true
 maintenance:
   enable: true
   disable_flectonepulse_maintenance: true

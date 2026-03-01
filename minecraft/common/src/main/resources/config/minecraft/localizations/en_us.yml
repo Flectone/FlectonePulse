@@ -449,6 +449,12 @@ integration:
         content: "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><reply><message>"
       CHAT_GLOBAL:
         content: "<final_message>"
+  luckperms:
+    weight_replacement:
+      example:
+        0: "[Player]"
+        10: "[Vip]"
+        100: "[Admin]"
   telegram:
     null_player: "This player does not exist"
     sender_name: "Telegram"

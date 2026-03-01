@@ -196,11 +196,14 @@ public interface LocalizationMerger {
     Localization.Command.Warnlist mergeWarnlist(@MappingTarget Localization.Command.Warnlist.WarnlistBuilder target, Localization.Command.Warnlist warnlist);
 
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
+    @Mapping(target = "luckperms", expression = "java(mergeLuckperms(target.build().luckperms().toBuilder(), source.luckperms()))")
     @Mapping(target = "telegram", expression = "java(mergeTelegram(target.build().telegram().toBuilder(), source.telegram()))")
     @Mapping(target = "twitch", expression = "java(mergeTwitch(target.build().twitch().toBuilder(), source.twitch()))")
     Localization.Integration mergeIntegration(@MappingTarget Localization.Integration.IntegrationBuilder target, Localization.Integration source);
 
     Localization.Integration.Discord mergeDiscord(@MappingTarget Localization.Integration.Discord.DiscordBuilder target, Localization.Integration.Discord discord);
+
+    Localization.Integration.Luckperms mergeLuckperms(@MappingTarget Localization.Integration.Luckperms.LuckpermsBuilder target, Localization.Integration.Luckperms luckperms);
 
     Localization.Integration.Telegram mergeTelegram(@MappingTarget Localization.Integration.Telegram.TelegramBuilder target, Localization.Integration.Telegram telegram);
 

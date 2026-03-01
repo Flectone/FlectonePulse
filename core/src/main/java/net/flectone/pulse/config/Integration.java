@@ -237,7 +237,11 @@ public record Integration(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Luckperms(Boolean enable, Boolean tabSort) implements EnableSetting {
+    public record Luckperms(
+            Boolean enable,
+            Boolean tabSort,
+            Boolean useWeightReplacement
+    ) implements EnableSetting {
     }
 
     @With
