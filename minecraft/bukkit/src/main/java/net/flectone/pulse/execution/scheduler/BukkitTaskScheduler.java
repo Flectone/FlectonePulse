@@ -12,6 +12,7 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.Consumer;
@@ -179,6 +180,8 @@ public class BukkitTaskScheduler implements TaskScheduler {
         return () -> {
             try {
                 runnable.run();
+            } catch (IllegalPluginAccessException ignore) {
+                // ignore shit exception
             } catch (SchedulerTaskException e) {
                 fLogger.warning(e);
             }
