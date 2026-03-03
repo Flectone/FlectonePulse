@@ -378,6 +378,7 @@ chatsetting:
     enable: false
 clearchat:
   enable: true
+  length: 100
   aliases:
   - "clearchat"
   destination:

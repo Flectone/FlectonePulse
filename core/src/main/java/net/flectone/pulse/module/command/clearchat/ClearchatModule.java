@@ -124,7 +124,7 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Clearchat>builder()
                 .sender(fPlayer)
-                .format("<br> ".repeat(100))
+                .format("<br> ".repeat(config().length()))
                 .build()
         );
 

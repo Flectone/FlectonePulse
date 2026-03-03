@@ -359,6 +359,7 @@ public record Command(
     @Jacksonized
     public record Clearchat(
             Boolean enable,
+            Integer length,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
