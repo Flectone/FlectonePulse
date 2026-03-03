@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -40,14 +41,15 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptId = addPrompt(1, Localization.Command.Prompt::id);
-        registerCommand(manager -> manager
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptId = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::id);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptId, commandParserProvider.integerParser())
@@ -55,12 +57,19 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String target = getArgument(commandContext, 0);
+        String target = commandModuleController.getArgument(this, commandContext, 0);
 
-        String promptId = getPrompt(1);
+        String promptId = commandModuleController.getPrompt(this, 1);
         Optional<Integer> optionalId = commandContext.optional(promptId);
         int id = optionalId.orElse(-1);
 

@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -16,6 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
+public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -52,20 +52,28 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::type);
-        String promptUrl = addPrompt(1, Localization.Command.Prompt::url);
-        registerCommand(manager -> manager
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptUrl = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::url);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
 
         listenerRegistry.register(StreamPulseListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -79,7 +87,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String type = getArgument(commandContext, 0);
+        String type = commandModuleController.getArgument(this, commandContext, 0);
         Boolean needStart = switch (type) {
             case "start" -> true;
             case "end" -> false;
@@ -116,7 +124,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         );
 
         if (needStart) {
-            String promptUrl = getPrompt(1);
+            String promptUrl = commandModuleController.getPrompt(this, 1);
             Optional<String> optionalUrl = commandContext.optional(promptUrl);
             String rawString = optionalUrl.orElse("");
 

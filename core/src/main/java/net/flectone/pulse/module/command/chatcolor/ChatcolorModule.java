@@ -17,6 +17,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -44,15 +45,16 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::type);
-        String promptColor = addPrompt(1, Localization.Command.Prompt::color);
-        String promptPlayer = addPrompt(2, Localization.Command.Prompt::player);
-        registerCommand(commandBuilder -> {
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptColor = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::color);
+        String promptPlayer = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::player);
+        commandModuleController.registerCommand(this, commandBuilder -> {
             commandBuilder = commandBuilder
                     .permission(permission().name())
                     .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion());
@@ -63,6 +65,13 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
             return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()));
         });
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -83,7 +92,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String type = getArgument(commandContext, 0);
+        String type = commandModuleController.getArgument(this, commandContext, 0);
         Optional<FColor.Type> fColorType = switch (type.toLowerCase()) {
             case "out" -> Optional.of(FColor.Type.OUT);
             case "see" -> Optional.of(FColor.Type.SEE);
@@ -104,7 +113,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fTarget = fPlayer;
 
-        String promptPlayer = getPrompt(2);
+        String promptPlayer = commandModuleController.getPrompt(this, 2);
         Optional<String> optionalTarget = commandContext.optional(promptPlayer);
         if (optionalTarget.isPresent() && hasOtherPermission) {
             fTarget = fPlayerService.getFPlayer(optionalTarget.get());
@@ -113,7 +122,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             }
         }
 
-        String promptColor = getPrompt(1);
+        String promptColor = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalClear = commandContext.optional(promptColor + " 1");
         if (optionalClear.isPresent() && optionalClear.get().equalsIgnoreCase("clear")) {
             setColors(fTarget, fColorType.get(), Collections.emptySet());

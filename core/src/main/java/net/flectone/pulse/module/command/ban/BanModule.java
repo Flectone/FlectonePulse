@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -48,15 +49,16 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptReason = addPrompt(1, Localization.Command.Prompt::reason);
-        String promptTime = addPrompt(2, Localization.Command.Prompt::time);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
+        String promptTime = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::time);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
@@ -66,12 +68,19 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String target = getArgument(commandContext, 0);
-        String promptReason = getPrompt(1);
-        String promptTime = getPrompt(2);
+        String target = commandModuleController.getArgument(this, commandContext, 0);
+        String promptReason = commandModuleController.getPrompt(this, 1);
+        String promptTime = commandModuleController.getPrompt(this, 2);
 
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));

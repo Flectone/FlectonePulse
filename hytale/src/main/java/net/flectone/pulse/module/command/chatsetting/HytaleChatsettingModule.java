@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.chatsetting.builder.HytaleMenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -30,8 +31,9 @@ public class HytaleChatsettingModule extends ChatsettingModule {
                                    SoundPlayer soundPlayer,
                                    TaskScheduler taskScheduler,
                                    ModuleController moduleController,
+                                   CommandModuleController commandModuleController,
                                    Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider) {
-        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController);
+        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
 
         this.hytaleMenuBuilderProvider = hytaleMenuBuilderProvider;
     }

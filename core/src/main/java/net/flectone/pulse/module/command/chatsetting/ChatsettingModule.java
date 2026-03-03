@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -42,6 +43,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     private final SoundPlayer soundPlayer;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
@@ -51,7 +53,8 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                                 ProxyRegistry proxyRegistry,
                                 SoundPlayer soundPlayer,
                                 TaskScheduler taskScheduler,
-                                ModuleController moduleController) {
+                                ModuleController moduleController,
+                                CommandModuleController commandModuleController) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
@@ -61,21 +64,29 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         this.soundPlayer = soundPlayer;
         this.taskScheduler = taskScheduler;
         this.moduleController = moduleController;
+        this.commandModuleController = commandModuleController;
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptType = addPrompt(1, Localization.Command.Prompt::type);
-        String promptValue = addPrompt(2, Localization.Command.Prompt::value);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptType = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::type);
+        String promptValue = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::value);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()))
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -100,7 +111,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (permissionChecker.check(fPlayer, permission().other())) {
-            String promptPlayer = getPrompt(0);
+            String promptPlayer = commandModuleController.getPrompt(this, 0);
             Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
             if (optionalPlayer.isPresent()) {
                 executeOther(fPlayer, optionalPlayer.get(), commandContext);
@@ -139,7 +150,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
         fTarget = fPlayerService.loadSettings(fTarget);
 
-        String promptType = getPrompt(1);
+        String promptType = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalType = commandContext.optional(promptType);
 
         if (optionalType.isEmpty()) {
@@ -149,7 +160,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
         SettingText settingText = SettingText.fromString(optionalType.get());
         if (settingText != null) {
-            String promptValue = getPrompt(2);
+            String promptValue = commandModuleController.getPrompt(this, 2);
             Optional<String> optionalValue = commandContext.optional(promptValue);
 
             saveSetting(fTarget.withSetting(settingText, optionalValue.orElse(null)), settingText);

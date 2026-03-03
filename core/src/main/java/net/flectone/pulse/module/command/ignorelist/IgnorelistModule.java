@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -44,16 +45,24 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptNumber = addPrompt(0, Localization.Command.Prompt::number);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptNumber = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::number);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -77,7 +86,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
-        String prompt = getPrompt(0);
+        String prompt = commandModuleController.getPrompt(this, 0);
         Optional<Integer> optionalPage = commandContext.optional(prompt);
         Integer page = optionalPage.orElse(1);
 
@@ -91,7 +100,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             return;
         }
 
-        String commandLine = "/" + getCommandName();
+        String commandLine = "/" + commandModuleController.getCommandName(this);
 
         List<Ignore> finalIgnoreList = ignoreList.stream()
                 .skip((long) (page - 1) * perPage)

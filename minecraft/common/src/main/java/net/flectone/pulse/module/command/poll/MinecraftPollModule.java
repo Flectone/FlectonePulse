@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -20,6 +21,7 @@ import org.incendo.cloud.meta.CommandMeta;
 @Singleton
 public class MinecraftPollModule extends PollModule {
 
+    private final CommandModuleController commandModuleController;
     private final PacketProvider packetProvider;
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
 
@@ -32,11 +34,13 @@ public class MinecraftPollModule extends PollModule {
                                MessagePipeline messagePipeline,
                                MessageDispatcher messageDispatcher,
                                ModuleController moduleController,
+                               CommandModuleController commandModuleController,
                                FLogger fLogger,
                                PacketProvider packetProvider,
                                Provider<DialogPollBuilder> dialogPollBuilderProvider) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, fLogger);
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, fLogger);
 
+        this.commandModuleController = commandModuleController;
         this.packetProvider = packetProvider;
         this.dialogPollBuilderProvider = dialogPollBuilderProvider;
     }
@@ -46,8 +50,8 @@ public class MinecraftPollModule extends PollModule {
         super.onEnable();
 
         if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
-            registerCustomCommand(manager ->
-                    manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
+            commandModuleController.registerCustomCommand(manager ->
+                    manager.commandBuilder(commandModuleController.getCommandName(this) + "gui", CommandMeta.empty())
                             .permission(permission().create().name())
                             .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
             );

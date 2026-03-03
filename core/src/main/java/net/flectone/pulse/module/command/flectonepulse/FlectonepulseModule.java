@@ -20,6 +20,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -62,6 +63,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
     private final SimpleDateFormat simpleDateFormat;
     private final @Named("projectPath") Path projectPath;
     private final FLogger fLogger;
@@ -70,9 +72,9 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::type);
-        String file = addPrompt(1, Localization.Command.Prompt::value);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String file = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::value);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(file, commandParserProvider.singleMessageParser())
@@ -90,6 +92,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         if (reflectionResolver.hasClass(SPARK_CLASS)) {
             injector.getInstance(SparkServer.class).onDisable();
         }
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -352,7 +356,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     private String getFilenameExported(CommandContext<FPlayer> commandContext) {
-        Optional<String> optionalFileName = commandContext.optional(getPrompt(1));
+        Optional<String> optionalFileName = commandContext.optional(commandModuleController.getPrompt(this, 1));
         return optionalFileName.orElse("export_" + simpleDateFormat.format(new Date())) + ".zip";
     }
 
@@ -366,7 +370,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     private Operation getOperation(CommandContext<FPlayer> commandContext) {
-        String type = getArgument(commandContext, 0);
+        String type = commandModuleController.getArgument(this, commandContext, 0);
         return Arrays.stream(Operation.values())
                 .filter(operation -> operation.name().equalsIgnoreCase(type))
                 .findAny()

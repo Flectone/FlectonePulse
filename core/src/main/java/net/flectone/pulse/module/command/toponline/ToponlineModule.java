@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -44,23 +45,31 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptNumber = addPrompt(0, Localization.Command.Prompt::number);
-        registerCommand(manager -> manager
+        String promptNumber = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::number);
+        commandModuleController.registerCommand(this, manager -> manager
                .permission(permission().name())
                .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String promptNumber = getPrompt(0);
+        String promptNumber = commandModuleController.getPrompt(this, 0);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
@@ -109,7 +118,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         String footer = StringUtils.replaceEach(localization.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
-                new String[]{"/" + getCommandName(), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
+                new String[]{"/" + commandModuleController.getCommandName(this), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
         MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);

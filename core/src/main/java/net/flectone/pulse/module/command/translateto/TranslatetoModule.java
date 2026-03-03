@@ -15,6 +15,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.constant.MessageType;
@@ -43,19 +44,27 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     private final Provider<TranslateModule> translateModuleProvider;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptLanguage = addPrompt(0, Localization.Command.Prompt::language);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptLanguage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::language);
+        String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                 .required(promptLanguage + " main", commandParserProvider.singleMessageParser(), languageSuggestion())
                 .required(promptLanguage + " target", commandParserProvider.singleMessageParser(), languageSuggestion())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {
@@ -69,11 +78,11 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String promptLanguage = getPrompt(0);
+        String promptLanguage = commandModuleController.getPrompt(this, 0);
         String mainLang = commandContext.get(promptLanguage + " main");
         String targetLang = commandContext.get(promptLanguage + " target");
 
-        String message = getArgument(commandContext, 1);
+        String message = commandModuleController.getArgument(this, commandContext, 1);
 
         String messageToTranslate = translateModuleProvider.get().getMessage(message);
         if (StringUtils.isEmpty(messageToTranslate)) {

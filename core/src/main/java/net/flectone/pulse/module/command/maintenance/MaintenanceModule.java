@@ -19,6 +19,7 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -45,6 +46,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
@@ -61,6 +63,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              MessagePipeline messagePipeline,
                              MessageDispatcher messageDispatcher,
                              ModuleController moduleController,
+                             CommandModuleController commandModuleController,
                              IconUtil iconUtil,
                              FLogger fLogger) {
         this.fileFacade = fileFacade;
@@ -73,6 +76,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
         this.moduleController = moduleController;
+        this.commandModuleController = commandModuleController;
         this.iconUtil = iconUtil;
         this.fLogger = fLogger;
     }
@@ -95,9 +99,16 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
             kickOnlinePlayers(FPlayer.UNKNOWN);
         }
 
-        registerCommand(commandBuilder -> commandBuilder
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override

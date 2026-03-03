@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -43,18 +44,26 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     private final SoundPlayer soundPlayer;
     private final CommandParserProvider commandParserProvider;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptCategory = addPrompt(0, Localization.Command.Prompt::category);
-        String promptNumber = addPrompt(1, Localization.Command.Prompt::number);
-        registerCommand(manager -> manager
+        String promptCategory = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::category);
+        String promptNumber = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::number);
+        commandModuleController.registerCommand(this, manager -> manager
                 .required(promptCategory, commandParserProvider.singleMessageParser(), categorySuggestion())
                 .optional(promptNumber, commandParserProvider.integerParser())
                 .permission(permission().name())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
@@ -69,7 +78,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String category = getArgument(commandContext, 0);
+        String category = commandModuleController.getArgument(this, commandContext, 0);
         if (!config().categories().containsKey(category)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Symbol>builder()
                     .sender(fPlayer)
@@ -84,7 +93,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         int size = symbols.length;
 
-        String promptNumber = getPrompt(1);
+        String promptNumber = commandModuleController.getPrompt(this, 1);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
@@ -124,7 +133,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
         MessageContext lineContext = messagePipeline.createContext(fPlayer, symbolLine.toString());
         component = component.append(messagePipeline.build(lineContext)).append(Component.newline());
 
-        String commandLine = "/" + getCommandName() + " " + category;
+        String commandLine = "/" + commandModuleController.getCommandName(this) + " " + category;
         String footer = StringUtils.replaceEach(
                 localization(fPlayer).footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},

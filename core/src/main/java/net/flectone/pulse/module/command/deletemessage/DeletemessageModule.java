@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.MessageType;
@@ -31,23 +32,31 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     private final ProxySender proxySender;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptId = addPrompt(0, Localization.Command.Prompt::id);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptId = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::id);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptId, UUIDParser.uuidParser())
         );
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        UUID uuid = getArgument(commandContext, 0);
+        UUID uuid = commandModuleController.getArgument(this, commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Deletemessage>builder()
                     .sender(fPlayer)

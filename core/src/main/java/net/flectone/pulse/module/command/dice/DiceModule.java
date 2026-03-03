@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.RandomUtil;
@@ -34,16 +35,24 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     private final RandomUtil randomUtil;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .optional(promptMessage, commandParserProvider.integerParser(config().min(), config().max()))
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -53,7 +62,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         int min = config().min();
         int max = config().max();
 
-        String promptMessage = getPrompt(0);
+        String promptMessage = commandModuleController.getPrompt(this, 0);
         Optional<Integer> optionalNumber = commandContext.optional(promptMessage);
 
         int number = optionalNumber.orElse(min);

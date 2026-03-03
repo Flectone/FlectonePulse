@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.constant.MessageType;
@@ -25,23 +26,31 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                         .permission(permission().name())
                         .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String message = getArgument(commandContext, 0);
+        String message = commandModuleController.getArgument(this, commandContext, 0);
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Broadcast>builder()
                 .sender(fPlayer)

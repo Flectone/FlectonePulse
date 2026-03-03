@@ -21,6 +21,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -59,17 +60,18 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
     private final FLogger fLogger;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptTime = addPrompt(0, Localization.Command.Prompt::time);
-        String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::repeatTime);
-        String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::multipleVote);
-        String promptMessage = addPrompt(3, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptTime = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::time);
+        String promptRepeatTime = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::repeatTime);
+        String promptMultipleVote = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::multipleVote);
+        String promptMessage = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().create().name())
                 .required(promptTime, commandParserProvider.durationParser())
                 .required(promptRepeatTime, commandParserProvider.durationParser())
@@ -77,10 +79,10 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
 
-        String promptId = addPrompt(4, Localization.Command.Prompt::id);
-        String promptNumber = addPrompt(5, Localization.Command.Prompt::number);
-        registerCustomCommand(manager ->
-                manager.commandBuilder(getCommandName() + "vote", CommandMeta.empty())
+        String promptId = commandModuleController.addPrompt(this, 4, Localization.Command.Prompt::id);
+        String promptNumber = commandModuleController.addPrompt(this, 5, Localization.Command.Prompt::number);
+        commandModuleController.registerCustomCommand(manager ->
+                manager.commandBuilder(commandModuleController.getCommandName(this) + "vote", CommandMeta.empty())
                         .permission(permission().name())
                         .required(promptId, commandParserProvider.integerParser())
                         .required(promptNumber, commandParserProvider.integerParser())
@@ -135,6 +137,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         super.onDisable();
 
         pollMap.clear();
+        commandModuleController.clearPrompts(this);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {
@@ -152,8 +155,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void executeVote(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        int id = getArgument(commandContext, 4);
-        int numberVote = getArgument(commandContext, 5);
+        int id = commandModuleController.getArgument(this, commandContext, 4);
+        int numberVote = commandModuleController.getArgument(this, commandContext, 5);
 
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL, dataOutputStream -> {
@@ -171,16 +174,16 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String promptTime = getPrompt(0);
+        String promptTime = commandModuleController.getPrompt(this, 0);
         long time = ((Duration) commandContext.get(promptTime)).toMillis();
 
-        String promptRepeatTime = getPrompt(1);
+        String promptRepeatTime = commandModuleController.getPrompt(this, 1);
         long repeatTime = ((Duration) commandContext.get(promptRepeatTime)).toMillis();
 
-        String promptMultipleVote = getPrompt(2);
+        String promptMultipleVote = commandModuleController.getPrompt(this, 2);
         boolean multipleVote = commandContext.get(promptMultipleVote);
 
-        String promptMessage = getPrompt(3);
+        String promptMessage = commandModuleController.getPrompt(this, 3);
         String rawPoll = commandContext.get(promptMessage);
 
         boolean hasTitle = rawPoll.startsWith("title=");

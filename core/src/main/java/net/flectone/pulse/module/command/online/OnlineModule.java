@@ -15,6 +15,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -42,18 +43,26 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptType = addPrompt(0, Localization.Command.Prompt::type);
-        String promptPlayer = addPrompt(1, Localization.Command.Prompt::player);
-        registerCommand(manager -> manager
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -68,8 +77,8 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String type = getArgument(commandContext, 0);
-        String target = getArgument(commandContext, 1);
+        String type = commandModuleController.getArgument(this, commandContext, 0);
+        String target = commandModuleController.getArgument(this, commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {

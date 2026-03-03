@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.nickname.listener.NicknamePulseListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -52,6 +53,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
     private final FLogger fLogger;
 
     private Pattern allowedPattern;
@@ -69,15 +71,15 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
             }
         }
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
 
-        String promptPlayer = addPrompt(1, Localization.Command.Prompt::player);
-        registerCustomCommand(manager ->
-                manager.commandBuilder(getCommandName() + "other", CommandMeta.empty())
+        String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
+        commandModuleController.registerCustomCommand(manager ->
+                manager.commandBuilder(commandModuleController.getCommandName(this) + "other", CommandMeta.empty())
                         .permission(permission().other().name())
                         .required(promptPlayer, commandParserProvider.playerParser())
                         .required(promptMessage, commandParserProvider.nativeMessageParser())
@@ -88,10 +90,17 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String nick = getArgument(commandContext, 0);
+        String nick = commandModuleController.getArgument(this, commandContext, 0);
 
         changeName(fPlayer, fPlayer, nick);
     }
@@ -99,7 +108,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     public void executeOther(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String playerName = getArgument(commandContext, 1);
+        String playerName = commandModuleController.getArgument(this, commandContext, 1);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown() || !fTarget.isOnline()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
@@ -113,7 +122,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
         fTarget = fPlayerService.loadSettings(fTarget);
 
-        String nick = getArgument(commandContext, 0);
+        String nick = commandModuleController.getArgument(this, commandContext, 0);
 
         changeName(fPlayer, fTarget, nick);
     }

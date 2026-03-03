@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
@@ -36,13 +37,14 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptId = addPrompt(0, Localization.Command.Prompt::id);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptId = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::id);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, input) -> {
                     FPlayer fPlayer = commandContext.sender();
@@ -56,10 +58,17 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        int mailID = getArgument(commandContext, 0);
+        int mailID = commandModuleController.getArgument(this, commandContext, 0);
 
         Optional<Mail> optionalMail = fPlayerService.getSenderMails(fPlayer)
                 .stream()

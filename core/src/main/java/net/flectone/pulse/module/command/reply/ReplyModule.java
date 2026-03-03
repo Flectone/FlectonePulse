@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -29,16 +30,24 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     private final SoundPlayer soundPlayer;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptMessage = addPrompt(0, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -56,7 +65,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
             return;
         }
 
-        String message = getArgument(commandContext, 0);
+        String message = commandModuleController.getArgument(this, commandContext, 0);
 
         tellModule.send(fPlayer, receiverName, message);
 

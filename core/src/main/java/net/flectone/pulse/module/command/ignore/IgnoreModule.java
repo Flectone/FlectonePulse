@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
@@ -34,23 +35,31 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        registerCommand(manager -> manager
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
         );
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String targetName = getArgument(commandContext, 0);
+        String targetName = commandModuleController.getArgument(this, commandContext, 0);
 
         if (fPlayer.name().equalsIgnoreCase(targetName)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignore>builder()

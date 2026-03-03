@@ -16,6 +16,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
@@ -52,15 +53,16 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptMove = addPrompt(1, Localization.Command.Prompt::move);
-        String promptUUID = addPrompt(2, Localization.Command.Prompt::id);
-        registerCommand(manager -> manager
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptMove = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::move);
+        String promptUUID = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::id);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptMove, commandParserProvider.nativeSingleMessageParser())
@@ -73,13 +75,14 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         super.onDisable();
 
         gameMap.clear();
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String player = getArgument(commandContext, 0);
+        String player = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
@@ -107,11 +110,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
-        String promptMove = getPrompt(1);
+        String promptMove = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalMove = commandContext.optional(promptMove);
         String move = optionalMove.orElse(null);
 
-        String promptUUID = getPrompt(2);
+        String promptUUID = commandModuleController.getPrompt(this, 2);
         Optional<UUID> optionalUUID = commandContext.optional(promptUUID);
         UUID uuid = optionalUUID.orElse(null);
 

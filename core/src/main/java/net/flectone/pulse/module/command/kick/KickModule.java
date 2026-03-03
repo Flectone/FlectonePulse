@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -41,14 +42,15 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptMessage, commandParserProvider.nativeMessageParser())
@@ -56,10 +58,17 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String playerName = getArgument(commandContext, 0);
+        String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Kick>builder()
@@ -80,7 +89,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
             return;
         }
 
-        String promptMessage = getPrompt(1);
+        String promptMessage = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalReason = commandContext.optional(promptMessage);
         String reason = optionalReason.orElse(null);
 

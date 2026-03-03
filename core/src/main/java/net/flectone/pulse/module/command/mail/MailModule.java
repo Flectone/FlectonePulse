@@ -18,6 +18,7 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -45,14 +46,15 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.playerParser(true))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
@@ -62,10 +64,17 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
+    }
+
+    @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        String playerName = getArgument(commandContext, 0);
+        String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
@@ -98,7 +107,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
-        String message = getArgument(commandContext, 1);
+        String message = commandModuleController.getArgument(this, commandContext, 1);
 
         Mail mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
         if (mail == null) return;

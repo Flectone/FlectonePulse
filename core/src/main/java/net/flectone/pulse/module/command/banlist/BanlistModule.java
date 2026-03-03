@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -48,18 +49,26 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptNumber = addPrompt(1, Localization.Command.Prompt::number);
-        registerCommand(commandBuilder -> commandBuilder
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptNumber = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::number);
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .optional(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
@@ -69,12 +78,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         Localization.Command.Banlist localization = localization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.global();
 
-        String commandLine = "/" + getCommandName();
+        String commandLine = "/" + commandModuleController.getCommandName(this);
 
         int page = 1;
         FPlayer targetFPlayer = null;
 
-        String promptPlayer = getPrompt(0);
+        String promptPlayer = commandModuleController.getPrompt(this, 0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
         if (optionalPlayer.isPresent()) {
             String playerName = optionalPlayer.get();
@@ -82,7 +91,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
             if (StringUtils.isNumeric(playerName)) {
                 page = Integer.parseInt(playerName);
             } else {
-                String promptNumber = getPrompt(1);
+                String promptNumber = commandModuleController.getPrompt(this, 1);
                 Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
                 page = optionalNumber.orElse(page);
 
@@ -142,7 +151,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         for (Moderation moderation : finalModerationList) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
-            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + unbanModule.getCommandName() + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)

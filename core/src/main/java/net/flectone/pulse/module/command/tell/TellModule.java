@@ -16,6 +16,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
@@ -49,14 +50,15 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final CommandModuleController commandModuleController;
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        String promptPlayer = addPrompt(0, Localization.Command.Prompt::player);
-        String promptMessage = addPrompt(1, Localization.Command.Prompt::message);
-        registerCommand(manager -> manager
+        String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
+        String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
+        commandModuleController.registerCommand(this, manager -> manager
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
@@ -68,12 +70,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         super.onDisable();
 
         senderReceiverMap.clear();
+        commandModuleController.clearPrompts(this);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        String playerName = getArgument(commandContext, 0);
-        String message = getArgument(commandContext, 1);
+        String playerName = commandModuleController.getArgument(this, commandContext, 0);
+        String message = commandModuleController.getArgument(this, commandContext, 1);
 
         send(fPlayer, playerName, message);
     }
