@@ -193,7 +193,7 @@ public class ModuleController {
         return classes.stream().anyMatch(clazz -> clazz.isInstance(module));
     }
 
-    private Class<? extends ModuleSimple> getRoot(Class<? extends ModuleSimple> clazz) {
+    public Class<? extends ModuleSimple> getRoot(Class<? extends ModuleSimple> clazz) {
         return moduleRootMap.computeIfAbsent(clazz, this::findRootSuperclass);
     }
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -26,10 +27,11 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandModuleController {
 
-    private final Object2ObjectOpenHashMap<Class<? extends ModuleCommand>, List<String>> commandPromptsMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, List<String>> commandPromptsMap = new Object2ObjectOpenHashMap<>();
 
     private final Provider<CommandRegistry> commandRegistryProvider;
     private final FileFacade fileFacade;
+    private final ModuleController moduleController;
 
     public void registerCommand(ModuleCommand<?> command,
                                 UnaryOperator<Command.Builder<FPlayer>> builder) {
@@ -61,14 +63,16 @@ public class CommandModuleController {
         // this command already registered and ignored
         if (prompts.size() != index) return "unknown";
 
+        Class<? extends ModuleSimple> commandClass = moduleController.getRoot(command.getClass());
         String prompt = promptLocalization.apply(fileFacade.localization().command().prompt());
+
         if (prompts.isEmpty()) {
-            commandPromptsMap.put(command.getClass(), List.of(prompt));
+            commandPromptsMap.put(commandClass, List.of(prompt));
         } else {
             List<String> newPrompts = new ArrayList<>(prompts);
             newPrompts.add(prompt);
 
-            commandPromptsMap.put(command.getClass(), List.copyOf(newPrompts));
+            commandPromptsMap.put(commandClass, List.copyOf(newPrompts));
         }
 
         return prompt;
@@ -84,7 +88,7 @@ public class CommandModuleController {
     }
 
     public List<String> getPrompts(ModuleCommand<?> command) {
-        return commandPromptsMap.getOrDefault(command.getClass(), Collections.emptyList());
+        return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), Collections.emptyList());
     }
 
     public <V extends @NonNull Object> V getArgument(ModuleCommand<?> command,
