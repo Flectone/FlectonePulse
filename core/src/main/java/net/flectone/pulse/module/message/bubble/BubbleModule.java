@@ -9,12 +9,13 @@ import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-public abstract class BubbleModule extends AbstractModule {
+public abstract class BubbleModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
@@ -35,6 +36,11 @@ public abstract class BubbleModule extends AbstractModule {
     }
 
     @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_BUBBLE;
+    }
+
+    @Override
     public Message.Bubble config() {
         return fileFacade.message().bubble();
     }
@@ -46,8 +52,6 @@ public abstract class BubbleModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         bubbleService.startTicker();
 
         listenerRegistry.register(BubblePulseListener.class);
@@ -55,8 +59,6 @@ public abstract class BubbleModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         bubbleService.clear();
     }
 

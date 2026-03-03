@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BallModule extends AbstractModuleCommand<Localization.Command.Ball> {
+public class BallModule implements AbstractModuleCommand<Localization.Command.Ball> {
 
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
@@ -38,8 +38,6 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -49,8 +47,6 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -90,8 +86,8 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_BALL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_BALL;
     }
 
     @Override

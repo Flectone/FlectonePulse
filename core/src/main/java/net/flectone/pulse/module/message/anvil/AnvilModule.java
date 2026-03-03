@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,11 +17,16 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AnvilModule extends AbstractModule {
+public class AnvilModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_ANVIL;
+    }
 
     @Override
     public Message.Anvil config() {

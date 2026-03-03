@@ -17,13 +17,13 @@ import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulse
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TabnameModule extends AbstractModuleLocalization<Localization.Message.Objective.Tabname> {
+public class TabnameModule implements AbstractModuleLocalization<Localization.Message.Objective.Tabname> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -34,8 +34,6 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
@@ -46,14 +44,12 @@ public class TabnameModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         fPlayerService.getPlatformFPlayers().forEach(this::remove);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.TABNAME;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_OBJECTIVE_TABNAME;
     }
 
     @Override

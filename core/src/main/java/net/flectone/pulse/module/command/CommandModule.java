@@ -54,18 +54,19 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CommandModule extends AbstractModule {
+public class CommandModule implements AbstractModule {
 
     private final FileFacade fileFacade;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return super.childrenBuilder().add(
+        return AbstractModule.super.childrenBuilder().add(
                 AfkModule.class,
                 AnonModule.class,
                 BallModule.class,
@@ -117,7 +118,12 @@ public class CommandModule extends AbstractModule {
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
+        return AbstractModule.super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND;
     }
 
     @Override

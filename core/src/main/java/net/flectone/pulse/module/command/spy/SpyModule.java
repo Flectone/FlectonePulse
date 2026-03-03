@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
+public class SpyModule implements AbstractModuleCommand<Localization.Command.Spy> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -41,8 +41,6 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
         );
@@ -76,8 +74,8 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_SPY;
+    public ModuleName name() {
+        return ModuleName.COMMAND_SPY;
     }
 
     @Override

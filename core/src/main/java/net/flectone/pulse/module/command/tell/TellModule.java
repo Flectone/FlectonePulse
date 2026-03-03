@@ -23,7 +23,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -35,7 +35,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TellModule extends AbstractModuleCommand<Localization.Command.Tell> {
+public class TellModule implements AbstractModuleCommand<Localization.Command.Tell> {
 
     private final Map<UUID, String> senderReceiverMap = new Object2ObjectOpenHashMap<>();
 
@@ -54,8 +54,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, manager -> manager
@@ -67,8 +65,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         senderReceiverMap.clear();
         commandModuleController.clearPrompts(this);
     }
@@ -82,8 +78,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_TELL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_TELL;
     }
 
     @Override
@@ -134,7 +130,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         fReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         // save for sender
         senderReceiverMap.put(fPlayer.uuid(), fReceiver.name());
@@ -143,7 +139,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             String receiverUUID = fReceiver.uuid().toString();
 
             UUID metadataUUID = UUID.randomUUID();
-            boolean isSent = proxySender.send(fPlayer, messageType(), dataOutputStream -> {
+            boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
                 dataOutputStream.writeUTF(receiverUUID);
                 dataOutputStream.writeUTF(message);
             }, metadataUUID);

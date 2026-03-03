@@ -22,7 +22,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
+public class WarnModule implements AbstractModuleCommand<Localization.Command.Warn> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -52,8 +52,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
         String promptTime = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::time);
@@ -66,8 +64,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -120,7 +116,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
         if (warn == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_WARN);
+        proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()
@@ -160,8 +156,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_WARN;
+    public ModuleName name() {
+        return ModuleName.COMMAND_WARN;
     }
 
     @Override

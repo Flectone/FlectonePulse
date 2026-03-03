@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -56,13 +56,13 @@ public class BasePulseListener implements PulseListener {
 
     @Pulse
     public Event onMessagePrepareEvent(MessagePrepareEvent event) {
-        MessageType messageType = event.messageType();
+        ModuleName moduleName = event.moduleName();
         String rawFormat = event.rawFormat();
         EventMetadata<?> eventMetadata = event.eventMetadata();
 
-        integrationSender.asyncSend(messageType, rawFormat, eventMetadata);
+        integrationSender.asyncSend(moduleName, rawFormat, eventMetadata);
 
-        if (proxySender.send(messageType, eventMetadata)) {
+        if (proxySender.send(moduleName, eventMetadata)) {
             return event.withCancelled(true);
         }
 
@@ -71,7 +71,7 @@ public class BasePulseListener implements PulseListener {
 
     @Pulse
     public void onEnableEvent(EnableEvent event) {
-        integrationSender.send(MessageType.SERVER_ENABLE, "", EventMetadata.builder()
+        integrationSender.send(ModuleName.SERVER_ENABLE, "", EventMetadata.builder()
                 .sender(FPlayer.UNKNOWN)
                 .format("")
                 .integration()
@@ -81,7 +81,7 @@ public class BasePulseListener implements PulseListener {
 
     @Pulse
     public void onDisableEvent(DisableEvent event) {
-        integrationSender.send(MessageType.SERVER_DISABLE, "", EventMetadata.builder()
+        integrationSender.send(ModuleName.SERVER_DISABLE, "", EventMetadata.builder()
                 .sender(FPlayer.UNKNOWN)
                 .format("")
                 .integration()

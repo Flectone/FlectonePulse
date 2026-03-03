@@ -10,12 +10,13 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.interactivechat.listener.InteractiveChatPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class InteractiveChatModule extends AbstractModule {
+public class InteractiveChatModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final InteractiveChatIntegration interactiveChatIntegration;
@@ -24,8 +25,6 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         interactiveChatIntegration.hook();
 
         listenerRegistry.register(InteractiveChatIntegration.class);
@@ -34,9 +33,12 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         interactiveChatIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_INTERACTIVECHAT;
     }
 
     @Override

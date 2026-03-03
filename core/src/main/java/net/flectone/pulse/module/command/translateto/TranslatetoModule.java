@@ -18,7 +18,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -36,7 +36,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
+public class TranslatetoModule implements AbstractModuleCommand<Localization.Command.Translateto> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -48,8 +48,6 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptLanguage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::language);
         String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, manager -> manager
@@ -62,8 +60,6 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -124,8 +120,8 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_TRANSLATETO;
+    public ModuleName name() {
+        return ModuleName.COMMAND_TRANSLATETO;
     }
 
     @Override

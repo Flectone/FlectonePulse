@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -25,7 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
@@ -33,7 +32,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> implements PulseListener {
+public class MailModule implements AbstractModuleCommand<Localization.Command.Mail> {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
@@ -50,8 +49,6 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, manager -> manager
@@ -65,8 +62,6 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -105,7 +100,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String message = commandModuleController.getArgument(this, commandContext, 1);
 
@@ -131,8 +126,8 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_MAIL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_MAIL;
     }
 
     @Override

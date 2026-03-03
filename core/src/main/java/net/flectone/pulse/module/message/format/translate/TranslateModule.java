@@ -17,7 +17,7 @@ import net.flectone.pulse.module.message.format.translate.listener.TranslatePuls
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -29,7 +29,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
+public class TranslateModule implements AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;
@@ -39,21 +39,17 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(TranslatePulseListener.class);
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         messageCache.invalidateAll();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.TRANSLATE;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_TRANSLATE;
     }
 
     @Override

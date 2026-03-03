@@ -33,7 +33,7 @@ import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -45,7 +45,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PlayerlistnameModule extends AbstractModuleLocalization<Localization.Message.Tab.Playerlistname> {
+public class PlayerlistnameModule implements AbstractModuleLocalization<Localization.Message.Tab.Playerlistname> {
 
     private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> ADD_ACTIONS = EnumSet.of(
             WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
@@ -70,8 +70,6 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
@@ -81,8 +79,8 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.PLAYERLISTNAME;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_TAB_PLAYERLISTNAME;
     }
 
     @Override

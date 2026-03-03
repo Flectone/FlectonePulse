@@ -11,11 +11,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.fixation.listener.FixationPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FixationModule extends AbstractModule {
+public class FixationModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -23,9 +24,12 @@ public class FixationModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(FixationPulseListener.class);
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_FIXATION;
     }
 
     @Override

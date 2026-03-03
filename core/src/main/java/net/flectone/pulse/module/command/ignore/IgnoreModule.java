@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
+public class IgnoreModule implements AbstractModuleCommand<Localization.Command.Ignore> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -39,8 +39,6 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
@@ -50,8 +48,6 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -115,8 +111,8 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_IGNORE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_IGNORE;
     }
 
     @Override

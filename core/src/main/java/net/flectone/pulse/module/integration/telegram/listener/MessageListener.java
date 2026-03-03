@@ -19,7 +19,6 @@ import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -100,7 +99,7 @@ public class MessageListener extends EventListener {
             }
         }
 
-        List<String> chats = config().messageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name());
+        List<String> chats = config().messageChannel().get(name().name());
         if (chats == null || !chats.contains(getChatId(message))) return;
 
         sendMessage(author, chat, text, reply);
@@ -115,7 +114,7 @@ public class MessageListener extends EventListener {
                 .base(EventMetadata.<Localization.Integration.Telegram>builder()
                         .sender(telegramIntegration.get().getSender())
                         .format(localization -> StringUtils.replaceEach(
-                                StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name())),
+                                StringUtils.defaultString(localization.messageChannel().get(name().name())),
                                 new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
                                 new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
                         ))

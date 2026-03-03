@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -33,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeleteModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
+public class DeleteModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 
@@ -49,22 +49,18 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(DeletePulseListener.class);
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         playersHistory.clear();
         cachedComponents.clear();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.DELETE;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION_DELETE;
     }
 
     @Override

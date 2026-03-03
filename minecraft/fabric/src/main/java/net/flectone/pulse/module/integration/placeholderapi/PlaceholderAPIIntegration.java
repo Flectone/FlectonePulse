@@ -28,7 +28,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -70,7 +70,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
 
-        Arrays.stream(MessageType.values()).forEach(setting ->
+        Arrays.stream(ModuleName.values()).forEach(setting ->
                 Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
         );
 
@@ -132,7 +132,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
-        Arrays.stream(MessageType.values()).forEach(messageType ->
+        Arrays.stream(ModuleName.values()).forEach(messageType ->
                 Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
                     FPlayer fPlayer = fPlayerMapper.map(context.source());
 

@@ -13,11 +13,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeeplModule extends AbstractModule {
+public class DeeplModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -26,8 +27,6 @@ public class DeeplModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         reflectionResolver.hasClassOrElse("com.deepl.api.DeepLClient", this::loadLibraries);
 
         injector.getInstance(DeeplIntegration.class).hook();
@@ -35,9 +34,12 @@ public class DeeplModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         injector.getInstance(DeeplIntegration.class).unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_DEEPL;
     }
 
     @Override

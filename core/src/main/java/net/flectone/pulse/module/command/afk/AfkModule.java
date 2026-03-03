@@ -12,14 +12,14 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AfkModule extends AbstractModuleCommand<Localization.Command> {
+public class AfkModule implements AbstractModuleCommand<Localization.Command> {
 
     private final FileFacade fileFacade;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
@@ -29,16 +29,14 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
         );
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_AFK;
+    public ModuleName name() {
+        return ModuleName.COMMAND_AFK;
     }
 
     @Override

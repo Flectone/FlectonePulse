@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class VaultModule extends AbstractModule {
+public class VaultModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final VaultIntegration vaultIntegration;
@@ -23,16 +24,17 @@ public class VaultModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         vaultIntegration.hook();
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         vaultIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_VAULT;
     }
 
     @Override

@@ -16,7 +16,7 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-public abstract class IntegrationModule extends AbstractModule {
+public abstract class IntegrationModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
@@ -44,7 +44,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
+        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = AbstractModule.super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
@@ -57,6 +57,11 @@ public abstract class IntegrationModule extends AbstractModule {
                 TwitchModule.class,
                 YandexModule.class
         );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION;
     }
 
     @Override
@@ -143,15 +148,15 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
-        if (containsEnabledChild(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(DiscordModule.class) && !ModuleName.INTEGRATION_DISCORD.name().equals(messageName)) {
             injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (containsEnabledChild(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(TwitchModule.class) && !ModuleName.INTEGRATION_TWITCH.name().equals(messageName)) {
             injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (containsEnabledChild(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
+        if (containsEnabledChild(TelegramModule.class) && !ModuleName.INTEGRATION_TELEGRAM.name().equals(messageName)) {
             injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
         }
     }

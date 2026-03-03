@@ -80,7 +80,7 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -113,7 +113,7 @@ public class ProxyMessageHandler {
             try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
                  DataInputStream input = new DataInputStream(byteStream)) {
 
-                MessageType tag = MessageType.fromProxyString(input.readUTF());
+                ModuleName tag = ModuleName.fromProxyString(input.readUTF());
                 if (tag == null) return;
 
                 UUID uuid = UUID.fromString(input.readUTF());
@@ -137,7 +137,7 @@ public class ProxyMessageHandler {
         fPlayerService.invalidateOnline(uuid);
     }
 
-    public void handleProxyMessage(DataInputStream input, UUID metadataUUID, MessageType tag) throws IOException {
+    public void handleProxyMessage(DataInputStream input, UUID metadataUUID, ModuleName tag) throws IOException {
         Set<String> proxyClusters = gson.fromJson(input.readUTF(), new TypeToken<Set<String>>() {}.getType());
 
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
@@ -157,7 +157,7 @@ public class ProxyMessageHandler {
         handleModuleMessage(input, fEntity, metadataUUID, tag);
     }
 
-    public void handleModuleMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID, MessageType tag) throws IOException {
+    public void handleModuleMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID, ModuleName tag) throws IOException {
         switch (tag) {
             case COMMAND_ANON -> handleAnonCommand(input, fEntity, metadataUUID);
             case COMMAND_ME -> handleMeCommand(input, fEntity, metadataUUID);
@@ -167,7 +167,7 @@ public class ProxyMessageHandler {
             case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity, metadataUUID);
             case COMMAND_CHATSETTING -> handleChatSettingCommand(fEntity);
             case COMMAND_COIN -> handleCoinCommand(input, fEntity, metadataUUID);
-            case COMMAND_DELETE -> handleDeleteCommand(input, fEntity);
+            case COMMAND_DELETEMESSAGE -> handleDeleteCommand(input, fEntity);
             case COMMAND_DICE -> handleDiceCommand(input, fEntity, metadataUUID);
             case COMMAND_DO -> handleDoCommand(input, fEntity, metadataUUID);
             case COMMAND_EMIT -> handleEmitCommand(input, fEntity, metadataUUID);
@@ -186,17 +186,17 @@ public class ProxyMessageHandler {
             case COMMAND_WARN -> handleWarnCommand(input, fEntity, metadataUUID);
             case COMMAND_KICK -> handleKickCommand(input, fEntity, metadataUUID);
             case COMMAND_TICTACTOE -> handleTicTacToeCommand(input, fEntity, metadataUUID);
-            case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
+            case MESSAGE_CHAT -> handleChatMessage(input, fEntity, metadataUUID);
             case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissors(input, fEntity, metadataUUID);
-            case JOIN -> handleJoin(input, fEntity, metadataUUID);
-            case QUIT -> handleQuit(input, fEntity, metadataUUID);
-            case AFK -> handleAfk(input, fEntity, metadataUUID);
-            case VANILLA -> handleVanilla(input, fEntity, metadataUUID);
+            case MESSAGE_JOIN -> handleJoin(input, fEntity, metadataUUID);
+            case MESSAGE_QUIT -> handleQuit(input, fEntity, metadataUUID);
+            case COMMAND_AFK -> handleAfk(input, fEntity, metadataUUID);
+            case MESSAGE_VANILLA -> handleVanilla(input, fEntity, metadataUUID);
         }
     }
 
-    private boolean handleModerationInvalidation(MessageType tag, FEntity fEntity) {
+    private boolean handleModerationInvalidation(ModuleName tag, FEntity fEntity) {
         return switch (tag) {
             case SYSTEM_BAN -> {
                 moderationService.invalidateBans(fEntity.uuid());
@@ -214,8 +214,8 @@ public class ProxyMessageHandler {
         };
     }
 
-    private boolean handleSystemCooldown(MessageType tag, DataInputStream input) throws IOException {
-        if (tag != MessageType.SYSTEM_COOLDOWN) return false;
+    private boolean handleSystemCooldown(ModuleName tag, DataInputStream input) throws IOException {
+        if (tag != ModuleName.SYSTEM_COOLDOWN) return false;
 
         UUID uuid = UUID.fromString(input.readUTF());
         String cooldownClass = input.readUTF();

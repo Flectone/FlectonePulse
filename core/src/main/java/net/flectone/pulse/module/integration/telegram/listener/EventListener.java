@@ -2,13 +2,14 @@ package net.flectone.pulse.module.integration.telegram.listener;
 
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.AbstractModuleLocalization;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 
-public abstract class EventListener extends AbstractModuleLocalization<Localization.Integration.Telegram> implements LongPollingSingleThreadUpdateConsumer {
+public abstract class EventListener implements AbstractModuleLocalization<Localization.Integration.Telegram>, LongPollingSingleThreadUpdateConsumer {
 
-    public MessageType messageType() {
-        return MessageType.FROM_TELEGRAM_TO_MINECRAFT;
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_TELEGRAM;
     }
 
 }

@@ -10,19 +10,19 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class VersionModule extends AbstractModuleLocalization<Localization.Message.Status.Version> {
+public class VersionModule implements AbstractModuleLocalization<Localization.Message.Status.Version> {
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
 
     @Override
-    public MessageType messageType() {
-        return MessageType.VERSION;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_STATUS_VERSION;
     }
 
     @Override

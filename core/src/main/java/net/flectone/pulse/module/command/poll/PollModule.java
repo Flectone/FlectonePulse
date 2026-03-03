@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -48,7 +48,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
+public class PollModule implements AbstractModuleCommand<Localization.Command.Poll> {
 
     private final Int2ObjectArrayMap<Poll> pollMap = new Int2ObjectArrayMap<>();
 
@@ -65,8 +65,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptTime = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::time);
         String promptRepeatTime = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::repeatTime);
         String promptMultipleVote = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::multipleVote);
@@ -128,14 +126,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
-                .add(permission().create());
+        return AbstractModuleCommand.super.permissionBuilder().add(permission().create());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         pollMap.clear();
         commandModuleController.clearPrompts(this);
     }
@@ -159,7 +154,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int numberVote = commandModuleController.getArgument(this, commandContext, 5);
 
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, ModuleName.COMMAND_POLL, dataOutputStream -> {
             dataOutputStream.writeUTF(Action.VOTE.name());
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
@@ -203,8 +198,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_POLL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_POLL;
     }
 
     @Override

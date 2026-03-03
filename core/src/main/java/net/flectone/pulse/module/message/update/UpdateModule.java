@@ -19,7 +19,7 @@ import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.comparator.VersionComparator;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -32,7 +32,7 @@ import java.net.http.HttpResponse;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class UpdateModule extends AbstractModuleLocalization<Localization.Message.Update> {
+public class UpdateModule implements AbstractModuleLocalization<Localization.Message.Update> {
 
     private final FileFacade fileFacade;
     private final MessageDispatcher messageDispatcher;
@@ -46,16 +46,14 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(UpdatePulseListener.class);
 
         checkAndUpdateLatestVersion();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.UPDATE;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_UPDATE;
     }
 
     @Override

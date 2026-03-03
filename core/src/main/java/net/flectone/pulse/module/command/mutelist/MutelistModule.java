@@ -24,7 +24,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MutelistModule extends AbstractModuleCommand<Localization.Command.Mutelist> {
+public class MutelistModule implements AbstractModuleCommand<Localization.Command.Mutelist> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -53,8 +53,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptNumber = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::number);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
@@ -66,8 +64,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -174,14 +170,14 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
         component = component.append(messagePipeline.build(footerContext));
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_MUTELIST, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.COMMAND_MUTELIST, fPlayer, component));
 
         soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_MUTELIST;
+    public ModuleName name() {
+        return ModuleName.COMMAND_MUTELIST;
     }
 
     @Override

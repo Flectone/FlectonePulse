@@ -19,7 +19,7 @@ import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,15 +38,15 @@ public class MessageDispatcher {
 
     public <L extends LocalizationSetting> List<FPlayer> createReceivers(AbstractModuleLocalization<L> module,
                                                                          EventMetadata<L> eventMetadata) {
-        return createReceivers(module.messageType(), module, eventMetadata);
+        return createReceivers(module.name(), module, eventMetadata);
     }
 
-    public <L extends LocalizationSetting> List<FPlayer> createReceivers(MessageType messageType,
+    public <L extends LocalizationSetting> List<FPlayer> createReceivers(ModuleName moduleName,
                                                                          AbstractModuleLocalization<L> module,
                                                                          EventMetadata<L> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, module.localization());
 
-        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(messageType, rawFormat, eventMetadata));
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, rawFormat, eventMetadata));
 
         // if canceled, it means that message was sent to Proxy
         if (messagePrepareEvent.cancelled()) return Collections.emptyList();
@@ -54,29 +54,29 @@ public class MessageDispatcher {
         return fPlayerService.getFPlayersWithConsole().stream()
                 .filter(eventMetadata.filter())
                 .filter(rangeFilter.createFilter(eventMetadata.filterPlayer(), eventMetadata.range()))
-                .filter(fReceiver -> fReceiver.isSetting(messageType))
+                .filter(fReceiver -> fReceiver.isSetting(moduleName))
                 .toList();
     }
 
     public <L extends LocalizationSetting> void dispatch(AbstractModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
-        dispatch(module.messageType(), module, eventMetadata);
+        dispatch(module.name(), module, eventMetadata);
     }
 
-    public <L extends LocalizationSetting> void dispatch(MessageType messageType,
+    public <L extends LocalizationSetting> void dispatch(ModuleName moduleName,
                                                          AbstractModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
-        List<FPlayer> receivers = createReceivers(messageType, module, eventMetadata);
-        dispatch(messageType, receivers, module, eventMetadata);
+        List<FPlayer> receivers = createReceivers(moduleName, module, eventMetadata);
+        dispatch(moduleName, receivers, module, eventMetadata);
     }
 
     public <L extends LocalizationSetting> void dispatch(List<FPlayer> receivers,
                                                          AbstractModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
-        dispatch(module.messageType(), receivers, module, eventMetadata);
+        dispatch(module.name(), receivers, module, eventMetadata);
     }
 
-    public <L extends LocalizationSetting> void dispatch(MessageType messageType,
+    public <L extends LocalizationSetting> void dispatch(ModuleName moduleName,
                                                          List<FPlayer> receivers,
                                                          AbstractModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
@@ -98,7 +98,7 @@ public class MessageDispatcher {
             }
 
             eventDispatcher.dispatch(new MessageSendEvent(
-                    messageType,
+                    moduleName,
                     receiver,
                     formatComponent,
                     subComponent,
@@ -119,7 +119,7 @@ public class MessageDispatcher {
     }
 
     public <L extends LocalizationSetting> void dispatchError(AbstractModuleLocalization<L> module, EventMetadata<L> eventMetadata) {
-        dispatch(MessageType.ERROR, module, eventMetadata);
+        dispatch(ModuleName.ERROR, module, eventMetadata);
     }
 
     private <L extends LocalizationSetting> Component buildSubcomponent(FPlayer receiver,

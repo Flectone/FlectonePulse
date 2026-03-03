@@ -17,7 +17,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
@@ -54,8 +54,8 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.AUTO;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_AUTO;
     }
 
     @Override

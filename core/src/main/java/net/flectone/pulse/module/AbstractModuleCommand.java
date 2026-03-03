@@ -7,15 +7,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
 
-public abstract class AbstractModuleCommand<M extends LocalizationSetting> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
+public interface AbstractModuleCommand<M extends LocalizationSetting> extends AbstractModuleLocalization<M>, CommandExecutionHandler<FPlayer> {
+
+    CommandSetting config();
+
+    void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 
     @Override
-    public void execute(@NonNull CommandContext<FPlayer> commandContext) {
+    default void execute(@NonNull CommandContext<FPlayer> commandContext) {
         execute(commandContext.sender(), commandContext);
     }
-
-    public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    public abstract CommandSetting config();
 
 }

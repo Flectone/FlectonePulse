@@ -12,6 +12,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IconModule extends AbstractModule {
+public class IconModule implements AbstractModule {
 
     private final List<String> iconList = new CopyOnWriteArrayList<>();
 
@@ -37,16 +38,17 @@ public class IconModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         initIcons();
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         iconList.clear();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_STATUS_ICON;
     }
 
     @Override

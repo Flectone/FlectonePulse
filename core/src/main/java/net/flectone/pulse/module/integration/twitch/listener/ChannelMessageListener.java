@@ -21,7 +21,6 @@ import net.flectone.pulse.module.integration.twitch.TwitchIntegration;
 import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -51,7 +50,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     public void execute(ChannelMessageEvent event) {
         if (executeCommand(event)) return;
 
-        List<String> channel = config().messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
+        List<String> channel = config().messageChannel().get(name().name());
         if (channel == null || channel.isEmpty()) return;
 
         String channelName = event.getChannel().getName();
@@ -81,7 +80,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .base(EventMetadata.<Localization.Integration.Twitch>builder()
                         .sender(twitchIntegration.get().getSender())
                         .format(localization -> StringUtils.replaceEach(
-                                StringUtils.defaultString(localization.messageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name())),
+                                StringUtils.defaultString(localization.messageChannel().get(name().name())),
                                 new String[]{"<name>", "<channel>"},
                                 new String[]{String.valueOf(nickname), String.valueOf(channel)}
                         ))

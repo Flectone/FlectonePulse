@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
+public class ReplacementModule implements AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new ConcurrentHashMap<>();
     private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
@@ -68,8 +68,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(ReplacementPulseListener.class);
 
         config().triggers().forEach((name, regex) ->
@@ -79,21 +77,19 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().addAll(permission().values().values());
+        return AbstractModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         triggerPatterns.clear();
         messageCache.invalidateAll();
         imageCache.invalidateAll();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.REPLACEMENT;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_REPLACEMENT;
     }
 
     @Override

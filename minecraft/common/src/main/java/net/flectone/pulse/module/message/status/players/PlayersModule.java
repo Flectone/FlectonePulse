@@ -16,14 +16,14 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PlayersModule extends AbstractModuleLocalization<Localization.Message.Status.Players> {
+public class PlayersModule implements AbstractModuleLocalization<Localization.Message.Status.Players> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -33,19 +33,17 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(PlayersPulseListener.class);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().bypass());
+        return AbstractModuleLocalization.super.permissionBuilder().add(permission().bypass());
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.PLAYERS;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_STATUS_PLAYERS;
     }
 
     @Override

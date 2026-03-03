@@ -16,7 +16,7 @@ import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,8 +45,8 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.BRAND;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_BRAND;
     }
 
     @Override

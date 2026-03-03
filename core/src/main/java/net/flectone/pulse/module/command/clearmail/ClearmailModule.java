@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
+public class ClearmailModule implements AbstractModuleCommand<Localization.Command.Clearmail> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -41,8 +41,6 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptId = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::id);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -59,8 +57,6 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -107,8 +103,8 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_CLEARMAIL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_CLEARMAIL;
     }
 
     @Override

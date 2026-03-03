@@ -14,13 +14,13 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
+public class MeModule implements AbstractModuleCommand<Localization.Command.Me> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -30,8 +30,6 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -41,8 +39,6 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -67,8 +63,8 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_ME;
+    public ModuleName name() {
+        return ModuleName.COMMAND_ME;
     }
 
     @Override

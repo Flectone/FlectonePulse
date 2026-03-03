@@ -6,13 +6,19 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TabModule extends AbstractModule {
+public class TabModule implements AbstractModule {
 
     private final FileFacade fileFacade;
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_TAB;
+    }
 
     @Override
     public Message.Tab config() {

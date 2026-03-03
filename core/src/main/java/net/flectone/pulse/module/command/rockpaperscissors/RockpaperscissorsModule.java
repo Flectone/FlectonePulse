@@ -23,7 +23,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +39,7 @@ import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
+public class RockpaperscissorsModule implements AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
 
     private final Map<UUID, RockPaperScissors> gameMap = new Object2ObjectArrayMap<>();
 
@@ -57,8 +57,6 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptMove = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::move);
         String promptUUID = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::id);
@@ -72,8 +70,6 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         gameMap.clear();
         commandModuleController.clearPrompts(this);
     }
@@ -108,7 +104,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String promptMove = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalMove = commandContext.optional(promptMove);
@@ -125,7 +121,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.uuid(), fReceiver.uuid());
 
-        proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+        proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.CREATE.name());
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
@@ -150,8 +146,8 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_ROCKPAPERSCISSORS;
+    public ModuleName name() {
+        return ModuleName.COMMAND_ROCKPAPERSCISSORS;
     }
 
     @Override
@@ -205,7 +201,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 return;
             }
 
-            boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+            boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
                 dataOutputStream.writeUTF(GamePhase.END.name());
                 dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
                 dataOutputStream.writeUTF(move);
@@ -227,7 +223,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .build()
         );
 
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.MOVE.name());
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(move);

@@ -20,7 +20,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
+public class ClearchatModule implements AbstractModuleCommand<Localization.Command.Clearchat> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -42,8 +42,6 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                         .permission(permission().name())
@@ -53,14 +51,12 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleCommand.super.permissionBuilder()
                 .add(permission().other());
     }
 
@@ -96,8 +92,8 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_CLEARCHAT;
+    public ModuleName name() {
+        return ModuleName.COMMAND_CLEARCHAT;
     }
 
     @Override
@@ -122,7 +118,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     public void clearChat(FPlayer fPlayer, boolean checkProxy) {
         if (checkProxy
                 && !platformPlayerAdapter.isOnline(fPlayer)
-                && proxySender.send(fPlayer, MessageType.COMMAND_CLEARCHAT)) {
+                && proxySender.send(fPlayer, ModuleName.COMMAND_CLEARCHAT)) {
             return;
         }
 

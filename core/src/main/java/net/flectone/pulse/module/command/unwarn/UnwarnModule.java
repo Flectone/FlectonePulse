@@ -21,7 +21,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unwarn> {
+public class UnwarnModule implements AbstractModuleCommand<Localization.Command.Unwarn> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -45,8 +45,6 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptId = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::id);
         commandModuleController.registerCommand(this, manager -> manager
@@ -58,8 +56,6 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -77,8 +73,8 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_UNWARN;
+    public ModuleName name() {
+        return ModuleName.COMMAND_UNWARN;
     }
 
     @Override
@@ -143,7 +139,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         moderationService.remove(fTarget, warns);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_WARN);
+        proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()

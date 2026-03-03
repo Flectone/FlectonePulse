@@ -16,13 +16,13 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ReplyModule extends AbstractModuleCommand<Localization.Command.Reply> {
+public class ReplyModule implements AbstractModuleCommand<Localization.Command.Reply> {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
@@ -34,8 +34,6 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
@@ -45,8 +43,6 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -73,8 +69,8 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_REPLY;
+    public ModuleName name() {
+        return ModuleName.COMMAND_REPLY;
     }
 
     @Override

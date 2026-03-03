@@ -11,11 +11,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.cmi.listener.CMIPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CMIModule extends AbstractModule {
+public class CMIModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final CMIIntegration cmiIntegration;
@@ -24,8 +25,6 @@ public class CMIModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         cmiIntegration.hook();
 
         listenerRegistry.register(CMIPulseListener.class);
@@ -33,9 +32,12 @@ public class CMIModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         cmiIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_CMI;
     }
 
     @Override

@@ -96,94 +96,94 @@ public class FileMigrator {
         types.clear();
 
         if (oldTypes.containsKey("AFK")) {
-            types.put(MessageType.AFK.name(), 9);
+            types.put(ModuleName.MESSAGE_AFK.name(), 9);
         }
 
         if (oldTypes.containsKey("ADVANCEMENT")) {
-            types.put(MessageType.ADVANCEMENT.name(), 10);
+            types.put("ADVANCEMENT", 10);
         }
 
-        types.put(MessageType.CHAT.name(), 11);
+        types.put("MESSAGE_CHAT", 11);
 
         if (oldTypes.containsKey("ANON")) {
-            types.put(MessageType.COMMAND_ANON.name(), 12);
+            types.put(ModuleName.COMMAND_ANON.name(), 12);
         }
 
         if (oldTypes.containsKey("BALL")) {
-            types.put(MessageType.COMMAND_BALL.name(), 13);
+            types.put(ModuleName.COMMAND_BALL.name(), 13);
         }
 
         if (oldTypes.containsKey("BROADCAST")) {
-            types.put(MessageType.COMMAND_BROADCAST.name(), 14);
+            types.put(ModuleName.COMMAND_BROADCAST.name(), 14);
         }
 
         if (oldTypes.containsKey("COIN")) {
-            types.put(MessageType.COMMAND_COIN.name(), 15);
+            types.put(ModuleName.COMMAND_COIN.name(), 15);
         }
 
         if (oldTypes.containsKey("DICE")) {
-            types.put(MessageType.COMMAND_DICE.name(), 16);
+            types.put(ModuleName.COMMAND_DICE.name(), 16);
         }
 
         if (oldTypes.containsKey("DO")) {
-            types.put(MessageType.COMMAND_DO.name(), 17);
+            types.put(ModuleName.COMMAND_DO.name(), 17);
         }
 
         if (oldTypes.containsKey("MAIL")) {
-            types.put(MessageType.COMMAND_MAIL.name(), 18);
+            types.put(ModuleName.COMMAND_MAIL.name(), 18);
         }
 
         if (oldTypes.containsKey("ME")) {
-            types.put(MessageType.COMMAND_ME.name(), 19);
+            types.put(ModuleName.COMMAND_ME.name(), 19);
         }
 
         if (oldTypes.containsKey("POLL")) {
-            types.put(MessageType.COMMAND_POLL.name(), 20);
+            types.put(ModuleName.COMMAND_POLL.name(), 20);
         }
 
         if (oldTypes.containsKey("ROCKPAPERSCISSORS")) {
-            types.put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), 21);
+            types.put(ModuleName.COMMAND_ROCKPAPERSCISSORS.name(), 21);
         }
 
-        types.put(MessageType.COMMAND_STREAM.name(), 22);
+        types.put(ModuleName.COMMAND_STREAM.name(), 22);
 
         if (oldTypes.containsKey("TELL")) {
-            types.put(MessageType.COMMAND_TELL.name(), 23);
+            types.put(ModuleName.COMMAND_TELL.name(), 23);
         }
 
         if (oldTypes.containsKey("TICTACTOE")) {
-            types.put(MessageType.COMMAND_TICTACTOE.name(), 24);
+            types.put(ModuleName.COMMAND_TICTACTOE.name(), 24);
         }
 
         if (oldTypes.containsKey("TRY")) {
-            types.put(MessageType.COMMAND_TRY.name(), 25);
+            types.put(ModuleName.COMMAND_TRY.name(), 25);
         }
 
         if (oldTypes.containsKey("DEATH")) {
-            types.put(MessageType.DEATH.name(), 26);
+            types.put("DEATH", 26);
         }
 
         if (oldTypes.containsKey("DISCORD")) {
-            types.put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), 27);
+            types.put(ModuleName.INTEGRATION_DISCORD.name(), 27);
         }
 
         if (oldTypes.containsKey("TELEGRAM")) {
-            types.put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), 28);
+            types.put(ModuleName.INTEGRATION_TELEGRAM.name(), 28);
         }
 
         if (oldTypes.containsKey("TWITCH")) {
-            types.put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), 29);
+            types.put(ModuleName.INTEGRATION_TWITCH.name(), 29);
         }
 
         if (oldTypes.containsKey("JOIN")) {
-            types.put(MessageType.JOIN.name(), 30);
+            types.put(ModuleName.MESSAGE_JOIN.name(), 30);
         }
 
         if (oldTypes.containsKey("QUIT")) {
-            types.put(MessageType.QUIT.name(), 31);
+            types.put(ModuleName.MESSAGE_QUIT.name(), 31);
         }
 
-        types.put(MessageType.SLEEP.name(), 32);
+        types.put("SLEEP", 32);
 
         Map<String, Permission.Command.Chatsetting.SettingItem> settings = files.permission().command().chatsetting().settings();
         settings.clear();
@@ -191,30 +191,30 @@ public class FileMigrator {
         settings.put(SettingText.CHAT_NAME.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.chat_name", Permission.Type.TRUE));
         settings.put("FCOLOR_" + FColor.Type.SEE.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.fcolor_see", Permission.Type.TRUE));
         settings.put("FCOLOR_" + FColor.Type.OUT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.fcolor_out", Permission.Type.OP));
-        settings.put(MessageType.AFK.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.afk", Permission.Type.TRUE));
-        settings.put(MessageType.ADVANCEMENT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.advancement", Permission.Type.TRUE));
-        settings.put(MessageType.CHAT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.chat", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_ANON.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_anon", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_BALL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_ball", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_BROADCAST.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_broadcast", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_COIN.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_coin", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_DICE.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_dice", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_DO.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_do", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_MAIL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_mail", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_ME.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_me", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_POLL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_poll", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_rockpaperscissors", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_STREAM.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_stream", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_TELL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_tell", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_TICTACTOE.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_tictactoe", Permission.Type.TRUE));
-        settings.put(MessageType.COMMAND_TRY.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_try", Permission.Type.TRUE));
-        settings.put(MessageType.DEATH.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.death", Permission.Type.TRUE));
-        settings.put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_discord_to_minecraft", Permission.Type.TRUE));
-        settings.put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_telegram_to_minecraft", Permission.Type.TRUE));
-        settings.put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_twitch_to_minecraft", Permission.Type.TRUE));
-        settings.put(MessageType.JOIN.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.join", Permission.Type.TRUE));
-        settings.put(MessageType.QUIT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.quit", Permission.Type.TRUE));
-        settings.put(MessageType.SLEEP.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.sleep", Permission.Type.TRUE));
+        settings.put(ModuleName.MESSAGE_AFK.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.afk", Permission.Type.TRUE));
+        settings.put("ADVANCEMENT", new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.advancement", Permission.Type.TRUE));
+        settings.put(ModuleName.MESSAGE_CHAT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.chat", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_ANON.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_anon", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_BALL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_ball", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_BROADCAST.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_broadcast", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_COIN.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_coin", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_DICE.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_dice", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_DO.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_do", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_MAIL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_mail", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_ME.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_me", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_POLL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_poll", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_ROCKPAPERSCISSORS.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_rockpaperscissors", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_STREAM.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_stream", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_TELL.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_tell", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_TICTACTOE.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_tictactoe", Permission.Type.TRUE));
+        settings.put(ModuleName.COMMAND_TRY.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.command_try", Permission.Type.TRUE));
+        settings.put("DEATH", new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.death", Permission.Type.TRUE));
+        settings.put(ModuleName.INTEGRATION_DISCORD.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_discord_to_minecraft", Permission.Type.TRUE));
+        settings.put(ModuleName.INTEGRATION_TELEGRAM.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_telegram_to_minecraft", Permission.Type.TRUE));
+        settings.put(ModuleName.INTEGRATION_TWITCH.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.from_twitch_to_minecraft", Permission.Type.TRUE));
+        settings.put(ModuleName.MESSAGE_JOIN.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.join", Permission.Type.TRUE));
+        settings.put(ModuleName.MESSAGE_QUIT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.quit", Permission.Type.TRUE));
+        settings.put("SLEEP", new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.sleep", Permission.Type.TRUE));
 
         Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
@@ -225,30 +225,30 @@ public class FileMigrator {
             boolean isRussian = localization.language().toLowerCase().contains("ru");
 
             if (isRussian) {
-                localizationTypes.put(MessageType.AFK.name(), "<status_color>Афк");
-                localizationTypes.put(MessageType.ADVANCEMENT.name(), "<status_color>Достижения");
-                localizationTypes.put(MessageType.CHAT.name(), "<status_color>Сообщения чата");
-                localizationTypes.put(MessageType.COMMAND_ANON.name(), "<status_color>Команда /anon");
-                localizationTypes.put(MessageType.COMMAND_BALL.name(), "<status_color>Команда /ball");
-                localizationTypes.put(MessageType.COMMAND_BROADCAST.name(), "<status_color>Команда /broadcast");
-                localizationTypes.put(MessageType.COMMAND_COIN.name(), "<status_color>Команда /coin");
-                localizationTypes.put(MessageType.COMMAND_DICE.name(), "<status_color>Команда /dice");
-                localizationTypes.put(MessageType.COMMAND_DO.name(), "<status_color>Команда /do");
-                localizationTypes.put(MessageType.COMMAND_MAIL.name(), "<status_color>Команда /mail");
-                localizationTypes.put(MessageType.COMMAND_ME.name(), "<status_color>Команда /me");
-                localizationTypes.put(MessageType.COMMAND_POLL.name(), "<status_color>Команда /poll");
-                localizationTypes.put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), "<status_color>Команда /rockpaperscissors");
-                localizationTypes.put(MessageType.COMMAND_STREAM.name(), "<status_color>Команда /stream");
-                localizationTypes.put(MessageType.COMMAND_TELL.name(), "<status_color>Команда /tell");
-                localizationTypes.put(MessageType.COMMAND_TICTACTOE.name(), "<status_color>Команда /tictactoe");
-                localizationTypes.put(MessageType.COMMAND_TRY.name(), "<status_color>Команда /try");
-                localizationTypes.put(MessageType.DEATH.name(), "<status_color>Смерти");
-                localizationTypes.put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), "<status_color>Сообщения из Discord");
-                localizationTypes.put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<status_color>Сообщения из Telegram");
-                localizationTypes.put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<status_color>Сообщения из Twitch");
-                localizationTypes.put(MessageType.JOIN.name(), "<status_color>Вход на сервер");
-                localizationTypes.put(MessageType.QUIT.name(), "<status_color>Выход с сервера");
-                localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Сон");
+                localizationTypes.put(ModuleName.MESSAGE_AFK.name(), "<status_color>Афк");
+                localizationTypes.put("ADVANCEMENT", "<status_color>Достижения");
+                localizationTypes.put(ModuleName.MESSAGE_CHAT.name(), "<status_color>Сообщения чата");
+                localizationTypes.put(ModuleName.COMMAND_ANON.name(), "<status_color>Команда /anon");
+                localizationTypes.put(ModuleName.COMMAND_BALL.name(), "<status_color>Команда /ball");
+                localizationTypes.put(ModuleName.COMMAND_BROADCAST.name(), "<status_color>Команда /broadcast");
+                localizationTypes.put(ModuleName.COMMAND_COIN.name(), "<status_color>Команда /coin");
+                localizationTypes.put(ModuleName.COMMAND_DICE.name(), "<status_color>Команда /dice");
+                localizationTypes.put(ModuleName.COMMAND_DO.name(), "<status_color>Команда /do");
+                localizationTypes.put(ModuleName.COMMAND_MAIL.name(), "<status_color>Команда /mail");
+                localizationTypes.put(ModuleName.COMMAND_ME.name(), "<status_color>Команда /me");
+                localizationTypes.put(ModuleName.COMMAND_POLL.name(), "<status_color>Команда /poll");
+                localizationTypes.put(ModuleName.COMMAND_ROCKPAPERSCISSORS.name(), "<status_color>Команда /rockpaperscissors");
+                localizationTypes.put(ModuleName.COMMAND_STREAM.name(), "<status_color>Команда /stream");
+                localizationTypes.put(ModuleName.COMMAND_TELL.name(), "<status_color>Команда /tell");
+                localizationTypes.put(ModuleName.COMMAND_TICTACTOE.name(), "<status_color>Команда /tictactoe");
+                localizationTypes.put(ModuleName.COMMAND_TRY.name(), "<status_color>Команда /try");
+                localizationTypes.put("DEATH", "<status_color>Смерти");
+                localizationTypes.put(ModuleName.INTEGRATION_DISCORD.name(), "<status_color>Сообщения из Discord");
+                localizationTypes.put(ModuleName.INTEGRATION_TELEGRAM.name(), "<status_color>Сообщения из Telegram");
+                localizationTypes.put(ModuleName.INTEGRATION_TWITCH.name(), "<status_color>Сообщения из Twitch");
+                localizationTypes.put(ModuleName.MESSAGE_JOIN.name(), "<status_color>Вход на сервер");
+                localizationTypes.put(ModuleName.MESSAGE_QUIT.name(), "<status_color>Выход с сервера");
+                localizationTypes.put("SLEEP", "<status_color>Сон");
 
                 Localization defaultRussianLocalization = fileLoaderProvider.get().getDefaultFiles().localizations().get(DefaultLocalization.RUSSIAN.getName());
 
@@ -262,30 +262,30 @@ public class FileMigrator {
                 );
 
             } else {
-                localizationTypes.put(MessageType.AFK.name(), "<status_color>Afk");
-                localizationTypes.put(MessageType.ADVANCEMENT.name(), "<status_color>Advancement");
-                localizationTypes.put(MessageType.CHAT.name(), "<status_color>Chat messages");
-                localizationTypes.put(MessageType.COMMAND_ANON.name(), "<status_color>Command /anon");
-                localizationTypes.put(MessageType.COMMAND_BALL.name(), "<status_color>Command /ball");
-                localizationTypes.put(MessageType.COMMAND_BROADCAST.name(), "<status_color>Command /broadcast");
-                localizationTypes.put(MessageType.COMMAND_COIN.name(), "<status_color>Command /coin");
-                localizationTypes.put(MessageType.COMMAND_DICE.name(), "<status_color>Command /dice");
-                localizationTypes.put(MessageType.COMMAND_DO.name(), "<status_color>Command /do");
-                localizationTypes.put(MessageType.COMMAND_MAIL.name(), "<status_color>Command /mail");
-                localizationTypes.put(MessageType.COMMAND_ME.name(), "<status_color>Command /me");
-                localizationTypes.put(MessageType.COMMAND_POLL.name(), "<status_color>Command /poll");
-                localizationTypes.put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), "<status_color>Command /rockpaperscissors");
-                localizationTypes.put(MessageType.COMMAND_STREAM.name(), "<status_color>Command /stream");
-                localizationTypes.put(MessageType.COMMAND_TELL.name(), "<status_color>Command /tell");
-                localizationTypes.put(MessageType.COMMAND_TICTACTOE.name(), "<status_color>Command /tictactoe");
-                localizationTypes.put(MessageType.COMMAND_TRY.name(), "<status_color>Command /try");
-                localizationTypes.put(MessageType.DEATH.name(), "<status_color>Death");
-                localizationTypes.put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), "<status_color>Messages from Discord");
-                localizationTypes.put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<status_color>Messages from Telegram");
-                localizationTypes.put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<status_color>Messages from Twitch");
-                localizationTypes.put(MessageType.JOIN.name(), "<status_color>Join");
-                localizationTypes.put(MessageType.QUIT.name(), "<status_color>Quit");
-                localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Sleep");
+                localizationTypes.put(ModuleName.MESSAGE_AFK.name(), "<status_color>Afk");
+                localizationTypes.put("ADVANCEMENT", "<status_color>Advancement");
+                localizationTypes.put(ModuleName.MESSAGE_CHAT.name(), "<status_color>Chat messages");
+                localizationTypes.put(ModuleName.COMMAND_ANON.name(), "<status_color>Command /anon");
+                localizationTypes.put(ModuleName.COMMAND_BALL.name(), "<status_color>Command /ball");
+                localizationTypes.put(ModuleName.COMMAND_BROADCAST.name(), "<status_color>Command /broadcast");
+                localizationTypes.put(ModuleName.COMMAND_COIN.name(), "<status_color>Command /coin");
+                localizationTypes.put(ModuleName.COMMAND_DICE.name(), "<status_color>Command /dice");
+                localizationTypes.put(ModuleName.COMMAND_DO.name(), "<status_color>Command /do");
+                localizationTypes.put(ModuleName.COMMAND_MAIL.name(), "<status_color>Command /mail");
+                localizationTypes.put(ModuleName.COMMAND_ME.name(), "<status_color>Command /me");
+                localizationTypes.put(ModuleName.COMMAND_POLL.name(), "<status_color>Command /poll");
+                localizationTypes.put(ModuleName.COMMAND_ROCKPAPERSCISSORS.name(), "<status_color>Command /rockpaperscissors");
+                localizationTypes.put(ModuleName.COMMAND_STREAM.name(), "<status_color>Command /stream");
+                localizationTypes.put(ModuleName.COMMAND_TELL.name(), "<status_color>Command /tell");
+                localizationTypes.put(ModuleName.COMMAND_TICTACTOE.name(), "<status_color>Command /tictactoe");
+                localizationTypes.put(ModuleName.COMMAND_TRY.name(), "<status_color>Command /try");
+                localizationTypes.put("DEATH", "<status_color>Death");
+                localizationTypes.put(ModuleName.INTEGRATION_DISCORD.name(), "<status_color>Messages from Discord");
+                localizationTypes.put(ModuleName.INTEGRATION_TELEGRAM.name(), "<status_color>Messages from Telegram");
+                localizationTypes.put(ModuleName.INTEGRATION_TWITCH.name(), "<status_color>Messages from Twitch");
+                localizationTypes.put(ModuleName.MESSAGE_JOIN.name(), "<status_color>Join");
+                localizationTypes.put(ModuleName.MESSAGE_QUIT.name(), "<status_color>Quit");
+                localizationTypes.put("SLEEP", "<status_color>Sleep");
 
                 Localization defaultEnglishLocalization = fileLoaderProvider.get().getDefaultFiles().localizations().get(DefaultLocalization.ENGLISH.getName());
 
@@ -305,7 +305,7 @@ public class FileMigrator {
 
     public FilePack migration_1_7_0(FilePack files) {
         Map<String, List<String>> messageChannel = files.integration().discord().messageChannel();
-        messageChannel.put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), List.of("123456"));
+        messageChannel.put(ModuleName.INTEGRATION_DISCORD.name(), List.of("123456"));
         messageChannel.put("CHAT_GLOBAL", List.of("123456"));
         files = files.withIntegration(files.integration().withDiscord(files.integration().discord().withMessageChannel(messageChannel)));
 
@@ -363,9 +363,9 @@ public class FileMigrator {
         for (Localization localization : files.localizations().values()) {
             Localization.Integration localizationIntegration = localization.integration();
 
-            localizationIntegration.discord().messageChannel().put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), Localization.Integration.Discord.ChannelEmbed.builder().content("<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>").build());
-            localizationIntegration.telegram().messageChannel().put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
-            localizationIntegration.twitch().messageChannel().put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
+            localizationIntegration.discord().messageChannel().put(ModuleName.INTEGRATION_DISCORD.name(), Localization.Integration.Discord.ChannelEmbed.builder().content("<fcolor:2><global_name> <fcolor:1>» <fcolor:4><message>").build());
+            localizationIntegration.telegram().messageChannel().put(ModuleName.INTEGRATION_TELEGRAM.name(), "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><message>");
+            localizationIntegration.twitch().messageChannel().put(ModuleName.INTEGRATION_TWITCH.name(), "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>");
 
             localizationIntegration.discord().infoChannel().forEach((key, value) ->
                     localizationIntegration.discord().infoChannel().put(key, Strings.CS.replace(value, "<tps>", "<replacement:tps>")));

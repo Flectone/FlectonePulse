@@ -14,7 +14,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -56,22 +56,22 @@ public class IntegrationSender {
     /**
      * Sends a message to integrations asynchronously.
      *
-     * @param messageType the type of message being sent
+     * @param moduleName the type of message being sent
      * @param format the message format string
      * @param eventMetadata the event metadata containing sender and message
      */
-    public void asyncSend(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
-        taskScheduler.runAsync(() -> send(messageType, format, eventMetadata), true);
+    public void asyncSend(ModuleName moduleName, String format, EventMetadata<?> eventMetadata) {
+        taskScheduler.runAsync(() -> send(moduleName, format, eventMetadata), true);
     }
 
     /**
      * Sends a message to integrations
      *
-     * @param messageType the type of message being sent
+     * @param moduleName the type of message being sent
      * @param format the message format string
      * @param eventMetadata the event metadata containing sender and message
      */
-    public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
+    public void send(ModuleName moduleName, String format, EventMetadata<?> eventMetadata) {
         UnaryOperator<String> integrationOperator = eventMetadata.integration();
         if (integrationOperator == null) return;
         if (!integrationModule.hasMessenger()) return;
@@ -99,11 +99,11 @@ public class IntegrationSender {
             );
         };
 
-        for (String specificMessageName : createSpecificMessageNames(messageType, eventMetadata)) {
+        for (String specificMessageName : createSpecificMessageNames(moduleName, eventMetadata)) {
             integrationModule.sendMessage(sender, specificMessageName, interfaceReplaceString);
         }
 
-        integrationModule.sendMessage(sender, messageType.name(), interfaceReplaceString);
+        integrationModule.sendMessage(sender, moduleName.name(), interfaceReplaceString);
     }
 
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
@@ -145,12 +145,12 @@ public class IntegrationSender {
         return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
     }
 
-    protected Collection<String> createSpecificMessageNames(MessageType messageType, EventMetadata<?> eventMetadata) {
-        if (messageType == MessageType.CHAT
+    protected Collection<String> createSpecificMessageNames(ModuleName moduleName, EventMetadata<?> eventMetadata) {
+        if (moduleName == ModuleName.MESSAGE_CHAT
                 && eventMetadata instanceof ChatMetadata<?> chatMetadata
                 && chatMetadata.chat().name() != null) {
-            return List.of((messageType.name() + "_" + chatMetadata.chat().name()).toUpperCase());
-        } else if (messageType == MessageType.VANILLA) {
+            return List.of((moduleName.name() + "_" + chatMetadata.chat().name()).toUpperCase());
+        } else if (moduleName == ModuleName.MESSAGE_VANILLA) {
             if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) return Collections.emptyList();
 
             String vanillaMessageName = vanillaMetadata.parsedComponent().vanillaMessage().name();

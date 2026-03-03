@@ -8,11 +8,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.tab.listener.TABPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TABModule extends AbstractModule {
+public class TABModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final TABIntegration tabIntegration;
@@ -20,8 +21,6 @@ public class TABModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         tabIntegration.hook();
 
         listenerRegistry.register(TABPulseListener.class);
@@ -29,9 +28,12 @@ public class TABModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         tabIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_TAB;
     }
 
     @Override

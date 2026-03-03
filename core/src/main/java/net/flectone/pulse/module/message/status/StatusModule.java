@@ -6,13 +6,19 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class StatusModule extends AbstractModule {
+public class StatusModule implements AbstractModule {
 
     private final FileFacade fileFacade;
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_STATUS;
+    }
 
     @Override
     public Message.Status config() {

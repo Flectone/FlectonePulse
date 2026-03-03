@@ -11,11 +11,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.litebans.listener.LiteBansPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class LiteBansModule extends AbstractModule {
+public class LiteBansModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final LiteBansIntegration liteBansIntegration;
@@ -24,8 +25,6 @@ public class LiteBansModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         liteBansIntegration.hook();
 
         listenerRegistry.register(LiteBansPulseListener.class);
@@ -33,9 +32,12 @@ public class LiteBansModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         liteBansIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_LITEBANS;
     }
 
     @Override

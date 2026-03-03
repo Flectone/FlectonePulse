@@ -21,7 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -37,7 +37,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SwearModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Swear> {
+public class SwearModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Swear> {
 
     private final @Named("swearMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
@@ -51,8 +51,6 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         try {
             combinedPattern = Pattern.compile(String.join("|", config().trigger()));
         } catch (PatternSyntaxException e) {
@@ -64,19 +62,17 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().see(), permission().bypass());
+        return AbstractModuleLocalization.super.permissionBuilder().add(permission().see(), permission().bypass());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         messageCache.invalidateAll();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.SWEAR;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION_SWEAR;
     }
 
     @Override

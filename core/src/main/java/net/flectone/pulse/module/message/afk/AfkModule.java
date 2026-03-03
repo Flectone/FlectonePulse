@@ -23,7 +23,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AfkModule extends AbstractModuleLocalization<Localization.Message.Afk> {
+public class AfkModule implements AbstractModuleLocalization<Localization.Message.Afk> {
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new ConcurrentHashMap<>();
 
@@ -55,8 +55,6 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         if (config().ticker().enable()) {
             taskScheduler.runPlayerRegionTimer(this::updateCoordinates, config().ticker().period());
         }
@@ -66,14 +64,12 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         playersCoordinates.clear();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.AFK;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_AFK;
     }
 
     @Override

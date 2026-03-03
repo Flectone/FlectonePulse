@@ -16,14 +16,14 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NewbieModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
+public class NewbieModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -50,18 +50,16 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
                     )
             ));
         }
-
-        super.onEnable();
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().bypass());
+        return AbstractModuleLocalization.super.permissionBuilder().add(permission().bypass());
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.NEWBIE;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION_NEWBIE;
     }
 
     @Override

@@ -28,7 +28,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -133,8 +133,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         }
 
         try {
-            MessageType messageType = MessageType.valueOf(params.toUpperCase());
-            return fPlayer.isSetting(messageType) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            ModuleName moduleName = ModuleName.valueOf(params.toUpperCase());
+            return fPlayer.isSetting(moduleName) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
         } catch (IllegalArgumentException ignored) {
             // ignore exception
         }

@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.List;
@@ -54,8 +54,8 @@ public abstract class SidebarModule extends AbstractModuleListLocalization<Local
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.SIDEBAR;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_SIDEBAR;
     }
 
     @Override

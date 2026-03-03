@@ -8,11 +8,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MaintenanceModule extends AbstractModule {
+public class MaintenanceModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final MaintenanceIntegration maintenanceIntegration;
@@ -20,8 +21,6 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         maintenanceIntegration.hook();
 
         listenerRegistry.register(MaintenancePulseListener.class);
@@ -29,9 +28,12 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         maintenanceIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_MAINTENANCE;
     }
 
     @Override

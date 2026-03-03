@@ -27,18 +27,19 @@ import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MessageModule extends AbstractModule {
+public class MessageModule implements AbstractModule {
 
     private final FileFacade fileFacade;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return super.childrenBuilder().add(
+        return AbstractModule.super.childrenBuilder().add(
                 AfkModule.class,
                 AnvilModule.class,
                 AutoModule.class,
@@ -60,6 +61,11 @@ public class MessageModule extends AbstractModule {
                 UpdateModule.class,
                 VanillaModule.class
         );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE;
     }
 
     @Override

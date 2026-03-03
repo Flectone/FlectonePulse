@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 
 import java.util.UUID;
 
@@ -54,7 +54,7 @@ public class CooldownRepository {
     public void syncProxy(UUID playerUUID, String cooldownOwner, long newExpireTime) {
         taskScheduler.runAsync(() -> {
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(FPlayer.UNKNOWN, MessageType.SYSTEM_COOLDOWN, dataOutputStream -> {
+                proxySender.send(FPlayer.UNKNOWN, ModuleName.SYSTEM_COOLDOWN, dataOutputStream -> {
                     dataOutputStream.writeUTF(playerUUID.toString());
                     dataOutputStream.writeUTF(cooldownOwner);
                     dataOutputStream.writeLong(newExpireTime);

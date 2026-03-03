@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 
@@ -24,7 +24,7 @@ import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class GreetingModule extends AbstractModuleLocalization<Localization.Message.Greeting> {
+public class GreetingModule implements AbstractModuleLocalization<Localization.Message.Greeting> {
 
     private final FileFacade fileFacade;
     private final SkinService skinService;
@@ -34,14 +34,12 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(GreetingPulseListener.class);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.GREETING;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_GREETING;
     }
 
     @Override

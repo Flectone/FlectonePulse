@@ -14,13 +14,13 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon> {
+public class AnonModule implements AbstractModuleCommand<Localization.Command.Anon> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -30,8 +30,6 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -41,8 +39,6 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -66,8 +62,8 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_ANON;
+    public ModuleName name() {
+        return ModuleName.COMMAND_ANON;
     }
 
     @Override

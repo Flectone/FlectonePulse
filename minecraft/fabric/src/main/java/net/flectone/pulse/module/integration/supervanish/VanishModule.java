@@ -8,11 +8,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class VanishModule extends AbstractModule {
+public class VanishModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final VanishIntegration vanishIntegration;
@@ -20,16 +21,17 @@ public class VanishModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         vanishIntegration.hook();
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         vanishIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_SUPERVANISH;
     }
 
     @Override

@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -41,7 +41,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NicknameModule extends AbstractModuleCommand<Localization.Command.Nickname> {
+public class NicknameModule implements AbstractModuleCommand<Localization.Command.Nickname> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -60,8 +60,6 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         if (!config().allowedInput().isEmpty()) {
             try {
                 allowedPattern = Pattern.compile(config().allowedInput());
@@ -91,8 +89,6 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -128,8 +124,8 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_NICKNAME;
+    public ModuleName name() {
+        return ModuleName.COMMAND_NICKNAME;
     }
 
     @Override
@@ -149,8 +145,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
-                .add(permission().see(), permission().other());
+        return AbstractModuleCommand.super.permissionBuilder().add(permission().see(), permission().other());
     }
 
     public void changeName(FPlayer fPlayer, FPlayer fTarget, String nickname) {
@@ -184,7 +179,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
         );
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fTarget, MessageType.COMMAND_NICKNAME);
+            proxySender.send(fTarget, ModuleName.COMMAND_NICKNAME);
         }
     }
 

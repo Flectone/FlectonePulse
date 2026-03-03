@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.type.tuple.Pair;
@@ -90,7 +90,7 @@ public class CooldownSender {
         MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
         Component component = messagePipeline.build(cooldownContext);
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));
 
         return true;
     }

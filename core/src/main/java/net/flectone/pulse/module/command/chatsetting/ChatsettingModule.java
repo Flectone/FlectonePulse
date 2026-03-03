@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-public abstract class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
+public abstract class ChatsettingModule implements AbstractModuleCommand<Localization.Command.Chatsetting> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -69,8 +69,6 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptType = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::type);
         String promptValue = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::value);
@@ -84,14 +82,12 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleCommand.super.permissionBuilder()
                 .add(permission().other())
                 .addAll(permission().settings().values());
     }
@@ -100,7 +96,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         return (context, input) -> {
             if (!permissionChecker.check(context.sender(), permission().other())) return Collections.emptyList();
 
-            return Arrays.stream(MessageType.values())
+            return Arrays.stream(ModuleName.values())
                     .map(setting -> Suggestion.suggestion(setting.name()))
                     .toList();
         };
@@ -125,8 +121,8 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_CHATSETTING;
+    public ModuleName name() {
+        return ModuleName.COMMAND_CHATSETTING;
     }
 
     @Override
@@ -182,7 +178,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
             fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
+                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }
@@ -192,7 +188,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
             fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
+                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }

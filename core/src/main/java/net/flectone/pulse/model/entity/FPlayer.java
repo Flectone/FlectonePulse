@@ -8,7 +8,7 @@ import lombok.With;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
@@ -66,19 +66,19 @@ public interface FPlayer extends FEntity {
 
     @Nullable String getSetting(SettingText settingText);
 
-    @NonNull String getSetting(MessageType messageType);
+    @NonNull String getSetting(ModuleName moduleName);
 
-    @NonNull String getSetting(String messageType);
+    @NonNull String getSetting(String moduleName);
 
-    boolean isSetting(MessageType messageType);
+    boolean isSetting(ModuleName moduleName);
 
-    boolean isSetting(String messageType);
+    boolean isSetting(String moduleName);
 
     FPlayer withoutSetting(SettingText settingText);
 
-    FPlayer withoutSetting(String messageType);
+    FPlayer withoutSetting(String moduleName);
 
-    FPlayer withoutSetting(MessageType messageType);
+    FPlayer withoutSetting(ModuleName moduleName);
 
     FPlayer withoutIgnore(Ignore ignore);
 
@@ -190,23 +190,23 @@ public interface FPlayer extends FEntity {
         }
 
         @Override
-        public @NonNull String getSetting(@NonNull MessageType messageType) {
-            return getSetting(messageType.name());
+        public @NonNull String getSetting(@NonNull ModuleName moduleName) {
+            return getSetting(moduleName.name());
         }
 
         @Override
-        public @NonNull String getSetting(@Nullable String messageType) {
-            return isSetting(messageType) ? "1" : "0";
+        public @NonNull String getSetting(@Nullable String moduleName) {
+            return isSetting(moduleName) ? "1" : "0";
         }
 
         @Override
-        public boolean isSetting(@NonNull MessageType messageType) {
+        public boolean isSetting(@NonNull ModuleName messageType) {
             return isSetting(messageType.name());
         }
 
         @Override
-        public boolean isSetting(@Nullable String messageType) {
-            Boolean value = this.settingsBoolean.get(messageType);
+        public boolean isSetting(@Nullable String moduleName) {
+            Boolean value = this.settingsBoolean.get(moduleName);
             return value == null || value;
         }
 
@@ -223,12 +223,12 @@ public interface FPlayer extends FEntity {
         }
 
         @Override
-        public FPlayer withoutSetting(@Nullable String messageType) {
-            if (!this.settingsBoolean.containsKey(messageType)) return this;
+        public FPlayer withoutSetting(@Nullable String moduleName) {
+            if (!this.settingsBoolean.containsKey(moduleName)) return this;
 
             Map<String, Boolean> newSettings = new Object2BooleanArrayMap<>(this.settingsBoolean);
 
-            newSettings.remove(messageType);
+            newSettings.remove(moduleName);
 
             return toBuilder()
                     .settingsBoolean(Collections.unmodifiableMap(newSettings))
@@ -236,8 +236,8 @@ public interface FPlayer extends FEntity {
         }
 
         @Override
-        public FPlayer withoutSetting(@NonNull MessageType messageType) {
-            return withoutSetting(messageType.name());
+        public FPlayer withoutSetting(@NonNull ModuleName moduleName) {
+            return withoutSetting(moduleName.name());
         }
 
         @Override

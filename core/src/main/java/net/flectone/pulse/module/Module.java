@@ -9,22 +9,28 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.module.command.CommandModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.MessageModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class Module extends AbstractModule {
+public class Module implements AbstractModule {
 
     private final FileFacade fileFacade;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return super.childrenBuilder().add(
+        return AbstractModule.super.childrenBuilder().add(
                 IntegrationModule.class,
                 CommandModule.class,
                 MessageModule.class
         );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MODULE;
     }
 
     @Override

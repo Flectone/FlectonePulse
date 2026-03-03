@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 
 @Singleton
@@ -27,10 +27,10 @@ public class AfkPulseListener implements PulseListener {
 
     @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        String messageType = event.messageType().name();
+        String messageType = event.moduleName().name();
 
         // check only sender-based message types
-        if (event.messageType() != MessageType.CHAT && !messageType.startsWith("COMMAND_")) return;
+        if (event.moduleName() != ModuleName.MESSAGE_CHAT && !messageType.startsWith("COMMAND_")) return;
 
         EventMetadata<?> eventMetadata = event.eventMetadata();
         if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;

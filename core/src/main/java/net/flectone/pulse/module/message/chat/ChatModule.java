@@ -28,7 +28,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatModule extends AbstractModuleLocalization<Localization.Message.Chat> {
+public class ChatModule implements AbstractModuleLocalization<Localization.Message.Chat> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -57,15 +57,15 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleLocalization.super.permissionBuilder()
                 .addAll(permission().types().values())
                 .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::sound).toList())
                 .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::cooldownBypass).toList());
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.CHAT;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_CHAT;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        if (disableSender.sendIfDisabled(fPlayer, fPlayer, messageType())) {
+        if (disableSender.sendIfDisabled(fPlayer, fPlayer, name())) {
             cancelEvent.run();
             return;
         }
@@ -205,7 +205,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         // check online server players first
         for (FPlayer fReceiver : serverReceivers) {
-            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
+            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(ModuleName.MESSAGE_CHAT)) {
                 return false;
             }
         }
@@ -220,7 +220,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             // check proxy players only if no online server receivers found
             for (FPlayer fReceiver : proxyReceivers) {
                 fReceiver = fPlayerService.loadSettings(fPlayerService.loadIgnores(fReceiver));
-                if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
+                if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(ModuleName.MESSAGE_CHAT)) {
                     return false;
                 }
             }

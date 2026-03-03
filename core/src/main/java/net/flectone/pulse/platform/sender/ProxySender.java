@@ -13,7 +13,7 @@ import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -54,11 +54,11 @@ public class ProxySender {
     /**
      * Sends event metadata to proxy network.
      *
-     * @param messageType the type of message being sent
+     * @param moduleName the type of message being sent
      * @param eventMetadata the event metadata containing sender and data
      * @return true if message was sent to at least one proxy, false otherwise
      */
-    public boolean send(MessageType messageType, EventMetadata<?> eventMetadata) {
+    public boolean send(ModuleName moduleName, EventMetadata<?> eventMetadata) {
         ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.proxy();
         if (proxyConsumer == null) return false;
 
@@ -66,7 +66,7 @@ public class ProxySender {
         if (!range.is(Range.Type.PROXY)) return false;
 
         FEntity sender = eventMetadata.sender();
-        return send(sender, messageType, proxyConsumer, eventMetadata.uuid());
+        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid());
     }
 
     /**
@@ -76,7 +76,7 @@ public class ProxySender {
      * @param tag the message type tag
      * @return true if message was sent to at least one proxy, false otherwise
      */
-    public boolean send(FEntity sender, MessageType tag) {
+    public boolean send(FEntity sender, ModuleName tag) {
         return send(sender, tag, dataOutputStream -> {}, UUID.randomUUID());
     }
 
@@ -89,7 +89,7 @@ public class ProxySender {
      * @param metadataUUID unique identifier for this metadata
      * @return true if data was sent to at least one proxy, false otherwise
      */
-    public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
+    public boolean send(FEntity sender, ModuleName tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
         if (!proxyRegistry.hasEnabledProxy()) return false;
         if (sender instanceof FPlayer fPlayer) {
             List<String> constant = fileFacade.localization(sender).message().format().names().constant();

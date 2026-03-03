@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AnimationModule extends AbstractModuleLocalization<Localization.Message.Format.Animation> {
+public class AnimationModule implements AbstractModuleLocalization<Localization.Message.Format.Animation> {
 
     private final Map<AnimationKey, Integer> animationMap = new ConcurrentHashMap<>();
 
@@ -44,26 +44,22 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(AnimationPulseListener.class);
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         animationMap.clear();
-    }
-
-    @Override
-    public MessageType messageType() {
-        return MessageType.ANIMATION;
     }
 
     @Override
     public Localization.Message.Format.Animation localization(FEntity sender) {
         return fileFacade.localization(sender).message().format().animation();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_ANIMATION;
     }
 
     @Override
@@ -78,7 +74,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().addAll(permission().values().values());
+        return AbstractModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
     }
 
     public MessageContext addTag(MessageContext messageContext) {

@@ -14,13 +14,14 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TwitchModule extends AbstractModule {
+public class TwitchModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -29,8 +30,6 @@ public class TwitchModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
         injector.getInstance(TwitchIntegration.class).hook();
@@ -38,8 +37,6 @@ public class TwitchModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         injector.getInstance(TwitchIntegration.class).unhook();
     }
 
@@ -433,6 +430,11 @@ public class TwitchModule extends AbstractModule {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_TWITCH;
     }
 
     @Override

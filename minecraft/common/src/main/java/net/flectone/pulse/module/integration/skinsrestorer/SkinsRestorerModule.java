@@ -9,13 +9,14 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SkinsRestorerModule extends AbstractModule {
+public class SkinsRestorerModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final SkinsRestorerIntegration skinsRestorerIntegration;
@@ -24,22 +25,22 @@ public class SkinsRestorerModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             // delay for init
             skinsRestorerIntegration.hookLater();
         } else {
             skinsRestorerIntegration.hook();
         }
-
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         skinsRestorerIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_SKINSRESTORER;
     }
 
     @Override

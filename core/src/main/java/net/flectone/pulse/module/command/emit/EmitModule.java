@@ -21,7 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit> {
+public class EmitModule implements AbstractModuleCommand<Localization.Command.Emit> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -48,8 +48,6 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptType = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::type);
         String promptMessage = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::message);
@@ -63,8 +61,6 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -133,8 +129,8 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_EMIT;
+    public ModuleName name() {
+        return ModuleName.COMMAND_EMIT;
     }
 
     @Override

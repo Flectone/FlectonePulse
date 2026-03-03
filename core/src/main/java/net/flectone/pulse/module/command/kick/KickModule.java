@@ -22,7 +22,7 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
+public class KickModule implements AbstractModuleCommand<Localization.Command.Kick> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -46,8 +46,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
@@ -59,8 +57,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -123,8 +119,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_KICK;
+    public ModuleName name() {
+        return ModuleName.COMMAND_KICK;
     }
 
     @Override

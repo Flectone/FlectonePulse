@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeletemessageModule extends AbstractModuleCommand<Localization.Command.Deletemessage> {
+public class DeletemessageModule implements AbstractModuleCommand<Localization.Command.Deletemessage> {
 
     private final FileFacade fileFacade;
     private final DeleteModule deleteModule;
@@ -36,8 +36,6 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptId = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::id);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -47,8 +45,6 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -67,7 +63,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        proxySender.send(fPlayer, MessageType.COMMAND_DELETE,
+        proxySender.send(fPlayer, ModuleName.COMMAND_DELETEMESSAGE,
                 dataOutputStream -> dataOutputStream.writeUTF(uuid.toString()),
                 UUID.randomUUID()
         );
@@ -86,8 +82,8 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_DELETE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_DELETEMESSAGE;
     }
 
     @Override

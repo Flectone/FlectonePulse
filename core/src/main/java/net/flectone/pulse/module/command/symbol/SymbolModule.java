@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +35,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
+public class SymbolModule implements AbstractModuleCommand<Localization.Command.Symbol> {
 
     private final FileFacade fileFacade;
     private final EventDispatcher eventDispatcher;
@@ -48,8 +48,6 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptCategory = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::category);
         String promptNumber = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::number);
         commandModuleController.registerCommand(this, manager -> manager
@@ -61,8 +59,6 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -149,14 +145,14 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
         MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
         component = component.append(messagePipeline.build(footerContext));
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_SYMBOL, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 
         soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_SYMBOL;
+    public ModuleName name() {
+        return ModuleName.COMMAND_SYMBOL;
     }
 
     @Override

@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.RegExUtils;
@@ -30,7 +31,7 @@ import java.util.OptionalInt;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FColorModule extends AbstractModule {
+public class FColorModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -40,14 +41,17 @@ public class FColorModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(FColorPulseListener.class);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().addAll(permission().colors().values());
+        return AbstractModule.super.permissionBuilder().addAll(permission().colors().values());
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_FCOLOR;
     }
 
     @Override

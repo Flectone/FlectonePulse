@@ -12,24 +12,30 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ModerationModule extends AbstractModule {
+public class ModerationModule implements AbstractModule {
 
     private final FileFacade fileFacade;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return super.childrenBuilder().add(
+        return AbstractModule.super.childrenBuilder().add(
                 CapsModule.class,
                 DeleteModule.class,
                 NewbieModule.class,
                 FloodModule.class,
                 SwearModule.class
         );
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION;
     }
 
     @Override

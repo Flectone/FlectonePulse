@@ -3,13 +3,14 @@ package net.flectone.pulse.module.integration.discord.listener;
 import discord4j.core.event.domain.Event;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.AbstractModuleLocalization;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import reactor.core.publisher.Mono;
 
-public abstract class EventListener<T extends Event> extends AbstractModuleLocalization<Localization.Integration.Discord> {
+public abstract class EventListener<T extends Event> implements AbstractModuleLocalization<Localization.Integration.Discord> {
 
-    public MessageType messageType() {
-        return MessageType.FROM_DISCORD_TO_MINECRAFT;
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_DISCORD;
     }
 
     public abstract Class<T> getEventType();

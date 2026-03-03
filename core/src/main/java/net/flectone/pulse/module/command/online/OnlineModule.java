@@ -20,7 +20,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -32,7 +32,7 @@ import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class OnlineModule extends AbstractModuleCommand<Localization.Command.Online> {
+public class OnlineModule implements AbstractModuleCommand<Localization.Command.Online> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -47,8 +47,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
         String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
         commandModuleController.registerCommand(this, manager -> manager
@@ -60,8 +58,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -122,8 +118,8 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_ONLINE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_ONLINE;
     }
 
     @Override

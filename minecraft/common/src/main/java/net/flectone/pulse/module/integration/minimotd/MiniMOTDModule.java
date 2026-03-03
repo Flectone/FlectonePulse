@@ -8,11 +8,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.minimotd.listener.MiniMOTDPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MiniMOTDModule extends AbstractModule {
+public class MiniMOTDModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final MiniMOTDIntegration miniMOTDIntegration;
@@ -20,8 +21,6 @@ public class MiniMOTDModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         miniMOTDIntegration.hook();
 
         listenerRegistry.register(MiniMOTDPulseListener.class);
@@ -29,9 +28,12 @@ public class MiniMOTDModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         miniMOTDIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_MINIMOTD;
     }
 
     @Override

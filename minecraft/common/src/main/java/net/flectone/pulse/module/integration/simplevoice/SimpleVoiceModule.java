@@ -6,10 +6,11 @@ import lombok.Getter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class SimpleVoiceModule extends AbstractModule {
+public class SimpleVoiceModule implements AbstractModule {
 
     @Getter private static SimpleVoiceIntegration SIMPLE_VOICE_INTEGRATION;
 
@@ -25,15 +26,17 @@ public class SimpleVoiceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
         SIMPLE_VOICE_INTEGRATION.hook();
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         SIMPLE_VOICE_INTEGRATION.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_SIMPLEVOICE;
     }
 
     @Override

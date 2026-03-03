@@ -11,11 +11,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.advancedban.listener.AdvancedBanPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AdvancedBanModule extends AbstractModule {
+public class AdvancedBanModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final AdvancedBanIntegration advancedBanIntegration;
@@ -24,8 +25,6 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         advancedBanIntegration.hook();
 
         listenerRegistry.register(AdvancedBanPulseListener.class);
@@ -33,9 +32,12 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         advancedBanIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_ADVANCEDBAN;
     }
 
     @Override

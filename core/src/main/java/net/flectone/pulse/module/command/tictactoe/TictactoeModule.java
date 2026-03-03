@@ -24,7 +24,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
+public class TictactoeModule implements AbstractModuleCommand<Localization.Command.Tictactoe> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -54,8 +54,6 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptHard = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::hard);
         commandModuleController.registerCommand(this, manager -> manager
@@ -77,8 +75,6 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         tictactoeService.clear();
         commandModuleController.clearPrompts(this);
     }
@@ -118,7 +114,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
@@ -138,7 +134,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         );
 
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.CREATE.name());
             dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
@@ -151,8 +147,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_TICTACTOE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_TICTACTOE;
     }
 
     @Override
@@ -289,7 +285,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer finalFReceiver = fReceiver;
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.MOVE.name());
             dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());

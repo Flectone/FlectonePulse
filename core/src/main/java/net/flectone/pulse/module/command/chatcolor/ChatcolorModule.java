@@ -24,7 +24,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -35,7 +35,7 @@ import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
+public class ChatcolorModule implements AbstractModuleCommand<Localization.Command.Chatcolor> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -49,8 +49,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
         String promptColor = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::color);
         String promptPlayer = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::player);
@@ -69,14 +67,12 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleCommand.super.permissionBuilder()
                 .add(permission().other())
                 .addAll(permission().colors().values());
     }
@@ -162,8 +158,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_CHATCOLOR;
+    public ModuleName name() {
+        return ModuleName.COMMAND_CHATCOLOR;
     }
 
     @Override
@@ -196,7 +192,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             fPlayerService.saveColors(fPlayer);
 
             // update proxy players
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {}, metadataUUID);
+            proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, dataOutputStream -> {}, metadataUUID);
         }
 
         sendMessageWithUpdatedColors(fPlayer, metadataUUID);

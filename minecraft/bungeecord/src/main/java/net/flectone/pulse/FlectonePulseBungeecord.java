@@ -1,7 +1,7 @@
 package net.flectone.pulse;
 
 import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -51,7 +51,7 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
     @EventHandler
     public void onServerConnectedEvent(ServerConnectedEvent event) {
-        byte[] data = ProxyMessageProcessor.create(MessageType.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
@@ -60,7 +60,7 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
     @EventHandler
     public void onDisconnectEvent(PlayerDisconnectEvent event) {
-        byte[] data = ProxyMessageProcessor.create(MessageType.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
+        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())

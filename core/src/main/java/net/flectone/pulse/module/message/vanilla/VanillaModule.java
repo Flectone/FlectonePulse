@@ -7,11 +7,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
-public abstract class VanillaModule extends AbstractModuleLocalization<Localization.Message.Vanilla> {
+public abstract class VanillaModule implements AbstractModuleLocalization<Localization.Message.Vanilla> {
 
     public static final String ARGUMENT = "argument";
 
@@ -22,13 +22,8 @@ public abstract class VanillaModule extends AbstractModuleLocalization<Localizat
     }
 
     @Override
-    public void onEnable() {
-        super.onEnable();
-    }
-
-    @Override
-    public MessageType messageType() {
-        return MessageType.VANILLA;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_VANILLA;
     }
 
     @Override

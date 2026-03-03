@@ -16,12 +16,12 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class JoinModule extends AbstractModuleLocalization<Localization.Message.Join> {
+public class JoinModule implements AbstractModuleLocalization<Localization.Message.Join> {
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -31,8 +31,8 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     private final ModuleController moduleController;
 
     @Override
-    public MessageType messageType() {
-        return MessageType.JOIN;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_JOIN;
     }
 
     @Override

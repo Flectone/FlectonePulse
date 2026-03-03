@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -31,7 +31,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NamesModule extends AbstractModuleLocalization<Localization.Message.Format.Names> {
+public class NamesModule implements AbstractModuleLocalization<Localization.Message.Format.Names> {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -42,9 +42,12 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(NamesPulseListener.class);
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_NAMES;
     }
 
     @Override
@@ -55,11 +58,6 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
     @Override
     public Permission.Message.Format.Names permission() {
         return fileFacade.permission().message().format().names();
-    }
-
-    @Override
-    public MessageType messageType() {
-        return MessageType.NAME;
     }
 
     @Override

@@ -33,7 +33,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -46,7 +46,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FormatModule extends AbstractModuleLocalization<Localization.Message.Format> {
+public class FormatModule implements AbstractModuleLocalization<Localization.Message.Format> {
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
@@ -58,7 +58,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return super.childrenBuilder().add(
+        return AbstractModuleLocalization.super.childrenBuilder().add(
                 FColorModule.class,
                 FixationModule.class,
                 MentionModule.class,
@@ -76,8 +76,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         putAdventureTag(AdventureTag.HOVER, StandardTags.hoverEvent());
         putAdventureTag(AdventureTag.CLICK, StandardTags.clickEvent());
         putAdventureTag(AdventureTag.COLOR, StandardTags.color());
@@ -107,21 +105,19 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleLocalization.super.permissionBuilder()
                 .add(permission().legacyColors())
                 .addAll(permission().adventureTags().values());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         tagResolverMap.clear();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.FORMAT;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT;
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.luckperms.listener.LuckPermsPulseLi
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -24,7 +25,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class LuckPermsModule extends AbstractModule {
+public class LuckPermsModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final LuckPermsIntegration luckPermsIntegration;
@@ -35,8 +36,6 @@ public class LuckPermsModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             // delay for init
             luckPermsIntegration.hookLater();
@@ -51,9 +50,12 @@ public class LuckPermsModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         luckPermsIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_LUCKPERMS;
     }
 
     @Override

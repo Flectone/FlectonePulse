@@ -14,6 +14,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -21,7 +22,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DiscordModule extends AbstractModule {
+public class DiscordModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -31,8 +32,6 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
         try {
@@ -44,9 +43,12 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         injector.getInstance(DiscordIntegration.class).unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_DISCORD;
     }
 
     @Override

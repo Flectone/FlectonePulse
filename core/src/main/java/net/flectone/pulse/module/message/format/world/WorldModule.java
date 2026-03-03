@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -27,7 +28,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WorldModule extends AbstractModule {
+public class WorldModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -39,9 +40,12 @@ public class WorldModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(WorldPulseListener.class);
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_WORLD;
     }
 
     @Override

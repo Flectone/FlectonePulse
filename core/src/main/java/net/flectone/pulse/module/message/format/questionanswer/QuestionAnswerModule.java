@@ -25,7 +25,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuestionAnswerModule extends AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
+public class QuestionAnswerModule implements AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
@@ -57,8 +57,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         config().questions().forEach((key, questionMessage) -> {
             try {
                 patternMap.put(key, Pattern.compile(questionMessage.target()));
@@ -72,7 +70,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
+        return AbstractModuleLocalization.super.permissionBuilder()
                 .addAll(permission().questions().values().stream().flatMap(question ->
                         Stream.of(
                                 question,
@@ -84,15 +82,13 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         processedQuestions.clear();
         patternMap.clear();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.QUESTION_ANSWER;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_QUESTIONANSWER;
     }
 
     @Override

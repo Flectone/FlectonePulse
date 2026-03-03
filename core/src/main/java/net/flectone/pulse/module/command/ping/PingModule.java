@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PingModule extends AbstractModuleCommand<Localization.Command.Ping> {
+public class PingModule implements AbstractModuleCommand<Localization.Command.Ping> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -38,8 +38,6 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -49,8 +47,6 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -85,8 +81,8 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_PING;
+    public ModuleName name() {
+        return ModuleName.COMMAND_PING;
     }
 
     @Override

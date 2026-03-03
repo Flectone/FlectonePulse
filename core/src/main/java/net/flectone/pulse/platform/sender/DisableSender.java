@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -43,13 +43,13 @@ public class DisableSender {
      *
      * @param entity the entity sending the message
      * @param receiver the entity receiving the message
-     * @param messageType the type of message being sent
+     * @param moduleName the type of message being sent
      * @return true if message type is disabled for receiver, false otherwise
      */
-    public boolean sendIfDisabled(FEntity entity, FEntity receiver, MessageType messageType) {
+    public boolean sendIfDisabled(FEntity entity, FEntity receiver, ModuleName moduleName) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (fReceiver.isUnknown()) return false;
-        if (fReceiver.isSetting(messageType)) return false;
+        if (fReceiver.isSetting(moduleName)) return false;
 
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return true;
@@ -63,7 +63,7 @@ public class DisableSender {
         MessageContext messageContext = messagePipeline.createContext(receiver, fPlayer, disableMessage);
         Component component = messagePipeline.build(messageContext);
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));
 
         return true;
     }

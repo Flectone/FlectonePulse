@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     private final ModuleController moduleController;
 
     @Override
-    public MessageType messageType() {
-        return MessageType.MOTD;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_STATUS_MOTD;
     }
 
     @Override

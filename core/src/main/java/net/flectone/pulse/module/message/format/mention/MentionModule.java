@@ -24,7 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MentionModule extends AbstractModuleLocalization<Localization.Message.Format.Mention> {
+public class MentionModule implements AbstractModuleLocalization<Localization.Message.Format.Mention> {
 
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
@@ -56,27 +56,23 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(MentionPulseListener.class);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
+        return AbstractModuleLocalization.super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         processedMentions.clear();
         messageCache.invalidateAll();
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.MENTION;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MENTION;
     }
 
     @Override

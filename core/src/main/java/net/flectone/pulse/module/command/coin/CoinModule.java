@@ -15,7 +15,7 @@ import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin> {
+public class CoinModule implements AbstractModuleCommand<Localization.Command.Coin> {
 
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
@@ -34,8 +34,6 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
         );
@@ -68,8 +66,8 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_COIN;
+    public ModuleName name() {
+        return ModuleName.COMMAND_COIN;
     }
 
     @Override

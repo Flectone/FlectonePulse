@@ -19,7 +19,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HelperModule extends AbstractModuleCommand<Localization.Command.Helper> {
+public class HelperModule implements AbstractModuleCommand<Localization.Command.Helper> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -41,8 +41,6 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -52,15 +50,12 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
-                .add(permission().see());
+        return AbstractModuleCommand.super.permissionBuilder().add(permission().see());
     }
 
     @Override
@@ -109,8 +104,8 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_HELPER;
+    public ModuleName name() {
+        return ModuleName.COMMAND_HELPER;
     }
 
     @Override

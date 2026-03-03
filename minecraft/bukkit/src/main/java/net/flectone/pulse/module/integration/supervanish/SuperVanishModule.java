@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +17,7 @@ import org.bukkit.metadata.MetadataValue;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SuperVanishModule extends AbstractModule {
+public class SuperVanishModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final SuperVanishIntegration superVanishIntegration;
@@ -25,8 +26,6 @@ public class SuperVanishModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(SuperVanishIntegration.class);
 
         superVanishIntegration.hook();
@@ -34,9 +33,12 @@ public class SuperVanishModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         superVanishIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_SUPERVANISH;
     }
 
     @Override

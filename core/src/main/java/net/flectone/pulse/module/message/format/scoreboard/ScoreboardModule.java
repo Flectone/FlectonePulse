@@ -6,9 +6,10 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
-public abstract class ScoreboardModule extends AbstractModule {
+public abstract class ScoreboardModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -17,6 +18,11 @@ public abstract class ScoreboardModule extends AbstractModule {
                                ListenerRegistry listenerRegistry) {
         this.fileFacade = fileFacade;
         this.listenerRegistry = listenerRegistry;
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_SCOREBOARD;
     }
 
     @Override
@@ -31,8 +37,6 @@ public abstract class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(ScoreboardPulseListener.class);
     }
 

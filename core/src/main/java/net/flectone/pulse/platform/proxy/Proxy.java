@@ -1,7 +1,7 @@
 package net.flectone.pulse.platform.proxy;
 
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 
 public interface Proxy {
 
@@ -11,6 +11,6 @@ public interface Proxy {
 
     void onDisable();
 
-    boolean sendMessage(FEntity sender, MessageType tag, byte[] message);
+    boolean sendMessage(FEntity sender, ModuleName tag, byte[] message);
 
 }

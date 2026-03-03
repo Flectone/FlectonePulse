@@ -16,7 +16,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -26,7 +26,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RightclickModule extends AbstractModuleLocalization<Localization.Message.Rightclick> {
+public class RightclickModule implements AbstractModuleLocalization<Localization.Message.Rightclick> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -37,8 +37,8 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     private final ModuleController moduleController;
 
     @Override
-    public MessageType messageType() {
-        return MessageType.RIGHT_CLICK;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_RIGHTCLICK;
     }
 
     @Override

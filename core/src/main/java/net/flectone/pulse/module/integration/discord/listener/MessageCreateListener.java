@@ -22,7 +22,6 @@ import net.flectone.pulse.module.integration.discord.DiscordIntegration;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -56,7 +55,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        List<String> channel = config().messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+        List<String> channel = config().messageChannel().get(name().name());
         if (channel == null) return Mono.empty();
         if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
 
@@ -89,7 +88,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .base(EventMetadata.<Localization.Integration.Discord>builder()
                         .sender(discordIntegration.get().getSender())
                         .format(localization -> {
-                            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+                            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(name().name());
                             if (channelEmbed == null) return "";
 
                             return StringUtils.replaceEach(

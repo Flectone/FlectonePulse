@@ -25,7 +25,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
@@ -34,7 +34,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Singleton
-public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
+public class MaintenanceModule implements AbstractModuleCommand<Localization.Command.Maintenance> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -83,8 +83,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(MaintenancePulseListener.class);
 
         File file = iconPath.resolve("maintenance.png").toFile();
@@ -106,15 +104,12 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder()
-                .add(permission().join());
+        return AbstractModuleCommand.super.permissionBuilder().add(permission().join());
     }
 
     @Override
@@ -150,8 +145,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_MAINTENANCE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_MAINTENANCE;
     }
 
     @Override

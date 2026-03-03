@@ -11,11 +11,12 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.libertybans.listener.LibertyBansPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class LibertyBansModule extends AbstractModule {
+public class LibertyBansModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final LibertyBansIntegration libertyBansIntegration;
@@ -24,8 +25,6 @@ public class LibertyBansModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         libertyBansIntegration.hook();
 
         listenerRegistry.register(LibertyBansPulseListener.class);
@@ -33,9 +32,12 @@ public class LibertyBansModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         libertyBansIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_LIBERTYBANS;
     }
 
     @Override

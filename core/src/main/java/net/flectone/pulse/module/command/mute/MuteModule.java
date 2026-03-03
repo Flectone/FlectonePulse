@@ -24,7 +24,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -38,7 +38,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
+public class MuteModule implements AbstractModuleCommand<Localization.Command.Mute> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -54,8 +54,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
         String promptTime = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::time);
@@ -69,8 +67,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -121,7 +117,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.id());
         if (mute == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
+        proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()
@@ -149,8 +145,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_MUTE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_MUTE;
     }
 
     @Override

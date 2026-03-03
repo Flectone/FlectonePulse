@@ -181,7 +181,7 @@ public class ModuleController {
 
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
             return disablePredicate
-                    .and((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()))
+                    .and((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
                     .and((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
                     .and((fPlayer, needBoolean) -> needBoolean && muteSenderProvider.get().sendIfMuted(fPlayer));
         }

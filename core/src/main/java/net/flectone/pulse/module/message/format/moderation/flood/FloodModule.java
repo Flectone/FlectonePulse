@@ -14,12 +14,13 @@ import net.flectone.pulse.module.message.format.moderation.flood.listener.FloodP
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FloodModule extends AbstractModule {
+public class FloodModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -28,14 +29,17 @@ public class FloodModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(FloodPulseListener.class);
     }
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().bypass());
+        return AbstractModule.super.permissionBuilder().add(permission().bypass());
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_FORMAT_MODERATION_FLOOD;
     }
 
     @Override

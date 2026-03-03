@@ -7,11 +7,12 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ItemsAdderModule extends AbstractModule {
+public class ItemsAdderModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final ItemsAdderIntegration itemsAdderIntegration;
@@ -19,8 +20,6 @@ public class ItemsAdderModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         itemsAdderIntegration.hook();
 
         listenerRegistry.register(ItemsAdderIntegration.class);
@@ -28,9 +27,12 @@ public class ItemsAdderModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         itemsAdderIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_ITEMSADDER;
     }
 
     @Override

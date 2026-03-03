@@ -9,12 +9,13 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TritonModule extends AbstractModule {
+public class TritonModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final TritonIntegration tritonIntegration;
@@ -23,8 +24,6 @@ public class TritonModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(TritonIntegration.class);
 
         tritonIntegration.hook();
@@ -32,9 +31,12 @@ public class TritonModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         tritonIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_TRITON;
     }
 
     @Override

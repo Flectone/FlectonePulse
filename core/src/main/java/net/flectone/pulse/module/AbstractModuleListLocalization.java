@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractModuleListLocalization<M extends LocalizationSetting> extends AbstractModuleLocalization<M> {
+public abstract class AbstractModuleListLocalization<M extends LocalizationSetting> implements AbstractModuleLocalization<M> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -20,8 +20,6 @@ public abstract class AbstractModuleListLocalization<M extends LocalizationSetti
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         messageIndexMap.clear();
     }
 

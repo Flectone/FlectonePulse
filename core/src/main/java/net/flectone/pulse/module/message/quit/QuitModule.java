@@ -17,12 +17,12 @@ import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuitModule extends AbstractModuleLocalization<Localization.Message.Quit> {
+public class QuitModule implements AbstractModuleLocalization<Localization.Message.Quit> {
 
     private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
@@ -33,14 +33,12 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         listenerRegistry.register(QuitPulseListener.class);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.QUIT;
+    public ModuleName name() {
+        return ModuleName.MESSAGE_QUIT;
     }
 
     @Override

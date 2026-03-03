@@ -21,7 +21,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
+public class StreamModule implements AbstractModuleCommand<Localization.Command.Stream> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -56,8 +56,6 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
         String promptUrl = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::url);
         commandModuleController.registerCommand(this, manager -> manager
@@ -71,8 +69,6 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -166,8 +162,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_STREAM;
+    public ModuleName name() {
+        return ModuleName.COMMAND_STREAM;
     }
 
     @Override

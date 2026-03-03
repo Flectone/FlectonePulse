@@ -23,7 +23,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.WebUtil;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SpriteModule extends AbstractModuleCommand<Localization.Command.Sprite> {
+public class SpriteModule implements AbstractModuleCommand<Localization.Command.Sprite> {
 
     private static final String FLECTONEPULSE_ATLAS_API = "https://flectone.net/files/r/minecraft/<version>/atlases/minecraft_textures_atlas_<atlas>.png.txt";
     private static final String ATLAS_FILE_NAME = "minecraft_textures_atlas_<atlas>.png.txt";
@@ -73,8 +73,6 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         atlasSpritesMap.clear();
         lazyLoadLocalAtlases();
 
@@ -89,8 +87,6 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -209,14 +205,14 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
         MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
         component = component.append(messagePipeline.build(footerContext));
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_SPRITE, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 
         soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_SPRITE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_SPRITE;
     }
 
     @Override

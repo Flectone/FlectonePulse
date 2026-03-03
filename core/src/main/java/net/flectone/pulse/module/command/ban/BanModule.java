@@ -25,7 +25,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
+public class BanModule implements AbstractModuleCommand<Localization.Command.Ban> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -53,8 +53,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
         String promptTime = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::time);
@@ -69,8 +67,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -102,8 +98,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_BAN;
+    public ModuleName name() {
+        return ModuleName.COMMAND_BAN;
     }
 
     @Override
@@ -149,7 +145,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.id());
         if (ban == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_BAN);
+        proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
 
         kick(fPlayer, fTarget, ban);
 

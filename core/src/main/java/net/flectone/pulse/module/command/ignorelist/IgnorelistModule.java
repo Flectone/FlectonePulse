@@ -22,7 +22,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
+public class IgnorelistModule implements AbstractModuleCommand<Localization.Command.Ignorelist> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -49,8 +49,6 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptNumber = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::number);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -60,8 +58,6 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -136,14 +132,14 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
         component = component.append(messagePipeline.build(footerContext));
 
-        eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.COMMAND_IGNORELIST, fPlayer, component));
 
         soundPlayer.play(soundOrThrow(), fPlayer);
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_IGNORELIST;
+    public ModuleName name() {
+        return ModuleName.COMMAND_IGNORELIST;
     }
 
     @Override

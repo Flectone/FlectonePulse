@@ -9,12 +9,13 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PlaceholderAPIModule extends AbstractModule {
+public class PlaceholderAPIModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final PlaceholderAPIIntegration placeholderAPIIntegration;
@@ -22,8 +23,6 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         placeholderAPIIntegration.hook();
 
         listenerRegistry.register(PlaceholderAPIIntegration.class);
@@ -31,14 +30,17 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     @Override
     public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().add(permission().use());
+        return AbstractModule.super.permissionBuilder().add(permission().use());
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         placeholderAPIIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_PLACEHOLDERAPI;
     }
 
     @Override

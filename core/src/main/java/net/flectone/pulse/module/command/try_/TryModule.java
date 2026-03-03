@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TryModule extends AbstractModuleCommand<Localization.Command.CommandTry> {
+public class TryModule implements AbstractModuleCommand<Localization.Command.CommandTry> {
 
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
@@ -36,8 +36,6 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
@@ -48,8 +46,6 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         commandModuleController.clearPrompts(this);
     }
 
@@ -84,8 +80,8 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_TRY;
+    public ModuleName name() {
+        return ModuleName.COMMAND_TRY;
     }
 
     @Override

@@ -8,11 +8,12 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.motd.listener.MOTDPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MOTDModule extends AbstractModule {
+public class MOTDModule implements AbstractModule {
 
     private final FileFacade fileFacade;
     private final MOTDIntegration motdIntegration;
@@ -20,8 +21,6 @@ public class MOTDModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         motdIntegration.hook();
 
         listenerRegistry.register(MOTDPulseListener.class);
@@ -29,9 +28,12 @@ public class MOTDModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         motdIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_MOTD;
     }
 
     @Override

@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
+public class FlectonepulseModule implements AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
     private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
 
@@ -70,8 +70,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
         String file = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::value);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
@@ -87,8 +85,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         if (reflectionResolver.hasClass(SPARK_CLASS)) {
             injector.getInstance(SparkServer.class).onDisable();
         }
@@ -158,8 +154,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public MessageType messageType() {
-        return MessageType.COMMAND_FLECTONEPULSE;
+    public ModuleName name() {
+        return ModuleName.COMMAND_FLECTONEPULSE;
     }
 
     @Override
