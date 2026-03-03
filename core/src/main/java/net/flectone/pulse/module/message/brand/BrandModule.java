@@ -16,32 +16,41 @@ import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BrandModule extends AbstractModuleListLocalization<Localization.Message.Brand> {
+public class BrandModule implements AbstractModuleListLocalization<Localization.Message.Brand> {
+
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final RandomUtil randomUtil;
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(BrandPulseListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        messageIndexMap.clear();
     }
 
     @Override
@@ -67,6 +76,21 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
         return localization(fPlayer).values();
+    }
+
+    @Override
+    public int getPlayerIndexOrDefault(int id, int defaultIndex) {
+        return messageIndexMap.getOrDefault(id, defaultIndex);
+    }
+
+    @Override
+    public int nextInt(int start, int end) {
+        return randomUtil.nextInt(start, end);
+    }
+
+    @Override
+    public void savePlayerIndex(int id, int playerIndex) {
+        messageIndexMap.put(id, playerIndex);
     }
 
     public void send(FPlayer fPlayer) {

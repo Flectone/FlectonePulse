@@ -19,16 +19,21 @@ import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FooterModule extends AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
+public class FooterModule implements AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
+
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
@@ -36,6 +41,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
     private final PacketSender packetSender;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final RandomUtil randomUtil;
 
     @Override
     public void onEnable() {
@@ -49,6 +55,8 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
     @Override
     public void onDisable() {
+        messageIndexMap.clear();
+
         // clear tab
         Destination.Type destinationType = config().destination().type();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
@@ -79,6 +87,21 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
         return joinMultiList(localization(fPlayer).lists());
+    }
+
+    @Override
+    public int getPlayerIndexOrDefault(int id, int defaultIndex) {
+        return messageIndexMap.getOrDefault(id, defaultIndex);
+    }
+
+    @Override
+    public int nextInt(int start, int end) {
+        return randomUtil.nextInt(start, end);
+    }
+
+    @Override
+    public void savePlayerIndex(int id, int playerIndex) {
+        messageIndexMap.put(id, playerIndex);
     }
 
     public void send(FPlayer fPlayer) {

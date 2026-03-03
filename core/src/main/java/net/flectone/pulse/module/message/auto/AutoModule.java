@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -24,20 +25,23 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AutoModule extends AbstractModuleListLocalization<Localization.Message.Auto> {
+public class AutoModule implements AbstractModuleListLocalization<Localization.Message.Auto> {
+
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final RandomUtil randomUtil;
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
         config().types().forEach((key, value) -> {
             Pair<Sound, PermissionSetting> sound = Pair.of(value.sound(), permission().types().get(key));
 
@@ -49,8 +53,13 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     @Override
+    public void onDisable() {
+        messageIndexMap.clear();
+    }
+
+    @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return super.permissionBuilder().addAll(permission().types().values());
+        return AbstractModuleListLocalization.super.permissionBuilder().addAll(permission().types().values());
     }
 
     @Override
@@ -76,6 +85,21 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public int getPlayerIndexOrDefault(int id, int defaultIndex) {
+        return messageIndexMap.getOrDefault(id, defaultIndex);
+    }
+
+    @Override
+    public int nextInt(int start, int end) {
+        return randomUtil.nextInt(start, end);
+    }
+
+    @Override
+    public void savePlayerIndex(int id, int playerIndex) {
+        messageIndexMap.put(id, playerIndex);
     }
 
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Pair<Sound, PermissionSetting> sound) {

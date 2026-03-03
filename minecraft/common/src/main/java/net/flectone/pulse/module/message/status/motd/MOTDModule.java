@@ -16,19 +16,30 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MOTDModule extends AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
+public class MOTDModule implements AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
+
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
     private final ModuleController moduleController;
+    private final RandomUtil randomUtil;
+
+    @Override
+    public void onDisable() {
+        messageIndexMap.clear();
+    }
 
     @Override
     public ModuleName name() {
@@ -53,6 +64,21 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
         return localization(fPlayer).values();
+    }
+
+    @Override
+    public int getPlayerIndexOrDefault(int id, int defaultIndex) {
+        return messageIndexMap.getOrDefault(id, defaultIndex);
+    }
+
+    @Override
+    public int nextInt(int start, int end) {
+        return randomUtil.nextInt(start, end);
+    }
+
+    @Override
+    public void savePlayerIndex(int id, int playerIndex) {
+        messageIndexMap.put(id, playerIndex);
     }
 
     public JsonElement next(FPlayer fPlayer) {
