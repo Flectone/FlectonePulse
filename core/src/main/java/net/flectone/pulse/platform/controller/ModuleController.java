@@ -137,11 +137,9 @@ public class ModuleController {
         Class<? extends ModuleSimple> root = findRootSuperclass(clazz);
         moduleRootMap.put(clazz, root);
 
-        if (!moduleChildrenMap.containsKey(root)) {
-            ModuleSimple module = injector.getInstance(root);
-            moduleChildrenMap.put(root, module.childrenBuilder().build());
-            modulePredicateMap.put(root, buildDisablePredicate(module));
-        }
+        ModuleSimple module = injector.getInstance(root);
+        moduleChildrenMap.put(root, module.childrenBuilder().build());
+        modulePredicateMap.put(root, buildDisablePredicate(module));
 
         getChildren(root).forEach(this::configureHierarchy);
     }
@@ -170,8 +168,8 @@ public class ModuleController {
             }
         }
 
-        Predicate<ModuleSimple> childPredicate = m -> isEnable(root) && m.config().enable();
-        getChildren(root).forEach(child -> enable(child, childPredicate));
+        Predicate<ModuleSimple> childPredicate = childModule -> isEnable(root) && childModule.config().enable();
+        getChildren(root).forEach(childModule -> enable(childModule, childPredicate));
     }
 
     public BiPredicate<FEntity, Boolean> buildDisablePredicate(ModuleSimple module) {
@@ -197,6 +195,7 @@ public class ModuleController {
         return moduleRootMap.computeIfAbsent(clazz, this::findRootSuperclass);
     }
 
+    @SuppressWarnings("unchecked")
     private Class<? extends ModuleSimple> findRootSuperclass(Class<? extends ModuleSimple> clazz) {
         Class<?> root = clazz;
         while (root.getSuperclass() != null
