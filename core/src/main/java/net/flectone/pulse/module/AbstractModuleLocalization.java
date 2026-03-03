@@ -22,19 +22,12 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.TagPattern;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.emptyResolver;
 
 public abstract class AbstractModuleLocalization<M extends LocalizationSetting> extends AbstractModule {
 
@@ -174,7 +167,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
 
         MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, destination.subtext())
                 .withFlags(eventMetadata.flags())
-                .addTagResolver(messageTag(message));
+                .addTagResolver(messagePipeline.messageTag(message));
 
         return messagePipeline.build(context);
     }
@@ -199,7 +192,7 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         MessageContext messageContext = messagePipeline.createContext(eventMetadata.uuid(), sender, receiver, formatContent)
                 .withFlags(eventMetadata.flags())
                 .addTagResolvers(eventMetadata.resolveTags(receiver))
-                .addTagResolver(messageTag(message));
+                .addTagResolver(messagePipeline.messageTag(message));
 
         if (!receiver.isUnknown()) {
             messageContext = messageContext
@@ -209,32 +202,4 @@ public abstract class AbstractModuleLocalization<M extends LocalizationSetting> 
         return messagePipeline.build(messageContext);
     }
 
-    public TagResolver messageTag(Component message) {
-        return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
-    }
-
-    public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
-        if (!isEnable() || target == null) return emptyResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            int targetIndex = 0;
-            if (argumentQueue.hasNext()) {
-                targetIndex = argumentQueue.pop().asInt().orElse(0);
-            }
-            
-            MessageContext messageContext = messagePipeline.createContext(target, receiver,
-                    Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex))
-            );
-
-            return Tag.selfClosingInserting(messagePipeline.build(messageContext));
-        });
-    }
-
-    public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
-        return targetTag(tag, "<display_name:<index>>", receiver, target);
-    }
-
-    public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
-        return targetTag("target", receiver, target);
-    }
 }

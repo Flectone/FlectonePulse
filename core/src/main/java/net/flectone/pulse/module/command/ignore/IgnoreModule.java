@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -28,6 +29,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -87,7 +89,9 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                         .sender(fPlayer)
                         .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
                         .destination(config().destination())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fTarget)
+                        })
                         .sound(soundOrThrow())
                         .build()
                 )

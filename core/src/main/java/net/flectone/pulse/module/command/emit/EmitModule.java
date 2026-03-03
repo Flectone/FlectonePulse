@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -37,6 +38,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final FPlayerService fPlayerService;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -109,7 +111,9 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
                     dataOutputStream.writeAsJson(destination);
                     dataOutputStream.writeString(message);
                 })
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag(fResolver, fTarget)
+                })
                 .integration()
                 .build()
         );

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -43,6 +44,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -165,7 +167,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 .destination(config().destination())
                 .message(string)
                 .sound(isSenderToSender ? null : soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag(fResolver, target)
+                })
                 .build()
         );
 

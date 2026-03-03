@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -46,6 +47,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final IntegrationModule integrationModule;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -212,7 +214,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         sendMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Rockpaperscissors::sender)
-                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag(fResolver, fReceiver)
+                })
                 .build()
         );
 

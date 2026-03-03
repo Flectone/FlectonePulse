@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -36,6 +37,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -79,7 +81,9 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
         sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
                 .base(EventMetadata.<Localization.Command.Online>builder()
                         .sender(fPlayer)
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, targetFPlayer)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, targetFPlayer)
+                        })
                         .format(s -> switch (type) {
                             case "first" -> timeFormatter.format(
                                     fPlayer,

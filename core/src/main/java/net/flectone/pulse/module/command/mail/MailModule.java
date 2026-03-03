@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -39,6 +40,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final ListenerRegistry listenerRegistry;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -104,7 +106,9 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                         .message(message)
                         .destination(config().destination())
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, finalFReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                        })
                         .build()
                 )
                 .mail(mail)

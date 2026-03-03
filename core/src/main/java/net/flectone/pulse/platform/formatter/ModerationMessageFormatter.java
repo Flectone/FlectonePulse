@@ -5,7 +5,9 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -17,29 +19,29 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationMessageFormatter {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<NewbieModule> newbieModuleProvider;
+    private final MessagePipeline messagePipeline;
+    private final FPlayerService fPlayerService;
 
     public String replacePlaceholders(String message,
-                                      String playerName,
-                                      String moderatorName,
                                       String moderationId,
                                       String reason,
                                       String date,
                                       String time,
                                       String timeLeft) {
         return StringUtils.replaceEach(message,
-                new String[]{"<player>", "<moderator>", "<id>", "<reason>", "<date>", "<time>", "<time_left>"},
-                new String[]{playerName, moderatorName, moderationId, reason, date, time, timeLeft}
+                new String[]{"<id>", "<reason>", "<date>", "<time>", "<time_left>"},
+                new String[]{moderationId, reason, date, time, timeLeft}
         );
     }
 
@@ -53,8 +55,6 @@ public class ModerationMessageFormatter {
             case KICK -> localization.command().kick().reasons();
         };
 
-        FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
-        FPlayer fModerator = fPlayerService.getFPlayer(moderation.moderator());
         String reason = constantReasons.getConstant(moderation.reason());
         String date = timeFormatter.formatDate(moderation.date());
         String time = moderation.isPermanent()
@@ -64,9 +64,7 @@ public class ModerationMessageFormatter {
                 ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.getRemainingTime());
 
-        return replacePlaceholders(message, fTarget.name(), fModerator.name(),
-                String.valueOf(moderation.id()), reason, date, time, timeLeft
-        );
+        return replacePlaceholders(message, String.valueOf(moderation.id()), reason, date, time, timeLeft);
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
@@ -80,40 +78,43 @@ public class ModerationMessageFormatter {
                 ? localization.time().permanent()
                 : timeFormatter.format(fReceiver, moderation.time() - System.currentTimeMillis());
 
-        return replacePlaceholders(message,
-                moderation.playerName(),
-                moderation.moderatorName(),
-                String.valueOf(moderation.moderationId()),
-                moderation.reason(),
-                date,
-                time,
-                timeLeft
-        );
+        return replacePlaceholders(message, String.valueOf(moderation.moderationId()), moderation.reason(), date, time, timeLeft);
     }
 
-    public String buildMuteMessage(FPlayer fPlayer, MuteChecker.Status status) {
+    public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
         String format = fileFacade.localization(fPlayer).command().mute().person();
 
         return switch (status) {
             case LOCAL -> {
                 List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
-                if (mutes.isEmpty()) yield format;
+                if (mutes.isEmpty()) yield Optional.empty();
 
-                yield replacePlaceholders(format, fPlayer, mutes.getFirst());
+                Moderation mute = mutes.getFirst();
+
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())));
+
+                yield Optional.of(muteContext);
             }
             case EXTERNAL -> {
                 ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
-                if (mute == null) yield format;
+                if (mute == null) yield Optional.empty();
 
-                yield replacePlaceholders(format, fPlayer, mute);
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
+
+                yield Optional.of(muteContext);
             }
             case NEWBIE -> {
                 ExternalModeration mute = newbieModuleProvider.get().getModeration(fPlayer);
-                if (mute == null) yield format;
+                if (mute == null) yield Optional.empty();
 
-                yield replacePlaceholders(format, fPlayer, mute);
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
+
+                yield Optional.of(muteContext);
             }
-            default -> "";
+            default -> Optional.empty();
         };
     }
 }

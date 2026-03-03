@@ -14,6 +14,8 @@ import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
+import java.util.Optional;
+
 /**
  * Sends mute notifications to players when they attempt to chat while muted.
  *
@@ -53,9 +55,10 @@ public class MuteSender {
         MuteChecker.Status status = muteChecker.check(fPlayer);
         if (status == MuteChecker.Status.NONE) return false;
 
-        String muteMessage = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        MessageContext muteContext = messagePipeline.createContext(fPlayer, muteMessage);
-        Component component = messagePipeline.build(muteContext);
+        Optional<MessageContext> muteContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
+        if (muteContext.isEmpty()) return false;
+
+        Component component = messagePipeline.build(muteContext.get());
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
 

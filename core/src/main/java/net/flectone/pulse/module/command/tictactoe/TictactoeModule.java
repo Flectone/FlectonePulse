@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -43,6 +44,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     private final Gson gson;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -118,7 +120,9 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                         .sender(fPlayer)
                         .format(Localization.Command.Tictactoe::sender)
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, finalFReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                        })
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -191,7 +195,9 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
                         .sender(fPlayer)
                         .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fReceiver)
+                        })
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -205,7 +211,9 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                         .sender(fPlayer)
                         .filterPlayer(fReceiver, false)
                         .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fReceiver)
+                        })
                         .build()
                 )
                 .ticTacToe(ticTacToe)

@@ -23,10 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.emptyResolver;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -122,6 +125,35 @@ public class MessagePipeline {
         return Optional.empty();
     }
 
+    public TagResolver messageTag(Component message) {
+        return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
+    }
+
+    public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
+        if (target == null) return emptyResolver(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            int targetIndex = 0;
+            if (argumentQueue.hasNext()) {
+                targetIndex = argumentQueue.pop().asInt().orElse(0);
+            }
+
+            MessageContext messageContext = createContext(target, receiver,
+                    Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex))
+            );
+
+            return Tag.selfClosingInserting(build(messageContext));
+        });
+    }
+
+    public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
+        return targetTag(tag, "<display_name:<index>>", receiver, target);
+    }
+
+    public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
+        return targetTag("target", receiver, target);
+    }
+
     public enum ReplacementTag {
         AFK,
         ANIMATION,
@@ -153,7 +185,7 @@ public class MessagePipeline {
         }
 
         public TagResolver emptyResolver() {
-            return ReplacementTag.emptyResolver(getTagName());
+            return emptyResolver(getTagName());
         }
 
         public static TagResolver emptyResolver(@TagPattern String tag) {

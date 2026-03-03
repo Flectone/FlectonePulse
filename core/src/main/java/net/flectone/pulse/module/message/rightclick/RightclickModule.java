@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -29,6 +30,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public MessageType messageType() {
@@ -66,7 +68,9 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
 
             sendMessage(EventMetadata.<Localization.Message.Rightclick>builder()
                     .sender(fPlayer)
-                    .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                    .tagResolvers(fResolver -> new TagResolver[]{
+                            messagePipeline.targetTag(fResolver, fTarget)
+                    })
                     .format(Localization.Message.Rightclick::format)
                     .destination(config().destination())
                     .sound(soundOrThrow())

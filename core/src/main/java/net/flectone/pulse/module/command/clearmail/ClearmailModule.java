@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -30,6 +31,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -81,7 +83,9 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                         .destination(config().destination())
                         .message(optionalMail.get().message())
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fReceiver)
+                        })
                         .build()
                 )
                 .mail(optionalMail.get())

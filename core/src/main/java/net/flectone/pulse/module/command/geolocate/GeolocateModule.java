@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -44,6 +45,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
+    private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
     @Override
@@ -98,7 +100,9 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
                 .base(EventMetadata.<Localization.Command.Geolocate>builder()
                         .sender(fPlayer)
-                        .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fTarget)
+                        })
                         .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
                                 new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
                                 new String[]{response.country(), response.region(), response.city(), response.timezone() , String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}

@@ -107,7 +107,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             );
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolver(targetTag(fPlayer, fTarget));
+                    .addTagResolver(messagePipeline.targetTag(fPlayer, fTarget));
 
             component = component
                     .append(messagePipeline.build(lineContext))
