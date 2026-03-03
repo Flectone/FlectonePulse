@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -18,6 +19,7 @@ public class GeyserModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final GeyserIntegration geyserIntegration;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -49,7 +51,7 @@ public class GeyserModule extends AbstractModule {
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return false;
+        if (moduleController.isDisabledFor(this, fPlayer)) return false;
 
         return geyserIntegration.isBedrockPlayer(fPlayer);
     }

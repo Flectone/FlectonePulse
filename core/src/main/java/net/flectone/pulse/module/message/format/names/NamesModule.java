@@ -14,6 +14,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -37,6 +38,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -67,7 +69,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext addTags(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
 
@@ -200,7 +202,7 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext addInvisibleTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER),

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.module.message.sign.listener.SignListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -15,8 +16,9 @@ public class BukkitSignModule extends SignModule {
     @Inject
     public BukkitSignModule(FileFacade fileFacade,
                             MessagePipeline messagePipeline,
-                            ListenerRegistry listenerRegistry) {
-        super(fileFacade, messagePipeline);
+                            ListenerRegistry listenerRegistry,
+                            ModuleController moduleController) {
+        super(fileFacade, messagePipeline, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

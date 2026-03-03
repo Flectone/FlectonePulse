@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -35,6 +36,7 @@ public class FColorModule extends AbstractModule {
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final LegacyColorConvertor legacyColorConvertor;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -70,7 +72,7 @@ public class FColorModule extends AbstractModule {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        if (isModuleDisabledFor(receiver)) return messageContext;
+        if (moduleController.isDisabledFor(this, receiver)) return messageContext;
 
         boolean isSenderColorOut = messageContext.isFlag(MessageFlag.SENDER_COLOR_OUT);
 

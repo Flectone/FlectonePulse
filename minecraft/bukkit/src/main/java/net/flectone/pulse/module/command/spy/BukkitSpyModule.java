@@ -7,6 +7,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.command.spy.listener.BukkitSpyListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -31,6 +32,7 @@ public class BukkitSpyModule extends SpyModule {
     private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry bukkitListenerManager;
     private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
 
     @Inject
     public BukkitSpyModule(FileFacade fileFacade,
@@ -38,12 +40,14 @@ public class BukkitSpyModule extends SpyModule {
                            PermissionChecker permissionChecker,
                            BukkitListenerRegistry bukkitListenerManager,
                            TaskScheduler taskScheduler,
-                           MessageDispatcher messageDispatcher) {
-        super(fileFacade, fPlayerService, permissionChecker, messageDispatcher);
+                           MessageDispatcher messageDispatcher,
+                           ModuleController moduleController) {
+        super(fileFacade, fPlayerService, permissionChecker, messageDispatcher, moduleController);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
         this.taskScheduler = taskScheduler;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     public void check(PlayerCommandPreprocessEvent event) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
             String rawInput = event.getMessage();
@@ -71,7 +75,7 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     public void check(InventoryClickEvent event) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
             if (!needToSpy("action", "anvil")) return;
@@ -96,7 +100,7 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     public void check(PlayerEditBookEvent event) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
             if (!needToSpy("action", "book")) return;
@@ -113,7 +117,7 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     public void check(SignChangeEvent event) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
             if (!needToSpy("action", "sign")) return;
@@ -126,7 +130,7 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     public void check(AsyncPlayerChatEvent event) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());

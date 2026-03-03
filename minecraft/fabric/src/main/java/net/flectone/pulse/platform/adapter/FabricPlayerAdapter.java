@@ -18,6 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.kyori.adventure.text.Component;
@@ -50,6 +51,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
     private final Injector injector;
 
     @Override
@@ -195,7 +197,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
         HeaderModule headerModule = injector.getInstance(HeaderModule.class);
 
-        if (!headerModule.isModuleDisabledFor(fPlayer)) {
+        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
                 MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
@@ -210,7 +212,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
         FooterModule footerModule = injector.getInstance(FooterModule.class);
 
-        if (!footerModule.isModuleDisabledFor(fPlayer)) {
+        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
                 MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);

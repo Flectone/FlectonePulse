@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
@@ -29,6 +30,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Inject
     public MinecraftMaintenanceModule(FileFacade fileFacade,
@@ -40,16 +42,18 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       FPlayerService fPlayerService,
                                       MessagePipeline messagePipeline,
                                       MessageDispatcher messageDispatcher,
+                                      ModuleController moduleController,
                                       IconUtil iconUtil,
                                       FLogger fLogger) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, iconUtil, fLogger);
+        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, iconUtil, fLogger);
 
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
+        this.moduleController = moduleController;
     }
 
     public void sendStatus(Object player) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
         if (!config().turnedOn()) return;
         if (!(player instanceof User user)) return;
 

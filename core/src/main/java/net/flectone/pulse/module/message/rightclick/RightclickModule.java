@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -33,6 +34,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public MessageType messageType() {
@@ -58,7 +60,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             UUID targetUUID = platformPlayerAdapter.getPlayerByEntityId(targetId);
             if (targetUUID == null) return;

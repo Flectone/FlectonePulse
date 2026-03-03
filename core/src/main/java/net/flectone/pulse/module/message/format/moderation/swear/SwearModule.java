@@ -17,6 +17,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.swear.listener.SwearPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -44,6 +45,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Getter private Pattern combinedPattern;
 
@@ -94,7 +96,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
@@ -113,7 +115,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {

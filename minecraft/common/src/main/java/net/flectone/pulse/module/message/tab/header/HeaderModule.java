@@ -16,6 +16,7 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.tab.header.listener.HeaderPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.util.constant.MessageType;
@@ -34,6 +35,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     private final ListenerRegistry listenerRegistry;
     private final PacketSender packetSender;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -82,7 +84,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     }
 
     public void send(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;

@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -47,6 +48,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final MuteChecker muteChecker;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -65,7 +67,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -181,7 +183,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     }
 
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
-        if (isModuleDisabledFor(fModerator)) return;
+        if (moduleController.isDisabledFor(this, fModerator)) return;
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Mute>builder()
                 .sender(fReceiver)

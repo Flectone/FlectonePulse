@@ -19,6 +19,7 @@ import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.util.file.FileFacade;
@@ -47,6 +48,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
+    private final ModuleController moduleController;
     private final IntegrationModule integrationModule;
 
     @Inject
@@ -58,6 +60,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   PlatformPlayerAdapter platformPlayerAdapter,
                                   TaskScheduler taskScheduler,
                                   PacketSender packetSender,
+                                  ModuleController moduleController,
                                   IntegrationModule integrationModule) {
         super(fileFacade);
 
@@ -68,6 +71,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
+        this.moduleController = moduleController;
         this.integrationModule = integrationModule;
     }
 
@@ -86,7 +90,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         Range range = parsedComponent.vanillaMessage().range();
         if (parsedComponent.translationKey().startsWith("death.")) {

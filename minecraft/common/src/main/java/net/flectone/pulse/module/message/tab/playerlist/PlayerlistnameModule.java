@@ -25,6 +25,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.PlayerlistnamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -62,6 +63,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private final ListenerRegistry listenerRegistry;
     private final MinecraftSkinService skinService;
     private final ProxyRegistry proxyRegistry;
+    private final ModuleController moduleController;
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
@@ -99,13 +101,13 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     public void update() {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         fPlayerService.getPlatformFPlayers().forEach(fPlayer -> taskScheduler.runRegion(fPlayer, () -> send(fPlayer)));
     }
 
     public void send(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
         fPlayerService.getFPlayersWhoCanSee(fPlayer)
@@ -174,7 +176,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     public boolean isProxyMode() {
-        return isEnable() && config().proxyMode() && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().proxyMode() && proxyRegistry.hasEnabledProxy();
     }
 
     private List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> getProxyPlayerInfos(FPlayer fReceiver) {

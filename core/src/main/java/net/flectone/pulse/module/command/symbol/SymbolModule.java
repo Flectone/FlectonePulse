@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.constant.MessageType;
@@ -41,6 +42,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     private final MessageDispatcher messageDispatcher;
     private final SoundPlayer soundPlayer;
     private final CommandParserProvider commandParserProvider;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -65,7 +67,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String category = getArgument(commandContext, 0);
         if (!config().categories().containsKey(category)) {

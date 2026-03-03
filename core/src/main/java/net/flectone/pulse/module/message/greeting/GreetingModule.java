@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -29,6 +30,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     private final SkinService skinService;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -58,7 +60,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     }
 
     public void send(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Greeting>builder()
                 .sender(fPlayer)

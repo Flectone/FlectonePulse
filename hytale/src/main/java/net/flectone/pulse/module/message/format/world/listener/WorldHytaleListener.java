@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.UUID;
@@ -20,9 +21,10 @@ public class WorldHytaleListener implements HytaleListener {
     private final WorldModule worldModule;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
 
     public void onAddPlayerToWorldEvent(AddPlayerToWorldEvent event) {
-        if (!worldModule.isEnable()) return;
+        if (!moduleController.isEnable(worldModule)) return;
 
         PlayerRef playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;

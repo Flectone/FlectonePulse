@@ -25,6 +25,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -45,6 +46,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final HytalePlaceholderAPIModule placeholderAPIModule;
+    private final ModuleController moduleController;
     private final TaskScheduler taskScheduler;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<LuckPermsModule> luckPermsModuleProvider;
@@ -147,7 +149,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         FEntity sender = messageContext.sender();
-        if (placeholderAPIModule.isModuleDisabledFor(sender)) return event;
+        if (moduleController.isDisabledFor(placeholderAPIModule, sender)) return event;
 
         FPlayer fReceiver = messageContext.receiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);

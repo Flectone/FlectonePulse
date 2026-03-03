@@ -24,6 +24,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -46,11 +47,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final FPlayerMapper fPlayerMapper;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
-    private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
     private final PermissionChecker permissionChecker;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<LuckPermsModule> luckPermsModuleProvider;
     private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -90,7 +91,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         FEntity sender = messageContext.sender();
-        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return event;
+        if (moduleController.isDisabledFor(PlaceholderAPIModule.class, sender)) return event;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;

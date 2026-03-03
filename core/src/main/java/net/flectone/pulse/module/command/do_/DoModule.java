@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -23,6 +24,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Command
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -37,7 +39,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Command
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String message = getArgument(commandContext, 0);
 

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
@@ -19,14 +20,15 @@ public class ChatPacketListener implements PacketListener {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ChatModule chatModule;
+    private final ModuleController moduleController;
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.CHAT_MESSAGE) return;
-        if (!chatModule.isEnable()) return;
+        if (!moduleController.isEnable(chatModule)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-        if (chatModule.isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
 
         WrapperPlayClientChatMessage wrapper = new WrapperPlayClientChatMessage(event);
         String message = wrapper.getMessage();

@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.listener.CapsPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
@@ -23,6 +24,7 @@ public class CapsModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -48,7 +50,7 @@ public class CapsModule extends AbstractModule {
 
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
         String contextMessage = messageContext.message();

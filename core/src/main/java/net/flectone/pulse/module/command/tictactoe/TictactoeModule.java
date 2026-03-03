@@ -17,6 +17,7 @@ import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
@@ -47,6 +48,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -80,7 +82,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String receiverName = getArgument(commandContext, 0);
         String promptHard = getPrompt(1);
@@ -167,7 +169,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     // /tictactoe %d create
     public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, UUID metadataUUID) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
 
@@ -188,7 +190,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     // /tictactoe %d <move>
     public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move, UUID metadataUUID) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;

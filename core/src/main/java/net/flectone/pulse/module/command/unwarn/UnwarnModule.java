@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -38,6 +39,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -54,7 +56,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
 
@@ -86,7 +88,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     }
 
     public void unwarn(FPlayer fPlayer, String target, int id) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {

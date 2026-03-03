@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.animation.listener.AnimationPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -39,6 +40,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -80,7 +82,7 @@ public class AnimationModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (isModuleDisabledFor(messageContext.sender())) return messageContext;
+        if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.ANIMATION, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

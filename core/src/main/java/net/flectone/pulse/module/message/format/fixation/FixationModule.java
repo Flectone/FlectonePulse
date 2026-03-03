@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.fixation.listener.FixationPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -18,6 +19,7 @@ public class FixationModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -38,7 +40,7 @@ public class FixationModule extends AbstractModule {
 
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         String contextMessage = messageContext.message();
         if (contextMessage.isBlank()) return messageContext;

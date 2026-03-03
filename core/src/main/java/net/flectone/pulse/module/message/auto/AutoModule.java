@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -77,7 +79,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Pair<Sound, PermissionSetting> sound) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         List<String> messages = localization(fPlayer).types().get(name);
         if (messages == null) return;

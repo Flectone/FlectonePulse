@@ -15,6 +15,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -28,6 +29,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -58,7 +60,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
         taskScheduler.runAsync(() -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
                     .base(EventMetadata.<Localization.Message.Quit>builder()

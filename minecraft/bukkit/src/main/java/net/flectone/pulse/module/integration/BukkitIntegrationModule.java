@@ -23,6 +23,7 @@ import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -41,6 +42,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Inject
@@ -48,11 +50,13 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    ReflectionResolver reflectionResolver,
+                                   ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, injector);
+        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, moduleController, injector);
         
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
+        this.moduleController = moduleController;
         this.fLogger = fLogger;
     }
 
@@ -134,7 +138,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public String checkMention(FEntity fSender, String message) {
-        if (isModuleDisabledFor(fSender)) return message;
+        if (moduleController.isDisabledFor(this, fSender)) return message;
 
         if (containsEnabledChild(InteractiveChatModule.class)) {
             return getInstance(InteractiveChatModule.class).checkMention(fSender, message);
@@ -256,7 +260,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public String getTritonLocale(FPlayer fPlayer) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
         if (!containsEnabledChild(TritonModule.class)) return null;
 
         return getInstance(TritonModule.class).getLocale(fPlayer);
@@ -264,7 +268,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
-        if (isModuleDisabledFor(fReceiver)) return false;
+        if (moduleController.isDisabledFor(this, fReceiver)) return false;
 
         if (containsEnabledChild(InteractiveChatModule.class)) {
             return getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);

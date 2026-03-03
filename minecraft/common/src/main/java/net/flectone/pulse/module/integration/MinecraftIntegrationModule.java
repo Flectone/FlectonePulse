@@ -17,6 +17,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -27,6 +28,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
     private final Injector injector;
 
@@ -34,11 +36,13 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
                                          FLogger fLogger,
                                          PlatformServerAdapter platformServerAdapter,
                                          ReflectionResolver reflectionResolver,
+                                         ModuleController moduleController,
                                          Injector injector) {
-        super(fileFacade, platformServerAdapter, injector);
+        super(fileFacade, platformServerAdapter, moduleController, injector);
 
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
+        this.moduleController = moduleController;
         this.fLogger = fLogger;
         this.injector = injector;
     }
@@ -89,7 +93,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {
-        if (!isEnable()) return false;
+        if (!moduleController.isEnable(this)) return false;
 
         if (containsEnabledChild(FloodgateModule.class)) {
             return injector.getInstance(FloodgateModule.class).isBedrockPlayer(fPlayer);
@@ -103,7 +107,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     public String getTextureUrl(FEntity sender) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
         if (!containsEnabledChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
@@ -111,7 +115,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
         if (!containsEnabledChild(SkinsRestorerModule.class)) return null;
         if (!(sender instanceof FPlayer fPlayer)) return null;
 

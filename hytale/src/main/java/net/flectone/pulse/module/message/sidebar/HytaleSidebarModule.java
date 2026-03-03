@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.HytaleMessageUtil;
@@ -33,6 +34,7 @@ public class HytaleSidebarModule extends SidebarModule {
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final HytaleMessageUtil hytaleMessageUtil;
+    private final ModuleController moduleController;
 
     @Inject
     public HytaleSidebarModule(FileFacade fileFacade,
@@ -42,13 +44,15 @@ public class HytaleSidebarModule extends SidebarModule {
                                PlatformPlayerAdapter platformPlayerAdapter,
                                PermissionChecker permissionChecker,
                                MessagePipeline messagePipeline,
-                               HytaleMessageUtil hytaleMessageUtil) {
+                               HytaleMessageUtil hytaleMessageUtil,
+                               ModuleController moduleController) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
         this.hytaleMessageUtil = hytaleMessageUtil;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -91,7 +95,7 @@ public class HytaleSidebarModule extends SidebarModule {
             return;
         }
 
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         Ref<EntityStore> refStore = playerRef.getReference();
         if (refStore == null) return;

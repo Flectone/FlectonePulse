@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
@@ -22,6 +23,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     private final FileFacade fileFacade;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final SoundPlayer soundPlayer;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -54,7 +56,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
             afkMessageModule.remove("afk", fPlayer);

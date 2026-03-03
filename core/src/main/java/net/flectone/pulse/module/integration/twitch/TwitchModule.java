@@ -11,6 +11,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
@@ -23,6 +24,7 @@ public class TwitchModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
+    private final ModuleController moduleController;
     private final Injector injector;
 
     @Override
@@ -444,7 +446,7 @@ public class TwitchModule extends AbstractModule {
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
-        if (isModuleDisabledFor(sender)) return;
+        if (moduleController.isDisabledFor(this, sender)) return;
 
         injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageName, twitchString);
     }

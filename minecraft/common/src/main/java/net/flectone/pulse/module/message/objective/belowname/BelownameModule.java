@@ -14,7 +14,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.belowname.listener.BelownamePulseListener;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -27,10 +27,10 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final MinecraftObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -72,7 +72,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void create(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         Localization.Message.Objective.Belowname localization = localization(fPlayer);
         Component displayFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.score(), localization.displayFormat());
@@ -83,7 +83,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void updateScore(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             Localization.Message.Objective.Belowname localization = localization(fPlayer);
@@ -94,7 +94,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void remove(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }

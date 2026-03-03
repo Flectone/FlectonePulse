@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.command.stream.StreamModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 public class StreamPulseListener implements PulseListener {
 
     private final StreamModule streamModule;
+    private final ModuleController moduleController;
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
         FPlayer fPlayer = event.player();
 
-        boolean hasStreamPermission = !streamModule.isModuleDisabledFor(fPlayer);
+        boolean hasStreamPermission = !moduleController.isDisabledFor(streamModule, fPlayer);
 
         if (fPlayer.getSetting(SettingText.STREAM_PREFIX) != null) {
             // remove prefix for non-streamers

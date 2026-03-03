@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -40,6 +41,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     private final ProxyRegistry proxyRegistry;
     private final SoundPlayer soundPlayer;
     private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
@@ -48,7 +50,8 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                                 ProxySender proxySender,
                                 ProxyRegistry proxyRegistry,
                                 SoundPlayer soundPlayer,
-                                TaskScheduler taskScheduler) {
+                                TaskScheduler taskScheduler,
+                                ModuleController moduleController) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
@@ -57,6 +60,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         this.proxyRegistry = proxyRegistry;
         this.soundPlayer = soundPlayer;
         this.taskScheduler = taskScheduler;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -93,7 +97,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (permissionChecker.check(fPlayer, permission().other())) {
             String promptPlayer = getPrompt(0);

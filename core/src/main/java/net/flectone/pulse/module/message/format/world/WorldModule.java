@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.world.listener.WorldPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -34,6 +35,7 @@ public class WorldModule extends AbstractModule {
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -54,7 +56,7 @@ public class WorldModule extends AbstractModule {
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
         return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.WORLD.getTagName(), "world_prefix"), (argumentQueue, context) -> {
@@ -72,7 +74,7 @@ public class WorldModule extends AbstractModule {
 
     public void update(FPlayer fPlayer) {
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             String newWorldPrefix = config().mode() == Mode.TYPE
                     ? config().values().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))

@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bossbar.listener.BossbarPacketListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
@@ -37,6 +38,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
     private final PacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
 
@@ -46,6 +48,7 @@ public class MinecraftBossbarModule extends BossbarModule {
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
                                   MessageDispatcher messageDispatcher,
+                                  ModuleController moduleController,
                                   PacketSender packetSender,
                                   TaskScheduler taskScheduler) {
         super(fileFacade);
@@ -54,6 +57,7 @@ public class MinecraftBossbarModule extends BossbarModule {
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
+        this.moduleController = moduleController;
         this.packetSender = packetSender;
         this.listenerRegistry = listenerRegistry;
     }
@@ -68,7 +72,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     public void send(UUID playerUUID, UUID bossbarUUID, String translationKey, boolean announce, Component oldTitle) {
         FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
             if (!fPlayer.isSetting(MessageType.BOSSBAR)) return;
 
             String message = localization(fPlayer).types().get(translationKey);

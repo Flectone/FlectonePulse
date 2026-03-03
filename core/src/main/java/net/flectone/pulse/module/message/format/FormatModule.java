@@ -28,6 +28,7 @@ import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
@@ -53,6 +54,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
+    private final ModuleController moduleController;
 
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
@@ -139,7 +141,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     public MessageContext addTags(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
 

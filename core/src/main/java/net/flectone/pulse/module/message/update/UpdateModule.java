@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.constant.MessageType;
@@ -38,6 +39,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     private final VersionComparator versionComparator;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
+    private final ModuleController moduleController;
     private final Gson gson;
 
     private String latestVersion;
@@ -73,7 +75,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     
     public void send(FPlayer fPlayer) {
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
             if (latestVersion == null) return;
 
             String currentVersion = fileFacade.config().version();

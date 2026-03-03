@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.bubble.listener.BubblePacketListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -17,8 +18,9 @@ public class MinecraftBubbleModule extends BubbleModule {
     public MinecraftBubbleModule(FileFacade fileFacade,
                                  TaskScheduler taskScheduler,
                                  BubbleService bubbleService,
-                                 ListenerRegistry listenerRegistry) {
-        super(fileFacade, taskScheduler, bubbleService, listenerRegistry);
+                                 ListenerRegistry listenerRegistry,
+                                 ModuleController moduleController) {
+        super(fileFacade, taskScheduler, bubbleService, listenerRegistry, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

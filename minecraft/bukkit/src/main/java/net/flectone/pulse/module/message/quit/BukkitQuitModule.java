@@ -6,6 +6,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -19,8 +20,9 @@ public class BukkitQuitModule extends QuitModule {
                             IntegrationModule integrationModule,
                             ListenerRegistry listenerRegistry,
                             TaskScheduler taskScheduler,
-                            MessageDispatcher messageDispatcher) {
-        super(fileFacade, integrationModule, listenerRegistry, taskScheduler, messageDispatcher);
+                            MessageDispatcher messageDispatcher,
+                            ModuleController moduleController) {
+        super(fileFacade, integrationModule, listenerRegistry, taskScheduler, messageDispatcher, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

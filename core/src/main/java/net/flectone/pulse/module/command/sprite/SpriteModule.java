@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.WebUtil;
@@ -63,6 +64,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
     private final PlatformServerAdapter platformServerAdapter;
     private final TaskScheduler taskScheduler;
     private final SoundPlayer soundPlayer;
+    private final ModuleController moduleController;
     private final WebUtil webUtil;
     private final FLogger fLogger;
     private final @Named("minecraftPath") Path minecraftPath;
@@ -92,7 +94,7 @@ public class SpriteModule extends AbstractModuleCommand<Localization.Command.Spr
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String atlas = getArgument(commandContext, 0);
         if (!config().categories().contains(atlas)) {

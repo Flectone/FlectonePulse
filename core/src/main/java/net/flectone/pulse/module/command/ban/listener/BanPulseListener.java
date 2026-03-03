@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ban.BanModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -37,11 +38,12 @@ public class BanPulseListener implements PulseListener {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final PermissionChecker permissionChecker;
+    private final ModuleController moduleController;
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
         // check module state
-        if (!banModule.isEnable()) return event;
+        if (!moduleController.isEnable(banModule)) return event;
 
         // get player bans
         FPlayer fPlayer = event.player();

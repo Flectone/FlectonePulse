@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
@@ -35,6 +36,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
+    private final ModuleController moduleController;
     private final Provider<IntegrationModule> integrationModuleProvider;
 
     @Inject
@@ -44,12 +46,15 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      PacketSender packetSender,
                                      PacketProvider packetProvider,
                                      ListenerRegistry listenerRegistry,
+                                     ModuleController moduleController,
                                      Provider<IntegrationModule> integrationModuleProvider) {
         super(fileFacade, listenerRegistry);
+
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
+        this.moduleController = moduleController;
         this.integrationModuleProvider = integrationModuleProvider;
     }
 
@@ -85,7 +90,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
 
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             if (!skipCacheTeam) {
                 uuidTeamMap.values().forEach(cacheTeam ->
@@ -107,7 +112,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     @Override
     public void remove(FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             Team team = uuidTeamMap.get(fPlayer.uuid());
             if (team == null) return;

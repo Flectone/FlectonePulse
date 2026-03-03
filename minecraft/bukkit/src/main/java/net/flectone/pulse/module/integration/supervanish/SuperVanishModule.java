@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ public class SuperVanishModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final SuperVanishIntegration superVanishIntegration;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -48,7 +50,7 @@ public class SuperVanishModule extends AbstractModule {
     }
 
     public boolean isVanished(FEntity sender) {
-        if (isModuleDisabledFor(sender)) return false;
+        if (moduleController.isDisabledFor(this, sender)) return false;
 
         Player player = Bukkit.getPlayer(sender.uuid());
         if (player != null) {

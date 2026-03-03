@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
@@ -18,6 +19,7 @@ public class TritonModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final TritonIntegration tritonIntegration;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -46,7 +48,7 @@ public class TritonModule extends AbstractModule {
     }
 
     public @Nullable String getLocale(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return tritonIntegration.getLocale(fPlayer);
     }

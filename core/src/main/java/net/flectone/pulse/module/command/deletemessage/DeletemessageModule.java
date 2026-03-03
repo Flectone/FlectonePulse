@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -29,6 +30,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     private final DeleteModule deleteModule;
     private final ProxySender proxySender;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -43,7 +45,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {

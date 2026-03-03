@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtrac
 import net.flectone.pulse.module.message.vanilla.listener.DeathListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.HytaleListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -37,6 +38,7 @@ public class HytaleVanillaModule extends VanillaModule {
     private final MessageDispatcher messageDispatcher;
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
+    private final ModuleController moduleController;
 
     @Inject
     public HytaleVanillaModule(FileFacade fileFacade,
@@ -47,7 +49,8 @@ public class HytaleVanillaModule extends VanillaModule {
                                TaskScheduler taskScheduler,
                                HytaleListenerRegistry hytaleListenerRegistry,
                                DeathListener deathListener,
-                               IntegrationModule integrationModule) {
+                               IntegrationModule integrationModule,
+                               ModuleController moduleController) {
         super(fileFacade);
 
         this.extractor = extractor;
@@ -55,11 +58,12 @@ public class HytaleVanillaModule extends VanillaModule {
         this.messageDispatcher = messageDispatcher;
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
+        this.moduleController = moduleController;
 
         hytaleListenerRegistry.register(javaPlugin -> javaPlugin.getEntityStoreRegistry().registerSystem(deathListener));
 
         hytaleListenerRegistry.registerOutboundFilter((playerRef, packet) -> {
-            if (!isEnable()) return false;
+            if (!moduleController.isEnable(this)) return false;
 
             if (packet instanceof ServerMessage chatMessage) {
                 Optional<ParsedComponent> parsedComponent = extractor.extract(chatMessage.message);
@@ -85,7 +89,7 @@ public class HytaleVanillaModule extends VanillaModule {
     }
 
     private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         Range range = parsedComponent.vanillaMessage().range();
         String vanillaMessageName = parsedComponent.vanillaMessage().name();

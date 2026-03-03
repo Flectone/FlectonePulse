@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
@@ -22,13 +23,16 @@ public class MiniPlaceholdersModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final MiniPlaceholdersIntegration miniPlaceholdersIntegration;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Inject
     public MiniPlaceholdersModule(FileFacade fileFacade,
                                   ListenerRegistry listenerRegistry,
+                                  ModuleController moduleController,
                                   FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.listenerRegistry = listenerRegistry;
+        this.moduleController = moduleController;
 
         // don't use injection because we skip relocate
         this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(fLogger);
@@ -45,7 +49,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
             MessageContext messageContext = messageFormattingEvent.context();
             FEntity sender = messageContext.sender();
-            if (isModuleDisabledFor(sender)) return event;
+            if (moduleController.isDisabledFor(this, sender)) return event;
             if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
             return miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);

@@ -16,6 +16,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
@@ -50,6 +51,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -75,7 +77,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
@@ -234,7 +236,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void end(UUID id, FPlayer fPlayer, String move, UUID metadataUUID) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
@@ -308,7 +310,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void move(UUID id, FEntity fPlayer, String move, UUID metadataUUID) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
@@ -348,7 +350,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void create(UUID id, FEntity fPlayer, UUID receiver) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(id, fPlayer.uuid(), receiver);
         gameMap.put(id, rockPaperScissors);

@@ -7,6 +7,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -23,8 +24,9 @@ public class MinecraftRightClickModule extends RightclickModule {
                                      ListenerRegistry listenerRegistry,
                                      TaskScheduler taskScheduler,
                                      MessagePipeline messagePipeline,
-                                     MessageDispatcher messageDispatcher) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, taskScheduler, messagePipeline, messageDispatcher);
+                                     MessageDispatcher messageDispatcher,
+                                     ModuleController moduleController) {
+        super(fileFacade, fPlayerService, platformPlayerAdapter, taskScheduler, messagePipeline, messageDispatcher, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

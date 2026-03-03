@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.constant.MessageType;
@@ -27,6 +28,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -41,7 +43,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String receiverName = tellModule.getReceiverFor(fPlayer);
         if (receiverName == null) {

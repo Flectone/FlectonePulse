@@ -15,6 +15,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -41,6 +42,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -65,7 +67,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String promptLanguage = getPrompt(0);
         String mainLang = commandContext.get(promptLanguage + " main");

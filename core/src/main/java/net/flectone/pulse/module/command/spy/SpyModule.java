@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -34,6 +35,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -46,7 +48,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
         if (turnedBefore) {
@@ -92,7 +94,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     public void check(FPlayer fPlayer, String chat, String message, List<FPlayer> receivers) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
         if (!needToSpy("action", chat)) return;
 
         spy(fPlayer, chat, message, receivers);
@@ -103,7 +105,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     public void spy(FPlayer fPlayer, String action, String message, List<FPlayer> receivers) {
-        if (!isEnable()) return;
+        if (!moduleController.isEnable(this)) return;
 
         messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()

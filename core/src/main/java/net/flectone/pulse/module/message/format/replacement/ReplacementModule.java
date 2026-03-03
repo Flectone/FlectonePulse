@@ -20,6 +20,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.replacement.listener.ReplacementPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
@@ -62,6 +63,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final SkinService skinService;
     private final UrlFormatter urlFormatter;
     private final PermissionChecker permissionChecker;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Override
@@ -111,7 +113,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         String contextMessage = messageContext.message();
         if (StringUtils.isEmpty(contextMessage)) return messageContext;
@@ -129,7 +131,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     public MessageContext addTags(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
 

@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -27,6 +28,7 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
+    private final ModuleController moduleController;
 
     @Override
     public MessageType messageType() {
@@ -54,7 +56,7 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     public JsonElement next(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         String nextMessage = getNextMessage(fPlayer, config().random());
         if (nextMessage == null) return null;

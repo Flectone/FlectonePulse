@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -34,6 +35,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -55,7 +57,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         int mailID = getArgument(commandContext, 0);
 

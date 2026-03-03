@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -30,10 +31,11 @@ public class MinecraftPollModule extends PollModule {
                                CommandParserProvider commandParserProvider,
                                MessagePipeline messagePipeline,
                                MessageDispatcher messageDispatcher,
+                               ModuleController moduleController,
                                FLogger fLogger,
                                PacketProvider packetProvider,
                                Provider<DialogPollBuilder> dialogPollBuilderProvider) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, fLogger);
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, fLogger);
 
         this.packetProvider = packetProvider;
         this.dialogPollBuilderProvider = dialogPollBuilderProvider;

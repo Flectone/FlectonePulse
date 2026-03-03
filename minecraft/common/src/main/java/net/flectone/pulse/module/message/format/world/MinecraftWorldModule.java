@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -27,8 +28,9 @@ public class MinecraftWorldModule extends WorldModule {
                                 ListenerRegistry listenerRegistry,
                                 TaskScheduler taskScheduler,
                                 PacketProvider packetProvider,
-                                MessagePipeline messagePipeline) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline);
+                                MessagePipeline messagePipeline,
+                                ModuleController moduleController) {
+        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline, moduleController);
 
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;

@@ -21,6 +21,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -57,6 +58,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Override
@@ -148,7 +150,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public void executeVote(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         int id = getArgument(commandContext, 4);
         int numberVote = getArgument(commandContext, 5);
@@ -167,7 +169,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String promptTime = getPrompt(0);
         long time = ((Duration) commandContext.get(promptTime)).toMillis();
@@ -265,7 +267,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote, UUID metadataUUID) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         Poll poll = pollMap.get(id);
         if (poll == null) {

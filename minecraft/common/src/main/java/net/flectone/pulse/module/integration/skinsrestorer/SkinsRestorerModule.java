@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -19,6 +20,7 @@ public class SkinsRestorerModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final SkinsRestorerIntegration skinsRestorerIntegration;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -51,13 +53,13 @@ public class SkinsRestorerModule extends AbstractModule {
     }
 
     public String getTextureUrl(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return skinsRestorerIntegration.getTextureUrl(fPlayer);
     }
 
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return skinsRestorerIntegration.getProfileProperty(fPlayer);
     }

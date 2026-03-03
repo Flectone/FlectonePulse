@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,6 +20,7 @@ public class AnvilModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Override
     public Message.Anvil config() {
@@ -31,7 +33,7 @@ public class AnvilModule extends AbstractModule {
     }
 
     public Optional<String> format(FPlayer fPlayer, String string) {
-        if (isModuleDisabledFor(fPlayer)) return Optional.empty();
+        if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
         return messagePipeline.legacyFormat(fPlayer, string);

@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
@@ -39,6 +40,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -55,7 +57,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
@@ -133,7 +135,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     public void kick(FEntity fModerator, FPlayer fTarget, Moderation kick) {
         if (fModerator == null) return;
-        if (isModuleDisabledFor(fModerator)) return;
+        if (moduleController.isDisabledFor(this, fModerator)) return;
 
         String format = moderationMessageFormatter.replacePlaceholders(localization(fTarget).person(), fTarget, kick);
         MessageContext messageContext = messagePipeline.createContext(fTarget, format)

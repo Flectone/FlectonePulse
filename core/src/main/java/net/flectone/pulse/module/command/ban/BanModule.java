@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -46,6 +47,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -65,7 +67,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -111,7 +113,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     public void ban(FPlayer fPlayer, String target, long time, String reason) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
@@ -167,7 +169,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     public void kick(FEntity fModerator, FPlayer fTarget, Moderation ban) {
         if (fModerator == null) return;
-        if (isModuleDisabledFor(fModerator)) return;
+        if (moduleController.isDisabledFor(this, fModerator)) return;
 
         Localization.Command.Ban localization = localization(fTarget);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, ban);

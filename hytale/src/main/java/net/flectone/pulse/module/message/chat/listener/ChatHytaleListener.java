@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.function.BiConsumer;
@@ -17,14 +18,15 @@ public class ChatHytaleListener implements HytaleListener {
 
     private final FPlayerService fPlayerService;
     private final HytaleChatModule chatModule;
+    private final ModuleController moduleController;
 
     public void onPlayerChatEvent(PlayerChatEvent event) {
         if (event.isCancelled()) return;
         if (event.getTargets().isEmpty()) return;
-        if (!chatModule.isEnable()) return;
+        if (!moduleController.isEnable(chatModule)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getSender().getUuid());
-        if (chatModule.isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
 
         Runnable cancelRunnable = () -> {
             event.setCancelled(true);

@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -27,6 +28,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -39,7 +41,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 

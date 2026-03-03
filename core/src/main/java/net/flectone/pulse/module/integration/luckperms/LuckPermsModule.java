@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.luckperms.listener.LuckPermsPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -30,6 +31,7 @@ public class LuckPermsModule extends AbstractModule {
     private final PlatformServerAdapter platformServerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -65,38 +67,38 @@ public class LuckPermsModule extends AbstractModule {
     }
 
     public boolean hasLuckPermission(FPlayer fPlayer, String permission) {
-        if (!isEnable()) return false;
+        if (!moduleController.isEnable(this)) return false;
 
         return luckPermsIntegration.hasPermission(fPlayer, permission);
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
-        if (!isEnable()) return 0;
+        if (!moduleController.isEnable(this)) return 0;
         if (!config().tabSort()) return 0;
 
         return luckPermsIntegration.getGroupWeight(fPlayer);
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return luckPermsIntegration.getPrefix(fPlayer);
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return luckPermsIntegration.getSuffix(fPlayer);
     }
 
     public Set<String> getGroups() {
-        if (!isEnable()) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Collections.emptySet();
 
         return luckPermsIntegration.getGroups();
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        if (isModuleDisabledFor(messageContext.sender())) return messageContext;
+        if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
         if (!(messageContext.sender() instanceof FPlayer fPlayer)) return messageContext;
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.WEIGHT_REPLACEMENT, (argumentQueue, context) -> {
@@ -121,7 +123,7 @@ public class LuckPermsModule extends AbstractModule {
 
     @Nullable
     public String getReplacementValue(FPlayer fPlayer, FPlayer fReceiver, String name) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
 
         Map<Integer, String> weightReplacement = fileFacade.localization(fReceiver).integration().luckperms().weightReplacement().get(name);
         if (weightReplacement == null || weightReplacement.isEmpty()) return null;

@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
@@ -36,6 +37,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
     private final PermissionChecker permissionChecker;
+    private final ModuleController moduleController;
 
     @Inject
     public MinecraftSidebarModule(FileFacade fileFacade,
@@ -45,7 +47,8 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   FPlayerService fPlayerService,
                                   PacketSender packetSender,
                                   PacketProvider packetProvider,
-                                  PermissionChecker permissionChecker) {
+                                  PermissionChecker permissionChecker,
+                                  ModuleController moduleController) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService);
 
         this.taskScheduler = taskScheduler;
@@ -53,6 +56,7 @@ public class MinecraftSidebarModule extends SidebarModule {
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.permissionChecker = permissionChecker;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class MinecraftSidebarModule extends SidebarModule {
                 return;
             }
 
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             String format = getNextMessage(fPlayer, config().random());
             if (format == null) return;

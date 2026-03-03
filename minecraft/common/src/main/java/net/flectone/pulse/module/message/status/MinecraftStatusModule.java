@@ -21,6 +21,7 @@ import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -44,6 +45,7 @@ public class MinecraftStatusModule extends StatusModule {
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
     private final EventDispatcher eventDispatcher;
+    private final ModuleController moduleController;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
@@ -56,7 +58,8 @@ public class MinecraftStatusModule extends StatusModule {
                                  FPlayerService fPlayerService,
                                  ListenerRegistry listenerRegistry,
                                  PacketProvider packetProvider,
-                                 EventDispatcher eventDispatcher) {
+                                 EventDispatcher eventDispatcher,
+                                 ModuleController moduleController) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -69,6 +72,7 @@ public class MinecraftStatusModule extends StatusModule {
         this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
         this.eventDispatcher = eventDispatcher;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -91,7 +95,7 @@ public class MinecraftStatusModule extends StatusModule {
     public void update(PacketSendEvent event) {
         InetAddress inetAddress = event.getUser().getAddress().getAddress();
         FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayer = fPlayerService.loadColors(fPlayer);
 
@@ -127,7 +131,7 @@ public class MinecraftStatusModule extends StatusModule {
         jsonObject.addProperty("name", version);
 
         int protocol = packetProvider.getServerVersion().getProtocolVersion();
-        if (versionModule.isEnable() && versionModule.config().protocol() != -1) {
+        if (moduleController.isEnable(versionModule) && versionModule.config().protocol() != -1) {
             protocol = versionModule.config().protocol();
         }
 
@@ -150,12 +154,12 @@ public class MinecraftStatusModule extends StatusModule {
     private JsonElement getPlayersJson(FPlayer fPlayer) {
         JsonObject playersJson = new JsonObject();
 
-        int max = playersModule.isEnable()
+        int max = moduleController.isEnable(playersModule)
                 ? playersModule.config().max()
                 : platformServerAdapter.getMaxPlayers();
         playersJson.addProperty("max", max);
 
-        int online = playersModule.isEnable()
+        int online = moduleController.isEnable(playersModule)
                 ? playersModule.config().online() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.config().online()
                 : platformServerAdapter.getOnlinePlayerCount();
         playersJson.addProperty("online", online);

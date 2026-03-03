@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -42,6 +43,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -56,7 +58,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String promptNumber = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);

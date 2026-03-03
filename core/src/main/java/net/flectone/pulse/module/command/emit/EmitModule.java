@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -41,6 +42,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -59,7 +61,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String targetName = getArgument(commandContext, 0);
         String typeWithMessage = getArgument(commandContext, 1);

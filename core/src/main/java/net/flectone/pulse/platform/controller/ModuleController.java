@@ -1,10 +1,12 @@
 package net.flectone.pulse.platform.controller;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
@@ -28,8 +30,8 @@ import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import org.jspecify.annotations.NonNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,12 +47,16 @@ public class ModuleController {
     public static final Set<Class<? extends AbstractModule>> WARN_MODULES = Set.of(WarnModule.class, WarnlistModule.class, UnwarnModule.class);
     public static final Set<Class<? extends AbstractModule>> KICK_MODULES = Set.of(KickModule.class);
 
+    private final Object2BooleanOpenHashMap<Class<? extends AbstractModule>> moduleStateMap = new Object2BooleanOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, List<Class<? extends AbstractModule>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, BiPredicate<FEntity, Boolean>> modulePredicateMap = new Object2ObjectOpenHashMap<>();
+
     private final Injector injector;
     private final EventDispatcher eventDispatcher;
-    private final PermissionChecker permissionChecker;
-    private final DisableSender disableSender;
-    private final CooldownSender cooldownSender;
-    private final MuteSender muteSender;
+    private final Provider<PermissionChecker> permissionCheckerProvider;
+    private final Provider<DisableSender> disableSenderProvider;
+    private final Provider<CooldownSender> cooldownSenderProvider;
+    private final Provider<MuteSender> muteSenderProvider;
     private final PermissionRegistry permissionRegistry;
 
     public Map<String, String> collectModuleStatuses() {
@@ -58,17 +64,51 @@ public class ModuleController {
     }
 
     public Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
-        AbstractModule module = injector.getInstance(clazz);
-
         Map<String, String> modules = new Object2ObjectArrayMap<>();
 
-        modules.put(clazz.getSimpleName(), module.isEnable() ? "true" : "false");
+        modules.put(clazz.getSimpleName(), isEnable(clazz) ? "true" : "false");
 
-        injector.getInstance(clazz)
-                .getChildren()
+        getChildren(clazz)
                 .forEach(subModule -> modules.putAll(collectModuleStatuses(subModule)));
 
         return modules;
+    }
+
+    public boolean isEnable(AbstractModule abstractModule) {
+        return isEnable(abstractModule.getClass());
+    }
+
+    public boolean isEnable(Class<? extends AbstractModule> clazz) {
+        return moduleStateMap.getBoolean(clazz);
+    }
+
+    public boolean containsChild(AbstractModule abstractModule, Class<? extends AbstractModule> child) {
+        return containsChild(abstractModule.getClass(), child);
+    }
+
+    public boolean containsChild(Class<? extends AbstractModule> clazz, Class<? extends AbstractModule> child) {
+        return getChildren(clazz).contains(child);
+    }
+
+    public boolean isDisabledFor(AbstractModule abstractModule, FEntity entity) {
+        return isDisabledFor(abstractModule, entity, false);
+    }
+
+    public boolean isDisabledFor(Class<? extends AbstractModule> clazz, FEntity entity) {
+        return isDisabledFor(clazz, entity, false);
+    }
+
+    public boolean isDisabledFor(AbstractModule abstractModule, FEntity entity, boolean isMessage) {
+        return isDisabledFor(abstractModule.getClass(), entity, isMessage);
+    }
+
+    public boolean isDisabledFor(Class<? extends AbstractModule> clazz, FEntity entity, boolean isMessage) {
+        BiPredicate<FEntity, Boolean> disablePredicate = modulePredicateMap.get(clazz);
+        return disablePredicate != null && disablePredicate.test(entity, isMessage);
+    }
+
+    public List<Class<? extends AbstractModule>> getChildren(Class<? extends AbstractModule> clazz) {
+        return moduleChildrenMap.getOrDefault(clazz, Collections.emptyList());
     }
 
     public void reload() {
@@ -94,16 +134,16 @@ public class ModuleController {
     public void configureChildren(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
-        module.setChildren(module.childrenBuilder().build());
-        module.setPredicates(buildPredicates(module));
+        moduleChildrenMap.put(clazz, module.childrenBuilder().build());
+        modulePredicateMap.put(clazz, buildDisablePredicate(module));
 
-        module.getChildren().forEach(this::configureChildren);
+        getChildren(clazz).forEach(this::configureChildren);
     }
 
     public void enable(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> enablePredicate) {
         AbstractModule module = injector.getInstance(clazz);
 
-        if (module.isEnable()) {
+        if (isEnable(clazz)) {
             ModuleDisableEvent preDisableEvent = eventDispatcher.dispatch(new ModuleDisableEvent(module));
 
             if (preDisableEvent.cancelled()) {
@@ -113,38 +153,36 @@ public class ModuleController {
             }
         }
 
-        module.setEnable(enablePredicate.test(module));
+        moduleStateMap.put(clazz, enablePredicate.test(module));
 
-        if (module.isEnable()) {
+        if (isEnable(clazz)) {
             ModuleEnableEvent preEnableEvent = eventDispatcher.dispatch(new ModuleEnableEvent(module));
 
             if (preEnableEvent.cancelled()) {
-                module.setEnable(false);
+                moduleStateMap.put(clazz, false);
             } else {
                 module.permissionBuilder().build().forEach(permissionRegistry::register);
                 module.onEnable();
             }
         }
 
-        Predicate<AbstractModule> childPredicate =abstractModule -> module.isEnable() && abstractModule.config().enable();
-        module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
+        Predicate<AbstractModule> childPredicate =abstractModule -> isEnable(clazz) && abstractModule.config().enable();
+        getChildren(clazz).forEach(subModule -> enable(subModule, childPredicate));
     }
 
-    public List<BiPredicate<FEntity, Boolean>> buildPredicates(AbstractModule module) {
-        ImmutableList.Builder<@NonNull BiPredicate<FEntity, Boolean>> predicatesBuilder = module.predicateBuilder();
-
-        predicatesBuilder
-                .add((fPlayer, needBoolean) -> !module.isEnable())
-                .add((fPlayer, needBoolean) -> !permissionChecker.check(fPlayer, module.permission()));
+    public BiPredicate<FEntity, Boolean> buildDisablePredicate(AbstractModule module) {
+        BiPredicate<FEntity, Boolean> disablePredicate = module.disablePredicate()
+                .and((fPlayer, needBoolean) -> !isEnable(module))
+                .and((fPlayer, needBoolean) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
 
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
-            predicatesBuilder
-                    .add((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()))
-                    .add((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
-                    .add((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
+            return disablePredicate
+                    .and((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()))
+                    .and((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
+                    .and((fPlayer, needBoolean) -> needBoolean && muteSenderProvider.get().sendIfMuted(fPlayer));
         }
 
-        return predicatesBuilder.build();
+        return disablePredicate;
     }
 
     public boolean isInstanceOfAny(AbstractModule module, Set<Class<? extends AbstractModule>> classes) {

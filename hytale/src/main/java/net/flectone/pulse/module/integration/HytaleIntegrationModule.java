@@ -10,6 +10,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.placeholderapi.HytalePlaceholderAPIModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
@@ -22,8 +23,9 @@ public class HytaleIntegrationModule extends IntegrationModule {
     @Inject
     public HytaleIntegrationModule(FileFacade fileFacade,
                                    PlatformServerAdapter platformServerAdapter,
+                                   ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, platformServerAdapter, injector);
+        super(fileFacade, platformServerAdapter, moduleController, injector);
 
         this.platformServerAdapter = platformServerAdapter;
     }

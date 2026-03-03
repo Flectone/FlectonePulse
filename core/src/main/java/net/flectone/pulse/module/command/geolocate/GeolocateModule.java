@@ -16,6 +16,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
 import net.flectone.pulse.module.command.geolocate.model.IpResponse;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
@@ -48,6 +49,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final TimeFormatter timeFormatter;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Override
@@ -63,7 +65,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);

@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -46,6 +47,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     private final CommandParserProvider commandParserProvider;
     private final EventDispatcher eventDispatcher;
     private final SoundPlayer soundPlayer;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -62,7 +64,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         Localization.Command.Warnlist localization = localization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.global();

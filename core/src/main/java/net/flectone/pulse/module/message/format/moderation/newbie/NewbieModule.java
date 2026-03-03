@@ -14,6 +14,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -28,6 +29,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Override
@@ -78,7 +80,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean isNewBie(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return false;
+        if (moduleController.isDisabledFor(this, fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission().bypass())) return false;
 
         long timeToCheck = switch (config().mode()) {

@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.status.players.listener.PlayersPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -28,6 +29,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     private final PermissionChecker permissionChecker;
     private final PlatformServerAdapter platformServerAdapter;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -62,10 +64,9 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public boolean isAllowed(FPlayer fPlayer) {
-        if (!isEnable()) return true;
         if (!config().control()) return true;
-
-        if (isModuleDisabledFor(fPlayer)) return true;
+        if (!moduleController.isEnable(this)) return true;
+        if (moduleController.isDisabledFor(this, fPlayer)) return true;
         if (permissionChecker.check(fPlayer, permission().bypass())) return true;
 
         int online = platformServerAdapter.getOnlinePlayerCount();
@@ -73,7 +74,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public List<Localization.Message.Status.Players.Sample> getSamples(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return localization(fPlayer).samples();
     }

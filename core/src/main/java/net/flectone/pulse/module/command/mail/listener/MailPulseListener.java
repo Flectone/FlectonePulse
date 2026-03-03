@@ -13,6 +13,7 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.List;
@@ -24,11 +25,12 @@ public class MailPulseListener implements PulseListener {
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fReceiver = event.player();
-        if (mailModule.isModuleDisabledFor(fReceiver)) return;
+        if (moduleController.isDisabledFor(mailModule, fReceiver)) return;
 
         List<Mail> mails = fPlayerService.getReceiverMails(fReceiver);
         if (mails.isEmpty()) return;

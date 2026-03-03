@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
@@ -32,17 +33,21 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final ModuleController moduleController;
 
     @Inject
     public HytaleScoreboardModule(FileFacade fileFacade,
                                   ListenerRegistry listenerRegistry,
                                   TaskScheduler taskScheduler,
                                   MessagePipeline messagePipeline,
-                                  PlatformPlayerAdapter platformPlayerAdapter) {
+                                  PlatformPlayerAdapter platformPlayerAdapter,
+                                  ModuleController moduleController) {
         super(fileFacade, listenerRegistry);
+
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -74,7 +79,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     @Override
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             CustomName customName = createNameplate(fPlayer);
             sendPacket(fPlayer.uuid(), customName.value());
@@ -86,7 +91,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     @Override
     public void remove(FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             CustomName customName = uuidTeamMap.get(fPlayer.uuid());
             if (customName == null) return;

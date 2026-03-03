@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.file.FileFacade;
@@ -27,6 +28,7 @@ public class IconModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
     private final RandomUtil randomUtil;
     private final IconUtil iconUtil;
     private final @Named("imagePath") Path iconPath;
@@ -86,7 +88,7 @@ public class IconModule extends AbstractModule {
     }
 
     public @Nullable String next(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
         if (iconList.isEmpty()) return null;
 
         if (config().random()) {

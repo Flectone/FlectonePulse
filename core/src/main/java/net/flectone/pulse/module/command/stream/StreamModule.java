@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -50,6 +51,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -75,7 +77,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         Boolean needStart = switch (type) {
@@ -178,7 +180,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
-        if (isModuleDisabledFor(fPlayer)) return messageContext;
+        if (moduleController.isDisabledFor(this, fPlayer)) return messageContext;
 
         return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);

@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.litebans.listener.LiteBansPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -19,6 +20,7 @@ public class LiteBansModule extends AbstractModule {
     private final FileFacade fileFacade;
     private final LiteBansIntegration liteBansIntegration;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -47,13 +49,13 @@ public class LiteBansModule extends AbstractModule {
     }
 
     public boolean isMuted(FEntity fEntity) {
-        if (isModuleDisabledFor(fEntity)) return false;
+        if (moduleController.isDisabledFor(this, fEntity)) return false;
 
         return liteBansIntegration.isMuted(fEntity);
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        if (isModuleDisabledFor(fEntity)) return null;
+        if (moduleController.isDisabledFor(this, fEntity)) return null;
 
         return liteBansIntegration.getMute(fEntity);
     }

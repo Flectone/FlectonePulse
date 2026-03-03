@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.MessageType;
@@ -32,6 +33,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -46,7 +48,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         int min = config().min();
         int max = config().max();

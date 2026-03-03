@@ -7,6 +7,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -21,8 +22,9 @@ public class HytaleJoinModule extends JoinModule {
                             IntegrationModule integrationModule,
                             TaskScheduler taskScheduler,
                             MessageDispatcher messageDispatcher,
-                            ListenerRegistry listenerRegistry) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher);
+                            ListenerRegistry listenerRegistry,
+                            ModuleController moduleController) {
+        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

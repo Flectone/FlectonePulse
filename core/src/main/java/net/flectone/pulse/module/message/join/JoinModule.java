@@ -15,6 +15,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -27,6 +28,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public MessageType messageType() {
@@ -57,7 +59,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 

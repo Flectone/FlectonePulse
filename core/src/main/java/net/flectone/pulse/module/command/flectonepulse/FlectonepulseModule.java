@@ -20,6 +20,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -60,6 +61,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final ReflectionResolver reflectionResolver;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
     private final SimpleDateFormat simpleDateFormat;
     private final @Named("projectPath") Path projectPath;
     private final FLogger fLogger;
@@ -92,7 +94,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         Operation operation = getOperation(commandContext);
         boolean needReload = switch (operation) {

@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.MinecraftSkinService;
@@ -40,6 +41,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final PacketProvider packetProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final ModuleController moduleController;
     private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
@@ -50,6 +52,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  PacketProvider packetProvider,
                                  IntegrationModule integrationModule,
                                  PlatformPlayerAdapter platformPlayerAdapter,
+                                 ModuleController moduleController,
                                  @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
         super(fileFacade);
 
@@ -59,6 +62,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.packetProvider = packetProvider;
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.moduleController = moduleController;
         this.isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
     }
 
@@ -74,7 +78,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            if (isModuleDisabledFor(sender)) return messageContext;
+            if (moduleController.isDisabledFor(this, sender)) return messageContext;
             if (!permissionChecker.check(sender, permission().playerHead())) return messageContext;
         }
 
@@ -137,7 +141,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
-            if (isModuleDisabledFor(sender)) return messageContext;
+            if (moduleController.isDisabledFor(this, sender)) return messageContext;
             if (!permissionChecker.check(sender, permission().sprite())) return messageContext;
         }
 

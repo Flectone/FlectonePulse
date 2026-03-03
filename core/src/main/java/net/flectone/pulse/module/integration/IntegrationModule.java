@@ -15,6 +15,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -28,13 +29,16 @@ public abstract class IntegrationModule extends AbstractModule {
 
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
     private final Injector injector;
 
     protected IntegrationModule(FileFacade fileFacade,
                                 PlatformServerAdapter platformServerAdapter,
+                                ModuleController moduleController,
                                 Injector injector) {
         this.fileFacade = fileFacade;
         this.platformServerAdapter = platformServerAdapter;
+        this.moduleController = moduleController;
         this.injector = injector;
     }
 
@@ -82,9 +86,9 @@ public abstract class IntegrationModule extends AbstractModule {
     public abstract String getTritonLocale(FPlayer fPlayer);
 
     public boolean containsEnabledChild(Class<? extends AbstractModule> clazz) {
-        if (!containsChild(clazz)) return false;
+        if (!moduleController.containsChild(this, clazz)) return false;
 
-        return injector.getInstance(clazz).isEnable();
+        return moduleController.isEnable(clazz);
     }
 
     public <T> T getInstance(Class<T> clazz) {
@@ -92,7 +96,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
-        if (!isEnable()) return false;
+        if (!moduleController.isEnable(this)) return false;
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
@@ -102,7 +106,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
@@ -112,7 +116,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        if (!isEnable()) return null;
+        if (!moduleController.isEnable(this)) return null;
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
@@ -122,7 +126,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public Set<String> getGroups() {
-        if (!isEnable()) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Collections.emptySet();
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getGroups();
@@ -132,7 +136,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
-        if (!isEnable()) return 0;
+        if (!moduleController.isEnable(this)) return 0;
         if (!containsEnabledChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
@@ -153,9 +157,9 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public boolean hasMessenger() {
-        return injector.getInstance(DiscordModule.class).isEnable()
-                || injector.getInstance(TwitchModule.class).isEnable()
-                || injector.getInstance(TelegramModule.class).isEnable();
+        return moduleController.isEnable(DiscordModule.class)
+                || moduleController.isEnable(TwitchModule.class)
+                || moduleController.isEnable(TelegramModule.class);
     }
 
     public boolean canSeeVanished(FEntity fTarget, FEntity fViewer) {
@@ -166,7 +170,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
-        if (isModuleDisabledFor(sender)) return text;
+        if (moduleController.isDisabledFor(this, sender)) return text;
         if (containsEnabledChild(DeeplModule.class)) {
             return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
         }
@@ -175,7 +179,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String yandexTranslate(FPlayer sender, String source, String target, String text) {
-        if (isModuleDisabledFor(sender)) return text;
+        if (moduleController.isDisabledFor(this, sender)) return text;
         if (containsEnabledChild(YandexModule.class)) {
             return injector.getInstance(YandexModule.class).translate(sender, source, target, text);
         }

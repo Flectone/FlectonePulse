@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -29,6 +30,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -68,7 +70,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     }
 
     public void send(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;

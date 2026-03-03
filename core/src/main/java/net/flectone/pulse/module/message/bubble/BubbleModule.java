@@ -7,6 +7,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
@@ -19,15 +20,18 @@ public abstract class BubbleModule extends AbstractModule {
     private final TaskScheduler taskScheduler;
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
 
     protected BubbleModule(FileFacade fileFacade,
                            TaskScheduler taskScheduler,
                            BubbleService bubbleService,
-                           ListenerRegistry listenerRegistry) {
+                           ListenerRegistry listenerRegistry,
+                           ModuleController moduleController) {
         this.fileFacade = fileFacade;
         this.taskScheduler = taskScheduler;
         this.bubbleService = bubbleService;
         this.listenerRegistry = listenerRegistry;
+        this.moduleController = moduleController;
     }
 
     @Override
@@ -58,7 +62,7 @@ public abstract class BubbleModule extends AbstractModule {
 
     public void add(@NonNull FPlayer fPlayer, @NonNull String inputString, List<FPlayer> receivers) {
         taskScheduler.runRegion(fPlayer, () -> {
-            if (isModuleDisabledFor(fPlayer)) return;
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             bubbleService.addMessage(fPlayer, inputString, receivers);
         });

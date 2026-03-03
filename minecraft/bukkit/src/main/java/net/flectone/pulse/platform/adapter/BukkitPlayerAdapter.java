@@ -17,6 +17,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.AttributesProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.provider.PassengersProvider;
@@ -48,6 +49,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final PassengersProvider passengersProvider;
     private final ReflectionResolver reflectionResolver;
     private final MessagePipeline messagePipeline;
+    private final ModuleController moduleController;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -271,7 +273,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         HeaderModule headerModule = injector.getInstance(HeaderModule.class);
 
         String header;
-        if (!headerModule.isModuleDisabledFor(fPlayer)) {
+        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
                 MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
@@ -293,7 +295,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         FooterModule footerModule = injector.getInstance(FooterModule.class);
 
         String footer;
-        if (!footerModule.isModuleDisabledFor(fPlayer)) {
+        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
                 MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);

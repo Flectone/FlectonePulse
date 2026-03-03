@@ -16,6 +16,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
@@ -47,6 +48,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -97,7 +99,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (fPlayer.name().equalsIgnoreCase(playerName)) {
             messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Tell>builder()

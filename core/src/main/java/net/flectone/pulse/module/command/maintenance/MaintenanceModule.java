@@ -19,6 +19,7 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
@@ -43,6 +44,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
@@ -58,6 +60,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              FPlayerService fPlayerService,
                              MessagePipeline messagePipeline,
                              MessageDispatcher messageDispatcher,
+                             ModuleController moduleController,
                              IconUtil iconUtil,
                              FLogger fLogger) {
         this.fileFacade = fileFacade;
@@ -69,6 +72,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
+        this.moduleController = moduleController;
         this.iconUtil = iconUtil;
         this.fLogger = fLogger;
     }
@@ -104,7 +108,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         boolean turned = !config().turnedOn();
 
@@ -155,7 +159,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     }
 
     public boolean isAllowed(FPlayer fPlayer) {
-        if (!isEnable()) return true;
+        if (!moduleController.isEnable(this)) return true;
         if (!config().turnedOn()) return true;
 
         return permissionChecker.check(fPlayer, permission().join());

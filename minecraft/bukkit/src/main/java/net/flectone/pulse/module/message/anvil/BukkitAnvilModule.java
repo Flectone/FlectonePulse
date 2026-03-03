@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
@@ -16,8 +17,9 @@ public class BukkitAnvilModule extends AnvilModule {
     @Inject
     public BukkitAnvilModule(FileFacade fileFacade,
                              BukkitListenerRegistry listenerRegistry,
-                             MessagePipeline messagePipeline) {
-        super(fileFacade, messagePipeline);
+                             MessagePipeline messagePipeline,
+                             ModuleController moduleController) {
+        super(fileFacade, messagePipeline, moduleController);
 
         this.listenerRegistry = listenerRegistry;
     }

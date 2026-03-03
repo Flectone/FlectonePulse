@@ -18,6 +18,7 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
@@ -43,6 +44,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -61,7 +63,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
@@ -76,7 +78,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         }
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            if (!tellModule.isEnable()) {
+            if (!moduleController.isEnable(tellModule)) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Mail::onlinePlayer)

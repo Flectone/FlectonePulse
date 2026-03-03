@@ -21,6 +21,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -52,6 +53,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final CooldownChecker cooldownChecker;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -110,7 +112,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     public MessageContext format(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         String contextMessage = messageContext.message();
         StringBuilder result = new StringBuilder(contextMessage);
@@ -135,7 +137,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         UUID processId = messageContext.messageUUID();
         FEntity receiver = messageContext.receiver();

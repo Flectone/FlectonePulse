@@ -17,6 +17,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.ColorConverter;
@@ -42,6 +43,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final ColorConverter colorConverter;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -79,7 +81,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         Optional<FColor.Type> fColorType = switch (type.toLowerCase()) {

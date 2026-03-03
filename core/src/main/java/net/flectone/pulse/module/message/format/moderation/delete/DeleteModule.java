@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.delete.listener.DeletePulseListener;
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
@@ -44,6 +45,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -87,7 +89,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         FPlayer receiver = messageContext.receiver();
-        if (isModuleDisabledFor(receiver)) return messageContext;
+        if (moduleController.isDisabledFor(this, receiver)) return messageContext;
 
         UUID messageUUID = messageContext.messageUUID();
 
@@ -144,7 +146,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean remove(FEntity sender, UUID messageUUID) {
-        if (isModuleDisabledFor(sender)) return false;
+        if (moduleController.isDisabledFor(this, sender)) return false;
         if (messageUUID == null) return false;
 
         List<Map.Entry<UUID, List<HistoryMessage>>> entryToDelete = playersHistory.entrySet().stream()

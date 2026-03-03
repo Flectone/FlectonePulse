@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatBukkitListener;
 import net.flectone.pulse.module.message.chat.listener.ChatPaperListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
@@ -30,6 +31,7 @@ public class BukkitChatModule extends MinecraftChatModule {
     private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry listenerRegistry;
     private final ReflectionResolver reflectionResolver;
+    private final ModuleController moduleController;
     private final FLogger fLogger;
 
     @Inject
@@ -47,6 +49,7 @@ public class BukkitChatModule extends MinecraftChatModule {
                                DisableSender disableSender,
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
+                               ModuleController moduleController,
                                FLogger fLogger,
                                ProxyRegistry proxyRegistry) {
         super(fileFacade, fPlayerService, platformServerAdapter, permissionChecker,
@@ -56,6 +59,7 @@ public class BukkitChatModule extends MinecraftChatModule {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.reflectionResolver = reflectionResolver;
+        this.moduleController = moduleController;
         this.fLogger = fLogger;
     }
 
@@ -67,7 +71,7 @@ public class BukkitChatModule extends MinecraftChatModule {
         if (mode == Message.Chat.Mode.PACKET) return; // already registered in super class
         if (mode == Message.Chat.Mode.PAPER) {
             if (reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
-                ChatPaperListener chatPaperListener = new ChatPaperListener(fPlayerService, this);
+                ChatPaperListener chatPaperListener = new ChatPaperListener(fPlayerService, moduleController, this);
                 listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().priority().name()));
                 return;
             }

@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -17,6 +18,7 @@ import net.flectone.pulse.util.file.FileFacade;
 public class VersionModule extends AbstractModuleLocalization<Localization.Message.Status.Version> {
 
     private final FileFacade fileFacade;
+    private final ModuleController moduleController;
 
     @Override
     public MessageType messageType() {
@@ -39,7 +41,7 @@ public class VersionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public String get(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return null;
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         return localization(fPlayer).name();
     }

@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.Collections;
@@ -27,12 +28,13 @@ public class BubblePacketListener implements PacketListener {
     private final BubbleModule bubbleModule;
     private final MinecraftBubbleRender bubbleRenderer;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final ModuleController moduleController;
     private final ChatModule chatModule;
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Play.Server.SET_PASSENGERS) return;
-        if (!bubbleModule.isEnable()) return;
+        if (!moduleController.isEnable(bubbleModule)) return;
 
         WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
         UUID playerUUID = platformPlayerAdapter.getPlayerByEntityId(wrapper.getEntityId());
@@ -44,7 +46,7 @@ public class BubblePacketListener implements PacketListener {
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.CHAT_MESSAGE) return;
-        if (chatModule.isEnable() || !bubbleModule.isEnable()) return;
+        if (moduleController.isEnable(chatModule) || !moduleController.isEnable(bubbleModule)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
 

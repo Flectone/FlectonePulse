@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -45,6 +46,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -62,7 +64,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -169,7 +171,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     }
 
     public void sendForTarget(FEntity fModerator, FPlayer fTarget, Moderation warn) {
-        if (isModuleDisabledFor(fModerator)) return;
+        if (moduleController.isDisabledFor(this, fModerator)) return;
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Warn>builder()
                 .sender(fTarget)

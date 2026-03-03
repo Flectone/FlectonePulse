@@ -19,6 +19,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -50,6 +51,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -91,7 +93,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (isModuleDisabledFor(sender)) return messageContext;
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
 
         return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (argumentQueue, context) -> {
@@ -126,7 +128,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             }
 
             // base module checks
-            if (isModuleDisabledFor(syncFPlayer)) return;
+            if (moduleController.isDisabledFor(this, syncFPlayer)) return;
 
             // skip ignored action
             if (config().ignore().contains(action)) return;
@@ -143,7 +145,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     }
 
     public void setAfkSuffix(FPlayer fPlayer) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.AFK_SUFFIX, localization().suffix()), SettingText.AFK_SUFFIX);
     }
@@ -156,7 +158,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         }
 
         // base module checks
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         // get current player coordinates
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(fPlayer);
@@ -196,7 +198,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     public void sendAfkMessage(UUID fPlayerUUID, boolean isAfk) {
         FPlayer fPlayer = fPlayerService.getFPlayer(fPlayerUUID);
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         if (isAfk && fPlayer.getSetting(SettingText.AFK_SUFFIX) == null
                 || !isAfk && fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
