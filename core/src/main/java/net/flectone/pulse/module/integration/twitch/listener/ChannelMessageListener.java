@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -40,6 +41,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     private final Provider<TwitchIntegration> twitchIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final TaskScheduler taskScheduler;
 
     public Class<ChannelMessageEvent> getEventType() {
@@ -75,7 +77,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     }
 
     public void sendMessage(String nickname, String channel, String message, Pair<String, String> reply) {
-        sendMessage(TwitchMetadata.<Localization.Integration.Twitch>builder()
+        messageDispatcher.dispatch(this, TwitchMetadata.<Localization.Integration.Twitch>builder()
                 .base(EventMetadata.<Localization.Integration.Twitch>builder()
                         .sender(twitchIntegration.get().getSender())
                         .format(localization -> StringUtils.replaceEach(

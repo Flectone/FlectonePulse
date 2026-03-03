@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -21,6 +22,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Command
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -39,7 +41,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Command
 
         String message = getArgument(commandContext, 0);
 
-        sendMessage(EventMetadata.<Localization.Command.CommandDo>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.CommandDo>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.CommandDo::format)
                 .message(message)

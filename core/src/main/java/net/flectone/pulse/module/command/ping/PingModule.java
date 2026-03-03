@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -29,6 +30,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -51,7 +53,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ping>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ping>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ping::nullPlayer)
                     .build()
@@ -60,7 +62,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
             return;
         }
 
-        sendMessage(EventMetadata.<Localization.Command.Ping>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Ping>builder()
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
                 .format(Localization.Command.Ping::format)

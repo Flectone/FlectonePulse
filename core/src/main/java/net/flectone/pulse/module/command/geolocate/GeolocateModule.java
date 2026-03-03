@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -46,6 +47,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final FLogger fLogger;
 
     @Override
@@ -67,7 +69,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullPlayer)
                     .build()
@@ -77,7 +79,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.ip();
         if (StringUtils.isEmpty(ip)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullOrError)
                     .build()
@@ -87,7 +89,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         IpResponse response = getGeolocation(ip);
         if (response == null || !response.isSuccess()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Geolocate>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullOrError)
                     .build()
@@ -97,7 +99,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         String userCurrentTime = getUserCurrentTime(response);
 
-        sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
+        messageDispatcher.dispatch(this, GeolocateMetadata.<Localization.Command.Geolocate>builder()
                 .base(EventMetadata.<Localization.Command.Geolocate>builder()
                         .sender(fPlayer)
                         .tagResolvers(fResolver -> new TagResolver[]{

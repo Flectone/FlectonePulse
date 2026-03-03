@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -36,6 +37,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -88,7 +90,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::nullPlayer)
                     .build()
@@ -98,7 +100,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::lowerWeightGroup)
                     .build()
@@ -119,7 +121,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (bans.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::notBanned)
                     .build()
@@ -132,7 +134,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         proxySender.send(fTarget, MessageType.SYSTEM_BAN);
 
-        sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .sender(fTarget)
                         .format(Localization.Command.Unban::format)

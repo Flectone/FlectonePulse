@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -48,6 +49,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     private final IntegrationModule integrationModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final FLogger fLogger;
 
     @Override
@@ -215,7 +217,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         processedMentions.put(processId, true);
 
-        sendMessage(EventMetadata.<Localization.Message.Format.Mention>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Format.Mention>builder()
                 .sender(fPlayer)
                 .format(Localization.Message.Format.Mention::person)
                 .destination(config().destination())

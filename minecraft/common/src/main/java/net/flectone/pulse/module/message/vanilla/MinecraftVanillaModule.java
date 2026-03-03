@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -42,6 +43,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final MinecraftComponentExtractor extractor;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
@@ -52,6 +54,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   MinecraftComponentExtractor extractor,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
+                                  MessageDispatcher messageDispatcher,
                                   PlatformPlayerAdapter platformPlayerAdapter,
                                   TaskScheduler taskScheduler,
                                   PacketSender packetSender,
@@ -61,6 +64,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.extractor = extractor;
         this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
+        this.messageDispatcher = messageDispatcher;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
@@ -107,7 +111,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
-        sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+        messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
                         .sender(fPlayer)
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))

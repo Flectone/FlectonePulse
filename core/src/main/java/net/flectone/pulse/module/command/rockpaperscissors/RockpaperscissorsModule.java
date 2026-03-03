@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -48,6 +49,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -78,7 +80,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::nullPlayer)
                     .build()
@@ -88,7 +90,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         }
 
         if (fReceiver.equals(fPlayer)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::myself)
                     .build()
@@ -126,7 +128,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         create(rockPaperScissors.getId(), fPlayer, fReceiver.uuid());
 
-        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .sender(fPlayer)
                         .format(s -> StringUtils.replaceEach(s.formatMove(),
@@ -166,7 +168,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         List<String> strategy = config().strategies().get(move);
 
         if (strategy == null) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::wrongMove)
                     .build()
@@ -178,7 +180,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         RockPaperScissors rockPaperScissors = gameMap.get(uuid);
 
         if (rockPaperScissors == null) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::nullGame)
                     .build()
@@ -189,7 +191,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         if (rockPaperScissors.getSenderMove() != null) {
             if (rockPaperScissors.getSender().equals(fPlayer.uuid())) {
-                sendErrorMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Rockpaperscissors::already)
                         .build()
@@ -211,7 +213,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
             return;
         }
 
-        sendMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Rockpaperscissors::sender)
                 .tagResolvers(fResolver -> new TagResolver[]{
@@ -253,14 +255,14 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                             localization(p).strategies().get(move)
                     );
 
-            sendMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .uuid(metadataUUID)
                     .sender(fPlayer)
                     .format(message)
                     .build()
             );
 
-            sendMessage(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .uuid(metadataUUID)
                     .sender(fReceiver)
                     .format(message)
@@ -278,7 +280,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         FEntity winFPlayer = config().strategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
-        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
@@ -291,7 +293,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .build()
         );
 
-        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
@@ -315,7 +317,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         rockPaperScissors.setSenderMove(move);
 
-        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .sender(fPlayer)
                         .filterPlayer(fReceiver, false)
@@ -327,7 +329,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .build()
         );
 
-        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)

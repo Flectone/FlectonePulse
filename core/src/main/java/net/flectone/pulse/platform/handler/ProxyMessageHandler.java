@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.data.repository.CooldownRepository;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -103,6 +104,7 @@ public class ProxyMessageHandler {
     private final TaskScheduler taskScheduler;
     private final CooldownRepository cooldownRepository;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     public void handleProxyMessage(byte[] bytes) {
         taskScheduler.runAsync(() -> {
@@ -227,7 +229,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(EventMetadata.<Localization.Command.Anon>builder()
+        messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Anon>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Anon::format)
@@ -245,7 +247,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(EventMetadata.<Localization.Command.Me>builder()
+        messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Me>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Me::format)
@@ -264,7 +266,7 @@ public class ProxyMessageHandler {
         int answer = input.readInt();
         String message = input.readUTF();
 
-        module.sendMessage(BallMetadata.<Localization.Command.Ball>builder()
+        messageDispatcher.dispatch(module, BallMetadata.<Localization.Command.Ball>builder()
                 .base(EventMetadata.<Localization.Command.Ball>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -292,7 +294,7 @@ public class ProxyMessageHandler {
 
         module.kick(fModerator, (FPlayer) fEntity, ban);
 
-        module.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+        messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Ban>builder()
                 .base(EventMetadata.<Localization.Command.Ban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -316,7 +318,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(EventMetadata.<Localization.Command.Broadcast>builder()
+        messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Broadcast>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Broadcast::format)
@@ -347,7 +349,7 @@ public class ProxyMessageHandler {
 
         int percent = input.readInt();
 
-        module.sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
+        messageDispatcher.dispatch(module, CoinMetadata.<Localization.Command.Coin>builder()
                 .base(EventMetadata.<Localization.Command.Coin>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -376,7 +378,7 @@ public class ProxyMessageHandler {
 
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
-        module.sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
+        messageDispatcher.dispatch(module, DiceMetadata.<Localization.Command.Dice>builder()
                 .base(EventMetadata.<Localization.Command.Dice>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -397,7 +399,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(EventMetadata.<Localization.Command.CommandDo>builder()
+        messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.CommandDo>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.CommandDo::format)
@@ -420,7 +422,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         if (fTarget.isConsole()) {
-            module.sendMessage(EventMetadata.<Localization.Command.Emit>builder()
+            messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Emit>builder()
                     .uuid(metadataUUID)
                     .sender(fEntity)
                     .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
@@ -432,7 +434,7 @@ public class ProxyMessageHandler {
                     .build()
             );
         } else {
-            module.sendMessage(EventMetadata.<Localization.Command.Emit>builder()
+            messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Emit>builder()
                     .uuid(metadataUUID)
                     .sender(fEntity)
                     .filterPlayer(fTarget)
@@ -452,7 +454,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(EventMetadata.<Localization.Command.Helper>builder()
+        messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Helper>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Helper::global)
@@ -475,7 +477,7 @@ public class ProxyMessageHandler {
 
         ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
-        module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
+        messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -507,7 +509,7 @@ public class ProxyMessageHandler {
 
         List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
-        module.sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
+        messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -532,7 +534,7 @@ public class ProxyMessageHandler {
 
         List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
-        module.sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
+        messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -557,7 +559,7 @@ public class ProxyMessageHandler {
 
         List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
-        module.sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
+        messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -584,7 +586,7 @@ public class ProxyMessageHandler {
                 Poll poll = gson.fromJson(input.readUTF(), Poll.class);
                 module.saveAndUpdateLast(poll);
 
-                module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                messageDispatcher.dispatch(module, PollMetadata.<Localization.Command.Poll>builder()
                         .base(EventMetadata.<Localization.Command.Poll>builder()
                                 .uuid(metadataUUID)
                                 .sender(fEntity)
@@ -609,7 +611,7 @@ public class ProxyMessageHandler {
         String action = input.readUTF();
         String string = input.readUTF();
 
-        module.sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+        messageDispatcher.dispatch(module, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -632,7 +634,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+        messageDispatcher.dispatch(module, StreamMetadata.<Localization.Command.Stream>builder()
                 .base(EventMetadata.<Localization.Command.Stream>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -672,7 +674,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
         String messageToTranslate = input.readUTF();
 
-        module.sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
+        messageDispatcher.dispatch(module, TranslatetoMetadata.<Localization.Command.Translateto>builder()
                 .base(EventMetadata.<Localization.Command.Translateto>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -696,7 +698,7 @@ public class ProxyMessageHandler {
         int value = input.readInt();
         String message = input.readUTF();
 
-        module.sendMessage(TryMetadata.<Localization.Command.CommandTry>builder()
+        messageDispatcher.dispatch(module, TryMetadata.<Localization.Command.CommandTry>builder()
                 .base(EventMetadata.<Localization.Command.CommandTry>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -722,7 +724,7 @@ public class ProxyMessageHandler {
 
         ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
-        module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
+        messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -754,7 +756,7 @@ public class ProxyMessageHandler {
 
         module.kick(fModerator, (FPlayer) fEntity, kick);
 
-        module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
+        messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -805,8 +807,8 @@ public class ProxyMessageHandler {
     private void handleChatMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
-        ChatModule chatModule = injector.getInstance(ChatModule.class);
-        if (chatModule.isModuleDisabledFor(fPlayer)) return;
+        ChatModule module = injector.getInstance(ChatModule.class);
+        if (module.isModuleDisabledFor(fPlayer)) return;
 
         String proxyChatName = input.readUTF();
         String message = input.readUTF();
@@ -821,9 +823,9 @@ public class ProxyMessageHandler {
         String chatName = optionalChat.get().getKey();
         Message.Chat.Type chatType = optionalChat.get().getValue();
 
-        Chat playerChat = new Chat(chatName, chatType, chatModule.permission().types().get(chatName));
+        Chat playerChat = new Chat(chatName, chatType, module.permission().types().get(chatName));
 
-        chatModule.sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
+        messageDispatcher.dispatch(module, ChatMetadata.<Localization.Message.Chat>builder()
                 .base(EventMetadata.<Localization.Message.Chat>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
@@ -832,7 +834,7 @@ public class ProxyMessageHandler {
                         .destination(chatType.destination())
                         .message(message)
                         .sound(playerChat.sound())
-                        .filter(chatModule.permissionFilter(chatName))
+                        .filter(module.permissionFilter(chatName))
                         .build()
                 )
                 .chat(playerChat)
@@ -883,7 +885,7 @@ public class ProxyMessageHandler {
 
         Message.Join message = fileFacade.message().join();
 
-        module.sendMessage(JoinMetadata.<Localization.Message.Join>builder()
+        messageDispatcher.dispatch(module, JoinMetadata.<Localization.Message.Join>builder()
                 .base(EventMetadata.<Localization.Message.Join>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -905,7 +907,7 @@ public class ProxyMessageHandler {
 
         boolean ignoreVanish = input.readBoolean();
 
-        module.sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+        messageDispatcher.dispatch(module, QuitMetadata.<Localization.Message.Quit>builder()
                 .base(EventMetadata.<Localization.Message.Quit>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -926,7 +928,7 @@ public class ProxyMessageHandler {
 
         boolean isAfk = input.readBoolean();
 
-        module.sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+        messageDispatcher.dispatch(module, AFKMetadata.<Localization.Message.Afk>builder()
                 .base(EventMetadata.<Localization.Message.Afk>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
@@ -957,7 +959,7 @@ public class ProxyMessageHandler {
 
         String vanillaMessageName = vanillaMessage.name();
 
-        module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+        messageDispatcher.dispatch(module, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)

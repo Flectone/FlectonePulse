@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -27,6 +28,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -50,7 +52,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Comman
 
         String message = getArgument(commandContext, 0);
 
-        sendMessage(TryMetadata.<Localization.Command.CommandTry>builder()
+        messageDispatcher.dispatch(this, TryMetadata.<Localization.Command.CommandTry>builder()
                 .base(EventMetadata.<Localization.Command.CommandTry>builder()
                         .sender(fPlayer)
                         .format(replacePercent(random))

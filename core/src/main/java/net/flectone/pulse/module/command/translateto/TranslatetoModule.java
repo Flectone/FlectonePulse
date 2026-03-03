@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -39,6 +40,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -78,7 +80,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Translateto>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Translateto>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Translateto::nullOrError)
                     .build()
@@ -88,7 +90,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         }
 
         String finalMessageToTranslate = messageToTranslate;
-        sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
+        messageDispatcher.dispatch(this, TranslatetoMetadata.<Localization.Command.Translateto>builder()
                 .base(EventMetadata.<Localization.Command.Translateto>builder()
                         .sender(fPlayer)
                         .format(replaceLanguage(targetLang))

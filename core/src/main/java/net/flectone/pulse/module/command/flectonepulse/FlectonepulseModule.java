@@ -12,6 +12,7 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -51,16 +52,17 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
 
+    private final Injector injector;
     private final FileFacade fileFacade;
     private final FlectonePulse flectonePulse;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
-    private final FLogger fLogger;
     private final ReflectionResolver reflectionResolver;
-    private final Injector injector;
     private final TaskScheduler taskScheduler;
+    private final MessageDispatcher messageDispatcher;
     private final SimpleDateFormat simpleDateFormat;
     private final @Named("projectPath") Path projectPath;
+    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
@@ -127,7 +129,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             String formattedTime = timeFormatter.format(fPlayer, Duration.between(start, end).toMillis());
 
-            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatTrue(), "<time>", formattedTime))
                     .destination(config().destination())
@@ -138,7 +140,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         } catch (Exception e) {
             fLogger.warning(e.getMessage());
 
-            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatFalse)
                     .message(e.getLocalizedMessage())
@@ -171,7 +173,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     private boolean commandEditor(FPlayer fPlayer, Operation operation) {
         if (fileFacade.config().editor().host().isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::nullHostEditor)
                     .build()
@@ -189,7 +191,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         int port = fileFacade.config().editor().port();
         if (!isPortAvailable(port)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.nullPortEditor(), "<port>", String.valueOf(port)))
                     .build()
@@ -200,7 +202,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         enableSpark();
 
-        sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                 .sender(fPlayer)
                 .format(flectonepulse -> Strings.CS.replace(flectonepulse.formatEditor(), "<url>", url))
                 .destination(config().destination())
@@ -226,7 +228,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         Path zipFile = projectPath.resolve(getFilenameExported(commandContext));
         if (zipFile.toFile().exists()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.fileExist(), "<file>", zipFile.getFileName().toString()))
                     .build()
@@ -276,7 +278,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                         }
                     });
 
-            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.formatExport(), "<file>", zipFile.getFileName().toString()))
                     .destination(config().destination())
@@ -296,7 +298,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         Path zipFile = projectPath.resolve(getFilenameExported(commandContext));
 
         if (!Files.exists(zipFile)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.nullFile(), "<file>", zipFile.getFileName().toString()))
                     .build()
@@ -331,7 +333,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                         }
                     });
 
-            sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(localization -> Strings.CS.replace(localization.formatImport(), "<file>", zipFile.getFileName().toString()))
                     .destination(config().destination())
@@ -353,7 +355,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     private void sendMessageStarting(FPlayer fPlayer, Operation operation) {
-        sendMessage(EventMetadata.<Localization.Command.Flectonepulse>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                 .sender(fPlayer)
                 .format(localization -> Strings.CS.replace(localization.formatStarting(), "<type>", operation.name().toLowerCase()))
                 .destination(config().destination())

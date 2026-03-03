@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -37,6 +38,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
@@ -58,7 +60,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         List<Ignore> ignoreList = fPlayer.ignores();
         if (ignoreList.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ignorelist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::empty)
                     .build()
@@ -78,7 +80,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ignorelist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::nullPage)
                     .build()

@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
@@ -28,10 +29,11 @@ public class MinecraftPollModule extends PollModule {
                                TaskScheduler taskScheduler,
                                CommandParserProvider commandParserProvider,
                                MessagePipeline messagePipeline,
+                               MessageDispatcher messageDispatcher,
                                FLogger fLogger,
                                PacketProvider packetProvider,
                                Provider<DialogPollBuilder> dialogPollBuilderProvider) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, fLogger);
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, fLogger);
 
         this.packetProvider = packetProvider;
         this.dialogPollBuilderProvider = dialogPollBuilderProvider;

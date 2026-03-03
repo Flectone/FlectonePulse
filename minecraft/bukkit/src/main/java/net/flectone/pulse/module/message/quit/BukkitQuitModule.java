@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitListener;
@@ -17,8 +18,9 @@ public class BukkitQuitModule extends QuitModule {
     public BukkitQuitModule(FileFacade fileFacade,
                             IntegrationModule integrationModule,
                             ListenerRegistry listenerRegistry,
-                            TaskScheduler taskScheduler) {
-        super(fileFacade, integrationModule, listenerRegistry, taskScheduler);
+                            TaskScheduler taskScheduler,
+                            MessageDispatcher messageDispatcher) {
+        super(fileFacade, integrationModule, listenerRegistry, taskScheduler, messageDispatcher);
 
         this.listenerRegistry = listenerRegistry;
     }

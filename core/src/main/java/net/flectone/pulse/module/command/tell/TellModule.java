@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -45,6 +46,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -98,7 +100,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (isModuleDisabledFor(fPlayer, true)) return;
 
         if (fPlayer.name().equalsIgnoreCase(playerName)) {
-            sendMessage(EventMetadata.<Localization.Command.Tell>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::myself)
                     .destination(config().destination())
@@ -114,7 +116,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         if (!fReceiver.isConsole()
                 && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Tell>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::nullPlayer)
                     .build()
@@ -159,7 +161,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                      UUID metadataUUID) {
         boolean isSenderToSender = sender.equals(fReceiver);
 
-        sendMessage(EventMetadata.<Localization.Command.Tell>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Tell>builder()
                 .uuid(metadataUUID)
                 .sender(sender)
                 .filterPlayer(fReceiver)

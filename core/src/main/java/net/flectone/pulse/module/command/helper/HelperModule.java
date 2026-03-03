@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -32,6 +33,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     private final ProxyRegistry proxyRegistry;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -62,7 +64,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                     .noneMatch(online -> permissionChecker.check(online, permission().see()));
 
             if (nullHelper) {
-                sendErrorMessage(EventMetadata.<Localization.Command.Helper>builder()
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Helper>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Helper::nullHelper)
                         .build()
@@ -74,14 +76,14 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         String message = getArgument(commandContext, 0);
 
-        sendMessage(EventMetadata.<Localization.Command.Helper>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Helper>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Helper::player)
                 .destination(config().destination())
                 .build()
         );
 
-        sendMessage(EventMetadata.<Localization.Command.Helper>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Helper>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Helper::global)
                 .destination(config().destination())

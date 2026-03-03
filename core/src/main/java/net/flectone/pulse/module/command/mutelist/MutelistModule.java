@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -41,6 +42,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnmuteModule unmuteModule;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final CommandParserProvider commandParserProvider;
     private final EventDispatcher eventDispatcher;
     private final SoundPlayer soundPlayer;
@@ -84,7 +86,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
+                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mutelist>builder()
                             .sender(fPlayer)
                             .format(Localization.Command.Mutelist::nullPlayer)
                             .build()
@@ -103,7 +105,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 : moderationService.getValidMutes(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mutelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::empty)
                     .build()
@@ -117,7 +119,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mutelist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mutelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::nullPage)
                     .build()

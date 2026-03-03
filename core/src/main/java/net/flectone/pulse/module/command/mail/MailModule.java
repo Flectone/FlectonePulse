@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -41,6 +42,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -64,7 +66,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mail>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mail::nullPlayer)
                     .build()
@@ -75,7 +77,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                sendErrorMessage(EventMetadata.<Localization.Command.Mail>builder()
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Mail::onlinePlayer)
                         .build()
@@ -99,7 +101,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         Mail mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
         if (mail == null) return;
 
-        sendMessage(MailMetadata.<Localization.Command.Mail>builder()
+        messageDispatcher.dispatch(this, MailMetadata.<Localization.Command.Mail>builder()
                 .base(EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
                         .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))

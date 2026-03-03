@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -43,6 +44,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -72,7 +74,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::nullTime)
                     .build()
@@ -83,7 +85,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::nullPlayer)
                     .build()
@@ -93,7 +95,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Warn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::lowerWeightGroup)
                     .build()
@@ -109,7 +111,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         proxySender.send(fTarget, MessageType.SYSTEM_WARN);
 
-        sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()
                         .sender(fTarget)
                         .format((fReceiver, localization) ->
@@ -169,7 +171,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public void sendForTarget(FEntity fModerator, FPlayer fTarget, Moderation warn) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        sendMessage(EventMetadata.<Localization.Command.Warn>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Warn>builder()
                 .sender(fTarget)
                 .format(localization -> moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, warn))
                 .tagResolvers(fResolver -> new TagResolver[]{

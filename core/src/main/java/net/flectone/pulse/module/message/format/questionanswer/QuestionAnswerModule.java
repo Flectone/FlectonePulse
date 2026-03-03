@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -50,6 +51,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final PermissionChecker permissionChecker;
     private final CooldownChecker cooldownChecker;
     private final TaskScheduler taskScheduler;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -170,7 +172,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
-        taskScheduler.runAsyncLater(() -> sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
+        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .base(EventMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                         .sender(sender)
                         .filterPlayer(fReceiver)

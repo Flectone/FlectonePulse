@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -26,6 +27,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -58,7 +60,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
         taskScheduler.runAsync(() -> {
             if (isModuleDisabledFor(fPlayer)) return;
 
-            sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+            messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
                     .base(EventMetadata.<Localization.Message.Quit>builder()
                             .sender(fPlayer)
                             .format(Localization.Message.Quit::format)

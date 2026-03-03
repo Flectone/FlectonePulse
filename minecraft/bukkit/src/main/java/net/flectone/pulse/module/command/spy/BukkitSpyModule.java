@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -36,8 +37,9 @@ public class BukkitSpyModule extends SpyModule {
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
                            BukkitListenerRegistry bukkitListenerManager,
-                           TaskScheduler taskScheduler) {
-        super(fileFacade, fPlayerService, permissionChecker);
+                           TaskScheduler taskScheduler,
+                           MessageDispatcher messageDispatcher) {
+        super(fileFacade, fPlayerService, permissionChecker, messageDispatcher);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;

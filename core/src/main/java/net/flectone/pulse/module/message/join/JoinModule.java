@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -25,6 +26,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public MessageType messageType() {
@@ -59,7 +61,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
 
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 
-        sendMessage(JoinMetadata.<Localization.Message.Join>builder()
+        messageDispatcher.dispatch(this, JoinMetadata.<Localization.Message.Join>builder()
                 .base(EventMetadata.<Localization.Message.Join>builder()
                         .sender(fPlayer)
                         .format(s -> hasPlayedBefore || !config().first() ? s.format() : s.formatFirstTime())

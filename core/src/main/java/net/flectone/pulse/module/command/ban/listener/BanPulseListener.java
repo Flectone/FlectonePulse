@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -34,6 +35,7 @@ public class BanPulseListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final PermissionChecker permissionChecker;
 
     @Pulse
@@ -64,7 +66,7 @@ public class BanPulseListener implements PulseListener {
 
         // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
-            banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+            messageDispatcher.dispatch(banModule, ModerationMetadata.<Localization.Command.Ban>builder()
                     .base(EventMetadata.<Localization.Command.Ban>builder()
                             .sender(fPlayer)
                             .format((fReceiver, message) -> {

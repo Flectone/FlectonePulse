@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -33,6 +34,7 @@ import java.net.http.HttpResponse;
 public class UpdateModule extends AbstractModuleLocalization<Localization.Message.Update> {
 
     private final FileFacade fileFacade;
+    private final MessageDispatcher messageDispatcher;
     private final VersionComparator versionComparator;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
@@ -77,7 +79,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
             String currentVersion = fileFacade.config().version();
             if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
-            sendMessage(UpdateMessageMetadata.<Localization.Message.Update>builder()
+            messageDispatcher.dispatch(this, UpdateMessageMetadata.<Localization.Message.Update>builder()
                     .base(EventMetadata.<Localization.Message.Update>builder()
                             .sender(fPlayer)
                             .format((fResolver, s) -> StringUtils.replaceEach(

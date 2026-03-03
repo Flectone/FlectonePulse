@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -44,6 +45,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ProxySender proxySender;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -76,7 +78,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String reason = timeReasonPair.second();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::nullTime)
                     .build()
@@ -113,7 +115,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::nullPlayer)
                     .build()
@@ -123,7 +125,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ban>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::lowerWeightGroup)
                     .build()
@@ -140,7 +142,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         kick(fPlayer, fTarget, ban);
 
-        sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Ban>builder()
                 .base(EventMetadata.<Localization.Command.Ban>builder()
                         .sender(fTarget)
                         .format((fReceiver, localization) ->

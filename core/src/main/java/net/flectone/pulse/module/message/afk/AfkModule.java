@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -48,6 +49,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -201,7 +203,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
         Range range = config().range();
         if (range.is(Range.Type.PLAYER)) {
-            sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+            messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
                     .base(EventMetadata.<Localization.Message.Afk>builder()
                             .sender(fPlayer)
                             .format(localization -> isAfk
@@ -219,7 +221,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             return;
         }
 
-        sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+        messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
                 .base(EventMetadata.<Localization.Message.Afk>builder()
                         .sender(fPlayer)
                         .format(localization -> isAfk

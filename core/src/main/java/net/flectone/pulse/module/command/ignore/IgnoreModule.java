@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -30,6 +31,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -49,7 +51,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.name().equalsIgnoreCase(targetName)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ignore>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignore>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::myself)
                     .build()
@@ -60,7 +62,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Ignore>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignore>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::nullPlayer)
                     .build()
@@ -84,7 +86,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
             metadataIgnore = fPlayer.ignores().getLast();
         }
 
-        sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()
+        messageDispatcher.dispatch(this, IgnoreMetadata.<Localization.Command.Ignore>builder()
                 .base(EventMetadata.<Localization.Command.Ignore>builder()
                         .sender(fPlayer)
                         .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
@@ -115,8 +117,6 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     public Permission.Command.Ignore permission() {
         return fileFacade.permission().command().ignore();
     }
-
-
 
     @Override
     public Localization.Command.Ignore localization(FEntity sender) {

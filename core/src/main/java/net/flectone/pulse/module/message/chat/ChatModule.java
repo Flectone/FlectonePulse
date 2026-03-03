@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -51,6 +52,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final MuteSender muteSender;
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
+    private final MessageDispatcher messageDispatcher;
     private final ProxyRegistry proxyRegistry;
 
     @Override
@@ -94,7 +96,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         Chat playerChat = getPlayerChat(fPlayer, eventMessage);
         if (playerChat.config() == null || !playerChat.config().enable()) {
-            sendErrorMessage(EventMetadata.<Localization.Message.Chat>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::nullChat)
                     .build()
@@ -152,9 +154,9 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .chat(playerChat)
                 .build();
 
-        List<FPlayer> receivers = createReceivers(messageType(), chatMetadata);
+        List<FPlayer> receivers = messageDispatcher.createReceivers(this, chatMetadata);
 
-        sendMessage(receivers, chatMetadata);
+        messageDispatcher.dispatch(receivers, this, chatMetadata);
 
         // send null receiver message
         if (playerChat.config().destination().type() != Destination.Type.CHAT) {
@@ -179,7 +181,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
-            sendErrorMessage(EventMetadata.<Localization.Message.Chat>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::nullReceiver)
                     .destination(playerChat.config().nullReceiver().destination())

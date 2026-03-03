@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -36,6 +37,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -88,7 +90,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::nullPlayer)
                     .build()
@@ -98,11 +100,12 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::lowerWeightGroup)
                     .build()
             );
+
             return;
         }
 
@@ -118,7 +121,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         }
 
         if (warns.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unwarn>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::notWarned)
                     .build()
@@ -131,7 +134,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         proxySender.send(fTarget, MessageType.SYSTEM_WARN);
 
-        sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .sender(fTarget)
                         .format(Localization.Command.Unwarn::format)

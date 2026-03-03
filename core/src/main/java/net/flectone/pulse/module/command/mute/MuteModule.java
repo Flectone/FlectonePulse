@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -45,6 +46,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final ProxySender proxySender;
     private final MuteChecker muteChecker;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -74,7 +76,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::nullTime)
                     .build()
@@ -85,7 +87,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::nullPlayer)
                     .build()
@@ -94,7 +96,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Mute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::lowerWeightGroup)
                     .build()
@@ -110,7 +112,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
-        sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()
                         .sender(fTarget)
                         .format((fReceiver, localization) ->
@@ -181,7 +183,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        sendMessage(EventMetadata.<Localization.Command.Mute>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Mute>builder()
                 .sender(fReceiver)
                 .format(localization ->
                         moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, mute)

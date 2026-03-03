@@ -11,6 +11,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -40,6 +41,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final ProxySender proxySender;
     private final ColorConverter colorConverter;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -87,7 +89,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission().colors().get(fColorType.get().name()))) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Chatcolor>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::nullType)
                     .build()
@@ -136,7 +138,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (newFColors.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Chatcolor>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::nullColor)
                     .build()
@@ -190,7 +192,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     }
 
     public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
-        sendMessage(EventMetadata.<Localization.Command.Chatcolor>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Chatcolor>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::format)

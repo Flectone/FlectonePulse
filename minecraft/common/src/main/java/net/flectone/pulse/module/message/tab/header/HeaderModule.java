@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -32,6 +33,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final PacketSender packetSender;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -85,7 +87,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(EventMetadata.<Localization.Message.Tab.Header>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Tab.Header>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(config().destination())

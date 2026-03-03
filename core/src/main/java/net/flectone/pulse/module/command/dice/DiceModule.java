@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -30,6 +31,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -59,7 +61,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
             cubes.add(randomUtil.nextInt(min, max + 1));
         }
 
-        sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
+        messageDispatcher.dispatch(this, DiceMetadata.<Localization.Command.Dice>builder()
                 .base(EventMetadata.<Localization.Command.Dice>builder()
                         .sender(fPlayer)
                         .format(dice -> replaceResult(cubes, dice.symbols(), dice.format()))

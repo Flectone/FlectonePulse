@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -29,6 +30,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -48,7 +50,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         int answer = randomUtil.nextInt(0, localization().answers().size());
         String message = getArgument(commandContext, 0);
 
-        sendMessage(BallMetadata.<Localization.Command.Ball>builder()
+        messageDispatcher.dispatch(this, BallMetadata.<Localization.Command.Ball>builder()
                 .base(EventMetadata.<Localization.Command.Ball>builder()
                         .sender(fPlayer)
                         .format(replaceAnswer(answer))

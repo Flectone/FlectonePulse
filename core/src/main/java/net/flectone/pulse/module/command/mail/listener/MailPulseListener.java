@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -22,6 +23,7 @@ public class MailPulseListener implements PulseListener {
 
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
+    private final MessageDispatcher messageDispatcher;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
@@ -34,7 +36,7 @@ public class MailPulseListener implements PulseListener {
         for (Mail mail : mails) {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
-            mailModule.sendMessage(MailMetadata.<Localization.Command.Mail>builder()
+            messageDispatcher.dispatch(mailModule, MailMetadata.<Localization.Command.Mail>builder()
                     .base(EventMetadata.<Localization.Command.Mail>builder()
                             .sender(fPlayer)
                             .filterPlayer(fReceiver, false)

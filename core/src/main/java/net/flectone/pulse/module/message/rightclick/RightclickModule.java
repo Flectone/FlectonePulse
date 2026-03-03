@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -31,6 +32,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public MessageType messageType() {
@@ -66,7 +68,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionUtil.INVISIBILITY_POTION_NAME)) return;
 
-            sendMessage(EventMetadata.<Localization.Message.Rightclick>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Rightclick>builder()
                     .sender(fPlayer)
                     .tagResolvers(fResolver -> new TagResolver[]{
                             messagePipeline.targetTag(fResolver, fTarget)

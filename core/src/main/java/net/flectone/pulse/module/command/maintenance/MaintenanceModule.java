@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -41,6 +42,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
@@ -55,6 +57,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PlatformPlayerAdapter platformPlayerAdapter,
                              FPlayerService fPlayerService,
                              MessagePipeline messagePipeline,
+                             MessageDispatcher messageDispatcher,
                              IconUtil iconUtil,
                              FLogger fLogger) {
         this.fileFacade = fileFacade;
@@ -65,6 +68,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
+        this.messageDispatcher = messageDispatcher;
         this.iconUtil = iconUtil;
         this.fLogger = fLogger;
     }
@@ -113,7 +117,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
             return;
         }
 
-        sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
+        messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
                 .base(EventMetadata.<Localization.Command.Maintenance>builder()
                         .sender(fPlayer)
                         .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())

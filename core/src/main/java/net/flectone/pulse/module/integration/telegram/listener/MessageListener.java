@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -44,6 +45,7 @@ public class MessageListener extends EventListener {
     private final Provider<TelegramIntegration> telegramIntegration;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final TaskScheduler taskScheduler;
 
     @Override
@@ -109,7 +111,7 @@ public class MessageListener extends EventListener {
         String firstName = user.getFirstName();
         String lastName = StringUtils.defaultString(user.getLastName());
 
-        sendMessage(TelegramMetadata.<Localization.Integration.Telegram>builder()
+        messageDispatcher.dispatch(this, TelegramMetadata.<Localization.Integration.Telegram>builder()
                 .base(EventMetadata.<Localization.Integration.Telegram>builder()
                         .sender(telegramIntegration.get().getSender())
                         .format(localization -> StringUtils.replaceEach(

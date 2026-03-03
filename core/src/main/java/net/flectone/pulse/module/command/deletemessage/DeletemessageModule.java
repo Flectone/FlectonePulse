@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -27,6 +28,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     private final FileFacade fileFacade;
     private final DeleteModule deleteModule;
     private final ProxySender proxySender;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -45,7 +47,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Deletemessage>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Deletemessage>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Deletemessage::nullMessage)
                     .build()
@@ -59,7 +61,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 UUID.randomUUID()
         );
 
-        sendMessage(DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
+        messageDispatcher.dispatch(this, DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
                 .base(EventMetadata.<Localization.Command.Deletemessage>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Deletemessage::format)

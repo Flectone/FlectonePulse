@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -27,6 +28,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -71,7 +73,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(EventMetadata.<Localization.Message.Brand>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Brand>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(config().destination())

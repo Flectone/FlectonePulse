@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -16,7 +17,6 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
 import java.util.List;
@@ -27,8 +27,8 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
 
     private final FileFacade fileFacade;
     private final SkinService skinService;
-    private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -60,38 +60,32 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        try {
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Greeting>builder()
+                .sender(fPlayer)
+                .format(s -> {
+                    String format = s.format();
+                    if (!format.contains("[#][#][#][#][#][#][#][#]")) return format;
 
-            sendMessage(EventMetadata.<Localization.Message.Greeting>builder()
-                    .sender(fPlayer)
-                    .format(s -> {
-                        String format = s.format();
-                        if (!format.contains("[#][#][#][#][#][#][#][#]")) return format;
+                    try {
+                        FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
 
-                        try {
-                            FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
+                        List<String> pixels = fImage.convertImageUrl();
 
-                            List<String> pixels = fImage.convertImageUrl();
+                        String greetingMessage = String.join("<br>", s.format());
 
-                            String greetingMessage = String.join("<br>", s.format());
-
-                            for (String pixel : pixels) {
-                                greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
-                            }
-
-                            return greetingMessage;
-                        } catch (Exception ignored) {
-                            return format;
+                        for (String pixel : pixels) {
+                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
                         }
 
-                    })
-                    .destination(config().destination())
-                    .sound(soundOrThrow())
-                    .build()
-            );
+                        return greetingMessage;
+                    } catch (Exception ignored) {
+                        return format;
+                    }
 
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
+                })
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .build()
+        );
     }
 }

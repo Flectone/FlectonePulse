@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -33,6 +34,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -69,7 +71,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                sendErrorMessage(EventMetadata.<Localization.Command.Clearchat>builder()
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Clearchat>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Clearchat::nullPlayer)
                         .build()
@@ -113,13 +115,13 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        sendMessage(EventMetadata.<Localization.Command.Clearchat>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Clearchat>builder()
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
                 .build()
         );
 
-        sendMessage(EventMetadata.<Localization.Command.Clearchat>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Clearchat>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Clearchat::format)
                 .destination(config().destination())

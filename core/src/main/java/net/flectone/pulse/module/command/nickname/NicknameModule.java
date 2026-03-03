@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -46,6 +47,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
     private final FLogger fLogger;
@@ -98,7 +100,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
         String playerName = getArgument(commandContext, 1);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown() || !fTarget.isOnline()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Nickname>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Nickname::nullPlayer)
                     .build()
@@ -142,7 +144,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
     public void changeName(FPlayer fPlayer, FPlayer fTarget, String nickname) {
         if (allowedPattern != null && !allowedPattern.matcher(nickname).matches()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Nickname>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Nickname::nullNickname)
                     .build()
@@ -158,7 +160,7 @@ public class NicknameModule extends AbstractModuleCommand<Localization.Command.N
 
         fPlayerService.saveOrUpdateSetting(fTarget, SettingText.NICKNAME);
 
-        sendMessage(NicknameMetadata.<Localization.Command.Nickname>builder()
+        messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
                 .base(EventMetadata.<Localization.Command.Nickname>builder()
                         .sender(fTarget)
                         .format(Localization.Command.Nickname::format)

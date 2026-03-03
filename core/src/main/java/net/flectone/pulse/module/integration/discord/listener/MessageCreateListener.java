@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -42,6 +43,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final Provider<DiscordIntegration> discordIntegration;
     private final TaskScheduler taskScheduler;
 
@@ -83,7 +85,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String displayName = member.getDisplayName();
         String userName = member.getUsername();
 
-        sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
+        messageDispatcher.dispatch(this, DiscordMetadata.<Localization.Integration.Discord>builder()
                 .base(EventMetadata.<Localization.Integration.Discord>builder()
                         .sender(discordIntegration.get().getSender())
                         .format(localization -> {

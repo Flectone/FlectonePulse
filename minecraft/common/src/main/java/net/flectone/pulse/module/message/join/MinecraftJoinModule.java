@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
@@ -19,8 +20,9 @@ public class MinecraftJoinModule extends JoinModule {
                                PlatformPlayerAdapter platformPlayerAdapter,
                                IntegrationModule integrationModule,
                                ListenerRegistry listenerRegistry,
-                               TaskScheduler taskScheduler) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler);
+                               TaskScheduler taskScheduler,
+                               MessageDispatcher messageDispatcher) {
+        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher);
 
         this.listenerRegistry = listenerRegistry;
     }

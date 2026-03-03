@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -38,6 +39,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -69,7 +71,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Online>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Online>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Online::nullPlayer)
                     .build()
@@ -78,7 +80,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
             return;
         }
 
-        sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
+        messageDispatcher.dispatch(this, OnlineMetadata.<Localization.Command.Online>builder()
                 .base(EventMetadata.<Localization.Command.Online>builder()
                         .sender(fPlayer)
                         .tagResolvers(fResolver -> new TagResolver[]{

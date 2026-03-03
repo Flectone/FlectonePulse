@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -35,6 +36,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final PacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
 
@@ -43,6 +45,7 @@ public class MinecraftBossbarModule extends BossbarModule {
                                   FPlayerService fPlayerService,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
+                                  MessageDispatcher messageDispatcher,
                                   PacketSender packetSender,
                                   TaskScheduler taskScheduler) {
         super(fileFacade);
@@ -50,6 +53,7 @@ public class MinecraftBossbarModule extends BossbarModule {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
+        this.messageDispatcher = messageDispatcher;
         this.packetSender = packetSender;
         this.listenerRegistry = listenerRegistry;
     }
@@ -91,7 +95,7 @@ public class MinecraftBossbarModule extends BossbarModule {
 
             Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
             if (announce && messageAnnounce != null) {
-                sendMessage(EventMetadata.<Localization.Message.Bossbar>builder()
+                messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Bossbar>builder()
                         .sender(fPlayer)
                         .format(localization -> Strings.CS.replace(
                                 StringUtils.defaultString(localization.announce().get(translationKey)),

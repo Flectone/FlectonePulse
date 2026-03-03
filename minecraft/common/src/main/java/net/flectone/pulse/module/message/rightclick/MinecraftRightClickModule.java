@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.rightclick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
@@ -21,8 +22,9 @@ public class MinecraftRightClickModule extends RightclickModule {
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ListenerRegistry listenerRegistry,
                                      TaskScheduler taskScheduler,
-                                     MessagePipeline messagePipeline) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, taskScheduler, messagePipeline);
+                                     MessagePipeline messagePipeline,
+                                     MessageDispatcher messageDispatcher) {
+        super(fileFacade, fPlayerService, platformPlayerAdapter, taskScheduler, messagePipeline, messageDispatcher);
 
         this.listenerRegistry = listenerRegistry;
     }

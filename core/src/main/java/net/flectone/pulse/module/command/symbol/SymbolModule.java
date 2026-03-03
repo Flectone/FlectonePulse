@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -37,6 +38,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     private final FileFacade fileFacade;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final SoundPlayer soundPlayer;
     private final CommandParserProvider commandParserProvider;
 
@@ -67,7 +69,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         String category = getArgument(commandContext, 0);
         if (!config().categories().containsKey(category)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Symbol>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Symbol>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Symbol::nullCategory)
                     .build()
@@ -88,7 +90,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Symbol>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Symbol>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Symbol::nullPage)
                     .build()

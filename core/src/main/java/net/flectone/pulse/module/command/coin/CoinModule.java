@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -25,6 +26,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -41,7 +43,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 
-        sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
+        messageDispatcher.dispatch(this, CoinMetadata.<Localization.Command.Coin>builder()
                 .base(EventMetadata.<Localization.Command.Coin>builder()
                         .sender(fPlayer)
                         .format(replaceResult(percent))

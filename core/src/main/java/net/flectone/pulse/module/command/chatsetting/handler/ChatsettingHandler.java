@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -39,6 +40,7 @@ public class ChatsettingHandler {
     private final ChatsettingModule chatsettingModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final FPlayerService fPlayerService;
 
     public Permission.Message.Chat chatPermission() {
@@ -52,7 +54,7 @@ public class ChatsettingHandler {
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(SettingText.CHAT_NAME.name()))) {
-            chatsettingModule.sendErrorMessage(EventMetadata.<Localization.Command.Chatsetting>builder()
+            messageDispatcher.dispatchError(chatsettingModule, EventMetadata.<Localization.Command.Chatsetting>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
@@ -91,7 +93,7 @@ public class ChatsettingHandler {
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get("FCOLOR_" + type.name()))) {
-            chatsettingModule.sendMessage(EventMetadata.<Localization.Command.Chatsetting>builder()
+            messageDispatcher.dispatchError(chatsettingModule, EventMetadata.<Localization.Command.Chatsetting>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
@@ -151,7 +153,7 @@ public class ChatsettingHandler {
 
     public void handleSubMenu(FPlayer fPlayer, SubMenuItem item, Runnable successRunnable) {
         if (item.perm() != null && !permissionChecker.check(fPlayer, item.perm())) {
-            chatsettingModule.sendMessage(EventMetadata.<Localization.Command.Chatsetting>builder()
+            messageDispatcher.dispatchError(chatsettingModule, EventMetadata.<Localization.Command.Chatsetting>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
@@ -164,11 +166,12 @@ public class ChatsettingHandler {
 
     public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType) {
         if (!permissionChecker.check(fPlayer, chatsettingModule.permission().settings().get(messageType))) {
-            chatsettingModule.sendMessage(EventMetadata.<Localization.Command.Chatsetting>builder()
+            messageDispatcher.dispatchError(chatsettingModule, EventMetadata.<Localization.Command.Chatsetting>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::noPermission)
                     .build()
             );
+
             return Status.DENIED;
         }
 

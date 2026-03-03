@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -29,6 +30,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -83,7 +85,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         String format = getNextMessage(fPlayer, type.random(), messages);
         if (StringUtils.isEmpty(format)) return;
 
-        sendMessage(EventMetadata.<Localization.Message.Auto>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Auto>builder()
                 .sender(fPlayer)
                 .format(format)
                 .destination(type.destination())

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -36,6 +37,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -88,7 +90,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::nullPlayer)
                     .build()
@@ -98,7 +100,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::lowerWeightGroup)
                     .build()
@@ -118,7 +120,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (mutes.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Unmute>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::notMuted)
                     .build()
@@ -131,7 +133,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
-        sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .sender(fTarget)
                         .format(Localization.Command.Unmute::format)

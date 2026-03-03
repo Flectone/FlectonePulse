@@ -1,0 +1,172 @@
+package net.flectone.pulse.execution.dispatcher;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.MessagePrepareEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.platform.filter.RangeFilter;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MessageDispatcher {
+
+    private final FPlayerService fPlayerService;
+    private final RangeFilter rangeFilter;
+    private final MessagePipeline messagePipeline;
+    private final EventDispatcher eventDispatcher;
+    private final TaskScheduler taskScheduler;
+
+    public <L extends LocalizationSetting> List<FPlayer> createReceivers(AbstractModuleLocalization<L> module,
+                                                                         EventMetadata<L> eventMetadata) {
+        return createReceivers(module.messageType(), module, eventMetadata);
+    }
+
+    public <L extends LocalizationSetting> List<FPlayer> createReceivers(MessageType messageType,
+                                                                         AbstractModuleLocalization<L> module,
+                                                                         EventMetadata<L> eventMetadata) {
+        String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, module.localization());
+
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(messageType, rawFormat, eventMetadata));
+
+        // if canceled, it means that message was sent to Proxy
+        if (messagePrepareEvent.cancelled()) return Collections.emptyList();
+
+        return fPlayerService.getFPlayersWithConsole().stream()
+                .filter(eventMetadata.filter())
+                .filter(rangeFilter.createFilter(eventMetadata.filterPlayer(), eventMetadata.range()))
+                .filter(fReceiver -> fReceiver.isSetting(messageType))
+                .toList();
+    }
+
+    public <L extends LocalizationSetting> void dispatch(AbstractModuleLocalization<L> module,
+                                                         EventMetadata<L> eventMetadata) {
+        dispatch(module.messageType(), module, eventMetadata);
+    }
+
+    public <L extends LocalizationSetting> void dispatch(MessageType messageType,
+                                                         AbstractModuleLocalization<L> module,
+                                                         EventMetadata<L> eventMetadata) {
+        List<FPlayer> receivers = createReceivers(messageType, module, eventMetadata);
+        dispatch(messageType, receivers, module, eventMetadata);
+    }
+
+    public <L extends LocalizationSetting> void dispatch(List<FPlayer> receivers,
+                                                         AbstractModuleLocalization<L> module,
+                                                         EventMetadata<L> eventMetadata) {
+        dispatch(module.messageType(), receivers, module, eventMetadata);
+    }
+
+    public <L extends LocalizationSetting> void dispatch(MessageType messageType,
+                                                         List<FPlayer> receivers,
+                                                         AbstractModuleLocalization<L> module,
+                                                         EventMetadata<L> eventMetadata) {
+        if (receivers.isEmpty()) return;
+
+        SchedulerRunnable sendMessageRunnable = () -> receivers.forEach(receiver -> {
+            // example
+            // format: TheFaser > <message>
+            // message: hello world!
+            // final formatted message: TheFaser > hello world!
+            Component messageComponent = buildMessageComponent(receiver, eventMetadata);
+            Component formatComponent = buildFormatComponent(receiver, eventMetadata, module, messageComponent);
+
+            // destination subtext
+            Component subComponent = Component.empty();
+            Destination destination = eventMetadata.destination();
+            if (StringUtils.isNotEmpty(destination.subtext())) {
+                subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
+            }
+
+            eventDispatcher.dispatch(new MessageSendEvent(
+                    messageType,
+                    receiver,
+                    formatComponent,
+                    subComponent,
+                    eventMetadata
+            ));
+        });
+
+        // fix Folia issue
+        if (eventMetadata instanceof QuitMetadata<L>) {
+            taskScheduler.runAsync(sendMessageRunnable);
+        } else {
+            FPlayer regionPlayer = eventMetadata.sender() instanceof FPlayer fPlayer
+                    ? fPlayer
+                    : fPlayerService.getRandomFPlayer();
+
+            taskScheduler.runRegion(regionPlayer, sendMessageRunnable);
+        }
+    }
+
+    public <L extends LocalizationSetting> void dispatchError(AbstractModuleLocalization<L> module, EventMetadata<L> eventMetadata) {
+        dispatch(MessageType.ERROR, module, eventMetadata);
+    }
+
+    private <L extends LocalizationSetting> Component buildSubcomponent(FPlayer receiver,
+                                                                        EventMetadata<L> eventMetadata,
+                                                                        Component message) {
+        Destination destination = eventMetadata.destination();
+        if (destination.subtext().isEmpty()) return Component.empty();
+
+        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, destination.subtext())
+                .withFlags(eventMetadata.flags())
+                .addTagResolver(messagePipeline.messageTag(message));
+
+        return messagePipeline.build(context);
+    }
+
+    private <L extends LocalizationSetting> Component buildMessageComponent(FPlayer receiver,
+                                                                            EventMetadata<L> eventMetadata) {
+        String message = eventMetadata.message();
+        if (StringUtils.isEmpty(message)) return Component.empty();
+
+        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, message)
+                .withFlags(eventMetadata.flags())
+                .addFlag(MessageFlag.USER_MESSAGE, true);
+
+        return messagePipeline.build(context);
+    }
+
+    private <L extends LocalizationSetting> Component buildFormatComponent(FPlayer receiver,
+                                                                           EventMetadata<L> eventMetadata,
+                                                                           AbstractModuleLocalization<L> module,
+                                                                           Component message) {
+        String formatContent = eventMetadata.resolveFormat(receiver, module.localization(receiver));
+        if (StringUtils.isEmpty(formatContent)) return Component.empty();
+
+        FEntity sender = eventMetadata.sender();
+
+        MessageContext messageContext = messagePipeline.createContext(eventMetadata.uuid(), sender, receiver, formatContent)
+                .withFlags(eventMetadata.flags())
+                .addTagResolvers(eventMetadata.resolveTags(receiver))
+                .addTagResolver(messagePipeline.messageTag(message));
+
+        if (!receiver.isUnknown()) {
+            messageContext = messageContext
+                    .withUserMessage(eventMetadata.message());
+        }
+
+        return messagePipeline.build(messageContext);
+    }
+
+}

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -32,6 +33,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -63,7 +65,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Clearmail>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Clearmail>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Clearmail::nullMail)
                     .build()
@@ -76,7 +78,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
         fPlayerService.deleteMail(optionalMail.get());
 
-        sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
+        messageDispatcher.dispatch(this, ClearmailMetadata.<Localization.Command.Clearmail>builder()
                 .base(EventMetadata.<Localization.Command.Clearmail>builder()
                         .sender(fPlayer)
                         .format(string -> Strings.CS.replaceOnce(string.format(), "<id>", String.valueOf(mailID)))

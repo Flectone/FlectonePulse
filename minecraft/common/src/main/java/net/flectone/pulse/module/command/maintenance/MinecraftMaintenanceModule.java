@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -38,9 +39,10 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       PlatformPlayerAdapter platformPlayerAdapter,
                                       FPlayerService fPlayerService,
                                       MessagePipeline messagePipeline,
+                                      MessageDispatcher messageDispatcher,
                                       IconUtil iconUtil,
                                       FLogger fLogger) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, iconUtil, fLogger);
+        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, iconUtil, fLogger);
 
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;

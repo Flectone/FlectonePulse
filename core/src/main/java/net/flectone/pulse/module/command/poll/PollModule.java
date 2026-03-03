@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -55,6 +56,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final TaskScheduler taskScheduler;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final FLogger fLogger;
 
     @Override
@@ -101,7 +103,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = config().range();
 
-                sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
                         .base(EventMetadata.<Localization.Command.Poll>builder()
                                 .sender(fPlayer)
                                 .format(resolvePollFormat(fPlayer, poll, status))
@@ -229,7 +231,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Range range = config().range();
 
-        sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+        messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
                 .base(EventMetadata.<Localization.Command.Poll>builder()
                         .sender(fPlayer)
                         .format(resolvePollFormat(fPlayer, poll, Status.START))
@@ -267,7 +269,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Poll>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::nullPoll)
                     .build()
@@ -277,7 +279,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         }
 
         if (poll.isEnded()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Poll>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::expired)
                     .build()
@@ -289,7 +291,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Poll>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::already)
                     .build()
@@ -301,7 +303,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+        messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
                 .base(EventMetadata.<Localization.Command.Poll>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)

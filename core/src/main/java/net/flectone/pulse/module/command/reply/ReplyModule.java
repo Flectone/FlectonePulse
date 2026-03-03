@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -25,6 +26,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     private final TellModule tellModule;
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -43,7 +45,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
         String receiverName = tellModule.getReceiverFor(fPlayer);
         if (receiverName == null) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Reply>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Reply>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Reply::nullReceiver)
                     .build()

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -32,6 +33,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -55,7 +57,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);
 
-        sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+        messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .sender(fPlayer)
                         .format(localization -> !turnedBefore ? localization.formatTrue() : localization.formatFalse())
@@ -103,7 +105,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     public void spy(FPlayer fPlayer, String action, String message, List<FPlayer> receivers) {
         if (!isEnable()) return;
 
-        sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+        messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Spy::formatLog)

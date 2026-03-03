@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.protocol.packets.interface_.ServerMessage;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -33,6 +34,7 @@ public class HytaleVanillaModule extends VanillaModule {
 
     private final HytaleComponentExtractor extractor;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
 
@@ -40,6 +42,7 @@ public class HytaleVanillaModule extends VanillaModule {
     public HytaleVanillaModule(FileFacade fileFacade,
                                HytaleComponentExtractor extractor,
                                MessagePipeline messagePipeline,
+                               MessageDispatcher messageDispatcher,
                                FPlayerService fPlayerService,
                                TaskScheduler taskScheduler,
                                HytaleListenerRegistry hytaleListenerRegistry,
@@ -49,6 +52,7 @@ public class HytaleVanillaModule extends VanillaModule {
 
         this.extractor = extractor;
         this.messagePipeline = messagePipeline;
+        this.messageDispatcher = messageDispatcher;
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
 
@@ -86,7 +90,7 @@ public class HytaleVanillaModule extends VanillaModule {
         Range range = parsedComponent.vanillaMessage().range();
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
-        sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+        messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
                         .sender(fPlayer)
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))

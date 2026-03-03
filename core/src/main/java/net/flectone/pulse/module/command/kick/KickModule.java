@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -37,6 +38,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -58,7 +60,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Kick>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Kick>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::nullPlayer)
                     .build()
@@ -68,7 +70,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         }
 
         if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Kick>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Kick>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::lowerWeightGroup)
                     .build()
@@ -85,7 +87,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
         kick(fPlayer, fTarget, kick);
 
-        sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()
                         .sender(fTarget)
                         .format((fReceiver, localization) ->

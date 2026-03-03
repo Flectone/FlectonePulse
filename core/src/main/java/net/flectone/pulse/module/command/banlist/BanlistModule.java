@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -41,6 +42,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnbanModule unbanModule;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
     private final EventDispatcher eventDispatcher;
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
@@ -84,7 +86,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendErrorMessage(EventMetadata.<Localization.Command.Banlist>builder()
+                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Banlist>builder()
                             .sender(fPlayer)
                             .format(Localization.Command.Banlist::nullPlayer)
                             .build()
@@ -103,7 +105,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 : moderationService.getValidBans(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Banlist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Banlist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::empty)
                     .build()
@@ -117,7 +119,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Banlist>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Banlist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::nullPage)
                     .build()

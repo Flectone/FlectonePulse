@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -39,6 +40,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
     private final CommandParserProvider commandParserProvider;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -66,7 +68,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
         String message = parseMessage(destination, typeWithMessage);
 
         if (targetName.equalsIgnoreCase("all")) {
-            sendMessage(EventMetadata.<Localization.Command.Emit>builder()
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
                     .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
                     .range(Range.get(Range.Type.PROXY))
@@ -89,7 +91,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (!fTarget.isOnline()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Emit>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Emit::nullPlayer)
                     .build()
@@ -98,7 +100,7 @@ public class EmitModule extends AbstractModuleCommand<Localization.Command.Emit>
             return;
         }
 
-        sendMessage(EventMetadata.<Localization.Command.Emit>builder()
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                 .sender(fPlayer)
                 .filterPlayer(fTarget)
                 .format(Localization.Command.Emit::format)

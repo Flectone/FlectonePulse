@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -48,6 +49,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
+    private final MessageDispatcher messageDispatcher;
 
     @Override
     public void onEnable() {
@@ -87,7 +89,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         boolean isStream = localization().prefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Stream>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::already)
                     .build()
@@ -97,7 +99,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         }
 
         if (!isStream && !needStart) {
-            sendErrorMessage(EventMetadata.<Localization.Command.Stream>builder()
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::not)
                     .build()
@@ -120,7 +122,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .filter(this::isUrl)
                     .collect(Collectors.joining(" "));
 
-            sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+            messageDispatcher.dispatch(this, StreamMetadata.<Localization.Command.Stream>builder()
                     .base(EventMetadata.<Localization.Command.Stream>builder()
                             .sender(fPlayer)
                             .format(replaceUrls(urls))
@@ -136,7 +138,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .build()
             );
         } else {
-            sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+            messageDispatcher.dispatch(this, StreamMetadata.<Localization.Command.Stream>builder()
                     .base(EventMetadata.<Localization.Command.Stream>builder()
                             .sender(fPlayer)
                             .format(Localization.Command.Stream::formatEnd)
