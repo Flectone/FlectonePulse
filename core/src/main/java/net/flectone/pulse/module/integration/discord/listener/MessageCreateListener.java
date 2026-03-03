@@ -27,6 +27,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 
@@ -37,7 +38,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MessageCreateListener extends EventListener<MessageCreateEvent> {
+public class MessageCreateListener implements EventListener<MessageCreateEvent> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -52,7 +53,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     }
 
     @Override
-    public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
+    public Mono<@NonNull MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
         List<String> channel = config().messageChannel().get(name().name());

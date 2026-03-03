@@ -4,17 +4,18 @@ import discord4j.core.event.domain.Event;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
+import org.jspecify.annotations.NonNull;
 import reactor.core.publisher.Mono;
 
-public abstract class EventListener<T extends Event> implements ModuleLocalization<Localization.Integration.Discord> {
+public interface  EventListener<T extends Event> extends ModuleLocalization<Localization.Integration.Discord> {
+
+    Class<T> getEventType();
+
+    Mono<@NonNull T> execute(T event);
 
     @Override
-    public ModuleName name() {
+    default ModuleName name() {
         return ModuleName.INTEGRATION_DISCORD;
     }
-
-    public abstract Class<T> getEventType();
-
-    public abstract Mono<T> execute(T event);
 
 }

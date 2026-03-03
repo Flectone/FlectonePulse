@@ -38,7 +38,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MessageListener extends EventListener {
+public class MessageListener implements EventListener {
 
     private final FileFacade fileFacade;
     private final Provider<TelegramIntegration> telegramIntegration;

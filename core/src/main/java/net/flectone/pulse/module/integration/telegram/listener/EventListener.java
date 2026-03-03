@@ -5,10 +5,10 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 
-public abstract class EventListener implements ModuleLocalization<Localization.Integration.Telegram>, LongPollingSingleThreadUpdateConsumer {
+public interface EventListener extends ModuleLocalization<Localization.Integration.Telegram>, LongPollingSingleThreadUpdateConsumer {
 
     @Override
-    public ModuleName name() {
+    default ModuleName name() {
         return ModuleName.INTEGRATION_TELEGRAM;
     }
 

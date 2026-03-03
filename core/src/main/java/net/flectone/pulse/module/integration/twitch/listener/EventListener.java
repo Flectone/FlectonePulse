@@ -5,15 +5,15 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
 
-public abstract class EventListener<T extends TwitchEvent> implements ModuleLocalization<Localization.Integration.Twitch> {
+public interface EventListener<T extends TwitchEvent> extends ModuleLocalization<Localization.Integration.Twitch> {
+
+    Class<T> getEventType();
+
+    void execute(T event);
 
     @Override
-    public ModuleName name() {
+    default ModuleName name() {
         return ModuleName.INTEGRATION_TWITCH;
     }
-
-    public abstract Class<T> getEventType();
-
-    public abstract void execute(T event);
 
 }

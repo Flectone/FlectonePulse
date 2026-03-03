@@ -34,7 +34,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
+public class ChannelMessageListener implements EventListener<ChannelMessageEvent> {
 
     private final FileFacade fileFacade;
     private final Provider<TwitchIntegration> twitchIntegration;
