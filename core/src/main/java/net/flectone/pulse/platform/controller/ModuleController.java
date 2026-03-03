@@ -12,8 +12,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.module.ModuleDisableEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.*;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
@@ -47,6 +46,7 @@ public class ModuleController {
     public static final Set<Class<? extends AbstractModule>> WARN_MODULES = Set.of(WarnModule.class, WarnlistModule.class, UnwarnModule.class);
     public static final Set<Class<? extends AbstractModule>> KICK_MODULES = Set.of(KickModule.class);
 
+    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, Class<? extends AbstractModule>> moduleRootMap = new Object2ObjectOpenHashMap<>();
     private final Object2BooleanOpenHashMap<Class<? extends AbstractModule>> moduleStateMap = new Object2BooleanOpenHashMap<>();
     private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, List<Class<? extends AbstractModule>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, BiPredicate<FEntity, Boolean>> modulePredicateMap = new Object2ObjectOpenHashMap<>();
@@ -64,11 +64,12 @@ public class ModuleController {
     }
 
     public Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
+        Class<? extends AbstractModule> root = getRoot(clazz);
+
         Map<String, String> modules = new Object2ObjectArrayMap<>();
+        modules.put(root.getSimpleName(), isEnable(root) ? "true" : "false");
 
-        modules.put(clazz.getSimpleName(), isEnable(clazz) ? "true" : "false");
-
-        getChildren(clazz)
+        getChildren(root)
                 .forEach(subModule -> modules.putAll(collectModuleStatuses(subModule)));
 
         return modules;
@@ -79,7 +80,8 @@ public class ModuleController {
     }
 
     public boolean isEnable(Class<? extends AbstractModule> clazz) {
-        return moduleStateMap.getBoolean(clazz);
+        Class<? extends AbstractModule> root = getRoot(clazz);
+        return moduleStateMap.getBoolean(root);
     }
 
     public boolean containsChild(AbstractModule abstractModule, Class<? extends AbstractModule> child) {
@@ -103,12 +105,14 @@ public class ModuleController {
     }
 
     public boolean isDisabledFor(Class<? extends AbstractModule> clazz, FEntity entity, boolean isMessage) {
-        BiPredicate<FEntity, Boolean> disablePredicate = modulePredicateMap.get(clazz);
+        Class<? extends AbstractModule> root = getRoot(clazz);
+        BiPredicate<FEntity, Boolean> disablePredicate = modulePredicateMap.get(root);
         return disablePredicate != null && disablePredicate.test(entity, isMessage);
     }
 
     public List<Class<? extends AbstractModule>> getChildren(Class<? extends AbstractModule> clazz) {
-        return moduleChildrenMap.getOrDefault(clazz, Collections.emptyList());
+        Class<? extends AbstractModule> root = getRoot(clazz);
+        return moduleChildrenMap.getOrDefault(root, Collections.emptyList());
     }
 
     public void reload() {
@@ -116,10 +120,8 @@ public class ModuleController {
     }
 
     public void reload(Class<? extends AbstractModule> clazz) {
-        // configure all modules
-        configureChildren(clazz);
+        configureHierarchy(clazz);
 
-        // enable
         enable(clazz, module -> module.config().enable());
     }
 
@@ -131,43 +133,45 @@ public class ModuleController {
         enable(clazz, module -> false);
     }
 
-    public void configureChildren(Class<? extends AbstractModule> clazz) {
-        AbstractModule module = injector.getInstance(clazz);
+    private void configureHierarchy(Class<? extends AbstractModule> clazz) {
+        Class<? extends AbstractModule> root = findRootSuperclass(clazz);
+        moduleRootMap.put(clazz, root);
 
-        moduleChildrenMap.put(clazz, module.childrenBuilder().build());
-        modulePredicateMap.put(clazz, buildDisablePredicate(module));
+        if (!moduleChildrenMap.containsKey(root)) {
+            AbstractModule module = injector.getInstance(root);
+            moduleChildrenMap.put(root, module.childrenBuilder().build());
+            modulePredicateMap.put(root, buildDisablePredicate(module));
+        }
 
-        getChildren(clazz).forEach(this::configureChildren);
+        getChildren(root).forEach(this::configureHierarchy);
     }
 
     public void enable(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> enablePredicate) {
-        AbstractModule module = injector.getInstance(clazz);
+        Class<? extends AbstractModule> root = getRoot(clazz);
+        AbstractModule module = injector.getInstance(root);
 
-        if (isEnable(clazz)) {
+        if (isEnable(root)) {
             ModuleDisableEvent preDisableEvent = eventDispatcher.dispatch(new ModuleDisableEvent(module));
-
-            if (preDisableEvent.cancelled()) {
-                // nothing
-            } else {
+            if (!preDisableEvent.cancelled()) {
                 module.onDisable();
             }
         }
 
-        moduleStateMap.put(clazz, enablePredicate.test(module));
+        boolean newState = enablePredicate.test(module);
+        moduleStateMap.put(root, newState);
 
-        if (isEnable(clazz)) {
+        if (newState) {
             ModuleEnableEvent preEnableEvent = eventDispatcher.dispatch(new ModuleEnableEvent(module));
-
             if (preEnableEvent.cancelled()) {
-                moduleStateMap.put(clazz, false);
+                moduleStateMap.put(root, false);
             } else {
                 module.permissionBuilder().build().forEach(permissionRegistry::register);
                 module.onEnable();
             }
         }
 
-        Predicate<AbstractModule> childPredicate =abstractModule -> isEnable(clazz) && abstractModule.config().enable();
-        getChildren(clazz).forEach(subModule -> enable(subModule, childPredicate));
+        Predicate<AbstractModule> childPredicate = m -> isEnable(root) && m.config().enable();
+        getChildren(root).forEach(child -> enable(child, childPredicate));
     }
 
     public BiPredicate<FEntity, Boolean> buildDisablePredicate(AbstractModule module) {
@@ -189,4 +193,25 @@ public class ModuleController {
         return classes.stream().anyMatch(clazz -> clazz.isInstance(module));
     }
 
+    private Class<? extends AbstractModule> getRoot(Class<? extends AbstractModule> clazz) {
+        return moduleRootMap.computeIfAbsent(clazz, this::findRootSuperclass);
+    }
+
+    private Class<? extends AbstractModule> findRootSuperclass(Class<? extends AbstractModule> clazz) {
+        Class<?> root = clazz;
+        while (root.getSuperclass() != null
+                && AbstractModule.class.isAssignableFrom(root.getSuperclass())
+                && !isBaseModuleClass(root.getSuperclass())) {
+            root = root.getSuperclass();
+        }
+
+        return (Class<? extends AbstractModule>) root;
+    }
+
+    private boolean isBaseModuleClass(Class<?> clazz) {
+        return clazz == AbstractModule.class
+                || clazz == AbstractModuleLocalization.class
+                || clazz == AbstractModuleCommand.class
+                || clazz == AbstractModuleListLocalization.class;
+    }
 }
