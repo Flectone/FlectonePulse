@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BanlistModule implements AbstractModuleCommand<Localization.Command.Banlist> {
+public class BanlistModule implements ModuleCommand<Localization.Command.Banlist> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

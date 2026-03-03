@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -34,7 +34,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Singleton
-public class MaintenanceModule implements AbstractModuleCommand<Localization.Command.Maintenance> {
+public class MaintenanceModule implements ModuleCommand<Localization.Command.Maintenance> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -109,7 +109,7 @@ public class MaintenanceModule implements AbstractModuleCommand<Localization.Com
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder().add(permission().join());
+        return ModuleCommand.super.permissionBuilder().add(permission().join());
     }
 
     @Override

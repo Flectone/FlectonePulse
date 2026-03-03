@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.cmi.CMIModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 
@@ -23,7 +23,7 @@ public class CMIPulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         if (!cmiModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         Integration.CMI config = cmiModule.config();
 
         if ((config.disableFlectonepulseBan() && moduleController.isInstanceOfAny(eventModule, ModuleController.BAN_MODULES)) ||

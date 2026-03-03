@@ -13,7 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.RandomUtil;
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MOTDModule implements AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
+public class MOTDModule implements ModuleListLocalization<Localization.Message.Status.MOTD> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

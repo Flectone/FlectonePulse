@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -19,7 +19,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AfkModule implements AbstractModuleCommand<Localization.Command> {
+public class AfkModule implements ModuleCommand<Localization.Command> {
 
     private final FileFacade fileFacade;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;

@@ -11,7 +11,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
@@ -22,7 +22,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuitModule implements AbstractModuleLocalization<Localization.Message.Quit> {
+public class QuitModule implements ModuleLocalization<Localization.Message.Quit> {
 
     private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;

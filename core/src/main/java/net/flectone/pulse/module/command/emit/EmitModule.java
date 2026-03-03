@@ -15,7 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class EmitModule implements AbstractModuleCommand<Localization.Command.Emit> {
+public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;

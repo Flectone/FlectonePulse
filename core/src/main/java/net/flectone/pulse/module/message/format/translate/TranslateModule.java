@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -29,7 +29,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TranslateModule implements AbstractModuleLocalization<Localization.Message.Format.Translate> {
+public class TranslateModule implements ModuleLocalization<Localization.Message.Format.Translate> {
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;

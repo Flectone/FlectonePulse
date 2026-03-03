@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -16,7 +16,7 @@ import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SkinsRestorerModule implements AbstractModule {
+public class SkinsRestorerModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final SkinsRestorerIntegration skinsRestorerIntegration;

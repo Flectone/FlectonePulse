@@ -16,7 +16,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SpriteModule implements AbstractModuleCommand<Localization.Command.Sprite> {
+public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> {
 
     private static final String FLECTONEPULSE_ATLAS_API = "https://flectone.net/files/r/minecraft/<version>/atlases/minecraft_textures_atlas_<atlas>.png.txt";
     private static final String ATLAS_FILE_NAME = "minecraft_textures_atlas_<atlas>.png.txt";

@@ -4,7 +4,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -15,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-public abstract class BubbleModule implements AbstractModule {
+public abstract class BubbleModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;

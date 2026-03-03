@@ -10,7 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TryModule implements AbstractModuleCommand<Localization.Command.CommandTry> {
+public class TryModule implements ModuleCommand<Localization.Command.CommandTry> {
 
     private final FileFacade fileFacade;
     private final RandomUtil randomUtil;

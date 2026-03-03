@@ -11,7 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnoreModule implements AbstractModuleCommand<Localization.Command.Ignore> {
+public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

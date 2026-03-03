@@ -10,13 +10,13 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
 
-public interface AbstractModuleLocalization<L extends LocalizationSetting> extends AbstractModule {
+public interface ModuleLocalization<L extends LocalizationSetting> extends ModuleSimple {
 
     L localization(FEntity sender);
 
     @Override
     default ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        ImmutableList.Builder<PermissionSetting> builder = AbstractModule.super.permissionBuilder();
+        ImmutableList.Builder<PermissionSetting> builder = ModuleSimple.super.permissionBuilder();
 
         if (permission() instanceof CooldownPermissionSetting cooldownPermission) {
             builder.add(cooldownPermission.cooldownBypass());

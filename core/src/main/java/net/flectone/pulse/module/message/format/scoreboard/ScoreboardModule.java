@@ -3,13 +3,13 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
-public abstract class ScoreboardModule implements AbstractModule {
+public abstract class ScoreboardModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;

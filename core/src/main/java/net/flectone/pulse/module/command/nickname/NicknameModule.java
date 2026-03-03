@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.nickname.listener.NicknamePulseListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -41,7 +41,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NicknameModule implements AbstractModuleCommand<Localization.Command.Nickname> {
+public class NicknameModule implements ModuleCommand<Localization.Command.Nickname> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -145,7 +145,7 @@ public class NicknameModule implements AbstractModuleCommand<Localization.Comman
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder().add(permission().see(), permission().other());
+        return ModuleCommand.super.permissionBuilder().add(permission().see(), permission().other());
     }
 
     public void changeName(FPlayer fPlayer, FPlayer fTarget, String nickname) {

@@ -9,7 +9,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiPredicate;
 
-public interface AbstractModule {
+public interface ModuleSimple {
 
     ModuleName name();
 
@@ -25,7 +25,7 @@ public interface AbstractModule {
         return (fEntity, aBoolean) -> false;
     }
 
-    default ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+    default ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return ImmutableList.builder();
     }
 

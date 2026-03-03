@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearchatModule implements AbstractModuleCommand<Localization.Command.Clearchat> {
+public class ClearchatModule implements ModuleCommand<Localization.Command.Clearchat> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -56,7 +56,7 @@ public class ClearchatModule implements AbstractModuleCommand<Localization.Comma
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder()
+        return ModuleCommand.super.permissionBuilder()
                 .add(permission().other());
     }
 

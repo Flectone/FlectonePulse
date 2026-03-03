@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class StreamModule implements AbstractModuleCommand<Localization.Command.Stream> {
+public class StreamModule implements ModuleCommand<Localization.Command.Stream> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

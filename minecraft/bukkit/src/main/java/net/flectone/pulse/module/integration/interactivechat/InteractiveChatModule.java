@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.interactivechat.listener.InteractiveChatPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -16,7 +16,7 @@ import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class InteractiveChatModule implements AbstractModule {
+public class InteractiveChatModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final InteractiveChatIntegration interactiveChatIntegration;

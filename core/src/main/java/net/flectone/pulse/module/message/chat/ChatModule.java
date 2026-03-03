@@ -16,7 +16,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatModule implements AbstractModuleLocalization<Localization.Message.Chat> {
+public class ChatModule implements ModuleLocalization<Localization.Message.Chat> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -57,7 +57,7 @@ public class ChatModule implements AbstractModuleLocalization<Localization.Messa
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder()
+        return ModuleLocalization.super.permissionBuilder()
                 .addAll(permission().types().values())
                 .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::sound).toList())
                 .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::cooldownBypass).toList());

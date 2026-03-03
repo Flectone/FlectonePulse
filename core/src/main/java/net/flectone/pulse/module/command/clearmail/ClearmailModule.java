@@ -11,7 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearmailModule implements AbstractModuleCommand<Localization.Command.Clearmail> {
+public class ClearmailModule implements ModuleCommand<Localization.Command.Clearmail> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

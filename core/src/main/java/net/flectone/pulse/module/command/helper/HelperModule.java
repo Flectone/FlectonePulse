@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HelperModule implements AbstractModuleCommand<Localization.Command.Helper> {
+public class HelperModule implements ModuleCommand<Localization.Command.Helper> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -55,7 +55,7 @@ public class HelperModule implements AbstractModuleCommand<Localization.Command.
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder().add(permission().see());
+        return ModuleCommand.super.permissionBuilder().add(permission().see());
     }
 
     @Override

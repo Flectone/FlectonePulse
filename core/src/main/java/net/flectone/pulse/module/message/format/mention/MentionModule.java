@@ -16,7 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MentionModule implements AbstractModuleLocalization<Localization.Message.Format.Mention> {
+public class MentionModule implements ModuleLocalization<Localization.Message.Format.Mention> {
 
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
@@ -61,7 +61,7 @@ public class MentionModule implements AbstractModuleLocalization<Localization.Me
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
+        return ModuleLocalization.super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
     }
 
     @Override

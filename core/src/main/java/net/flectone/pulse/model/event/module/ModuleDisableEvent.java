@@ -1,15 +1,15 @@
 package net.flectone.pulse.model.event.module;
 
 import lombok.With;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 
 @With
 public record ModuleDisableEvent(
         boolean cancelled,
-        AbstractModule module
+        ModuleSimple module
 ) implements ModuleEvent {
 
-    public ModuleDisableEvent(AbstractModule module) {
+    public ModuleDisableEvent(ModuleSimple module) {
         this(false, module);
     }
 

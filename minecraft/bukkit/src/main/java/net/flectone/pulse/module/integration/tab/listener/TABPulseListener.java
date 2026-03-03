@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.message.format.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
@@ -27,7 +27,7 @@ public class TABPulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         if (!tabModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         Integration.Tab config = tabModule.config();
 
         if ((eventModule instanceof HeaderModule && config.disableFlectonepulseHeader())

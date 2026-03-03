@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -20,7 +20,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MiniPlaceholdersModule implements AbstractModule {
+public class MiniPlaceholdersModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final MiniPlaceholdersIntegration miniPlaceholdersIntegration;
@@ -45,7 +45,7 @@ public class MiniPlaceholdersModule implements AbstractModule {
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModule.super.permissionBuilder().add(permission().use());
+        return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 
     @Override

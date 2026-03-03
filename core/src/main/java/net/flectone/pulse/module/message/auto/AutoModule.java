@@ -15,7 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AutoModule implements AbstractModuleListLocalization<Localization.Message.Auto> {
+public class AutoModule implements ModuleListLocalization<Localization.Message.Auto> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -59,7 +59,7 @@ public class AutoModule implements AbstractModuleListLocalization<Localization.M
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleListLocalization.super.permissionBuilder().addAll(permission().types().values());
+        return ModuleListLocalization.super.permissionBuilder().addAll(permission().types().values());
     }
 
     @Override

@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.moderation.caps.listener.CapsPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CapsModule implements AbstractModule {
+public class CapsModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -34,7 +34,7 @@ public class CapsModule implements AbstractModule {
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModule.super.permissionBuilder().add(permission().bypass());
+        return ModuleSimple.super.permissionBuilder().add(permission().bypass());
     }
 
     @Override

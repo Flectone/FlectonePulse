@@ -11,7 +11,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.animation.listener.AnimationPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AnimationModule implements AbstractModuleLocalization<Localization.Message.Format.Animation> {
+public class AnimationModule implements ModuleLocalization<Localization.Message.Format.Animation> {
 
     private final Map<AnimationKey, Integer> animationMap = new ConcurrentHashMap<>();
 
@@ -74,7 +74,7 @@ public class AnimationModule implements AbstractModuleLocalization<Localization.
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
+        return ModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
     }
 
     public MessageContext addTag(MessageContext messageContext) {

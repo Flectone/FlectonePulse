@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.MinecraftStatusModule;
 
@@ -21,7 +21,7 @@ public class MOTDPulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         if (!motdModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         if (eventModule instanceof MinecraftStatusModule && motdModule.config().disableFlectonepulseStatus()) {
             return event.withCancelled(true);
         }

@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -39,7 +39,7 @@ import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RockpaperscissorsModule implements AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
+public class RockpaperscissorsModule implements ModuleCommand<Localization.Command.Rockpaperscissors> {
 
     private final Map<UUID, RockPaperScissors> gameMap = new Object2ObjectArrayMap<>();
 

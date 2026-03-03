@@ -8,7 +8,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 
 @Singleton
@@ -21,7 +21,7 @@ public class MaintenancePulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         if (!maintenanceModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         if (eventModule instanceof MaintenanceModule && maintenanceModule.config().disableFlectonepulseMaintenance()) {
             return event.withCancelled(true);
         }

@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -19,7 +19,7 @@ public class InteractiveChatPulseListener implements PulseListener {
 
     @Pulse
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         if (eventModule instanceof DeleteModule) {
             fLogger.warning("Delete module is disabled, InteractiveChat is incompatible with it");
             return event.withCancelled(true);

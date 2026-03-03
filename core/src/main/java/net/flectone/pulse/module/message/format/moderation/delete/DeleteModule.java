@@ -11,7 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.delete.listener.DeletePulseListener;
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -33,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeleteModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
+public class DeleteModule implements ModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 

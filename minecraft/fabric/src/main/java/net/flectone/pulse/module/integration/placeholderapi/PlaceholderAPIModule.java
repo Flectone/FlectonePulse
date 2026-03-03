@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -15,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PlaceholderAPIModule implements AbstractModule {
+public class PlaceholderAPIModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final PlaceholderAPIIntegration placeholderAPIIntegration;
@@ -30,7 +30,7 @@ public class PlaceholderAPIModule implements AbstractModule {
 
     @Override
     public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
-        return AbstractModule.super.permissionBuilder().add(permission().use());
+        return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 
     @Override

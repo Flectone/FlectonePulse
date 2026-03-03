@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.afk.AfkModule;
 import net.flectone.pulse.module.command.anon.AnonModule;
 import net.flectone.pulse.module.command.ball.BallModule;
@@ -60,13 +60,13 @@ import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CommandModule implements AbstractModule {
+public class CommandModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return AbstractModule.super.childrenBuilder().add(
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        return ModuleSimple.super.childrenBuilder().add(
                 AfkModule.class,
                 AnonModule.class,
                 BallModule.class,
@@ -118,7 +118,7 @@ public class CommandModule implements AbstractModule {
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModule.super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
+        return ModuleSimple.super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
     }
 
     @Override

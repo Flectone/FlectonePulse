@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-public interface AbstractModuleListLocalization<M extends LocalizationSetting> extends AbstractModuleLocalization<M> {
+public interface ModuleListLocalization<M extends LocalizationSetting> extends ModuleLocalization<M> {
 
     List<String> getAvailableMessages(FPlayer fPlayer);
 

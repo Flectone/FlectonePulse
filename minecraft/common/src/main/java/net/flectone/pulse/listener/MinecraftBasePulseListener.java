@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.sprite.SpriteModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
@@ -28,7 +28,7 @@ public class MinecraftBasePulseListener implements PulseListener {
 
     @Pulse
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         if (eventModule instanceof BubbleModule
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             fLogger.warning("Bubble module is not supported on this version of Minecraft");

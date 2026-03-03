@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
@@ -18,13 +18,13 @@ import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ModerationModule implements AbstractModule {
+public class ModerationModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return AbstractModule.super.childrenBuilder().add(
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        return ModuleSimple.super.childrenBuilder().add(
                 CapsModule.class,
                 DeleteModule.class,
                 NewbieModule.class,

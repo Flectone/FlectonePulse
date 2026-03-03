@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.deletemessage.DeletemessageModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytaleBasePulseListener implements PulseListener {
 
-    private static final List<Class<? extends AbstractModule>> NOT_SUPPORTED_MODULES = List.of(
+    private static final List<Class<? extends ModuleSimple>> NOT_SUPPORTED_MODULES = List.of(
             AnvilModule.class,
             BookModule.class,
             BossbarModule.class,
@@ -54,7 +54,7 @@ public class HytaleBasePulseListener implements PulseListener {
 
     @Pulse
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         if (NOT_SUPPORTED_MODULES.stream().anyMatch(clazz -> clazz.isInstance(eventModule))) {
             fLogger.warning(eventModule.getClass().getSimpleName() + " is not supported on Hytale");
             return event.withCancelled(true);

@@ -15,13 +15,13 @@ import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class Module implements AbstractModule {
+public class Module implements ModuleSimple {
 
     private final FileFacade fileFacade;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return AbstractModule.super.childrenBuilder().add(
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        return ModuleSimple.super.childrenBuilder().add(
                 IntegrationModule.class,
                 CommandModule.class,
                 MessageModule.class

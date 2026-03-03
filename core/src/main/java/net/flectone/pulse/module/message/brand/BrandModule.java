@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BrandModule implements AbstractModuleListLocalization<Localization.Message.Brand> {
+public class BrandModule implements ModuleListLocalization<Localization.Message.Brand> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

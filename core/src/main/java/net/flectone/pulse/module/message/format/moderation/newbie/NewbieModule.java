@@ -11,7 +11,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -23,7 +23,7 @@ import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NewbieModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
+public class NewbieModule implements ModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -54,7 +54,7 @@ public class NewbieModule implements AbstractModuleLocalization<Localization.Mes
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().add(permission().bypass());
+        return ModuleLocalization.super.permissionBuilder().add(permission().bypass());
     }
 
     @Override

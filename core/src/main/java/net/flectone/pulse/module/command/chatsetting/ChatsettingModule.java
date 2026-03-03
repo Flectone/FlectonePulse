@@ -8,7 +8,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-public abstract class ChatsettingModule implements AbstractModuleCommand<Localization.Command.Chatsetting> {
+public abstract class ChatsettingModule implements ModuleCommand<Localization.Command.Chatsetting> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -87,7 +87,7 @@ public abstract class ChatsettingModule implements AbstractModuleCommand<Localiz
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder()
+        return ModuleCommand.super.permissionBuilder()
                 .add(permission().other())
                 .addAll(permission().settings().values());
     }

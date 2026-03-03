@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MutelistModule implements AbstractModuleCommand<Localization.Command.Mutelist> {
+public class MutelistModule implements ModuleCommand<Localization.Command.Mutelist> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -31,7 +31,7 @@ import java.util.OptionalInt;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FColorModule implements AbstractModule {
+public class FColorModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -46,7 +46,7 @@ public class FColorModule implements AbstractModule {
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModule.super.permissionBuilder().addAll(permission().colors().values());
+        return ModuleSimple.super.permissionBuilder().addAll(permission().colors().values());
     }
 
     @Override

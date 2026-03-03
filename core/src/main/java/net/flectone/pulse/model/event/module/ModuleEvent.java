@@ -1,12 +1,12 @@
 package net.flectone.pulse.model.event.module;
 
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 
 public interface ModuleEvent extends Event {
 
-    AbstractModule module();
+    ModuleSimple module();
 
-    ModuleEvent withModule(AbstractModule module);
+    ModuleEvent withModule(ModuleSimple module);
 
 }

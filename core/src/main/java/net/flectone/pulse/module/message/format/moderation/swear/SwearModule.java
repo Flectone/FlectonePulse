@@ -15,7 +15,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.swear.listener.SwearPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -37,7 +37,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SwearModule implements AbstractModuleLocalization<Localization.Message.Format.Moderation.Swear> {
+public class SwearModule implements ModuleLocalization<Localization.Message.Format.Moderation.Swear> {
 
     private final @Named("swearMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
@@ -62,7 +62,7 @@ public class SwearModule implements AbstractModuleLocalization<Localization.Mess
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().add(permission().see(), permission().bypass());
+        return ModuleLocalization.super.permissionBuilder().add(permission().see(), permission().bypass());
     }
 
     @Override

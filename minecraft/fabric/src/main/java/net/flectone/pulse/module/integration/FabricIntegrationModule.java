@@ -8,7 +8,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.supervanish.VanishModule;
@@ -44,8 +44,8 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
             builder.add(VanishModule.class);

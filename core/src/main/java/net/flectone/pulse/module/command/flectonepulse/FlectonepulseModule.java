@@ -17,7 +17,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FlectonepulseModule implements AbstractModuleCommand<Localization.Command.Flectonepulse> {
+public class FlectonepulseModule implements ModuleCommand<Localization.Command.Flectonepulse> {
 
     private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
 

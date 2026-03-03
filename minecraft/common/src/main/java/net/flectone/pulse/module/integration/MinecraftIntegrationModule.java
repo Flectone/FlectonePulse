@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.floodgate.FloodgateModule;
@@ -48,8 +48,8 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = super.childrenBuilder();
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
             builder.add(SkinsRestorerModule.class);

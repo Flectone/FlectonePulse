@@ -10,7 +10,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
@@ -23,7 +23,7 @@ import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TabnameModule implements AbstractModuleLocalization<Localization.Message.Objective.Tabname> {
+public class TabnameModule implements ModuleLocalization<Localization.Message.Objective.Tabname> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

@@ -11,7 +11,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DiceModule implements AbstractModuleCommand<Localization.Command.Dice> {
+public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;

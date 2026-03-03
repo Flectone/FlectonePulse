@@ -14,7 +14,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.status.icon.IconModule;
 import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
@@ -76,7 +76,7 @@ public class MinecraftStatusModule extends StatusModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
                 MOTDModule.class,
                 IconModule.class,

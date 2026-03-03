@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
-public class SimpleVoiceModule implements AbstractModule {
+public class SimpleVoiceModule implements ModuleSimple {
 
     @Getter private static SimpleVoiceIntegration SIMPLE_VOICE_INTEGRATION;
 

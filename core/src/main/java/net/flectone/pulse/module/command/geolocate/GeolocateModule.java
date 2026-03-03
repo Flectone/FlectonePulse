@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
 import net.flectone.pulse.module.command.geolocate.model.IpResponse;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -38,7 +38,7 @@ import java.util.Scanner;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class GeolocateModule implements AbstractModuleCommand<Localization.Command.Geolocate> {
+public class GeolocateModule implements ModuleCommand<Localization.Command.Geolocate> {
 
     private static final String IP_API_URL = "http://ip-api.com/json/<ip>?fields=status,country,regionName,city,timezone,offset,mobile,proxy,hosting,query";
 

@@ -2,11 +2,11 @@ package net.flectone.pulse.module.integration.discord.listener;
 
 import discord4j.core.event.domain.Event;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
 import reactor.core.publisher.Mono;
 
-public abstract class EventListener<T extends Event> implements AbstractModuleLocalization<Localization.Integration.Discord> {
+public abstract class EventListener<T extends Event> implements ModuleLocalization<Localization.Integration.Discord> {
 
     @Override
     public ModuleName name() {

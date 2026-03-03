@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
 
-public interface AbstractModuleCommand<M extends LocalizationSetting> extends AbstractModuleLocalization<M>, CommandExecutionHandler<FPlayer> {
+public interface ModuleCommand<M extends LocalizationSetting> extends ModuleLocalization<M>, CommandExecutionHandler<FPlayer> {
 
     CommandSetting config();
 

@@ -18,7 +18,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuestionAnswerModule implements AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
+public class QuestionAnswerModule implements ModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
@@ -70,7 +70,7 @@ public class QuestionAnswerModule implements AbstractModuleLocalization<Localiza
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder()
+        return ModuleLocalization.super.permissionBuilder()
                 .addAll(permission().questions().values().stream().flatMap(question ->
                         Stream.of(
                                 question,

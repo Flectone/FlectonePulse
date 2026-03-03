@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-public abstract class IntegrationModule implements AbstractModule {
+public abstract class IntegrationModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
@@ -43,8 +43,8 @@ public abstract class IntegrationModule implements AbstractModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> builder = AbstractModule.super.childrenBuilder();
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = ModuleSimple.super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
@@ -90,7 +90,7 @@ public abstract class IntegrationModule implements AbstractModule {
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 
-    public boolean containsEnabledChild(Class<? extends AbstractModule> clazz) {
+    public boolean containsEnabledChild(Class<? extends ModuleSimple> clazz) {
         if (!moduleController.containsChild(this, clazz)) return false;
 
         return moduleController.isEnable(clazz);

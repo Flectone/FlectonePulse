@@ -11,8 +11,8 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
@@ -46,7 +46,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FormatModule implements AbstractModuleLocalization<Localization.Message.Format> {
+public class FormatModule implements ModuleLocalization<Localization.Message.Format> {
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
@@ -57,8 +57,8 @@ public class FormatModule implements AbstractModuleLocalization<Localization.Mes
     private final ModuleController moduleController;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends AbstractModule>> childrenBuilder() {
-        return AbstractModuleLocalization.super.childrenBuilder().add(
+    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        return ModuleLocalization.super.childrenBuilder().add(
                 FColorModule.class,
                 FixationModule.class,
                 MentionModule.class,
@@ -105,7 +105,7 @@ public class FormatModule implements AbstractModuleLocalization<Localization.Mes
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder()
+        return ModuleLocalization.super.permissionBuilder()
                 .add(permission().legacyColors())
                 .addAll(permission().adventureTags().values());
     }

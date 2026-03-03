@@ -9,13 +9,13 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ObjectModule implements AbstractModuleLocalization<Localization.Message.Format.Object> {
+public class ObjectModule implements ModuleLocalization<Localization.Message.Format.Object> {
 
     private final FileFacade fileFacade;
 
@@ -26,7 +26,7 @@ public class ObjectModule implements AbstractModuleLocalization<Localization.Mes
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().add(permission().playerHead(), permission().sprite());
+        return ModuleLocalization.super.permissionBuilder().add(permission().playerHead(), permission().sprite());
     }
 
     @Override

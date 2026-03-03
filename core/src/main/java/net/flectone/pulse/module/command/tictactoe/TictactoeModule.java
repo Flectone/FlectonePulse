@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
@@ -36,7 +36,7 @@ import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TictactoeModule implements AbstractModuleCommand<Localization.Command.Tictactoe> {
+public class TictactoeModule implements ModuleCommand<Localization.Command.Tictactoe> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

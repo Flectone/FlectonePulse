@@ -41,15 +41,15 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModuleController {
 
-    public static final Set<Class<? extends AbstractModule>> BAN_MODULES = Set.of(BanModule.class, BanlistModule.class, UnbanModule.class);
-    public static final Set<Class<? extends AbstractModule>> MUTE_MODULES = Set.of(MuteModule.class, MutelistModule.class, UnmuteModule.class);
-    public static final Set<Class<? extends AbstractModule>> WARN_MODULES = Set.of(WarnModule.class, WarnlistModule.class, UnwarnModule.class);
-    public static final Set<Class<? extends AbstractModule>> KICK_MODULES = Set.of(KickModule.class);
+    public static final Set<Class<? extends ModuleSimple>> BAN_MODULES = Set.of(BanModule.class, BanlistModule.class, UnbanModule.class);
+    public static final Set<Class<? extends ModuleSimple>> MUTE_MODULES = Set.of(MuteModule.class, MutelistModule.class, UnmuteModule.class);
+    public static final Set<Class<? extends ModuleSimple>> WARN_MODULES = Set.of(WarnModule.class, WarnlistModule.class, UnwarnModule.class);
+    public static final Set<Class<? extends ModuleSimple>> KICK_MODULES = Set.of(KickModule.class);
 
-    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, Class<? extends AbstractModule>> moduleRootMap = new Object2ObjectOpenHashMap<>();
-    private final Object2BooleanOpenHashMap<Class<? extends AbstractModule>> moduleStateMap = new Object2BooleanOpenHashMap<>();
-    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, List<Class<? extends AbstractModule>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
-    private final Object2ObjectOpenHashMap<Class<? extends AbstractModule>, BiPredicate<FEntity, Boolean>> modulePredicateMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, Class<? extends ModuleSimple>> moduleRootMap = new Object2ObjectOpenHashMap<>();
+    private final Object2BooleanOpenHashMap<Class<? extends ModuleSimple>> moduleStateMap = new Object2BooleanOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, List<Class<? extends ModuleSimple>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, BiPredicate<FEntity, Boolean>> modulePredicateMap = new Object2ObjectOpenHashMap<>();
 
     private final Injector injector;
     private final EventDispatcher eventDispatcher;
@@ -63,8 +63,8 @@ public class ModuleController {
         return collectModuleStatuses(Module.class);
     }
 
-    public Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
-        Class<? extends AbstractModule> root = getRoot(clazz);
+    public Map<String, String> collectModuleStatuses(Class<? extends ModuleSimple> clazz) {
+        Class<? extends ModuleSimple> root = getRoot(clazz);
 
         Map<String, String> modules = new Object2ObjectArrayMap<>();
         modules.put(root.getSimpleName(), isEnable(root) ? "true" : "false");
@@ -75,43 +75,43 @@ public class ModuleController {
         return modules;
     }
 
-    public boolean isEnable(AbstractModule abstractModule) {
+    public boolean isEnable(ModuleSimple abstractModule) {
         return isEnable(abstractModule.getClass());
     }
 
-    public boolean isEnable(Class<? extends AbstractModule> clazz) {
-        Class<? extends AbstractModule> root = getRoot(clazz);
+    public boolean isEnable(Class<? extends ModuleSimple> clazz) {
+        Class<? extends ModuleSimple> root = getRoot(clazz);
         return moduleStateMap.getBoolean(root);
     }
 
-    public boolean containsChild(AbstractModule abstractModule, Class<? extends AbstractModule> child) {
+    public boolean containsChild(ModuleSimple abstractModule, Class<? extends ModuleSimple> child) {
         return containsChild(abstractModule.getClass(), child);
     }
 
-    public boolean containsChild(Class<? extends AbstractModule> clazz, Class<? extends AbstractModule> child) {
+    public boolean containsChild(Class<? extends ModuleSimple> clazz, Class<? extends ModuleSimple> child) {
         return getChildren(clazz).contains(child);
     }
 
-    public boolean isDisabledFor(AbstractModule abstractModule, FEntity entity) {
+    public boolean isDisabledFor(ModuleSimple abstractModule, FEntity entity) {
         return isDisabledFor(abstractModule, entity, false);
     }
 
-    public boolean isDisabledFor(Class<? extends AbstractModule> clazz, FEntity entity) {
+    public boolean isDisabledFor(Class<? extends ModuleSimple> clazz, FEntity entity) {
         return isDisabledFor(clazz, entity, false);
     }
 
-    public boolean isDisabledFor(AbstractModule abstractModule, FEntity entity, boolean isMessage) {
+    public boolean isDisabledFor(ModuleSimple abstractModule, FEntity entity, boolean isMessage) {
         return isDisabledFor(abstractModule.getClass(), entity, isMessage);
     }
 
-    public boolean isDisabledFor(Class<? extends AbstractModule> clazz, FEntity entity, boolean isMessage) {
-        Class<? extends AbstractModule> root = getRoot(clazz);
+    public boolean isDisabledFor(Class<? extends ModuleSimple> clazz, FEntity entity, boolean isMessage) {
+        Class<? extends ModuleSimple> root = getRoot(clazz);
         BiPredicate<FEntity, Boolean> disablePredicate = modulePredicateMap.get(root);
         return disablePredicate != null && disablePredicate.test(entity, isMessage);
     }
 
-    public List<Class<? extends AbstractModule>> getChildren(Class<? extends AbstractModule> clazz) {
-        Class<? extends AbstractModule> root = getRoot(clazz);
+    public List<Class<? extends ModuleSimple>> getChildren(Class<? extends ModuleSimple> clazz) {
+        Class<? extends ModuleSimple> root = getRoot(clazz);
         return moduleChildrenMap.getOrDefault(root, Collections.emptyList());
     }
 
@@ -119,7 +119,7 @@ public class ModuleController {
         reload(Module.class);
     }
 
-    public void reload(Class<? extends AbstractModule> clazz) {
+    public void reload(Class<? extends ModuleSimple> clazz) {
         configureHierarchy(clazz);
 
         enable(clazz, module -> module.config().enable());
@@ -129,16 +129,16 @@ public class ModuleController {
         terminate(Module.class);
     }
 
-    public void terminate(Class<? extends AbstractModule> clazz) {
+    public void terminate(Class<? extends ModuleSimple> clazz) {
         enable(clazz, module -> false);
     }
 
-    private void configureHierarchy(Class<? extends AbstractModule> clazz) {
-        Class<? extends AbstractModule> root = findRootSuperclass(clazz);
+    private void configureHierarchy(Class<? extends ModuleSimple> clazz) {
+        Class<? extends ModuleSimple> root = findRootSuperclass(clazz);
         moduleRootMap.put(clazz, root);
 
         if (!moduleChildrenMap.containsKey(root)) {
-            AbstractModule module = injector.getInstance(root);
+            ModuleSimple module = injector.getInstance(root);
             moduleChildrenMap.put(root, module.childrenBuilder().build());
             modulePredicateMap.put(root, buildDisablePredicate(module));
         }
@@ -146,9 +146,9 @@ public class ModuleController {
         getChildren(root).forEach(this::configureHierarchy);
     }
 
-    public void enable(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> enablePredicate) {
-        Class<? extends AbstractModule> root = getRoot(clazz);
-        AbstractModule module = injector.getInstance(root);
+    public void enable(Class<? extends ModuleSimple> clazz, Predicate<ModuleSimple> enablePredicate) {
+        Class<? extends ModuleSimple> root = getRoot(clazz);
+        ModuleSimple module = injector.getInstance(root);
 
         if (isEnable(root)) {
             ModuleDisableEvent preDisableEvent = eventDispatcher.dispatch(new ModuleDisableEvent(module));
@@ -170,16 +170,16 @@ public class ModuleController {
             }
         }
 
-        Predicate<AbstractModule> childPredicate = m -> isEnable(root) && m.config().enable();
+        Predicate<ModuleSimple> childPredicate = m -> isEnable(root) && m.config().enable();
         getChildren(root).forEach(child -> enable(child, childPredicate));
     }
 
-    public BiPredicate<FEntity, Boolean> buildDisablePredicate(AbstractModule module) {
+    public BiPredicate<FEntity, Boolean> buildDisablePredicate(ModuleSimple module) {
         BiPredicate<FEntity, Boolean> disablePredicate = module.disablePredicate()
                 .and((fPlayer, needBoolean) -> !isEnable(module))
                 .and((fPlayer, needBoolean) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
 
-        if (module instanceof AbstractModuleLocalization<?> localizationModule) {
+        if (module instanceof ModuleLocalization<?> localizationModule) {
             return disablePredicate
                     .and((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
                     .and((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
@@ -189,29 +189,29 @@ public class ModuleController {
         return disablePredicate;
     }
 
-    public boolean isInstanceOfAny(AbstractModule module, Set<Class<? extends AbstractModule>> classes) {
+    public boolean isInstanceOfAny(ModuleSimple module, Set<Class<? extends ModuleSimple>> classes) {
         return classes.stream().anyMatch(clazz -> clazz.isInstance(module));
     }
 
-    private Class<? extends AbstractModule> getRoot(Class<? extends AbstractModule> clazz) {
+    private Class<? extends ModuleSimple> getRoot(Class<? extends ModuleSimple> clazz) {
         return moduleRootMap.computeIfAbsent(clazz, this::findRootSuperclass);
     }
 
-    private Class<? extends AbstractModule> findRootSuperclass(Class<? extends AbstractModule> clazz) {
+    private Class<? extends ModuleSimple> findRootSuperclass(Class<? extends ModuleSimple> clazz) {
         Class<?> root = clazz;
         while (root.getSuperclass() != null
-                && AbstractModule.class.isAssignableFrom(root.getSuperclass())
+                && ModuleSimple.class.isAssignableFrom(root.getSuperclass())
                 && !isBaseModuleClass(root.getSuperclass())) {
             root = root.getSuperclass();
         }
 
-        return (Class<? extends AbstractModule>) root;
+        return (Class<? extends ModuleSimple>) root;
     }
 
     private boolean isBaseModuleClass(Class<?> clazz) {
-        return clazz == AbstractModule.class
-                || clazz == AbstractModuleLocalization.class
-                || clazz == AbstractModuleCommand.class
-                || clazz == AbstractModuleListLocalization.class;
+        return clazz == ModuleSimple.class
+                || clazz == ModuleLocalization.class
+                || clazz == ModuleCommand.class
+                || clazz == ModuleListLocalization.class;
     }
 }

@@ -7,7 +7,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class SidebarModule implements AbstractModuleListLocalization<Localization.Message.Sidebar> {
+public abstract class SidebarModule implements ModuleListLocalization<Localization.Message.Sidebar> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

@@ -18,7 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -48,7 +48,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PollModule implements AbstractModuleCommand<Localization.Command.Poll> {
+public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
     private final Int2ObjectArrayMap<Poll> pollMap = new Int2ObjectArrayMap<>();
 
@@ -126,7 +126,7 @@ public class PollModule implements AbstractModuleCommand<Localization.Command.Po
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleCommand.super.permissionBuilder().add(permission().create());
+        return ModuleCommand.super.permissionBuilder().add(permission().create());
     }
 
     @Override

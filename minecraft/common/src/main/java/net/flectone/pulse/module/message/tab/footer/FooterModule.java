@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.AbstractModuleListLocalization;
+import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FooterModule implements AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
+public class FooterModule implements ModuleListLocalization<Localization.Message.Tab.Footer> {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

@@ -10,7 +10,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -31,7 +31,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NamesModule implements AbstractModuleLocalization<Localization.Message.Format.Names> {
+public class NamesModule implements ModuleLocalization<Localization.Message.Format.Names> {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;

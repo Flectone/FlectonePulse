@@ -13,7 +13,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -32,7 +32,7 @@ import java.net.http.HttpResponse;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class UpdateModule implements AbstractModuleLocalization<Localization.Message.Update> {
+public class UpdateModule implements ModuleLocalization<Localization.Message.Update> {
 
     private final FileFacade fileFacade;
     private final MessageDispatcher messageDispatcher;

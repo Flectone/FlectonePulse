@@ -16,7 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.FImage;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.replacement.listener.ReplacementPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ReplacementModule implements AbstractModuleLocalization<Localization.Message.Format.Replacement> {
+public class ReplacementModule implements ModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new ConcurrentHashMap<>();
     private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
@@ -77,7 +77,7 @@ public class ReplacementModule implements AbstractModuleLocalization<Localizatio
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
+        return ModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
     }
 
     @Override

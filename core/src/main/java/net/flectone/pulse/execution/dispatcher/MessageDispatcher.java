@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.service.FPlayerService;
@@ -36,13 +36,13 @@ public class MessageDispatcher {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
 
-    public <L extends LocalizationSetting> List<FPlayer> createReceivers(AbstractModuleLocalization<L> module,
+    public <L extends LocalizationSetting> List<FPlayer> createReceivers(ModuleLocalization<L> module,
                                                                          EventMetadata<L> eventMetadata) {
         return createReceivers(module.name(), module, eventMetadata);
     }
 
     public <L extends LocalizationSetting> List<FPlayer> createReceivers(ModuleName moduleName,
-                                                                         AbstractModuleLocalization<L> module,
+                                                                         ModuleLocalization<L> module,
                                                                          EventMetadata<L> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, module.localization());
 
@@ -58,27 +58,27 @@ public class MessageDispatcher {
                 .toList();
     }
 
-    public <L extends LocalizationSetting> void dispatch(AbstractModuleLocalization<L> module,
+    public <L extends LocalizationSetting> void dispatch(ModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
         dispatch(module.name(), module, eventMetadata);
     }
 
     public <L extends LocalizationSetting> void dispatch(ModuleName moduleName,
-                                                         AbstractModuleLocalization<L> module,
+                                                         ModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
         List<FPlayer> receivers = createReceivers(moduleName, module, eventMetadata);
         dispatch(moduleName, receivers, module, eventMetadata);
     }
 
     public <L extends LocalizationSetting> void dispatch(List<FPlayer> receivers,
-                                                         AbstractModuleLocalization<L> module,
+                                                         ModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
         dispatch(module.name(), receivers, module, eventMetadata);
     }
 
     public <L extends LocalizationSetting> void dispatch(ModuleName moduleName,
                                                          List<FPlayer> receivers,
-                                                         AbstractModuleLocalization<L> module,
+                                                         ModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
         if (receivers.isEmpty()) return;
 
@@ -118,7 +118,7 @@ public class MessageDispatcher {
         }
     }
 
-    public <L extends LocalizationSetting> void dispatchError(AbstractModuleLocalization<L> module, EventMetadata<L> eventMetadata) {
+    public <L extends LocalizationSetting> void dispatchError(ModuleLocalization<L> module, EventMetadata<L> eventMetadata) {
         dispatch(ModuleName.ERROR, module, eventMetadata);
     }
 
@@ -149,7 +149,7 @@ public class MessageDispatcher {
 
     private <L extends LocalizationSetting> Component buildFormatComponent(FPlayer receiver,
                                                                            EventMetadata<L> eventMetadata,
-                                                                           AbstractModuleLocalization<L> module,
+                                                                           ModuleLocalization<L> module,
                                                                            Component message) {
         String formatContent = eventMetadata.resolveFormat(receiver, module.localization(receiver));
         if (StringUtils.isEmpty(formatContent)) return Component.empty();

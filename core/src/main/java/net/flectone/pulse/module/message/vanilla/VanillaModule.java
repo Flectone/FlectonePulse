@@ -5,13 +5,13 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
-public abstract class VanillaModule implements AbstractModuleLocalization<Localization.Message.Vanilla> {
+public abstract class VanillaModule implements ModuleLocalization<Localization.Message.Vanilla> {
 
     public static final String ARGUMENT = "argument";
 

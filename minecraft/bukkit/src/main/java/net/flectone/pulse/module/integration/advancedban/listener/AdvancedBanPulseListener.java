@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
-import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 
@@ -23,7 +23,7 @@ public class AdvancedBanPulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         if (!advancedBanModule.isHooked()) return event;
 
-        AbstractModule eventModule = event.module();
+        ModuleSimple eventModule = event.module();
         Integration.Advancedban config = advancedBanModule.config();
 
         if ((config.disableFlectonepulseBan() && moduleController.isInstanceOfAny(eventModule, ModuleController.BAN_MODULES)) ||

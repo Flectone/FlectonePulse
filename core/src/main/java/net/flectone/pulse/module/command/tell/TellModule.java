@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.CommandModuleController;
@@ -35,7 +35,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TellModule implements AbstractModuleCommand<Localization.Command.Tell> {
+public class TellModule implements ModuleCommand<Localization.Command.Tell> {
 
     private final Map<UUID, String> senderReceiverMap = new Object2ObjectOpenHashMap<>();
 

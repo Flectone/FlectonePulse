@@ -9,19 +9,19 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BossbarModule implements AbstractModuleLocalization<Localization.Message.Bossbar> {
+public class BossbarModule implements ModuleLocalization<Localization.Message.Bossbar> {
 
     private final FileFacade fileFacade;
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return AbstractModuleLocalization.super.permissionBuilder().addAll(permission().types().values());
+        return ModuleLocalization.super.permissionBuilder().addAll(permission().types().values());
     }
 
     @Override
