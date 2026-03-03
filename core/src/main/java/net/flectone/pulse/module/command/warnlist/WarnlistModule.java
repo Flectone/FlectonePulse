@@ -142,7 +142,10 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolver(targetTag(fPlayer, fTarget));
+                    .addTagResolvers(
+                            messagePipeline.targetTag(fPlayer, fTarget),
+                            messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
+                    );;
 
             component = component
                     .append(messagePipeline.build(lineContext))

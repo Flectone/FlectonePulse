@@ -21,6 +21,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.List;
 
@@ -37,22 +38,31 @@ public class BanPulseListener implements PulseListener {
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
+        // check module state
         if (!banModule.isEnable()) return event;
 
+        // get player bans
         FPlayer fPlayer = event.player();
         List<Moderation> bans = moderationService.getValidBans(fPlayer);
         if (bans.isEmpty()) return event;
 
+        // get moderator
         Moderation ban = bans.getFirst();
         FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
+
+        // load custom player colors
         fPlayer = fPlayerService.loadColors(fPlayer);
 
+        // replace string moderation placeholders
         Localization.Command.Ban localization = banModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
 
-        MessageContext messageContext = messagePipeline.createContext(fModerator, fPlayer, formatPlayer);
+        // build message
+        MessageContext messageContext = messagePipeline.createContext(fModerator, fPlayer, formatPlayer)
+                .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator));
         Component reason = messagePipeline.build(messageContext);
 
+        // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
             banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
                     .base(EventMetadata.<Localization.Command.Ban>builder()
@@ -63,6 +73,7 @@ public class BanPulseListener implements PulseListener {
                             })
                             .range(Range.get(Range.Type.SERVER))
                             .filter(filter -> permissionChecker.check(filter, banModule.permission()))
+                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                             .build()
                     )
                     .moderation(ban)

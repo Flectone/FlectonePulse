@@ -32,7 +32,6 @@ import org.incendo.cloud.type.tuple.Pair;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -114,12 +113,19 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()
                         .sender(fTarget)
-                        .format(buildFormat(mute))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, mute)
+                        )
                         .range(config().range())
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
-                        .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute))
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute)
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                        })
                         .build()
                 )
                 .moderation(mute)
@@ -172,16 +178,17 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         return localization(fReceiver).suffix();
     }
 
-    public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {
-        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, mute);
-    }
-
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
         if (isModuleDisabledFor(fModerator)) return;
 
         sendMessage(EventMetadata.<Localization.Command.Mute>builder()
                 .sender(fReceiver)
-                .format(s -> moderationMessageFormatter.replacePlaceholders(s.person(), fReceiver, mute))
+                .format(localization ->
+                        moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, mute)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fModerator)
+                })
                 .build()
         );
     }

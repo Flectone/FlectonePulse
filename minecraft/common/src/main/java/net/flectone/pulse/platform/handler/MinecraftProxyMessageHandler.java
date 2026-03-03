@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.data.repository.CooldownRepository;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -28,8 +29,9 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
                                         ModerationService moderationService,
                                         Gson gson,
                                         TaskScheduler taskScheduler,
-                                        CooldownRepository cooldownRepository) {
-        super(injector, fileFacade, fPlayerService, fLogger, moderationService, gson, taskScheduler, cooldownRepository);
+                                        CooldownRepository cooldownRepository,
+                                        MessagePipeline messagePipeline) {
+        super(injector, fileFacade, fPlayerService, fLogger, moderationService, gson, taskScheduler, cooldownRepository, messagePipeline);
 
         this.injector = injector;
     }

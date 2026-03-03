@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.data.repository.CooldownRepository;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -73,6 +74,7 @@ import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -82,7 +84,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -101,6 +102,7 @@ public class ProxyMessageHandler {
     private final Gson gson;
     private final TaskScheduler taskScheduler;
     private final CooldownRepository cooldownRepository;
+    private final MessagePipeline messagePipeline;
 
     public void handleProxyMessage(byte[] bytes) {
         taskScheduler.runAsync(() -> {
@@ -286,16 +288,21 @@ public class ProxyMessageHandler {
         FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
         module.kick(fModerator, (FPlayer) fEntity, ban);
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
                 .base(EventMetadata.<Localization.Command.Ban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(module.buildFormat(ban))
+                        .format((fReceiver, message) ->
+                                moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, ban)
+                        )
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.command().ban().destination())
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderation(ban)
@@ -466,14 +473,19 @@ public class ProxyMessageHandler {
         FPlayer fModerator = fPlayerService.getFPlayer(mute.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
         module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(module.buildFormat(mute))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, mute)
+                        )
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.command().mute().destination())
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderation(mute)
@@ -499,10 +511,11 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unban -> Strings.CS.replace(unban.format(), "<moderator>", fModerator.name()))
+                        .format(Localization.Command.Unban::format)
                         .destination(fileFacade.command().unban().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderator(fModerator)
@@ -523,10 +536,11 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.name()))
+                        .format(Localization.Command.Unmute::format)
                         .destination(fileFacade.command().unmute().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderator(fModerator)
@@ -547,10 +561,11 @@ public class ProxyMessageHandler {
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fModerator.name()))
+                        .format(Localization.Command.Unwarn::format)
                         .destination(fileFacade.command().unwarn().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderator(fModerator)
@@ -705,21 +720,26 @@ public class ProxyMessageHandler {
         FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
         module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(module.buildFormat(warn))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
+                        )
                         .range(Range.get(Range.Type.SERVER))
                         .destination(fileFacade.command().warn().destination())
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderation(warn)
                 .build()
         );
 
-        module.send(fModerator, (FPlayer) fEntity, warn);
+        module.sendForTarget(fModerator, (FPlayer) fEntity, warn);
     }
 
     private void handleKickCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -730,21 +750,26 @@ public class ProxyMessageHandler {
         FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
         if (module.isModuleDisabledFor(fModerator)) return;
 
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
+        module.kick(fModerator, (FPlayer) fEntity, kick);
+
         module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(module.buildFormat(kick))
+                        .format((fReceiver, message) ->
+                                moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, kick)
+                        )
                         .destination(fileFacade.command().kick().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
                 .moderation(kick)
                 .build()
         );
-
-        module.kick(fModerator, (FPlayer) fEntity, kick);
     }
 
     private void handleTicTacToeCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

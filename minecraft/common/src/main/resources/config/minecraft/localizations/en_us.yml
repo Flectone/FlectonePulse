@@ -59,9 +59,9 @@ command:
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot ban a player with equal or higher permissions"
     reasons:
       default: "You have been banned from this server"
-    server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>has banned <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>🔒 <moderator> <fcolor:1>has banned <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 BAN 🔒<fcolor:1><br><br>Date: <date><br><br>Time: <time><br><br>Remaining time: <time_left><br><br>Moderator: <moderator><br><br>Reason: <reason>"
-    connection_attempt: "<color:#ff7171>🔒 Banned <fcolor:2><player> <fcolor:1>tried to log in <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    connection_attempt: "<color:#ff7171>🔒 Banned <display_name> tried to log in <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   banlist:
     empty: "<color:#98FB98>☺ No bans found"
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
@@ -231,7 +231,7 @@ command:
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot kick a player with equal or higher permissions"
     reasons:
       default: "Kicked by an operator"
-    server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>kicked <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>🔒 <moderator> <fcolor:1>kicked <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 KICK 🔒 <fcolor:1><br><br>ID: <id><br><br>Date: <date><br><br>Moderator: <moderator><br><br>Reason: <reason>"
   mail:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
@@ -253,7 +253,7 @@ command:
     suffix: " <color:#ff7171>🔒</color>"
     reasons:
       default: "You have been muted on this server"
-    server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>has muted <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>🔒 <moderator> <fcolor:1>has muted <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 You are muted, <time_left> left"
   mutelist:
     empty: "<color:#98FB98>☺ No mutes found"
@@ -403,24 +403,24 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not banned"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unban a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unbanned the player <fcolor:2><player>"
+    format: "<color:#98FB98>🔓 <moderator> unbanned the player <display_name>"
   unmute:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not muted"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unmute a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unmutted the player <fcolor:2><player>"
+    format: "<color:#98FB98>🔓 <moderator> unmutted the player <display_name>"
   unwarn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_warned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not warned"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unwarn a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <fcolor:2><moderator> <color:#98FB98>unwarned the player <fcolor:2><player>"
+    format: "<color:#98FB98>🔓 <moderator> unwarned the player <display_name>"
   warn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot warn a player with equal or higher permissions"
     reasons:
       default: "You have been warned on this server"
-    server: "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>gave a warning to <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
+    server: "<color:#ff7171>🔒 <moderator> <fcolor:1>gave a warning to <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>🔒 You are warned a <time>"
   warnlist:
     empty: "<color:#98FB98>☺ No warns found"

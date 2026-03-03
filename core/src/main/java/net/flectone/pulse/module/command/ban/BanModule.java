@@ -25,11 +25,11 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -143,7 +143,9 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
                 .base(EventMetadata.<Localization.Command.Ban>builder()
                         .sender(fTarget)
-                        .format(buildFormat(ban))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, ban)
+                        )
                         .range(config().range())
                         .destination(config().destination())
                         .sound(soundOrThrow())
@@ -153,6 +155,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                         .integration(string ->
                                 moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
                         )
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fPlayer)})
                         .build()
                 )
                 .moderation(ban)
@@ -160,23 +163,16 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         );
     }
 
-    public BiFunction<FPlayer, Localization.Command.Ban, String> buildFormat(Moderation ban) {
-        return (fReceiver, message) -> {
-            String format = message.server();
-
-            return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
-        };
-    }
-
     public void kick(FEntity fModerator, FPlayer fTarget, Moderation ban) {
-        if (isModuleDisabledFor(fModerator)) return;
         if (fModerator == null) return;
+        if (isModuleDisabledFor(fModerator)) return;
 
         Localization.Command.Ban localization = localization(fTarget);
-        String formatPlayer = localization.person();
-        formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);
+        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, ban);
 
-        MessageContext messageContext = messagePipeline.createContext(fModerator, fTarget, formatPlayer);
+        MessageContext messageContext = messagePipeline.createContext(fModerator, fTarget, formatPlayer)
+                .addTagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator));
+
         Component kickMessage = messagePipeline.build(messageContext);
 
         platformPlayerAdapter.kick(fTarget, kickMessage);

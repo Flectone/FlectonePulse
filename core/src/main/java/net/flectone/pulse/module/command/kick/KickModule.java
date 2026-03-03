@@ -21,10 +21,10 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -88,12 +88,19 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()
                         .sender(fTarget)
-                        .format(buildFormat(kick))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, kick)
+                        )
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
                         .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
-                        .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick)
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                        })
                         .build()
                 )
                 .moderation(kick)
@@ -122,16 +129,14 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         return fileFacade.localization(sender).command().kick();
     }
 
-    public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
-        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, kick);
-    }
-
-    public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
+    public void kick(FEntity fModerator, FPlayer fTarget, Moderation kick) {
+        if (fModerator == null) return;
         if (isModuleDisabledFor(fModerator)) return;
 
-        String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).person(), fReceiver, kick);
-        MessageContext messageContext = messagePipeline.createContext(fReceiver, format);
+        String format = moderationMessageFormatter.replacePlaceholders(localization(fTarget).person(), fTarget, kick);
+        MessageContext messageContext = messagePipeline.createContext(fTarget, format)
+                .addTagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator));
 
-        platformPlayerAdapter.kick(fReceiver, messagePipeline.build(messageContext));
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(messageContext));
     }
 }

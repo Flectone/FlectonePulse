@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -19,7 +20,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
-import org.apache.commons.lang3.Strings;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -133,7 +135,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .sender(fTarget)
-                        .format(unwarn -> Strings.CS.replace(unwarn.format(), "<moderator>", fPlayer.name()))
+                        .format(Localization.Command.Unban::format)
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
@@ -141,7 +143,10 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                             dataOutputStream.writeAsJson(fPlayer);
                             dataOutputStream.writeAsJson(bans);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.name()))
+                        .integration()
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                        })
                         .build()
                 )
                 .moderator(fPlayer)

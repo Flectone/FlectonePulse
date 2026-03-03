@@ -59,9 +59,9 @@ command:
     lower_weight_group: "<color:#ff7171>Ты не можешь забанить игрока с такими же или большими правами"
     reasons:
       default: "Ты заблокирован на этом сервере"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> заблокировал игрока <fcolor:2><player> <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
-    person: "<color:#ff7171>[!] БАН<fcolor:1><br>Дата: <date><br><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
-    connection_attempt: "<color:#ff7171>[!] Заблокированный <fcolor:2><player><fcolor:1> попытался подключиться <fcolor:1><br>Осталось: <time_left>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>заблокировал игрока <display_name> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    person: "<color:#ff7171>[!] БАН <fcolor:1><br>Дата: <date><br><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    connection_attempt: "<color:#ff7171>[!] <fcolor:1>Заблокированный <display_name> попытался подключиться. Осталось: <time_left>"
   banlist:
     empty: "<color:#98FB98>Блокировки не найдены"
     null_page: "<color:#ff7171>Страница не найдена"
@@ -231,8 +231,8 @@ command:
     lower_weight_group: "<color:#ff7171>Ты не можешь кикнуть игрока с такими же или большими правами"
     reasons:
       default: "Исключён модератором"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> исключил <fcolor:2><player><fcolor:1> <br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
-    person: "<color:#ff7171>[!] КИК<fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>исключил <display_name> <br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
+    person: "<color:#ff7171>[!] КИК <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   mail:
     null_player: "<color:#ff7171>Игрок не найден"
     online_player: "<color:#ff7171>Игрок в сети"
@@ -253,7 +253,7 @@ command:
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "Ты был замучен на сервере"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> выдал мут игроку <fcolor:2><player><fcolor:1> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>выдал мут игроку <display_name> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     person: "<color:#ff7171>[!] Ты замучен, осталось <time_left>"
   mutelist:
     empty: "<color:#98FB98>Муты не найдены"
@@ -403,24 +403,24 @@ command:
     null_player: "<color:#ff7171>Игрок не найден"
     not_banned: "<color:#ff7171>Игрок не заблокирован"
     lower_weight_group: "<color:#ff7171>Ты не можешь разбанить игрока с такими же или большими правами"
-    format: "<color:#98FB98><fcolor:2><moderator><color:#98FB98> разблокировал игрока <fcolor:2><player>"
+    format: "<color:#98FB98><moderator> разблокировал игрока <display_name>"
   unmute:
     null_player: "<color:#ff7171>Игрок не найден"
     not_muted: "<color:#ff7171>Игрок не замучен"
     lower_weight_group: "<color:#ff7171>Ты не можешь размутить игрока с такими же или большими правами"
-    format: "<color:#98FB98><fcolor:2><moderator><color:#98FB98> размутил игрока <fcolor:2><player>"
+    format: "<color:#98FB98><moderator> размутил игрока <display_name>"
   unwarn:
     null_player: "<color:#ff7171>Игрок не найден"
     not_warned: "<color:#ff7171>Игрок не имеет предупреждений"
     lower_weight_group: "<color:#ff7171>Ты не можешь снять предупреждение с игрока с такими же или большими правами"
-    format: "<color:#98FB98><fcolor:2><moderator><color:#98FB98> снял предупреждение с игрока <fcolor:2><player>"
+    format: "<color:#98FB98><moderator> снял предупреждение с игрока <display_name>"
   warn:
     null_player: "<color:#ff7171>Игрок не найден"
     null_time: "<color:#ff7171>Невозможное время"
     lower_weight_group: "<color:#ff7171>Ты не можешь выдать предупреждение игроку с такими же или большими правами"
     reasons:
       default: "Ты получил предупреждение"
-    server: "<color:#ff7171>[!] <fcolor:2><moderator><fcolor:1> выдал предупреждение игроку <fcolor:2><player> <fcolor:1> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>выдал предупреждение игроку <display_name> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     person: "<color:#ff7171>[!] Ты получил предупреждение на <time>"
   warnlist:
     empty: "<color:#98FB98>Предупреждения не найдены"

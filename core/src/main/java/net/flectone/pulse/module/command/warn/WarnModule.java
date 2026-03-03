@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -20,6 +21,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -28,7 +30,6 @@ import org.incendo.cloud.type.tuple.Pair;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -41,6 +42,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final CommandParserProvider commandParserProvider;
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxySender proxySender;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -110,19 +112,26 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()
                         .sender(fTarget)
-                        .format(buildFormat(warn))
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
+                        )
                         .range(config().range())
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
-                        .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn)
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                        })
                         .build()
                 )
                 .moderation(warn)
                 .build()
         );
 
-        send(fPlayer, fTarget, warn);
+        sendForTarget(fPlayer, fTarget, warn);
 
         List<Moderation> warns = moderationService.getValidWarns(fTarget);
         if (warns.isEmpty()) return;
@@ -157,16 +166,15 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         return fileFacade.localization(sender).command().warn();
     }
 
-    public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
-        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, warn);
-    }
-
-    public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {
+    public void sendForTarget(FEntity fModerator, FPlayer fTarget, Moderation warn) {
         if (isModuleDisabledFor(fModerator)) return;
 
         sendMessage(EventMetadata.<Localization.Command.Warn>builder()
-                .sender(fReceiver)
-                .format(s -> moderationMessageFormatter.replacePlaceholders(s.person(), fReceiver, warn))
+                .sender(fTarget)
+                .format(localization -> moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, warn))
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fModerator)
+                })
                 .build()
         );
     }
