@@ -11,14 +11,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.platform.render.BrandRender;
+import net.flectone.pulse.platform.render.ActionBarRender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
+
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -27,15 +30,16 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
-    private final BrandRender brandRender;
+    private final ActionBarRender actionBarRender;
     private final MessagePipeline messagePipeline;
+    private final TaskScheduler taskScheduler;
     @Getter private final FLogger fLogger;
 
     private boolean enable;
 
     // only for fabric support
     public SimpleVoiceIntegration() {
-        this(null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null);
     }
 
     @Override
@@ -98,8 +102,11 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
         event.cancel();
 
-        String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        MessageContext context = messagePipeline.createContext(fPlayer, message);
-        brandRender.render(fPlayer, messagePipeline.build(context));
+        taskScheduler.runRegion(fPlayer, () -> {
+            Optional<MessageContext> messageContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
+            if (messageContext.isEmpty()) return;
+
+            actionBarRender.render(fPlayer, messagePipeline.build(messageContext.get()));
+        });
     }
 }
