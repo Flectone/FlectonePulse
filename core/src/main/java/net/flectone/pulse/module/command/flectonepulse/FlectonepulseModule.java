@@ -20,7 +20,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -63,7 +63,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final SimpleDateFormat simpleDateFormat;
     private final @Named("projectPath") Path projectPath;
     private final FLogger fLogger;

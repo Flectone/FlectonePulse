@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -48,7 +48,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
 
     @Override
     public void onEnable() {

@@ -18,7 +18,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -66,7 +66,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     private final TaskScheduler taskScheduler;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final WebUtil webUtil;
     private final FLogger fLogger;
     private final @Named("minecraftPath") Path minecraftPath;

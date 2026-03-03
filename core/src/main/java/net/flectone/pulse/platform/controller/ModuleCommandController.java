@@ -25,7 +25,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CommandModuleController {
+public class ModuleCommandController {
 
     private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, List<String>> commandPromptsMap = new Object2ObjectOpenHashMap<>();
 

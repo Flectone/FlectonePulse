@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -43,7 +43,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     private final SoundPlayer soundPlayer;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
@@ -54,7 +54,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                                 SoundPlayer soundPlayer,
                                 TaskScheduler taskScheduler,
                                 ModuleController moduleController,
-                                CommandModuleController commandModuleController) {
+                                ModuleCommandController commandModuleController) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;

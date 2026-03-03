@@ -17,7 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.nickname.listener.NicknamePulseListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -53,7 +53,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final FLogger fLogger;
 
     private Pattern allowedPattern;

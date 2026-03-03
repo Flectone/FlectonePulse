@@ -8,7 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -21,7 +21,7 @@ import org.incendo.cloud.meta.CommandMeta;
 @Singleton
 public class MinecraftPollModule extends PollModule {
 
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final PacketProvider packetProvider;
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
 
@@ -34,7 +34,7 @@ public class MinecraftPollModule extends PollModule {
                                MessagePipeline messagePipeline,
                                MessageDispatcher messageDispatcher,
                                ModuleController moduleController,
-                               CommandModuleController commandModuleController,
+                               ModuleCommandController commandModuleController,
                                FLogger fLogger,
                                PacketProvider packetProvider,
                                Provider<DialogPollBuilder> dialogPollBuilderProvider) {

@@ -16,7 +16,7 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
 import net.flectone.pulse.module.command.geolocate.model.IpResponse;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -51,7 +51,7 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final FLogger fLogger;
 
     @Override

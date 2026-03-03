@@ -15,7 +15,7 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -44,7 +44,7 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     private final Provider<TranslateModule> translateModuleProvider;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
 
     @Override
     public void onEnable() {

@@ -17,7 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -49,7 +49,7 @@ public class BanlistModule implements ModuleCommand<Localization.Command.Banlist
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
 
     @Override
     public void onEnable() {

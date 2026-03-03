@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -25,7 +25,7 @@ public class AfkModule implements ModuleCommand<Localization.Command> {
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
 
     @Override
     public void onEnable() {

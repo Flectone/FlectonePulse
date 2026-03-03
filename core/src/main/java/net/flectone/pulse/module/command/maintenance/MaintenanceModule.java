@@ -19,7 +19,7 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseLi
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.controller.CommandModuleController;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -46,7 +46,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final CommandModuleController commandModuleController;
+    private final ModuleCommandController commandModuleController;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
@@ -63,7 +63,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                              MessagePipeline messagePipeline,
                              MessageDispatcher messageDispatcher,
                              ModuleController moduleController,
-                             CommandModuleController commandModuleController,
+                             ModuleCommandController commandModuleController,
                              IconUtil iconUtil,
                              FLogger fLogger) {
         this.fileFacade = fileFacade;
