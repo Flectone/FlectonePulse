@@ -822,10 +822,10 @@ message:
     object:
       name: "flectonepulse.module.message.format.object"
       type: "TRUE"
-      player_head:
+      player_head_tag:
         name: "flectonepulse.module.message.format.object.player_head"
         type: "TRUE"
-      sprite:
+      sprite_tag:
         name: "flectonepulse.module.message.format.object.sprite"
         type: "TRUE"
     question_answer:

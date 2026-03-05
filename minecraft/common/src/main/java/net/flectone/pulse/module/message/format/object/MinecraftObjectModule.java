@@ -74,12 +74,12 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     public MessageContext addPlayerHeadTag(MessageContext messageContext) {
-        if (!config().playerHead()) return messageContext;
+        if (!config().playerHeadTag().enable()) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             if (moduleController.isDisabledFor(this, sender)) return messageContext;
-            if (!permissionChecker.check(sender, permission().playerHead())) return messageContext;
+            if (!permissionChecker.check(sender, permission().playerHeadTag())) return messageContext;
         }
 
         return messageContext.addTagResolvers(
@@ -94,11 +94,11 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createPlayerHeadTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        if (config().hideInvisiblePlayerHead()
+        if (config().playerHeadTag().hideInvisiblePlayerHead()
                 && !messageContext.isFlag(MessageFlag.USER_MESSAGE)
                 && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
 
         PlayerHeadObjectContents.Builder playerHeadBuilderComponent = ObjectContents.playerHead();
@@ -116,7 +116,7 @@ public class MinecraftObjectModule extends ObjectModule {
                             .build()
             ).build();
 
-            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent));
+            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
         }
 
         try {
@@ -133,16 +133,16 @@ public class MinecraftObjectModule extends ObjectModule {
                                 .build()
                 ).build();
 
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent));
+        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
     }
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
-        if (!config().sprite()) return messageContext;
+        if (!config().spriteTag().enable()) return messageContext;
 
         FEntity sender = messageContext.sender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             if (moduleController.isDisabledFor(this, sender)) return messageContext;
-            if (!permissionChecker.check(sender, permission().sprite())) return messageContext;
+            if (!permissionChecker.check(sender, permission().spriteTag())) return messageContext;
         }
 
         return messageContext.addTagResolvers(
@@ -157,7 +157,7 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -170,15 +170,15 @@ public class MinecraftObjectModule extends ObjectModule {
 
         Component spriteComponent = Component.object().contents(spriteObjectContents).build();
 
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, spriteComponent));
+        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, spriteComponent, config().spriteTag().needExtraSpace()));
     }
 
-    private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent) {
+    private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
         FPlayer fReceiver = messageContext.receiver();
 
         // check console version
         if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
-            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent));
+            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
         } else if (fReceiver.isUnknown()) {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
@@ -188,7 +188,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (user != null && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
-                return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent));
+                return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
             }
 
             // continue building
@@ -203,10 +203,10 @@ public class MinecraftObjectModule extends ObjectModule {
         return Component.text(localization(messageContext.receiver()).defaultSymbol());
     }
 
-    private Component addDefaultParametersIfNeeded(MessageContext messageContext, Component component) {
+    private Component addDefaultParametersIfNeeded(MessageContext messageContext, Component component, boolean needExtraSpace) {
         if (!Component.IS_NOT_EMPTY.test(component)) return Component.empty();
 
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && config().needExtraSpace()) {
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && needExtraSpace) {
             component = component.append(Component.space());
         }
 

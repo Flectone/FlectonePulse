@@ -26,7 +26,8 @@ public class ObjectModule implements ModuleLocalization<Localization.Message.For
 
     @Override
     public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        return ModuleLocalization.super.permissionBuilder().add(permission().playerHead(), permission().sprite());
+        return ModuleLocalization.super.permissionBuilder()
+                .add(permission().playerHeadTag(), permission().spriteTag(), permission().textureTag());
     }
 
     @Override

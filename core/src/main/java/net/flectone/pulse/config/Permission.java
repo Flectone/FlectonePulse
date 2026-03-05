@@ -1297,6 +1297,8 @@ public record Permission(
                     Permission.Type type,
                     PermissionEntry playerHead,
                     PermissionEntry sprite
+                    PermissionEntry playerHeadTag,
+                    PermissionEntry spriteTag,
             ) implements PermissionSetting {}
 
             @With

@@ -201,6 +201,13 @@ format:
     sprite: true
     need_extra_space: true
     hide_invisible_player_head: false
+    player_head_tag:
+      enable: true
+      need_extra_space: true
+      hide_invisible_player_head: false
+    sprite_tag:
+      enable: true
+      need_extra_space: true
   question_answer:
     enable: false
     questions:

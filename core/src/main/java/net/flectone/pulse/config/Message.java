@@ -454,6 +454,29 @@ public record Message(
                 Boolean needExtraSpace,
                 Boolean hideInvisiblePlayerHead
         ) implements EnableSetting {
+                PlayerheadTag playerHeadTag,
+                SpriteTag spriteTag,
+        ) implements EnableSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            public record PlayerheadTag(
+                    Boolean enable,
+                    Boolean needExtraSpace,
+                    Boolean hideInvisiblePlayerHead
+            ) implements EnableSetting {
+
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            public record SpriteTag(
+                    Boolean enable,
+                    Boolean needExtraSpace
+            ) implements EnableSetting {
+
+            }
+
         }
 
         @With
