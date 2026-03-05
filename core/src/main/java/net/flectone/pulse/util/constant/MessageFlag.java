@@ -110,6 +110,12 @@ public enum MessageFlag {
      */
     OBJECT_SPRITE(true),
 
+
+    /**
+     * Enables texture module processing.
+     */
+    OBJECT_TEXTURE(true),
+
     /**
      * Enables Nickname module processing.
      */

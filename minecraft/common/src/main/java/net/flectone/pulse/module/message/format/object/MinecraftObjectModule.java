@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListener;
+import net.flectone.pulse.module.message.format.object.texture.TextureService;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -38,6 +39,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MinecraftSkinService skinService;
+    private final TextureService textureService;
     private final PacketProvider packetProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -49,6 +51,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  ListenerRegistry listenerRegistry,
                                  PermissionChecker permissionChecker,
                                  MinecraftSkinService skinService,
+                                 TextureService textureService,
                                  PacketProvider packetProvider,
                                  IntegrationModule integrationModule,
                                  PlatformPlayerAdapter platformPlayerAdapter,
@@ -59,6 +62,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
         this.skinService = skinService;
+        this.textureService = textureService;
         this.packetProvider = packetProvider;
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
@@ -71,6 +75,17 @@ public class MinecraftObjectModule extends ObjectModule {
         super.onEnable();
 
         listenerRegistry.register(ObjectPulseListener.class);
+
+        if (config().textureTag().enable()) {
+            textureService.reload();
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        textureService.terminateMineskin();
     }
 
     public MessageContext addPlayerHeadTag(MessageContext messageContext) {
@@ -154,6 +169,38 @@ public class MinecraftObjectModule extends ObjectModule {
                     return createSpriteTag(messageContext, defaultComponent, argumentQueue);
                 })
         );
+    }
+
+    public MessageContext addTextureTag(MessageContext messageContext) {
+        if (!config().textureTag().enable()) return messageContext;
+
+        FEntity sender = messageContext.sender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            if (moduleController.isDisabledFor(this, sender)) return messageContext;
+            if (!permissionChecker.check(sender, permission().textureTag())) return messageContext;
+        }
+
+        return messageContext.addTagResolvers(
+                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), ((argumentQueue, context) ->
+                        createTextureTag(messageContext, getDefaultObjectComponent(messageContext), argumentQueue))
+                ),
+                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, context) -> {
+                    Component defaultComponent = argumentQueue.hasNext() ? Component.text(argumentQueue.pop().value()) : getDefaultObjectComponent(messageContext);
+                    return createTextureTag(messageContext, defaultComponent, argumentQueue);
+                })
+        );
+    }
+
+    public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+        if (receiverVersionTag != null) return receiverVersionTag;
+        if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
+
+        String textureName = argumentQueue.pop().value();
+        Component textureComponent = textureService.getTexture(textureName);
+        if (textureComponent == null) return MessagePipeline.ReplacementTag.emptyTag();
+
+        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, textureComponent, config().textureTag().needExtraSpace()));
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {

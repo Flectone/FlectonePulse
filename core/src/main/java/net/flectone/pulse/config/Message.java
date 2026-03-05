@@ -449,13 +449,9 @@ public record Message(
         @Jacksonized
         public record Object(
                 Boolean enable,
-                Boolean playerHead,
-                Boolean sprite,
-                Boolean needExtraSpace,
-                Boolean hideInvisiblePlayerHead
-        ) implements EnableSetting {
                 PlayerheadTag playerHeadTag,
                 SpriteTag spriteTag,
+                TextureTag textureTag
         ) implements EnableSetting {
 
             @With
@@ -475,6 +471,17 @@ public record Message(
                     Boolean needExtraSpace
             ) implements EnableSetting {
 
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record TextureTag(
+                    Boolean enable,
+                    Boolean needExtraSpace,
+                    String mineskinApiKey,
+                    Map<String, String> values
+            ) implements EnableSetting {
             }
 
         }

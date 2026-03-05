@@ -206,10 +206,6 @@ format:
     should_check_invisibility: false
   object:
     enable: true
-    player_head: true
-    sprite: true
-    need_extra_space: true
-    hide_invisible_player_head: false
     player_head_tag:
       enable: true
       need_extra_space: true
@@ -217,6 +213,12 @@ format:
     sprite_tag:
       enable: true
       need_extra_space: true
+    texture_tag:
+      enable: true
+      need_extra_space: false
+      mineskin_api_key: ""
+      values:
+        example: ""
   question_answer:
     enable: false
     questions:

@@ -1295,10 +1295,9 @@ public record Permission(
             public record Object(
                     String name,
                     Permission.Type type,
-                    PermissionEntry playerHead,
-                    PermissionEntry sprite
                     PermissionEntry playerHeadTag,
                     PermissionEntry spriteTag,
+                    PermissionEntry textureTag
             ) implements PermissionSetting {}
 
             @With

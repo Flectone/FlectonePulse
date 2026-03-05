@@ -15,4 +15,5 @@ dependencies {
     compileOnly "org.geysermc.floodgate:api:$floodgate_version"
     compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
     compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
+    compileOnly "org.mineskin:java-client-jsoup:$mineskin_api_version"
 }

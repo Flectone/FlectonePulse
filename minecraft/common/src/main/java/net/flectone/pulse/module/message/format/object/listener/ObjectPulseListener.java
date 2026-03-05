@@ -28,6 +28,10 @@ public class ObjectPulseListener implements PulseListener {
             messageContext = objectModule.addSpriteTag(messageContext);
         }
 
+        if (messageContext.isFlag(MessageFlag.OBJECT_TEXTURE)) {
+            messageContext = objectModule.addTextureTag(messageContext);
+        }
+
         return event.withContext(messageContext);
     }
 

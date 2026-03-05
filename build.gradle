@@ -66,6 +66,7 @@ subprojects {
         maven { url = "https://maven.hytale.com/pre-release" }
         maven { url = "https://www.cursemaven.com" }
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
+        maven { url = "https://repo.inventivetalent.org/repository/public/"}
     }
 
     dependencies {

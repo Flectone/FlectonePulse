@@ -177,6 +177,8 @@ public class MessagePipeline {
         PLAYER_HEAD_OR,
         SPRITE,
         SPRITE_OR,
+        TEXTURE,
+        TEXTURE_OR,
         FCOLOR;
 
         @Subst("")

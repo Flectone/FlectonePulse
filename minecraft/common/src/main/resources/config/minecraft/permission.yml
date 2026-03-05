@@ -828,6 +828,9 @@ message:
       sprite_tag:
         name: "flectonepulse.module.message.format.object.sprite"
         type: "TRUE"
+      texture_tag:
+        name: "flectonepulse.module.message.format.object.texture"
+        type: "OP"
     question_answer:
       name: "flectonepulse.module.message.format.questionanswer"
       type: "TRUE"
