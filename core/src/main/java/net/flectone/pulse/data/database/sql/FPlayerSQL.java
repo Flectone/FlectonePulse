@@ -23,7 +23,7 @@ public interface FPlayerSQL extends SQL {
      * @param name the player name
      * @return optional containing player info if found
      */
-    @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name)")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 
     /**

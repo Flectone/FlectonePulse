@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `fp_player` (
     `id` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     `online` INT NOT NULL DEFAULT 0,
     `uuid` VARCHAR(36) NOT NULL UNIQUE,
-    `name` VARCHAR(255) NOT NULL UNIQUE,
+    `name` VARCHAR(255) NOT NULL,
     `ip` VARCHAR(39),
     UNIQUE(`uuid`, `name`)
 );

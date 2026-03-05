@@ -68,18 +68,6 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      */
     public boolean insert(@NonNull UUID uuid, @NonNull String name) {
         return inTransaction(sql -> {
-            Optional<PlayerInfo> existingByName = sql.findByName(name);
-            if (existingByName.isPresent()) {
-                PlayerInfo playerInfo = existingByName.get();
-
-                UUID existingUuid = UUID.fromString(playerInfo.uuid());
-                if (!uuid.equals(existingUuid)) {
-                    updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
-                }
-
-                return false;
-            }
-
             Optional<PlayerInfo> existingByUUID = sql.findByUUID(uuid.toString());
             if (existingByUUID.isPresent()) {
                 PlayerInfo playerInfo = existingByUUID.get();

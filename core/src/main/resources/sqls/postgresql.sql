@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "fp_player" (
     "id" SERIAL PRIMARY KEY,
     "online" BOOLEAN NOT NULL DEFAULT FALSE,
     "uuid" VARCHAR(36) NOT NULL UNIQUE,
-    "name" VARCHAR(255) NOT NULL UNIQUE,
+    "name" VARCHAR(255) NOT NULL,
     "ip" VARCHAR(39),
     UNIQUE("uuid", "name")
 );
