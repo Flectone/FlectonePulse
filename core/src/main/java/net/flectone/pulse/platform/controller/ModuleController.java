@@ -174,14 +174,14 @@ public class ModuleController {
 
     public BiPredicate<FEntity, Boolean> buildDisablePredicate(ModuleSimple module) {
         BiPredicate<FEntity, Boolean> disablePredicate = module.disablePredicate()
-                .and((fPlayer, needBoolean) -> !isEnable(module))
-                .and((fPlayer, needBoolean) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
+                .or((fPlayer, needBoolean) -> !isEnable(module))
+                .or((fPlayer, needBoolean) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
 
         if (module instanceof ModuleLocalization<?> localizationModule) {
             return disablePredicate
-                    .and((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
-                    .and((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
-                    .and((fPlayer, needBoolean) -> needBoolean && muteSenderProvider.get().sendIfMuted(fPlayer));
+                    .or((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
+                    .or((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
+                    .or((fPlayer, needBoolean) -> needBoolean && muteSenderProvider.get().sendIfMuted(fPlayer));
         }
 
         return disablePredicate;
