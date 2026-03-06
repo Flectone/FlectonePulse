@@ -36,22 +36,35 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     }
 
     /**
-     * Records a player's join (first join or subsequent).
+     * Records a player's join
+     * If the player already exists, increments their session count;
+     * otherwise inserts a new playtime record.
      *
      * @param fPlayer the player who joined
      */
     public void saveJoin(@NonNull FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
-        useTransaction(sql -> {
-            long currentTime = System.currentTimeMillis();
+        saveSession(new PlayTime(-1, fPlayer.id(), System.currentTimeMillis(), System.currentTimeMillis(), 0, 1));
+    }
 
-            Optional<PlayTime> playTimeOptional = sql.findByPlayer(fPlayer.id());
+    /**
+     * Records a player's session
+     * If the player already exists, increments their session count;
+     * otherwise inserts a new playtime record.
+     *
+     * @param playTime the playtime data to save
+     */
+    public void saveSession(@NonNull PlayTime playTime) {
+        if (playTime.id() != -1) return;
+
+        useTransaction(sql -> {
+            Optional<PlayTime> playTimeOptional = sql.findByPlayer(playTime.playerId());
 
             if (playTimeOptional.isPresent()) {
-                sql.incrementSessions(currentTime, fPlayer.id());
+                sql.incrementSessions(playTime.last(), playTime.playerId());
             } else {
-                sql.insert(fPlayer.id(), currentTime, currentTime, 0, 1);
+                sql.insert(playTime.playerId(), playTime.first(), playTime.last(), playTime.total(), playTime.sessions());
             }
         });
     }

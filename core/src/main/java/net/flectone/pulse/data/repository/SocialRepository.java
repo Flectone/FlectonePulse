@@ -110,6 +110,15 @@ public class SocialRepository {
     }
 
     /**
+     * Saves a player's time session when they join the server.
+     *
+     * @param playTime session to save
+     */
+    public void saveJoinSession(PlayTime playTime) {
+        timeDAO.saveSession(playTime);
+    }
+
+    /**
      * Saves a player's last seen timestamp when they quit the server.
      *
      * @param fPlayer the player whose last seen time is being saved

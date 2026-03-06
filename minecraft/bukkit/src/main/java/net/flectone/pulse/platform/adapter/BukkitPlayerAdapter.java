@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -408,6 +409,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (player == null) return Collections.emptyList();
 
         return passengersProvider.getPassengers(player);
+    }
+
+    @Override
+    public @Nullable PlayTime getPlayedTime(FPlayer fPlayer) {
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
+
+        return new PlayTime(-1, fPlayer.id(), offlinePlayer.getFirstPlayed(), offlinePlayer.getLastPlayed(), offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L, 1);
     }
 
     @Override

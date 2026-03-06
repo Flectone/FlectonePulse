@@ -61,6 +61,21 @@ public class FPlayerService {
         fPlayerRepository.invalid(getConsole().uuid());
         addConsole();
 
+        // more like a migration for older versions below 1.9.0,
+        // because this information was not in the database before.
+        // and also we cannot add information about all players,
+        // because players may not be in the database
+        if (getPlayTimesCount() == 0) {
+            fPlayerRepository.getAllPlayersDatabase().forEach(fPlayer -> {
+                if (fPlayer.isUnknown()) return;
+
+                PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
+                if (platformPlayTime == null) return;
+
+                socialRepository.saveJoinSession(platformPlayTime);
+            });
+        }
+
         // invalidate and load all platform players
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
             fPlayerRepository.invalid(uuid);

@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.adapter;
 
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.PlayTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jspecify.annotations.NonNull;
@@ -392,5 +393,19 @@ public interface PlatformPlayerAdapter {
         return getPassengers(entity.uuid());
     }
 
+    /**
+     * Gets the total played time for a player.
+     *
+     * @param fPlayer the player to get play time for
+     * @return play time, or null if not available
+     */
+    @Nullable PlayTime getPlayedTime(FPlayer fPlayer);
+
+    /**
+     * Kicks a player from the server with a specified reason.
+     *
+     * @param fPlayer the player to kick
+     * @param reason the reason for kicking, displayed to the player
+     */
     void kick(FPlayer fPlayer, Component reason);
 }

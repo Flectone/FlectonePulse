@@ -29,6 +29,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.PlayTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -422,6 +423,11 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public @Nullable PlayTime getPlayedTime(FPlayer fPlayer) {
+        return null;
     }
 
     @Override
