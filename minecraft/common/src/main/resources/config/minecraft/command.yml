@@ -93,9 +93,9 @@ chatsetting:
     disabled_material: "RED_DYE"
     enabled_material: "LIME_DYE"
     types:
-      AFK: 9
+      MESSAGE_AFK: 9
       ADVANCEMENT: 10
-      CHAT: 11
+      MESSAGE_CHAT: 11
       COMMAND_ANON: 12
       COMMAND_BALL: 13
       COMMAND_BROADCAST: 14
@@ -111,11 +111,11 @@ chatsetting:
       COMMAND_TICTACTOE: 24
       COMMAND_TRY: 25
       DEATH: 26
-      FROM_DISCORD_TO_MINECRAFT: 27
-      FROM_TELEGRAM_TO_MINECRAFT: 28
-      FROM_TWITCH_TO_MINECRAFT: 29
-      JOIN: 30
-      QUIT: 31
+      INTEGRATION_DISCORD: 27
+      INTEGRATION_TELEGRAM: 28
+      INTEGRATION_TWITCH: 29
+      MESSAGE_JOIN: 30
+      MESSAGE_QUIT: 31
       SLEEP: 32
   menu:
     material: "LIGHT_BLUE_DYE"

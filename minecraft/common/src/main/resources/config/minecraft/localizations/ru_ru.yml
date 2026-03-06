@@ -92,9 +92,9 @@ command:
       disabled_color: "<color:#ff7171>"
       disabled_hover: "<color:#ff7171>Отображение выключено"
       types:
-        AFK: "<status_color>Афк"
+        MESSAGE_AFK: "<status_color>Афк"
         ADVANCEMENT: "<status_color>Достижения"
-        CHAT: "<status_color>Сообщения чата"
+        MESSAGE_CHAT: "<status_color>Сообщения чата"
         COMMAND_ANON: "<status_color>Команда /anon"
         COMMAND_BALL: "<status_color>Команда /ball"
         COMMAND_BROADCAST: "<status_color>Команда /broadcast"
@@ -110,11 +110,11 @@ command:
         COMMAND_TICTACTOE: "<status_color>Команда /tictactoe"
         COMMAND_TRY: "<status_color>Команда /try"
         DEATH: "<status_color>Смерти"
-        FROM_DISCORD_TO_MINECRAFT: "<status_color>Сообщения из Discord"
-        FROM_TELEGRAM_TO_MINECRAFT: "<status_color>Сообщения из Telegram"
-        FROM_TWITCH_TO_MINECRAFT: "<status_color>Сообщения из Twitch"
-        JOIN: "<status_color>Вход на сервер"
-        QUIT: "<status_color>Выход с сервера"
+        INTEGRATION_DISCORD: "<status_color>Сообщения из Discord"
+        INTEGRATION_TELEGRAM: "<status_color>Сообщения из Telegram"
+        INTEGRATION_TWITCH: "<status_color>Сообщения из Twitch"
+        MESSAGE_JOIN: "<status_color>Вход на сервер"
+        MESSAGE_QUIT: "<status_color>Выход с сервера"
         SLEEP: "<status_color>Сон"
     menu:
       chat:
@@ -445,9 +445,9 @@ integration:
     info_channel:
       айди: "ТПС <replacement:tps>"
     message_channel:
-      FROM_DISCORD_TO_MINECRAFT:
+      INTEGRATION_DISCORD:
         content: "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><reply><message>"
-      CHAT_GLOBAL:
+      MESSAGE_CHAT_GLOBAL:
         content: "<final_message>"
   luckperms:
     weight_replacement:
@@ -465,8 +465,8 @@ integration:
     info_channel:
       айди: "ТПС <replacement:tps>"
     message_channel:
-      FROM_TELEGRAM_TO_MINECRAFT: "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><reply><message>"
-      CHAT_GLOBAL: "<final_message>"
+      INTEGRATION_TELEGRAM: "<fcolor:2><user_name> <fcolor:1>» <fcolor:4><reply><message>"
+      MESSAGE_CHAT_GLOBAL: "<final_message>"
   twitch:
     null_player: "Игрок не найден"
     sender_name: "Twitch"
@@ -474,8 +474,8 @@ integration:
     custom_command:
       ping: "Пинг игрока <player> равен <replacement:ping>"
     message_channel:
-      FROM_TWITCH_TO_MINECRAFT: "<fcolor:2><name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply><message>"
-      CHAT_GLOBAL: "<final_message>"
+      INTEGRATION_TWITCH: "<fcolor:2><name> <fcolor:1>» <fcolor:4><hover:show_text:'<fcolor:4><reply><message>'"
+      MESSAGE_CHAT_GLOBAL: "<final_message>"
 message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"

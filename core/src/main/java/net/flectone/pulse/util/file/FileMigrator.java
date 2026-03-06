@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.FColor;
@@ -15,10 +13,7 @@ import net.flectone.pulse.util.constant.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -92,7 +87,7 @@ public class FileMigrator {
         }
 
         Map<String, Integer> types = files.command().chatsetting().checkbox().types();
-        Map<String, Integer> oldTypes = new Object2ObjectOpenHashMap<>(types);
+        Map<String, Integer> oldTypes = new HashMap<>(types);
         types.clear();
 
         if (oldTypes.containsKey("AFK")) {
@@ -311,7 +306,7 @@ public class FileMigrator {
 
         Map<String, String> triggers = files.message().format().replacement().triggers();
 
-        Map<String, String> updates = new Object2ObjectOpenHashMap<>();
+        Map<String, String> updates = new HashMap<>();
         updates.put("smile", ":-?\\)");
         updates.put("big_smile", ":-?D");
         updates.put("sad", ":-?\\(");
@@ -440,7 +435,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_1(FilePack files) {
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ObjectArrayList<>();
+        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();
 
         for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
             if (!vanillaMessage.name().equals("DEATH")) {
@@ -448,7 +443,7 @@ public class FileMigrator {
                 continue;
             }
 
-            List<String> translationKeys = new ObjectArrayList<>(vanillaMessage.translationKeys());
+            List<String> translationKeys = new ArrayList<>(vanillaMessage.translationKeys());
             if (!translationKeys.contains("death.attack.spear")) {
                 translationKeys.add("death.attack.spear");
             }
@@ -582,31 +577,61 @@ public class FileMigrator {
 
         for (Localization localization : files.localizations().values()) {
 
-            Map<String, String> newChats = new Object2ObjectOpenHashMap<>(localization.message().chat().types());
+            Map<String, String> newChats = new HashMap<>(localization.message().chat().types());
             newChats.forEach((key, value) ->
                     newChats.put(key, replaceOldTags.apply(value))
             );
 
-            List<String> newDisplays = new ObjectArrayList<>(localization.message().format().names().display());
+            List<String> newDisplays = new ArrayList<>(localization.message().format().names().display());
             newDisplays.replaceAll(replaceOldTags);
 
             String newPlayerListname = replaceOldTags.apply(localization.message().tab().playerlistname().format());
 
-            localization = localization.withMessage(
-                    localization.message()
-                            .withChat(
-                                    localization.message().chat().withTypes(newChats)
+            localization = localization
+                    .withMessage(localization.message()
+                            .withChat(localization.message().chat()
+                                    .withTypes(newChats)
                             )
-                            .withFormat(
-                                    localization.message().format().withNames(localization.message().format().names().withDisplay(newDisplays))
+                            .withFormat(localization.message().format()
+                                    .withNames(localization.message().format().names()
+                                            .withDisplay(newDisplays)
+                                    )
                             )
-                            .withTab(
-                                    localization.message().tab().withPlayerlistname(localization.message().tab().playerlistname().withFormat(newPlayerListname))
+                            .withTab(localization.message().tab()
+                                    .withPlayerlistname(localization.message().tab().playerlistname()
+                                            .withFormat(newPlayerListname)
+                                    )
                             )
-            );
+                    )
+                    .withCommand(localization.command()
+                            .withChatsetting(localization.command().chatsetting()
+                                    .withCheckbox(localization.command().chatsetting().checkbox()
+                                            .withTypes(
+                                                    replaceOldMessageName(localization.command().chatsetting().checkbox().types())
+                                            )
+                                    )
+                            )
+                    )
+                    .withIntegration(localization.integration()
+                            .withDiscord(localization.integration().discord()
+                                    .withMessageChannel(
+                                            replaceOldMessageName(localization.integration().discord().messageChannel())
+                                    )
+                            )
+                            .withTelegram(localization.integration().telegram()
+                                    .withMessageChannel(
+                                            replaceOldMessageName(localization.integration().telegram().messageChannel())
+                                    )
+                            )
+                            .withTwitch(localization.integration().twitch()
+                                    .withMessageChannel(
+                                            replaceOldMessageName(localization.integration().twitch().messageChannel())
+                                    )
+                            )
+                    );
 
             if (isHytale) {
-                Map<String, String> types = new Object2ObjectOpenHashMap<>(localization.message().vanilla().types());
+                Map<String, String> types = new HashMap<>(localization.message().vanilla().types());
                 types.put("server.assetModule.outOfDatePacks", "");
                 types.put("server.pluginManager.outOfDatePlugins", "");
 
@@ -622,14 +647,191 @@ public class FileMigrator {
 
         return files
                 .withLocalizations(newLocalizations)
-                .withMessage(files.message().withFormat(
-                        files.message().format().withScoreboard(
-                                files.message().format().scoreboard()
+                .withCommand(files.command()
+                        .withChatsetting(files.command().chatsetting()
+                                .withCheckbox(files.command().chatsetting().checkbox()
+                                        .withTypes(
+                                                replaceOldMessageName(files.command().chatsetting().checkbox().types())
+                                        )
+                                )
+                        )
+                )
+                .withIntegration(files.integration()
+                        .withDiscord(files.integration().discord()
+                                .withMessageChannel(
+                                        replaceOldMessageName(files.integration().discord().messageChannel())
+                                )
+                        )
+                        .withTelegram(files.integration().telegram()
+                                .withMessageChannel(
+                                        replaceOldMessageName(files.integration().telegram().messageChannel())
+                                )
+                        )
+                        .withTwitch(files.integration().twitch()
+                                .withMessageChannel(
+                                        replaceOldMessageName(files.integration().twitch().messageChannel())
+                                )
+                        )
+                )
+                .withMessage(files.message()
+                        .withFormat(files.message().format()
+                                .withScoreboard(files.message().format().scoreboard()
                                         .withPrefix(replaceOldTags.apply(files.message().format().scoreboard().prefix()))
                                         .withSuffix(replaceOldTags.apply(files.message().format().scoreboard().suffix()))
                                 )
                         )
+                )
+                .withPermission(files.permission()
+                        .withCommand(files.permission().command()
+                                .withChatsetting(files.permission().command().chatsetting()
+                                        .withSettings(
+                                                replaceOldMessageName(files.permission().command().chatsetting().settings())
+                                        )
+                                )
+                        )
                 );
+    }
+
+    private <T> Map<String, T> replaceOldMessageName(Map<String, T> oldMap) {
+        Map<String, T> newMap = new HashMap<>(oldMap);
+
+        oldMap.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith("CHAT_"))
+                .forEach(entry -> newMap.put("MESSAGE_" + entry.getKey(), newMap.remove(entry.getKey())));
+
+        if (newMap.containsKey("AFK")) {
+            newMap.put("MESSAGE_AFK", newMap.remove("AFK"));
+        }
+
+        if (newMap.containsKey("AUTO")) {
+            newMap.put("MESSAGE_AUTO", newMap.remove("AUTO"));
+        }
+
+        if (newMap.containsKey("BOSSBAR")) {
+            newMap.put("MESSAGE_BOSSBAR", newMap.remove("BOSSBAR"));
+        }
+
+        if (newMap.containsKey("BRAND")) {
+            newMap.put("MESSAGE_BRAND", newMap.remove("BRAND"));
+        }
+
+        if (newMap.containsKey("CHAT")) {
+            newMap.put("MESSAGE_CHAT", newMap.remove("CHAT"));
+        }
+
+        if (newMap.containsKey("DELETE")) {
+            newMap.put("MESSAGE_FORMAT_MODERATION_DELETE", newMap.remove("DELETE"));
+        }
+
+        if (newMap.containsKey("FOOTER")) {
+            newMap.put("MESSAGE_TAB_FOOTER", newMap.remove("FOOTER"));
+        }
+
+        if (newMap.containsKey("FORMAT")) {
+            newMap.put("MESSAGE_FORMAT", newMap.remove("FORMAT"));
+        }
+
+        if (newMap.containsKey("FROM_DISCORD_TO_MINECRAFT")) {
+            newMap.put("INTEGRATION_DISCORD", newMap.remove("FROM_DISCORD_TO_MINECRAFT"));
+        }
+
+        if (newMap.containsKey("FROM_TELEGRAM_TO_MINECRAFT")) {
+            newMap.put("INTEGRATION_TELEGRAM", newMap.remove("FROM_TELEGRAM_TO_MINECRAFT"));
+        }
+
+        if (newMap.containsKey("FROM_TWITCH_TO_MINECRAFT")) {
+            newMap.put("INTEGRATION_TWITCH", newMap.remove("FROM_TWITCH_TO_MINECRAFT"));
+        }
+
+        if (newMap.containsKey("GREETING")) {
+            newMap.put("MESSAGE_GREETING", newMap.remove("GREETING"));
+        }
+
+        if (newMap.containsKey("HEADER")) {
+            newMap.put("MESSAGE_TAB_HEADER", newMap.remove("HEADER"));
+        }
+
+        if (newMap.containsKey("JOIN")) {
+            newMap.put("MESSAGE_JOIN", newMap.remove("JOIN"));
+        }
+
+        if (newMap.containsKey("MENTION")) {
+            newMap.put("MESSAGE_FORMAT_MENTION", newMap.remove("MENTION"));
+        }
+
+        if (newMap.containsKey("MOTD")) {
+            newMap.put("MESSAGE_STATUS_MOTD", newMap.remove("MOTD"));
+        }
+
+        if (newMap.containsKey("NAME")) {
+            newMap.put("MESSAGE_FORMAT_NAMES", newMap.remove("NAME"));
+        }
+
+        if (newMap.containsKey("NEWBIE")) {
+            newMap.put("MESSAGE_FORMAT_MODERATION_NEWBIE", newMap.remove("NEWBIE"));
+        }
+
+        if (newMap.containsKey("OBJECTIVE")) {
+            newMap.put("MESSAGE_OBJECTIVE", newMap.remove("OBJECTIVE"));
+        }
+
+        if (newMap.containsKey("TABNAME")) {
+            newMap.put("MESSAGE_TAB_PLAYERLISTNAME", newMap.remove("TABNAME"));
+        }
+
+        if (newMap.containsKey("PLAYERS")) {
+            newMap.put("MESSAGE_STATUS_PLAYERS", newMap.remove("PLAYERS"));
+        }
+
+        if (newMap.containsKey("PLAYERLISTNAME")) {
+            newMap.put("MESSAGE_TAB_PLAYERLISTNAME", newMap.remove("PLAYERLISTNAME"));
+        }
+
+        if (newMap.containsKey("QUESTION_ANSWER")) {
+            newMap.put("MESSAGE_FORMAT_QUESTIONANSWER", newMap.remove("QUESTION_ANSWER"));
+        }
+
+        if (newMap.containsKey("QUIT")) {
+            newMap.put("MESSAGE_QUIT", newMap.remove("QUIT"));
+        }
+
+        if (newMap.containsKey("OBJECT")) {
+            newMap.put("MESSAGE_FORMAT_OBJECT", newMap.remove("OBJECT"));
+        }
+
+        if (newMap.containsKey("REPLACEMENT")) {
+            newMap.put("MESSAGE_FORMAT_REPLACEMENT", newMap.remove("REPLACEMENT"));
+        }
+
+        if (newMap.containsKey("RIGHT_CLICK")) {
+            newMap.put("MESSAGE_RIGHTCLICK", newMap.remove("RIGHT_CLICK"));
+        }
+
+        if (newMap.containsKey("SIDEBAR")) {
+            newMap.put("MESSAGE_SIDEBAR", newMap.remove("SIDEBAR"));
+        }
+
+        if (newMap.containsKey("SWEAR")) {
+            newMap.put("MESSAGE_FORMAT_MODERATION_SWEAR", newMap.remove("SWEAR"));
+        }
+
+        if (newMap.containsKey("TRANSLATE")) {
+            newMap.put("MESSAGE_FORMAT_TRANSLATE", newMap.remove("TRANSLATE"));
+        }
+
+        if (newMap.containsKey("UPDATE")) {
+            newMap.put("MESSAGE_UPDATE", newMap.remove("UPDATE"));
+        }
+
+        if (newMap.containsKey("VANILLA")) {
+            newMap.put("MESSAGE_VANILLA", newMap.remove("VANILLA"));
+        }
+
+        if (newMap.containsKey("VERSION")) {
+            newMap.put("MESSAGE_STATUS_VERSION", newMap.remove("VERSION"));
+        }
+
+        return newMap;
     }
 
 }

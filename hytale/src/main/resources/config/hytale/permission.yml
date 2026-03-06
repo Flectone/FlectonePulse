@@ -93,14 +93,14 @@ command:
       FCOLOR_OUT:
         name: "flectonepulse.module.command.chatsetting.fcolor_out"
         type: "OP"
-      AFK:
-        name: "flectonepulse.module.command.chatsetting.afk"
+      MESSAGE_AFK:
+        name: "flectonepulse.module.command.chatsetting.message_afk"
         type: "TRUE"
       ADVANCEMENT:
         name: "flectonepulse.module.command.chatsetting.advancement"
         type: "TRUE"
-      CHAT:
-        name: "flectonepulse.module.command.chatsetting.chat"
+      MESSAGE_CHAT:
+        name: "flectonepulse.module.command.chatsetting.message_chat"
         type: "TRUE"
       COMMAND_ANON:
         name: "flectonepulse.module.command.chatsetting.command_anon"
@@ -147,20 +147,20 @@ command:
       DEATH:
         name: "flectonepulse.module.command.chatsetting.death"
         type: "TRUE"
-      FROM_DISCORD_TO_MINECRAFT:
-        name: "flectonepulse.module.command.chatsetting.from_discord_to_minecraft"
+      INTEGRATION_DISCORD:
+        name: "flectonepulse.module.command.chatsetting.integration_discord"
         type: "TRUE"
-      FROM_TELEGRAM_TO_MINECRAFT:
-        name: "flectonepulse.module.command.chatsetting.from_telegram_to_minecraft"
+      INTEGRATION_TELEGRAM:
+        name: "flectonepulse.module.command.chatsetting.integration_telegram"
         type: "TRUE"
-      FROM_TWITCH_TO_MINECRAFT:
-        name: "flectonepulse.module.command.chatsetting.from_twitch_to_minecraft"
+      INTEGRATION_TWITCH:
+        name: "flectonepulse.module.command.chatsetting.integration_twitch"
         type: "TRUE"
-      JOIN:
-        name: "flectonepulse.module.command.chatsetting.join"
+      MESSAGE_JOIN:
+        name: "flectonepulse.module.command.chatsetting.message_join"
         type: "TRUE"
-      QUIT:
-        name: "flectonepulse.module.command.chatsetting.quit"
+      MESSAGE_QUIT:
+        name: "flectonepulse.module.command.chatsetting.nessage_quit"
         type: "TRUE"
       SLEEP:
         name: "flectonepulse.module.command.chatsetting.sleep"

@@ -36,6 +36,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 /**
  * Database for FlectonePulse.
@@ -274,6 +275,17 @@ public class Database {
             } else {
                 migration("1_6_0");
             }
+        }
+
+        Predicate<String> versionTest = version -> {
+            String oldDatabaseVersion = versionName.orElse(null);
+            if (StringUtils.isEmpty(oldDatabaseVersion)) return true;
+            return versionComparator.isOlderThan(fileFacade.getPreInitVersion(), version)
+                    && versionComparator.isOlderThan(oldDatabaseVersion, version);
+        };
+
+        if (versionTest.test("1.8.2")) {
+            migration("1_8_2");
         }
 
         versionDAO.insertOrUpdate(fileFacade.config().version());
