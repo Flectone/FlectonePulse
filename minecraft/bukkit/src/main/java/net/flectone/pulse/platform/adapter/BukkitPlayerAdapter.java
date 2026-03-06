@@ -411,14 +411,6 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NonNull List<PlayedTimePlayer> getPlayedTimePlayers() {
-        return Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(offlinePlayer -> offlinePlayer.getName() != null)
-                .map(offlinePlayer -> new PlayedTimePlayer(offlinePlayer.getName(), offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L))
-                .toList();
-    }
-
-    @Override
     public void kick(FPlayer fPlayer, Component reason) {
         packetSender.send(fPlayer, new WrapperPlayServerDisconnect(reason));
     }

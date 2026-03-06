@@ -36,6 +36,7 @@ public class PlayerPreLoginProcessor {
         FPlayer fPlayer = fPlayerService.addFPlayer(uuid, name);
         PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
         if (event.allowed()) {
+            fPlayerService.saveJoinSession(fPlayer);
             allowedConsumer.accept(event.withPlayer(fPlayerService.updateCache(fPlayerService.loadData(fPlayer))));
         } else {
             fPlayerService.invalidateOnline(fPlayer.uuid());

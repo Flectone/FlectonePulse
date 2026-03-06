@@ -278,7 +278,7 @@ command:
     format_current: "<fcolor:1>[/] <target> currently on server"
     format_first: "<fcolor:1>[/] <target> was first on server <time> ago"
     format_last: "<fcolor:1>[/] <target> <fcolor:1>was last on server <time> ago"
-    format_total: "<fcolor:1>[/] <target> <fcolor:1>has spent a total of <time> on server"
+    format_total: "<fcolor:1>[/] <target> <fcolor:1>has spent a total of <time> on server and was <sessions> time(s)"
   ping:
     null_player: "<color:#ff7171>This player does not exist"
     format: "<fcolor:1><display_name>'s ping is <replacement:ping>"

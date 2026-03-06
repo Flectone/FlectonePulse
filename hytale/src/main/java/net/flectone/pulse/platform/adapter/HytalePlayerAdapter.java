@@ -425,11 +425,6 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NonNull List<PlayedTimePlayer> getPlayedTimePlayers() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public void kick(FPlayer fPlayer, Component reason) {
         PlayerRef playerRef = getPlayer(fPlayer.uuid());
         if (playerRef == null) return;

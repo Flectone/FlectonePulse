@@ -14,13 +14,14 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,13 +37,13 @@ import java.util.Optional;
 public class ToponlineModule implements ModuleCommand<Localization.Command.Toponline> {
 
     private final FileFacade fileFacade;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
+    private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
 
@@ -69,12 +69,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
-        List<PlatformPlayerAdapter.PlayedTimePlayer> playedTimePlayers = platformPlayerAdapter.getPlayedTimePlayers()
-                .stream()
-                .sorted(Comparator.comparing(PlatformPlayerAdapter.PlayedTimePlayer::playedTime).reversed())
-                .toList();
-
-        int size = playedTimePlayers.size();
+        int size = fPlayerService.getPlayTimesCount();
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
@@ -88,10 +83,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
             return;
         }
 
-        List<PlatformPlayerAdapter.PlayedTimePlayer> finalPlayedTimePlayers = playedTimePlayers.stream()
-                .skip((long) (page - 1) * perPage)
-                .limit(perPage)
-                .toList();
+        List<PlayTime> finalPlayedTimePlayers = fPlayerService.getAllPlayTimes(perPage, (page - 1) * perPage);
 
         Localization.Command.Toponline localization = localization(fPlayer);
 
@@ -99,14 +91,20 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
         Component component = messagePipeline.build(headerContext).append(Component.newline());
 
-        for (PlatformPlayerAdapter.PlayedTimePlayer timePlayer : finalPlayedTimePlayers) {
-            String line = StringUtils.replaceEach(
+        for (PlayTime timePlayer : finalPlayedTimePlayers) {
+            FPlayer fTarget = fPlayerService.getFPlayer(timePlayer.playerId());
+
+            String line = Strings.CS.replace(
                     localization.line(),
-                    new String[]{"<time_player>", "<time>"},
-                    new String[]{timePlayer.name(), timeFormatter.format(fPlayer, timePlayer.playedTime())}
+                    "<time>",
+                    timeFormatter.format(fPlayer, timePlayer.total() + (fTarget.isOnline() ? System.currentTimeMillis() - timePlayer.last() : 0))
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line);
+            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
+                    .addTagResolvers(
+                            messagePipeline.targetTag("time_player", fPlayer, fTarget)
+                    );
+
             component = component
                     .append(messagePipeline.build(lineContext))
                     .append(Component.newline());

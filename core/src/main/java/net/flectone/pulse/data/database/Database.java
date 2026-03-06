@@ -14,6 +14,7 @@ import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -92,6 +93,7 @@ public class Database {
         jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(PlayTime.class));
 
         executeSQLFile(platformServerAdapter.getResource("sqls/" + config().type().name().toLowerCase() + ".sql"));
 

@@ -8,6 +8,7 @@ import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -15,8 +16,10 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -141,9 +144,15 @@ public class FPlayerService {
 
         fPlayerRepository.removeOnline(fPlayer);
 
+        socialRepository.saveLastSeen(fPlayer);
+
         updateFPlayer(fPlayer);
 
         return fPlayer;
+    }
+
+    public void saveJoinSession(FPlayer fPlayer) {
+        socialRepository.saveJoinSession(fPlayer);
     }
 
     public void updateFPlayer(FPlayer fPlayer) {
@@ -338,4 +347,18 @@ public class FPlayerService {
         return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target)
                 || platformPlayerAdapter.isOperator(source) && !platformPlayerAdapter.isOperator(target);
     }
+
+    public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
+        return socialRepository.getPlayTime(fPlayer);
+    }
+
+    public int getPlayTimesCount() {
+        return socialRepository.getPlayTimesCount();
+    }
+
+    public List<PlayTime> getAllPlayTimes(int limit, int offset) {
+        return socialRepository.getAllPlayTimes(limit, offset);
+    }
+
+
 }

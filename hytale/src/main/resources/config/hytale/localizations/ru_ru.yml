@@ -278,7 +278,7 @@ command:
     format_current: "<fcolor:1>[/] <target> сейчас на сервере"
     format_first: "<fcolor:1>[/] <target> впервые зашёл на сервер <time> назад"
     format_last: "<fcolor:1>[/] <target> <fcolor:1>последний раз был на сервере <time> назад"
-    format_total: "<fcolor:1>[/] <target> <fcolor:1>всего провёл на сервере <time>"
+    format_total: "<fcolor:1>[/] <target> <fcolor:1>всего провёл на сервере <time> и был <sessions> раз(а)"
   ping:
     null_player: "<color:#ff7171>Игрок не найден"
     format: "<fcolor:1>Пинг игрока <display_name> равен <replacement:ping>"

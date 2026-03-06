@@ -390,11 +390,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NonNull List<PlayedTimePlayer> getPlayedTimePlayers() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public void kick(FPlayer fPlayer, Component reason) {
         packetSender.send(fPlayer, new WrapperPlayServerDisconnect(reason));
     }

@@ -41,14 +41,6 @@ public interface PlatformPlayerAdapter {
     record Statistics(double health, double armor, double level, double food, double damage) {}
 
     /**
-     * Player with played time information.
-     *
-     * @param name the player name
-     * @param playedTime the total played time in milliseconds
-     */
-    record PlayedTimePlayer(String name, long playedTime) {}
-
-    /**
      * Gets the entity ID of a player.
      *
      * @param uuid the player UUID
@@ -399,13 +391,6 @@ public interface PlatformPlayerAdapter {
     default @NonNull List<Integer> getPassengers(@NonNull FEntity entity) {
         return getPassengers(entity.uuid());
     }
-
-    /**
-     * Gets all players with their played time.
-     *
-     * @return list of players with played time
-     */
-    @NonNull List<PlayedTimePlayer> getPlayedTimePlayers();
 
     void kick(FPlayer fPlayer, Component reason);
 }

@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,6 +24,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -77,7 +79,8 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         String target = commandModuleController.getArgument(this, commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
-        if (targetFPlayer.isUnknown()) {
+        PlayTime playTime = fPlayerService.getPlayTime(targetFPlayer);
+        if (playTime == null) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Online>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Online::nullPlayer)
@@ -93,18 +96,23 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag(fResolver, targetFPlayer)
                         })
-                        .format(s -> switch (type) {
+                        .format(localization -> switch (type) {
                             case "first" -> timeFormatter.format(
                                     fPlayer,
-                                    System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(targetFPlayer),
-                                    s.formatFirst()
+                                    System.currentTimeMillis() - playTime.first(),
+                                    localization.formatFirst()
                             );
                             case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
-                                    ? s.formatCurrent()
-                                    : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.formatLast());
-                            case "total" -> timeFormatter.format(fPlayer,
-                                    platformPlayerAdapter.getAllTimePlayed(targetFPlayer),
-                                    s.formatTotal()
+                                    ? localization.formatCurrent()
+                                    : timeFormatter.format(fPlayer, System.currentTimeMillis() - playTime.last(), localization.formatLast());
+                            case "total" -> Strings.CS.replace(
+                                    timeFormatter.format(
+                                            fPlayer,
+                                            playTime.total() + (targetFPlayer.isOnline() ? System.currentTimeMillis() - playTime.last() : 0),
+                                            localization.formatTotal()
+                                    ),
+                                    "<sessions>",
+                                    String.valueOf(playTime.sessions())
                             );
                             default -> "";
                         })

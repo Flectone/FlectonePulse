@@ -7,6 +7,16 @@ CREATE TABLE IF NOT EXISTS "fp_player" (
     UNIQUE("uuid", "name")
 );
 
+CREATE TABLE IF NOT EXISTS "fp_time" (
+    "id" SERIAL PRIMARY KEY,
+    "player" INTEGER NOT NULL UNIQUE,
+    "first" BIGINT NOT NULL,
+    "last" BIGINT NOT NULL,
+    "total" BIGINT NOT NULL,
+    "sessions" INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY("player") REFERENCES "fp_player"("id"),
+);
+
 CREATE TABLE IF NOT EXISTS "fp_setting" (
     "id" SERIAL PRIMARY KEY,
     "player" INTEGER NOT NULL,

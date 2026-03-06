@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.IgnoreDAO;
 import net.flectone.pulse.data.database.dao.MailDAO;
+import net.flectone.pulse.data.database.dao.TimeDAO;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.Nullable;
@@ -25,6 +27,7 @@ public class SocialRepository {
 
     private final IgnoreDAO ignoreDAO;
     private final MailDAO mailDAO;
+    private final TimeDAO timeDAO;
 
     /**
      * Loads ignore relationships for a player.
@@ -95,6 +98,54 @@ public class SocialRepository {
      */
     public void deleteMail(Mail mail) {
         mailDAO.delete(mail);
+    }
+
+    /**
+     * Saves a player's time session when they join the server.
+     *
+     * @param fPlayer the player whose session is being saved
+     */
+    public void saveJoinSession(FPlayer fPlayer) {
+        timeDAO.saveJoin(fPlayer);
+    }
+
+    /**
+     * Saves a player's last seen timestamp when they quit the server.
+     *
+     * @param fPlayer the player whose last seen time is being saved
+     */
+    public void saveLastSeen(FPlayer fPlayer) {
+        timeDAO.saveQuit(fPlayer);
+    }
+
+    /**
+     * Gets the play time statistics for a specific player.
+     *
+     * @param fPlayer the player to get play time for
+     * @return the player's play time statistics, or null if not found
+     */
+    public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
+        return timeDAO.getByPlayer(fPlayer).orElse(null);
+    }
+
+    /**
+     * Gets the total count of all play time records in the database.
+     *
+     * @return the total number of play time records
+     */
+    public int getPlayTimesCount() {
+        return timeDAO.getTotalCount();
+    }
+
+    /**
+     * Gets a paginated list of all play time records.
+     *
+     * @param limit the maximum number of records to retrieve
+     * @param offset the number of records to skip before starting to return results
+     * @return list of play time records within the specified range
+     */
+    public List<PlayTime> getAllPlayTimes(int limit, int offset) {
+        return timeDAO.getAllPlayTimes(limit, offset);
     }
 
 }
