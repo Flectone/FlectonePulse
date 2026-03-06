@@ -144,7 +144,7 @@ public class FlectonePulseAPI {
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
 
         // update and clear all fplayers
-        fPlayerService.getOnlineFPlayers().forEach(fPlayer -> fPlayerService.updateFPlayer(fPlayer.withOnline(false)));
+        fPlayerService.getOnlineFPlayers().forEach(fPlayerService::clearAndSave);
         fPlayerService.clear();
 
         // disable all modules
