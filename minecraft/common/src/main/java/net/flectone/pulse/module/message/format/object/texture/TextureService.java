@@ -14,7 +14,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.module.message.format.object.texture.mineskin.MineskinIntegration;
 import net.flectone.pulse.module.message.format.object.texture.model.Frame;
 import net.flectone.pulse.module.message.format.object.texture.model.Texture;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.file.FileWriter;
 import net.flectone.pulse.util.logging.FLogger;
@@ -50,16 +50,16 @@ public class TextureService {
 
     private final FileFacade fileFacade;
     private final @Named("imagePath") Path imagePath;
-    private final ReflectionResolver reflectionResolver;
     private final Gson gson;
     private final FLogger fLogger;
     private final Injector injector;
+    private final LibraryResolver libraryResolver;
 
     private MineskinIntegration mineskinIntegration;
 
     public void reload() {
         if (StringUtils.isNotEmpty(config().mineskinApiKey())) {
-            reflectionResolver.hasClassOrElse("org.mineskin.MineSkinClient", libraryResolver -> {
+            if (mineskinIntegration == null) {
                 libraryResolver.loadLibrary(Library.builder()
                         .groupId("org{}mineskin")
                         .artifactId("java-client-jsoup")
@@ -73,7 +73,7 @@ public class TextureService {
                         )
                         .build()
                 );
-            });
+            }
 
             mineskinIntegration = injector.getInstance(MineskinIntegration.class);
             mineskinIntegration.hook();
