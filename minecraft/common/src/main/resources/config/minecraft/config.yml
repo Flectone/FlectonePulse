@@ -4,6 +4,7 @@ language:
   by_player: true
 database:
   ignore_existing_driver: false
+  use_playtime_tracking: true
   type: "H2"
   name: "flectonepulse"
   host: "127.0.0.1"

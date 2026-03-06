@@ -144,7 +144,9 @@ public class FPlayerService {
 
         fPlayerRepository.removeOnline(fPlayer);
 
-        socialRepository.saveLastSeen(fPlayer);
+        if (isPlaytimeTracking()) {
+            socialRepository.saveLastSeen(fPlayer);
+        }
 
         updateFPlayer(fPlayer);
 
@@ -152,7 +154,9 @@ public class FPlayerService {
     }
 
     public void saveJoinSession(FPlayer fPlayer) {
-        socialRepository.saveJoinSession(fPlayer);
+        if (isPlaytimeTracking()) {
+            socialRepository.saveJoinSession(fPlayer);
+        }
     }
 
     public void updateFPlayer(FPlayer fPlayer) {
@@ -349,16 +353,19 @@ public class FPlayerService {
     }
 
     public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        return socialRepository.getPlayTime(fPlayer);
+        return isPlaytimeTracking() ? socialRepository.getPlayTime(fPlayer) : null;
     }
 
     public int getPlayTimesCount() {
-        return socialRepository.getPlayTimesCount();
+        return isPlaytimeTracking() ? socialRepository.getPlayTimesCount() : -1;
     }
 
     public List<PlayTime> getAllPlayTimes(int limit, int offset) {
-        return socialRepository.getAllPlayTimes(limit, offset);
+        return isPlaytimeTracking() ? socialRepository.getAllPlayTimes(limit, offset) : Collections.emptyList();
     }
 
+    private boolean isPlaytimeTracking() {
+        return fileFacade.config().database().usePlaytimeTracking();
+    }
 
 }

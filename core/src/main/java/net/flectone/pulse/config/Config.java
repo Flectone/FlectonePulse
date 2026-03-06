@@ -67,6 +67,7 @@ public record Config(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Database(Boolean ignoreExistingDriver,
+                           Boolean usePlaytimeTracking,
                            net.flectone.pulse.data.database.Database.Type type,
                            String name,
                            String host,
