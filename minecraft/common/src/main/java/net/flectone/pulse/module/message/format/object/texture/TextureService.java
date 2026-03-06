@@ -137,7 +137,7 @@ public class TextureService {
                 // save texture to cache
                 textureMap.put(key, textureComponent);
             } catch (IllegalArgumentException e) {
-                fLogger.warning(e);
+                fLogger.warning(e.getMessage());
             }catch (IOException e) {
                 fLogger.warning(e);
             }
