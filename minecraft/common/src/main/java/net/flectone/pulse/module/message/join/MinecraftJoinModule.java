@@ -9,6 +9,7 @@ import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -23,8 +24,9 @@ public class MinecraftJoinModule extends JoinModule {
                                ListenerRegistry listenerRegistry,
                                TaskScheduler taskScheduler,
                                MessageDispatcher messageDispatcher,
-                               ModuleController moduleController) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController);
+                               ModuleController moduleController,
+                               FPlayerService fPlayerService) {
+        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService);
 
         this.listenerRegistry = listenerRegistry;
     }

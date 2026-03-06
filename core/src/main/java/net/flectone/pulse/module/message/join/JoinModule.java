@@ -11,11 +11,13 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -29,6 +31,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final FPlayerService fPlayerService;
 
     @Override
     public ModuleName name() {
@@ -61,12 +64,13 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
+        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer) || (playTime != null && playTime.sessions() > 1);
 
         messageDispatcher.dispatch(this, JoinMetadata.<Localization.Message.Join>builder()
                 .base(EventMetadata.<Localization.Message.Join>builder()
                         .sender(fPlayer)
-                        .format(s -> hasPlayedBefore || !config().first() ? s.format() : s.formatFirstTime())
+                        .format(localization -> hasPlayedBefore || !config().first() ? localization.format() : localization.formatFirstTime())
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
