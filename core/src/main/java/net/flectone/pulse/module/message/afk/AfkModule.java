@@ -146,6 +146,14 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.AFK_SUFFIX, localization().suffix()), SettingText.AFK_SUFFIX);
     }
 
+    public int getAfkDuration(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return 0;
+        if (StringUtils.isEmpty(fPlayer.getSetting(SettingText.AFK_SUFFIX))) return 0;
+
+        Pair<Integer, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
+        return timeCoordinates != null ? (int) (System.currentTimeMillis() / 1000) - timeCoordinates.first() : 0;
+    }
+
     private void updateCoordinates(@NonNull FPlayer fPlayer) {
         // remove offline afk suffix
         if (!fPlayer.isOnline()) {

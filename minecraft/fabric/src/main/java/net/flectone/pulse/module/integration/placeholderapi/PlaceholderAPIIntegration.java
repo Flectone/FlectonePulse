@@ -21,6 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -50,6 +51,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final PermissionChecker permissionChecker;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
+    private final Provider<AfkModule> afkModuleProvider;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -67,6 +69,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     @Override
     public void unhook() {
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
+
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"));
 
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"));
 
@@ -116,6 +120,12 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
             return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
+        });
+
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"), (context, argument) -> {
+            FPlayer fPlayer = fPlayerMapper.map(context.source());
+
+            return PlaceholderResult.value(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
         });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"), (context, argument) ->

@@ -22,6 +22,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -50,6 +51,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final TaskScheduler taskScheduler;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
+    private final Provider<AfkModule> afkModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -93,6 +95,10 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
         params = params.toLowerCase();
         if (params.equalsIgnoreCase("mute_suffix")) {
             return muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer);
+        }
+
+        if (params.equalsIgnoreCase("afk_duration")) {
+            return String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer));
         }
 
         if (params.startsWith("condition_")) {
