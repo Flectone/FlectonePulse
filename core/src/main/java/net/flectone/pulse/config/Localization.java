@@ -1029,17 +1029,8 @@ public record Localization(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Animation(
-                    List<AnimationLocalization> values
+                    Map<String, List<String>> values
             ) implements LocalizationSetting {
-
-                @With
-                @Builder(toBuilder = true)
-                @Jacksonized
-                public record AnimationLocalization(
-                        String name,
-                        List<String> texts
-                ) implements LocalizationSetting {}
-
             }
 
             @With

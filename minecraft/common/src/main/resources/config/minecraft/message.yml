@@ -140,8 +140,9 @@ format:
   animation:
     enable: true
     values:
-    - name: "flectonepulse"
-      interval: 5
+      flectonepulse:
+        raw: false
+        interval: 5
   condition:
     enable: true
     values:

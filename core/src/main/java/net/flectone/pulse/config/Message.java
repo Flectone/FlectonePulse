@@ -313,17 +313,14 @@ public record Message(
         @Jacksonized
         public record Animation(
                 Boolean enable,
-                List<AnimationConfig> values
+                Map<String, AnimationConfig> values
         ) implements EnableSetting {
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
             public record AnimationConfig(
-                    String name,
-                    String world,
                     Boolean raw,
-                    Integer priority,
                     Integer interval
             ) implements LocalizationSetting {}
 

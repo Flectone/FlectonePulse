@@ -20,9 +20,8 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,31 +85,17 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
             String animation = argumentQueue.pop().value();
             if (!permissionChecker.check(messageContext.receiver(), permission().values().get(animation))) return MessagePipeline.ReplacementTag.emptyTag();
 
-            Localization.Message.Format.Animation.AnimationLocalization animationLocalization = localization(messageContext.receiver()).values().stream()
-                    .filter(localization -> animation.equals(localization.name()))
-                    .filter(localization -> localization.texts() != null && !localization.texts().isEmpty())
-                    .findAny()
-                    .orElse(null);
-            if (animationLocalization == null) return MessagePipeline.ReplacementTag.emptyTag();
+            List<String> texts = localization(messageContext.receiver()).values().get(animation);
+            if (texts == null || texts.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-            Message.Format.Animation.AnimationConfig animationConfig = config().values().stream()
-                    .filter(config -> animation.equals(config.name()))
-                    .filter(config -> StringUtils.isEmpty(config.world())
-                            || config.world().equals(platformPlayerAdapter.getWorldName(messageContext.receiver()))
-                    )
-                    .max(Comparator.comparingInt(Message.Format.Animation.AnimationConfig::interval))
-                    .orElse(Message.Format.Animation.AnimationConfig.builder()
-                            .raw(false)
-                            .interval(0)
-                            .build()
-                    );
-            if (animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
+            Message.Format.Animation.AnimationConfig animationConfig = config().values().get(animation);
+            if (animationConfig == null || animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
 
             UUID player = messageContext.receiver().uuid();
-            int playerIndex = increment(player, animation, animationConfig.interval(), animationLocalization.texts().size());
+            int playerIndex = increment(player, animation, animationConfig.interval(), texts.size());
 
             try {
-                String text = animationLocalization.texts().get(playerIndex);
+                String text = texts.get(playerIndex);
                 if (Boolean.TRUE.equals(animationConfig.raw())) return Tag.preProcessParsed(text);
 
                 MessageContext textContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), text)
