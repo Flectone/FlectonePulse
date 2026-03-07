@@ -143,6 +143,9 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     public void setAfkSuffix(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
+        int time = (int) (System.currentTimeMillis() / 1000);
+        playersCoordinates.put(fPlayer.uuid(), Pair.of(time, platformPlayerAdapter.getCoordinates(fPlayer)));
+
         fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.AFK_SUFFIX, localization().suffix()), SettingText.AFK_SUFFIX);
     }
 
