@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class BukkitSpyModule extends SpyModule {
@@ -134,13 +136,17 @@ public class BukkitSpyModule extends SpyModule {
     public void check(AsyncPlayerChatEvent event) {
         if (!moduleController.isEnable(this)) return;
 
+        UUID playerUUID = event.getPlayer().getUniqueId();
+        String message = event.getMessage();
+        List<UUID> recipients = event.getRecipients().stream()
+                .map(Entity::getUniqueId)
+                .toList();
+
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
-            String message = event.getMessage();
-
-            check(fPlayer, "chat", message, event.getRecipients().stream()
-                    .map(player -> fPlayerService.getFPlayer(player.getUniqueId()))
+            check(fPlayer, "chat", message, recipients.stream()
+                    .map(fPlayerService::getFPlayer)
                     .toList()
             );
         });
