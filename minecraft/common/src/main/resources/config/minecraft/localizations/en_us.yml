@@ -449,12 +449,6 @@ integration:
         content: "<fcolor:2><global_name> <fcolor:1>» <fcolor:4><reply><message>"
       MESSAGE_CHAT_GLOBAL:
         content: "<final_message>"
-  luckperms:
-    weight_replacement:
-      example:
-        0: "[Player]"
-        10: "[Vip]"
-        100: "[Admin]"
   telegram:
     null_player: "This player does not exist"
     sender_name: "Telegram"
@@ -534,6 +528,14 @@ message:
           - "<#82c4fc>F<#77bdfc>l<#6bb5fb>e<#5faefa>c<#6bb5fb>t<#77bdfc>o<#82c4fc>n<#8eccfd>e<#9ad3fe>P<#a6dbff>u<#a6dbff>l<#9ad3fe>s<#8eccfd>e"
           - "<#8eccfd>F<#82c4fc>l<#77bdfc>e<#6bb5fb>c<#5faefa>t<#6bb5fb>o<#77bdfc>n<#82c4fc>e<#8eccfd>P<#9ad3fe>u<#a6dbff>l<#a6dbff>s<#9ad3fe>e"
           - "<#9ad3fe>F<#8eccfd>l<#82c4fc>e<#77bdfc>c<#6bb5fb>t<#5faefa>o<#6bb5fb>n<#77bdfc>e<#82c4fc>P<#8eccfd>u<#9ad3fe>l<#a6dbff>s<#a6dbff>e"
+    condition:
+      values:
+        player_name:
+          notch: "Markus Persson"
+          thefaser: "Artyom Mochalin"
+        admin:
+          "true": "Admin"
+          "false": "Player"
     object:
       default_symbol: "☐"
     replacement:

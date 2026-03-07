@@ -21,7 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -49,7 +49,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<ConditionModule> conditionModuleProvider;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -67,6 +67,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     @Override
     public void unhook() {
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
+
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"));
 
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
 
@@ -116,8 +118,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "weight_replacement"), (context, argument) ->
-                PlaceholderResult.value(integrationModuleProvider.get().getReplacementValue(fPlayerMapper.map(context.source()), argument))
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"), (context, argument) ->
+                PlaceholderResult.value(conditionModuleProvider.get().getConditionValue(argument, fPlayerMapper.map(context.source())))
         );
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->

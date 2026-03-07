@@ -269,6 +269,9 @@ public record Message(
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/animation")
             Animation animation,
 
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/condition")
+            Condition condition,
+
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/fcolor")
             FColor fcolor,
 
@@ -323,6 +326,30 @@ public record Message(
                     Integer priority,
                     Integer interval
             ) implements LocalizationSetting {}
+
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Condition(
+                Boolean enable,
+                Map<String, Criteria> values
+        ) implements EnableSetting {
+
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Criteria(
+                    String value,
+                    Type type
+            ) {
+
+                public enum Type {
+                    STRING,
+                    PERMISSION
+                }
+
+            }
 
         }
 

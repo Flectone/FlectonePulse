@@ -785,9 +785,6 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord")
             Discord discord,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms")
-            Luckperms luckperms,
-
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram")
             Telegram telegram,
 
@@ -860,13 +857,6 @@ public record Localization(
                 ) {}
             }
         }
-
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
-        public record Luckperms(
-                Map<String, Map<Integer, String>> weightReplacement
-        ) implements LocalizationSetting {}
 
         @With
         @Builder(toBuilder = true)
@@ -1009,6 +999,9 @@ public record Localization(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/animation")
                 Animation animation,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/condition")
+                Condition condition,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
@@ -1048,6 +1041,13 @@ public record Localization(
                 ) implements LocalizationSetting {}
 
             }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Condition(
+                    Map<String, Map<String, String>> values
+            ) implements LocalizationSetting {}
 
             @With
             @Builder(toBuilder = true)

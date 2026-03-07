@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.integration.luckperms.listener;
+package net.flectone.pulse.module.message.format.condition.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,21 +8,21 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class LuckPermsPulseListener implements PulseListener {
+public class ConditionPulseListener implements PulseListener {
 
-    private final LuckPermsModule luckPermsModule;
+    private final ConditionModule conditionModule;
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
 
-        return event.withContext(luckPermsModule.addTag(messageContext));
+        return event.withContext(conditionModule.addTag(messageContext));
     }
 
 }

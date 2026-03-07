@@ -20,7 +20,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
@@ -146,14 +145,6 @@ public abstract class IntegrationModule implements ModuleSimple {
         if (!containsEnabledChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
-    }
-
-    @Nullable
-    public String getReplacementValue(FPlayer fPlayer, String name) {
-        if (!moduleController.isEnable(this)) return null;
-        if (!containsEnabledChild(LuckPermsModule.class)) return null;
-
-        return injector.getInstance(LuckPermsModule.class).getReplacementValue(fPlayer, name);
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {

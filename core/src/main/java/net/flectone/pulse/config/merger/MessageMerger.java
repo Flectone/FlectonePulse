@@ -63,6 +63,7 @@ public interface MessageMerger {
     Message.Chat mergeChat(@MappingTarget Message.Chat.ChatBuilder target, Message.Chat chat);
 
     @Mapping(target = "animation", expression = "java(mergeAnimation(target.build().animation().toBuilder(), source.animation()))")
+    @Mapping(target = "condition", expression = "java(mergeCondition(target.build().condition().toBuilder(), source.condition()))")
     @Mapping(target = "fcolor", expression = "java(mergeFColor(target.build().fcolor().toBuilder(), source.fcolor()))")
     @Mapping(target = "fixation", expression = "java(mergeFixation(target.build().fixation().toBuilder(), source.fixation()))")
     @Mapping(target = "mention", expression = "java(mergeMention(target.build().mention().toBuilder(), source.mention()))")
@@ -77,6 +78,8 @@ public interface MessageMerger {
     Message.Format mergeFormat(@MappingTarget Message.Format.FormatBuilder target, Message.Format source);
 
     Message.Format.Animation mergeAnimation(@MappingTarget Message.Format.Animation.AnimationBuilder target, Message.Format.Animation animation);
+
+    Message.Format.Condition mergeCondition(@MappingTarget Message.Format.Condition.ConditionBuilder target, Message.Format.Condition condition);
 
     Message.Format.FColor mergeFColor(@MappingTarget Message.Format.FColor.FColorBuilder target, Message.Format.FColor fcolor);
 

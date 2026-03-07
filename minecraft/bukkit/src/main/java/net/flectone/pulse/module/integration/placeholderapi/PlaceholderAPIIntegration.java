@@ -21,7 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -53,7 +53,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<ConditionModule> conditionModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -99,11 +99,11 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             return muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer);
         }
 
-        if (params.startsWith("weight_replacement")) {
-            String weightReplacement = params.substring(params.lastIndexOf("_") + 1);
-            if (StringUtils.isEmpty(weightReplacement)) return null;
+        if (params.startsWith("condition_")) {
+            String conditionName = params.substring(10);
+            if (StringUtils.isEmpty(conditionName)) return null;
 
-            return integrationModuleProvider.get().getReplacementValue(fPlayer, weightReplacement);
+            return StringUtils.defaultString(conditionModuleProvider.get().getConditionValue(conditionName, fPlayer));
         }
 
         if (params.startsWith("fcolor")) {

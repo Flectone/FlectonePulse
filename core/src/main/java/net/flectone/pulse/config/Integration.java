@@ -239,8 +239,7 @@ public record Integration(
     @Jacksonized
     public record Luckperms(
             Boolean enable,
-            Boolean tabSort,
-            Boolean useWeightReplacement
+            Boolean tabSort
     ) implements EnableSetting {
     }
 

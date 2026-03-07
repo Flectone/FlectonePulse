@@ -157,6 +157,7 @@ public class MessagePipeline {
     public enum ReplacementTag {
         AFK,
         ANIMATION,
+        CONDITION,
         MUTE,
         STREAM,
         SUFFIX,
@@ -172,7 +173,6 @@ public class MessagePipeline {
         QUESTION,
         TRANSLATION,
         WORLD,
-        WEIGHT_REPLACEMENT,
         PLAYER_HEAD,
         PLAYER_HEAD_OR,
         SPRITE,

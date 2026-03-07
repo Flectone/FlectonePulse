@@ -11,10 +11,11 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.animation.AnimationModule;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
@@ -59,13 +60,14 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     @Override
     public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return ModuleLocalization.super.childrenBuilder().add(
+                AnimationModule.class,
+                ConditionModule.class,
                 FColorModule.class,
                 FixationModule.class,
                 MentionModule.class,
                 ModerationModule.class,
                 NamesModule.class,
                 ObjectModule.class,
-                AnimationModule.class,
                 QuestionAnswerModule.class,
                 ReplacementModule.class,
                 ScoreboardModule.class,

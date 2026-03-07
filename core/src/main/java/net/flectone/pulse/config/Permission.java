@@ -1126,6 +1126,9 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/animation")
                 Animation animation,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/condition")
+                Condition condition,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fcolor")
                 FColor fcolor,
 
@@ -1171,6 +1174,15 @@ public record Permission(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Animation(
+                    String name,
+                    Permission.Type type,
+                    Map<String, PermissionEntry> values
+            ) implements PermissionSetting {}
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Condition(
                     String name,
                     Permission.Type type,
                     Map<String, PermissionEntry> values

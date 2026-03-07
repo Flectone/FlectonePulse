@@ -132,6 +132,15 @@ format:
     values:
       - name: "flectonepulse"
         interval: 5
+  condition:
+    enable: true
+    values:
+      player_name:
+        value: "%player_name%"
+        type: "STRING"
+      admin:
+        value: "minecraft.admin"
+        type: "PERMISSION"
   fcolor:
     enable: true
     default_colors:

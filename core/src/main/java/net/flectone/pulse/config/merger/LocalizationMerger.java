@@ -196,14 +196,11 @@ public interface LocalizationMerger {
     Localization.Command.Warnlist mergeWarnlist(@MappingTarget Localization.Command.Warnlist.WarnlistBuilder target, Localization.Command.Warnlist warnlist);
 
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
-    @Mapping(target = "luckperms", expression = "java(mergeLuckperms(target.build().luckperms().toBuilder(), source.luckperms()))")
     @Mapping(target = "telegram", expression = "java(mergeTelegram(target.build().telegram().toBuilder(), source.telegram()))")
     @Mapping(target = "twitch", expression = "java(mergeTwitch(target.build().twitch().toBuilder(), source.twitch()))")
     Localization.Integration mergeIntegration(@MappingTarget Localization.Integration.IntegrationBuilder target, Localization.Integration source);
 
     Localization.Integration.Discord mergeDiscord(@MappingTarget Localization.Integration.Discord.DiscordBuilder target, Localization.Integration.Discord discord);
-
-    Localization.Integration.Luckperms mergeLuckperms(@MappingTarget Localization.Integration.Luckperms.LuckpermsBuilder target, Localization.Integration.Luckperms luckperms);
 
     Localization.Integration.Telegram mergeTelegram(@MappingTarget Localization.Integration.Telegram.TelegramBuilder target, Localization.Integration.Telegram telegram);
 
@@ -241,6 +238,7 @@ public interface LocalizationMerger {
     Localization.Message.Chat mergeChat2(@MappingTarget Localization.Message.Chat.ChatBuilder target, Localization.Message.Chat chat);
 
     @Mapping(target = "animation", expression = "java(mergeAnimation(target.build().animation().toBuilder(), source.animation()))")
+    @Mapping(target = "condition", expression = "java(mergeCondition(target.build().condition().toBuilder(), source.condition()))")
     @Mapping(target = "object", expression = "java(mergeObject(target.build().object().toBuilder(), source.object()))")
     @Mapping(target = "replacement", expression = "java(mergeReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "mention", expression = "java(mergeMention2(target.build().mention().toBuilder(), source.mention()))")
@@ -251,6 +249,8 @@ public interface LocalizationMerger {
     Localization.Message.Format mergeFormat(@MappingTarget Localization.Message.Format.FormatBuilder target, Localization.Message.Format source);
 
     Localization.Message.Format.Animation mergeAnimation(@MappingTarget Localization.Message.Format.Animation.AnimationBuilder target, Localization.Message.Format.Animation animation);
+
+    Localization.Message.Format.Condition mergeCondition(@MappingTarget Localization.Message.Format.Condition.ConditionBuilder target, Localization.Message.Format.Condition condition);
 
     Localization.Message.Format.Object mergeObject(@MappingTarget Localization.Message.Format.Object.ObjectBuilder target, Localization.Message.Format.Object object);
 
