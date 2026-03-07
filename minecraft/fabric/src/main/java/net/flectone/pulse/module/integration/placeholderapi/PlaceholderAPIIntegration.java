@@ -72,6 +72,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"));
 
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration_formatted"));
+
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"));
 
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
@@ -126,6 +128,12 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
             return PlaceholderResult.value(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
+        });
+
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration_formatted"), (context, argument) -> {
+            FPlayer fPlayer = fPlayerMapper.map(context.source());
+
+            return PlaceholderResult.value(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
         });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"), (context, argument) ->

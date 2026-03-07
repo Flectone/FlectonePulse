@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -29,6 +30,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
@@ -52,6 +54,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final TimeFormatter timeFormatter;
 
     @Override
     public void onEnable() {
@@ -96,9 +99,9 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();
-            if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
+            if (!afkSuffix.contains("%") && !afkSuffix.contains("<")) return Tag.preProcessParsed(afkSuffix);
 
-            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)
+            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), Strings.CS.replace(afkSuffix, "<time>", getAfkDurationFormatted(fPlayer, messageContext.receiver())))
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
@@ -155,6 +158,14 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         Pair<Integer, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
         return timeCoordinates != null ? (int) (System.currentTimeMillis() / 1000) - timeCoordinates.first() : 0;
+    }
+
+    @NonNull
+    public String getAfkDurationFormatted(FPlayer fPlayer, FPlayer fReceiver) {
+        int afkDuration = getAfkDuration(fPlayer);
+        if (afkDuration == 0) return "";
+
+        return timeFormatter.format(fReceiver, afkDuration * 1000L);
     }
 
     private void updateCoordinates(@NonNull FPlayer fPlayer) {

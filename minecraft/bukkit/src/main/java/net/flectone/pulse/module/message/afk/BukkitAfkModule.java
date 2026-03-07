@@ -9,6 +9,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -27,8 +28,9 @@ public class BukkitAfkModule extends AfkModule {
                            ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline,
                            MessageDispatcher messageDispatcher,
-                           ModuleController moduleController) {
-        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController);
+                           ModuleController moduleController,
+                           TimeFormatter timeFormatter) {
+        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter);
 
         this.listenerRegistry = listenerRegistry;
     }

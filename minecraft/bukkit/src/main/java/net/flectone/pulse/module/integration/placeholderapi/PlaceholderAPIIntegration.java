@@ -105,6 +105,10 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             return String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer));
         }
 
+        if (params.equalsIgnoreCase("afk_duration_formatted")) {
+            return afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer);
+        }
+
         if (params.startsWith("condition_")) {
             String conditionName = params.substring(10);
             if (StringUtils.isEmpty(conditionName)) return null;
