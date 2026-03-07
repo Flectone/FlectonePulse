@@ -3,7 +3,6 @@ package net.flectone.pulse.platform.controller;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,6 +19,8 @@ import org.incendo.cloud.meta.CommandMeta;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -27,7 +28,7 @@ import java.util.function.UnaryOperator;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModuleCommandController {
 
-    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, List<String>> commandPromptsMap = new Object2ObjectOpenHashMap<>();
+    private final Map<Class<? extends ModuleSimple>, List<String>> commandPromptsMap = new ConcurrentHashMap<>();
 
     private final Provider<CommandRegistry> commandRegistryProvider;
     private final FileFacade fileFacade;
@@ -60,8 +61,10 @@ public class ModuleCommandController {
                             Function<Localization.Command.Prompt, String> promptLocalization) {
         List<String> prompts = getPrompts(command);
 
-        // this command already registered and ignored
-        if (prompts.size() != index) return "unknown";
+        // this prompt already registered
+        if (prompts.size() > index) {
+            return prompts.get(index);
+        }
 
         Class<? extends ModuleSimple> commandClass = moduleController.getRoot(command.getClass());
         String prompt = promptLocalization.apply(fileFacade.localization().command().prompt());
