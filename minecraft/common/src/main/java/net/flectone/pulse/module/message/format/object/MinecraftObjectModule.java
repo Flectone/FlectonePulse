@@ -30,6 +30,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -116,32 +117,30 @@ public class MinecraftObjectModule extends ObjectModule {
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
 
-        PlayerHeadObjectContents.Builder playerHeadBuilderComponent = ObjectContents.playerHead();
+        PlayerHeadObjectContents.Builder playerHeadBuilder = ObjectContents.playerHead();
 
         FEntity sender = messageContext.sender();
         String playerHead = argumentQueue.hasNext() ? argumentQueue.pop().value() : null;
         if (playerHead == null || playerHead.length() > 16) {
             PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(sender);
 
-            Component playerHeadComponent = Component.object().contents(
-                    playerHeadBuilderComponent
-                            .profileProperty(profileProperty)
-                            .build()
-            ).build();
+            Component playerHeadComponent = StringUtils.isNotEmpty(profileProperty.value())
+                    ? Component.object().contents(playerHeadBuilder.profileProperty(profileProperty).build()).build()
+                    : Component.object().contents(playerHeadBuilder.name(sender.name()).build()).build();
 
             return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
         }
 
         try {
-            playerHeadBuilderComponent.id(UUID.fromString(playerHead));
+            playerHeadBuilder.id(UUID.fromString(playerHead));
         } catch (IllegalArgumentException e) {
-            playerHeadBuilderComponent.name(playerHead);
+            playerHeadBuilder.name(playerHead);
         }
 
         boolean showPlayerHat = !argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value());
 
         Component playerHeadComponent = Component.object().contents(
-                        playerHeadBuilderComponent
+                        playerHeadBuilder
                                 .hat(showPlayerHat)
                                 .build()
                 ).build();
