@@ -104,10 +104,10 @@ public class BackupCreator {
 
                     int exitCode = process.waitFor();
                     if (exitCode != 0) {
-                        fLogger.warning(databaseType + " backup failed (exit code: " + exitCode + ")");
+                        fLogger.warning("%s backup failed (exit code: %s)", databaseType, exitCode);
                     }
                 } catch (IOException | InterruptedException e) {
-                    fLogger.warning("Failed to backup " + databaseType + ": " + e.getMessage());
+                    fLogger.warning("Failed to backup %s: %s", databaseType, e.getMessage());
                 }
             }
         }
@@ -142,7 +142,7 @@ public class BackupCreator {
             Files.createDirectories(backupFilePath.getParent());
             Files.copy(pathToFile, backupFilePath);
         } catch (IOException e) {
-            fLogger.warning("Failed to backup " + fileName, e);
+            fLogger.warning(e, "Failed to backup %s", fileName);
         }
     }
 }

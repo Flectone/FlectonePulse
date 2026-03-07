@@ -52,7 +52,7 @@ public class HytaleBasePulseListener implements PulseListener {
     public Event onModuleEnableEvent(ModuleEnableEvent event) {
         ModuleSimple eventModule = event.module();
         if (NOT_SUPPORTED_MODULES.stream().anyMatch(clazz -> clazz.isInstance(eventModule))) {
-            fLogger.warning(eventModule.getClass().getSimpleName() + " is not supported on Hytale");
+            fLogger.warning("%s is not supported on Hytale", eventModule.getClass().getSimpleName());
             return event.withCancelled(true);
         }
 

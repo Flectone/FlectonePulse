@@ -22,7 +22,7 @@ public class IconUtil {
 
             BufferedImage bufferedImage = ImageIO.read(icon);
             if (bufferedImage.getHeight() != 64 || bufferedImage.getWidth() != 64) {
-                fLogger.warning("Image " + icon.getName() + " size must be 64x64");
+                fLogger.warning("Image %s size must be 64x64", icon.getName());
                 return null;
             }
 
@@ -33,7 +33,7 @@ public class IconUtil {
             return new String(Base64.getEncoder().encode(bytes));
 
         } catch (Exception e) {
-            fLogger.warning("Failed to load " + icon.getName(), e);
+            fLogger.warning(e,"Failed to load %s", icon.getName());
         }
 
         return null;

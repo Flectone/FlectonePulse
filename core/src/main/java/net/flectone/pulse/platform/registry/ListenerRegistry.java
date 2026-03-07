@@ -91,7 +91,7 @@ public class ListenerRegistry implements Registry {
                 Object result = method.invoke(listener, event);
                 return result instanceof Event newEvent ? newEvent : event;
             } catch (IllegalAccessException | InvocationTargetException e) {
-                fLogger.warning("Failed to invoke @Pulse handler", e);
+                fLogger.warning(e, "Failed to invoke @Pulse handler");
                 return event;
             }
         });

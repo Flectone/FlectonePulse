@@ -98,7 +98,7 @@ public class MinecraftTranslationService implements TranslationService {
                     : loadLegacyTranslations(localizationFile);
 
             translations.putAll(loadedTranslations);
-            fLogger.info("Loaded translation " + localizationFile.getFileName());
+            fLogger.info("Loaded translation %s", localizationFile.getFileName());
         } catch (Exception e) {
             fLogger.warning("Failed to load translations");
         }

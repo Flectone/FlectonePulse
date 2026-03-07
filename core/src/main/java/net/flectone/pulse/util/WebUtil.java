@@ -23,7 +23,7 @@ public class WebUtil {
         try {
             HttpURLConnection connection = createConnection(fileUrl);
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                fLogger.info("Downloading " + fileUrl);
+                fLogger.info("Downloading %s", fileUrl);
 
                 try (InputStream inputStream = connection.getInputStream()) {
                     Files.createDirectories(outputPath.getParent());
@@ -33,9 +33,9 @@ public class WebUtil {
                 }
             }
 
-            fLogger.warning("Failed to download " + outputPath.getFileName() + ". HTTP response: " + connection.getResponseCode() + " - " + fileUrl);
+            fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), connection.getResponseCode(), fileUrl);
         } catch (IOException e) {
-            fLogger.warning("Failed to download " + outputPath.getFileName() + " file");
+            fLogger.warning("Failed to download %s file", outputPath.getFileName());
         }
 
         return false;

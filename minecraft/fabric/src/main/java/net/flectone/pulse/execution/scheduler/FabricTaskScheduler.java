@@ -196,7 +196,7 @@ public class FabricTaskScheduler implements TaskScheduler {
             }
             if (task.isRepeating()) rescheduleTask(task);
         } catch (Exception e) {
-            logger.warning("Task execution failed: " + e.getMessage());
+            logger.warning("Task execution failed: %s", e.getMessage());
         }
     }
 

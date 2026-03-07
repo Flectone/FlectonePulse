@@ -17,11 +17,11 @@ public interface FIntegration {
     }
 
     default void logHook() {
-        getFLogger().info("[+] Loaded integration: " + getIntegrationName());
+        getFLogger().info("[+] Loaded integration: %s", getIntegrationName());
     }
 
     default void logUnhook() {
-        getFLogger().info("[-] Unloaded integration: " + getIntegrationName());
+        getFLogger().info("[-] Unloaded integration: %s", getIntegrationName());
     }
 
 }

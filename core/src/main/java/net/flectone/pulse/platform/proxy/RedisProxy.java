@@ -77,7 +77,7 @@ public class RedisProxy implements Proxy {
 
             fLogger.info("Redis (Lettuce) connected");
         } catch (Exception e) {
-            fLogger.warning("Redis connection failed: ", e);
+            fLogger.warning(e, "Redis connection failed");
             onDisable();
         }
     }

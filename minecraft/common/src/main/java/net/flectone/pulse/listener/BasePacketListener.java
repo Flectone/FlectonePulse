@@ -145,7 +145,7 @@ public class BasePacketListener implements PacketListener {
                 overlay = wrapper.isOverlay();
             }
         } catch (Exception e) {
-            fLogger.warning("Error when reading a PacketType.Play.Server." + event.getPacketType() + ", THIS IS NOT A FLECTONEPULSE BUG, Report to PacketEvents: " + e.getMessage());
+            fLogger.warning("Error when reading a PacketType.Play.Server.%s, THIS IS NOT A FLECTONEPULSE BUG, Report to PacketEvents: %s", event.getPacketType(), e.getMessage());
         }
 
         if (component != null) {

@@ -125,7 +125,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
                 try {
                     method.invoke(hytaleListener, event);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    fLogger.warning("Error invoking event handler " + method.getName(), e);
+                    fLogger.warning(e, "Error invoking event handler %s", method.getName());
                 }
             };
 

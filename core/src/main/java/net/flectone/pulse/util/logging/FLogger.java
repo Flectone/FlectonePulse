@@ -59,7 +59,7 @@ public record FLogger(
     }
 
     public void logEnabled() {
-        info("FlectonePulse v" + BuildConfig.PROJECT_VERSION + " enabled");
+        info("FlectonePulse v%s enabled", BuildConfig.PROJECT_VERSION);
     }
 
     public void logDisabling() {
@@ -67,7 +67,7 @@ public record FLogger(
     }
 
     public void logDisabled() {
-        info("FlectonePulse v" + BuildConfig.PROJECT_VERSION + " disabled");
+        info("FlectonePulse v%s disabled", BuildConfig.PROJECT_VERSION);
     }
 
     public void logReloading() {
@@ -75,7 +75,7 @@ public record FLogger(
     }
 
     public void logReloaded() {
-        info("FlectonePulse v" + BuildConfig.PROJECT_VERSION + " reloaded");
+        info("FlectonePulse v%s reloaded", BuildConfig.PROJECT_VERSION);
     }
 
     public void logDescription() {
@@ -92,20 +92,32 @@ public record FLogger(
         log(new LogRecord(Level.INFO, string));
     }
 
+    public void info(String format, Object... args) {
+        info(String.format(format, args));
+    }
+
     public void warning(String string) {
         log(new LogRecord(Level.WARNING, string));
     }
 
-    public void warning(Throwable throwable) {
-        warning("An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues", throwable);
+    public void warning(String format, Object... args) {
+        warning(String.format(format, args));
     }
 
-    public void warning(String exception, Throwable throwable) {
+    public void warning(Throwable throwable) {
+        warning(throwable, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
+    }
+
+    public void warning(Throwable throwable, String string) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         throwable.printStackTrace(printWriter);
 
-        log(new LogRecord(Level.WARNING, exception + "\n" + stringWriter));
+        log(new LogRecord(Level.WARNING, string + "\n" + stringWriter));
+    }
+
+    public void warning(Throwable throwable, String format, Object args) {
+        warning(throwable, String.format(format, args));
     }
 
     // Idea taken from net.kyori.ansi.ColorLevel

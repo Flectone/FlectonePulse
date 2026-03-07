@@ -74,7 +74,9 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
                 String existingName = playerInfo.name();
                 if (!name.equalsIgnoreCase(existingName)) {
-                    updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
+                    logger.warning("Player with UUID '%s' changed name: '%s' -> '%s'", uuid, existingName, name);
+
+                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
                 }
 
                 return false;
@@ -86,7 +88,9 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
                 UUID existingUuid = UUID.fromString(playerInfo.uuid());
                 if (!uuid.equals(existingUuid)) {
-                    updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
+                    logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
+
+                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
                 }
 
                 return false;
@@ -198,11 +202,6 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN)
         );
-    }
-
-    private void updateAndWarn(FPlayerSQL fPlayerSQL, int id, UUID uuid, String name, String ip) {
-        logger.warning("Found player " + name + " with different UUID or name, will now use UUID: " + uuid + " and name: " + name);
-        fPlayerSQL.update(id, true, uuid.toString(), name, ip);
     }
 
     private FPlayer convertToFPlayer(PlayerInfo entity) {
