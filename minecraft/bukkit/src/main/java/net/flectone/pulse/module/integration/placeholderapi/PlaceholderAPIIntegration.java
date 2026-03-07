@@ -21,7 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -53,7 +53,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final Provider<MuteModule> muteModuleProvider;
-    private final Provider<LuckPermsModule> luckPermsModuleProvider;
+    private final Provider<IntegrationModule> integrationModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -103,7 +103,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             String weightReplacement = params.substring(params.lastIndexOf("_") + 1);
             if (StringUtils.isEmpty(weightReplacement)) return null;
 
-            return luckPermsModuleProvider.get().getReplacementValue(fPlayer, weightReplacement);
+            return integrationModuleProvider.get().getReplacementValue(fPlayer, weightReplacement);
         }
 
         if (params.startsWith("fcolor")) {
