@@ -97,11 +97,14 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (argumentQueue, context) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
+
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();
-            if (!afkSuffix.contains("%") && !afkSuffix.contains("<")) return Tag.preProcessParsed(afkSuffix);
 
-            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), Strings.CS.replace(afkSuffix, "<time>", getAfkDurationFormatted(fPlayer, messageContext.receiver())))
+            afkSuffix = Strings.CS.replace(afkSuffix, "<time>", getAfkDurationFormatted(fPlayer, messageContext.receiver()));
+            if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
+
+            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)
                     .withFlags(messageContext.flags())
                     .addFlag(MessageFlag.USER_MESSAGE, false);
 
