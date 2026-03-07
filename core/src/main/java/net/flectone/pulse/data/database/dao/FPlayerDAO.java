@@ -8,12 +8,10 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FPlayerSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,41 +80,22 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 return false;
             }
 
+            Optional<PlayerInfo> existingByName = sql.findByName(name);
+            if (existingByName.isPresent()) {
+                PlayerInfo playerInfo = existingByName.get();
 
-            try {
-                sql.insert(uuid.toString(), name);
-            } catch (UnableToExecuteStatementException e) {
-                return checkOldPlayerTable(sql, uuid, name, e);
+                UUID existingUuid = UUID.fromString(playerInfo.uuid());
+                if (!uuid.equals(existingUuid)) {
+                    updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
+                }
+
+                return false;
             }
+
+            sql.insert(uuid.toString(), name);
 
             return true;
         });
-    }
-
-    // use this only for FlectonePulse versions that are earlier than 1.8.1,
-    // because old table has a unique `name` and new one doesn't
-    // perhaps this should be removed in the future? Migrating `player` data is too complicated and unsafe
-    private boolean checkOldPlayerTable(FPlayerSQL sql,
-                                        UUID uuid,
-                                        String name,
-                                        UnableToExecuteStatementException exception) throws UnableToExecuteStatementException {
-        if (!(exception.getCause() instanceof SQLIntegrityConstraintViolationException)) {
-            throw exception;
-        }
-
-        Optional<PlayerInfo> existingByName = sql.findByName(name);
-        if (existingByName.isPresent()) {
-            PlayerInfo playerInfo = existingByName.get();
-
-            UUID existingUuid = UUID.fromString(playerInfo.uuid());
-            if (!uuid.equals(existingUuid)) {
-                updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
