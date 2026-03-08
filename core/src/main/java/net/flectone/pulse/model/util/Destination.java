@@ -67,59 +67,6 @@ public record Destination(
         this(type, null, null, null, null, textScreen);
     }
 
-    @JsonValue
-    public Map<String, Object> toJson() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("type", this.type);
-
-        switch (this.type) {
-            case TOAST -> {
-                Toast toast = this.toast != null ? this.toast : DEFAULT_TOAST;
-                map.put("icon", toast.icon());
-                map.put("subtext", this.subtext);
-                map.put("style", toast.style());
-            }
-            case TITLE, SUBTITLE, ACTION_BAR -> {
-                Times times = this.times != null ? this.times : DEFAULT_TIMES;
-                Map<String, Object> timesMap = new LinkedHashMap<>();
-                timesMap.put("stay", times.stayTicks());
-
-                if (this.type != Type.ACTION_BAR) {
-                    timesMap.put("fade_in", times.fadeInTicks());
-                    timesMap.put("fade_out", times.fadeOutTicks());
-                    map.put("subtext", this.subtext);
-                }
-
-                map.put("times", timesMap);
-            }
-            case BOSS_BAR -> {
-                BossBar bossBar = this.bossBar != null ? this.bossBar : DEFAULT_BOSS_BAR;
-                map.put("duration", bossBar.duration());
-                map.put("health", bossBar.health());
-                map.put("overlay", bossBar.overlay());
-                map.put("color", bossBar.color());
-                map.put("play_boss_music", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
-                map.put("create_world_fog", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
-                map.put("darken_screen", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
-            }
-            case TEXT_SCREEN -> {
-                TextScreen textScreen = this.textScreen != null ? this.textScreen : DEFAULT_TEXT_SCREEN;
-                map.put("background", textScreen.background());
-                map.put("has_shadow", textScreen.hasShadow());
-                map.put("see_through", textScreen.seeThrough());
-                map.put("animation_time", textScreen.animationTime());
-                map.put("live_time", textScreen.liveTime());
-                map.put("width", textScreen.width());
-                map.put("scale", textScreen.scale());
-                map.put("offset_x", textScreen.offsetX());
-                map.put("offset_y", textScreen.offsetY());
-                map.put("offset_z", textScreen.offsetZ());
-            }
-        }
-
-        return map;
-    }
-
     @JsonCreator
     public static Destination fromJson(Map<String, Object> map) {
         Type type = Type.valueOf(String.valueOf(map.get("type")));
@@ -205,6 +152,59 @@ public record Destination(
 
     private static <T> T parseOrDefault(Object object, T defaultObject, Function<String, T> functionParse) {
         return object == null ? defaultObject : functionParse.apply(String.valueOf(object));
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("type", this.type);
+
+        switch (this.type) {
+            case TOAST -> {
+                Toast toast = this.toast != null ? this.toast : DEFAULT_TOAST;
+                map.put("icon", toast.icon());
+                map.put("subtext", this.subtext);
+                map.put("style", toast.style());
+            }
+            case TITLE, SUBTITLE, ACTION_BAR -> {
+                Times times = this.times != null ? this.times : DEFAULT_TIMES;
+                Map<String, Object> timesMap = new LinkedHashMap<>();
+                timesMap.put("stay", times.stayTicks());
+
+                if (this.type != Type.ACTION_BAR) {
+                    timesMap.put("fade_in", times.fadeInTicks());
+                    timesMap.put("fade_out", times.fadeOutTicks());
+                    map.put("subtext", this.subtext);
+                }
+
+                map.put("times", timesMap);
+            }
+            case BOSS_BAR -> {
+                BossBar bossBar = this.bossBar != null ? this.bossBar : DEFAULT_BOSS_BAR;
+                map.put("duration", bossBar.duration());
+                map.put("health", bossBar.health());
+                map.put("overlay", bossBar.overlay());
+                map.put("color", bossBar.color());
+                map.put("play_boss_music", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
+                map.put("create_world_fog", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
+                map.put("darken_screen", bossBar.flags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
+            }
+            case TEXT_SCREEN -> {
+                TextScreen textScreen = this.textScreen != null ? this.textScreen : DEFAULT_TEXT_SCREEN;
+                map.put("background", textScreen.background());
+                map.put("has_shadow", textScreen.hasShadow());
+                map.put("see_through", textScreen.seeThrough());
+                map.put("animation_time", textScreen.animationTime());
+                map.put("live_time", textScreen.liveTime());
+                map.put("width", textScreen.width());
+                map.put("scale", textScreen.scale());
+                map.put("offset_x", textScreen.offsetX());
+                map.put("offset_y", textScreen.offsetY());
+                map.put("offset_z", textScreen.offsetZ());
+            }
+        }
+
+        return map;
     }
 
     public enum Type {

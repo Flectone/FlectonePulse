@@ -129,9 +129,6 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
     }
 
     @Override
-    public void onEnable() {}
-
-    @Override
     public Integration.Discord config() {
         return fileFacade.integration().discord();
     }

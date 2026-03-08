@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The log filter.
  * Idea taken from here <a href="https://github.com/Whitescan/ConsoleFilter/blob/master/src/main/java/dev/whitescan/consolefilter/share/LogFilter.java">...</a>
+ *
  * @author Whitescan
  * @since 1.0.0
  */

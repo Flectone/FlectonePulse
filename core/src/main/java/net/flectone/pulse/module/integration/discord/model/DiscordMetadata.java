@@ -12,4 +12,5 @@ public record DiscordMetadata<L extends LocalizationSetting>(
         @NonNull String nickname,
         @NonNull String displayName,
         @NonNull String userName
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

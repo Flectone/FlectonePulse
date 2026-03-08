@@ -52,7 +52,8 @@ public record Localization(
             String format,
             String permanent,
             String zero
-    ) {}
+    ) {
+    }
 
     @With
     @Builder(toBuilder = true)
@@ -210,7 +211,8 @@ public record Localization(
                 String parseString,
                 String permission,
                 String syntax
-        ) {}
+        ) {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -234,12 +236,14 @@ public record Localization(
                 String url,
                 String move,
                 String value
-        ) {}
+        ) {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Anon(String format) implements LocalizationSetting {}
+        public record Anon(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -247,7 +251,8 @@ public record Localization(
         public record Ball(
                 String format,
                 List<String> answers
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -268,7 +273,8 @@ public record Localization(
             public record Type(
                     String connectionAttempt,
                     ReasonMap reasons
-            ) {}
+            ) {
+            }
         }
 
         @With
@@ -280,12 +286,14 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Broadcast(String format) implements LocalizationSetting {}
+        public record Broadcast(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -295,7 +303,8 @@ public record Localization(
                 String nullType,
                 String nullColor,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -318,7 +327,8 @@ public record Localization(
                     String disabledColor,
                     String disabledHover,
                     Map<String, String> types
-            ) {}
+            ) {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -336,7 +346,8 @@ public record Localization(
                         String item,
                         String inventory,
                         Map<String, String> types
-                ) {}
+                ) {
+                }
             }
         }
 
@@ -346,7 +357,8 @@ public record Localization(
         public record Clearchat(
                 String nullPlayer,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -354,7 +366,8 @@ public record Localization(
         public record Clearmail(
                 String nullMail,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -364,7 +377,8 @@ public record Localization(
                 String tail,
                 String format,
                 String formatDraw
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -372,7 +386,8 @@ public record Localization(
         public record Deletemessage(
                 String nullMessage,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -380,12 +395,14 @@ public record Localization(
         public record Dice(
                 Map<Integer, String> symbols,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record CommandDo(String format) implements LocalizationSetting {}
+        public record CommandDo(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -393,7 +410,8 @@ public record Localization(
         public record Emit(
                 String nullPlayer,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -409,7 +427,8 @@ public record Localization(
                 String formatEditor,
                 String formatExport,
                 String formatImport
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -418,7 +437,8 @@ public record Localization(
                 String nullPlayer,
                 String nullOrError,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -427,7 +447,8 @@ public record Localization(
                 String nullHelper,
                 String global,
                 String player
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -439,7 +460,8 @@ public record Localization(
                 String you,
                 String formatTrue,
                 String formatFalse
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -450,7 +472,8 @@ public record Localization(
                 String header,
                 String line,
                 String footer
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -461,7 +484,8 @@ public record Localization(
                 ReasonMap reasons,
                 String server,
                 String person
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -471,7 +495,8 @@ public record Localization(
                 String onlinePlayer,
                 String sender,
                 String receiver
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -482,12 +507,14 @@ public record Localization(
                 String kick,
                 String formatTrue,
                 String formatFalse
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Me(String format) implements LocalizationSetting {}
+        public record Me(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -500,7 +527,8 @@ public record Localization(
                 ReasonMap reasons,
                 String server,
                 String person
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -511,7 +539,8 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -522,7 +551,8 @@ public record Localization(
                 String display,
                 String displaySee,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -533,7 +563,8 @@ public record Localization(
                 String formatFirst,
                 String formatLast,
                 String formatTotal
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -541,7 +572,8 @@ public record Localization(
         public record Ping(
                 String nullPlayer,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -565,7 +597,8 @@ public record Localization(
                     String start,
                     String run,
                     String end
-            ) {}
+            ) {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -582,13 +615,15 @@ public record Localization(
                     String inputAnswerName,
                     String inputAnswersInitial,
                     String createButtonName
-            ) {}
+            ) {
+            }
         }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Reply(String nullReceiver) implements LocalizationSetting {}
+        public record Reply(String nullReceiver) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -605,7 +640,8 @@ public record Localization(
                 String formatWin,
                 String formatDraw,
                 Map<String, String> strategies
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -618,7 +654,8 @@ public record Localization(
                 String header,
                 String lineElement,
                 String footer
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -628,7 +665,8 @@ public record Localization(
                 String formatFalse,
                 String formatLog,
                 Map<String, String> actions
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -641,7 +679,8 @@ public record Localization(
                 String urlTemplate,
                 String formatStart,
                 String formatEnd
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -652,7 +691,8 @@ public record Localization(
                 String header,
                 String lineElement,
                 String footer
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -662,7 +702,8 @@ public record Localization(
                 String sender,
                 String receiver,
                 String myself
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -695,7 +736,8 @@ public record Localization(
                     String second,
                     String secondRemove,
                     String secondWin
-            ) {}
+            ) {
+            }
         }
 
         @With
@@ -706,7 +748,8 @@ public record Localization(
                 String header,
                 String line,
                 String footer
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -714,7 +757,8 @@ public record Localization(
         public record Translateto(
                 String nullOrError,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -722,7 +766,8 @@ public record Localization(
         public record CommandTry(
                 String formatTrue,
                 String formatFalse
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -732,7 +777,8 @@ public record Localization(
                 String notBanned,
                 String lowerWeightGroup,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -742,7 +788,8 @@ public record Localization(
                 String notMuted,
                 String lowerWeightGroup,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -752,7 +799,8 @@ public record Localization(
                 String notWarned,
                 String lowerWeightGroup,
                 String format
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -764,7 +812,8 @@ public record Localization(
                 ReasonMap reasons,
                 String server,
                 String person
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -775,7 +824,8 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
     }
 
     @With
@@ -812,7 +862,8 @@ public record Localization(
                     String webhookName,
                     String webhookAvatar,
                     Embed embed
-            ) {}
+            ) {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -837,7 +888,8 @@ public record Localization(
                         String name,
                         String url,
                         String iconUrl
-                ) {}
+                ) {
+                }
 
                 @With
                 @Builder(toBuilder = true)
@@ -845,7 +897,8 @@ public record Localization(
                 public record Footer(
                         String text,
                         String iconUrl
-                ) {}
+                ) {
+                }
 
                 @With
                 @Builder(toBuilder = true)
@@ -854,7 +907,8 @@ public record Localization(
                         String name,
                         String value,
                         Boolean inline
-                ) {}
+                ) {
+                }
             }
         }
 
@@ -868,7 +922,8 @@ public record Localization(
                 Map<String, String> customCommand,
                 Map<String, String> infoChannel,
                 Map<String, String> messageChannel
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -879,7 +934,8 @@ public record Localization(
                 String formatReply,
                 Map<String, String> customCommand,
                 Map<String, String> messageChannel
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
     }
 
     @With
@@ -953,7 +1009,8 @@ public record Localization(
             public record Format(
                     String global,
                     String local
-            ) {}
+            ) {
+            }
         }
 
         @With
@@ -961,7 +1018,8 @@ public record Localization(
         @Jacksonized
         public record Auto(
                 Map<String, List<String>> types
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -969,19 +1027,22 @@ public record Localization(
         public record Bossbar(
                 Map<String, String> announce,
                 Map<String, String> types
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
         public record Brand(
                 List<String> values
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Bubble(String format) implements LocalizationSetting {}
+        public record Bubble(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -990,7 +1051,8 @@ public record Localization(
                 String nullChat,
                 String nullReceiver,
                 Map<String, String> types
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -1038,14 +1100,16 @@ public record Localization(
             @Jacksonized
             public record Condition(
                     Map<String, Map<String, String>> values
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
             public record Object(
                     String defaultSymbol
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -1053,7 +1117,8 @@ public record Localization(
             public record Replacement(
                     String spoilerSymbol,
                     Map<String, String> values
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -1061,7 +1126,8 @@ public record Localization(
             public record Mention(
                     String person,
                     String format
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -1083,17 +1149,20 @@ public record Localization(
                 public record Delete(
                         String placeholder,
                         String format
-                ) implements LocalizationSetting {}
+                ) implements LocalizationSetting {
+                }
 
                 @With
                 @Builder(toBuilder = true)
                 @Jacksonized
-                public record Newbie(String reason) implements LocalizationSetting {}
+                public record Newbie(String reason) implements LocalizationSetting {
+                }
 
                 @With
                 @Builder(toBuilder = true)
                 @Jacksonized
-                public record Swear(String symbol, String formatSee) implements LocalizationSetting {}
+                public record Swear(String symbol, String formatSee) implements LocalizationSetting {
+                }
             }
 
             @With
@@ -1105,25 +1174,29 @@ public record Localization(
                     String entity,
                     String unknown,
                     String invisible
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
             public record QuestionAnswer(
                     Map<String, String> questions
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Translate(String action) implements LocalizationSetting {}
+            public record Translate(String action) implements LocalizationSetting {
+            }
         }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Greeting(String format) implements LocalizationSetting {}
+        public record Greeting(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -1131,7 +1204,8 @@ public record Localization(
         public record Join(
                 String format,
                 String formatFirstTime
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -1151,7 +1225,8 @@ public record Localization(
                     String score,
                     String displayFormat,
                     String scoreFormat
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -1160,26 +1235,30 @@ public record Localization(
                     String score,
                     String displayFormat,
                     String scoreFormat
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
         }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Quit(String format) implements LocalizationSetting {}
+        public record Quit(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Rightclick(String format) implements LocalizationSetting {}
+        public record Rightclick(String format) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
         public record Sidebar(
                 List<List<String>> values
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -1200,7 +1279,8 @@ public record Localization(
             @Jacksonized
             public record MOTD(
                     List<String> values
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
@@ -1216,13 +1296,15 @@ public record Localization(
                 public record Sample(
                         String name,
                         String id
-                ) {}
+                ) {
+                }
             }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Version(String name) implements LocalizationSetting {}
+            public record Version(String name) implements LocalizationSetting {
+            }
         }
 
         @With
@@ -1244,19 +1326,22 @@ public record Localization(
             @Jacksonized
             public record Footer(
                     List<List<String>> lists
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
             public record Header(
                     List<List<String>> lists
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Playerlistname(String format) implements LocalizationSetting {}
+            public record Playerlistname(String format) implements LocalizationSetting {
+            }
         }
 
         @With
@@ -1265,7 +1350,8 @@ public record Localization(
         public record Update(
                 String formatPlayer,
                 String formatConsole
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
 
         @With
         @Builder(toBuilder = true)
@@ -1274,7 +1360,8 @@ public record Localization(
                 String formatPlayer,
                 String formatEntity,
                 Map<String, String> types
-        ) implements LocalizationSetting {}
+        ) implements LocalizationSetting {
+        }
     }
 
     @With
@@ -1284,7 +1371,8 @@ public record Localization(
             String header,
             String line,
             String footer
-    ) {}
+    ) {
+    }
 
     public static class ReasonMap extends LinkedHashMap<String, String> {
 

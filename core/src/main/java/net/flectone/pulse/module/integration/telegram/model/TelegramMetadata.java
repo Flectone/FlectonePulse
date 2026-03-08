@@ -12,4 +12,5 @@ public record TelegramMetadata<L extends LocalizationSetting>(
         @NonNull String firstName,
         @NonNull String lastName,
         @NonNull String chat
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

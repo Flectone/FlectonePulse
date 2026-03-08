@@ -16,21 +16,6 @@ public record Sound(
 
     public static final Sound DEFAULT = new Sound(false, 1f, 1f, "BLOCK", "minecraft:block.note_block.bell");
 
-    @JsonValue
-    public Map<String, Object> toJson() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("enable", this.enable);
-
-        if (this.enable) {
-            map.put("volume", this.volume);
-            map.put("pitch", this.pitch);
-            map.put("category", this.category);
-            map.put("name", this.name);
-        }
-
-        return map;
-    }
-
     @JsonCreator
     public static Sound fromJson(Map<String, Object> map) {
         boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
@@ -49,6 +34,21 @@ public record Sound(
         String stringName = name == null ? DEFAULT.name() : String.valueOf(name);
 
         return new Sound(true, floatVolume, floatPitch, stringCategory, stringName);
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("enable", this.enable);
+
+        if (this.enable) {
+            map.put("volume", this.volume);
+            map.put("pitch", this.pitch);
+            map.put("category", this.category);
+            map.put("name", this.name);
+        }
+
+        return map;
     }
 
 }

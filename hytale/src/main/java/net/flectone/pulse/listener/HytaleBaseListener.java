@@ -44,9 +44,9 @@ public class HytaleBaseListener implements HytaleListener {
         playerPreLoginProcessor.processLogin(uuid, playerName,
                 loginEvent -> {},
                 loginEvent -> {
-            event.setReason(PlainTextComponentSerializer.plainText().serialize(loginEvent.kickReason()));
-            event.setCancelled(true);
-        });
+                    event.setReason(PlainTextComponentSerializer.plainText().serialize(loginEvent.kickReason()));
+                    event.setCancelled(true);
+                });
     }
 
     // PlayerReadyEvent is called every time you move from portal to portal, this causes duplication

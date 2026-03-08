@@ -181,15 +181,6 @@ public class MessagePipeline {
         TEXTURE_OR,
         FCOLOR;
 
-        @Subst("")
-        public String getTagName() {
-            return name().toLowerCase();
-        }
-
-        public TagResolver emptyResolver() {
-            return emptyResolver(getTagName());
-        }
-
         public static TagResolver emptyResolver(@TagPattern String tag) {
             return TagResolver.resolver(tag, (argumentQueue, context) ->
                     Tag.selfClosingInserting(Component.empty())
@@ -198,6 +189,15 @@ public class MessagePipeline {
 
         public static Tag emptyTag() {
             return Tag.selfClosingInserting(Component.empty());
+        }
+
+        @Subst("")
+        public String getTagName() {
+            return name().toLowerCase();
+        }
+
+        public TagResolver emptyResolver() {
+            return emptyResolver(getTagName());
         }
 
     }

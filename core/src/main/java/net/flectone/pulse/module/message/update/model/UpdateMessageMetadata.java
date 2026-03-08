@@ -10,4 +10,5 @@ public record UpdateMessageMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull String latestVersion,
         @NonNull String currentVersion
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

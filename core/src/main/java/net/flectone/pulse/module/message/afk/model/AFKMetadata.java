@@ -11,4 +11,5 @@ public record AFKMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         boolean newStatus,
         boolean ignoreVanish
-) implements VanishMetadata<L> {}
+) implements VanishMetadata<L> {
+}

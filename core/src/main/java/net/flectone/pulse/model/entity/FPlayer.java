@@ -21,14 +21,18 @@ import java.util.stream.Collectors;
  * This is a platform-dynamic, Flectone player. All actions done through Flectone involving a player most likely are done through FPlayer.
  * <hr>
  * <p>
- *     For example, plugins using the Bukkit API can get an instance of the {@link FPlayer} object by simply using
- *     <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Entity.html#getUniqueId()"><code>Entity.getUniqueId()</code></a>
- *     and using {@link FPlayerService}'s <code>{@link UUID} getFPlayer</code> method.
+ * For example, plugins using the Bukkit API can get an instance of the {@link FPlayer} object by simply using
+ * <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Entity.html#getUniqueId()"><code>Entity.getUniqueId()</code></a>
+ * and using {@link FPlayerService}'s <code>{@link UUID} getFPlayer</code> method.
  * </p>
  *
  * @see FPlayerService
  */
 public interface FPlayer extends FEntity {
+
+    static FPlayerImpl.FPlayerImplBuilder builder() {
+        return new FPlayerImpl.FPlayerImplBuilder();
+    }
 
     String TYPE = "PLAYER";
 
@@ -91,10 +95,6 @@ public interface FPlayer extends FEntity {
     FPlayer withConstants(List<Component> constants);
 
     FPlayerImpl.FPlayerImplBuilder toBuilder();
-
-    static FPlayerImpl.FPlayerImplBuilder builder() {
-        return new FPlayerImpl.FPlayerImplBuilder();
-    }
 
     @Override
     default boolean isUnknown() {

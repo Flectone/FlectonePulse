@@ -28,18 +28,18 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServerModInitializer, FlectonePulse {
 
-	@Setter private MinecraftServer minecraftServer;
-	private FLogger fLogger;
-	private Injector injector;
+    @Setter private MinecraftServer minecraftServer;
+    private FLogger fLogger;
+    private Injector injector;
 
-	@Override
-	public void onPreLaunch() {
+    @Override
+    public void onPreLaunch() {
         // configure packetevents api
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-	}
+    }
 
-	@Override
-	public void onInitializeServer() {
+    @Override
+    public void onInitializeServer() {
         // initialize custom logger
         Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
         fLogger = new FLogger(
@@ -48,27 +48,27 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
         );
         fLogger.logEnabling();
 
-		// set up library resolver for dependency loading
-		LibraryResolver libraryResolver = new FabricLibraryResolver(logger);
-		libraryResolver.addLibraries();
-		libraryResolver.resolveRepositories();
-		libraryResolver.loadLibraries();
+        // set up library resolver for dependency loading
+        LibraryResolver libraryResolver = new FabricLibraryResolver(logger);
+        libraryResolver.addLibraries();
+        libraryResolver.resolveRepositories();
+        libraryResolver.loadLibraries();
 
         // create guice injector for dependency injection
         injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, libraryResolver, fLogger));
 
         // we need to call enable right now, because the commands must be registered before server is fully started
         onEnable();
-	}
+    }
 
-	@Override
-	public void onEnable() {
-		if (!isReady()) return;
+    @Override
+    public void onEnable() {
+        if (!isReady()) return;
 
         removeDefaultFabricCommands();
 
-		injector.getInstance(FlectonePulseAPI.class).onEnable();
-	}
+        injector.getInstance(FlectonePulseAPI.class).onEnable();
+    }
 
     @Override
     public void onDisable() {

@@ -12,4 +12,5 @@ public record PollMetadata<L extends LocalizationSetting>(
         @NonNull Poll poll,
         PollModule.@NonNull Status status,
         PollModule.@NonNull Action action
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

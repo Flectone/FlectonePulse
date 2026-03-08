@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record BallMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         int answer
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

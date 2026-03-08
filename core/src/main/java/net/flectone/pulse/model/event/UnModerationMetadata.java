@@ -13,4 +13,5 @@ public record UnModerationMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull FPlayer moderator,
         @NonNull List<Moderation> moderations
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

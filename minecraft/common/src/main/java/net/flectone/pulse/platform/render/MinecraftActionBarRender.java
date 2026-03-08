@@ -19,7 +19,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftActionBarRender implements ActionBarRender{
+public class MinecraftActionBarRender implements ActionBarRender {
 
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;

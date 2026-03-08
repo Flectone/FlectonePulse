@@ -8,7 +8,11 @@ import net.flectone.pulse.model.util.Sound;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 
-public record Chat(@Nullable String name, Message.Chat.@Nullable Type config, Permission.Message.Chat.@Nullable Type permission) {
+public record Chat(
+        @Nullable String name,
+        Message.Chat.@Nullable Type config,
+        Permission.Message.Chat.@Nullable Type permission
+) {
 
     public Pair<Cooldown, PermissionSetting> cooldown() {
         if (config == null) return Pair.of(null, null);

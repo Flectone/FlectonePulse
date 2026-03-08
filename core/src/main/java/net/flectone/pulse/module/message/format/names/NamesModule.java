@@ -78,11 +78,11 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                 Component showEntityName = sender.showEntityName();
                 if (showEntityName == null) {
                     MessageContext displayContext = messagePipeline.createContext(sender, receiver,
-                                StringUtils.replaceEach(
-                                        sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
-                                        new String[]{"<name>", "<type>", "<uuid>"},
-                                        new String[]{"<lang:'" + sender.type() + "'>", sender.type(), sender.uuid().toString()}
-                                )
+                                    StringUtils.replaceEach(
+                                            sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
+                                            new String[]{"<name>", "<type>", "<uuid>"},
+                                            new String[]{"<lang:'" + sender.type() + "'>", sender.type(), sender.uuid().toString()}
+                                    )
                             )
                             .withFlags(messageContext.flags())
                             .addFlags(

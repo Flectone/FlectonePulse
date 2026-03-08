@@ -13,7 +13,6 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.animation.listener.AnimationPulseListener;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -31,14 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AnimationModule implements ModuleLocalization<Localization.Message.Format.Animation> {
 
     private final Map<AnimationKey, Integer> animationMap = new ConcurrentHashMap<>();
-
-    private record AnimationKey(UUID player, String phase) {}
-
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
 
     @Override
@@ -133,6 +128,9 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
         animationMap.put(animationKey, newEncoded);
 
         return currentIndex;
+    }
+
+    private record AnimationKey(UUID player, String phase) {
     }
 
 }

@@ -117,7 +117,7 @@ public class TicTacToe {
         }
 
         if (field[0][0] != 0 && Math.abs(field[0][0]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][2])) {
-            winningTrio =  new int[]{0, 0, 1, 1, 2, 2};
+            winningTrio = new int[]{0, 0, 1, 1, 2, 2};
         }
 
         if (field[0][2] != 0 && Math.abs(field[0][2]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][0])) {
@@ -126,7 +126,7 @@ public class TicTacToe {
 
         if (winningTrio != null) {
             for (int i = 1; i < winningTrio.length; i = i + 2) {
-                int row = winningTrio[i-1];
+                int row = winningTrio[i - 1];
                 int column = winningTrio[i];
                 field[row][column] = Math.abs(field[row][column]) + WIN_OFFSET;
             }

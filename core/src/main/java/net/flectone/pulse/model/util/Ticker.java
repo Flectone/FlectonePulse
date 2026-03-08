@@ -10,6 +10,17 @@ public record Ticker(boolean enable, long period) {
 
     public static final Ticker DEFAULT = new Ticker(false, 100L);
 
+    @JsonCreator
+    public static Ticker fromJson(Map<String, Object> map) {
+        boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
+        if (!isEnable) return DEFAULT;
+
+        Object period = map.get("period");
+        long longPeriod = period == null ? 100L : Long.parseLong(String.valueOf(period));
+
+        return new Ticker(true, longPeriod);
+    }
+
     @JsonValue
     public Map<String, Object> toJson() {
         Map<String, Object> map = new LinkedHashMap<>();
@@ -20,16 +31,5 @@ public record Ticker(boolean enable, long period) {
         }
 
         return map;
-    }
-
-    @JsonCreator
-    public static Ticker fromJson(Map<String, Object> map) {
-        boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
-        if (!isEnable) return DEFAULT;
-
-        Object period = map.get("period");
-        long longPeriod = period == null ? 100L : Long.parseLong(String.valueOf(period));
-
-        return new Ticker(true, longPeriod);
     }
 }

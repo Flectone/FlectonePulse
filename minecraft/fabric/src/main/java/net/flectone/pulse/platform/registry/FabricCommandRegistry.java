@@ -68,9 +68,9 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
         String permissionString = permission.permissionString();
 
         Command<FPlayer> command = commandBuilder.permission(fPlayer -> {
-           boolean value = permissionChecker.check(fPlayer, permissionString);
+            boolean value = permissionChecker.check(fPlayer, permissionString);
 
-           return PermissionResult.of(value, permission);
+            return PermissionResult.of(value, permission);
         }).build();
 
         String commandName = command.rootComponent().name();

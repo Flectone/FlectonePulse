@@ -245,6 +245,38 @@ public class HytaleMenuBuilder implements MenuBuilder {
         world.execute(() -> pageBuilder.open(refStore.getStore()));
     }
 
+    private ButtonBuilder createButton(String id, Component componentTitle, Component componentLore, BiConsumer<Void, UIContext> callback) {
+        return ButtonBuilder.textButton()
+                .withId(id)
+                .withText(PlainTextComponentSerializer.plainText().serialize(componentTitle))
+                .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentLore))
+                .withAnchor(new HyUIAnchor()
+                        .setWidth(config().buttonWidth())
+                        .setHeight(config().buttonHeight())
+                )
+                .withPadding(new HyUIPadding().setFull(config().buttonPadding()))
+                .addEventListener(CustomUIEventBindingType.Activating, callback);
+    }
+
+    private PageBuilder createPage(PlayerRef playerRef, Component title, GridGroup gridGroup) {
+        return PageBuilder.pageForPlayer(playerRef)
+                .withLifetime(CustomPageLifetime.CanDismissOrCloseThroughInteraction)
+                .addElement(PageOverlayBuilder.pageOverlay()
+                        .addChild(ContainerBuilder.container()
+                                .withTitleText(PlainTextComponentSerializer.plainText().serialize(title))
+                                .withAnchor(new HyUIAnchor()
+                                        .setWidth(config().panelWidth())
+                                        .setHeight(config().panelHeight())
+                                )
+                                .addChild(gridGroup.buildMainGroup())
+                        )
+                );
+    }
+
+    private Command.Chatsetting.Modern config() {
+        return chatsettingModule.config().modern();
+    }
+
     private record GridGroup(
             int maxPerLine,
             int currentLine,
@@ -280,37 +312,5 @@ public class HytaleMenuBuilder implements MenuBuilder {
             );
         }
 
-    }
-
-    private ButtonBuilder createButton(String id, Component componentTitle, Component componentLore, BiConsumer<Void, UIContext> callback) {
-        return ButtonBuilder.textButton()
-                .withId(id)
-                .withText(PlainTextComponentSerializer.plainText().serialize(componentTitle))
-                .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentLore))
-                .withAnchor(new HyUIAnchor()
-                        .setWidth(config().buttonWidth())
-                        .setHeight(config().buttonHeight())
-                )
-                .withPadding(new HyUIPadding().setFull(config().buttonPadding()))
-                .addEventListener(CustomUIEventBindingType.Activating, callback);
-    }
-
-    private PageBuilder createPage(PlayerRef playerRef, Component title, GridGroup gridGroup) {
-        return PageBuilder.pageForPlayer(playerRef)
-                .withLifetime(CustomPageLifetime.CanDismissOrCloseThroughInteraction)
-                .addElement(PageOverlayBuilder.pageOverlay()
-                        .addChild(ContainerBuilder.container()
-                                .withTitleText(PlainTextComponentSerializer.plainText().serialize(title))
-                                .withAnchor(new HyUIAnchor()
-                                        .setWidth(config().panelWidth())
-                                        .setHeight(config().panelHeight())
-                                )
-                                .addChild(gridGroup.buildMainGroup())
-                        )
-                );
-    }
-
-    private Command.Chatsetting.Modern config() {
-        return chatsettingModule.config().modern();
     }
 }

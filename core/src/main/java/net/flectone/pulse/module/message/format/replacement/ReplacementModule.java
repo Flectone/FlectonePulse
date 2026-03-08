@@ -244,8 +244,6 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         return stringBuilder.append("'>").toString();
     }
 
-    private record MatchInfo(int start, int end, String replacement) {}
-
     private Tag spoilerTag(MessageContext messageContext, String spoilerText) {
         // skip deprecated issue <spoiler:\>
         if (spoilerText.equals("\\")) return MessagePipeline.ReplacementTag.emptyTag();
@@ -524,4 +522,12 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
             return component;
         });
     }
+
+    private record MatchInfo(
+            int start,
+            int end,
+            String replacement
+    ) {
+    }
+
 }

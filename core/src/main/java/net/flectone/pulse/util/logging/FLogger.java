@@ -21,6 +21,22 @@ public record FLogger(
 
     private static final boolean ANSI_SUPPORTED = isAnsiSupported();
 
+    // Idea taken from net.kyori.ansi.ColorLevel
+    private static boolean isAnsiSupported() {
+        if (System.console() == null) return false;
+
+        String colorterm = System.getenv("COLORTERM");
+        if (colorterm != null && (colorterm.contains("truecolor") || colorterm.contains("24bit"))) return true;
+
+        String term = System.getenv("TERM");
+        if (term != null && (term.contains("truecolor") || term.contains("direct") || term.contains("256color")))
+            return true;
+        if (System.getenv("WT_SESSION") != null) return true;
+
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        return !os.contains("win");
+    }
+
     public Config.Logger config() {
         return fileFacadeSupplier.get() == null ? null : fileFacadeSupplier.get().config().logger();
     }
@@ -118,21 +134,6 @@ public record FLogger(
 
     public void warning(Throwable throwable, String format, Object args) {
         warning(throwable, String.format(format, args));
-    }
-
-    // Idea taken from net.kyori.ansi.ColorLevel
-    private static boolean isAnsiSupported() {
-        if (System.console() == null) return false;
-
-        String colorterm = System.getenv("COLORTERM");
-        if (colorterm != null && (colorterm.contains("truecolor") || colorterm.contains("24bit"))) return true;
-
-        String term = System.getenv("TERM");
-        if (term != null && (term.contains("truecolor") || term.contains("direct") || term.contains("256color"))) return true;
-        if (System.getenv("WT_SESSION") != null) return true;
-
-        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-        return !os.contains("win");
     }
 
 }

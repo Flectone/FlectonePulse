@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record CoinMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         int percent
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

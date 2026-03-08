@@ -23,7 +23,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BasePulseListener implements PulseListener {
-    
+
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ProxySender proxySender;

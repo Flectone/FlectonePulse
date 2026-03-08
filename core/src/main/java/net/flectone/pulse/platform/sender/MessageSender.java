@@ -21,8 +21,8 @@ import java.util.Locale;
  * messageSender.sendToConsole(Component.text("Server message"));
  * }</pre>
  *
- * @since 1.2.0
  * @author TheFaser
+ * @since 1.2.0
  */
 public interface MessageSender {
 

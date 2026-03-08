@@ -10,4 +10,5 @@ import org.jspecify.annotations.NonNull;
 public record ClearmailMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull Mail mail
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

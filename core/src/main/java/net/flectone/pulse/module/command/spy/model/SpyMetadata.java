@@ -10,4 +10,5 @@ public record SpyMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         boolean turned,
         @NonNull String action
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

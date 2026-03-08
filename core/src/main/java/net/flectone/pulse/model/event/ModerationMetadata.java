@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record ModerationMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull Moderation moderation
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

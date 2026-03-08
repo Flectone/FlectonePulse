@@ -11,4 +11,5 @@ public record TicTacToeMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull TicTacToe ticTacToe,
         TictactoeModule.@NonNull GamePhase gamePhase
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

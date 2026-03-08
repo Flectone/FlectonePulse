@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record GeolocateMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull IpResponse response
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

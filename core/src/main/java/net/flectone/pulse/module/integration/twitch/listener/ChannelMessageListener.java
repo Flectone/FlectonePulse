@@ -113,9 +113,6 @@ public class ChannelMessageListener implements EventListener<ChannelMessageEvent
     }
 
     @Override
-    public void onEnable() {}
-
-    @Override
     public Integration.Twitch config() {
         return fileFacade.integration().twitch();
     }

@@ -4,5 +4,9 @@ import net.flectone.pulse.config.Message;
 
 import java.util.Map;
 
-public record ParsedComponent(String translationKey, Message.Vanilla.VanillaMessage vanillaMessage, Map<Integer, Object> arguments) {
+public record ParsedComponent(
+        String translationKey,
+        Message.Vanilla.VanillaMessage vanillaMessage,
+        Map<Integer, Object> arguments
+) {
 }

@@ -23,8 +23,8 @@ import org.incendo.cloud.type.tuple.Pair;
  * soundPlayer.play(Pair.of(sound, permission), sender, new Vector3i(100, 64, 200));
  * }</pre>
  *
- * @since 1.6.0
  * @author TheFaser
+ * @since 1.6.0
  */
 public interface SoundPlayer {
 

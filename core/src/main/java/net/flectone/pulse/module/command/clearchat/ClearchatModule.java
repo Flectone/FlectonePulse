@@ -44,8 +44,8 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     public void onEnable() {
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
-                        .permission(permission().name())
-                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission().other()))
+                .permission(permission().name())
+                .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission().other()))
         );
     }
 

@@ -10,4 +10,5 @@ public record TranslatetoMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull String targetLanguage,
         @NonNull String messageToTranslate
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

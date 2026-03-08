@@ -114,7 +114,7 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
                         })
                         .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
                                 new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
-                                new String[]{response.country(), response.region(), response.city(), response.timezone() , String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}
+                                new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}
                         ))
                         .destination(config().destination())
                         .sound(soundOrThrow())

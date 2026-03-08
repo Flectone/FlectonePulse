@@ -32,7 +32,6 @@ public interface FlectonePulse {
      * FlectonePulse components and services.
      *
      * @return the Injector instance, or {@code null} if not initialized
-     *
      * @see #isReady()
      * @see #get(Class)
      */
@@ -63,7 +62,6 @@ public interface FlectonePulse {
      * and should be called when configuration changes are made at runtime.
      *
      * @throws ReloadException if an error occurs during reload
-     *
      * @see ReloadException
      */
     void reload() throws ReloadException;
@@ -99,7 +97,6 @@ public interface FlectonePulse {
      * @param type the class of the instance to retrieve
      * @return an instance of the requested type
      * @throws IllegalStateException if the injector is not ready
-     *
      * @see #isReady()
      */
     default <T> T get(Class<T> type) {
@@ -118,7 +115,6 @@ public interface FlectonePulse {
      * to ensure the injector has been properly initialized.
      *
      * @return {@code true} if the injector is ready, {@code false} otherwise
-     *
      * @see #get(Class)
      */
     default boolean isReady() {

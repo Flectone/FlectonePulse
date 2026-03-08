@@ -8,6 +8,14 @@ import java.util.UUID;
 
 public interface FEntity {
 
+    static FEntityImpl.FEntityImplBuilder builder() {
+        return FEntityImpl.builder();
+    }
+
+    static FEntity unknown() {
+        return FEntityImpl.builder().build();
+    }
+
     UUID UNKNOWN_UUID = new UUID(0, 0);
 
     String UNKNOWN_NAME = "UNKNOWN_FLECTONEPULSE";
@@ -21,14 +29,6 @@ public interface FEntity {
     String type();
 
     @Nullable Component showEntityName();
-
-    static FEntityImpl.FEntityImplBuilder builder() {
-        return FEntityImpl.builder();
-    }
-
-    static FEntity unknown() {
-        return FEntityImpl.builder().build();
-    }
 
     default boolean isUnknown() {
         return uuid().equals(UNKNOWN_UUID);

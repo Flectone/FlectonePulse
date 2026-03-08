@@ -8,4 +8,5 @@ public record Mail(
         @ColumnName("sender") int sender,
         @ColumnName("receiver") int receiver,
         @ColumnName("message") String message
-) {}
+) {
+}

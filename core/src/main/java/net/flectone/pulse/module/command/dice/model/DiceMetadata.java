@@ -11,4 +11,5 @@ import java.util.List;
 public record DiceMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull List<Integer> cubes
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

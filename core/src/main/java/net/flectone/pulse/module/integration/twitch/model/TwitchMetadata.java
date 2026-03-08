@@ -10,4 +10,5 @@ public record TwitchMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull String nickname,
         @NonNull String channel
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

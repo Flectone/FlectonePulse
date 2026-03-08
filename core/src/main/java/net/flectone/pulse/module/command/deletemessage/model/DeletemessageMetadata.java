@@ -11,4 +11,5 @@ import java.util.UUID;
 public record DeletemessageMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull UUID deletedUUID
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

@@ -4,4 +4,10 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 
 import java.util.Map;
 
-public record SubMenuItem(String name, String material, Map<Integer, String> colors, PermissionSetting perm) {}
+public record SubMenuItem(
+        String name,
+        String material,
+        Map<Integer, String> colors,
+        PermissionSetting perm
+) {
+}

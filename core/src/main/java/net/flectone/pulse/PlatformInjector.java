@@ -93,57 +93,79 @@ public abstract class PlatformInjector extends AbstractModule {
 
     public abstract void setupPlatform(ReflectionResolver reflectionResolver);
 
-    @Provides @Singleton @Named("cooldown")
+    @Provides
+    @Singleton
+    @Named("cooldown")
     public Cache<CooldownRepository.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.COOLDOWN);
     }
 
-    @Provides @Singleton @Named("offlinePlayers")
+    @Provides
+    @Singleton
+    @Named("offlinePlayers")
     public Cache<UUID, FPlayer> provideOfflinePlayersCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.OFFLINE_PLAYERS);
     }
 
-    @Provides @Singleton @Named("profileProperty")
+    @Provides
+    @Singleton
+    @Named("profileProperty")
     public Cache<UUID, PlayerHeadObjectContents.ProfileProperty> provideProfilePropertyCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.PROFILE_PROPERTY);
     }
 
-    @Provides @Singleton @Named("dialogClick")
+    @Provides
+    @Singleton
+    @Named("dialogClick")
     public Cache<UUID, AtomicInteger> provideDialogClickCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.DIALOG_CLICK);
     }
 
-    @Provides @Singleton @Named("moderation")
+    @Provides
+    @Singleton
+    @Named("moderation")
     public Cache<Pair<UUID, Moderation.Type>, List<Moderation>> provideModerationCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.MODERATION);
     }
 
-    @Provides @Singleton @Named("legacyColorMessage")
+    @Provides
+    @Singleton
+    @Named("legacyColorMessage")
     public Cache<String, String> provideLegacyColorMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.LEGACY_COLOR_MESSAGE);
     }
 
-    @Provides @Singleton @Named("mentionMessage")
+    @Provides
+    @Singleton
+    @Named("mentionMessage")
     public Cache<String, String> provideMentionMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.MENTION_MESSAGE);
     }
 
-    @Provides @Singleton @Named("swearMessage")
+    @Provides
+    @Singleton
+    @Named("swearMessage")
     public Cache<String, String> provideSwearMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.SWEAR_MESSAGE);
     }
 
-    @Provides @Singleton @Named("replacementMessage")
+    @Provides
+    @Singleton
+    @Named("replacementMessage")
     public Cache<String, String> provideReplacementMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.REPLACEMENT_MESSAGE);
     }
 
-    @Provides @Singleton @Named("replacementImage")
+    @Provides
+    @Singleton
+    @Named("replacementImage")
     public Cache<String, Component> provideReplacementImageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.REPLACEMENT_IMAGE);
     }
 
-    @Provides @Singleton @Named("translateMessage")
+    @Provides
+    @Singleton
+    @Named("translateMessage")
     public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.TRANSLATE_MESSAGE);
     }

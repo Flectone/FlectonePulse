@@ -154,7 +154,7 @@ public class WarnlistModule implements ModuleCommand<Localization.Command.Warnli
                     .addTagResolvers(
                             messagePipeline.targetTag(fPlayer, fTarget),
                             messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
-                    );;
+                    );
 
             component = component
                     .append(messagePipeline.build(lineContext))

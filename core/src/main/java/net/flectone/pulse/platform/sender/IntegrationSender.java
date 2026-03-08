@@ -40,8 +40,8 @@ import java.util.regex.Pattern;
  * integrationSender.asyncSend(MessageType.CHAT, "<final_message>", eventMetadata);
  * }</pre>
  *
- * @since 1.5.0
  * @author TheFaser
+ * @since 1.5.0
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -95,7 +95,7 @@ public class IntegrationSender {
             return StringUtils.replaceEach(
                     plainSerialize(createFormat(input, eventMetadata)),
                     new String[]{"<player>", "<message>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.name(), plainMessage,  finalMessage, clearMessage(finalMessage)}
+                    new String[]{sender.name(), plainMessage, finalMessage, clearMessage(finalMessage)}
             );
         };
 

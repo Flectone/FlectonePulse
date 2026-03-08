@@ -11,4 +11,5 @@ public record MailMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull Mail mail,
         @NonNull FPlayer target
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

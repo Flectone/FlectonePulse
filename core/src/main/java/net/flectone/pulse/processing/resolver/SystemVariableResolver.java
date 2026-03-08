@@ -29,7 +29,7 @@ public class SystemVariableResolver {
             stringBuilder.append(text, index, matcher.start());
 
             String variable = matcher.group(1);
-            Object obj =  System.getenv(variable);
+            Object obj = System.getenv(variable);
 
             String value;
             if (obj != null) {

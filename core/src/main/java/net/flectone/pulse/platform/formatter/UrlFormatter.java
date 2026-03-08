@@ -17,7 +17,7 @@ public class UrlFormatter {
     private static final String SAFE_AMPERSAND = "__AND__";
 
     public String escapeAmpersand(String url) {
-        return Strings.CS.replace(url,"&", SAFE_AMPERSAND);
+        return Strings.CS.replace(url, "&", SAFE_AMPERSAND);
     }
 
     public String unescapeAmpersand(String url) {

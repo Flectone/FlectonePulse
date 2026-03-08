@@ -18,7 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPermissionChecker implements PermissionChecker {
 
-    private static final net.minecraft.command.permission.Permission TRUE_PERMISSION = new  net.minecraft.command.permission.Permission.Level(PermissionLevel.ALL);
+    private static final net.minecraft.command.permission.Permission TRUE_PERMISSION = new net.minecraft.command.permission.Permission.Level(PermissionLevel.ALL);
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FabricIntegrationModule integrationModule;

@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 public record Range(int value, Type type) {
 
     private static final Map<Type, Range> DEFAULT_RANGES = EnumSet.allOf(Type.class).stream()
-                    .filter(type -> type != Type.BLOCKS)
-                    .collect(Collectors.toMap(
-                            Function.identity(),
-                            Range::new,
-                            (a, b) -> a,
-                            () -> new EnumMap<>(Type.class)
-                    ));
+            .filter(type -> type != Type.BLOCKS)
+            .collect(Collectors.toMap(
+                    Function.identity(),
+                    Range::new,
+                    (a, b) -> a,
+                    () -> new EnumMap<>(Type.class)
+            ));
 
     public Range {
         if (value < 0 && type == Type.BLOCKS) {
@@ -35,10 +35,6 @@ public record Range(int value, Type type) {
         this(type.value, type);
     }
 
-    public boolean is(Type type) {
-        return this.type == type;
-    }
-
     public static Range get(int range) {
         return new Range(range);
     }
@@ -49,15 +45,6 @@ public record Range(int value, Type type) {
         }
 
         return DEFAULT_RANGES.get(type);
-    }
-
-    @JsonValue
-    public Object toJson() {
-        if (this.type == Type.BLOCKS) {
-            return this.value;
-        }
-
-        return this.type.name();
     }
 
     @JsonCreator
@@ -75,6 +62,19 @@ public record Range(int value, Type type) {
             Range.Type type = Range.Type.fromString(string);
             return new Range(type);
         }
+    }
+
+    @JsonValue
+    public Object toJson() {
+        if (this.type == Type.BLOCKS) {
+            return this.value;
+        }
+
+        return this.type.name();
+    }
+
+    public boolean is(Type type) {
+        return this.type == type;
     }
 
     public enum Type {

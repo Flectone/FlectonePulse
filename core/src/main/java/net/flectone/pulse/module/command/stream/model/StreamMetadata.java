@@ -11,4 +11,5 @@ public record StreamMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         boolean turned,
         @Nullable String urls
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

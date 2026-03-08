@@ -17,9 +17,11 @@ public interface ModuleSimple {
 
     PermissionSetting permission();
 
-    default void onEnable() {}
+    default void onEnable() {
+    }
 
-    default void onDisable() {}
+    default void onDisable() {
+    }
 
     default BiPredicate<FEntity, Boolean> disablePredicate() {
         return (fEntity, aBoolean) -> false;

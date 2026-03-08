@@ -11,4 +11,5 @@ public record VanillaMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         ParsedComponent parsedComponent,
         boolean ignoreVanish
-) implements VanishMetadata<L> {}
+) implements VanishMetadata<L> {
+}

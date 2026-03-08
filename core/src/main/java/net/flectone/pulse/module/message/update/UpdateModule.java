@@ -70,7 +70,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
     public Localization.Message.Update localization(FEntity sender) {
         return fileFacade.localization(sender).message().update();
     }
-    
+
     public void send(FPlayer fPlayer) {
         taskScheduler.runRegion(fPlayer, () -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
@@ -98,11 +98,6 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
         });
     }
 
-    private static class LatestRelease {
-        @SerializedName("tag_name")
-        public String tagName;
-    }
-
     private void checkAndUpdateLatestVersion() {
         taskScheduler.runAsync(() -> {
             HttpClient client = HttpClient.newHttpClient();
@@ -114,7 +109,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
                 if (response.statusCode() != 200) return;
 
                 LatestRelease latestRelease = gson.fromJson(response.body(), LatestRelease.class);
-                latestVersion = Strings.CS.replace(latestRelease.tagName, "v", "");
+                latestVersion = Strings.CS.replace(latestRelease.tagName(), "v", "");
 
                 // send to console
                 send(FPlayer.UNKNOWN);
@@ -123,4 +118,11 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
             }
         });
     }
+
+    private record LatestRelease(
+            @SerializedName("tag_name")
+            String tagName
+    ) {
+    }
+
 }

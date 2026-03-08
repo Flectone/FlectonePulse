@@ -75,13 +75,13 @@ public class FileWriter {
         }
 
         files.localizations().values()
-                .forEach( localization -> {
-                    Path localizationPath = filePathProvider.get(localization);
-                    if (!checkExist || !Files.exists(localizationPath)) {
-                        save(localizationPath, localization);
-                    }
-                }
-        );
+                .forEach(localization -> {
+                            Path localizationPath = filePathProvider.get(localization);
+                            if (!checkExist || !Files.exists(localizationPath)) {
+                                save(localizationPath, localization);
+                            }
+                        }
+                );
     }
 
     public void save(Path pathToFile, Object fileResource) {

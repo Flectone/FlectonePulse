@@ -55,7 +55,7 @@ import java.util.function.Predicate;
 public class MinecraftBubbleRender implements BubbleRender {
 
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
-    
+
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
@@ -246,8 +246,9 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public void removeAllBubbles() {
-        activeBubbleEntities.values().forEach(entities -> 
-                entities.forEach(this::despawnBubbleEntity));
+        activeBubbleEntities.values().forEach(entities ->
+                entities.forEach(this::despawnBubbleEntity)
+        );
         activeBubbleEntities.clear();
     }
 

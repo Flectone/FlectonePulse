@@ -39,7 +39,7 @@ public interface CommandRegistry extends Registry {
      *
      * @param builder function that creates a command builder using the CommandManager
      */
-    void registerCommand(Function<CommandManager<FPlayer> , Command.Builder<FPlayer>> builder);
+    void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder);
 
     /**
      * Unregisters a command by its name.

@@ -11,4 +11,5 @@ public record RockPaperScissorsMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull RockPaperScissors rockPaperScissors,
         RockpaperscissorsModule.@NonNull GamePhase gamePhase
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

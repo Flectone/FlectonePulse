@@ -12,7 +12,7 @@ import java.io.OutputStream;
 public class SafeDataOutputStream extends DataOutputStream {
 
     private final Gson gson;
-    
+
     public SafeDataOutputStream(Gson gson, OutputStream out) {
         super(out);
 
@@ -23,9 +23,9 @@ public class SafeDataOutputStream extends DataOutputStream {
         String json = gson.toJson(object);
         super.writeUTF(json);
     }
-    
+
     public void writeString(@Nullable String string) throws IOException {
         super.writeUTF(StringUtils.defaultString(string));
     }
-    
+
 }

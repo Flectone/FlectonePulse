@@ -23,6 +23,10 @@ import java.util.function.UnaryOperator;
 
 public interface EventMetadata<L extends LocalizationSetting> {
 
+    static <L extends LocalizationSetting> Builder<L> builder() {
+        return new Builder<>();
+    }
+
     EventMetadata<L> base();
 
     default @NonNull UUID uuid() {
@@ -83,10 +87,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
     default @NonNull String resolveFormat(FPlayer player, L localization) {
         return base().resolveFormat(player, localization);
-    }
-
-    static <L extends LocalizationSetting> Builder<L> builder() {
-        return new Builder<>();
     }
 
     final class Builder<L extends LocalizationSetting> {

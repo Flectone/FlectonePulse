@@ -60,7 +60,7 @@ public class HytaleSidebarModule extends SidebarModule {
     @Override
     public void remove(FPlayer fPlayer) {
         HyUIHud hyUIHud = playerSidebars.get(fPlayer.uuid());
-        if (hyUIHud != null)  {
+        if (hyUIHud != null) {
             hyUIHud.remove();
 
             playerSidebars.remove(fPlayer.uuid());

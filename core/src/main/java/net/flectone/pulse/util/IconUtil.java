@@ -33,7 +33,7 @@ public class IconUtil {
             return new String(Base64.getEncoder().encode(bytes));
 
         } catch (Exception e) {
-            fLogger.warning(e,"Failed to load %s", icon.getName());
+            fLogger.warning(e, "Failed to load %s", icon.getName());
         }
 
         return null;

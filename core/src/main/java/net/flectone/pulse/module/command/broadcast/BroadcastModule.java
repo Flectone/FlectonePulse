@@ -32,8 +32,8 @@ public class BroadcastModule implements ModuleCommand<Localization.Command.Broad
     public void onEnable() {
         String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, manager -> manager
-                        .permission(permission().name())
-                        .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .permission(permission().name())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
 

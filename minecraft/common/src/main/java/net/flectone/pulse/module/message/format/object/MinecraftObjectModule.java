@@ -140,10 +140,10 @@ public class MinecraftObjectModule extends ObjectModule {
         boolean showPlayerHat = !argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value());
 
         Component playerHeadComponent = Component.object().contents(
-                        playerHeadBuilder
-                                .hat(showPlayerHat)
-                                .build()
-                ).build();
+                playerHeadBuilder
+                        .hat(showPlayerHat)
+                        .build()
+        ).build();
 
         return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
     }

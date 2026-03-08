@@ -15,8 +15,8 @@ import net.kyori.adventure.text.Component;
  * actionBar.render(player, Component.text("Hello!"), 60); // 3 seconds
  * }</pre>
  *
- * @since 1.7.0
  * @author TheFaser
+ * @since 1.7.0
  */
 public interface ActionBarRender {
 

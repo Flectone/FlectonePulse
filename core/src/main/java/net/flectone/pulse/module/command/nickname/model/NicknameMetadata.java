@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record NicknameMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull String nickname
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

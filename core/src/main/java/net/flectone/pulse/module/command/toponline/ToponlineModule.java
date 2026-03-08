@@ -51,8 +51,8 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     public void onEnable() {
         String promptNumber = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::number);
         commandModuleController.registerCommand(this, manager -> manager
-               .permission(permission().name())
-               .optional(promptNumber, commandParserProvider.integerParser())
+                .permission(permission().name())
+                .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
 

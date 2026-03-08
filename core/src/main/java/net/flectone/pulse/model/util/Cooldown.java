@@ -13,6 +13,17 @@ public record Cooldown(
 
     public static final Cooldown DEFAULT = new Cooldown(false, 60L);
 
+    @JsonCreator
+    public static Cooldown fromJson(Map<String, Object> map) {
+        boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
+        if (!isEnable) return DEFAULT;
+
+        Object duration = map.get("duration");
+        long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
+
+        return new Cooldown(true, longDuration);
+    }
+
     @JsonValue
     public Map<String, Object> toJson() {
         Map<String, Object> map = new LinkedHashMap<>();
@@ -23,16 +34,5 @@ public record Cooldown(
         }
 
         return map;
-    }
-
-    @JsonCreator
-    public static Cooldown fromJson(Map<String, Object> map) {
-        boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
-        if (!isEnable) return DEFAULT;
-
-        Object duration = map.get("duration");
-        long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
-
-        return new Cooldown(true, longDuration);
     }
 }

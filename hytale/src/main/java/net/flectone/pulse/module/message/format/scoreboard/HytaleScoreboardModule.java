@@ -27,9 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HytaleScoreboardModule extends ScoreboardModule {
 
     private final Map<UUID, CustomName> uuidTeamMap = new ConcurrentHashMap<>();
-
-    private record CustomName(String original, String value){}
-
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -138,5 +135,8 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         }
 
         return new CustomName(fPlayer.name(), PlainTextComponentSerializer.plainText().serialize(prefix.append(displayName).append(suffix)));
+    }
+
+    private record CustomName(String original, String value) {
     }
 }

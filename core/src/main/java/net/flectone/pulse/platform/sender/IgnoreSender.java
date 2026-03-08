@@ -26,8 +26,8 @@ import net.kyori.adventure.text.Component;
  * }
  * }</pre>
  *
- * @since 1.6.0
  * @author TheFaser
+ * @since 1.6.0
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

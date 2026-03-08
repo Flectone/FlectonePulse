@@ -3,7 +3,7 @@ version: '${version}'
 main: net.flectone.pulse.BukkitFlectonePulse
 api-version: '1.13'
 prefix: ${prefix}
-authors: [TheFaser]
+authors: [ TheFaser ]
 description: ${description}
 website: ${website}
 folia-supported: true

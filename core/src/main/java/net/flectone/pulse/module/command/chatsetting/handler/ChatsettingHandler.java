@@ -182,6 +182,10 @@ public class ChatsettingHandler {
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
     }
 
+    private FPlayer syncFPlayer(FPlayer fPlayer) {
+        return fPlayerService.getFPlayer(fPlayer);
+    }
+
     public enum Status {
         DENIED,
         ENABLED,
@@ -194,10 +198,6 @@ public class ChatsettingHandler {
                 default -> throw new IllegalArgumentException();
             };
         }
-    }
-
-    private FPlayer syncFPlayer(FPlayer fPlayer) {
-        return fPlayerService.getFPlayer(fPlayer);
     }
 
 }

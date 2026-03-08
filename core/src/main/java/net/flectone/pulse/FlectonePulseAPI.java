@@ -45,8 +45,7 @@ public class FlectonePulseAPI {
      *
      * @see FlectonePulse
      */
-    @Getter 
-    private static FlectonePulse instance;
+    @Getter private static FlectonePulse instance;
 
     /**
      * Constructs the API wrapper with dependency injection.

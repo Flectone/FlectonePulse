@@ -7,7 +7,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import org.jspecify.annotations.NonNull;
 import reactor.core.publisher.Mono;
 
-public interface  EventListener<T extends Event> extends ModuleLocalization<Localization.Integration.Discord> {
+public interface EventListener<T extends Event> extends ModuleLocalization<Localization.Integration.Discord> {
 
     Class<T> getEventType();
 

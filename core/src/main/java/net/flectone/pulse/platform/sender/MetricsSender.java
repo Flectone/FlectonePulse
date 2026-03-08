@@ -25,8 +25,8 @@ import java.util.zip.GZIPOutputStream;
  * metricsSender.sendMetrics(metrics);
  * }</pre>
  *
- * @since 0.8.1
  * @author TheFaser
+ * @since 0.8.1
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

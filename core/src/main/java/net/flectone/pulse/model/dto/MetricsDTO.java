@@ -24,4 +24,5 @@ public record MetricsDTO(
         int playerCount,
         Map<String, String> modules,
         String createdAt
-) {}
+) {
+}

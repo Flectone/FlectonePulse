@@ -42,23 +42,6 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     /**
-     * Represents player information retrieved from the database.
-     *
-     * @param id the player's database ID
-     * @param online whether the player is online
-     * @param uuid the player's UUID
-     * @param name the player's name
-     * @param ip the player's IP address, may be null
-     */
-    public record PlayerInfo(
-            int id,
-            boolean online,
-            @NonNull String uuid,
-            @NonNull String name,
-            @Nullable String ip
-    ) {}
-
-    /**
      * Inserts a new player into the database.
      * Handles UUID and name conflicts by updating existing records.
      *
@@ -224,5 +207,23 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
         return entities.stream()
                 .map(playerInfo -> convertToFPlayer(playerInfo, false))
                 .toList();
+    }
+
+    /**
+     * Represents player information retrieved from the database.
+     *
+     * @param id the player's database ID
+     * @param online whether the player is online
+     * @param uuid the player's UUID
+     * @param name the player's name
+     * @param ip the player's IP address, may be null
+     */
+    public record PlayerInfo(
+            int id,
+            boolean online,
+            @NonNull String uuid,
+            @NonNull String name,
+            @Nullable String ip
+    ) {
     }
 }

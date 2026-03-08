@@ -233,8 +233,8 @@ public class FabricTaskScheduler implements TaskScheduler {
     private static class ScheduledTask {
         private final Runnable runnable;
         private final long period;
-        private long nextTick;
         private final boolean isAsync;
+        private long nextTick;
         private boolean isCanceled;
 
         ScheduledTask(Runnable runnable, long firstTick, long period, boolean isAsync) {

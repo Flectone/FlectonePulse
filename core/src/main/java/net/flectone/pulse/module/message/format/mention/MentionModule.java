@@ -155,8 +155,8 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
     private Tag mentionTag(MessageContext messageContext, String mention) {
         String format = StringUtils.replaceEach(localization(messageContext.receiver()).format(),
-                new String[]{ "<player>", "<target>" },
-                new String[]{ mention, mention }
+                new String[]{"<player>", "<target>"},
+                new String[]{mention, mention}
         );
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)

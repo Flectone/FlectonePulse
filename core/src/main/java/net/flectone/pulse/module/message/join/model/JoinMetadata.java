@@ -11,4 +11,5 @@ public record JoinMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         boolean playedBefore,
         boolean ignoreVanish
-) implements VanishMetadata<L> {}
+) implements VanishMetadata<L> {
+}

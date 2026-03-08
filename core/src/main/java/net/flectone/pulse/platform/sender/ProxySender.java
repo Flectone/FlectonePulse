@@ -38,8 +38,8 @@ import java.util.UUID;
  * }, UUID.randomUUID());
  * }</pre>
  *
- * @since 1.0.0
  * @author TheFaser
+ * @since 1.0.0
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

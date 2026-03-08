@@ -13,7 +13,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 public class EntityUtil {
 
     private final PacketProvider packetProvider;
-    
+
     public String resolveEntityTranslationKey(String entityType) {
         ItemType itemType = ItemTypes.getByName(entityType);
 

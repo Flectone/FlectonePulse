@@ -48,9 +48,6 @@ public class MessageListener implements EventListener {
     private final TaskScheduler taskScheduler;
 
     @Override
-    public void onEnable() {}
-
-    @Override
     public Integration.Telegram config() {
         return fileFacade.integration().telegram();
     }

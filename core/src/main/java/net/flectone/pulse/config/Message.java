@@ -322,7 +322,8 @@ public record Message(
             public record AnimationConfig(
                     Boolean raw,
                     Integer interval
-            ) implements LocalizationSetting {}
+            ) implements LocalizationSetting {
+            }
 
         }
 

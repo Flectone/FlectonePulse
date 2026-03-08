@@ -51,9 +51,9 @@ public class TictactoeService {
                 String[] column = values[i].split(";");
                 if (column.length != 3) return null;
 
-                ticTacToe.getField()[i-2][0] = Integer.parseInt(column[0]);
-                ticTacToe.getField()[i-2][1] = Integer.parseInt(column[1]);
-                ticTacToe.getField()[i-2][2] = Integer.parseInt(column[2]);
+                ticTacToe.getField()[i - 2][0] = Integer.parseInt(column[0]);
+                ticTacToe.getField()[i - 2][1] = Integer.parseInt(column[1]);
+                ticTacToe.getField()[i - 2][2] = Integer.parseInt(column[2]);
             }
 
             return ticTacToe;

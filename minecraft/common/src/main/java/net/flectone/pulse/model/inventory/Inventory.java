@@ -37,11 +37,11 @@ public class Inventory {
 
     public static class Builder {
 
-        private Component name = Component.empty();
-        private int size;
         private final Int2ObjectOpenHashMap<ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
         private final Int2ObjectOpenHashMap<BiConsumer<ItemStack, Inventory>> clickConsumerMap = new Int2ObjectOpenHashMap<>();
         private final List<Consumer<Inventory>> closeConsumerList = new ObjectArrayList<>();
+        private Component name = Component.empty();
+        private int size;
 
         public Builder name(Component name) {
             this.name = name;

@@ -22,26 +22,6 @@ import java.util.UUID;
 public interface PlatformPlayerAdapter {
 
     /**
-     * Player coordinates in the world.
-     *
-     * @param x the X coordinate
-     * @param y the Y coordinate
-     * @param z the Z coordinate
-     */
-    record Coordinates(double x, double y, double z, float yaw, float pitch) {}
-
-    /**
-     * Player statistics.
-     *
-     * @param health the player health
-     * @param armor the player armor value
-     * @param level the player experience level
-     * @param food the player food level
-     * @param damage the player damage value
-     */
-    record Statistics(double health, double armor, double level, double food, double damage) {}
-
-    /**
      * Gets the entity ID of a player.
      *
      * @param uuid the player UUID
@@ -408,4 +388,26 @@ public interface PlatformPlayerAdapter {
      * @param reason the reason for kicking, displayed to the player
      */
     void kick(FPlayer fPlayer, Component reason);
+
+    /**
+     * Player coordinates in the world.
+     *
+     * @param x the X coordinate
+     * @param y the Y coordinate
+     * @param z the Z coordinate
+     */
+    record Coordinates(double x, double y, double z, float yaw, float pitch) {
+    }
+
+    /**
+     * Player statistics.
+     *
+     * @param health the player health
+     * @param armor  the player armor value
+     * @param level  the player experience level
+     * @param food   the player food level
+     * @param damage the player damage value
+     */
+    record Statistics(double health, double armor, double level, double food, double damage) {
+    }
 }

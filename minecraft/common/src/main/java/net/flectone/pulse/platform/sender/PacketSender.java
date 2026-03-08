@@ -24,8 +24,8 @@ import java.util.UUID;
  * packetSender.send(packet);
  * }</pre>
  *
- * @since 0.8.0
  * @author TheFaser
+ * @since 0.8.0
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

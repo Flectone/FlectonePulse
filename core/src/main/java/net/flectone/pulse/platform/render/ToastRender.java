@@ -19,8 +19,8 @@ import net.kyori.adventure.text.Component;
  * toastRender.render(player, Component.text("Achievement Unlocked!"), toast);
  * }</pre>
  *
- * @since 1.7.0
  * @author TheFaser
+ * @since 1.7.0
  */
 public interface ToastRender {
 

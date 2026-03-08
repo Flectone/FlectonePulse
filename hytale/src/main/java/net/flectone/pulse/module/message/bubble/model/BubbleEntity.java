@@ -7,4 +7,5 @@ public record BubbleEntity(
         Ref<EntityStore> entityRef,
         Bubble bubble,
         long expiryTime
-) {}
+) {
+}

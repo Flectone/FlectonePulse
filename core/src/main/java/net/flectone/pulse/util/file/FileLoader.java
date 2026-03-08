@@ -178,7 +178,7 @@ public class FileLoader {
     }
 
     public <T> T loadFromResource(String path, Class<T> type) {
-        try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream( "config/" + path)) {
+        try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("config/" + path)) {
             if (resourceAsStream == null) {
                 throw new FileNotFoundException("Resource not found: " + path);
             }

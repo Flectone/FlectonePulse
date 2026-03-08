@@ -32,13 +32,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BubbleService {
 
     private final Map<UUID, PlayerBubbleState> playerBubbleStates = new ConcurrentHashMap<>();
-
-    private record PlayerBubbleState(
-            Queue<Bubble> waitingQueue,
-            Queue<Bubble> activeBubbles,
-            ReentrantLock lock
-    ) {}
-
     private final FileFacade fileFacade;
     private final BubbleRender bubbleRender;
     private final ColorConverter colorConverter;
@@ -215,6 +208,13 @@ public class BubbleService {
 
         int countWords = message.split(" ").length;
         return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
+    }
+
+    private record PlayerBubbleState(
+            Queue<Bubble> waitingQueue,
+            Queue<Bubble> activeBubbles,
+            ReentrantLock lock
+    ) {
     }
 
 }

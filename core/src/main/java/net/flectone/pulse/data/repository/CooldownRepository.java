@@ -23,8 +23,6 @@ public class CooldownRepository {
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
 
-    public record CooldownKey(UUID playerUUID, String cooldownClass) {}
-
     public long getTimeLeft(UUID playerUUID, Cooldown cooldown, String cooldownOwner) {
         if (cooldown == null || !cooldown.enable()) return 0;
 
@@ -61,6 +59,9 @@ public class CooldownRepository {
                 }, UUID.randomUUID());
             }
         });
+    }
+
+    public record CooldownKey(UUID playerUUID, String cooldownClass) {
     }
 
 }

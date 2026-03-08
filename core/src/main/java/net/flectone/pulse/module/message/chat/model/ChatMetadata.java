@@ -9,4 +9,5 @@ import org.jspecify.annotations.NonNull;
 public record ChatMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull Chat chat
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}

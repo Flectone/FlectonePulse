@@ -57,9 +57,9 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptHard = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::hard);
         commandModuleController.registerCommand(this, manager -> manager
-               .required(promptPlayer, commandParserProvider.playerParser())
-               .optional(promptHard, commandParserProvider.booleanParser())
-               .permission(permission().name())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .optional(promptHard, commandParserProvider.booleanParser())
+                .permission(permission().name())
         );
 
         String promptId = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::id);
@@ -323,7 +323,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                     }
             );
 
-           formatField = StringUtils.replaceEach(
+            formatField = StringUtils.replaceEach(
                     formatField,
                     new String[]{"<title>", "<symbol>", "<move>"},
                     new String[]{

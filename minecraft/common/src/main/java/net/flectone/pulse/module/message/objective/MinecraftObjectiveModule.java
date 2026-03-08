@@ -13,7 +13,6 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -25,17 +24,14 @@ import org.jspecify.annotations.NonNull;
 public class MinecraftObjectiveModule extends ObjectiveModule {
 
     private final PacketSender packetSender;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
 
     @Inject
     public MinecraftObjectiveModule(FileFacade fileFacade,
                                     PacketSender packetSender,
-                                    PlatformPlayerAdapter platformPlayerAdapter,
                                     MessagePipeline messagePipeline) {
         super(fileFacade);
         this.packetSender = packetSender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.messagePipeline = messagePipeline;
     }
 

@@ -16,9 +16,9 @@ public class HytaleCommandManager extends CommandManager<FPlayer> {
     private final SenderMapper<CommandSender, FPlayer> senderMapper;
 
     public HytaleCommandManager(@NonNull ExecutionCoordinator<FPlayer> executionCoordinator,
-                                   @NonNull HytaleRegistrationHandler commandRegistrationHandler,
-                                   @NonNull SenderMapper<CommandSender, FPlayer> senderMapper,
-                                   JavaPlugin javaPlugin) {
+                                @NonNull HytaleRegistrationHandler commandRegistrationHandler,
+                                @NonNull SenderMapper<CommandSender, FPlayer> senderMapper,
+                                JavaPlugin javaPlugin) {
         super(executionCoordinator, commandRegistrationHandler);
 
         this.senderMapper = senderMapper;

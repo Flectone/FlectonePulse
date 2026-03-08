@@ -152,14 +152,14 @@ public enum ModuleName {
                     messageType -> messageType
             ));
 
-    public String toProxyTag() {
-        return "FlectonePulse:" + this.name();
-    }
-
     public static ModuleName fromProxyString(String string) {
         if (string == null || string.isEmpty()) return null;
 
         return ENUM_BY_PROXY_KEY.get(string);
+    }
+
+    public String toProxyTag() {
+        return "FlectonePulse:" + this.name();
     }
 
 }

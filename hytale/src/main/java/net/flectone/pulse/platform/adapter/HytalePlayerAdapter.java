@@ -401,7 +401,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         double dx = toPos.getX() - fromPos.getX();
         double dy = toPos.getY() - fromPos.getY();
         double dz = toPos.getZ() - fromPos.getZ();
-        double distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
         if (distance <= 0) return true;
 

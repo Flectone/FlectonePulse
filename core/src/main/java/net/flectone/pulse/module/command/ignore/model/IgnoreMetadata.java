@@ -10,4 +10,5 @@ public record IgnoreMetadata<L extends LocalizationSetting>(
         @NonNull EventMetadata<L> base,
         @NonNull Ignore ignore,
         boolean ignored
-) implements EventMetadata<L> {}
+) implements EventMetadata<L> {
+}
