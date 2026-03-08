@@ -39,7 +39,6 @@ subprojects {
     repositories {
         mavenCentral()
 
-        maven { url = "https://jitpack.io" }
         maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
         maven { url = "https://oss.sonatype.org/content/groups/public/" }
         maven { url = "https://repo.aikar.co/content/groups/aikar/" }
@@ -67,6 +66,7 @@ subprojects {
         maven { url = "https://www.cursemaven.com" }
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
         maven { url = "https://repo.inventivetalent.org/repository/public/"}
+        maven { url = "https://jitpack.io" }
     }
 
     dependencies {
