@@ -760,8 +760,11 @@ message:
         player_name:
           name: "flectonepulse.module.message.format.condition.player_name"
           type: "TRUE"
-        admin:
-          name: "flectonepulse.module.message.format.condition.admin"
+        player_ping:
+          name: "flectonepulse.module.message.format.condition.player_ping"
+          type: "TRUE"
+        is_admin:
+          name: "flectonepulse.module.message.format.condition.is_admin"
           type: "TRUE"
     fcolor:
       name: "flectonepulse.module.message.format.fcolor"

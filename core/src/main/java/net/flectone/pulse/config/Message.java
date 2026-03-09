@@ -343,6 +343,7 @@ public record Message(
             ) {
 
                 public enum Type {
+                    NUMBER,
                     STRING,
                     PERMISSION
                 }

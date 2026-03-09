@@ -530,9 +530,16 @@ message:
     condition:
       values:
         player_name:
+          default: "Nameless"
           notch: "Markus Persson"
           thefaser: "Artyom Mochalin"
-        admin:
+        player_ping:
+          0: "Excellent"
+          50: "Good"
+          100: "Decent"
+          150: "Bad"
+          300: "Terrible"
+        is_admin:
           "true": "Admin"
           "false": "Player"
     object:

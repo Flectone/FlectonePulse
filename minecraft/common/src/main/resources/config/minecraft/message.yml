@@ -149,7 +149,10 @@ format:
       player_name:
         value: "%player_name%"
         type: "STRING"
-      admin:
+      player_ping:
+        value: "%player_ping%"
+        type: "NUMBER"
+      is_admin:
         value: "minecraft.admin"
         type: "PERMISSION"
   fcolor:

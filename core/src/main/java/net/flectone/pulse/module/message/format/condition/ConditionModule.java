@@ -100,12 +100,33 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
         if (values == null || values.isEmpty()) return null;
 
         String conditionValue = switch (criteria.type()) {
-            case STRING -> {
-                MessageContext conditionNameContext = messagePipeline.createContext(fPlayer, fReceiver, criteria.value())
-                        .withFlags(flags);
+            case NUMBER -> {
+                try {
+                    double number = Double.parseDouble(buildCriteriaString(fPlayer, fReceiver, criteria.value(), flags));
 
-                yield values.get(messagePipeline.buildPlain(conditionNameContext).toLowerCase().trim());
+                    String key = null;
+                    double maxNumber = Double.MIN_VALUE;
+
+                    for (String configKey : values.keySet()) {
+                        double configNumber = Double.parseDouble(configKey);
+
+                        if (number >= configNumber && configNumber > maxNumber) {
+                            key = configKey;
+                            maxNumber = configNumber;
+
+                            // take first max number
+                            if (maxNumber == number) {
+                                break;
+                            }
+                        }
+                    }
+
+                    yield key != null ? values.get(key) : null;
+                } catch (NumberFormatException ignored) {
+                    yield null;
+                }
             }
+            case STRING -> values.get(buildCriteriaString(fPlayer, fReceiver, criteria.value(), flags).toLowerCase());
             case PERMISSION -> {
                 boolean hasPermission = permissionChecker.check(fPlayer, criteria.value());
                 yield values.get(String.valueOf(hasPermission));
@@ -113,6 +134,13 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
         };
 
         return conditionValue != null ? conditionValue : values.get("default");
+    }
+
+    private String buildCriteriaString(FEntity fPlayer, FPlayer fReceiver, String value, Map<MessageFlag, Boolean> flags) {
+        MessageContext conditionNameContext = messagePipeline.createContext(fPlayer, fReceiver, value)
+                .withFlags(flags);
+
+        return messagePipeline.buildPlain(conditionNameContext).trim();
     }
 
 }
