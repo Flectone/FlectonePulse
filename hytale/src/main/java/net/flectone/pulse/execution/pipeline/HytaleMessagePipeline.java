@@ -1,5 +1,6 @@
 package net.flectone.pulse.execution.pipeline;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -23,8 +24,9 @@ public class HytaleMessagePipeline extends MessagePipeline {
     @Inject
     public HytaleMessagePipeline(FLogger fLogger,
                                  MiniMessage miniMessage,
-                                 EventDispatcher eventDispatcher) {
-        super(fLogger, miniMessage, eventDispatcher);
+                                 EventDispatcher eventDispatcher,
+                                 Gson gson) {
+        super(fLogger, miniMessage, eventDispatcher, gson);
     }
 
     @Override

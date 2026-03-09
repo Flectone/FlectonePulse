@@ -1,5 +1,6 @@
 package net.flectone.pulse.execution.pipeline;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,7 +17,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +38,7 @@ public class MessagePipeline {
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
+    private final Gson gson;
 
     public MessageContext createContext(@NonNull String message) {
         return createContext(FPlayer.UNKNOWN, message);
@@ -97,7 +98,7 @@ public class MessagePipeline {
     }
 
     public JsonElement buildJson(MessageContext context) {
-        return GsonComponentSerializer.gson().serializeToTree(build(context));
+        return gson.toJsonTree(build(context));
     }
 
     public Optional<String> legacyFormat(@NonNull FPlayer fPlayer, @NonNull String message) {
