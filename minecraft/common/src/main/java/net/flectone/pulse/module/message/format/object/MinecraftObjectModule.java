@@ -220,10 +220,11 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
         FPlayer fReceiver = messageContext.receiver();
 
-        // check console version
-        if (messageContext.isFlag(MessageFlag.CHECK_OBJECT_RECEIVER) && isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
-            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
-        } else if (fReceiver.isUnknown()) {
+        if (fReceiver.isUnknown()) {
+            if (!isNewerThanOrEqualsV_1_21_9 || messageContext.isFlag(MessageFlag.CHECK_OBJECT_RECEIVER)) {
+                return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
+            }
+
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
