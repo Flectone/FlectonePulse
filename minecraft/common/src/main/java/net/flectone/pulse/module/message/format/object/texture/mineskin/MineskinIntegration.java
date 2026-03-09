@@ -65,7 +65,7 @@ public class MineskinIntegration implements FIntegration {
                 .thenCompose(jobResponse -> jobResponse.getOrLoadSkin(client))
                 .thenApply(skin -> {
                     ValueAndSignature valueAndSignature = skin.texture().data();
-                    return new Frame(x, y, valueAndSignature.value(), valueAndSignature.signature());
+                    return new Frame(x, y, valueAndSignature.value());
                 });
     }
 
