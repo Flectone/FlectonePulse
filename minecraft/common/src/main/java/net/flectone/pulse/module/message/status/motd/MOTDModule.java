@@ -17,6 +17,7 @@ import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -87,7 +88,9 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
         String nextMessage = getNextMessage(fPlayer, config().random());
         if (nextMessage == null) return null;
 
-        MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage);
+        MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage)
+                .addFlag(MessageFlag.CHECK_OBJECT_RECEIVER, false);
+
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             return messagePipeline.buildJson(nextMessageContext);
         } else {

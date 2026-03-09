@@ -110,11 +110,16 @@ public enum MessageFlag {
      */
     OBJECT_SPRITE(true),
 
-
     /**
      * Enables texture module processing.
      */
     OBJECT_TEXTURE(true),
+
+    /**
+     * Enables object incompatible receiver detection.
+     * (player_head, sprite and texture)
+     */
+    CHECK_OBJECT_RECEIVER(true),
 
     /**
      * Enables Nickname module processing.

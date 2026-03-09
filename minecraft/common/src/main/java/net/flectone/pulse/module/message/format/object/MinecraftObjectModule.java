@@ -221,7 +221,7 @@ public class MinecraftObjectModule extends ObjectModule {
         FPlayer fReceiver = messageContext.receiver();
 
         // check console version
-        if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
+        if (messageContext.isFlag(MessageFlag.CHECK_OBJECT_RECEIVER) && isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
             return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
         } else if (fReceiver.isUnknown()) {
             return MessagePipeline.ReplacementTag.emptyTag();
