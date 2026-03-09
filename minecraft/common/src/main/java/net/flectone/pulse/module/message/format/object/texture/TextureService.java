@@ -126,8 +126,7 @@ public class TextureService {
                             ObjectContents.playerHead()
                                     .profileProperty(PlayerHeadObjectContents.property(
                                             "textures",
-                                            frame.value(),
-                                            frame.signature()
+                                            frame.value()
                                     ))
                                     .build()
                     ));
