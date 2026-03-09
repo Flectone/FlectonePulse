@@ -227,9 +227,14 @@ public class MinecraftObjectModule extends ObjectModule {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
-        // check player version
+        // get user
         User user = packetProvider.getUser(fReceiver);
-        if (user != null && user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+
+        // I think null user == Status (MOTD) viewer
+        if (user == null) return null;
+
+        // check player version
+        if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
                 return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
