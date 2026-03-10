@@ -129,7 +129,12 @@ public enum MessageFlag {
     /**
      * Enables Translate module processing.
      */
-    TRANSLATE_MODULE(true);
+    TRANSLATE_MODULE(true),
+
+    /**
+     * Enables URL detection and processing.
+     */
+    URL_PROCESSING(true);
 
     private final boolean defaultValue;
 

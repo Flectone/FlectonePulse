@@ -126,8 +126,8 @@ public class IntegrationSender {
         MessageContext context = messagePipeline.createContext(eventMetadata.sender(), FPlayer.UNKNOWN, message)
                 .withFlags(eventMetadata.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.TRANSLATE_MODULE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE},
-                        new boolean[]{true, false, false, false, false}
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.TRANSLATE_MODULE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.URL_PROCESSING},
+                        new boolean[]{true, false, false, false, false, false}
                 );
 
         return messagePipeline.build(context);
