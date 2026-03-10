@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.message.status.motd;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -82,7 +84,7 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
         messageIndexMap.put(id, playerIndex);
     }
 
-    public JsonElement next(FPlayer fPlayer) {
+    public JsonElement next(FPlayer fPlayer, User user) {
         if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         String nextMessage = getNextMessage(fPlayer, config().random());
@@ -90,6 +92,10 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
 
         MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage)
                 .addFlag(MessageFlag.CHECK_OBJECT_RECEIVER, false);
+
+        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) {
+            nextMessageContext = nextMessageContext.addFlag(MessageFlag.OBJECT_DEFAULT, true);
+        }
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
             return messagePipeline.buildJson(nextMessageContext);

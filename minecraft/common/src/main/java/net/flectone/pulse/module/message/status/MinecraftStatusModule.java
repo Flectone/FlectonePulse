@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.status;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
@@ -28,7 +29,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
-import java.net.InetAddress;
 import java.util.Collection;
 import java.util.List;
 
@@ -93,8 +93,9 @@ public class MinecraftStatusModule extends StatusModule {
     }
 
     public void update(PacketSendEvent event) {
-        InetAddress inetAddress = event.getUser().getAddress().getAddress();
-        FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
+        User user = event.getUser();
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayer = fPlayerService.loadColors(fPlayer);
@@ -103,7 +104,7 @@ public class MinecraftStatusModule extends StatusModule {
 
         responseJson.add("version", getVersionJson(fPlayer));
         responseJson.add("players", getPlayersJson(fPlayer));
-        responseJson.add("description", getDescriptionJson(fPlayer));
+        responseJson.add("description", getDescriptionJson(fPlayer, user));
 
         String favicon = getFavicon(fPlayer);
         if (favicon != null) {
@@ -140,10 +141,9 @@ public class MinecraftStatusModule extends StatusModule {
         return jsonObject;
     }
 
-    private JsonElement getDescriptionJson(FPlayer fPlayer) {
-        JsonElement jsonElement = MOTDModule.next(fPlayer);
-        jsonElement = jsonElement == null ? platformServerAdapter.getMOTD() : jsonElement;
-        return jsonElement;
+    private JsonElement getDescriptionJson(FPlayer fPlayer, User user) {
+        JsonElement jsonElement = MOTDModule.next(fPlayer, user);
+        return jsonElement == null ? platformServerAdapter.getMOTD() : jsonElement;
     }
 
     private String getFavicon(FPlayer fPlayer) {
