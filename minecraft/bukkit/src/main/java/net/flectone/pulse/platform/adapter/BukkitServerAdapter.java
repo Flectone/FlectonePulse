@@ -167,7 +167,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public boolean hasProject(@NonNull String projectName) {
-        return Bukkit.getPluginManager().getPlugin(projectName) != null;
+        return Bukkit.getPluginManager().isPluginEnabled(projectName);
     }
 
     @Override
