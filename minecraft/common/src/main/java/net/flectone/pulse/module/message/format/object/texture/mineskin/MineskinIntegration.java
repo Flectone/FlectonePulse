@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.format.object.texture.model.Frame;
+import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class MineskinIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
+    private final SystemVariableResolver systemVariableResolver;
     @Getter private final FLogger fLogger;
 
     private MineSkinClient client;
@@ -33,7 +35,7 @@ public class MineskinIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        String apiKey = fileFacade.message().format().object().textureTag().mineskinApiKey();
+        String apiKey = systemVariableResolver.substituteEnvVars(fileFacade.message().format().object().textureTag().mineskinApiKey());
         if (StringUtils.isEmpty(apiKey)) return;
 
         client = MineSkinClient.builder()
