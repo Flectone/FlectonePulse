@@ -444,7 +444,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
     private Tag urlTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (!messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
         String string = Strings.CS.replace(
                 localization(messageContext.receiver()).values().getOrDefault("url", ""),
@@ -467,7 +467,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
     private Tag imageTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (!messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
         Component componentPixels;
         try {
