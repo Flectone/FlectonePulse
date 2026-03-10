@@ -122,6 +122,11 @@ public enum MessageFlag {
     CHECK_OBJECT_RECEIVER(true),
 
     /**
+     * Object will be replaced with default
+     */
+    OBJECT_DEFAULT(false),
+
+    /**
      * Enables Nickname module processing.
      */
     NICKNAME(true);
