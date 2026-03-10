@@ -154,15 +154,8 @@ public class MinecraftStatusModule extends StatusModule {
     private JsonElement getPlayersJson(FPlayer fPlayer) {
         JsonObject playersJson = new JsonObject();
 
-        int max = moduleController.isEnable(playersModule)
-                ? playersModule.config().max()
-                : platformServerAdapter.getMaxPlayers();
-        playersJson.addProperty("max", max);
-
-        int online = moduleController.isEnable(playersModule)
-                ? playersModule.config().online() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.config().online()
-                : platformServerAdapter.getOnlinePlayerCount();
-        playersJson.addProperty("online", online);
+        playersJson.addProperty("max", playersModule.getMaxOnline(fPlayer));
+        playersJson.addProperty("online", playersModule.getOnline(fPlayer));
 
         playersJson.add("sample", getSampleJson(fPlayer));
 

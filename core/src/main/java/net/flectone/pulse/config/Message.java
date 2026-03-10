@@ -723,7 +723,7 @@ public record Message(
                 Boolean enable,
                 Boolean control,
                 Integer max,
-                Integer online
+                String online
         ) implements EnableSetting {
         }
 

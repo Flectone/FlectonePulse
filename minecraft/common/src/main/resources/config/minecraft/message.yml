@@ -389,7 +389,7 @@ status:
     enable: false
     control: true
     max: 69
-    online: -69
+    online: ""
   version:
     enable: false
     protocol: -1
