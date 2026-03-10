@@ -3,6 +3,7 @@ package net.flectone.pulse.processing.resolver;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,10 +15,7 @@ public class SystemVariableResolver {
     private static final Pattern ENV_VAR_PATTERN = Pattern.compile("\\$\\{([A-Za-z0-9_.-]+)(?::([^}]*))?}");
 
     public String substituteEnvVars(String text) {
-        String variable = process(text);
-        if (variable.isBlank()) return text;
-
-        return variable;
+        return StringUtils.isNotEmpty(text) ? process(text) : text;
     }
 
     private String process(String text) {
