@@ -51,7 +51,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         FEntity fReceiver = messageContext.receiver();
 
         // switch parsing
-        if (!messageContext.isFlag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS)) {
+        if (!messageContext.isFlag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER)) {
             FEntity tempFPlayer = fSender;
             fSender = fReceiver;
             fReceiver = tempFPlayer;

@@ -93,7 +93,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (!config().playerHeadTag().enable()) return messageContext;
 
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
             if (moduleController.isDisabledFor(this, sender)) return messageContext;
             if (!permissionChecker.check(sender, permission().playerHeadTag())) return messageContext;
         }
@@ -111,7 +111,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
     private Tag createPlayerHeadTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         if (config().playerHeadTag().hideInvisiblePlayerHead()
-                && !messageContext.isFlag(MessageFlag.USER_MESSAGE)
+                && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace());
@@ -152,7 +152,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (!config().spriteTag().enable()) return messageContext;
 
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
             if (moduleController.isDisabledFor(this, sender)) return messageContext;
             if (!permissionChecker.check(sender, permission().spriteTag())) return messageContext;
         }
@@ -172,7 +172,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (!config().textureTag().enable()) return messageContext;
 
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
             if (moduleController.isDisabledFor(this, sender)) return messageContext;
             if (!permissionChecker.check(sender, permission().textureTag())) return messageContext;
         }
@@ -220,11 +220,11 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
         FPlayer fReceiver = messageContext.receiver();
 
-        if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT)) {
+        if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
             return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
         }
 
-        if (!messageContext.isFlag(MessageFlag.CHECK_OBJECT_RECEIVER) && isNewerThanOrEqualsV_1_21_9) {
+        if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION) && isNewerThanOrEqualsV_1_21_9) {
             return null;
         }
 
@@ -264,11 +264,11 @@ public class MinecraftObjectModule extends ObjectModule {
     private Component addDefaultParametersIfNeeded(MessageContext messageContext, Component component, boolean needExtraSpace) {
         if (!Component.IS_NOT_EMPTY.test(component)) return Component.empty();
 
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE) && needExtraSpace) {
+        if (!messageContext.isFlag(MessageFlag.PLAYER_MESSAGE) && needExtraSpace) {
             component = component.append(Component.space());
         }
 
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
             component = component.color(NamedTextColor.WHITE);
         }
 

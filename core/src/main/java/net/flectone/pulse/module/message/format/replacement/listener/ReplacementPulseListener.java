@@ -20,7 +20,7 @@ public class ReplacementPulseListener implements PulseListener {
     @Pulse
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.REPLACEMENT)) return event;
+        if (!messageContext.isFlag(MessageFlag.REPLACEMENT_MODULE)) return event;
 
         messageContext = replacementModule.format(messageContext);
         messageContext = replacementModule.addTags(messageContext);

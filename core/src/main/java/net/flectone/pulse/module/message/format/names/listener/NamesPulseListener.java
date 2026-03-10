@@ -21,10 +21,10 @@ public class NamesPulseListener implements PulseListener {
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME) && namesModule.isInvisible(sender)) {
+        if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME_DETECTION) && namesModule.isInvisible(sender)) {
             return event.withContext(namesModule.addInvisibleTag(messageContext));
         } else {
             return event.withContext(namesModule.addTags(messageContext));

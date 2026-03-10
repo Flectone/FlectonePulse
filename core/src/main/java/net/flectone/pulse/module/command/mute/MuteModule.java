@@ -175,7 +175,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
 
             MessageContext suffixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), suffix)
                     .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(suffixContext));
         }));

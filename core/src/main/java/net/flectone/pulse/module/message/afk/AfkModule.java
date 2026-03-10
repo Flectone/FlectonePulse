@@ -106,7 +106,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
             MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)
                     .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(afkContext));
         }));

@@ -86,7 +86,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             )
                             .withFlags(messageContext.flags())
                             .addFlags(
-                                    new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                    new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
                                     new boolean[]{false, false}
                             );
 
@@ -107,7 +107,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                         .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
                         .withFlags(messageContext.flags())
                         .addFlags(
-                                new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
                                 new boolean[]{false, false}
                         );
 
@@ -156,7 +156,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
                                     .withFlags(messageContext.flags())
                                     .addFlags(
-                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
                                             new boolean[]{false, false}
                                     );
 
@@ -171,7 +171,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
                                     .withFlags(messageContext.flags())
                                     .addFlags(
-                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
                                             new boolean[]{false, false}
                                     );
 
@@ -185,7 +185,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
                                     .withFlags(messageContext.flags())
                                     .addFlags(
-                                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.MENTION},
+                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
                                             new boolean[]{false, false}
                                     );
 

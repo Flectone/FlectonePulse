@@ -10,126 +10,126 @@ package net.flectone.pulse.util.constant;
 public enum MessageFlag {
 
     /**
-     * True for player messages, false for system messages.
-     * Controls whether full user processing is applied.
+     * Enables Caps module processing.
      */
-    USER_MESSAGE(false),
-
-    /**
-     * Controls how integration placeholders (e.g., PlaceholderAPI) are processed.
-     * If enabled, placeholders are processed on behalf of the sender.
-     * If disabled, placeholders are processed on behalf of the recipient.
-     */
-    SENDER_INTEGRATION_PLACEHOLDERS(true),
+    CAPS_MODULE(true),
 
     /**
      * Controls message color processing.
      * If enabled, OUT colors are applied from the sender.
      * If disabled, OUT colors are applied from the recipient.
      */
-    SENDER_COLOR_OUT(true),
-
-    /**
-     * Enables mention detection and notifications.
-     */
-    MENTION(true),
-
-    /**
-     * Enables FlectonePulse placeholder replacement (%item%, %skin%, etc.).
-     */
-    REPLACEMENT(true),
-
-    /**
-     * Replaces missing tags with empty content in messages.
-     */
-    REPLACE_DISABLED_TAGS(true),
-
-    /**
-     * Enables Fixation module processing.
-     */
-    FIXATION(true),
-
-    /**
-     * Enables QuestionAnswer module processing.
-     */
-    QUESTION(true),
-
-    /**
-     * Enables Translate module processing.
-     */
-    TRANSLATION(true),
-
-    /**
-     * Enables %item% placeholder processing.
-     */
-    TRANSLATE_ITEM(true),
-
-    /**
-     * Enables Swear module processing.
-     */
-    SWEAR(true),
-
-    /**
-     * Enables Caps module processing.
-     */
-    CAPS(true),
+    COLOR_CONTEXT_SENDER(true),
 
     /**
      * Enables Delete module processing.
      */
-    DELETE(true),
+    DELETE_MODULE(true),
+
+    /**
+     * Enables Fixation module processing.
+     */
+    FIXATION_MODULE(true),
 
     /**
      * Enables Flood module processing.
      */
-    FLOOD(true),
+    FLOOD_MODULE(true),
+
+    /**
+     * Provides InteractiveChat plugin compatibility.
+     */
+    INTERACTIVE_CHAT_COMPAT(true),
+
+    /**
+     * Enables detection of invisible player names.
+     */
+    INVISIBLE_NAME_DETECTION(true),
+
+    /**
+     * Enables item placeholder detection and processing.
+     */
+    ITEM_DETECTION(true),
 
     /**
      * Maintains legacy color code compatibility.
      * Handles conversion between old and new color systems.
      */
-    LEGACY_COLORS(true),
+    LEGACY_COLOR_CONVERSION(true),
 
     /**
-     * Provides InteractiveChat plugin compatibility.
+     * Enables mention detection and notifications.
      */
-    INTERACTIVE_CHAT(true),
+    MENTION_MODULE(true),
 
     /**
-     * Enables detection of invisible player names.
+     * Enables Nickname module processing.
      */
-    INVISIBLE_NAME(true),
+    NICKNAME_MODULE(true),
+
+    /**
+     * Object will be replaced with default.
+     */
+    OBJECT_DEFAULT_VALUE(false),
 
     /**
      * Enables player_head placeholder processing.
      */
-    OBJECT_PLAYER_HEAD(true),
-
-    /**
-     * Enables sprite module processing.
-     */
-    OBJECT_SPRITE(true),
-
-    /**
-     * Enables texture module processing.
-     */
-    OBJECT_TEXTURE(true),
+    OBJECT_PLAYER_HEAD_PROCESSING(true),
 
     /**
      * Enables object incompatible receiver detection.
      * (player_head, sprite and texture)
      */
-    CHECK_OBJECT_RECEIVER(true),
+    OBJECT_RECEIVER_VALIDATION(true),
 
     /**
-     * Object will be replaced with default
+     * Enables sprite placeholder processing.
      */
-    OBJECT_DEFAULT(false),
+    OBJECT_SPRITE_PROCESSING(true),
 
     /**
-     * Enables Nickname module processing.
+     * Enables texture placeholder processing.
      */
-    NICKNAME(true);
+    OBJECT_TEXTURE_PROCESSING(true),
+
+    /**
+     * Controls how integration placeholders (e.g., PlaceholderAPI) are processed.
+     * If enabled, placeholders are processed on behalf of the sender.
+     * If disabled, placeholders are processed on behalf of the recipient.
+     */
+    PLACEHOLDER_CONTEXT_SENDER(true),
+
+    /**
+     * True for player messages, false for system messages.
+     * Controls whether full user processing is applied.
+     */
+    PLAYER_MESSAGE(false),
+
+    /**
+     * Enables QuestionAnswer module processing.
+     */
+    QUESTIONANSWER_MODULE(true),
+
+    /**
+     * Replaces missing tags with empty content in messages.
+     */
+    REMOVE_DISABLED_TAGS(true),
+
+    /**
+     * Enables FlectonePulse placeholder replacement (%item%, %skin%, etc.).
+     */
+    REPLACEMENT_MODULE(true),
+
+    /**
+     * Enables Swear module processing.
+     */
+    SWEAR_MODULE(true),
+
+    /**
+     * Enables Translate module processing.
+     */
+    TRANSLATE_MODULE(true);
 
     private final boolean defaultValue;
 

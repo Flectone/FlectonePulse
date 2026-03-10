@@ -20,7 +20,7 @@ public class LegacyColorPulseListener implements PulseListener {
     @Pulse(priority = Event.Priority.HIGHEST)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.LEGACY_COLORS)) return event;
+        if (!messageContext.isFlag(MessageFlag.LEGACY_COLOR_CONVERSION)) return event;
 
         return event.withContext(legacyColorConvertor.convert(messageContext));
     }

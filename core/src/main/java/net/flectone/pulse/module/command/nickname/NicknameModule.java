@@ -198,7 +198,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             MessageContext nickContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), displayFormat)
                     .withFlags(messageContext.flags())
                     .addFlags(
-                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.NICKNAME},
+                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.NICKNAME_MODULE},
                             new boolean[]{false, false}
                     );
 

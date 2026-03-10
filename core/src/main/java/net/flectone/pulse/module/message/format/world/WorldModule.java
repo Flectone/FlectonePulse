@@ -70,7 +70,7 @@ public class WorldModule implements ModuleSimple {
 
             MessageContext worldContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
                     .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(worldContext));
         }));

@@ -181,7 +181,7 @@ public class ChannelMessageListener implements EventListener<ChannelMessageEvent
     private String buildMessage(FPlayer fPlayer, String localization) {
         MessageContext messageContext = messagePipeline.createContext(fPlayer, localization)
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.OBJECT_PLAYER_HEAD, MessageFlag.OBJECT_SPRITE},
+                        new MessageFlag[]{MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_SPRITE_PROCESSING},
                         new boolean[]{false, false}
                 );
 

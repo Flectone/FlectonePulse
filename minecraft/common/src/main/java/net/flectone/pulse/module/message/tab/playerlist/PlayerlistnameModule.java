@@ -193,7 +193,7 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
         boolean offlineClient = fReceiver.uuid().version() == 3;
 
         MessageContext messageContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
-                .addFlag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient); // disable player_head for official client
+                .addFlag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, offlineClient); // disable player_head for official client
 
         return messagePipeline.build(messageContext);
     }

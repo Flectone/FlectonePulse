@@ -20,7 +20,7 @@ public class ConditionPulseListener implements PulseListener {
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
         return event.withContext(conditionModule.addTag(messageContext));
     }

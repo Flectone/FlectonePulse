@@ -91,10 +91,10 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
         if (nextMessage == null) return null;
 
         MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage)
-                .addFlag(MessageFlag.CHECK_OBJECT_RECEIVER, false);
+                .addFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
 
         if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) {
-            nextMessageContext = nextMessageContext.addFlag(MessageFlag.OBJECT_DEFAULT, true);
+            nextMessageContext = nextMessageContext.addFlag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
         }
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {

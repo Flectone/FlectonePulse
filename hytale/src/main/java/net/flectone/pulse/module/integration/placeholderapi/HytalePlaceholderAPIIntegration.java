@@ -162,14 +162,14 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
         if (moduleController.isDisabledFor(placeholderAPIModule, sender)) return event;
 
         FPlayer fReceiver = messageContext.receiver();
-        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
         if (!permissionChecker.check(sender, placeholderAPIModule.permission().use()) && isUserMessage) return event;
         if (!(sender instanceof FPlayer fPlayer)) return event;
 
         String message = messageContext.message();
 
         // switch parsing
-        if (!messageContext.isFlag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS)) {
+        if (!messageContext.isFlag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER)) {
             FPlayer tempFPlayer = fPlayer;
             fPlayer = fReceiver;
             fReceiver = tempFPlayer;

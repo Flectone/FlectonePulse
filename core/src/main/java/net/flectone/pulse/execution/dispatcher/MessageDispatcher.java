@@ -142,7 +142,7 @@ public class MessageDispatcher {
 
         MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, message)
                 .withFlags(eventMetadata.flags())
-                .addFlag(MessageFlag.USER_MESSAGE, true);
+                .addFlag(MessageFlag.PLAYER_MESSAGE, true);
 
         return messagePipeline.build(context);
     }

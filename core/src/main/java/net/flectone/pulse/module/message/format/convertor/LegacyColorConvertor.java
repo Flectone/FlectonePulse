@@ -68,7 +68,7 @@ public class LegacyColorConvertor {
 
     public MessageContext convert(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && !permissionChecker.check(sender, fileFacade.permission().message().format().legacyColors())) return messageContext;
 
         String contextMessage = messageContext.message();

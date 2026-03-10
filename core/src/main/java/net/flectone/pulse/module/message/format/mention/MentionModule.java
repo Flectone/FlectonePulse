@@ -161,7 +161,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .addFlag(MessageFlag.USER_MESSAGE, false);
+                .addFlag(MessageFlag.PLAYER_MESSAGE, false);
 
         Component component = messagePipeline.build(newContext);
         return Tag.selfClosingInserting(component);

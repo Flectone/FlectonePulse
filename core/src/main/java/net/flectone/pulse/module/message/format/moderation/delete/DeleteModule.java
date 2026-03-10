@@ -99,7 +99,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
             MessageContext newContext = messagePipeline.createContext(sender, receiver, placeholder)
                     .withFlags(messageContext.flags())
                     .addFlags(
-                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.DELETE, MessageFlag.USER_MESSAGE},
+                            new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.DELETE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
                     );
 

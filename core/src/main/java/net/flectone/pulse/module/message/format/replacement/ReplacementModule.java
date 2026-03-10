@@ -184,7 +184,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                     MessageContext componentContext = messagePipeline.createContext(sender, receiver, replacement)
                             .withFlags(messageContext.flags())
                             .addFlags(
-                                    new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                                    new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                                     new boolean[]{false, false}
                             );
 
@@ -252,7 +252,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext spoilerContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), "." + spoilerText)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATE_ITEM},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.ITEM_DETECTION},
                         new boolean[]{false, false} // we don't need to double format "|| %item% ||"
                 );
 
@@ -270,7 +270,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
         MessageContext formatContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
-                .addFlag(MessageFlag.USER_MESSAGE, false); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+                .addFlag(MessageFlag.PLAYER_MESSAGE, false); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
 
         Component component = messagePipeline.build(formatContext);
 
@@ -291,7 +291,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 );
 
@@ -310,7 +310,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 );
 
@@ -329,7 +329,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext context = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 );
 
@@ -356,7 +356,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
             MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                     .withFlags(messageContext.flags())
                     .addFlags(
-                            new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                             new boolean[]{false, false}
                     );
 
@@ -385,7 +385,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 );
 
@@ -413,7 +413,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
@@ -425,13 +425,13 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
     private Tag itemTag(MessageContext messageContext) {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
-        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.TRANSLATE_ITEM));
+        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
         String format = localization(messageContext.receiver()).values().getOrDefault("item", "");
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
                 .addTagResolver(TagResolver.resolver("message_1", (argumentQueue, ctx) -> Tag.selfClosingInserting(componentItem)));
@@ -454,7 +454,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT, MessageFlag.LEGACY_COLORS},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
                 );
 
@@ -483,7 +483,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
                 .withFlags(messageContext.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.REPLACEMENT, MessageFlag.LEGACY_COLORS},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
                 )
                 .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));

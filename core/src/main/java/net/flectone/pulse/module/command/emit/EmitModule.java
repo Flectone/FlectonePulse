@@ -77,7 +77,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
         if (targetName.equalsIgnoreCase("all")) {
             messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
-                    .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
+                    .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
                     .range(Range.get(Range.Type.PROXY))
                     .format(Localization.Command.Emit::format)
                     .message(message)
@@ -111,7 +111,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                 .sender(fPlayer)
                 .filterPlayer(fTarget)
                 .format(Localization.Command.Emit::format)
-                .flag(MessageFlag.SENDER_INTEGRATION_PLACEHOLDERS, false)
+                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
                 .message(message)
                 .destination(destination)
                 .sound(soundOrThrow())

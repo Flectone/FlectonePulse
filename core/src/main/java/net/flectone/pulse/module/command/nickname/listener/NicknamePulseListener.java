@@ -22,9 +22,9 @@ public class NicknamePulseListener implements PulseListener {
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.NICKNAME)) return event;
-        if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME) && namesModule.isInvisible(event.context().sender())) return event;
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+        if (!messageContext.isFlag(MessageFlag.NICKNAME_MODULE)) return event;
+        if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME_DETECTION) && namesModule.isInvisible(event.context().sender())) return event;
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
         return event.withContext(nickModule.addTag(messageContext));
     }

@@ -73,12 +73,12 @@ public class FColorModule implements ModuleSimple {
         if (!message.contains(MessagePipeline.ReplacementTag.FCOLOR.getTagName())) return messageContext;
 
         FEntity sender = messageContext.sender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return messageContext;
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE) && !permissionChecker.check(sender, formatPermission().legacyColors())) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
         if (moduleController.isDisabledFor(this, receiver)) return messageContext;
 
-        boolean isSenderColorOut = messageContext.isFlag(MessageFlag.SENDER_COLOR_OUT);
+        boolean isSenderColorOut = messageContext.isFlag(MessageFlag.COLOR_CONTEXT_SENDER);
 
         messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();

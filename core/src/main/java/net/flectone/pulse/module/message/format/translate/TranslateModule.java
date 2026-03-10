@@ -112,7 +112,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())
                     .addFlags(
-                            new MessageFlag[]{MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION, MessageFlag.TRANSLATION, MessageFlag.USER_MESSAGE},
+                            new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.TRANSLATE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
                     );
 

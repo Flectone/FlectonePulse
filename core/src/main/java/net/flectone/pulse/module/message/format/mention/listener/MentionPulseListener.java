@@ -20,8 +20,8 @@ public class MentionPulseListener implements PulseListener {
     @Pulse
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
-        if (!messageContext.isFlag(MessageFlag.MENTION)) return event;
-        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+        if (!messageContext.isFlag(MessageFlag.MENTION_MODULE)) return event;
+        if (!messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
         messageContext = mentionModule.format(messageContext);
         messageContext = mentionModule.addTags(messageContext);

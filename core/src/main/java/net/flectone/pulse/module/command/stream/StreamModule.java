@@ -193,7 +193,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
             MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), streamPrefix)
                     .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.USER_MESSAGE, false);
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
 
             return Tag.inserting(messagePipeline.build(prefixContext));
         }));

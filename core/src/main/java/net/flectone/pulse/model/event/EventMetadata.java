@@ -131,7 +131,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
         }
 
         public Builder<L> filterPlayer(FPlayer player, boolean senderColorOut) {
-            return filterPlayer(player).flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut);
+            return filterPlayer(player).flag(MessageFlag.COLOR_CONTEXT_SENDER, senderColorOut);
         }
 
         public Builder<L> filter(Predicate<FPlayer> filter) {

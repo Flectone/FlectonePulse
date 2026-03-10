@@ -129,14 +129,14 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         Component prefix = Component.empty();
         if (!config().prefix().isEmpty()) {
             MessageContext prefixContext = messagePipeline.createContext(fPlayer, config().prefix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME, false);
+                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
             prefix = messagePipeline.build(prefixContext);
         }
 
         Component suffix = Component.empty();
         if (!config().suffix().isEmpty()) {
             MessageContext suffixContext = messagePipeline.createContext(fPlayer, config().suffix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME, false);
+                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
             suffix = messagePipeline.build(suffixContext);
         }
 

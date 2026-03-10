@@ -111,7 +111,7 @@ public class IntegrationSender {
         MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
                 .withFlags(eventMetadata.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.TRANSLATION, MessageFlag.OBJECT_SPRITE, MessageFlag.OBJECT_PLAYER_HEAD},
+                        new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING},
                         new boolean[]{false, false, false}
                 )
                 .addTagResolvers(eventMetadata.resolveTags(FPlayer.UNKNOWN));
@@ -126,7 +126,7 @@ public class IntegrationSender {
         MessageContext context = messagePipeline.createContext(eventMetadata.sender(), FPlayer.UNKNOWN, message)
                 .withFlags(eventMetadata.flags())
                 .addFlags(
-                        new MessageFlag[]{MessageFlag.USER_MESSAGE, MessageFlag.TRANSLATION, MessageFlag.MENTION, MessageFlag.INTERACTIVE_CHAT, MessageFlag.QUESTION},
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.TRANSLATE_MODULE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE},
                         new boolean[]{true, false, false, false, false}
                 );
 

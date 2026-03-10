@@ -37,7 +37,7 @@ public class MiniPlaceholdersModule implements ModuleSimple {
             MessageContext messageContext = messageFormattingEvent.context();
             FEntity sender = messageContext.sender();
             if (moduleController.isDisabledFor(this, sender)) return event;
-            if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return event;
+            if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) return event;
 
             return miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
         });

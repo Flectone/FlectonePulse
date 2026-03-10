@@ -67,7 +67,7 @@ public class MessagePipeline {
         MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(context));
         MessageContext eventContext = event.context();
 
-        if (eventContext.isFlag(MessageFlag.REPLACE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.USER_MESSAGE)) {
+        if (eventContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
             TagResolver tagResolver = eventContext.tagResolver();
             eventContext = eventContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
                     .filter(tag -> !tagResolver.has(tag.getTagName()))
@@ -108,7 +108,7 @@ public class MessagePipeline {
             Component deserialized = legacyComponentSerializer.deserialize(message);
 
             MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
-                    .addFlag(MessageFlag.USER_MESSAGE, true);
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, true);
 
             Component component = build(context)
                     .applyFallbackStyle(deserialized.style())

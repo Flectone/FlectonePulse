@@ -141,7 +141,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
 
         return messageContext.addTagResolvers(tagResolverMap
                 .entrySet()
