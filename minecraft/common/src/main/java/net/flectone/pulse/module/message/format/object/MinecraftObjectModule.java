@@ -45,6 +45,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
+    private final MessagePipeline messagePipeline;
     private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
@@ -57,6 +58,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  IntegrationModule integrationModule,
                                  PlatformPlayerAdapter platformPlayerAdapter,
                                  ModuleController moduleController,
+                                 MessagePipeline messagePipeline,
                                  @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
         super(fileFacade);
 
@@ -68,6 +70,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.moduleController = moduleController;
+        this.messagePipeline = messagePipeline;
         this.isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
     }
 
@@ -100,10 +103,12 @@ public class MinecraftObjectModule extends ObjectModule {
 
         return messageContext.addTagResolvers(
                 TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), ((argumentQueue, context) ->
-                        createPlayerHeadTag(messageContext, getDefaultObjectComponent(messageContext), argumentQueue))
+                        createPlayerHeadTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
                 ),
                 TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), ((argumentQueue, context) -> {
-                    Component defaultComponent = argumentQueue.hasNext() ? Component.text(argumentQueue.pop().value()) : getDefaultObjectComponent(messageContext);
+                    Component defaultComponent = argumentQueue.hasNext()
+                            ? buildArgument(messageContext, argumentQueue.pop().value())
+                            : getDefaultComponent(messageContext);
                     return createPlayerHeadTag(messageContext, defaultComponent, argumentQueue);
                 }))
         );
@@ -128,7 +133,7 @@ public class MinecraftObjectModule extends ObjectModule {
                     ? Component.object().contents(playerHeadBuilder.profileProperty(profileProperty).build()).build()
                     : Component.object().contents(playerHeadBuilder.name(sender.name()).build()).build();
 
-            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
+            return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
         }
 
         try {
@@ -145,7 +150,7 @@ public class MinecraftObjectModule extends ObjectModule {
                         .build()
         ).build();
 
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
+        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
     }
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
@@ -159,10 +164,12 @@ public class MinecraftObjectModule extends ObjectModule {
 
         return messageContext.addTagResolvers(
                 TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), ((argumentQueue, context) ->
-                        createSpriteTag(messageContext, getDefaultObjectComponent(messageContext), argumentQueue))
+                        createSpriteTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
                 ),
                 TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, context) -> {
-                    Component defaultComponent = argumentQueue.hasNext() ? Component.text(argumentQueue.pop().value()) : getDefaultObjectComponent(messageContext);
+                    Component defaultComponent = argumentQueue.hasNext()
+                            ? buildArgument(messageContext, argumentQueue.pop().value())
+                            : getDefaultComponent(messageContext);
                     return createSpriteTag(messageContext, defaultComponent, argumentQueue);
                 })
         );
@@ -179,10 +186,12 @@ public class MinecraftObjectModule extends ObjectModule {
 
         return messageContext.addTagResolvers(
                 TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), ((argumentQueue, context) ->
-                        createTextureTag(messageContext, getDefaultObjectComponent(messageContext), argumentQueue))
+                        createTextureTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
                 ),
                 TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, context) -> {
-                    Component defaultComponent = argumentQueue.hasNext() ? Component.text(argumentQueue.pop().value()) : getDefaultObjectComponent(messageContext);
+                    Component defaultComponent = argumentQueue.hasNext()
+                            ? buildArgument(messageContext, argumentQueue.pop().value())
+                            : getDefaultComponent(messageContext);
                     return createTextureTag(messageContext, defaultComponent, argumentQueue);
                 })
         );
@@ -197,7 +206,7 @@ public class MinecraftObjectModule extends ObjectModule {
         Component textureComponent = textureService.getTexture(textureName);
         if (textureComponent == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, textureComponent, config().textureTag().needExtraSpace()));
+        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, textureComponent, config().textureTag().needExtraSpace()));
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
@@ -214,14 +223,14 @@ public class MinecraftObjectModule extends ObjectModule {
 
         Component spriteComponent = Component.object().contents(spriteObjectContents).build();
 
-        return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, spriteComponent, config().spriteTag().needExtraSpace()));
+        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, spriteComponent, config().spriteTag().needExtraSpace()));
     }
 
     private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
         FPlayer fReceiver = messageContext.receiver();
 
         if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
-            return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
+            return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
         }
 
         if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION) && isNewerThanOrEqualsV_1_21_9) {
@@ -230,7 +239,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
         if (fReceiver.isUnknown()) {
             if (isNewerThanOrEqualsV_1_21_9) {
-                return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
+                return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
             }
 
             return MessagePipeline.ReplacementTag.emptyTag();
@@ -246,7 +255,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
-                return Tag.selfClosingInserting(addDefaultParametersIfNeeded(messageContext, defaultComponent, needExtraSpace));
+                return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
             }
 
             // continue building
@@ -257,11 +266,18 @@ public class MinecraftObjectModule extends ObjectModule {
         return MessagePipeline.ReplacementTag.emptyTag();
     }
 
-    private Component getDefaultObjectComponent(MessageContext messageContext) {
+    private Component buildArgument(MessageContext messageContext, String argument) {
+        MessageContext argumentContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), argument)
+                .withFlags(messageContext.flags());
+
+        return messagePipeline.build(argumentContext);
+    }
+
+    private Component getDefaultComponent(MessageContext messageContext) {
         return Component.text(localization(messageContext.receiver()).defaultSymbol());
     }
 
-    private Component addDefaultParametersIfNeeded(MessageContext messageContext, Component component, boolean needExtraSpace) {
+    private Component applyDefaultFormatting(MessageContext messageContext, Component component, boolean needExtraSpace) {
         if (!Component.IS_NOT_EMPTY.test(component)) return Component.empty();
 
         if (!messageContext.isFlag(MessageFlag.PLAYER_MESSAGE) && needExtraSpace) {
