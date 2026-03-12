@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -51,7 +53,14 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
     private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> ADD_ACTIONS = EnumSet.of(
             WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LISTED,
-            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME,
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LIST_ORDER
+    );
+
+    private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> UPDATE_ACTIONS = EnumSet.of(
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LISTED,
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME,
+            WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LIST_ORDER
     );
 
     private final FileFacade fileFacade;
@@ -165,10 +174,11 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
                     platformPlayerAdapter.getPing(fPlayer),
                     gameMode,
                     name,
-                    null
+                    null,
+                    integrationModule.getGroupWeight(fPlayer)
             );
 
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME, playerInfo));
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfo));
             return;
         }
 
