@@ -20,11 +20,7 @@ public class PlayerPreLoginProcessor {
     private final ProxyRegistry proxyRegistry;
     private final EventDispatcher eventDispatcher;
 
-    public void processAsyncLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> allowedConsumer, Consumer<PlayerPreLoginEvent> kickConsumer) {
-        processLogin(uuid, name, allowedConsumer, kickConsumer);
-    }
-
-    public void processLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> allowedConsumer, Consumer<PlayerPreLoginEvent> kickConsumer) {
+    public void processLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> kickConsumer) {
         // if no one was on the server, the cache may be invalid for other servers
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
         if (fPlayerService.getOnlineFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
@@ -37,7 +33,7 @@ public class PlayerPreLoginProcessor {
         PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
         if (event.allowed()) {
             fPlayerService.saveJoinSession(fPlayer);
-            allowedConsumer.accept(event.withPlayer(fPlayerService.updateCache(fPlayerService.loadData(fPlayer))));
+            fPlayerService.updateCache(fPlayerService.loadData(fPlayer));
         } else {
             fPlayerService.invalidateOnline(fPlayer.uuid());
             kickConsumer.accept(event);

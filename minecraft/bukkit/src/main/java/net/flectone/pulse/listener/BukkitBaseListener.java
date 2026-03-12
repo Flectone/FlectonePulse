@@ -39,12 +39,12 @@ public class BukkitBaseListener implements Listener {
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
         // in older versions (1.20.1 and older), there is no configuration stage
         // so we use Bukkit API
-        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_20_1)
+        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)
                 || fileFacade.config().module().useBukkitPreLoginListener()) {
             UUID uuid = event.getUniqueId();
             String name = event.getName();
 
-            playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {}, loginEvent -> {
+            playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
 
                 Component reason = loginEvent.kickReason();

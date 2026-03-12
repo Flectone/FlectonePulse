@@ -3,6 +3,7 @@ package net.flectone.pulse.listener;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -22,7 +23,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
-import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -84,7 +84,6 @@ public class BasePacketListener implements PacketListener {
         PacketTypeCommon packetType = event.getPacketType();
         switch (packetType) {
             case PacketType.Login.Server.LOGIN_SUCCESS -> handleLoginSuccess(event);
-            case PacketType.Login.Server.DISCONNECT -> handleLoginDisconnect(event);
             case PacketType.Play.Server.SET_PASSENGERS -> handleSetPassengers(event);
             default -> {
                 Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);
@@ -112,18 +111,31 @@ public class BasePacketListener implements PacketListener {
         }
     }
 
+    @Override
+    public void onUserDisconnect(UserDisconnectEvent event) {
+        UUID uuid = event.getUser().getUUID();
+        if (uuid == null) return;
+
+        taskScheduler.runAsyncLater(() -> {
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            if (!fPlayer.isOnline()) return;
+
+            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+        }, 5L);
+    }
+
     private void handleLoginSuccess(PacketSendEvent event) {
         boolean usePacketPreLoginListener =
                 // only for 1.20.2 and newer versions
-                // because there is a configuration stage and there are no problems with evet.setСancelled(True)
+                // because there is a configuration stage and there are no problems
                 event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)
-                // or maybe it's enabled in config, it only works for Bukkit
+                // and not Bukkit AsyncPlayerPreLoginEvent
                 && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().module().useBukkitPreLoginListener());
 
         if (!usePacketPreLoginListener) return;
 
-        WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
-        UserProfile userProfile = wrapper.getUserProfile();
+        WrapperLoginServerLoginSuccess wrapperLoginServerLoginSuccess = new WrapperLoginServerLoginSuccess(event);
+        UserProfile userProfile = wrapperLoginServerLoginSuccess.getUserProfile();
 
         UUID uuid = userProfile.getUUID();
         if (uuid == null) return;
@@ -131,26 +143,9 @@ public class BasePacketListener implements PacketListener {
         String playerName = userProfile.getName();
         if (playerName == null) return;
 
-        event.setCancelled(true);
-
-        playerPreLoginProcessor.processAsyncLogin(uuid, playerName,
-                loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
-                loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
+        playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent ->
+                packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
         );
-    }
-
-    private void handleLoginDisconnect(PacketSendEvent event) {
-        if (event.getPacketType() != PacketType.Login.Server.DISCONNECT) return;
-
-        taskScheduler.runAsync(() -> {
-            UUID uuid = event.getUser().getUUID();
-            if (uuid == null) return;
-
-            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-
-            eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
-            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
-        });
     }
 
     private void handleSetPassengers(PacketSendEvent event) {
