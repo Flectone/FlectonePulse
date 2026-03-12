@@ -65,11 +65,17 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerRegionTimer(fPlayer -> {
-                if (!uuidTeamMap.containsKey(fPlayer.uuid())) return;
+                Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
+                if (oldTeam == null) return;
 
                 // new info
                 Team newTeam = createTeam(fPlayer);
-                sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
+                if (newTeam.name().equals(oldTeam.name())) {
+                    sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
+                } else {
+                    sendPacket(oldTeam, WrapperPlayServerTeams.TeamMode.REMOVE);
+                    sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
+                }
 
                 // update info
                 uuidTeamMap.put(fPlayer.uuid(), newTeam);
