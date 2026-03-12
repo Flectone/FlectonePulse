@@ -48,44 +48,44 @@ public class FileWriter {
     private final FilePathProvider filePathProvider;
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
-    public void save(FilePack files, boolean checkExist) {
+    public void save(FilePack files, boolean checkExist, boolean checkLastModifiedTime) {
         Path commandPath = filePathProvider.get(files.command());
         if (!checkExist || !Files.exists(commandPath)) {
-            save(commandPath, files.command());
+            save(commandPath, files.command(), checkLastModifiedTime);
         }
 
         Path configPath = filePathProvider.get(files.config());
         if (!checkExist || !Files.exists(configPath)) {
-            save(configPath, files.config());
+            save(configPath, files.config(), checkLastModifiedTime);
         }
 
         Path integrationPath = filePathProvider.get(files.integration());
         if (!checkExist || !Files.exists(integrationPath)) {
-            save(integrationPath, files.integration());
+            save(integrationPath, files.integration(), checkLastModifiedTime);
         }
 
         Path messagePath = filePathProvider.get(files.message());
         if (!checkExist || !Files.exists(messagePath)) {
-            save(messagePath, files.message());
+            save(messagePath, files.message(), checkLastModifiedTime);
         }
 
         Path permissionPath = filePathProvider.get(files.permission());
         if (!checkExist || !Files.exists(permissionPath)) {
-            save(permissionPath, files.permission());
+            save(permissionPath, files.permission(), checkLastModifiedTime);
         }
 
         files.localizations().values()
                 .forEach(localization -> {
                             Path localizationPath = filePathProvider.get(localization);
                             if (!checkExist || !Files.exists(localizationPath)) {
-                                save(localizationPath, localization);
+                                save(localizationPath, localization, checkLastModifiedTime);
                             }
                         }
                 );
     }
 
-    public void save(Path pathToFile, Object fileResource) {
-        if (pathToFile.toFile().lastModified() == LAST_MODIFIED_TIME) return;
+    public void save(Path pathToFile, Object fileResource, boolean checkLastModifiedTime) {
+        if (checkLastModifiedTime && pathToFile.toFile().lastModified() == LAST_MODIFIED_TIME) return;
 
         Map<String, String> comments = new LinkedHashMap<>();
         collectDescriptions(fileResource.getClass(), "", comments, new ObjectOpenHashSet<>());

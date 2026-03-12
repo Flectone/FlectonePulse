@@ -118,7 +118,11 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
         boolean turned = !config().turnedOn();
 
-        fileFacade.updateFilePack(filePack -> filePack.withCommand(filePack.command().withMaintenance(filePack.command().maintenance().withTurnedOn(turned))));
+        fileFacade.updateFilePack(filePack -> filePack.withCommand(
+                filePack.command().withMaintenance(
+                        filePack.command().maintenance().withTurnedOn(turned)
+                )
+        ));
 
         try {
             fileFacade.saveFiles();

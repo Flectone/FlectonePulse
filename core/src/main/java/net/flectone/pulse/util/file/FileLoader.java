@@ -86,7 +86,7 @@ public class FileLoader {
                 Map.copyOf(localizations)
         );
 
-        fileWriter.save(defaultFiles, true);
+        fileWriter.save(defaultFiles, true, true);
     }
 
     public FilePack loadFiles(FilePack currentFiles) {
@@ -199,7 +199,7 @@ public class FileLoader {
             if (e instanceof MismatchedInputException mismatchedInputException
                     && mismatchedInputException.getMessage() != null
                     && mismatchedInputException.getMessage().contains("No content to map due to end-of-input")) {
-                fileWriter.save(pathToFile, defaultFile);
+                fileWriter.save(pathToFile, defaultFile, true);
             } else {
                 throw new FileLoadException(file.getPath(), e);
             }

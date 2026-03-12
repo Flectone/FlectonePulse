@@ -117,7 +117,7 @@ public class FileFacade {
     }
 
     public void saveFiles() {
-        fileWriter.save(files, false);
+        fileWriter.save(files, false, false);
     }
 
     public void updateFiles() {
