@@ -21,7 +21,7 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -66,7 +66,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<FileFacade> fileFacadeProvider;
     private final PaperItemStackUtil paperItemStackUtil;
     private final TaskScheduler taskScheduler;
-    private final IconUtil iconUtil;
+    private final IconConvertor iconUtil;
 
     private String serverIcon;
     private Pair<MethodHandle, Object> getTPSMethodPair;
@@ -143,7 +143,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         File iconFile = new File(Bukkit.getWorldContainer(), "server-icon.png");
         if (!iconFile.exists()) return Optional.empty();
 
-        return Optional.ofNullable(iconUtil.convertIcon(iconFile));
+        return Optional.ofNullable(iconUtil.convert(iconFile));
     }
 
     @Override

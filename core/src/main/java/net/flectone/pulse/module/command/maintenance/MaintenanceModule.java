@@ -23,7 +23,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -47,7 +47,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
-    private final IconUtil iconUtil;
+    private final IconConvertor iconUtil;
     private final FLogger fLogger;
 
     protected String icon;
@@ -64,7 +64,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                              MessageDispatcher messageDispatcher,
                              ModuleController moduleController,
                              ModuleCommandController commandModuleController,
-                             IconUtil iconUtil,
+                             IconConvertor iconUtil,
                              FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.permissionChecker = permissionChecker;
@@ -91,7 +91,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             platformServerAdapter.saveResource("images/maintenance.png");
         }
 
-        icon = iconUtil.convertIcon(file);
+        icon = iconUtil.convert(file);
 
         if (config().turnedOn()) {
             kickOnlinePlayers(FPlayer.UNKNOWN);

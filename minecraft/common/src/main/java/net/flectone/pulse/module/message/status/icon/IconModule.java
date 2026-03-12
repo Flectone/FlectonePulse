@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -40,7 +40,7 @@ public class IconModule implements ModuleSimple {
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final RandomUtil randomUtil;
-    private final IconUtil iconUtil;
+    private final IconConvertor iconUtil;
     private final ServerStatusFormatter statusUtil;
     private final @Named("imagePath") Path iconPath;
 
@@ -94,7 +94,7 @@ public class IconModule implements ModuleSimple {
                 if (!icon.isFile()) continue;
                 if (!icon.getName().equals(iconName)) continue;
 
-                String convertedIcon = iconUtil.convertIcon(icon);
+                String convertedIcon = iconUtil.convert(icon);
                 if (convertedIcon == null) continue;
                 iconList.add(convertedIcon);
             }

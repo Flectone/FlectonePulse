@@ -21,7 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
@@ -49,7 +49,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       MessageDispatcher messageDispatcher,
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
-                                      IconUtil iconUtil,
+                                      IconConvertor iconUtil,
                                       ServerStatusFormatter statusUtil,
                                       FLogger fLogger) {
         super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil, fLogger);

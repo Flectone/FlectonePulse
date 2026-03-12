@@ -22,7 +22,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -59,7 +59,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
     private final RandomUtil randomUtil;
-    private final IconUtil iconUtil;
+    private final IconConvertor iconUtil;
 
     private String serverIcon;
 
@@ -156,7 +156,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (serverIcon == null) {
             Optional<Path> optionalPath = minecraftServer.getIconFile();
             // empty string is an indicator that it is already initialized
-            serverIcon = optionalPath.map(path -> iconUtil.convertIcon(path.toFile())).orElse("");
+            serverIcon = optionalPath.map(path -> iconUtil.convert(path.toFile())).orElse("");
         }
 
         return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;

@@ -1,9 +1,10 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.processing.converter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -13,11 +14,12 @@ import java.util.Base64;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IconUtil {
+public class IconConvertor {
 
     private final FLogger fLogger;
 
-    public String convertIcon(File icon) {
+    @Nullable
+    public String convert(File icon) {
         try {
 
             BufferedImage bufferedImage = ImageIO.read(icon);
