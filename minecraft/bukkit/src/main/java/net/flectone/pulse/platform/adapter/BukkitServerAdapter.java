@@ -21,6 +21,7 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -32,16 +33,19 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.CachedServerIcon;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
@@ -62,7 +66,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<FileFacade> fileFacadeProvider;
     private final PaperItemStackUtil paperItemStackUtil;
     private final TaskScheduler taskScheduler;
+    private final IconUtil iconUtil;
 
+    private String serverIcon;
     private Pair<MethodHandle, Object> getTPSMethodPair;
 
     @Override
@@ -118,6 +124,26 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", Bukkit.getServer().getMotd());
         return jsonObject;
+    }
+
+    @Override
+    public @Nullable String getIcon() {
+        if (serverIcon == null) {
+            // empty string is an indicator that it is already initialized
+            serverIcon = getServerIcon().orElse("");
+        }
+
+        return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
+    }
+
+    private Optional<String> getServerIcon() {
+        CachedServerIcon cachedServerIcon = Bukkit.getServerIcon();
+        if (cachedServerIcon == null) return Optional.empty();
+
+        File iconFile = new File(Bukkit.getWorldContainer(), "server-icon.png");
+        if (!iconFile.exists()) return Optional.empty();
+
+        return Optional.ofNullable(iconUtil.convertIcon(iconFile));
     }
 
     @Override

@@ -90,6 +90,13 @@ public interface PlatformServerAdapter {
     @NonNull JsonElement getMOTD();
 
     /**
+     * Gets the server icon.
+     *
+     * @return the server icon as a string, or null if unavailable
+     */
+    @Nullable String getIcon();
+
+    /**
      * Checks if a project/resource is available on the server.
      *
      * @param projectName name of the project/resource to check

@@ -121,6 +121,11 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public @Nullable String getIcon() {
+        return null;
+    }
+
+    @Override
     public boolean hasProject(@NonNull String projectName) {
         HytaleServer hytaleServer = HytaleServer.get();
         if (hytaleServer == null) return false;

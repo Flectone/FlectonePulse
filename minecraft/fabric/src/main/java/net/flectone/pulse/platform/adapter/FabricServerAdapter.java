@@ -22,6 +22,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -34,6 +35,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -57,6 +59,9 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
     private final RandomUtil randomUtil;
+    private final IconUtil iconUtil;
+
+    private String serverIcon;
 
     @Override
     public void dispatchCommand(@NonNull String command) {
@@ -141,6 +146,20 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", minecraftServer.getServerMotd());
         return jsonObject;
+    }
+
+    @Override
+    public @Nullable String getIcon() {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
+
+        if (serverIcon == null) {
+            Optional<Path> optionalPath = minecraftServer.getIconFile();
+            // empty string is an indicator that it is already initialized
+            serverIcon = optionalPath.map(path -> iconUtil.convertIcon(path.toFile())).orElse("");
+        }
+
+        return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
     }
 
     @Override
