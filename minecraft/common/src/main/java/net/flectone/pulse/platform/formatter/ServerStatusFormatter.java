@@ -41,7 +41,9 @@ public class ServerStatusFormatter {
         MessageContext motdContext = messagePipeline.createContext(fPlayer, message)
                 .addFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
 
-        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) {
+        // display player_head in MOTD is only available for clients 1.21.9-1.21.11
+        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)
+                || user.getClientVersion().isNewerThan(ClientVersion.V_1_21_11)) {
             motdContext = motdContext.addFlag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
         }
 
