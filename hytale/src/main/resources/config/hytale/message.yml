@@ -264,6 +264,7 @@ format:
   scoreboard:
     enable: true
     name_visible: true
+    hide_name_when_sneaking: false
     color: "<white>"
     prefix: "<prefix><stream> <white>"
     suffix: " <afk><suffix>"

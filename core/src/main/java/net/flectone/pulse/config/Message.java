@@ -549,6 +549,7 @@ public record Message(
         public record Scoreboard(
                 Boolean enable,
                 Boolean nameVisible,
+                Boolean hideNameWhenSneaking,
                 String color,
                 String prefix,
                 String suffix,

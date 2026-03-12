@@ -39,7 +39,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
                                   MessagePipeline messagePipeline,
                                   PlatformPlayerAdapter platformPlayerAdapter,
                                   ModuleController moduleController) {
-        super(fileFacade, listenerRegistry);
+        super(fileFacade, listenerRegistry, platformPlayerAdapter);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -115,8 +115,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     }
 
     private CustomName createNameplate(FPlayer fPlayer) {
-        // invisible name
-        if (!config().nameVisible()) return new CustomName(fPlayer.name(), "");
+        if (isInvisibleNameFor(fPlayer)) return new CustomName(fPlayer.name(), "");
 
         Component displayName = Component.text(fPlayer.name());
 

@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -46,9 +47,10 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      PacketSender packetSender,
                                      PacketProvider packetProvider,
                                      ListenerRegistry listenerRegistry,
+                                     PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,
                                      Provider<IntegrationModule> integrationModuleProvider) {
-        super(fileFacade, listenerRegistry);
+        super(fileFacade, listenerRegistry, platformPlayerAdapter);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -146,9 +148,9 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
             suffix = messagePipeline.build(suffixContext);
         }
 
-        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = config().nameVisible()
-                ? WrapperPlayServerTeams.NameTagVisibility.ALWAYS
-                : WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS;
+        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = isInvisibleNameFor(fPlayer)
+                ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS
+                : WrapperPlayServerTeams.NameTagVisibility.ALWAYS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
 
         MessageContext colorContext = messagePipeline.createContext(fPlayer, config().color());
