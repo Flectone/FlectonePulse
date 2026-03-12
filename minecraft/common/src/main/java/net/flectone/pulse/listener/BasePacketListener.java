@@ -18,8 +18,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -49,6 +51,7 @@ public class BasePacketListener implements PacketListener {
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TextScreenRender textScreenRender;
     private final PlatformServerAdapter platformServerAdapter;
+    private final TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
     @Override
@@ -100,6 +103,19 @@ public class BasePacketListener implements PacketListener {
                     loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
                     loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
             );
+        }
+
+        if (event.getPacketType() == PacketType.Login.Server.DISCONNECT) {
+            taskScheduler.runAsync(() -> {
+                UUID uuid = event.getUser().getUUID();
+                if (uuid == null) return;
+
+                FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+
+                eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
+                eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+            });
+            return;
         }
 
         if (event.getPacketType() == PacketType.Play.Server.SET_PASSENGERS) {

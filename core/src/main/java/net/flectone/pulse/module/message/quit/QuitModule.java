@@ -13,10 +13,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -26,15 +24,9 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
 
     private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
-    private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-
-    @Override
-    public void onEnable() {
-        listenerRegistry.register(QuitPulseListener.class);
-    }
 
     @Override
     public ModuleName name() {
@@ -56,25 +48,31 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
         return fileFacade.localization(sender).message().quit();
     }
 
-    public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runAsync(() -> {
-            if (moduleController.isDisabledFor(this, fPlayer)) return;
+    public void sendLater(FPlayer fPlayer) {
+        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, false), 5L);
+    }
 
-            messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
-                    .base(EventMetadata.<Localization.Message.Quit>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Message.Quit::format)
-                            .destination(config().destination())
-                            .range(config().range())
-                            .sound(soundOrThrow())
-                            .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                            .integration()
-                            .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
-                            .build()
-                    )
-                    .ignoreVanish(ignoreVanish)
-                    .build()
-            );
-        });
+    public void send(FPlayer fPlayer, boolean ignoreVanish) {
+        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, ignoreVanish));
+    }
+
+    private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+        messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
+                .base(EventMetadata.<Localization.Message.Quit>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Message.Quit::format)
+                        .destination(config().destination())
+                        .range(config().range())
+                        .sound(soundOrThrow())
+                        .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                        .integration()
+                        .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
+                        .build()
+                )
+                .ignoreVanish(ignoreVanish)
+                .build()
+        );
     }
 }

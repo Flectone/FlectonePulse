@@ -33,6 +33,8 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
+import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.MinecraftRightClickModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.sidebar.MinecraftSidebarModule;
@@ -101,6 +103,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(WorldModule.class).to(MinecraftWorldModule.class);
         bind(JoinModule.class).to(MinecraftJoinModule.class);
         bind(ObjectiveModule.class).to(MinecraftObjectiveModule.class);
+        bind(QuitModule.class).to(MinecraftQuitModule.class);
         bind(RightclickModule.class).to(MinecraftRightClickModule.class);
         bind(SidebarModule.class).to(MinecraftSidebarModule.class);
         bind(StatusModule.class).to(MinecraftStatusModule.class);

@@ -21,7 +21,7 @@ import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.join.BukkitJoinModule;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
 import net.flectone.pulse.module.message.quit.BukkitQuitModule;
-import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.adapter.BukkitPlayerAdapter;
@@ -114,7 +114,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(SignModule.class).to(BukkitSignModule.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
         bind(MinecraftJoinModule.class).to(BukkitJoinModule.class);
-        bind(QuitModule.class).to(BukkitQuitModule.class);
+        bind(MinecraftQuitModule.class).to(BukkitQuitModule.class);
 
         // Scheduler
         bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class)
