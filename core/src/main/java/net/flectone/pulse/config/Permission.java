@@ -1670,7 +1670,9 @@ public record Permission(
             @Jacksonized
             public record Playerlistname(
                     String name,
-                    Permission.Type type
+                    Permission.Type type,
+                    PermissionEntry hideInvisible,
+                    PermissionEntry hideSpectator
             ) implements PermissionSetting {
             }
         }

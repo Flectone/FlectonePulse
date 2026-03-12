@@ -781,6 +781,8 @@ public record Message(
         @Jacksonized
         public record Playerlistname(
                 Boolean enable,
+                Boolean hideInvisible,
+                Boolean hideSpectator,
                 Boolean proxyMode,
                 Ticker ticker
         ) implements EnableSetting {

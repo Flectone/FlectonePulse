@@ -382,6 +382,8 @@ tab:
       period: 100
   playerlistname:
     enable: false
+    hide_invisible: false
+    hide_spectator: false
     proxy_mode: true
     ticker:
       enable: true

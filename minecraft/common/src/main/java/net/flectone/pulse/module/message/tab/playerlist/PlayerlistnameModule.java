@@ -34,6 +34,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -76,6 +77,12 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);
+    }
+
+    @Override
+    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+        return ModuleLocalization.super.permissionBuilder()
+                .add(permission().hideInvisible(), permission().hideSpectator());
     }
 
     @Override
@@ -150,11 +157,13 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
                 }
             }
 
+            GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer));
+
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
-                    true,
+                    isListed(fPlayer, gameMode),
                     platformPlayerAdapter.getPing(fPlayer),
-                    GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer)),
+                    gameMode,
                     name,
                     null
             );
@@ -175,6 +184,15 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
 
     public boolean isProxyMode() {
         return moduleController.isEnable(this) && config().proxyMode() && proxyRegistry.hasEnabledProxy();
+    }
+
+    private boolean isListed(FPlayer fPlayer, GameMode gameMode) {
+        if (config().hideInvisible()
+                && platformPlayerAdapter.hasPotionEffect(fPlayer, PotionUtil.INVISIBILITY_POTION_NAME)) {
+            return false;
+        }
+
+        return !config().hideSpectator() || gameMode != GameMode.SPECTATOR;
     }
 
     private List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> getProxyPlayerInfos(FPlayer fReceiver) {

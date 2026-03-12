@@ -1046,8 +1046,14 @@ message:
       name: "flectonepulse.module.message.tab.header"
       type: "TRUE"
     playerlistname:
-      name: "flectonepulse.module.message.tab.footer"
+      name: "flectonepulse.module.message.tab.playerlistname"
       type: "TRUE"
+      hide_invisible:
+        name: "flectonepulse.module.message.tab.playerlistname.hide_invisible"
+        type: "TRUE"
+      hide_spectator:
+        name: "flectonepulse.module.message.tab.playerlistname.hide_spectator"
+        type: "TRUE"
   update:
     name: "flectonepulse.module.message.update"
     type: "OP"
