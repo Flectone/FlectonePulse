@@ -16,7 +16,7 @@ import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class BrandModule implements ModuleListLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     @Override
     public void onEnable() {

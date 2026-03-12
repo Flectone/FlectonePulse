@@ -11,7 +11,7 @@ import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -28,13 +28,13 @@ public abstract class SidebarModule implements ModuleListLocalization<Localizati
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     protected SidebarModule(FileFacade fileFacade,
                             TaskScheduler taskScheduler,
                             ListenerRegistry listenerRegistry,
                             FPlayerService fPlayerService,
-                            RandomUtil randomUtil) {
+                            RandomGenerator randomUtil) {
         this.fileFacade = fileFacade;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;

@@ -13,7 +13,7 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
@@ -50,7 +50,7 @@ public class FPlayerService {
     private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     public void clear() {
         fPlayerRepository.clearCache();

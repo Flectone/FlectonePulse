@@ -17,7 +17,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +38,7 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     @Override
     public void onEnable() {

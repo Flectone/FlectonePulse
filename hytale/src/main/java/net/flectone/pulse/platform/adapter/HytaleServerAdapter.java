@@ -16,7 +16,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -35,7 +35,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytaleServerAdapter implements PlatformServerAdapter {
 
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final @Named("projectPath") Path projectPath;
     private final FLogger fLogger;
 

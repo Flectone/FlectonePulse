@@ -1,4 +1,4 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.util.generator;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RandomUtil {
+public class RandomGenerator {
 
     /**
      * Returns a random integer between the specified start (inclusive) and end (exclusive).

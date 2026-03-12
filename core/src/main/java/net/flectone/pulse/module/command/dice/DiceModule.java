@@ -16,7 +16,7 @@ import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;

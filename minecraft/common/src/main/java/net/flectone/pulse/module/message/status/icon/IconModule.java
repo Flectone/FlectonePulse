@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -39,7 +39,7 @@ public class IconModule implements ModuleSimple {
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final IconConvertor iconUtil;
     private final ServerStatusFormatter statusUtil;
     private final @Named("imagePath") Path iconPath;

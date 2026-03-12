@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.HytaleMessageUtil;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -47,7 +47,7 @@ public class HytaleSidebarModule extends SidebarModule {
                                MessagePipeline messagePipeline,
                                HytaleMessageUtil hytaleMessageUtil,
                                ModuleController moduleController,
-                               RandomUtil randomUtil) {
+                               RandomGenerator randomUtil) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
 
         this.platformPlayerAdapter = platformPlayerAdapter;

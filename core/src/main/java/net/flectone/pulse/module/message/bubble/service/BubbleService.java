@@ -14,7 +14,7 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
@@ -36,7 +36,7 @@ public class BubbleService {
     private final BubbleRender bubbleRender;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final MessagePipeline messagePipeline;
 
     public void startTicker() {

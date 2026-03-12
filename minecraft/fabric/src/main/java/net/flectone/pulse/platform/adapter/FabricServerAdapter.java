@@ -23,7 +23,7 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.TpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -58,7 +58,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final @Named("projectPath") Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final IconConvertor iconUtil;
 
     private String serverIcon;

@@ -18,7 +18,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -50,7 +50,7 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   PacketProvider packetProvider,
                                   PermissionChecker permissionChecker,
                                   ModuleController moduleController,
-                                  RandomUtil randomUtil) {
+                                  RandomGenerator randomUtil) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
 
         this.taskScheduler = taskScheduler;

@@ -17,7 +17,7 @@ import net.flectone.pulse.module.message.status.motd.listener.MOTDPacketListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -38,7 +38,7 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final ServerStatusFormatter statusUtil;
 
     @Override

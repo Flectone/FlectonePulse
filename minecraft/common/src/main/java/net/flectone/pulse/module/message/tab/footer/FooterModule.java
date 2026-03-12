@@ -19,7 +19,7 @@ import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -41,7 +41,7 @@ public class FooterModule implements ModuleListLocalization<Localization.Message
     private final PacketSender packetSender;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     @Override
     public void onEnable() {

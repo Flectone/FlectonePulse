@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -14,7 +14,7 @@ public class TictactoeService {
 
     private final Int2ObjectArrayMap<TicTacToe> ticTacToeMap = new Int2ObjectArrayMap<>();
 
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
 
     public TicTacToe create(int id, FPlayer fPlayer, FPlayer fReceiver, boolean hard) {
         TicTacToe ticTacToe = new TicTacToe(id, fPlayer.id(), fReceiver.id(), hard);

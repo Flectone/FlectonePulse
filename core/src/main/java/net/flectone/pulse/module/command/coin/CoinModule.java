@@ -14,7 +14,7 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
 
     private final FileFacade fileFacade;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;

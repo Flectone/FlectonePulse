@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.util.EntityUtil;
-import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;
@@ -44,7 +44,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     private final PacketSender packetSender;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
-    private final RandomUtil randomUtil;
+    private final RandomGenerator randomUtil;
     private final EntityUtil entityUtil;
     private final Provider<MinecraftBubbleRender> bubbleRenderer;
     private final Provider<TitleRender> titleRender;
