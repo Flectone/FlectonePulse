@@ -234,7 +234,7 @@ public class FPlayerRepository {
      * @return list of online players
      */
     public List<FPlayer> getOnlinePlayersDatabase() {
-        return fPlayerDAO.getOnlineFPlayers();
+        return fPlayerDAO.getOnlineFPlayers().stream().filter(fPlayer -> !fPlayer.isConsole()).toList();
     }
 
     /**
