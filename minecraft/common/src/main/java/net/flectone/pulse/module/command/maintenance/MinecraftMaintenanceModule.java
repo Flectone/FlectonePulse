@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.maintenance;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerData;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,7 +14,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -20,6 +22,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -30,8 +33,9 @@ import java.nio.file.Path;
 public class MinecraftMaintenanceModule extends MaintenanceModule {
 
     private final FPlayerService fPlayerService;
-    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ServerStatusFormatter statusUtil;
 
     @Inject
     public MinecraftMaintenanceModule(FileFacade fileFacade,
@@ -46,18 +50,40 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
                                       IconUtil iconUtil,
+                                      ServerStatusFormatter statusUtil,
                                       FLogger fLogger) {
         super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil, fLogger);
 
         this.fPlayerService = fPlayerService;
-        this.messagePipeline = messagePipeline;
         this.moduleController = moduleController;
+        this.listenerRegistry = listenerRegistry;
+        this.statusUtil = statusUtil;
     }
 
-    public void sendStatus(Object player) {
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        listenerRegistry.register(MaintenancePacketListener.class);
+    }
+
+    public void updateServerData(PacketSendEvent event) {
         if (!moduleController.isEnable(this)) return;
         if (!config().turnedOn()) return;
-        if (!(player instanceof User user)) return;
+
+        User user = event.getUser();
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+
+        event.markForReEncode(true);
+
+        WrapperPlayServerServerData wrapperPlayServerServerData = new WrapperPlayServerServerData(event);
+        wrapperPlayServerServerData.setIcon(statusUtil.formatIcon(icon));
+        wrapperPlayServerServerData.setMOTD(statusUtil.createMOTD(fPlayer, user, localization(fPlayer).serverDescription()));
+    }
+
+    public void sendStatus(User user) {
+        if (!moduleController.isEnable(this)) return;
+        if (!config().turnedOn()) return;
 
         FPlayer fPlayer = fPlayerService.loadColors(fPlayerService.getFPlayer(user.getAddress().getAddress()));
 
@@ -67,11 +93,13 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
         responseJson.add("version", getVersionJson(localizationMaintenance.serverVersion()));
         responseJson.add("players", getPlayersJson());
+        responseJson.add("description", statusUtil.formatDescription(fPlayer, user, localizationMaintenance.serverDescription()));
 
-        MessageContext context = messagePipeline.createContext(fPlayer, localizationMaintenance.serverDescription());
-        responseJson.add("description", messagePipeline.buildJson(context));
+        String favicon = statusUtil.formatIcon(icon);
+        if (favicon != null) {
+            responseJson.addProperty("favicon", favicon);
+        }
 
-        responseJson.addProperty("favicon", "data:image/png;base64," + (icon == null ? "" : icon));
         responseJson.addProperty("enforcesSecureChat", false);
 
         WrapperStatusServerResponse wrapperStatusServerResponse = new WrapperStatusServerResponse(responseJson);

@@ -1,5 +1,8 @@
 package net.flectone.pulse.module.message.status.icon;
 
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerData;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -8,10 +11,14 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.message.status.icon.listener.IconPacketListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.Nullable;
@@ -30,8 +37,11 @@ public class IconModule implements ModuleSimple {
     private final FileFacade fileFacade;
     private final PlatformServerAdapter platformServerAdapter;
     private final ModuleController moduleController;
+    private final FPlayerService fPlayerService;
+    private final ListenerRegistry listenerRegistry;
     private final RandomUtil randomUtil;
     private final IconUtil iconUtil;
+    private final ServerStatusFormatter statusUtil;
     private final @Named("imagePath") Path iconPath;
 
     private int index;
@@ -39,6 +49,8 @@ public class IconModule implements ModuleSimple {
     @Override
     public void onEnable() {
         initIcons();
+
+        listenerRegistry.register(IconPacketListener.class);
     }
 
     @Override
@@ -87,6 +99,18 @@ public class IconModule implements ModuleSimple {
                 iconList.add(convertedIcon);
             }
         });
+    }
+
+    public void update(PacketSendEvent event) {
+        User user = event.getUser();
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+        event.markForReEncode(true);
+
+        WrapperPlayServerServerData wrapperPlayServerServerData = new WrapperPlayServerServerData(event);
+        wrapperPlayServerServerData.setIcon(statusUtil.formatIcon(next(fPlayer)));
     }
 
     public @Nullable String next(FPlayer fPlayer) {

@@ -1,27 +1,28 @@
 package net.flectone.pulse.module.message.status.motd;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerData;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleListLocalization;
+import net.flectone.pulse.module.message.status.motd.listener.MOTDPacketListener;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,16 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
-    private final MessagePipeline messagePipeline;
-    private final PacketProvider packetProvider;
+    private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
+    private final ListenerRegistry listenerRegistry;
     private final RandomUtil randomUtil;
+    private final ServerStatusFormatter statusUtil;
+
+    @Override
+    public void onEnable() {
+        listenerRegistry.register(MOTDPacketListener.class);
+    }
 
     @Override
     public void onDisable() {
@@ -84,26 +91,30 @@ public class MOTDModule implements ModuleListLocalization<Localization.Message.S
         messageIndexMap.put(id, playerIndex);
     }
 
-    public JsonElement next(FPlayer fPlayer, User user) {
+    public void update(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.SERVER_DATA) return;
+
+        User user = event.getUser();
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+        fPlayer = fPlayerService.loadColors(fPlayer);
+
+        event.markForReEncode(true);
+
+        WrapperPlayServerServerData wrapperPlayServerServerData = new WrapperPlayServerServerData(event);
+        wrapperPlayServerServerData.setMOTD(next(fPlayer, user));
+    }
+
+    @Nullable
+    public Component next(FPlayer fPlayer, User user) {
         if (moduleController.isDisabledFor(this, fPlayer)) return null;
 
         String nextMessage = getNextMessage(fPlayer, config().random());
         if (nextMessage == null) return null;
 
-        MessageContext nextMessageContext = messagePipeline.createContext(fPlayer, nextMessage)
-                .addFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
-
-        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) {
-            nextMessageContext = nextMessageContext.addFlag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
-        }
-
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            return messagePipeline.buildJson(nextMessageContext);
-        } else {
-            String serializedText = messagePipeline.buildLegacy(nextMessageContext);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("text", serializedText);
-            return jsonObject;
-        }
+        return statusUtil.createMOTD(fPlayer, user, nextMessage);
     }
+
 }

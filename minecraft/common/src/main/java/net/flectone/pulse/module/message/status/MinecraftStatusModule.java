@@ -21,11 +21,11 @@ import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -40,12 +40,12 @@ public class MinecraftStatusModule extends StatusModule {
     private final PlayersModule playersModule;
     private final VersionModule versionModule;
     private final MessagePipeline messagePipeline;
-    private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
     private final EventDispatcher eventDispatcher;
     private final ModuleController moduleController;
+    private final ServerStatusFormatter statusUtil;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
@@ -54,12 +54,12 @@ public class MinecraftStatusModule extends StatusModule {
                                  PlayersModule playersModule,
                                  VersionModule versionModule,
                                  MessagePipeline messagePipeline,
-                                 PlatformServerAdapter platformServerAdapter,
                                  FPlayerService fPlayerService,
                                  ListenerRegistry listenerRegistry,
                                  PacketProvider packetProvider,
                                  EventDispatcher eventDispatcher,
-                                 ModuleController moduleController) {
+                                 ModuleController moduleController,
+                                 ServerStatusFormatter statusUtil) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -67,12 +67,12 @@ public class MinecraftStatusModule extends StatusModule {
         this.playersModule = playersModule;
         this.versionModule = versionModule;
         this.messagePipeline = messagePipeline;
-        this.platformServerAdapter = platformServerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
         this.eventDispatcher = eventDispatcher;
         this.moduleController = moduleController;
+        this.statusUtil = statusUtil;
     }
 
     @Override
@@ -104,9 +104,9 @@ public class MinecraftStatusModule extends StatusModule {
 
         responseJson.add("version", getVersionJson(fPlayer));
         responseJson.add("players", getPlayersJson(fPlayer));
-        responseJson.add("description", getDescriptionJson(fPlayer, user));
+        responseJson.add("description", statusUtil.formatDescription(MOTDModule.next(fPlayer, user)));
 
-        String favicon = getFavicon(fPlayer);
+        String favicon = statusUtil.formatIcon(iconModule.next(fPlayer));
         if (favicon != null) {
             responseJson.addProperty("favicon", favicon);
         }
@@ -139,16 +139,6 @@ public class MinecraftStatusModule extends StatusModule {
         jsonObject.addProperty("protocol", protocol);
 
         return jsonObject;
-    }
-
-    private JsonElement getDescriptionJson(FPlayer fPlayer, User user) {
-        JsonElement jsonElement = MOTDModule.next(fPlayer, user);
-        return jsonElement == null ? platformServerAdapter.getMOTD() : jsonElement;
-    }
-
-    private String getFavicon(FPlayer fPlayer) {
-        String icon = iconModule.next(fPlayer);
-        return icon == null ? null : "data:image/png;base64," + icon;
     }
 
     private JsonElement getPlayersJson(FPlayer fPlayer) {
