@@ -22,6 +22,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -80,6 +81,38 @@ public class BasePacketListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
 
+        PacketTypeCommon packetType = event.getPacketType();
+        switch (packetType) {
+            case PacketType.Login.Server.LOGIN_SUCCESS -> handleLoginSuccess(event);
+            case PacketType.Login.Server.DISCONNECT -> handleLoginDisconnect(event);
+            case PacketType.Play.Server.SET_PASSENGERS -> handleSetPassengers(event);
+            default -> {
+                Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);
+                if (optionalPair.isEmpty()) return;
+
+                User user = event.getUser();
+                if (user == null) return;
+
+                UUID userUUID = user.getUUID();
+                if (userUUID == null) return;
+
+                Pair<Component, Boolean> triplet = optionalPair.get();
+
+                // skip minecraft warning
+                if (triplet.getLeft() instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals("multiplayer.message_not_delivered")) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
+                MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, triplet.getLeft(), triplet.getRight()));
+
+                event.setCancelled(messageReceiveEvent.cancelled());
+            }
+        }
+    }
+
+    private void handleLoginSuccess(PacketSendEvent event) {
         boolean usePacketPreLoginListener =
                 // only for 1.20.2 and newer versions
                 // because there is a configuration stage and there are no problems with evet.setСancelled(True)
@@ -87,64 +120,44 @@ public class BasePacketListener implements PacketListener {
                 // or maybe it's enabled in config, it only works for Bukkit
                 && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().module().useBukkitPreLoginListener());
 
-        if (usePacketPreLoginListener) {
-            WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
-            UserProfile userProfile = wrapper.getUserProfile();
+        if (!usePacketPreLoginListener) return;
 
-            UUID uuid = userProfile.getUUID();
+        WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
+        UserProfile userProfile = wrapper.getUserProfile();
+
+        UUID uuid = userProfile.getUUID();
+        if (uuid == null) return;
+
+        String playerName = userProfile.getName();
+        if (playerName == null) return;
+
+        event.setCancelled(true);
+
+        playerPreLoginProcessor.processAsyncLogin(uuid, playerName,
+                loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
+                loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
+        );
+    }
+
+    private void handleLoginDisconnect(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Login.Server.DISCONNECT) return;
+
+        taskScheduler.runAsync(() -> {
+            UUID uuid = event.getUser().getUUID();
             if (uuid == null) return;
 
-            String playerName = userProfile.getName();
-            if (playerName == null) return;
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-            event.setCancelled(true);
+            eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
+            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+        });
+    }
 
-            playerPreLoginProcessor.processAsyncLogin(uuid, playerName,
-                    loginEvent -> packetSender.send(uuid, new WrapperLoginServerLoginSuccess(uuid, playerName)),
-                    loginEvent -> packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
-            );
-        }
+    private void handleSetPassengers(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.SET_PASSENGERS) return;
 
-        if (event.getPacketType() == PacketType.Login.Server.DISCONNECT) {
-            taskScheduler.runAsync(() -> {
-                UUID uuid = event.getUser().getUUID();
-                if (uuid == null) return;
-
-                FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-
-                eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-                eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
-            });
-            return;
-        }
-
-        if (event.getPacketType() == PacketType.Play.Server.SET_PASSENGERS) {
-            WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
-            textScreenRender.updateAndRide(wrapper.getEntityId());
-            return;
-        }
-
-        Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);
-        if (optionalPair.isEmpty()) return;
-
-        User user = event.getUser();
-        if (user == null) return;
-
-        UUID userUUID = user.getUUID();
-        if (userUUID == null) return;
-
-        Pair<Component, Boolean> triplet = optionalPair.get();
-
-        // skip minecraft warning
-        if (triplet.getLeft() instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals("multiplayer.message_not_delivered")) {
-            event.setCancelled(true);
-            return;
-        }
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
-        MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, triplet.getLeft(), triplet.getRight()));
-
-        event.setCancelled(messageReceiveEvent.cancelled());
+        WrapperPlayServerSetPassengers wrapper = new WrapperPlayServerSetPassengers(event);
+        textScreenRender.updateAndRide(wrapper.getEntityId());
     }
 
     private Optional<Pair<Component, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {
