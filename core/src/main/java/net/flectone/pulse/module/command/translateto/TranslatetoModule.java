@@ -18,6 +18,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -158,7 +159,7 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
                     + lang + "&dt=t&q=" + text + "&ie=UTF-8&oe=UTF-8").toURL();
 
             URLConnection uc = url.openConnection();
-            uc.setRequestProperty("User-Agent", "Mozilla/5.0");
+            uc.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;

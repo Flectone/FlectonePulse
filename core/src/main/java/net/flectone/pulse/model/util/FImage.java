@@ -2,6 +2,7 @@ package net.flectone.pulse.model.util;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
+import net.flectone.pulse.util.WebUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -20,7 +21,7 @@ public record FImage(String link) {
     public List<String> convertImageUrl() throws IOException, URISyntaxException {
         URL url = new URI(link).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+        connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
         BufferedImage bufferedImage = ImageIO.read(connection.getInputStream());
         if (bufferedImage == null) return Collections.emptyList();

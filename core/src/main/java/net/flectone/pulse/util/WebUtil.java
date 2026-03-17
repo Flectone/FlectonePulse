@@ -17,6 +17,8 @@ import java.nio.file.Path;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WebUtil {
 
+    public static final String USER_AGENT = "FlectonePulse/1.0";
+
     private final FLogger fLogger;
 
     public boolean downloadFile(String fileUrl, Path outputPath) {
@@ -43,7 +45,7 @@ public class WebUtil {
 
     public HttpURLConnection createConnection(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+        connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setRequestMethod("GET");
         connection.setConnectTimeout(15000);
         connection.setReadTimeout(15000);

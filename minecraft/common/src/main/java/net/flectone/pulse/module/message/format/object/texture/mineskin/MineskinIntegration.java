@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.format.object.texture.model.Frame;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,7 @@ public class MineskinIntegration implements FIntegration {
 
         client = MineSkinClient.builder()
                 .requestHandler(JsoupRequestHandler::new)
-                .userAgent("FlectonePulse/1.0")
+                .userAgent(WebUtil.USER_AGENT)
                 .apiKey(apiKey)
                 .build();
 
