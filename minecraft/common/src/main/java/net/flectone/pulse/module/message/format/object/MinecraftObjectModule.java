@@ -31,6 +31,7 @@ import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -133,7 +134,7 @@ public class MinecraftObjectModule extends ObjectModule {
                     ? Component.object().contents(playerHeadBuilder.profileProperty(profileProperty).build()).build()
                     : Component.object().contents(playerHeadBuilder.name(sender.name()).build()).build();
 
-            return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
+            return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
         }
 
         try {
@@ -150,7 +151,7 @@ public class MinecraftObjectModule extends ObjectModule {
                         .build()
         ).build();
 
-        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace()));
+        return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
     }
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
@@ -209,7 +210,7 @@ public class MinecraftObjectModule extends ObjectModule {
         Component textureComponent = textureService.getTexture(textureName);
         if (textureComponent == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, textureComponent, config().textureTag().needExtraSpace()));
+        return applyDefaultFormatting(messageContext, textureComponent, config().textureTag().needExtraSpace());
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
@@ -229,14 +230,15 @@ public class MinecraftObjectModule extends ObjectModule {
 
         Component spriteComponent = Component.object().contents(spriteObjectContents).build();
 
-        return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, spriteComponent, config().spriteTag().needExtraSpace()));
+        return applyDefaultFormatting(messageContext, spriteComponent, config().spriteTag().needExtraSpace());
     }
 
+    @Nullable
     private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
         FPlayer fReceiver = messageContext.receiver();
 
         if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
-            return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
+            return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
 
         if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION) && isNewerThanOrEqualsV_1_21_9) {
@@ -245,7 +247,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
         if (fReceiver.isUnknown()) {
             if (isNewerThanOrEqualsV_1_21_9) {
-                return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
+                return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
             }
 
             return MessagePipeline.ReplacementTag.emptyTag();
@@ -261,7 +263,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
-                return Tag.selfClosingInserting(applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace));
+                return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
             }
 
             // continue building
@@ -283,8 +285,8 @@ public class MinecraftObjectModule extends ObjectModule {
         return Component.text(localization(messageContext.receiver()).defaultSymbol());
     }
 
-    private Component applyDefaultFormatting(MessageContext messageContext, Component component, boolean needExtraSpace) {
-        if (!Component.IS_NOT_EMPTY.test(component)) return Component.empty();
+    private Tag applyDefaultFormatting(MessageContext messageContext, Component component, boolean needExtraSpace) {
+        if (!Component.IS_NOT_EMPTY.test(component)) return MessagePipeline.ReplacementTag.emptyTag();
 
         if (!messageContext.isFlag(MessageFlag.PLAYER_MESSAGE) && needExtraSpace) {
             component = component.append(Component.space());
@@ -294,6 +296,6 @@ public class MinecraftObjectModule extends ObjectModule {
             component = component.color(NamedTextColor.WHITE);
         }
 
-        return component;
+        return Tag.selfClosingInserting(component);
     }
 }
