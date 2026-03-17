@@ -118,7 +118,7 @@ public class Database {
      * Initializes the database connection.
      */
     public void init() {
-        fLogger.info("%s database connected", config().type());
+        fLogger.info("[+] Database connected: %s", config().type());
     }
 
     /**
@@ -128,7 +128,7 @@ public class Database {
         if (dataSource != null) {
             dataSource.close();
 
-            fLogger.info("Database disconnected");
+            fLogger.info("[-] Database disconnected");
         }
     }
 
