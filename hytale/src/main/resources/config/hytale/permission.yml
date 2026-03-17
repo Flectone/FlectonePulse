@@ -756,6 +756,8 @@ message:
           name: "flectonepulse.module.message.format.animation.flectonepulse"
           type: "TRUE"
     condition:
+      name: "flectonepulse.module.message.format.condition"
+      type: "TRUE"
       values:
         player_name:
           name: "flectonepulse.module.message.format.condition.player_name"
