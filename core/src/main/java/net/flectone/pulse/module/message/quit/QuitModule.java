@@ -49,11 +49,11 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public void sendLater(FPlayer fPlayer) {
-        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, false), 5L);
+        taskScheduler.runAsyncLater(() -> privateSend(fPlayer, false), 5L);
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, ignoreVanish));
+        taskScheduler.runAsync(() -> privateSend(fPlayer, ignoreVanish));
     }
 
     private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
