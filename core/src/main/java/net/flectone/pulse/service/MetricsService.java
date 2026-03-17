@@ -27,10 +27,10 @@ public class MetricsService {
         taskScheduler.runAsyncTimer(this::send, 20L * 60 * 60);
     }
 
-    public void send() {
+    public MetricsDTO createMetrics() {
         Config config = fileFacade.config();
 
-        MetricsDTO metricsDTO = MetricsDTO.builder()
+        return MetricsDTO.builder()
                 .serverUUID(platformServerAdapter.getServerUUID())
                 .serverCore(platformServerAdapter.getServerCore())
                 .serverVersion(platformServerAdapter.getServerVersionName())
@@ -49,8 +49,10 @@ public class MetricsService {
                 .modules(moduleController.collectModuleStatuses())
                 .createdAt(Instant.now().toString())
                 .build();
+    }
 
-        metricsSender.sendMetrics(metricsDTO);
+    public void send() {
+        metricsSender.sendMetrics(createMetrics());
     }
 
     private String booleanToString(boolean value) {
