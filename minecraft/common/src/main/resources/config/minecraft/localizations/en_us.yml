@@ -195,6 +195,7 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     format: "<fcolor:4><message>"
   flectonepulse:
+    dump_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>An error occurred while uploading the dump: <error>"
     null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Host parameter must be configured in config.yml"
     null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Port <port> is unavailable, choose another one in config.yml"
     null_file: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>File <file> does not exist"
@@ -202,6 +203,7 @@ command:
     format_starting: "<fcolor:1>★ Starting <fcolor:2><type><fcolor:1>, please wait..."
     format_false: "<color:#ff7171>★ Problem occurred during reload <br>Error: <message>"
     format_true: "<fcolor:1>★ <fcolor:2>FlectonePulse <fcolor:1>successfully reloaded! (<fcolor:2><i><time></i><fcolor:1>)"
+    format_dump: "<fcolor:1>★ Dump link <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_editor: "<fcolor:1>★ Web editing link <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_export: "<fcolor:1>★ Files exported to <fcolor:2><file>"
     format_import: "<fcolor:1>★ Files imported from <fcolor:2><file>"

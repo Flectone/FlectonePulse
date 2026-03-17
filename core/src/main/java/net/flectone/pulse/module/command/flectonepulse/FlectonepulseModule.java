@@ -2,6 +2,9 @@ package net.flectone.pulse.module.command.flectonepulse;
 
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.relocation.Relocation;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -14,6 +17,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.dto.MetricsDTO;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -26,6 +30,8 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.service.MetricsService;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -38,6 +44,10 @@ import org.jspecify.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -53,6 +63,8 @@ import java.util.stream.Stream;
 public class FlectonepulseModule implements ModuleCommand<Localization.Command.Flectonepulse> {
 
     private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
+    private static final String PASTES_DEV_URL = "https://pastes.dev/";
+    private static final URI API_PASTES_DEV = URI.create("https://api.pastes.dev/post");
 
     private final Injector injector;
     private final FileFacade fileFacade;
@@ -65,6 +77,10 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final SimpleDateFormat simpleDateFormat;
+    private final MetricsService metricsService;
+    private final Gson gson;
+    private final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+    private final HttpClient httpClient;
     private final @Named("projectPath") Path projectPath;
     private final FLogger fLogger;
 
@@ -98,6 +114,10 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
 
         Operation operation = getOperation(commandContext);
         boolean needReload = switch (operation) {
+            case DUMP -> {
+                commandDump(fPlayer, operation);
+                yield false;
+            }
             case EDITOR -> {
                 commandEditor(fPlayer, operation);
                 yield false;
@@ -171,6 +191,54 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     @Override
     public Localization.Command.Flectonepulse localization(FEntity sender) {
         return fileFacade.localization(sender).command().flectonepulse();
+    }
+
+    private boolean commandDump(FPlayer fPlayer, Operation operation) {
+        sendMessageStarting(fPlayer, operation);
+
+        MetricsDTO metricsDTO = metricsService.createMetrics();
+        String prettyJson = prettyGson.toJson(metricsDTO);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(API_PASTES_DEV)
+                .header("Content-Type", "text/json")
+                .header("User-Agent", WebUtil.USER_AGENT)
+                .POST(HttpRequest.BodyPublishers.ofString(prettyJson))
+                .build();
+
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            fLogger.warning(e);
+            return false;
+        }
+
+        if (response.statusCode() == 201) {
+            JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
+            String pasteKey = jsonResponse.get("key").getAsString();
+            String pasteUrl = PASTES_DEV_URL + pasteKey;
+
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
+                    .sender(fPlayer)
+                    .format(localization -> Strings.CS.replace(localization.formatDump(), "<url>", pasteUrl))
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .build()
+            );
+        } else {
+            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
+                    .sender(fPlayer)
+                    .format(localization -> Strings.CS.replace(localization.dumpError(), "<error>", response.body()))
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .build()
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     private boolean commandEditor(FPlayer fPlayer, Operation operation) {
@@ -404,10 +472,11 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
 
     public enum Operation {
 
-        RELOAD,
+        DUMP,
         EDITOR,
         EXPORT,
         EXPORT_ALL,
+        RELOAD,
         IMPORT
 
     }

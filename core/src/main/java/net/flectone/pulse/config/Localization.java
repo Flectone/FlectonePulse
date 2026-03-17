@@ -417,6 +417,7 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Flectonepulse(
+                String dumpError,
                 String nullHostEditor,
                 String nullPortEditor,
                 String nullFile,
@@ -424,6 +425,7 @@ public record Localization(
                 String formatStarting,
                 String formatFalse,
                 String formatTrue,
+                String formatDump,
                 String formatEditor,
                 String formatExport,
                 String formatImport
