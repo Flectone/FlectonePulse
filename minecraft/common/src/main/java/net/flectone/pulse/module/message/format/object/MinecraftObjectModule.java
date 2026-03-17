@@ -198,6 +198,9 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
+        User user = packetProvider.getUser(messageContext.receiver());
+        if (user != null && user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
@@ -210,6 +213,9 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
+        User user = packetProvider.getUser(messageContext.receiver());
+        if (user != null && user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
