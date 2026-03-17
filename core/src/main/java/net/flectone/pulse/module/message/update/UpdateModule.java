@@ -41,6 +41,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final Gson gson;
+    private final HttpClient httpClient;
 
     private String latestVersion;
 
@@ -100,12 +101,11 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
 
     private void checkAndUpdateLatestVersion() {
         taskScheduler.runAsync(() -> {
-            HttpClient client = HttpClient.newHttpClient();
             try {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://api.github.com/repos/Flectone/FlectonePulse/releases/latest"))
                         .build();
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() != 200) return;
 
                 LatestRelease latestRelease = gson.fromJson(response.body(), LatestRelease.class);

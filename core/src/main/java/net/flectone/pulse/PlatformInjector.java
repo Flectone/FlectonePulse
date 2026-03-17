@@ -33,8 +33,10 @@ import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,6 +59,7 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(FlectonePulseAPI.class).asEagerSingleton();
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
+        bind(HttpClient.class).toInstance(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build());
 
         ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
         bind(ReflectionResolver.class).toInstance(reflectionResolver);
