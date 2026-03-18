@@ -38,7 +38,7 @@ public class HytalePermissionChecker implements PermissionChecker {
 
         PlayerRef player = hytalePlayerAdapter.getPlayer(entity.uuid());
         if (player != null) {
-            value = value || PermissionsModule.get().hasPermission(entity.uuid(), permission); // player has no default permissions
+            value = value && PermissionsModule.get().hasPermission(entity.uuid(), permission); // player has no default permissions
         }
 
         return value;
