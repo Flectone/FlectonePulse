@@ -304,7 +304,6 @@ public interface PermissionMerger {
     @Mapping(target = "condition", expression = "java(mergeMessageFormatCondition(target.build().condition().toBuilder(), source.condition()))")
     @Mapping(target = "fcolor", expression = "java(mergeMessageFormatFColor(target.build().fcolor().toBuilder(), source.fcolor()))")
     @Mapping(target = "fixation", expression = "java(mergeMessageFormatFixation(target.build().fixation().toBuilder(), source.fixation()))")
-    @Mapping(target = "image", expression = "java(mergeMessageFormatImage(target.build().image().toBuilder(), source.image()))")
     @Mapping(target = "mention", expression = "java(mergeMessageFormatMention(target.build().mention().toBuilder(), source.mention()))")
     @Mapping(target = "moderation", expression = "java(mergeMessageFormatModeration(target.build().moderation().toBuilder(), source.moderation()))")
     @Mapping(target = "names", expression = "java(mergeMessageFormatNames(target.build().names().toBuilder(), source.names()))")
@@ -324,8 +323,6 @@ public interface PermissionMerger {
     Permission.Message.Format.FColor mergeMessageFormatFColor(@MappingTarget Permission.Message.Format.FColor.FColorBuilder target, Permission.Message.Format.FColor fcolor);
 
     Permission.Message.Format.Fixation mergeMessageFormatFixation(@MappingTarget Permission.Message.Format.Fixation.FixationBuilder target, Permission.Message.Format.Fixation fixation);
-
-    Permission.Message.Format.Image mergeMessageFormatImage(@MappingTarget Permission.Message.Format.Image.ImageBuilder target, Permission.Message.Format.Image image);
 
     Permission.Message.Format.Mention mergeMessageFormatMention(@MappingTarget Permission.Message.Format.Mention.MentionBuilder target, Permission.Message.Format.Mention mention);
 

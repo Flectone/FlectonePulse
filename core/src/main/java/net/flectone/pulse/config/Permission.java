@@ -1222,9 +1222,6 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fixation")
                 Fixation fixation,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/image")
-                Image image,
-
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/mention")
                 Mention mention,
 
@@ -1291,15 +1288,6 @@ public record Permission(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Fixation(
-                    String name,
-                    Permission.Type type
-            ) implements PermissionSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            public record Image(
                     String name,
                     Permission.Type type
             ) implements PermissionSetting {
