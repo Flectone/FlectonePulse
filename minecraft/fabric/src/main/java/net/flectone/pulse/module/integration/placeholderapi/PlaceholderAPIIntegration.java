@@ -29,7 +29,6 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -37,8 +36,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Arrays;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -69,23 +66,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     @Override
     public void unhook() {
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
-
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"));
-
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration_formatted"));
-
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"));
-
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
-
-        Arrays.stream(ModuleName.values()).forEach(setting ->
-                Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
-        );
-
-        Arrays.stream(SettingText.values()).forEach(setting ->
-                Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
-        );
-
+        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "setting"));
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"));
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"));
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"));
@@ -152,24 +137,21 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
-        Arrays.stream(ModuleName.values()).forEach(messageType ->
-                Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
-                    FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "setting"), (context, argument) -> {
+            if (argument == null) return PlaceholderResult.value("");
 
-                    return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
-                })
-        );
+            FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-        Arrays.stream(SettingText.values()).forEach(settingText ->
-                Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, settingText.name().toLowerCase()), (context, argument) -> {
-                    FPlayer fPlayer = fPlayerMapper.map(context.source());
+            SettingText settingText = SettingText.fromString(argument);
+            if (settingText != null) {
+                String value = fPlayer.getSetting(settingText);
+                if (settingText == SettingText.CHAT_NAME && value == null) return PlaceholderResult.value("default");
 
-                    String value = fPlayer.getSetting(settingText);
-                    if (settingText == SettingText.CHAT_NAME && value == null) return PlaceholderResult.value("default");
+                return PlaceholderResult.value(StringUtils.defaultString(value));
+            }
 
-                    return value == null ? PlaceholderResult.value("") : PlaceholderResult.value(value);
-                })
-        );
+            return PlaceholderResult.value(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
+        });
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"), (context, argument) -> {
             FPlayer fPlayer = fPlayerMapper.map(context.source());

@@ -31,7 +31,6 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -133,19 +132,19 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             return colorsMap.get(Integer.parseInt(number));
         }
 
-        SettingText settingText = SettingText.fromString(params);
-        if (settingText != null) {
-            String value = fPlayer.getSetting(settingText);
-            if (settingText == SettingText.CHAT_NAME && value == null) return "default";
+        if (params.startsWith("setting_")) {
+            String conditionName = params.substring(8);
+            if (StringUtils.isEmpty(conditionName)) return null;
 
-            return StringUtils.defaultString(value);
-        }
+            SettingText settingText = SettingText.fromString(conditionName);
+            if (settingText != null) {
+                String value = fPlayer.getSetting(settingText);
+                if (settingText == SettingText.CHAT_NAME && value == null) return "default";
 
-        try {
-            ModuleName moduleName = ModuleName.valueOf(params.toUpperCase());
-            return PlaceholderAPI.booleanValue(fPlayer.isSetting(moduleName));
-        } catch (IllegalArgumentException ignored) {
-            // ignore exception
+                return StringUtils.defaultString(value);
+            }
+
+            return PlaceholderAPI.booleanValue(fPlayer.isSetting(params.toUpperCase()));
         }
 
         return switch (params) {
