@@ -155,8 +155,16 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         if (serverIcon == null) {
             Optional<Path> optionalPath = minecraftServer.getIconFile();
+
+            if (optionalPath.isPresent()) {
+                serverIcon = iconUtil.convert(optionalPath.get().toFile());
+            }
+
             // empty string is an indicator that it is already initialized
-            serverIcon = optionalPath.map(path -> iconUtil.convert(path.toFile())).orElse("");
+            if (serverIcon == null) {
+                serverIcon = "";
+            }
+
         }
 
         return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
