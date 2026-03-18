@@ -7,19 +7,21 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ItemsAdderIntegration implements FIntegration, PulseListener {
 
+    private final LegacyColorConvertor legacyColorConvertor;
     @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
@@ -46,11 +48,21 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
         MessageContext messageContext = event.context();
         if (!isHooked()) return event;
 
-        FEntity fPlayer = messageContext.sender();
-        Player player = Bukkit.getPlayer(fPlayer.uuid());
-        if (player == null) return event;
+        Permissible permissible = Bukkit.getPlayer(messageContext.sender().uuid());
+        if (permissible == null) {
+            // I think it's ok?
+            permissible = Bukkit.getConsoleSender();
+        }
 
-        String message = FontImageWrapper.replaceFontImages(player, messageContext.message());
-        return event.withContext(messageContext.withMessage(message));
+        if (StringUtils.isNotEmpty(messageContext.userMessage())) {
+            messageContext = messageContext.withUserMessage(formatFontImages(permissible, messageContext.userMessage()));
+        }
+
+        return event.withContext(messageContext.withMessage(formatFontImages(permissible, messageContext.message())));
+    }
+
+    private String formatFontImages(Permissible permissible, String message) {
+        // ItemsAdder returns a string with legacy colors, so we need to format them
+        return legacyColorConvertor.convert(FontImageWrapper.replaceFontImages(permissible, message));
     }
 }
