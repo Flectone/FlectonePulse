@@ -101,6 +101,10 @@ public class MessagePipeline {
         return gson.toJsonTree(build(context));
     }
 
+    public String buildJsonString(MessageContext context) {
+        return gson.toJson(buildJson(context));
+    }
+
     public Optional<String> legacyFormat(@NonNull FPlayer fPlayer, @NonNull String message) {
         LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
 

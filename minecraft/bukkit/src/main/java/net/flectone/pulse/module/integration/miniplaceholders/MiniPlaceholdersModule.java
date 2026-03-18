@@ -2,17 +2,25 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.command.mute.MuteModule;
+import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.module.message.format.condition.ConditionModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -28,15 +36,22 @@ public class MiniPlaceholdersModule implements ModuleSimple {
 
     @Inject
     public MiniPlaceholdersModule(FileFacade fileFacade,
+                                  FPlayerService fPlayerService,
+                                  PlatformPlayerAdapter platformPlayerAdapter,
+                                  PlatformServerAdapter platformServerAdapter,
+                                  Provider<MuteModule> muteModuleProvider,
+                                  Provider<ConditionModule> conditionModuleProvider,
+                                  Provider<AfkModule> afkModuleProvider,
                                   ListenerRegistry listenerRegistry,
                                   ModuleController moduleController,
+                                  MessagePipeline messagePipeline,
                                   FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.listenerRegistry = listenerRegistry;
         this.moduleController = moduleController;
 
         // don't use injection because we skip relocate
-        this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(fLogger);
+        this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(fileFacade, fPlayerService, platformPlayerAdapter, platformServerAdapter, muteModuleProvider, conditionModuleProvider, afkModuleProvider, messagePipeline, fLogger);
     }
 
     @Override
