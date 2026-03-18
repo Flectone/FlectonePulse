@@ -311,7 +311,6 @@ public interface PermissionMerger {
     @Mapping(target = "questionAnswer", expression = "java(mergeMessageFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "scoreboard", expression = "java(mergeMessageFormatScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
-    @Mapping(target = "spoiler", expression = "java(mergeMessageFormatSpoiler(target.build().spoiler().toBuilder(), source.spoiler()))")
     @Mapping(target = "translate", expression = "java(mergeMessageFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
     @Mapping(target = "world", expression = "java(mergeMessageFormatWorld(target.build().world().toBuilder(), source.world()))")
     Permission.Message.Format mergeMessageFormat(@MappingTarget Permission.Message.Format.FormatBuilder target, Permission.Message.Format source);
@@ -352,8 +351,6 @@ public interface PermissionMerger {
     Permission.Message.Format.QuestionAnswer mergeMessageFormatQuestionAnswer(@MappingTarget Permission.Message.Format.QuestionAnswer.QuestionAnswerBuilder target, Permission.Message.Format.QuestionAnswer questionAnswer);
 
     Permission.Message.Format.Replacement mergeMessageFormatReplacement(@MappingTarget Permission.Message.Format.Replacement.ReplacementBuilder target, Permission.Message.Format.Replacement replacement);
-
-    Permission.Message.Format.Spoiler mergeMessageFormatSpoiler(@MappingTarget Permission.Message.Format.Spoiler.SpoilerBuilder target, Permission.Message.Format.Spoiler spoiler);
 
     Permission.Message.Format.Translate mergeMessageFormatTranslate(@MappingTarget Permission.Message.Format.Translate.TranslateBuilder target, Permission.Message.Format.Translate translate);
 

@@ -1244,9 +1244,6 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/scoreboard")
                 Scoreboard scoreboard,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/spoiler")
-                Spoiler spoiler,
-
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
                 Translate translate,
 
