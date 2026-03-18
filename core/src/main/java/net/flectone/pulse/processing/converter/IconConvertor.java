@@ -20,6 +20,8 @@ public class IconConvertor {
 
     @Nullable
     public String convert(File icon) {
+        if (!icon.exists()) return null;
+
         try {
 
             BufferedImage bufferedImage = ImageIO.read(icon);
