@@ -7,6 +7,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,8 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -179,23 +182,62 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             Universe universe = Universe.get();
             if (universe != null) {
                 PlayerRef offlinePlayer = universe.getPlayer(fPlayer.uuid());
-                message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
-
-                if (fPlayer.isOnline()) {
-                    PlayerRef receiver = universe.getPlayer(fReceiver.uuid());
-                    if (receiver == null) {
-                        receiver = offlinePlayer;
-                    }
-
-                    message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer, receiver, message);
-                }
+                message = setPlaceholders(universe, fPlayer, fReceiver, offlinePlayer, message);
             }
 
+        } catch (IllegalStateException e) {
+            if (e.getMessage().contains("Assert not in thread!")) {
+                String syncMessage = syncSetPlaceholders(fPlayer, fReceiver, message);
+                if (syncMessage != null) {
+                    message = syncMessage;
+                }
+            }
         } catch (Exception ignored) {
             // ignore placeholderapi exceptions
         }
 
         return event.withContext(messageContext.withMessage(message));
+    }
+
+
+    private String syncSetPlaceholders(FPlayer fPlayer, FPlayer fReceiver, String message) {
+        Universe universe = Universe.get();
+        if (universe == null) return null;
+
+        PlayerRef offlinePlayer = universe.getPlayer(fPlayer.uuid());
+        if (offlinePlayer == null) return null;
+        if (offlinePlayer.getWorldUuid() == null) return null;
+
+        World world = universe.getWorld(offlinePlayer.getWorldUuid());
+        if (world == null) return null;
+
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+        world.execute(() -> {
+            try {
+                completableFuture.complete(setPlaceholders(universe, fPlayer, fReceiver, offlinePlayer, message));
+            } catch (Exception ignored) {
+                completableFuture.complete(null);
+            }
+
+        });
+
+        return completableFuture.join();
+    }
+
+    private String setPlaceholders(Universe universe, FPlayer fPlayer, FPlayer fReceiver, PlayerRef offlinePlayer, String message) {
+        String formattedMessage = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
+
+        if (fPlayer.isOnline()) {
+            PlayerRef receiver = universe.getPlayer(fReceiver.uuid());
+            if (receiver == null) {
+                receiver = offlinePlayer;
+            }
+
+            formattedMessage = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer, receiver, formattedMessage);
+        }
+
+        return formattedMessage;
     }
 
 }
