@@ -385,6 +385,7 @@ tab:
     enable: false
     hide_invisible: false
     hide_spectator: false
+    spectator_list_order: false
     proxy_mode: true
     ticker:
       enable: true

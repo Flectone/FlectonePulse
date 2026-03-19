@@ -784,6 +784,7 @@ public record Message(
                 Boolean enable,
                 Boolean hideInvisible,
                 Boolean hideSpectator,
+                Boolean spectatorListOrder,
                 Boolean proxyMode,
                 Ticker ticker
         ) implements EnableSetting {

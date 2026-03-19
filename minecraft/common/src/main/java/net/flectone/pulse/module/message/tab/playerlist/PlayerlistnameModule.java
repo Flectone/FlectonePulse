@@ -175,7 +175,7 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
                     gameMode,
                     name,
                     null,
-                    integrationModule.getGroupWeight(fPlayer)
+                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getGroupWeight(fPlayer) : 0
             );
 
             packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfo));
