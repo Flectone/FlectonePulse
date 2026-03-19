@@ -16,6 +16,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permissible;
+import org.jspecify.annotations.Nullable;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -49,11 +50,6 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
         if (!isHooked()) return event;
 
         Permissible permissible = Bukkit.getPlayer(messageContext.sender().uuid());
-        if (permissible == null) {
-            // I think it's ok?
-            permissible = Bukkit.getConsoleSender();
-        }
-
         if (StringUtils.isNotEmpty(messageContext.userMessage())) {
             messageContext = messageContext.withUserMessage(formatFontImages(permissible, messageContext.userMessage()));
         }
@@ -61,8 +57,11 @@ public class ItemsAdderIntegration implements FIntegration, PulseListener {
         return event.withContext(messageContext.withMessage(formatFontImages(permissible, messageContext.message())));
     }
 
-    private String formatFontImages(Permissible permissible, String message) {
+    private String formatFontImages(@Nullable Permissible permissible, String message) {
         // ItemsAdder returns a string with legacy colors, so we need to format them
-        return legacyColorConvertor.convert(FontImageWrapper.replaceFontImages(permissible, message));
+        return legacyColorConvertor.convert(permissible != null
+                ? FontImageWrapper.replaceFontImages(permissible, message)
+                : FontImageWrapper.replaceFontImages(message)
+        );
     }
 }
