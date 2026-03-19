@@ -417,7 +417,7 @@ public class ProxyMessageHandler {
         EmitModule module = injector.getInstance(EmitModule.class);
         if (moduleController.isDisabledFor(module, fEntity)) return;
 
-        FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+        FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
 
         Map<String, Object> destinationMap = gson.fromJson(input.readUTF(), new TypeToken<Map<String, Object>>(){}.getType());
         Destination destination = Destination.fromJson(destinationMap);
@@ -506,7 +506,7 @@ public class ProxyMessageHandler {
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnbanModule module = injector.getInstance(UnbanModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
         List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
@@ -531,7 +531,7 @@ public class ProxyMessageHandler {
     private void handleUnmuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnmuteModule module = injector.getInstance(UnmuteModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
         List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
@@ -556,7 +556,7 @@ public class ProxyMessageHandler {
     private void handleUnwarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnwarnModule module = injector.getInstance(UnwarnModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
         List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
@@ -782,7 +782,7 @@ public class ProxyMessageHandler {
         TictactoeModule.GamePhase gamePhase = TictactoeModule.GamePhase.valueOf(input.readUTF());
         switch (gamePhase) {
             case CREATE -> {
-                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
+                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
                 int ticTacToeId = input.readInt();
                 boolean isHard = input.readBoolean();
 
@@ -796,7 +796,7 @@ public class ProxyMessageHandler {
                 injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
             }
             case MOVE -> {
-                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
+                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
                 TicTacToe ticTacToe = injector.getInstance(TictactoeService.class).fromString(input.readUTF());
                 int typeTitle = input.readInt();
                 String move = input.readUTF();
@@ -998,7 +998,7 @@ public class ProxyMessageHandler {
     protected Optional<FEntity> parseFEntity(JsonObject jsonObject) {
         if (jsonObject.has("name") && jsonObject.has("uuid") && jsonObject.has("type")) {
             boolean isPlayer = jsonObject.has("id");
-            return Optional.of(gson.fromJson(jsonObject, isPlayer ? FPlayer.class : FEntity.class));
+            return Optional.of(gson.fromJson(jsonObject, isPlayer ? FPlayer.FPlayerImpl.class : FEntity.FEntityImpl.class));
         }
 
         return Optional.empty();
