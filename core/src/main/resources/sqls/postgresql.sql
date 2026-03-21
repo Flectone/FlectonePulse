@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS "fp_moderation" (
 
 CREATE TABLE IF NOT EXISTS "fp_fcolor" (
     "id" SERIAL PRIMARY KEY,
-    "name" TEXT NOT NULL UNIQUE
+    "name" VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS "fp_player_fcolor" (
