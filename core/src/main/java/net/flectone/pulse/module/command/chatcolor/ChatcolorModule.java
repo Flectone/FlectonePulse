@@ -26,6 +26,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -139,7 +140,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
             if (name == null || name.equals("null")) continue;
 
             int number = i + 1;
-            FColor fColor = new FColor(number, name);
+            FColor fColor = new FColor(number, StringUtils.left(name, 255));
 
             newFColors.put(number, fColor);
         }
