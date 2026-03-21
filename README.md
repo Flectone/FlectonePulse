@@ -57,9 +57,9 @@ join:
 
 ![color](https://flectone.net/pulse/welcomemessage.png)
 
-## 🧱 Any textures in chat (WITHOUT RESOURCE PACK)
+## 🧱 Any textures in messages (WITHOUT RESOURCE PACK)
 
-Add any custom texture (image) using the `<texture:name>` placeholder
+Add custom texture (image) using the `<texture:name>` placeholder
 [![texture1](https://flectone.net/pulse/texturemotd.png)](https://flectone.net/pulse/docs/message/format/object/)
 [![texture2](https://flectone.net/pulse/texture.png)](https://flectone.net/pulse/docs/message/format/object/)
 

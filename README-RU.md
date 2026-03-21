@@ -57,9 +57,9 @@ join:
 
 ![color](https://flectone.net/pulse/welcomemessage.png)
 
-## 🧱 Любые текстуры в чате (БЕЗ РЕСУРСПАКА)
+## 🧱 Любые текстуры в сообщениях (БЕЗ РЕСУРСПАКА)
 
-Добавьте любую свою текстуру (изображение) с помощью плейсхолдера `<texture:название>`
+Добавьте свою текстуру (изображение) с помощью плейсхолдера `<texture:название>`
 [![texture1](https://flectone.net/pulse/texturemotd.png)](https://flectone.net/pulse/docs/message/format/object/)
 [![texture2](https://flectone.net/pulse/texture.png)](https://flectone.net/pulse/docs/message/format/object/)
 
