@@ -57,11 +57,14 @@ join:
 
 ![color](https://flectone.net/pulse/welcomemessage.png)
 
-## 🧱 Головы игроков в чате
+## 🧱 Любые текстуры в чате (БЕЗ РЕСУРСПАКА)
 
-Добавьте аватарки в сообщения с помощью плейсхолдера `<player_head>` или можно указывать ник `<player_head:имя>`. Для этого не нужен ресурспак, все игроки это увидят
+Добавьте любую свою текстуру (изображение) с помощью плейсхолдера `<texture:название>`
+[![texture1](https://flectone.net/pulse/texturemotd.png)](https://flectone.net/pulse/docs/message/format/object/)
+[![texture2](https://flectone.net/pulse/texture.png)](https://flectone.net/pulse/docs/message/format/object/)
 
-![object](https://flectone.net/pulse/object.png)
+Используйте аватарки в сообщениях с помощью плейсхолдера `<player_head>` и символы Minecraft через `<sprite:название>`
+[![object](https://flectone.net/pulse/object.png)](https://flectone.net/pulse/docs/message/format/object/)
 
 ## 🌈 Настройка чата с /chatsetting
 

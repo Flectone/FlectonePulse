@@ -57,11 +57,14 @@ join:
 
 ![color](https://flectone.net/pulse/welcomemessage.png)
 
-## 🧱 Player heads in chat
+## 🧱 Any textures in chat (WITHOUT RESOURCE PACK)
 
-Add avatars to messages using the placeholder `<player_head>` or specify a nickname `<player_head:name>`. No resource pack needed, all players will see it
+Add any custom texture (image) using the `<texture:name>` placeholder
+[![texture1](https://flectone.net/pulse/texturemotd.png)](https://flectone.net/pulse/docs/message/format/object/)
+[![texture2](https://flectone.net/pulse/texture.png)](https://flectone.net/pulse/docs/message/format/object/)
 
-![object](https://flectone.net/pulse/object.png)
+Use avatars in messages using the `<player_head>` placeholder and Minecraft symbols using `<sprite:name>`
+[![object](https://flectone.net/pulse/object.png)](https://flectone.net/pulse/docs/message/format/object/)
 
 ## 🌈 Chat customization with /chatsetting
 
