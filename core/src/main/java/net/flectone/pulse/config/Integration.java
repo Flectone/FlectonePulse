@@ -317,6 +317,7 @@ public record Integration(
     @Jacksonized
     public record Telegram(
             Boolean enable,
+            Boolean ignoreAllBots,
             Mode parseMode,
             String token,
             Map<String, Command> customCommand,

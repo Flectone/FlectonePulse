@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.forum.EditForumTopic;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTitle;
@@ -44,6 +45,7 @@ public class TelegramIntegration implements FIntegration {
     @Getter private FPlayer sender = FPlayer.UNKNOWN;
     private TelegramBotsLongPollingApplication botsApplication;
     private OkHttpTelegramClient telegramClient;
+    @Getter private Long botId;
 
     public Integration.Telegram config() {
         return fileFacade.integration().telegram();
@@ -66,6 +68,8 @@ public class TelegramIntegration implements FIntegration {
 
             botsApplication = new TelegramBotsLongPollingApplication();
             botsApplication.registerBot(token, messageListener);
+
+            botId = telegramClient.execute(new GetMe()).getId();
 
             Integration.ChannelInfo channelInfo = config().channelInfo();
 

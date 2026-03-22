@@ -84,6 +84,9 @@ public class MessageListener implements EventListener {
         User author = message.getFrom();
         if (author == null) return;
 
+        // always ignore ourselves
+        if (author.getIsBot() && (config().ignoreAllBots() || author.getId().equals(telegramIntegration.get().getBotId()))) return;
+
         String chat = message.getChat().getTitle();
         if (chat == null) return;
 

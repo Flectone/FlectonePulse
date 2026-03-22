@@ -99,6 +99,7 @@ tab:
   disable_flectonepulse_playerlistname: false
 telegram:
   enable: false
+  ignore_all_bots: true
   parse_mode: "NONE"
   token: ""
   custom_command:
