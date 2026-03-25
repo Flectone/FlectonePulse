@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.command;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,7 @@ public class CommandModule implements ModuleSimple {
     private final FileFacade fileFacade;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return ModuleSimple.super.childrenBuilder().add(
                 AfkModule.class,
                 AnonModule.class,
@@ -117,7 +117,7 @@ public class CommandModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().seeInvisiblePlayersInSuggest());
     }
 

@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.tab;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.ModuleSimple;
@@ -19,7 +19,7 @@ public class MinecraftTabModule extends TabModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
                 FooterModule.class,
                 HeaderModule.class,

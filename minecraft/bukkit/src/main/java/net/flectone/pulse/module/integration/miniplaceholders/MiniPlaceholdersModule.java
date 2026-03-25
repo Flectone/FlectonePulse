@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -71,7 +71,7 @@ public class MiniPlaceholdersModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 

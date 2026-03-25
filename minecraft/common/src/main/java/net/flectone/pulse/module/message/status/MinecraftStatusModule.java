@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.status;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,10 +22,10 @@ import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -76,7 +76,7 @@ public class MinecraftStatusModule extends StatusModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
                 MOTDModule.class,
                 IconModule.class,

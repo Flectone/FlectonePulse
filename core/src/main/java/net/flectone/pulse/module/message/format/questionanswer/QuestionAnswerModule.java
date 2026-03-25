@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.questionanswer;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -69,7 +69,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder()
                 .addAll(permission().questions().values().stream().flatMap(question ->
                         Stream.of(

@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.moderation.flood;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class FloodModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().bypass());
     }
 

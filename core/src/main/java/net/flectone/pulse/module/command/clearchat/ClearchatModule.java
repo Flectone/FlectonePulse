@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.command.clearchat;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleCommand.super.permissionBuilder()
                 .add(permission().other());
     }

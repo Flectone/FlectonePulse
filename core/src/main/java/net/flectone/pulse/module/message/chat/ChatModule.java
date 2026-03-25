@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.chat;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -56,7 +56,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     private final ProxyRegistry proxyRegistry;
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder()
                 .addAll(permission().types().values())
                 .addAll(permission().types().values().stream().map(Permission.Message.Chat.Type::sound).toList())

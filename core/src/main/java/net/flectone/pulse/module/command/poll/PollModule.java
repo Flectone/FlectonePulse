@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.command.poll;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -125,7 +125,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleCommand.super.permissionBuilder().add(permission().create());
     }
 

@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.command.chatsetting;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -86,7 +86,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleCommand.super.permissionBuilder()
                 .add(permission().other())
                 .addAll(permission().settings().values());

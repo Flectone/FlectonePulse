@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -31,8 +31,8 @@ public class HytaleIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("HelpChat:PlaceholderAPI")) {
             builder.add(HytalePlaceholderAPIModule.class);

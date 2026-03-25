@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +58,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     private final ModuleController moduleController;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return ModuleLocalization.super.childrenBuilder().add(
                 AnimationModule.class,
                 ConditionModule.class,
@@ -106,7 +106,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder()
                 .add(permission().legacyColors())
                 .addAll(permission().adventureTags().values());

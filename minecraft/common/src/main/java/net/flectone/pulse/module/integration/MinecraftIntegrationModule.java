@@ -1,21 +1,16 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.integration.deepl.DeeplModule;
-import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.floodgate.FloodgateModule;
 import net.flectone.pulse.module.integration.geyser.GeyserModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
-import net.flectone.pulse.module.integration.telegram.TelegramModule;
-import net.flectone.pulse.module.integration.twitch.TwitchModule;
-import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -48,8 +43,8 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
             builder.add(SkinsRestorerModule.class);
@@ -83,13 +78,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
             }
         }
 
-        return builder.add(
-                DeeplModule.class,
-                DiscordModule.class,
-                TelegramModule.class,
-                TwitchModule.class,
-                YandexModule.class
-        );
+        return builder;
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {

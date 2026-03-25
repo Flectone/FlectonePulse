@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.command.chatcolor;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -72,7 +72,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleCommand.super.permissionBuilder()
                 .add(permission().other())
                 .addAll(permission().colors().values());

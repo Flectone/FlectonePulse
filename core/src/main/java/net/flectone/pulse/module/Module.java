@@ -1,6 +1,6 @@
 package net.flectone.pulse.module;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class Module implements ModuleSimple {
     private final FileFacade fileFacade;
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return ModuleSimple.super.childrenBuilder().add(
                 IntegrationModule.class,
                 CommandModule.class,

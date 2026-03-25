@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format.moderation.newbie;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder().add(permission().bypass());
     }
 

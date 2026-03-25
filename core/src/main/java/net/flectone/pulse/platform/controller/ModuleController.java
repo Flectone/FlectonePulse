@@ -31,7 +31,6 @@ import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -48,7 +47,7 @@ public class ModuleController {
 
     private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, Class<? extends ModuleSimple>> moduleRootMap = new Object2ObjectOpenHashMap<>();
     private final Object2BooleanOpenHashMap<Class<? extends ModuleSimple>> moduleStateMap = new Object2BooleanOpenHashMap<>();
-    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, List<Class<? extends ModuleSimple>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, Set<Class<? extends ModuleSimple>>> moduleChildrenMap = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectOpenHashMap<Class<? extends ModuleSimple>, BiPredicate<FEntity, Boolean>> modulePredicateMap = new Object2ObjectOpenHashMap<>();
 
     private final Injector injector;
@@ -110,9 +109,9 @@ public class ModuleController {
         return disablePredicate != null && disablePredicate.test(entity, isMessage);
     }
 
-    public List<Class<? extends ModuleSimple>> getChildren(Class<? extends ModuleSimple> clazz) {
+    public Set<Class<? extends ModuleSimple>> getChildren(Class<? extends ModuleSimple> clazz) {
         Class<? extends ModuleSimple> root = getRoot(clazz);
-        return moduleChildrenMap.getOrDefault(root, Collections.emptyList());
+        return moduleChildrenMap.getOrDefault(root, Collections.emptySet());
     }
 
     public void reload() {

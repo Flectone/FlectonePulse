@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class PlaceholderAPIModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<@NonNull PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 

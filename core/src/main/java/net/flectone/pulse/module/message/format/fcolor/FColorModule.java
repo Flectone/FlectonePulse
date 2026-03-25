@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.fcolor;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class FColorModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().addAll(permission().colors().values());
     }
 

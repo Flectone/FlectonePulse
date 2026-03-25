@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -43,8 +43,8 @@ public abstract class IntegrationModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> builder = ModuleSimple.super.childrenBuilder();
+    public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = ModuleSimple.super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);

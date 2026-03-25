@@ -1,6 +1,6 @@
 package net.flectone.pulse.module;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.flectone.pulse.config.setting.EnableSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
@@ -27,12 +27,12 @@ public interface ModuleSimple {
         return (fEntity, aBoolean) -> false;
     }
 
-    default ImmutableList.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
-        return ImmutableList.builder();
+    default ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
+        return ImmutableSet.builder();
     }
 
-    default ImmutableList.Builder<@NonNull PermissionSetting> permissionBuilder() {
-        return ImmutableList.<PermissionSetting>builder().add(permission());
+    default ImmutableSet.Builder<@NonNull PermissionSetting> permissionBuilder() {
+        return ImmutableSet.<PermissionSetting>builder().add(permission());
     }
 
 }

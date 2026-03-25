@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.message.format.mention;
 
 import com.google.common.cache.Cache;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -60,7 +60,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder().add(permission().sound(), permission().group(), permission().bypass());
     }
 

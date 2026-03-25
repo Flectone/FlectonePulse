@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -44,7 +45,7 @@ public class MiniPlaceholdersModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<@NotNull PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 

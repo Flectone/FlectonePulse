@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.format.animation;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public ImmutableList.Builder<PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
         return ModuleLocalization.super.permissionBuilder().addAll(permission().values().values());
     }
 

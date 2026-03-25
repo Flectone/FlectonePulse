@@ -1,6 +1,6 @@
 package net.flectone.pulse.module;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,8 +15,8 @@ public interface ModuleLocalization<L extends LocalizationSetting> extends Modul
     L localization(FEntity sender);
 
     @Override
-    default ImmutableList.Builder<PermissionSetting> permissionBuilder() {
-        ImmutableList.Builder<PermissionSetting> builder = ModuleSimple.super.permissionBuilder();
+    default ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
+        ImmutableSet.Builder<PermissionSetting> builder = ModuleSimple.super.permissionBuilder();
 
         if (permission() instanceof CooldownPermissionSetting cooldownPermission) {
             builder.add(cooldownPermission.cooldownBypass());
