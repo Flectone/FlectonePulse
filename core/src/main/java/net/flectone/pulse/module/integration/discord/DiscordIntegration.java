@@ -247,7 +247,10 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = FPlayer.builder().name(fileFacade.localization().integration().discord().senderName()).build();
+        sender = FPlayer.builder()
+                .integration(true)
+                .name(fileFacade.localization().integration().discord().senderName())
+                .build();
 
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;

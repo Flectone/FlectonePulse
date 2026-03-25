@@ -34,13 +34,19 @@ public interface FPlayer extends FEntity {
         return new FPlayerImpl.FPlayerImplBuilder();
     }
 
-    String TYPE = "PLAYER";
+    String PLAYER_TYPE = "PLAYER";
+
+    String CONSOLE_TYPE = "CONSOLE";
+
+    String INTEGRATION_TYPE = "INTEGRATION";
 
     FPlayer UNKNOWN = FPlayer.builder().build();
 
     Integer id();
 
     boolean isConsole();
+
+    boolean isIntegration();
 
     boolean isOnline();
 
@@ -110,6 +116,7 @@ public interface FPlayer extends FEntity {
             @Nullable Component showEntityName,
             Integer id,
             boolean console,
+            boolean integration,
             boolean online,
             String ip,
             Map<FColor.Type, Set<FColor>> fColors,
@@ -122,18 +129,29 @@ public interface FPlayer extends FEntity {
         public FPlayerImpl {
             if (name == null) name = FEntity.UNKNOWN_NAME;
             if (uuid == null) uuid = FEntity.UNKNOWN_UUID;
-            if (type == null) type = TYPE;
+            if (type == null) type = PLAYER_TYPE;
             if (id == null) id = -1;
             if (fColors == null) fColors = Collections.emptyMap();
             if (settingsBoolean == null) settingsBoolean = Collections.emptyMap();
             if (settingsText == null) settingsText = Collections.emptyMap();
             if (ignores == null) ignores = Collections.emptyList();
             if (constants == null) constants = Collections.emptyList();
+
+            console = console || type.equalsIgnoreCase(CONSOLE_TYPE);
+            if (console) type = CONSOLE_TYPE;
+
+            integration = integration || type.equalsIgnoreCase(INTEGRATION_TYPE);
+            if (integration) type = INTEGRATION_TYPE;
         }
 
         @Override
         public boolean isConsole() {
             return console;
+        }
+
+        @Override
+        public boolean isIntegration() {
+            return integration;
         }
 
         @Override

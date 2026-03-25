@@ -249,7 +249,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
-        String formatTarget = fTarget.type().equals(FPlayer.TYPE)
+        String formatTarget = fTarget.type().equals(FPlayer.PLAYER_TYPE)
                 ? localization.formatPlayer()
                 : localization.formatEntity();
 
