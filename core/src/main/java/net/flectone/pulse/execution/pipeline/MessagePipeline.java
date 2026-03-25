@@ -77,7 +77,11 @@ public class MessagePipeline {
         }
 
         try {
-            return miniMessage.deserialize(eventContext.message(), eventContext.tagResolver());
+            return miniMessage.deserialize(
+                    // always need to replace legacy § with & to avoid MiniMessage problems
+                    Strings.CS.replace(eventContext.message(), "§", "&"),
+                    eventContext.tagResolver()
+            );
         } catch (Exception e) {
             fLogger.warning(e);
         }
