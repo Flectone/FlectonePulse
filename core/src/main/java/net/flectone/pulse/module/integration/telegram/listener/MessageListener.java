@@ -125,7 +125,7 @@ public class MessageListener implements EventListener {
                         .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            MessageContext tagContext = messagePipeline.createContext(localization().formatReply())
+                            MessageContext tagContext = messagePipeline.createContext(localization(fResolver).formatReply())
                                     .addTagResolvers(
                                             TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
                                             TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
