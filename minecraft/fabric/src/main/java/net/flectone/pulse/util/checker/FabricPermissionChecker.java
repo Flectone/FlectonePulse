@@ -28,7 +28,7 @@ public class FabricPermissionChecker implements PermissionChecker {
     @Override
     public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
+        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return true;

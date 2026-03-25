@@ -23,7 +23,7 @@ public class HytalePermissionChecker implements PermissionChecker {
     @Override
     public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
+        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission.Type hytalePermission = hytalePermissionRegistry.getPermissions().get(permission);

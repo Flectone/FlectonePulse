@@ -22,7 +22,7 @@ public class BukkitPermissionChecker implements PermissionChecker {
     @Override
     public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
-        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
+        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission bukkitPermission = Bukkit.getPluginManager().getPermission(permission);
