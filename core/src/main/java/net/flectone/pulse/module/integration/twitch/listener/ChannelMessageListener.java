@@ -94,7 +94,12 @@ public class ChannelMessageListener implements EventListener<ChannelMessageEvent
                             MessageContext tagContext = messagePipeline.createContext(localization(fResolver).formatReply())
                                     .addTagResolvers(
                                             TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            TagResolver.resolver("reply_message", Tag.preProcessParsed(StringUtils.defaultString(reply.second())))
+                                            TagResolver.resolver("reply_message", (argumentQueue1, context1) -> {
+                                                MessageContext replyContext = messagePipeline.createContext(twitchIntegration.get().getSender(), fResolver, reply.second())
+                                                        .addFlag(MessageFlag.PLAYER_MESSAGE, true);
+
+                                                return Tag.selfClosingInserting(messagePipeline.build(replyContext));
+                                            })
                                     );
 
                             return Tag.inserting(messagePipeline.build(tagContext));
