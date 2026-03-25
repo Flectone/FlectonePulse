@@ -200,7 +200,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
     public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         User user = packetProvider.getUser(messageContext.receiver());
-        if (user != null && user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
 
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
@@ -215,7 +215,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         User user = packetProvider.getUser(messageContext.receiver());
-        if (user != null && user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
 
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
@@ -260,7 +260,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (user == null) return null;
 
         // check player version
-        if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+        if (user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
                 return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
