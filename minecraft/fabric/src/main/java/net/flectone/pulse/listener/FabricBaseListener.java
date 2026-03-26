@@ -11,8 +11,8 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,20 +22,20 @@ public class FabricBaseListener {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
 
-    public void asyncProcessJoinEvent(ServerPlayNetworkHandler handler, PacketSender packetSender, MinecraftServer minecraftServer) {
+    public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
         taskScheduler.runAsyncLater(() -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
+            ServerPlayer player = handler.getPlayer();
+            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
 
             eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
             eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
         }, 1L);
     }
 
-    public void asyncProcessQuitEvent(ServerPlayNetworkHandler handler, MinecraftServer minecraftServer) {
+    public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
         taskScheduler.runAsync(() -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
+            ServerPlayer player = handler.getPlayer();
+            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
 
             eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
             eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));

@@ -19,8 +19,8 @@ import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
 
     private void removeDefaultFabricCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            CommandNode<ServerCommandSource> root = dispatcher.getRoot();
+            CommandNode<CommandSourceStack> root = dispatcher.getRoot();
 
             for (String command : injector.getInstance(FileFacade.class).config().command().disabledFabric()) {
                 root.getChildren().removeIf(node -> node.getName().equals(command));

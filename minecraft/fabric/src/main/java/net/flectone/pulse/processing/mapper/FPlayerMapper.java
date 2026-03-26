@@ -7,37 +7,37 @@ import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.incendo.cloud.SenderMapper;
 import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer> {
+public class FPlayerMapper implements SenderMapper<CommandSourceStack, FPlayer> {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
-    public @NonNull FPlayer map(@NonNull ServerCommandSource sender) {
-        ServerPlayerEntity player = sender.getPlayer();
+    public @NonNull FPlayer map(@NonNull CommandSourceStack sender) {
+        ServerPlayer player = sender.getPlayer();
         if (player != null) {
-            return fPlayerService.getFPlayer(player.getUuid());
+            return fPlayerService.getFPlayer(player.getUUID());
         }
 
         return fPlayerService.getFPlayer(sender);
     }
 
     @Override
-    public @NonNull ServerCommandSource reverse(@NonNull FPlayer mapped) {
+    public @NonNull CommandSourceStack reverse(@NonNull FPlayer mapped) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
 
         Object obj = platformPlayerAdapter.convertToPlatformPlayer(mapped);
-        return obj instanceof ServerPlayerEntity player
-                ? player.getCommandSource()
-                : minecraftServer.getCommandSource();
+        return obj instanceof ServerPlayer player
+                ? player.createCommandSourceStack()
+                : minecraftServer.createCommandSourceStack();
     }
 }

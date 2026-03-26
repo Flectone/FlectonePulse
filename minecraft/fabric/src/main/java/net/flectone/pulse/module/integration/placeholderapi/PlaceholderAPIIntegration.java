@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
+import eu.pb4.placeholders.api.parsers.NodeParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +28,14 @@ import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.processing.mapper.FPlayerMapper;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -42,7 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     private final FileFacade fileFacade;
-    private final FPlayerMapper fPlayerMapper;
+    private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -53,6 +54,8 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
 
+    private boolean hooked;
+
     @Override
     public String getIntegrationName() {
         return "TextPlaceholderAPI";
@@ -60,24 +63,12 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     @Override
     public void hook() {
-        taskScheduler.runAsyncLater(this::register);
-    }
-
-    @Override
-    public void unhook() {
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration_formatted"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "setting"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"));
-        Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "tps"));
-
-        logUnhook();
+        if (!hooked) {
+            taskScheduler.runAsyncLater(() -> {
+                register();
+                hooked = true;
+            });
+        }
     }
 
     @Pulse(priority = Event.Priority.LOW)
@@ -94,53 +85,69 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 ? fPlayer
                 : messageContext.receiver()
         );
-        if (!(player instanceof ServerPlayerEntity playerEntity)) return event;
+        if (!(player instanceof ServerPlayer playerEntity)) return event;
 
         String message = messageContext.message();
 
-        Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
-        return event.withContext(messageContext.withMessage(text.getString()));
+        String text = NodeParser.builder()
+                .serverPlaceholders()
+                .commonPlaceholders()
+                .simplifiedTextFormat()
+                .build()
+                .parseComponent(message, ServerPlaceholderContext.of(playerEntity).asParserContext())
+                .getString();
+
+        return event.withContext(messageContext.withMessage(text));
     }
 
     private void register() {
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "mute_suffix"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
             return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
             return PlaceholderResult.value(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "afk_duration_formatted"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration_formatted"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
             return PlaceholderResult.value(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "condition"), (context, argument) ->
-                PlaceholderResult.value(conditionModuleProvider.get().getConditionValue(argument, fPlayerMapper.map(context.source())))
-        );
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":condition"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->
+            return PlaceholderResult.value(conditionModuleProvider.get().getConditionValue(argument, fPlayerService.getFPlayer(context.player().getUUID())));
+        });
+
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)
         );
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_out"), (context, argument) ->
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_out"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.OUT)
         );
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_see"), (context, argument) ->
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":fcolor_see"), (context, argument) ->
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "setting"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":setting"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
             if (argument == null) return PlaceholderResult.value("");
 
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
             SettingText settingText = SettingText.fromString(argument);
             if (settingText != null) {
@@ -153,26 +160,32 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.name());
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ip"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.ip());
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "ping"), (context, argument) -> {
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
         });
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "online"), (context, argument) ->
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) ->
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "tps"), (context, argument) ->
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, argument) ->
                 PlaceholderResult.value(platformServerAdapter.getTPS())
         );
 
@@ -182,8 +195,9 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private PlaceholderResult fColorPlaceholder(PlaceholderContext context, String argument, FColor.Type... types) {
         if (argument == null) return PlaceholderResult.invalid();
         if (!StringUtils.isNumeric(argument)) return PlaceholderResult.invalid();
+        if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
-        FPlayer fPlayer = fPlayerMapper.map(context.source());
+        FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
         Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {

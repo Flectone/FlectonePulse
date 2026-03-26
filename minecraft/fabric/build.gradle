@@ -1,14 +1,11 @@
-import net.fabricmc.loom.task.RemapJarTask
-
 plugins {
-	id 'fabric-loom' version '1.15.5'
+    id 'net.fabricmc.fabric-loom' version "${fabric_loom_version}"
 }
 
 dependencies {
 	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
-	mappings("net.fabricmc:yarn:${yarn_mappings_version}:v2")
 
-	modCompileOnly("net.fabricmc:fabric-loader:${fabric_loader_version}")
+	compileOnly("net.fabricmc:fabric-loader:${fabric_loader_version}")
 	Set<String> fabricApiModules = [
 			'fabric-api-base',
 			'fabric-command-api-v2',
@@ -17,7 +14,7 @@ dependencies {
 	]
 
 	fabricApiModules.forEach {
-		modCompileOnly(fabricApi.module(it, "$fabric_api_version"))
+		compileOnly(fabricApi.module(it, "$fabric_api_version"))
 	}
 
 	Set<String> adventureApiModules = [
@@ -33,16 +30,16 @@ dependencies {
 	]
 
 	adventureApiModules.forEach {
-		modCompileOnly("net.kyori:$it:$adventure_api")
+		compileOnly("net.kyori:$it:$adventure_api")
 	}
 
-	modCompileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
-	modCompileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
-	modCompileOnly("maven.modrinth:vanish:1.6.8+26.1")
-    modCompileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
+	compileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
+	compileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
+	compileOnly("maven.modrinth:vanish:$vanish_version")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	// fix integration with LuckPerms
-	modImplementation(include("org.incendo:cloud-fabric:${cloud_fabric_version}"))
+	implementation("org.incendo:cloud-fabric:${cloud_fabric_version}")
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")
@@ -64,6 +61,7 @@ shadowJar {
 		include(dependency("com.alessiodp.libby:.*"))
 		include(dependency("org.xerial:.*"))
 		include(dependency("net.kyori:.*"))
+        include(dependency("org.incendo:.*"))
 		include(project(":core"))
         include(project(":minecraft:common"))
 	}
@@ -80,16 +78,10 @@ processResources {
 	}
 }
 
-tasks.register("fabricRemapJar", RemapJarTask) {
-    dependsOn tasks.shadowJar
-    input = tasks.shadowJar.archiveFile
-    addNestedDependencies = true
-}
-
 tasks.named("buildFinalJar", Jar) {
     from {
-        zipTree(tasks.fabricRemapJar.archiveFile)
+        zipTree(tasks.shadowJar.archiveFile)
     }
 
-    dependsOn tasks.fabricRemapJar
+    dependsOn tasks.shadowJar
 }
