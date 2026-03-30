@@ -14,6 +14,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
@@ -257,7 +259,10 @@ public class DiscordIntegration implements FIntegration {
 
         discordClient = DiscordClient.create(token);
 
-        gateway = discordClient.gateway().login().block();
+        gateway = discordClient.gateway()
+                .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)))
+                .login()
+                .block();
         if (gateway == null) return;
 
         Integration.Discord.Presence presence = config().presence();
