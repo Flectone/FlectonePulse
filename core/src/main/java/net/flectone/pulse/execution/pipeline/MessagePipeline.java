@@ -90,7 +90,15 @@ public class MessagePipeline {
     }
 
     public String buildDefault(MessageContext context) {
-        return MiniMessage.miniMessage().serialize(build(context));
+        // add a space so that MiniMessage correctly deserializes closed tags
+        // https://github.com/Flectone/FlectonePulse/issues/243
+        context = context.withMessage(context.message() + " ");
+
+        // build and serialize component
+        String serializedComponent = MiniMessage.miniMessage().serialize(build(context));
+
+        // remove last space
+        return StringUtils.chomp(serializedComponent);
     }
 
     public String buildPlain(MessageContext context) {
