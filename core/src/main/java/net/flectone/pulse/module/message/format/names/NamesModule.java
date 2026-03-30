@@ -69,15 +69,15 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        FPlayer receiver = messageContext.receiver();
+        FPlayer fReceiver = messageContext.receiver();
 
         if (!(sender instanceof FPlayer fPlayer)) {
             return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-                Localization.Message.Format.Names localizationName = localization(receiver);
+                Localization.Message.Format.Names localizationName = localization(fReceiver);
 
                 Component showEntityName = sender.showEntityName();
                 if (showEntityName == null) {
-                    MessageContext displayContext = messagePipeline.createContext(sender, receiver,
+                    MessageContext displayContext = messagePipeline.createContext(sender, fReceiver,
                                     StringUtils.replaceEach(
                                             sender.type().equals(FEntity.UNKNOWN_TYPE) ? localizationName.unknown() : localizationName.entity(),
                                             new String[]{"<name>", "<type>", "<uuid>"},
@@ -95,7 +95,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                     return Tag.selfClosingInserting(displayName);
                 }
 
-                MessageContext displayContext = messagePipeline.createContext(sender, receiver,
+                MessageContext displayContext = messagePipeline.createContext(sender, fReceiver,
                                 sender.type().equals(FEntity.UNKNOWN_TYPE)
                                         ? localizationName.unknown()
                                         : StringUtils.replaceEach(
@@ -148,12 +148,12 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                                 }
                             }
 
-                            Localization.Message.Format.Names localization = localization(receiver);
+                            Localization.Message.Format.Names localization = localization(fReceiver);
                             String displayName = fPlayer.isUnknown() || localization.display().isEmpty()
                                     ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.name())
                                     : localization.display().get(displayNameIndex);
 
-                            MessageContext displayContext = messagePipeline.createContext(sender, receiver, displayName)
+                            MessageContext displayContext = messagePipeline.createContext(sender, fReceiver, displayName)
                                     .withFlags(messageContext.flags())
                                     .addFlags(
                                             new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
@@ -166,31 +166,11 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                         }),
                         TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (argumentQueue, context) -> {
                             String prefix = integrationModule.getPrefix(fPlayer);
-                            if (StringUtils.isEmpty(prefix)) return MessagePipeline.ReplacementTag.emptyTag();
-
-                            MessageContext prefixContext = messagePipeline.createContext(fPlayer, receiver, prefix)
-                                    .withFlags(messageContext.flags())
-                                    .addFlags(
-                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
-                                            new boolean[]{false, false}
-                                    );
-
-                            Component prefixComponent = messagePipeline.build(prefixContext);
-                            return Tag.inserting(prefixComponent);
+                            return buildVaultTag(fPlayer, fReceiver, prefix, messageContext);
                         }),
                         TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (argumentQueue, context) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
-                            if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
-
-                            MessageContext suffixContext = messagePipeline.createContext(fPlayer, receiver, suffix)
-                                    .withFlags(messageContext.flags())
-                                    .addFlags(
-                                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
-                                            new boolean[]{false, false}
-                                    );
-
-                            Component suffixComponent = messagePipeline.build(suffixContext);
-                            return Tag.inserting(suffixComponent);
+                            return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
                         TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (argumentQueue, context) ->
                                 Tag.preProcessParsed(fPlayer.name())
@@ -217,6 +197,19 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
     public boolean isInvisible(FEntity entity) {
         return config().shouldCheckInvisibility()
                 && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME);
+    }
+
+    private Tag buildVaultTag(FPlayer fPlayer, FPlayer fReceiver, String vaultTag, MessageContext messageContext) {
+        if (StringUtils.isEmpty(vaultTag)) return MessagePipeline.ReplacementTag.emptyTag();
+
+        MessageContext tagContext = messagePipeline.createContext(fPlayer, fReceiver, vaultTag)
+                .withFlags(messageContext.flags())
+                .addFlags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
+                        new boolean[]{false, false}
+                );
+
+        return Tag.preProcessParsed(messagePipeline.buildDefault(tagContext));
     }
 
 }
