@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -34,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Singleton
 public class MinecraftObjectModule extends ObjectModule {
@@ -42,6 +44,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final PermissionChecker permissionChecker;
     private final MinecraftSkinService skinService;
     private final TextureService textureService;
+    private final FPlayerService fPlayerService;
     private final PacketProvider packetProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -55,6 +58,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  PermissionChecker permissionChecker,
                                  MinecraftSkinService skinService,
                                  TextureService textureService,
+                                 FPlayerService fPlayerService,
                                  PacketProvider packetProvider,
                                  IntegrationModule integrationModule,
                                  PlatformPlayerAdapter platformPlayerAdapter,
@@ -67,6 +71,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.permissionChecker = permissionChecker;
         this.skinService = skinService;
         this.textureService = textureService;
+        this.fPlayerService = fPlayerService;
         this.packetProvider = packetProvider;
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
@@ -125,33 +130,51 @@ public class MinecraftObjectModule extends ObjectModule {
 
         PlayerHeadObjectContents.Builder playerHeadBuilder = ObjectContents.playerHead();
 
-        FEntity sender = messageContext.sender();
         String playerHead = argumentQueue.hasNext() ? argumentQueue.pop().value() : null;
-        if (playerHead == null || playerHead.length() > 16) {
-            PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(sender);
 
-            Component playerHeadComponent = StringUtils.isNotEmpty(profileProperty.value())
-                    ? Component.object().contents(playerHeadBuilder.profileProperty(profileProperty).build()).build()
-                    : Component.object().contents(playerHeadBuilder.name(sender.name()).build()).build();
+        // I think a player name "true" or "false" is not possible on the server
+        if (playerHead == null || "true".equals(playerHead) || "false".equals(playerHead)) {
+            playerHeadBuilder.hat(!"false".equals(playerHead));
 
+            FEntity sender = messageContext.sender();
+            applyFPlayerProfileProperty(sender, playerHeadBuilder, builder -> builder.name(sender.name()));
+
+            Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
             return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
         }
 
-        try {
-            playerHeadBuilder.id(UUID.fromString(playerHead));
-        } catch (IllegalArgumentException e) {
-            playerHeadBuilder.name(playerHead);
+        playerHeadBuilder.hat(!argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value()));
+
+        if (playerHead.length() > 16) {
+            playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
+        } else {
+            try {
+                UUID playerHeadUUID = UUID.fromString(playerHead);
+                FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
+
+                applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
+            } catch (IllegalArgumentException e) {
+                FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
+
+                applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+            }
         }
 
-        boolean showPlayerHat = !argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value());
-
-        Component playerHeadComponent = Component.object().contents(
-                playerHeadBuilder
-                        .hat(showPlayerHat)
-                        .build()
-        ).build();
+        Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
 
         return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
+    }
+
+    private void applyFPlayerProfileProperty(FEntity fEntity,
+                                             PlayerHeadObjectContents.Builder playerHeadBuilder,
+                                             Consumer<PlayerHeadObjectContents.Builder> otherConsumer) {
+        PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fEntity);
+
+        if (StringUtils.isNotEmpty(profileProperty.value())) {
+            playerHeadBuilder.profileProperty(profileProperty);
+        } else {
+            otherConsumer.accept(playerHeadBuilder);
+        }
     }
 
     public MessageContext addSpriteTag(MessageContext messageContext) {
