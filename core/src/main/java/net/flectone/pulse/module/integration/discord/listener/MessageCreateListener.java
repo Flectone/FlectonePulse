@@ -149,6 +149,16 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
     }
 
     private Optional<Pair<String, String>> retrieveReply(Message message) {
+        if (!message.getMessageSnapshots().isEmpty()) {
+            PartialMessage partialMessage = message.getMessageSnapshots().getFirst().getMessage();
+
+            String content = getMessageContent(partialMessage);
+
+            Optional<User> author = partialMessage.getAuthor();
+            return author.map(user -> Pair.of(user.getUsername(), content))
+                    .or(() -> Optional.of(Pair.of("Unknown", content)));
+        }
+
         Optional<Message> optionalReferencedMessage = message.getReferencedMessage();
         if (optionalReferencedMessage.isEmpty()) return Optional.empty();
 
