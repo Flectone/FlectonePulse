@@ -5,7 +5,10 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.Embed;
+import discord4j.core.object.PartialMessage;
 import discord4j.core.object.entity.*;
+import discord4j.core.object.entity.poll.Poll;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -61,29 +65,36 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
         if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
 
         Optional<Member> optionalMember = event.getMember();
-        if (optionalMember.isEmpty()) return Mono.empty();
+        if (optionalMember.isPresent()) {
+            Member member = optionalMember.get();
 
-        Member member = optionalMember.get();
-
-        // always ignore ourselves
-        if (member.isBot() && (config().ignoreAllBots() || member.getId().asLong() == discordIntegration.get().getClientID())) return Mono.empty();
+            // always ignore ourselves
+            if (member.isBot() && (config().ignoreAllBots()
+                    || member.getId().asLong() == discordIntegration.get().getClientID())) return Mono.empty();
+        }
 
         // check command in message
         if (executeCommand(discordMessage)) return Mono.empty();
 
         String content = getMessageContent(discordMessage);
-        if (content == null) return Mono.empty();
-
-        sendMessage(optionalMember.get(), content, retrieveReply(discordMessage).orElse(null));
+        sendMessage(
+                event.getMember().orElse(null),
+                discordMessage.getWebhookId().isPresent() ? discordMessage.getWebhook().block() : null,
+                content,
+                retrieveReply(discordMessage).orElse(null)
+        );
 
         return Mono.empty();
     }
 
-    public void sendMessage(Member member, String message, Pair<String, String> reply) {
-        String globalName = member.getGlobalName().orElse("");
-        String nickname = member.getNickname().orElse("");
-        String displayName = member.getDisplayName();
-        String userName = member.getUsername();
+    public void sendMessage(@Nullable Member member,
+                            @Nullable Webhook webhook,
+                            @NonNull String message,
+                            @Nullable Pair<String, String> reply) {
+        String userName = member != null ? member.getUsername() : webhook != null ? webhook.getName().orElse("") : "";
+        String globalName = member != null ? member.getGlobalName().orElse(userName) : userName;
+        String displayName = member != null ? member.getDisplayName() : globalName;
+        String nickname = member != null ? member.getNickname().orElse(userName) : userName;
 
         messageDispatcher.dispatch(this, DiscordMetadata.<Localization.Integration.Discord>builder()
                 .base(EventMetadata.<Localization.Integration.Discord>builder()
@@ -180,17 +191,90 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
         return Optional.of(Pair.of("Unknown", content));
     }
 
+    @NonNull
     private String getMessageContent(Message message) {
-        String content = message.getContent();
-        if (!message.getAttachments().isEmpty()) {
-            content = (content.isEmpty() ? "" : content + " ") + String.join(" ", message.getAttachments()
-                    .stream()
-                    .map(Attachment::getUrl)
-                    .toList()
+        return getMessageContent(message.getContent(), message.getPoll().orElse(null), message.getAttachments(), message.getEmbeds());
+    }
+
+    @NonNull
+    private String getMessageContent(PartialMessage partialMessage) {
+        return getMessageContent(partialMessage.getContent().orElse(null), null, partialMessage.getAttachments(), partialMessage.getEmbeds());
+    }
+
+    @NonNull
+    private String getMessageContent(String content, Poll poll, List<Attachment> attachments, List<Embed> embeds) {
+        StringBuilder contentBuilder = new StringBuilder();
+
+        if (StringUtils.isNotEmpty(content)) {
+            contentBuilder.append(content);
+        }
+
+        if (!embeds.isEmpty()) {
+            if (!contentBuilder.isEmpty()) {
+                contentBuilder.append("\n");
+            }
+
+            embeds.forEach(embed -> contentBuilder.append(extractTextFromEmbed(embed)));
+        }
+
+        if (poll != null) {
+            if (!contentBuilder.isEmpty()) {
+                contentBuilder.append("\n");
+            }
+
+            contentBuilder.append(poll.getQuestion().getText().orElse("")).append("\n");
+            poll.getAnswers().forEach(answer -> contentBuilder
+                    .append(" - ")
+                    .append(answer.getText().orElse(""))
+                    .append("\n")
             );
         }
 
-        return content;
+        if (!attachments.isEmpty()) {
+            if (!contentBuilder.isEmpty()) {
+                contentBuilder.append(' ');
+            }
+
+            contentBuilder.append(attachments.stream()
+                    .map(Attachment::getUrl)
+                    .collect(Collectors.joining(" "))
+            );
+        }
+
+        return contentBuilder.toString();
+    }
+
+    private String extractTextFromEmbed(Embed embed) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        embed.getAuthor().ifPresent(author -> {
+            stringBuilder.append(author.getName().orElse(""));
+            stringBuilder.append("\n");
+        });
+
+        embed.getTitle().ifPresent(string -> stringBuilder
+                .append(string)
+                .append("\n")
+        );
+
+        embed.getDescription().ifPresent(string -> stringBuilder
+                .append(string)
+                .append("\n")
+        );
+
+        embed.getFooter().ifPresent(footer -> {
+            stringBuilder.append(footer.getText());
+            stringBuilder.append("\n");
+        });
+
+        embed.getFields().forEach(field -> stringBuilder
+                .append(field.getName())
+                .append(": ")
+                .append(field.getValue())
+                .append("\n")
+        );
+
+        return stringBuilder.toString();
     }
 
     private boolean executeCommand(Message message) {
