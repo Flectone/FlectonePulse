@@ -36,7 +36,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -45,7 +44,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,11 +138,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return "";
 
-        try (Level level = player.level()) {
-            return level.dimension().identifier().getPath();
-        } catch (IOException ignored) {
-            return "";
-        }
+        return player.level().dimension().identifier().getPath();
     }
 
     @Override
