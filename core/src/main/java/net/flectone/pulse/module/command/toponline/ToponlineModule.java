@@ -94,10 +94,12 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         for (PlayTime timePlayer : finalPlayedTimePlayers) {
             FPlayer fTarget = fPlayerService.getFPlayer(timePlayer.playerId());
 
+            // take only time that is saved in database and do not check player online,
+            // otherwise there will be an incorrect order
             String line = Strings.CS.replace(
                     localization.line(),
                     "<time>",
-                    timeFormatter.format(fPlayer, timePlayer.total() + (fTarget.isOnline() ? System.currentTimeMillis() - timePlayer.last() : 0))
+                    timeFormatter.format(fPlayer, timePlayer.total())
             );
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
