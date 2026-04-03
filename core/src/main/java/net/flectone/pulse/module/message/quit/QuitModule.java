@@ -11,12 +11,15 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -49,17 +52,17 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public void sendLater(FPlayer fPlayer) {
-        taskScheduler.runAsyncLater(() -> privateSend(fPlayer, false), 5L);
+        taskScheduler.runAsync(() -> privateSend(fPlayer, false, 5L));
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runAsync(() -> privateSend(fPlayer, ignoreVanish));
+        taskScheduler.runAsync(() -> privateSend(fPlayer, ignoreVanish, 0L));
     }
 
-    private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
+    private void privateSend(FPlayer fPlayer, boolean ignoreVanish, long delay) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
+        EventMetadata<Localization.Message.Quit> eventMetadata = QuitMetadata.<Localization.Message.Quit>builder()
                 .base(EventMetadata.<Localization.Message.Quit>builder()
                         .sender(fPlayer)
                         .format(Localization.Message.Quit::format)
@@ -72,7 +75,16 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
                         .build()
                 )
                 .ignoreVanish(ignoreVanish)
-                .build()
-        );
+                .build();
+
+        List<MessageSendEvent> messageEvents = messageDispatcher.createReceivers(this, eventMetadata).stream()
+                .map(fReceiver -> messageDispatcher.createMessageEvent(fReceiver, name(), this, eventMetadata))
+                .toList();
+
+        if (delay == 0) {
+            messageEvents.forEach(messageDispatcher::dispatch);
+        } else {
+            taskScheduler.runAsyncLater(() -> messageEvents.forEach(messageDispatcher::dispatch), delay);
+        }
     }
 }
