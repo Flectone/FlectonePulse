@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +14,6 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -58,6 +56,33 @@ public class MessageDispatcher {
                 .toList();
     }
 
+    public <L extends LocalizationSetting> MessageSendEvent createMessageEvent(FPlayer fReceiver,
+                                                                               ModuleName moduleName,
+                                                                               ModuleLocalization<L> module,
+                                                                               EventMetadata<L> eventMetadata) {
+        // example
+        // format: TheFaser > <message>
+        // message: hello world!
+        // final formatted message: TheFaser > hello world!
+        Component messageComponent = buildMessageComponent(fReceiver, eventMetadata);
+        Component formatComponent = buildFormatComponent(fReceiver, eventMetadata, module, messageComponent);
+
+        // destination subtext
+        Component subComponent = Component.empty();
+        Destination destination = eventMetadata.destination();
+        if (StringUtils.isNotEmpty(destination.subtext())) {
+            subComponent = buildSubcomponent(fReceiver, eventMetadata, messageComponent);
+        }
+
+        return new MessageSendEvent(
+                moduleName,
+                fReceiver,
+                formatComponent,
+                subComponent,
+                eventMetadata
+        );
+    }
+
     public <L extends LocalizationSetting> void dispatch(ModuleLocalization<L> module,
                                                          EventMetadata<L> eventMetadata) {
         dispatch(module.name(), module, eventMetadata);
@@ -82,40 +107,18 @@ public class MessageDispatcher {
                                                          EventMetadata<L> eventMetadata) {
         if (receivers.isEmpty()) return;
 
-        SchedulerRunnable sendMessageRunnable = () -> receivers.forEach(receiver -> {
-            // example
-            // format: TheFaser > <message>
-            // message: hello world!
-            // final formatted message: TheFaser > hello world!
-            Component messageComponent = buildMessageComponent(receiver, eventMetadata);
-            Component formatComponent = buildFormatComponent(receiver, eventMetadata, module, messageComponent);
-
-            // destination subtext
-            Component subComponent = Component.empty();
-            Destination destination = eventMetadata.destination();
-            if (StringUtils.isNotEmpty(destination.subtext())) {
-                subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
-            }
-
-            eventDispatcher.dispatch(new MessageSendEvent(
-                    moduleName,
-                    receiver,
-                    formatComponent,
-                    subComponent,
-                    eventMetadata
-            ));
-        });
-
         // fix Folia issue
-        if (eventMetadata instanceof QuitMetadata<L>) {
-            taskScheduler.runAsync(sendMessageRunnable);
-        } else {
-            FPlayer regionPlayer = eventMetadata.sender() instanceof FPlayer fPlayer
-                    ? fPlayer
-                    : fPlayerService.getRandomFPlayer();
+        FPlayer regionPlayer = eventMetadata.sender() instanceof FPlayer fPlayer
+                ? fPlayer
+                : fPlayerService.getRandomFPlayer();
 
-            taskScheduler.runRegion(regionPlayer, sendMessageRunnable);
-        }
+        taskScheduler.runRegion(regionPlayer, () -> receivers.forEach(fReceiver ->
+                dispatch(createMessageEvent(fReceiver, moduleName, module, eventMetadata)))
+        );
+    }
+
+    public MessageSendEvent dispatch(MessageSendEvent messageSendEvent) {
+        return eventDispatcher.dispatch(messageSendEvent);
     }
 
     public <L extends LocalizationSetting> void dispatchError(ModuleLocalization<L> module, EventMetadata<L> eventMetadata) {
