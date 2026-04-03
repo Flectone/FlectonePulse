@@ -79,7 +79,9 @@ public class MinecraftTranslationService implements TranslationService {
 
     public boolean downloadLocalizationFile(boolean isModern, String language) {
         Path outputPath = resolveLocalizationFile(isModern);
-        if (Files.exists(outputPath)) return true;
+        if (Files.exists(outputPath)
+                // check file without Internet connection
+                || Files.exists(resolveLocalizationFile(true))) return true;
 
         String formattedLanguage = isModern ? language : formatLegacyLanguage(language);
         if (formattedLanguage == null) return false;
