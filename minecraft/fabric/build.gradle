@@ -33,7 +33,7 @@ dependencies {
 		compileOnly("net.kyori:$it:$adventure_api")
 	}
 
-	compileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
+	compileOnly("com.github.retrooper:packetevents-fabric-common:$packetevents_spigot_version")
 	compileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
 	compileOnly("maven.modrinth:vanish:$vanish_version")
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
