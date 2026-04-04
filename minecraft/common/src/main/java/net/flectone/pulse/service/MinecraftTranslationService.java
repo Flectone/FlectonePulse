@@ -57,9 +57,8 @@ public class MinecraftTranslationService implements TranslationService {
             lastLanguage = newLanguage;
             translations.clear();
 
-            boolean isModern = detectModernVersion();
-            if (downloadLocalizationFile(isModern, lastLanguage)) {
-                loadTranslations(isModern);
+            if (downloadLocalizationFile(lastLanguage)) {
+                loadTranslations();
                 initGlobalTranslator();
             }
 
@@ -77,7 +76,8 @@ public class MinecraftTranslationService implements TranslationService {
         GlobalTranslator.translator().addSource(translator);
     }
 
-    public boolean downloadLocalizationFile(boolean isModern, String language) {
+    public boolean downloadLocalizationFile(String language) {
+        boolean isModern = detectModernVersion();
         Path outputPath = resolveLocalizationFile(isModern);
         if (Files.exists(outputPath)
                 // check file without Internet connection
@@ -90,9 +90,16 @@ public class MinecraftTranslationService implements TranslationService {
         return webUtil.downloadFile(url, outputPath);
     }
 
-    public void loadTranslations(boolean isModern) {
-        Path localizationFile = resolveLocalizationFile(isModern);
-        if (!Files.exists(localizationFile)) return;
+    public void loadTranslations() {
+        boolean isModern = false;
+
+        Path localizationFile = resolveLocalizationFile(true);
+        if (Files.exists(localizationFile)) {
+            isModern = true;
+        } else {
+            localizationFile = resolveLocalizationFile(false);
+            if (!Files.exists(localizationFile)) return;
+        }
 
         try {
             Map<String, String> loadedTranslations = isModern
