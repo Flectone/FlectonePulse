@@ -25,6 +25,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
+import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -435,7 +435,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef playerRef = getPlayer(fPlayer.uuid());
         if (playerRef == null) return;
 
-        playerRef.getPacketHandler().disconnect(PlainTextComponentSerializer.plainText().serialize(reason));
+        playerRef.getPacketHandler().disconnect(HytaleComponentSerializer.get().serialize(reason));
     }
 
     @Nullable
