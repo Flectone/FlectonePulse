@@ -162,6 +162,7 @@ public record Integration(
     public record Discord(
             Boolean enable,
             Boolean ignoreAllBots,
+            Boolean ignoreAllWebhooks,
             String token,
             Map<String, Command> customCommand,
             Presence presence,

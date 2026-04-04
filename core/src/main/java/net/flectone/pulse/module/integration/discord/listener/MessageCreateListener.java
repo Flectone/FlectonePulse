@@ -73,13 +73,27 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
                     || member.getId().asLong() == discordIntegration.get().getClientID())) return Mono.empty();
         }
 
+        Webhook webhook = null;
+
+        Optional<Snowflake> webhookId = discordMessage.getWebhookId();
+        if (webhookId.isPresent()) {
+            if (config().ignoreAllWebhooks()) return Mono.empty();
+
+            webhook = discordMessage.getWebhook().block();
+
+            // always ignore ourselves
+            Optional<User> creator = webhook.getCreator();
+            if (creator.isPresent()
+                    && creator.get().getId().equals(discordIntegration.get().getClientID())) return Mono.empty();
+        }
+
         // check command in message
         if (executeCommand(discordMessage)) return Mono.empty();
 
         String content = getMessageContent(discordMessage);
         sendMessage(
                 event.getMember().orElse(null),
-                discordMessage.getWebhookId().isPresent() ? discordMessage.getWebhook().block() : null,
+                webhook,
                 content,
                 retrieveReply(discordMessage).orElse(null)
         );

@@ -19,6 +19,7 @@ deepl:
 discord:
   enable: false
   ignore_all_bots: true
+  ignore_all_webhooks: true
   token: ""
   custom_command:
     ping:
