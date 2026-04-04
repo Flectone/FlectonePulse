@@ -1,6 +1,7 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
@@ -8,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.platform.registry.FabricPermissionRegistry;
 import net.minecraft.server.MinecraftServer;
@@ -23,6 +25,7 @@ public class FabricPermissionChecker implements PermissionChecker {
     private final FabricIntegrationModule integrationModule;
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
+    private final Provider<LuckPermsModule> luckPermsModuleProvider;
 
     @Override
     public boolean check(FEntity entity, String permission) {
@@ -37,6 +40,8 @@ public class FabricPermissionChecker implements PermissionChecker {
 
         boolean value;
         if (fabricPermission != null) {
+            if (fabricPermission == Permission.Type.TRUE && luckPermsModuleProvider.get().isAlwaysHaveTrue()) return true;
+
             value = fabricPermission != Permission.Type.FALSE &&
                     (fabricPermission == Permission.Type.TRUE || fabricPlayerAdapter.isOperator(fPlayer) && fabricPermission != Permission.Type.NOT_OP);
         } else {

@@ -240,6 +240,7 @@ public record Integration(
     @Jacksonized
     public record Luckperms(
             Boolean enable,
+            Boolean alwaysHaveTrue,
             Boolean tabSort
     ) implements EnableSetting {
     }

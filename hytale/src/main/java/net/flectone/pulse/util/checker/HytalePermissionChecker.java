@@ -1,6 +1,7 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -9,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.HytalePlayerAdapter;
 import net.flectone.pulse.platform.registry.HytalePermissionRegistry;
 
@@ -19,6 +21,7 @@ public class HytalePermissionChecker implements PermissionChecker {
     private final IntegrationModule integrationModule;
     private final HytalePermissionRegistry hytalePermissionRegistry;
     private final HytalePlayerAdapter hytalePlayerAdapter;
+    private final Provider<LuckPermsModule> luckPermsModuleProvider;
 
     @Override
     public boolean check(FEntity entity, String permission) {
@@ -30,6 +33,8 @@ public class HytalePermissionChecker implements PermissionChecker {
 
         boolean value;
         if (hytalePermission != null) {
+            if (hytalePermission == Permission.Type.TRUE && luckPermsModuleProvider.get().isAlwaysHaveTrue()) return true;
+
             value = hytalePermission != Permission.Type.FALSE &&
                     (hytalePermission == Permission.Type.TRUE || hytalePlayerAdapter.isOperator(fPlayer) && hytalePermission != Permission.Type.NOT_OP);
         } else {

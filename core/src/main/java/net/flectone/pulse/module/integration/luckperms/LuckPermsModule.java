@@ -61,6 +61,10 @@ public class LuckPermsModule implements ModuleSimple {
         return luckPermsIntegration.hasPermission(fPlayer, permission);
     }
 
+    public boolean isAlwaysHaveTrue() {
+        return moduleController.isEnable(this) && config().alwaysHaveTrue();
+    }
+
     public int getGroupWeight(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return 0;
         if (!config().tabSort()) return 0;
