@@ -29,7 +29,7 @@ public class SparkServer {
         sparkService.port(fileFacade.config().editor().port());
         sparkService.staticFiles.location("/");
 
-        sparkService.before((req, res) -> res.type("text/html; charset=utf-8"));
+        sparkService.before((_, res) -> res.type("text/html; charset=utf-8"));
 
         controller.initConfigFiles();
         controller.setupRoutes(sparkService);

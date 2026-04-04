@@ -63,7 +63,7 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
-        return (context, input) -> config().categories()
+        return (_, _) -> config().categories()
                 .keySet()
                 .stream()
                 .map(Suggestion::suggestion)

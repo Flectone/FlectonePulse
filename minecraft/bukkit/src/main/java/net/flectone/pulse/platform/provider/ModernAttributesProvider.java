@@ -16,7 +16,7 @@ public class ModernAttributesProvider implements AttributesProvider {
         try {
             AttributeInstance instance = player.getAttribute(Attribute.GENERIC_ARMOR);
             return instance != null ? round(instance.getValue()) : 0.0;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return 0.0;
         }
     }
@@ -26,7 +26,7 @@ public class ModernAttributesProvider implements AttributesProvider {
         try {
             AttributeInstance instance = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
             return instance != null ? round(instance.getValue()) : 1.0;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return 1.0;
         }
     }

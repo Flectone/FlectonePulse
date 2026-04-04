@@ -48,7 +48,7 @@ public class FabricTaskScheduler implements TaskScheduler {
             if (!asyncExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
                 asyncExecutor.shutdownNow();
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             asyncExecutor.shutdownNow();
         }
 
@@ -208,10 +208,10 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     private void registerTask(long tick, ScheduledTask task) {
-        scheduledTasks.compute(tick, (k, v) -> {
-            if (v == null) v = new CopyOnWriteArrayList<>();
-            v.add(task);
-            return v;
+        scheduledTasks.compute(tick, (_, tasks) -> {
+            if (tasks == null) tasks = new CopyOnWriteArrayList<>();
+            tasks.add(task);
+            return tasks;
         });
     }
 

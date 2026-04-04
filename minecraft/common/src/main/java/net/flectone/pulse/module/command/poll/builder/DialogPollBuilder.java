@@ -155,7 +155,7 @@ public class DialogPollBuilder {
 
         return builder
                 .addButton(0, button)
-                .addClickHandler(newAnswerButtonId, (dialog, nbt) -> {
+                .addClickHandler(newAnswerButtonId, (_, nbt) -> {
                     if (nbt instanceof NBTCompound nbtCompound) {
                         NBTPoll nbtPoll = readPoll(fPlayer, nbtCompound);
 
@@ -187,7 +187,7 @@ public class DialogPollBuilder {
 
         return builder
                 .addButton(1, button)
-                .addClickHandler(newAnswerButtonId, (dialog, nbt) -> {
+                .addClickHandler(newAnswerButtonId, (_, nbt) -> {
                     if (nbt instanceof NBTCompound nbtCompound) {
                         NBTPoll nbtPoll = readPoll(fPlayer, nbtCompound);
 
@@ -217,7 +217,7 @@ public class DialogPollBuilder {
 
         return builder
                 .addButton(2, button)
-                .addClickHandler(createId, (dialog, nbt) -> {
+                .addClickHandler(createId, (_, nbt) -> {
                     if (nbt instanceof NBTCompound nbtCompound) {
                         NBTPoll nbtPoll = readPoll(fPlayer, nbtCompound);
 

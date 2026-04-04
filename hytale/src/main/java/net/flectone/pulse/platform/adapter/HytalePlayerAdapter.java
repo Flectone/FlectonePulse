@@ -411,7 +411,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
         Vector3i targetBlock = TargetUtil.getTargetBlock(
                 world,
-                (blockId, fluidId) -> blockId != 0,
+                (blockId, _) -> blockId != 0,
                 fromPos.getX(), fromPos.getY(), fromPos.getZ(),
                 dx, dy, dz,
                 distance

@@ -52,7 +52,7 @@ public class TimeFormatter {
         try {
             double value = Double.parseDouble(part.substring(0, unitIndex));
             return value == 0.0;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }

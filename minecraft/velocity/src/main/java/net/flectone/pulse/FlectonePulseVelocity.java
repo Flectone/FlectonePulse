@@ -85,12 +85,4 @@ public class FlectonePulseVelocity {
                 .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
     }
 
-    public void reload() {
-        fLogger.logReloading();
-
-        proxyServer.getChannelRegistrar().unregister(IDENTIFIER);
-        proxyServer.getChannelRegistrar().register(IDENTIFIER);
-
-        fLogger.logReloaded();
-    }
 }

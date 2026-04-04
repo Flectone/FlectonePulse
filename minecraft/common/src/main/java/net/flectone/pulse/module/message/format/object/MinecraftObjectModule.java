@@ -108,15 +108,15 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), ((argumentQueue, context) ->
-                        createPlayerHeadTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
+                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
+                        createPlayerHeadTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), ((argumentQueue, context) -> {
+                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), (argumentQueue, _) -> {
                     Component defaultComponent = argumentQueue.hasNext()
                             ? buildArgument(messageContext, argumentQueue.pop().value())
                             : getDefaultComponent(messageContext);
                     return createPlayerHeadTag(messageContext, defaultComponent, argumentQueue);
-                }))
+                })
         );
     }
 
@@ -153,7 +153,7 @@ public class MinecraftObjectModule extends ObjectModule {
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
 
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _) {
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
 
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
@@ -187,10 +187,10 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), ((argumentQueue, context) ->
-                        createSpriteTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
+                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), (argumentQueue, _) ->
+                        createSpriteTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, context) -> {
+                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, _) -> {
                     Component defaultComponent = argumentQueue.hasNext()
                             ? buildArgument(messageContext, argumentQueue.pop().value())
                             : getDefaultComponent(messageContext);
@@ -209,10 +209,10 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), ((argumentQueue, context) ->
-                        createTextureTag(messageContext, getDefaultComponent(messageContext), argumentQueue))
+                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), (argumentQueue, _) ->
+                        createTextureTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, context) -> {
+                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, _) -> {
                     Component defaultComponent = argumentQueue.hasNext()
                             ? buildArgument(messageContext, argumentQueue.pop().value())
                             : getDefaultComponent(messageContext);

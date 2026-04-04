@@ -83,7 +83,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         FPlayer receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
             String firstLang = "auto";
             String secondLang = receiver.getSetting(SettingText.LOCALE);
 
@@ -125,7 +125,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             UUID uuid = UUID.fromString(stringUUID);
 
             return getMessage(uuid);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException _) {
             return null;
         }
     }

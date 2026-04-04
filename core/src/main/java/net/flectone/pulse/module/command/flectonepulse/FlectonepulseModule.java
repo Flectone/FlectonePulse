@@ -286,9 +286,9 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     private boolean isPortAvailable(int port) {
         if (injector.getInstance(SparkServer.class).isEnable()) return true;
 
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (var _ = new ServerSocket(port)) {
             return true;
-        } catch (IOException e) {
+        } catch (IOException _) {
             return false;
         }
     }
@@ -449,7 +449,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (context, input) -> Arrays.stream(Operation.values())
+        return (_, _) -> Arrays.stream(Operation.values())
                 .map(operation -> Suggestion.suggestion(operation.name().toLowerCase()))
                 .toList();
     }

@@ -77,7 +77,7 @@ public class ProxySender {
      * @return true if message was sent to at least one proxy, false otherwise
      */
     public boolean send(FEntity sender, ModuleName tag) {
-        return send(sender, tag, dataOutputStream -> {}, UUID.randomUUID());
+        return send(sender, tag, _ -> {}, UUID.randomUUID());
     }
 
     /**

@@ -95,7 +95,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (argumentQueue, context) -> {
+        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (_, _) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
 
             String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);

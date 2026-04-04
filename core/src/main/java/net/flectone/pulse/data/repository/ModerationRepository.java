@@ -52,7 +52,7 @@ public class ModerationRepository {
 
             return valid;
 
-        } catch (Exception e) {
+        } catch (Exception _) {
             return Collections.emptyList();
         }
     }

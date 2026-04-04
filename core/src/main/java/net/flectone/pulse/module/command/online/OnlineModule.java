@@ -64,7 +64,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (context, input) -> List.of(
+        return (_, _) -> List.of(
                 Suggestion.suggestion("first"),
                 Suggestion.suggestion("last"),
                 Suggestion.suggestion("total")

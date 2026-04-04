@@ -36,7 +36,7 @@ public class ChatPacketListener implements PacketListener {
         event.setCancelled(true);
 
         taskScheduler.runAsync(() ->
-                chatModule.handleChatEvent(fPlayer, message, () -> {}, (string, value) -> {})
+                chatModule.handleChatEvent(fPlayer, message, () -> {}, (_, _) -> {})
         );
     }
 }

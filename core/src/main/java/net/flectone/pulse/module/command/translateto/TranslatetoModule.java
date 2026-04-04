@@ -65,7 +65,7 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {
-        return (context, input) -> config().languages()
+        return (_, _) -> config().languages()
                 .stream()
                 .map(Suggestion::suggestion)
                 .toList();
@@ -175,7 +175,7 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
             int endIndex = jsonResponse.indexOf("\"", startIndex);
 
             return jsonResponse.substring(startIndex, endIndex);
-        } catch (IOException | URISyntaxException ignored) {
+        } catch (IOException | URISyntaxException _) {
             return "";
         }
     }

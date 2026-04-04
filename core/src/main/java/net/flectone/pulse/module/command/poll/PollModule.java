@@ -136,7 +136,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {
-        return (context, input) -> {
+        return (_, input) -> {
             String[] words = input.input().split(" ");
             if (words.length < 5) return List.of(Suggestion.suggestion("title="));
 

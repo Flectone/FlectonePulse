@@ -50,7 +50,7 @@ public class ReflectionResolver {
     public @Nullable Class<?> resolveClass(String className) {
         try {
             return Class.forName(className);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException _) {
             return null;
         }
     }
@@ -62,11 +62,11 @@ public class ReflectionResolver {
     public @Nullable Method resolveMethod(@NonNull Class<?> clazz, @NonNull String methodName, Class<?>... parameterTypes) {
         try {
             return clazz.getMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException _) {
             while (clazz != null) {
                 try {
                     return clazz.getDeclaredMethod(methodName, parameterTypes);
-                } catch (NoSuchMethodException ignored) {
+                } catch (NoSuchMethodException _) {
                     clazz = clazz.getSuperclass();
                 }
             }
@@ -88,7 +88,7 @@ public class ReflectionResolver {
     public @Nullable MethodHandle unreflect(HandleFunction<MethodHandles.Lookup, MethodHandle> handleFunction) {
         try {
             return handleFunction.apply(MethodHandles.lookup());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException _) {
             return null;
         }
     }

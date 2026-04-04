@@ -114,7 +114,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, _) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 

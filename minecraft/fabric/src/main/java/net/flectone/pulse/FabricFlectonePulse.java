@@ -99,7 +99,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
             if (!packetEventsAPI.isInitialized()) {
                 packetEventsAPI.getInjector().uninject();
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore
         }
     }
@@ -117,7 +117,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
     }
 
     private void removeDefaultFabricCommands() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             CommandNode<CommandSourceStack> root = dispatcher.getRoot();
 
             for (String command : injector.getInstance(FileFacade.class).config().command().disabledFabric()) {

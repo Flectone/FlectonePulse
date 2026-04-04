@@ -17,7 +17,7 @@ public record Range(int value, Type type) {
             .collect(Collectors.toMap(
                     Function.identity(),
                     Range::new,
-                    (a, b) -> a,
+                    (a, _) -> a,
                     () -> new EnumMap<>(Type.class)
             ));
 
@@ -58,7 +58,7 @@ public record Range(int value, Type type) {
                 return new Range(value);
             }
             return new Range(type);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             Range.Type type = Range.Type.fromString(string);
             return new Range(type);
         }

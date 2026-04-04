@@ -44,7 +44,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
         String promptId = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::id);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
-                .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, input) -> {
+                .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, _) -> {
                     FPlayer fPlayer = commandContext.sender();
 
                     return fPlayerService.getSenderMails(fPlayer)

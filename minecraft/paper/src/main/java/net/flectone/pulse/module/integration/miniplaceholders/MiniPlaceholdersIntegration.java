@@ -182,43 +182,43 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
                 .version(BuildConfig.PROJECT_VERSION)
                 .author(BuildConfig.PROJECT_AUTHOR)
                 // ignore required type error
-                .audiencePlaceholder(Player.class, "mute_suffix", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "mute_suffix", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
                 })
-                .audiencePlaceholder(Player.class, "afk_duration", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "afk_duration", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
                 })
-                .audiencePlaceholder(Player.class, "condition", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "condition", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(StringUtils.defaultString(conditionModuleProvider.get().getConditionValue(queue.pop().value(), fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "fcolor", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "fcolor", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.SEE, FColor.Type.OUT);
                 })
-                .audiencePlaceholder(Player.class, "fcolor_out", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "fcolor_out", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.OUT);
                 })
-                .audiencePlaceholder(Player.class, "fcolor_see", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "fcolor_see", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.SEE);
                 })
-                .audiencePlaceholder(Player.class, "setting", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "setting", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -234,28 +234,28 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
 
                     return Tag.preProcessParsed(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
                 })
-                .audiencePlaceholder(Player.class, "player", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "player", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(fPlayer.name());
                 })
-                .audiencePlaceholder(Player.class, "ip", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "ip", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(StringUtils.defaultString(fPlayer.ip()));
                 })
-                .audiencePlaceholder(Player.class, "ping", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "ping", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "format", (player, queue, context) -> {
+                .audiencePlaceholder(Player.class, "format", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -264,10 +264,10 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
 
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
                 })
-                .globalPlaceholder("online", (ctx, queue) ->
+                .globalPlaceholder("online", (_, _) ->
                         Tag.preProcessParsed(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
                 )
-                .globalPlaceholder("tps", (ctx, queue) ->
+                .globalPlaceholder("tps", (_, _) ->
                         Tag.preProcessParsed(platformServerAdapter.getTPS())
                 )
                 .build();

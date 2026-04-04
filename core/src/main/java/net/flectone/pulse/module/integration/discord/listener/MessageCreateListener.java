@@ -127,13 +127,13 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
                         .destination(config().destination())
                         .message(message)
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (argumentQueue, context) -> {
+                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                             MessageContext tagContext = messagePipeline.createContext(localization(fResolver).formatReply())
                                     .addTagResolvers(
                                             TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            TagResolver.resolver("reply_message", (argumentQueue1, context1) -> {
+                                            TagResolver.resolver("reply_message", (_, _) -> {
                                                 MessageContext replyContext = messagePipeline.createContext(discordIntegration.get().getSender(), fResolver, reply.second())
                                                         .addFlag(MessageFlag.PLAYER_MESSAGE, true);
 

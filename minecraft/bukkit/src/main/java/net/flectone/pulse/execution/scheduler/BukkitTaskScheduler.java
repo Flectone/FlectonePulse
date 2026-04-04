@@ -114,7 +114,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
             try {
                 runnable.run();
                 return;
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // ignore exception
             }
         }
@@ -180,7 +180,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
         return () -> {
             try {
                 runnable.run();
-            } catch (IllegalPluginAccessException ignore) {
+            } catch (IllegalPluginAccessException _) {
                 // ignore shit exception
             } catch (SchedulerTaskException e) {
                 fLogger.warning(e);

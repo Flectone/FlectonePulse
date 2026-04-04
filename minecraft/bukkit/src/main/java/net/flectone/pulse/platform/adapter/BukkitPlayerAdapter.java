@@ -71,10 +71,10 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             Object gameProfile = gameProfileMethod.invoke(entityPlayer);
             try {
                 propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("properties"));
-            } catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException _) {
                 propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("getProperties"));
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable _) {
             // nothing
         }
     }
@@ -189,7 +189,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
                     "textures",
                     textureProperty.getValue()
             );
-        } catch (Throwable ignored) {
+        } catch (Throwable _) {
             return null;
         }
     }
@@ -365,7 +365,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
                     ? playerInventory.getItemInOffHand()
                     : playerInventory.getItemInMainHand();
 
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException _) {
             return playerInventory.getItemInHand();
         }
     }

@@ -246,7 +246,7 @@ public class FlectonePulseAPI {
 
                 try {
                     database.connect();
-                } catch (Exception ignored) {
+                } catch (Exception _) {
                     throw reloadException;
                 }
             }

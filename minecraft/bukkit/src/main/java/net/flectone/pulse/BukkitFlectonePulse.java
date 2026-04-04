@@ -87,7 +87,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             if (!packetEventsAPI.isInitialized()) {
                 packetEventsAPI.getInjector().uninject();
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore
         }
     }

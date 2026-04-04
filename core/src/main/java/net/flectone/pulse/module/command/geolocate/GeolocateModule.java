@@ -128,7 +128,7 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
     private IpResponse getGeolocation(String ip) {
         try (Scanner scanner = new Scanner(new URL(IP_API_URL.replace("<ip>", ip)).openStream(), StandardCharsets.UTF_8).useDelimiter("\\A")) {
             return objectMapper.readValue(scanner.next(), IpResponse.class);
-        } catch (IOException e) {
+        } catch (IOException _) {
             return null;
         }
     }

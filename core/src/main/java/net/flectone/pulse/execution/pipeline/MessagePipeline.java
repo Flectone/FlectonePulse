@@ -135,7 +135,7 @@ public class MessagePipeline {
                 return Optional.of(formattedMessage);
             }
 
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore problem
         }
 
@@ -143,13 +143,13 @@ public class MessagePipeline {
     }
 
     public TagResolver messageTag(Component message) {
-        return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
+        return TagResolver.resolver("message", (_, _) -> Tag.inserting(message));
     }
 
     public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
         if (target == null) return emptyResolver(tag);
 
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, _) -> {
             int targetIndex = 0;
             if (argumentQueue.hasNext()) {
                 targetIndex = argumentQueue.pop().asInt().orElse(0);
@@ -199,7 +199,7 @@ public class MessagePipeline {
         FCOLOR;
 
         public static TagResolver emptyResolver(@TagPattern String tag) {
-            return TagResolver.resolver(tag, (argumentQueue, context) ->
+            return TagResolver.resolver(tag, (_, _) ->
                     Tag.selfClosingInserting(Component.empty())
             );
         }

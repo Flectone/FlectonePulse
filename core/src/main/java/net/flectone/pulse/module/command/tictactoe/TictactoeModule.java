@@ -302,7 +302,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                                                                                       FPlayer fPlayer,
                                                                                       int typeTile,
                                                                                       String move) {
-        return (fResolver, message) -> {
+        return (_, message) -> {
             String title = (switch (typeTile) {
                 case 1 -> message.formatWin();
                 case -1 -> message.formatDraw();

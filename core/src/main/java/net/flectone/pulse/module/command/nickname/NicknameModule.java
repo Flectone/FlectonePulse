@@ -184,7 +184,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (_, _) -> {
             String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
             if (value == null) return Tag.preProcessParsed(messageContext.sender().name());
 

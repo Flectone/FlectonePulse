@@ -73,7 +73,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (context, input) -> List.of(
+        return (_, _) -> List.of(
                 Suggestion.suggestion("start"),
                 Suggestion.suggestion("end")
         );
@@ -186,7 +186,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
         if (moduleController.isDisabledFor(this, fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (argumentQueue, context) -> {
+        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (_, _) -> {
             String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
@@ -213,7 +213,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         try {
             new URI(string).toURL();
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             return false;
         }
     }

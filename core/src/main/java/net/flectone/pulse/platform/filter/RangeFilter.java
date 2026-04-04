@@ -23,7 +23,7 @@ public class RangeFilter {
         }
 
         if (!(filterPlayer instanceof FPlayer fPlayer) || fPlayer.isUnknown()) {
-            return player -> true;
+            return _ -> true;
         }
 
         return fReceiver -> {

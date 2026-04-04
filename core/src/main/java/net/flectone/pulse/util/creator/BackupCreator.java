@@ -125,7 +125,7 @@ public class BackupCreator {
         try {
             Process process = new ProcessBuilder(command, "--version").start();
             return process.waitFor() == 0;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }

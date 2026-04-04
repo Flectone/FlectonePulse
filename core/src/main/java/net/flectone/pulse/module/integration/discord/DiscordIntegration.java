@@ -367,7 +367,7 @@ public class DiscordIntegration implements FIntegration {
     private Optional<Snowflake> parseSnowflake(String string) {
         try {
             return Optional.of(Snowflake.of(string));
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             return Optional.empty();
         }
     }

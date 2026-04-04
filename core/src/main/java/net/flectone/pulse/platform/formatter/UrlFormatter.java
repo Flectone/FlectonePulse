@@ -29,7 +29,7 @@ public class UrlFormatter {
 
         try {
             return new URL(url).toURI().toASCIIString();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException _) {
             return "";
         }
     }

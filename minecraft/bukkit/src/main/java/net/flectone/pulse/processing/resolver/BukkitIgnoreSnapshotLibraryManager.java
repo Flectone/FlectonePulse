@@ -87,7 +87,7 @@ public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
         } finally {
             try {
                 Files.deleteIfExists(out);
-            } catch (IOException ignored) {
+            } catch (IOException _) {
             }
         }
 

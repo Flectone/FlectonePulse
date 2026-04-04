@@ -57,7 +57,7 @@ public class FabricProxy implements Proxy {
             PayloadTypeRegistry.serverboundPlay().register(channel, streamCodec);
         }
 
-        ServerPlayNetworking.registerGlobalReceiver(channel, (payload, context) ->
+        ServerPlayNetworking.registerGlobalReceiver(channel, (payload, _) ->
                 proxyMessageHandler.handleProxyMessage(payload.data())
         );
     }

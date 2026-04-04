@@ -58,7 +58,7 @@ public class TictactoeService {
 
             return ticTacToe;
 
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             return null;
         }
     }

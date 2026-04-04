@@ -24,27 +24,27 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
     private static final Map<String, Mapping> LEGACY_TRANSLATION_MAPPINGS = Map.of(
             "commands.setblock.success",
             new Mapping(serverVersion -> serverVersion.isNewerThanOrEquals(ServerVersion.V_1_19_4), "commands.setblock.success",
-                    new Mapping(serverVersion -> true, "commands.setblock.success.1_19_4", null)
+                    new Mapping(_ -> true, "commands.setblock.success.1_19_4", null)
             ),
 
             "commands.setworldspawn.success",
             new Mapping(serverVersion -> serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9), "commands.setworldspawn.success",
                     new Mapping(serverVersion -> serverVersion.isOlderThanOrEquals(ServerVersion.V_1_16), "commands.setworldspawn.success.1_16",
-                            new Mapping(serverVersion -> true, "commands.setworldspawn.success.1_21_8", null)
+                            new Mapping(_ -> true, "commands.setworldspawn.success.1_21_8", null)
                     )
             ),
 
             "commands.spawnpoint.success.multiple",
             new Mapping(serverVersion -> serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9), "commands.spawnpoint.success.multiple",
                     new Mapping(serverVersion -> serverVersion.isOlderThanOrEquals(ServerVersion.V_1_14_2), "commands.spawnpoint.success.multiple.1_14_2",
-                            new Mapping(serverVersion -> true, "commands.spawnpoint.success.multiple.1_21_8", null)
+                            new Mapping(_ -> true, "commands.spawnpoint.success.multiple.1_21_8", null)
                     )
             ),
 
             "commands.spawnpoint.success.single",
             new Mapping(serverVersion -> serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9), "commands.spawnpoint.success.single",
                     new Mapping(serverVersion -> serverVersion.isOlderThanOrEquals(ServerVersion.V_1_14_2), "commands.spawnpoint.success.single.1_14_2",
-                            new Mapping(serverVersion -> true, "commands.spawnpoint.success.single.1_21_8", null)
+                            new Mapping(_ -> true, "commands.spawnpoint.success.single.1_21_8", null)
                     )
             )
     );

@@ -86,7 +86,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             double[] recentTps = (double[]) getTPSMethodPair.first().invoke(getTPSMethodPair.second());
             double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
             return String.valueOf(tps);
-        } catch (Throwable ignored) {
+        } catch (Throwable _) {
             return "";
         }
     }
@@ -113,7 +113,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             Field consoleField = server.getClass().getDeclaredField("console");
             consoleField.setAccessible(true);
             return consoleField.get(server);
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException _) {
             Method getServerMethod = server.getClass().getMethod("getServer");
             return getServerMethod.invoke(server);
         }
@@ -218,7 +218,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         Material itemMaterial;
         try {
             itemMaterial = Material.valueOf(material);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             itemMaterial = Material.DIAMOND_BLOCK;
         }
 
@@ -263,8 +263,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         meta.setDisplayName(legacyComponentSerializer.serialize(name));
         meta.setLore(lore.stream()
-                .map(component -> legacyComponentSerializer.serialize(name))
-                .toList());
+                .map(legacyComponentSerializer::serialize)
+                .toList()
+        );
 
         legacyItem.setItemMeta(meta);
         return SpigotConversionUtil.fromBukkitItemStack(legacyItem);
@@ -305,7 +306,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
             Object item = nmsStack.getClass().getMethod("getItem").invoke(nmsStack);
             return (String) item.getClass().getMethod("getName").invoke(item);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return "";
         }
     }

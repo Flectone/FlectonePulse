@@ -498,7 +498,7 @@ public class FileMigrator {
                                 .collect(Collectors.toMap(
                                                 Map.Entry::getKey,
                                                 entry -> StringUtils.isEmpty(entry.getValue()) ? "null" : entry.getValue(),
-                                                (object, object2) -> object,
+                                                (object, _) -> object,
                                                 LinkedHashMap::new
                                         )
                                 ))

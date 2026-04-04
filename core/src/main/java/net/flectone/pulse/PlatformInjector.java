@@ -89,7 +89,7 @@ public abstract class PlatformInjector extends AbstractModule {
 //                    .sorted()
 //                    .forEach(fLogger::warning);
 //
-//        } catch (Exception e) {
+//        } catch (Exception _) {
 //            fLogger.warning(e);
 //        }
     }
@@ -203,8 +203,8 @@ public abstract class PlatformInjector extends AbstractModule {
                 .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
                 .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING) // jackson 2.x value
                 // fix nulls
-                .changeDefaultPropertyInclusion(config -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)) // show only non-null values
-                .changeDefaultNullHandling(config -> JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
+                .changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)) // show only non-null values
+                .changeDefaultNullHandling(_ -> JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
                 .withConfigOverride(String.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null string
                 .withConfigOverride(Collection.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null collection
                 .withConfigOverride(List.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null list

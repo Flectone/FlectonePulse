@@ -78,7 +78,7 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
                         }
 
                         return greetingMessage;
-                    } catch (Exception ignored) {
+                    } catch (Exception _) {
                         return format;
                     }
 

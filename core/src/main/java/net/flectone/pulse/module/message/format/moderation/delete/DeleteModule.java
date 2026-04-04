@@ -89,7 +89,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
 
         UUID messageUUID = messageContext.messageUUID();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DELETE, (_, _) -> {
             String placeholder = Strings.CS.replace(
                     localization(receiver).placeholder(),
                     "<uuid>",
@@ -118,7 +118,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
         UUID playerUUID = receiver.uuid();
         HistoryMessage historyMessage = new HistoryMessage(messageUUID, component);
 
-        List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, k -> new ObjectArrayList<>());
+        List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, _ -> new ObjectArrayList<>());
 
         if (history.size() >= config().historyLength()) {
             history.removeFirst();

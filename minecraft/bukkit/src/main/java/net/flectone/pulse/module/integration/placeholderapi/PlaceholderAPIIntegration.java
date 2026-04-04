@@ -191,7 +191,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
                 message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
             }
 
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore placeholderapi exceptions
         }
 

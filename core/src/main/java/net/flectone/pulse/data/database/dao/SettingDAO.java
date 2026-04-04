@@ -48,7 +48,7 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      */
     public void save(@NonNull FPlayer player) {
         useTransaction(sql -> {
-            player.settingsBoolean().forEach((messageType, value) ->
+            player.settingsBoolean().forEach((messageType, _) ->
                     insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
             );
 

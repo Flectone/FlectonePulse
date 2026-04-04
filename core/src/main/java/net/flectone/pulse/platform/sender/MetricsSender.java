@@ -64,7 +64,7 @@ public class MetricsSender {
             connection.disconnect();
             connection.getResponseCode();
 
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore errors
         }
     }

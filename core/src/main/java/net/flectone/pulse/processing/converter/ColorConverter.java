@@ -102,7 +102,7 @@ public class ColorConverter {
             int b = Integer.parseInt(hex.substring(4, rgbPartLength), 16);
 
             return (alpha << 24) | (r << 16) | (g << 8) | b;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             fLogger.warning("Incorrect HEX characters");
             return DEFAULT_BACKGROUND_COLOR;
         }

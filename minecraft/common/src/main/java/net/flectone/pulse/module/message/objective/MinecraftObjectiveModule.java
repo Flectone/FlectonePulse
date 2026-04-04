@@ -89,7 +89,7 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
 
     public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format) {
         MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, format)
-                .addTagResolvers(TagResolver.resolver("score", (argumentQueue, context) ->
+                .addTagResolvers(TagResolver.resolver("score", (_, _) ->
                         Tag.inserting(messagePipeline.build(messagePipeline.createContext(fPlayer, score)))
                 ));
 

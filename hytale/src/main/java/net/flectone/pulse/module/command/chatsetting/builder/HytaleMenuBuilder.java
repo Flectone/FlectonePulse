@@ -103,7 +103,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         String id = "fp_" + UUID.randomUUID();
 
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (unused, uiContext) -> {
+        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, uiContext) -> {
             ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
             if (status == ChatsettingHandler.Status.DENIED) return;
 
@@ -156,7 +156,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         String id = "fp_chat";
 
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (unused, uiContext) ->
+        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, _) ->
                 chatsettingHandler.handleChatMenu(fPlayer, fTarget, chat, localization, this, id)
         ));
     }
@@ -183,7 +183,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         String id = "fp_fcolor_" + type.ordinal();
 
-        return gridGroup.append(createButton(id, componentTitle, componentLore, (unused, uiContext) ->
+        return gridGroup.append(createButton(id, componentTitle, componentLore, (_, _) ->
                 chatsettingHandler.handleFColorMenu(fPlayer, fTarget, type, color, subMenu, this, id)
         ));
     }
@@ -232,7 +232,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
             String subId = id + "_" + i;
 
-            gridGroup = gridGroup.append(createButton(subId, componentTitle, componentLore, (unused, uiContext) ->
+            gridGroup = gridGroup.append(createButton(subId, componentTitle, componentLore, (_, _) ->
                     chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                         onSelect.accept(item);
                         closeConsumer.run();

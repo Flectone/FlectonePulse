@@ -80,7 +80,7 @@ public class FColorModule implements ModuleSimple {
 
         boolean isSenderColorOut = messageContext.isFlag(MessageFlag.COLOR_CONTEXT_SENDER);
 
-        messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
+        messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt number = argumentQueue.pop().asInt();

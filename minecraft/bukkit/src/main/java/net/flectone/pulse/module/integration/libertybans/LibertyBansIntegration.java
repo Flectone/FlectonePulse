@@ -90,7 +90,7 @@ public class LibertyBansIntegration implements FIntegration {
                     .getFirstSpecificPunishment()
                     .toCompletableFuture()
                     .join();
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException _) {
             return Optional.empty();
         }
     }

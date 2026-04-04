@@ -36,7 +36,7 @@ public class WebUtil {
             }
 
             fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), connection.getResponseCode(), fileUrl);
-        } catch (IOException e) {
+        } catch (IOException _) {
             fLogger.warning("Failed to download %s file", outputPath.getFileName());
         }
 

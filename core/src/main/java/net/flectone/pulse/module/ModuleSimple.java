@@ -24,7 +24,7 @@ public interface ModuleSimple {
     }
 
     default BiPredicate<FEntity, Boolean> disablePredicate() {
-        return (fEntity, aBoolean) -> false;
+        return (_, _) -> false;
     }
 
     default ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {

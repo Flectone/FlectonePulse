@@ -70,8 +70,8 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
                         return;
                     }
                     method.invoke(listener, event);
-                } catch (InvocationTargetException ex) {
-                    throw new EventException(ex.getCause());
+                } catch (InvocationTargetException e) {
+                    throw new EventException(e.getCause());
                 } catch (Throwable t) {
                     throw new EventException(t);
                 }

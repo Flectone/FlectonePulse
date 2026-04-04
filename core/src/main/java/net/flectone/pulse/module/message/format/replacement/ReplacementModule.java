@@ -131,7 +131,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
         FPlayer receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, _) -> {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -400,7 +400,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         Component componentPixels;
         try {
             componentPixels = createImageComponent(url);
-        } catch (ExecutionException ignored) {
+        } catch (ExecutionException _) {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
@@ -416,7 +416,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
+                .addTagResolver(TagResolver.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);
 
@@ -434,7 +434,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(TagResolver.resolver("message_1", (argumentQueue, ctx) -> Tag.selfClosingInserting(componentItem)));
+                .addTagResolver(TagResolver.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)));
 
         Component componentFormat = messagePipeline.build(newContext);
 
@@ -472,7 +472,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         Component componentPixels;
         try {
             componentPixels = createImageComponent(url);
-        } catch (ExecutionException ignored) {
+        } catch (ExecutionException _) {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
@@ -488,7 +488,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
                 )
-                .addTagResolver(TagResolver.resolver("pixels", (argumentQueue, ctx) -> Tag.inserting(componentPixels)));
+                .addTagResolver(TagResolver.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);
 
@@ -517,7 +517,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
                 imageCache.put(link, component);
 
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // return empty component
             }
 

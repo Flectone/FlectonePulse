@@ -203,7 +203,7 @@ public class HytaleBubbleRender implements BubbleRender {
         return messagePipeline.build(messageContext
                 .withMessage(localization.format())
                 .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
+                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
         );
     }
 
@@ -239,7 +239,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
     @Override
     public void removeAllBubbles() {
-        activeBubbles.forEach((key, bubbleDataList) -> bubbleDataList.stream()
+        activeBubbles.forEach((_, bubbleDataList) -> bubbleDataList.stream()
                 .filter(bubbleEntity -> bubbleEntity.entityRef().isValid())
                 .forEach(bubbleEntity -> {
                     EntityStore entityStore = bubbleEntity.entityRef().getStore().getExternalData();

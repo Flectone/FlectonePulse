@@ -135,12 +135,12 @@ public class Database {
     private void setupTemplateEngine() {
         BiFunction<String, StatementContext, String> template = null;
         if (StringUtils.isNotEmpty(config().prefix())) {
-            template = (sql, ctx) -> Strings.CS.replace(sql, "fp_", config().prefix());
+            template = (sql, _) -> Strings.CS.replace(sql, "fp_", config().prefix());
         }
 
         if (config().type() == Type.POSTGRESQL) {
             if (template == null) {
-                template = (sql, ctx) -> sql;
+                template = (sql, _) -> sql;
             }
 
             template = template.andThen(sql -> Strings.CS.replace(sql, "`", "\""));

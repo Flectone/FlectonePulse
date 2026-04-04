@@ -91,7 +91,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
-        return (context, input) -> config().categories()
+        return (_, _) -> config().categories()
                 .stream()
                 .map(Suggestion::suggestion)
                 .toList();

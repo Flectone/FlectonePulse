@@ -113,7 +113,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
 
                 // send to console
                 send(FPlayer.UNKNOWN);
-            } catch (IOException | InterruptedException ignored) {
+            } catch (IOException | InterruptedException _) {
                 // ignore exception
             }
         });

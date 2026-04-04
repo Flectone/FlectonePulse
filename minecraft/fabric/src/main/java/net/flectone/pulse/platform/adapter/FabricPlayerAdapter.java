@@ -361,7 +361,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
                 position.x + x, position.y + y, position.z + z
         );
 
-        return player.level().getEntitiesOfClass(ServerPlayer.class, searchBox, entity -> true)
+        return player.level().getEntitiesOfClass(ServerPlayer.class, searchBox, _ -> true)
                 .stream()
                 .filter(target -> {
                     Vec3 startPos = target.getEyePosition(1.0F);

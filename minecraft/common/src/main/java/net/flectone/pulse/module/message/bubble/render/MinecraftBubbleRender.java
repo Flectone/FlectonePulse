@@ -121,7 +121,7 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubbleEntityPredicate) {
-        activeBubbleEntities.forEach((uuid, bubbleEntities) -> {
+        activeBubbleEntities.forEach((_, bubbleEntities) -> {
             if (bubbleEntities.isEmpty()) return;
 
             List<BubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
@@ -209,7 +209,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         return messagePipeline.build(messageContext
                 .withMessage(localization.format())
                 .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
+                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
         );
     }
 

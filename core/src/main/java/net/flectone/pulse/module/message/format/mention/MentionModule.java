@@ -115,7 +115,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
         UUID processId = messageContext.messageUUID();
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, _) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 

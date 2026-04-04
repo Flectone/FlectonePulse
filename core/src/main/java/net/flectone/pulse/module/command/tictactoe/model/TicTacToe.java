@@ -218,7 +218,7 @@ public class TicTacToe {
             String[] stringMove = move.split("-");
 
             return Pair.of(Integer.parseInt(stringMove[0]), Integer.parseInt(stringMove[1]));
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             return null;
         }
     }

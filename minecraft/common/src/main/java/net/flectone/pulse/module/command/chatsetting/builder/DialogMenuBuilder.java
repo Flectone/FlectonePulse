@@ -159,7 +159,7 @@ public class DialogMenuBuilder implements MenuBuilder {
 
         return dialogBuilder
                 .addButton(slot, button)
-                .addClickHandler(id, dialog ->
+                .addClickHandler(id, _ ->
                         chatsettingHandler.handleChatMenu(fPlayer, fTarget, chat, localization, this, id)
                 );
     }
@@ -193,7 +193,7 @@ public class DialogMenuBuilder implements MenuBuilder {
 
         return dialogBuilder
                 .addButton(slot, button)
-                .addClickHandler(id, dialog ->
+                .addClickHandler(id, _ ->
                         chatsettingHandler.handleFColorMenu(fPlayer, fTarget, type, color, subMenu, this, id)
                 );
     }
@@ -219,7 +219,7 @@ public class DialogMenuBuilder implements MenuBuilder {
         );
 
         Dialog.Builder dialogBuilder = new Dialog.Builder(commonDialogData, chatsettingModule.config().modern().columns())
-                .addCloseConsumer(dialog -> closeConsumer.run());
+                .addCloseConsumer(_ -> closeConsumer.run());
 
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
@@ -245,7 +245,7 @@ public class DialogMenuBuilder implements MenuBuilder {
             );
 
             dialogBuilder.addButton(i, button);
-            dialogBuilder.addClickHandler(subId, dialog -> chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
+            dialogBuilder.addClickHandler(subId, _ -> chatsettingHandler.handleSubMenu(fPlayer, item, () -> {
                 onSelect.accept(item);
                 dialogController.close(fPlayer.uuid());
                 open(fPlayer, fTargetUUID);

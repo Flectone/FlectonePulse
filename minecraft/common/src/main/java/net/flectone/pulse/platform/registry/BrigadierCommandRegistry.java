@@ -24,22 +24,22 @@ public interface BrigadierCommandRegistry extends CommandRegistry {
 
         brigadierManager.registerMapping(new TypeToken<PlayerParser>() {},
                 builder -> builder.cloudSuggestions()
-                        .to(argument -> StringArgumentType.string())
+                        .to(_ -> StringArgumentType.string())
         );
 
         brigadierManager.registerMapping(new TypeToken<DurationReasonParser>() {},
                 builder -> builder.cloudSuggestions()
-                        .to(argument -> StringArgumentType.greedyString())
+                        .to(_ -> StringArgumentType.greedyString())
         );
 
         brigadierManager.registerMapping(new TypeToken<ColorParser>() {},
                 builder -> builder.cloudSuggestions()
-                        .to(argument -> StringArgumentType.greedyString())
+                        .to(_ -> StringArgumentType.greedyString())
         );
 
         brigadierManager.registerMapping(new TypeToken<MessageParser>() {},
                 builder -> builder.cloudSuggestions()
-                        .to(argument -> StringArgumentType.greedyString())
+                        .to(_ -> StringArgumentType.greedyString())
         );
 
         brigadierManager.settings().set(BrigadierSetting.FORCE_EXECUTABLE, true);

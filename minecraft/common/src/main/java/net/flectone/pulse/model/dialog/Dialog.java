@@ -51,7 +51,7 @@ public class Dialog {
         }
 
         public Builder addClickHandler(String id, Consumer<Dialog> consumer) {
-            clickConsumerMap.put(id, (dialog, nbt) -> consumer.accept(dialog));
+            clickConsumerMap.put(id, (dialog, _) -> consumer.accept(dialog));
             return this;
         }
 
@@ -66,7 +66,7 @@ public class Dialog {
         }
 
         public Dialog build() {
-            List<ActionButton> buttons = buttonMap.entrySet().stream()
+            List<ActionButton> buttons = buttonMap.int2ObjectEntrySet().stream()
                     .sorted(Map.Entry.comparingByKey())
                     .map(Map.Entry::getValue)
                     .toList();

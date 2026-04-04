@@ -191,7 +191,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
                     message = syncMessage;
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // ignore placeholderapi exceptions
         }
 
@@ -215,7 +215,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
         world.execute(() -> {
             try {
                 completableFuture.complete(setPlaceholders(universe, fPlayer, fReceiver, offlinePlayer, message));
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 completableFuture.complete(null);
             }
 

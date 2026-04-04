@@ -53,7 +53,7 @@ public class PaperItemStackUtil {
     private Component replaceItemMark(Component component) {
         return component.replaceText(TextReplacementConfig.builder()
                 .match(FLECTONEPULSE_ITEM_MARK_PATTERN)
-                .replacement((matchResult, builder) -> {
+                .replacement((matchResult, _) -> {
                     String foundUuid = matchResult.group(1);
                     ItemStack itemStack = uuidItemStackCache.getIfPresent(UUID.fromString(foundUuid));
                     if (itemStack == null) return Component.empty();

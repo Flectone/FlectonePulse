@@ -61,7 +61,7 @@ public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, 
 
             try {
                 timeValue = Integer.parseInt(group.substring(0, group.length() - 1));
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException _) {
                 timeValue = -1;
             }
 

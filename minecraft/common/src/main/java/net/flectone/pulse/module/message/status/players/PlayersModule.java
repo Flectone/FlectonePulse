@@ -88,7 +88,7 @@ public class PlayersModule implements ModuleLocalization<Localization.Message.St
         String online = config().online();
         try {
             return StringUtils.isEmpty(online) ? serverOnline : Integer.parseInt(online);
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             // ignore exception
         }
 
@@ -96,7 +96,7 @@ public class PlayersModule implements ModuleLocalization<Localization.Message.St
         online = messagePipeline.buildPlain(onlineContext);
         try {
             return Integer.parseInt(online);
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             return serverOnline;
         }
     }

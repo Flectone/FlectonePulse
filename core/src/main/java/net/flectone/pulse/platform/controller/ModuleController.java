@@ -129,7 +129,7 @@ public class ModuleController {
     }
 
     public void terminate(Class<? extends ModuleSimple> clazz) {
-        enable(clazz, module -> false);
+        enable(clazz, _ -> false);
     }
 
     private void configureHierarchy(Class<? extends ModuleSimple> clazz) {
@@ -173,8 +173,8 @@ public class ModuleController {
 
     public BiPredicate<FEntity, Boolean> buildDisablePredicate(ModuleSimple module) {
         BiPredicate<FEntity, Boolean> disablePredicate = module.disablePredicate()
-                .or((fPlayer, needBoolean) -> !isEnable(module))
-                .or((fPlayer, needBoolean) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
+                .or((_, _) -> !isEnable(module))
+                .or((fPlayer, _) -> !permissionCheckerProvider.get().check(fPlayer, module.permission()));
 
         if (module instanceof ModuleLocalization<?> localizationModule) {
             return disablePredicate

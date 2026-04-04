@@ -62,7 +62,7 @@ public class SkinsRestorerIntegration implements FIntegration {
             }
 
             logHook();
-        } catch (Exception e) {
+        } catch (Exception _) {
             fLogger.warning("SkinsRestorer hook is failed, check https://skinsrestorer.net/docs/installation");
         }
     }
@@ -94,7 +94,7 @@ public class SkinsRestorerIntegration implements FIntegration {
         try {
             Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
             return skin.orElse(null);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return null;
         }
     }

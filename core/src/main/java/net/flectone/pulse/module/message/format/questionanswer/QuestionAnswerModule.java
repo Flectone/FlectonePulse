@@ -138,7 +138,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         UUID processId = messageContext.messageUUID();
         FEntity receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, _) -> {
             Tag.Argument questionTag = argumentQueue.peek();
             if (questionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 

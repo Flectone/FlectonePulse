@@ -53,7 +53,7 @@ public class BubbleService {
 
         PlayerBubbleState state = playerBubbleStates.computeIfAbsent(
                 sender.uuid(),
-                uuid -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
+                _ -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
         );
 
         MessageContext messageContext = messagePipeline.createContext(sender, message)
@@ -187,7 +187,7 @@ public class BubbleService {
     }
 
     public void clear() {
-        playerBubbleStates.forEach((uuid, state) -> clearBubbleState(state));
+        playerBubbleStates.forEach((_, state) -> clearBubbleState(state));
         playerBubbleStates.clear();
         bubbleRender.removeAllBubbles();
     }

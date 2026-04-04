@@ -79,7 +79,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (context, input) -> Arrays.stream(FColor.Type.values())
+        return (context, _) -> Arrays.stream(FColor.Type.values())
                 .filter(type -> permissionChecker.check(context.sender(), permission().colors().get(type.name())))
                 .map(setting -> Suggestion.suggestion(setting.name().toLowerCase()))
                 .toList();
@@ -193,7 +193,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
             fPlayerService.saveColors(fPlayer);
 
             // update proxy players
-            proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, dataOutputStream -> {}, metadataUUID);
+            proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, _ -> {}, metadataUUID);
         }
 
         sendMessageWithUpdatedColors(fPlayer, metadataUUID);

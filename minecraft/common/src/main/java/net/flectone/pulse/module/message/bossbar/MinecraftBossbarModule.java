@@ -118,7 +118,7 @@ public class MinecraftBossbarModule extends BossbarModule {
         String tag = "raiders";
         if (StringUtils.isEmpty(raiders)) return MessagePipeline.ReplacementTag.emptyResolver(tag);
 
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (_, _) -> {
             String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
             if (StringUtils.isEmpty(raidersRemaining)) return MessagePipeline.ReplacementTag.emptyTag();
 

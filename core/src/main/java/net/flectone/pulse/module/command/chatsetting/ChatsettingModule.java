@@ -93,7 +93,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (context, input) -> {
+        return (context, _) -> {
             if (!permissionChecker.check(context.sender(), permission().other())) return Collections.emptyList();
 
             return Arrays.stream(ModuleName.values())

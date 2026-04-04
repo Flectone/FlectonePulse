@@ -84,7 +84,7 @@ public class BukkitBaseListener implements Listener {
     private String getPlayerLocale(Player player) {
         try {
             return player.getLocale();
-        } catch (NoSuchMethodError e) {
+        } catch (NoSuchMethodError _) {
             return fileFacade.config().language().type();
         }
     }

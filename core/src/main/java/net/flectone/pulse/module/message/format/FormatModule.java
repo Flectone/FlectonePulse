@@ -167,7 +167,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     }
 
     private TagResolver bedrockGradientTag() {
-        return TagResolver.resolver("gradient", (argumentQueue, context) -> {
+        return TagResolver.resolver("gradient", (argumentQueue, _) -> {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 

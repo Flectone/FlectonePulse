@@ -72,7 +72,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
         FPlayer fReceiver = messageContext.receiver();
 
         if (!(sender instanceof FPlayer fPlayer)) {
-            return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
+            return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (_, _) -> {
                 Localization.Message.Format.Names localizationName = localization(fReceiver);
 
                 Component showEntityName = sender.showEntityName();
@@ -104,7 +104,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                                         new String[]{sender.type(), sender.uuid().toString()}
                                 )
                         )
-                        .addTagResolver(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
+                        .addTagResolver(TagResolver.resolver("name", (_, _) -> Tag.selfClosingInserting(showEntityName)))
                         .withFlags(messageContext.flags())
                         .addFlags(
                                 new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
@@ -118,7 +118,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
         return messageContext
                 .addTagResolvers(
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, context) -> {
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
                             List<Component> constants = fPlayer.constants();
                             if (constants.isEmpty()) {
                                 List<String> stringConstants = localization(fPlayer).constant();
@@ -139,7 +139,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                             return Tag.inserting(constants.get(constantIndex));
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, context) -> {
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
                             int displayNameIndex = 0;
                             if (argumentQueue.hasNext()) {
                                 displayNameIndex = argumentQueue.pop().asInt().orElse(0);
@@ -164,15 +164,15 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                             return Tag.selfClosingInserting(displayNameComponent);
                         }),
-                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (argumentQueue, context) -> {
+                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (_, _) -> {
                             String prefix = integrationModule.getPrefix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, prefix, messageContext);
                         }),
-                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (argumentQueue, context) -> {
+                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (_, _) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (argumentQueue, context) ->
+                        TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (_, _) ->
                                 Tag.preProcessParsed(fPlayer.name())
                         )
                 );
@@ -184,7 +184,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER),
-                (argumentQueue, context) -> {
+                (_, _) -> {
                     String formatInvisible = localization(receiver).invisible();
                     MessageContext invisibleContext = messagePipeline.createContext(sender, receiver, formatInvisible);
                     Component name = messagePipeline.build(invisibleContext);

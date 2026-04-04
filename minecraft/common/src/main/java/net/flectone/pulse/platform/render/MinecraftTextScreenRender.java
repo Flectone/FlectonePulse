@@ -192,7 +192,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
     private void destroy(FPlayer fPlayer, int entityId) {
         destroy(fPlayer.uuid(), entityId);
-        livingEntities.computeIfPresent(fPlayer.uuid(), (integer, integers) -> {
+        livingEntities.computeIfPresent(fPlayer.uuid(), (_, integers) -> {
             integers.remove((Integer) entityId);
             return integers;
         });

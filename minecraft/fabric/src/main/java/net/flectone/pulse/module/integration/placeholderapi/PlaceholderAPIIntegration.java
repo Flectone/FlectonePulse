@@ -101,7 +101,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     }
 
     private void register() {
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":mute_suffix"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -109,7 +109,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -117,7 +117,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration_formatted"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":afk_duration_formatted"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
@@ -160,32 +160,32 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.name());
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ip"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(fPlayer.ip());
         });
 
-        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"), (context, argument) -> {
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":ping"), (context, _) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
             return PlaceholderResult.value(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
         });
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) ->
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (_, _) ->
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, argument) ->
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (_, _) ->
                 PlaceholderResult.value(platformServerAdapter.getTPS())
         );
 

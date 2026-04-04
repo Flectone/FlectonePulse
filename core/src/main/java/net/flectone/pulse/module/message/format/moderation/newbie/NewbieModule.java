@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.format.moderation.newbie;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -104,7 +103,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         };
 
         return new ExternalModeration(fPlayer.name(),
-                FPlayer.UNKNOWN_NAME,
+                FEntity.UNKNOWN_NAME,
                 localization().reason(),
                 1,
                 firstPlayed,

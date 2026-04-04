@@ -108,7 +108,7 @@ public class MinecraftTranslationService implements TranslationService {
 
             translations.putAll(loadedTranslations);
             fLogger.info("[+] Loaded translation: %s", localizationFile.getFileName());
-        } catch (Exception e) {
+        } catch (Exception _) {
             fLogger.warning("Failed to load translations");
         }
     }
@@ -158,7 +158,7 @@ public class MinecraftTranslationService implements TranslationService {
             String url = buildLocalizationUrl(getVersion(), "en_us", ".json");
             HttpURLConnection connection = webUtil.createConnection(url);
             return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
-        } catch (IOException e) {
+        } catch (IOException _) {
             // legacy version
             return false;
         }

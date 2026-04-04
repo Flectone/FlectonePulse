@@ -141,7 +141,7 @@ public class FileLoader {
                     languages.add(Strings.CS.replace(localizationName, ".yml", ""));
                 }
             });
-        } catch (NoSuchFileException ignored) {
+        } catch (NoSuchFileException _) {
             // ignore first startup
         } catch (IOException e) {
             fLogger.warning(e);

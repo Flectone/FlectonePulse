@@ -149,7 +149,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeWithMessageSuggestion() {
-        return (context, input) -> {
+        return (_, input) -> {
             String[] words = input.input().split(" ");
             String string = words.length < 3 ? "" : words[2];
 
@@ -188,7 +188,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
             parseContent(content, destination);
 
             return Destination.fromJson(destination);
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             return Destination.EMPTY_CHAT;
         }
     }

@@ -101,8 +101,8 @@ public class ListenerRegistry implements Registry {
         lock.writeLock().lock();
         try {
             pulseListeners
-                    .computeIfAbsent(eventClass, k -> new EnumMap<>(Event.Priority.class))
-                    .computeIfAbsent(priority, k -> new ObjectArrayList<>())
+                    .computeIfAbsent(eventClass, _ -> new EnumMap<>(Event.Priority.class))
+                    .computeIfAbsent(priority, _ -> new ObjectArrayList<>())
                     .add(handler);
         } finally {
             lock.writeLock().unlock();

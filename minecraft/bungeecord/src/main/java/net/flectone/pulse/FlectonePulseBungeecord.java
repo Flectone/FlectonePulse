@@ -67,15 +67,6 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
                 .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
     }
 
-    public void reload() {
-        fLogger.logReloading();
-
-        unregisterChannel();
-        registerChannel();
-
-        fLogger.logReloaded();
-    }
-
     private void registerChannel() {
         getProxy().registerChannel(CHANNEL);
         getProxy().getPluginManager().registerListener(this, this);
