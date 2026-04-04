@@ -1,13 +1,11 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,7 +18,6 @@ public class BukkitPermissionChecker implements PermissionChecker {
 
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final Provider<LuckPermsModule> luckPermsModuleProvider;
 
     @Override
     public boolean check(FEntity entity, String permission) {
@@ -33,7 +30,7 @@ public class BukkitPermissionChecker implements PermissionChecker {
         boolean value;
         if (bukkitPermission != null) {
             PermissionDefault permissionDefault = bukkitPermission.getDefault();
-            if (permissionDefault == PermissionDefault.TRUE && luckPermsModuleProvider.get().isAlwaysHaveTrue()) return true;
+            if (permissionDefault == PermissionDefault.TRUE && integrationModule.isAlwaysHaveTruePermission()) return true;
 
             value = permissionDefault != PermissionDefault.FALSE &&
                     (permissionDefault == PermissionDefault.TRUE || platformPlayerAdapter.isOperator(fPlayer) && permissionDefault != PermissionDefault.NOT_OP);

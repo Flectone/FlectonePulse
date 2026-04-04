@@ -110,6 +110,16 @@ public abstract class IntegrationModule implements ModuleSimple {
         return false;
     }
 
+    public boolean isAlwaysHaveTruePermission() {
+        if (!moduleController.isEnable(this)) return false;
+
+        if (containsEnabledChild(LuckPermsModule.class)) {
+            return getInstance(LuckPermsModule.class).isAlwaysHaveTrue();
+        }
+
+        return false;
+    }
+
     public String getPrefix(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return null;
 
