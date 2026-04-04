@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration.simplevoice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.ModuleSimple;
@@ -12,8 +11,7 @@ import net.flectone.pulse.util.file.FileFacade;
 @Singleton
 public class SimpleVoiceModule implements ModuleSimple {
 
-    @Getter private static SimpleVoiceIntegration SIMPLE_VOICE_INTEGRATION;
-
+    private static SimpleVoiceIntegration simpleVoiceIntegration;
     private final FileFacade fileFacade;
 
     @Inject
@@ -21,17 +19,21 @@ public class SimpleVoiceModule implements ModuleSimple {
                              SimpleVoiceIntegration simpleVoiceIntegration) {
         this.fileFacade = fileFacade;
 
-        SimpleVoiceModule.SIMPLE_VOICE_INTEGRATION = simpleVoiceIntegration;
+        SimpleVoiceModule.simpleVoiceIntegration = simpleVoiceIntegration;
     }
 
     @Override
     public void onEnable() {
-        SIMPLE_VOICE_INTEGRATION.hook();
+        if (simpleVoiceIntegration != null) {
+            simpleVoiceIntegration.hook();
+        }
     }
 
     @Override
     public void onDisable() {
-        SIMPLE_VOICE_INTEGRATION.unhook();
+        if (simpleVoiceIntegration != null) {
+            simpleVoiceIntegration.unhook();
+        }
     }
 
     @Override
@@ -48,4 +50,17 @@ public class SimpleVoiceModule implements ModuleSimple {
     public Permission.Integration.Simplevoice permission() {
         return fileFacade.permission().integration().simplevoice();
     }
+
+    public static void onEntitySoundPacketEvent(Object event) {
+        if (simpleVoiceIntegration != null) {
+            simpleVoiceIntegration.onEntitySoundPacketEvent(event);
+        }
+    }
+
+    public static void onMicrophonePacketEvent(Object event) {
+        if (simpleVoiceIntegration != null) {
+            simpleVoiceIntegration.onMicrophonePacketEvent(event);
+        }
+    }
+
 }

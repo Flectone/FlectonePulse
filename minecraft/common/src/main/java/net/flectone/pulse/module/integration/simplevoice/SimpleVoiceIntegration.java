@@ -49,11 +49,8 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     @Override
     public void registerEvents(EventRegistration registration) {
-        SimpleVoiceIntegration simpleVoiceIntegration = SimpleVoiceModule.getSIMPLE_VOICE_INTEGRATION();
-        if (simpleVoiceIntegration == null) return;
-
-        registration.registerEvent(MicrophonePacketEvent.class, simpleVoiceIntegration::onMicrophonePacketEvent);
-        registration.registerEvent(EntitySoundPacketEvent.class, simpleVoiceIntegration::onEntitySoundPacketEvent);
+        registration.registerEvent(EntitySoundPacketEvent.class, SimpleVoiceModule::onEntitySoundPacketEvent);
+        registration.registerEvent(MicrophonePacketEvent.class, SimpleVoiceModule::onMicrophonePacketEvent);
     }
 
     @Override
@@ -73,8 +70,9 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         logUnhook();
     }
 
-    public void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {
+    public void onEntitySoundPacketEvent(Object objectEvent) {
         if (!enable) return;
+        if (!(objectEvent instanceof EntitySoundPacketEvent event)) return;
         if (event.getSenderConnection() == null) return;
         if (event.getReceiverConnection() == null) return;
 
@@ -89,8 +87,9 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         event.cancel();
     }
 
-    public void onMicrophonePacketEvent(MicrophonePacketEvent event) {
+    public void onMicrophonePacketEvent(Object objectEvent) {
         if (!enable) return;
+        if (!(objectEvent instanceof MicrophonePacketEvent event)) return;
         if (event.isCancelled()) return;
         if (event.getSenderConnection() == null) return;
 
