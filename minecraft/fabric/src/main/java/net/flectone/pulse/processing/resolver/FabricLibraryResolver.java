@@ -1,16 +1,16 @@
 package net.flectone.pulse.processing.resolver;
 
-import com.alessiodp.libby.FabricLibraryManager;
 import com.alessiodp.libby.Library;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.processing.resolver.libby.FabricLibbyResolver;
 import org.slf4j.Logger;
 
 @Singleton
 public class FabricLibraryResolver extends LibraryResolver {
 
     public FabricLibraryResolver(Logger logger) {
-        super(new FabricLibraryManager(BuildConfig.PROJECT_MOD_ID, logger, "libraries"));
+        super(new FabricLibbyResolver(BuildConfig.PROJECT_MOD_ID, logger, "libraries"));
     }
 
     @Override

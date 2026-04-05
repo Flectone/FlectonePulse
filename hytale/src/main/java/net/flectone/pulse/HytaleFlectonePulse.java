@@ -1,7 +1,6 @@
 package net.flectone.pulse;
 
 import com.alessiodp.libby.LibraryManager;
-import com.alessiodp.libby.StandaloneLibraryManager;
 import com.alessiodp.libby.logging.LogLevel;
 import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.google.inject.Guice;
@@ -17,6 +16,7 @@ import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
 import net.flectone.pulse.processing.resolver.HytaleLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.libby.HytaleLibbyResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
@@ -122,7 +122,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
             }
         };
 
-        return new StandaloneLibraryManager(logAdapter, projectPath, "libraries");
+        return new HytaleLibbyResolver(logAdapter, projectPath, "libraries");
     }
 
     @Override

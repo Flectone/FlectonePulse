@@ -34,12 +34,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FileLoader {
+
+    private static final boolean LOAD_ASM_JAR = Boolean.parseBoolean(System.getProperty("load.asm.jar", "true"));
+
+    public static final Predicate<Path> ADD_FILE_TO_CLASSPATH_PREDICATE = path -> {
+        if (LOAD_ASM_JAR) return true;
+
+        String fileName = path.getFileName().toString();
+        if (!fileName.endsWith(".jar")) return true;
+        if (fileName.equals("asm.jar")) return false;
+
+        return !fileName.startsWith("asm-") && !fileName.startsWith("asm_");
+    };
 
     private final FileWriter fileWriter;
     private final ObjectMapper yamlMapper;

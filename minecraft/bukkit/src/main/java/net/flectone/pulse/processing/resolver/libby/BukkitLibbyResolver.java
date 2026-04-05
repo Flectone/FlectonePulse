@@ -1,8 +1,10 @@
-package net.flectone.pulse.processing.resolver;
+package net.flectone.pulse.processing.resolver.libby;
 
 import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
+import net.flectone.pulse.util.file.FileLoader;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -17,9 +19,9 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
+public class BukkitLibbyResolver extends BukkitLibraryManager {
 
-    public BukkitIgnoreSnapshotLibraryManager(@NonNull Plugin plugin, @NonNull String directoryName) {
+    public BukkitLibbyResolver(@NonNull Plugin plugin, @NonNull String directoryName) {
         super(plugin, directoryName);
     }
 
@@ -93,4 +95,12 @@ public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
 
         throw new RuntimeException("Failed to download library '" + library + "'");
     }
+
+    @Override
+    protected void addToClasspath(@NotNull Path path) {
+        if (FileLoader.ADD_FILE_TO_CLASSPATH_PREDICATE.test(path)) {
+            super.addToClasspath(path);
+        }
+    }
+
 }
