@@ -39,7 +39,7 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	// fix integration with LuckPerms
-	implementation("org.incendo:cloud-fabric:${cloud_fabric_version}")
+	implementation("net.flectone:cloud-fabric:${cloud_fabric_version}")
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")

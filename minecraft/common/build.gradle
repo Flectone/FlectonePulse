@@ -4,8 +4,8 @@ dependencies {
     compileOnly "com.alessiodp.libby:libby-core:$libby_version"
     compileOnly "net.kyori:adventure-text-serializer-ansi:$adventure_api"
     compileOnly "org.incendo:cloud-core:$cloud_core_version"
-    compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
-    compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
+    compileOnly "net.flectone:cloud-brigadier:$cloud_paper_version"
+    compileOnly "net.flectone:cloud-minecraft-extras:$cloud_minecraft_extras_version"
 
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
     compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
