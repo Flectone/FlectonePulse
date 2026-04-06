@@ -238,7 +238,7 @@ public class MinecraftObjectModule extends ObjectModule {
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
         User user = packetProvider.getUser(messageContext.receiver());
-        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
 
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
