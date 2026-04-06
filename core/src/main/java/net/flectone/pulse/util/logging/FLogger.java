@@ -19,6 +19,8 @@ public record FLogger(
         Supplier<FileFacade> fileFacadeSupplier
 ) {
 
+    public static final String ERROR_MESSAGE_REPORT = "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues";
+
     private static final boolean ANSI_SUPPORTED = isAnsiSupported();
 
     // Idea taken from net.kyori.ansi.ColorLevel
@@ -121,7 +123,7 @@ public record FLogger(
     }
 
     public void warning(Throwable throwable) {
-        warning(throwable, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
+        warning(throwable, ERROR_MESSAGE_REPORT);
     }
 
     public void warning(Throwable throwable, String string) {

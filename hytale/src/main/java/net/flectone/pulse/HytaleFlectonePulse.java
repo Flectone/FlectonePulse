@@ -59,8 +59,12 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
-        // create guice injector for dependency injection
-        injector = Guice.createInjector(Stage.PRODUCTION, new HytaleInjector(this, projectPath, libraryResolver, fLogger));
+        try {
+            // create guice injector for dependency injection
+            injector = Guice.createInjector(Stage.PRODUCTION, new HytaleInjector(this, projectPath, libraryResolver, fLogger));
+        } catch (Exception e) {
+            throwInitException(e);
+        }
 
         HytaleTaskScheduler hytaleTaskScheduler = injector.getInstance(HytaleTaskScheduler.class);
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(hytaleTaskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);

@@ -15,6 +15,7 @@ import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -45,15 +46,22 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
 
-        // create guice injector for dependency injection
-        injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, this, libraryResolver, fLogger));
+        try {
+            // create guice injector for dependency injection
+            injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, this, libraryResolver, fLogger));
+        } catch (Exception e) {
+            throwInitException(e);
+        }
 
         PacketEvents.getAPI().load();
     }
 
     @Override
     public void onEnable() {
-        if (!isReady()) return;
+        if (!isReady()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         get(FlectonePulseAPI.class).onEnable();
     }

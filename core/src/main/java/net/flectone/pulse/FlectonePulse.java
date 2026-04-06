@@ -1,6 +1,7 @@
 package net.flectone.pulse;
 
 import com.google.inject.Injector;
+import net.flectone.pulse.exception.InitException;
 import net.flectone.pulse.exception.ReloadException;
 
 /**
@@ -119,6 +120,33 @@ public interface FlectonePulse {
      */
     default boolean isReady() {
         return getInjector() != null;
+    }
+
+    /**
+     * Throws an InitException with the message from the provided exception.
+     *
+     * <p>In production mode (when -Dflectonepulse.debug is not set to true), the error
+     * message is truncated to the first 25 lines to prevent excessive log output.
+     * In debug mode, the full exception message is preserved.
+     *
+     * @param e the original exception whose message will be included in the InitException
+     * @throws InitException always thrown with the processed error message
+     */
+    default void throwInitException(Exception e) throws InitException {
+        String errorMessage = e.getMessage();
+
+        if (!Boolean.parseBoolean(System.getProperty("flectonepulse.debug", "false"))) {
+            String[] lines = e.getMessage().split("\n");
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < Math.min(25, lines.length); i++) {
+                stringBuilder.append(lines[i]).append("\n");
+            }
+
+            errorMessage = stringBuilder.toString();
+        }
+
+        throw new InitException(errorMessage);
     }
 
 }

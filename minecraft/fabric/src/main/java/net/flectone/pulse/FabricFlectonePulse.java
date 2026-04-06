@@ -54,8 +54,12 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
-        // create guice injector for dependency injection
-        injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, libraryResolver, fLogger));
+        try {
+            // create guice injector for dependency injection
+            injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, libraryResolver, fLogger));
+        } catch (Exception e) {
+            throwInitException(e);
+        }
 
         // we need to call enable right now, because the commands must be registered before server is fully started
         onEnable();
