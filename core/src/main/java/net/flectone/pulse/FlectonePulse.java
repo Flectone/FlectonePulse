@@ -3,6 +3,7 @@ package net.flectone.pulse;
 import com.google.inject.Injector;
 import net.flectone.pulse.exception.InitException;
 import net.flectone.pulse.exception.ReloadException;
+import net.flectone.pulse.util.logging.FLogger;
 
 /**
  * Main interface for accessing FlectonePulse API functionality.
@@ -135,7 +136,7 @@ public interface FlectonePulse {
     default void throwInitException(Exception e) throws InitException {
         String errorMessage = e.getMessage();
 
-        if (!Boolean.parseBoolean(System.getProperty("flectonepulse.debug", "false"))) {
+        if (!FLogger.DEBUG_ENABLED) {
             String[] lines = e.getMessage().split("\n");
             StringBuilder stringBuilder = new StringBuilder();
 

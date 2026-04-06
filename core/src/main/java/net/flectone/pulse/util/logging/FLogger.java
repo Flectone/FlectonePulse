@@ -19,6 +19,7 @@ public record FLogger(
         Supplier<FileFacade> fileFacadeSupplier
 ) {
 
+    public static final boolean DEBUG_ENABLED = Boolean.parseBoolean(System.getProperty("flectonepulse.debug", "false"));
     public static final String ERROR_MESSAGE_REPORT = "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues";
 
     private static final boolean ANSI_SUPPORTED = isAnsiSupported();
