@@ -97,6 +97,41 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
+
+        addLibrary(Library.builder()
+                .groupId("org{}incendo")
+                .artifactId("cloud-core")
+                .version(BuildConfig.CLOUD_CORE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}flectone")
+                .artifactId("cloud-brigadier")
+                .version(BuildConfig.CLOUD_PAPER_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}flectone")
+                .artifactId("cloud-minecraft-modded-common")
+                .version(BuildConfig.CLOUD_FABRIC_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}flectone")
+                .artifactId("cloud-fabric")
+                .version(BuildConfig.CLOUD_FABRIC_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .build()
+        );
     }
 
 }

@@ -37,9 +37,7 @@ dependencies {
 	compileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
 	compileOnly("maven.modrinth:vanish:$vanish_version")
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
-
-	// fix integration with LuckPerms
-	implementation("net.flectone:cloud-fabric:${cloud_fabric_version}")
+	compileOnly("net.flectone:cloud-fabric:${cloud_fabric_version}")
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")
@@ -62,6 +60,7 @@ shadowJar {
 		include(dependency("org.xerial:.*"))
 		include(dependency("net.kyori:.*"))
         include(dependency("org.incendo:.*"))
+        include(dependency("net.flectone:.*"))
 		include(project(":core"))
         include(project(":minecraft:common"))
 	}
