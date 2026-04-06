@@ -611,6 +611,11 @@ public class FileMigrator {
                                             )
                                     )
                             )
+                            .withFlectonepulse(localization.command().flectonepulse()
+                                    .withFormatFalse(
+                                            Strings.CS.replace(localization.command().flectonepulse().formatFalse(), "<message>", "<error>")
+                                    )
+                            )
                     )
                     .withIntegration(localization.integration()
                             .withDiscord(localization.integration().discord()

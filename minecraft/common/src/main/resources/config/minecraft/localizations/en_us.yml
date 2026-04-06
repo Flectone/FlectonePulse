@@ -201,7 +201,7 @@ command:
     null_file: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>File <file> does not exist"
     file_exist: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>File <file> already exists"
     format_starting: "<fcolor:1>★ Starting <fcolor:2><type><fcolor:1>, please wait..."
-    format_false: "<color:#ff7171>★ Problem occurred during reload <br>Error: <message>"
+    format_false: "<color:#ff7171>★ Problem occurred during reload <br>Error: <error>"
     format_true: "<fcolor:1>★ <fcolor:2>FlectonePulse <fcolor:1>successfully reloaded! (<fcolor:2><i><time></i><fcolor:1>)"
     format_dump: "<fcolor:1>★ Dump link <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_editor: "<fcolor:1>★ Web editing link <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"

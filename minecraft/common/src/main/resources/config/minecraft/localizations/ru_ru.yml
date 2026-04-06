@@ -201,7 +201,7 @@ command:
     null_file: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Файл <file> не существует"
     file_exist: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Файл <file> уже существует"
     format_starting: "<fcolor:1>★ Начало <fcolor:2><type><fcolor:1>, подождите..."
-    format_false: "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>"
+    format_false: "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <error>"
     format_true: "<fcolor:1>★ <fcolor:2>FlectonePulse <fcolor:1>успешно перезагружен! (<fcolor:2><i><time></i><fcolor:1>)"
     format_dump: "<fcolor:1>★ Ссылка для дампа <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"
     format_editor: "<fcolor:1>★ Ссылка для веб-редактирования <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>"

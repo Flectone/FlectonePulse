@@ -35,6 +35,9 @@ import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -165,7 +168,11 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
             messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatFalse)
-                    .message(e.getLocalizedMessage())
+                    .tagResolvers(_ -> new TagResolver[]{
+                            TagResolver.resolver("error", (_, _) ->
+                                    Tag.selfClosingInserting(Component.text(e.getLocalizedMessage()))
+                            )
+                    })
                     .destination(config().destination())
                     .build()
             );
