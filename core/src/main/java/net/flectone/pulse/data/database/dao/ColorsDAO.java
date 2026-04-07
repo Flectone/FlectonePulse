@@ -75,7 +75,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
         return withHandle(sql -> {
             FPlayer newFPlayer = fPlayer;
             for (FColor.Type type : FColor.Type.values()) {
-                newFPlayer = loadType(sql, fPlayer, type);
+                newFPlayer = loadType(sql, newFPlayer, type);
             }
 
             return newFPlayer;
