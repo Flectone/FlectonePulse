@@ -319,6 +319,6 @@ public class MinecraftObjectModule extends ObjectModule {
             component = component.color(NamedTextColor.WHITE);
         }
 
-        return Tag.selfClosingInserting(component);
+        return Tag.inserting(component);
     }
 }
