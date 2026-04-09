@@ -363,8 +363,12 @@ public class FPlayerService {
     public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
         if (source.isConsole()) return true;
 
-        return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target)
-                || platformPlayerAdapter.isOperator(source) && !platformPlayerAdapter.isOperator(target);
+        boolean sourceIsOperator = platformPlayerAdapter.isOperator(source);
+        boolean targetIsOperator = platformPlayerAdapter.isOperator(target);
+        if (!sourceIsOperator && targetIsOperator) return false;
+
+        return sourceIsOperator && !targetIsOperator
+                || integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
     }
 
     public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
