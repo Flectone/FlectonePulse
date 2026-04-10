@@ -209,6 +209,13 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                         new boolean[]{false, false}
                 );
 
+        // <texture> and <player_head> can't be deserialized, so it returns a Component, instead of a string
+        // because of this, color won't be able to be applied to next word,
+        // but it's better that way than displaying the tags incorrectly
+        if (vaultTag.contains("<texture") || vaultTag.contains("<player_head")) {
+            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
+        }
+
         return Tag.preProcessParsed(messagePipeline.buildDefault(tagContext));
     }
 
