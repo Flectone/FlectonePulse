@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.twitch;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,6 +21,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.Proxy;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -53,15 +55,7 @@ public class TwitchIntegration implements FIntegration {
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.clientID());
         if (token.isEmpty() || identityProvider.isEmpty()) return;
 
-        OAuth2Credential oAuth2Credential = new OAuth2Credential(identityProvider, token);
-        twitchClient = TwitchClientBuilder.builder()
-                .withEnableChat(true)
-                .withEnableEventSocket(true)
-                .withEnableHelix(true)
-                .withFeignLogLevel(Logger.Level.NONE)
-                .withDefaultAuthToken(oAuth2Credential)
-                .withChatAccount(oAuth2Credential)
-                .build();
+        twitchClient = createTwitchClient(identityProvider, token);
 
         for (List<String> channels : integration.messageChannel().values()) {
             for (String channel : channels) {
@@ -117,5 +111,31 @@ public class TwitchIntegration implements FIntegration {
         twitchClient.close();
 
         logUnhook();
+    }
+
+    private TwitchClient createTwitchClient(String identityProvider, String token) {
+        OAuth2Credential oAuth2Credential = new OAuth2Credential(identityProvider, token);
+
+        TwitchClientBuilder twitchClientBuilder = TwitchClientBuilder.builder()
+                .withEnableChat(true)
+                .withEnableEventSocket(true)
+                .withEnableHelix(true)
+                .withFeignLogLevel(Logger.Level.NONE)
+                .withDefaultAuthToken(oAuth2Credential)
+                .withChatAccount(oAuth2Credential);
+
+        Integration.Proxy proxy = fileFacade.integration().twitch().proxy();
+        if (proxy.type() == Proxy.Type.DIRECT || proxy.type() == Proxy.Type.SOCKS) {
+            return twitchClientBuilder.build();
+        }
+
+        ProxyConfig proxyConfig = ProxyConfig.builder()
+                .hostname(proxy.host())
+                .port(proxy.port())
+                .username(StringUtils.isNotEmpty(proxy.user()) ? systemVariableResolver.substituteEnvVars(proxy.user()) : null)
+                .password(StringUtils.isNotEmpty(proxy.password()) ? systemVariableResolver.substituteEnvVars(proxy.password()).toCharArray() : null)
+                .build();
+
+        return twitchClientBuilder.withProxyConfig(proxyConfig).build();
     }
 }

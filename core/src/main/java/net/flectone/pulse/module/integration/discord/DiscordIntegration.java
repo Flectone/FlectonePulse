@@ -2,8 +2,10 @@ package net.flectone.pulse.module.integration.discord;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import discord4j.common.ReactorResources;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.presence.Activity;
@@ -16,6 +18,7 @@ import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
+import discord4j.rest.request.RouterOptions;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
@@ -38,8 +41,13 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jspecify.annotations.NonNull;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 
 import java.awt.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -257,7 +265,7 @@ public class DiscordIntegration implements FIntegration {
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 
-        discordClient = DiscordClient.create(token);
+        discordClient = createDiscordClient();
 
         gateway = discordClient.gateway()
                 .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)))
@@ -364,6 +372,32 @@ public class DiscordIntegration implements FIntegration {
         }
     }
 
+    private DiscordClient createDiscordClient() {
+        DiscordClientBuilder<@NonNull DiscordClient, @NonNull RouterOptions> builder = DiscordClient.builder(config().token());
+
+        Integration.Proxy proxy = config().proxy();
+        if (proxy.type() == Proxy.Type.DIRECT) {
+            return builder.build();
+        }
+
+        HttpClient httpClient = HttpClient.create()
+                .proxy(typeSpec -> {
+                    ProxyProvider.Builder proxyProviderBuilder = typeSpec
+                            .type(proxy.type() == Proxy.Type.HTTP ? ProxyProvider.Proxy.HTTP : ProxyProvider.Proxy.SOCKS5)
+                            .socketAddress(new InetSocketAddress(proxy.host(), proxy.port()));
+
+                    if (StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
+                        proxyProviderBuilder
+                                .username(systemVariableResolver.substituteEnvVars(proxy.user()))
+                                .password(_ -> systemVariableResolver.substituteEnvVars(proxy.password()));
+                    }
+                });
+
+        builder.setReactorResources(ReactorResources.builder().httpClient(httpClient).build());
+
+        return builder.build();
+    }
+
     private Optional<Snowflake> parseSnowflake(String string) {
         try {
             return Optional.of(Snowflake.of(string));
@@ -371,4 +405,5 @@ public class DiscordIntegration implements FIntegration {
             return Optional.empty();
         }
     }
+
 }

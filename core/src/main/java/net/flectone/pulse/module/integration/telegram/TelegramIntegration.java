@@ -16,6 +16,8 @@ import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -27,6 +29,8 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTit
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -67,7 +71,7 @@ public class TelegramIntegration implements FIntegration {
         if (token.isEmpty()) return;
 
         try {
-            telegramClient = new OkHttpTelegramClient(token);
+            telegramClient = new OkHttpTelegramClient(createHttpClientBuilder().build(), token);
 
             botsApplication = new TelegramBotsLongPollingApplication();
             botsApplication.registerBot(token, messageListener);
@@ -165,6 +169,38 @@ public class TelegramIntegration implements FIntegration {
                 );
             }
         }
+    }
+
+    private OkHttpClient.Builder createHttpClientBuilder() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+        Integration.Proxy proxy = config().proxy();
+        if (proxy.type() == Proxy.Type.DIRECT) {
+            return builder;
+        }
+
+        InetSocketAddress socketAddress = new InetSocketAddress(proxy.host(), proxy.port());
+        builder.proxy(new Proxy(proxy.type(), socketAddress));
+
+        if (proxy.type() == Proxy.Type.HTTP
+                && StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
+
+            builder.authenticator((_, response) -> {
+                if (response.code() == 407) {
+                    return response.request().newBuilder()
+                            .header("Proxy-Authorization", Credentials.basic(
+                                    systemVariableResolver.substituteEnvVars(proxy.user()),
+                                    systemVariableResolver.substituteEnvVars(proxy.password())
+                            ))
+                            .build();
+                }
+
+                return null;
+            });
+
+        }
+
+        return builder;
     }
 
     private String getNewChatName(String value) {

@@ -21,6 +21,12 @@ discord:
   ignore_all_bots: true
   ignore_all_webhooks: true
   token: ""
+  proxy:
+    type: "DIRECT"
+    host: "127.0.0.1"
+    port: 1080
+    user: ""
+    password: ""
   custom_command:
     ping:
       need_player: true
@@ -104,6 +110,12 @@ telegram:
   ignore_all_bots: true
   parse_mode: "NONE"
   token: ""
+  proxy:
+    type: "DIRECT"
+    host: "127.0.0.1"
+    port: 1080
+    user: ""
+    password: ""
   custom_command:
     id:
       need_player: false
@@ -133,6 +145,12 @@ twitch:
   enable: false
   client_id: ""
   token: ""
+  proxy:
+    type: "DIRECT"
+    host: "127.0.0.1"
+    port: 1080
+    user: ""
+    password: ""
   custom_command:
     ping:
       need_player: true

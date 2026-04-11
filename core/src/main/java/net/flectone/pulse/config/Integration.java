@@ -164,6 +164,7 @@ public record Integration(
             Boolean ignoreAllBots,
             Boolean ignoreAllWebhooks,
             String token,
+            Proxy proxy,
             Map<String, Command> customCommand,
             Presence presence,
             ChannelInfo channelInfo,
@@ -322,6 +323,7 @@ public record Integration(
             Boolean ignoreAllBots,
             Mode parseMode,
             String token,
+            Proxy proxy,
             Map<String, Command> customCommand,
             ChannelInfo channelInfo,
             Map<String, List<String>> messageChannel,
@@ -349,6 +351,7 @@ public record Integration(
             Boolean enable,
             String clientID,
             String token,
+            Proxy proxy,
             Map<String, Command> customCommand,
             Map<String, List<String>> messageChannel,
             Map<String, List<String>> followChannel,
@@ -367,6 +370,18 @@ public record Integration(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Yandex(Boolean enable, String token, String folderId) implements EnableSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Proxy(
+            java.net.Proxy.Type type,
+            String host,
+            Integer port,
+            String user,
+            String password
+    ) {
     }
 
     @With
