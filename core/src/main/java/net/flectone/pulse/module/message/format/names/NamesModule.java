@@ -116,6 +116,11 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
             });
         }
 
+        // Nickname module can be disabled in config, but its placeholder is used, so we need to add it
+        Set<String> playerNameTags = !messageContext.tagResolver().has(MessagePipeline.ReplacementTag.NICKNAME.getTagName()) && messageContext.isFlag(MessageFlag.NICKNAME_MODULE)
+                ? Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName(), MessagePipeline.ReplacementTag.NICKNAME.getTagName())
+                : Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName());
+
         return messageContext
                 .addTagResolvers(
                         TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
@@ -172,7 +177,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             String suffix = integrationModule.getSuffix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER.getTagName(), (_, _) ->
+                        TagResolver.resolver(playerNameTags, (_, _) ->
                                 Tag.preProcessParsed(fPlayer.name())
                         )
                 );

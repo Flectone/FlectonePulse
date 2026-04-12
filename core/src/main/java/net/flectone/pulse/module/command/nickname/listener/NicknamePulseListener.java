@@ -19,7 +19,7 @@ public class NicknamePulseListener implements PulseListener {
     private final NicknameModule nickModule;
     private final NamesModule namesModule;
 
-    @Pulse(priority = Event.Priority.HIGH)
+    @Pulse(priority = Event.Priority.NORMAL)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.NICKNAME_MODULE)) return event;
