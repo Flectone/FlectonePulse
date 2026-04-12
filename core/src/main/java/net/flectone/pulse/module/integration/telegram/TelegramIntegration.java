@@ -185,18 +185,12 @@ public class TelegramIntegration implements FIntegration {
         if (proxy.type() == Proxy.Type.HTTP
                 && StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
 
-            builder.authenticator((_, response) -> {
-                if (response.code() == 407) {
-                    return response.request().newBuilder()
-                            .header("Proxy-Authorization", Credentials.basic(
-                                    systemVariableResolver.substituteEnvVars(proxy.user()),
-                                    systemVariableResolver.substituteEnvVars(proxy.password())
-                            ))
-                            .build();
-                }
-
-                return null;
-            });
+            builder.authenticator((_, response) -> response.request().newBuilder()
+                    .header("Proxy-Authorization", Credentials.basic(
+                            systemVariableResolver.substituteEnvVars(proxy.user()),
+                            systemVariableResolver.substituteEnvVars(proxy.password())
+                    ))
+                    .build());
 
         }
 
