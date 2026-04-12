@@ -291,6 +291,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public void saveResource(@NonNull String path) {
+        if (getResource(path) == null) return;
+
         plugin.saveResource(path, false);
     }
 
