@@ -3,6 +3,7 @@ afk:
   enable: true
   range: "SERVER"
   delay: 3000
+  radius: 1.0
   ignore:
   - "afk"
   destination:

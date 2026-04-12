@@ -397,6 +397,11 @@ public interface PlatformPlayerAdapter {
      * @param z the Z coordinate
      */
     record Coordinates(double x, double y, double z, float yaw, float pitch) {
+
+        public double distance(Coordinates other) {
+            return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2));
+        }
+
     }
 
     /**

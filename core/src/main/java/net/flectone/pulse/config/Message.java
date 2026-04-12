@@ -106,6 +106,7 @@ public record Message(
             Boolean enable,
             Range range,
             Integer delay,
+            Double radius,
             List<String> ignore,
             Destination destination,
             Ticker ticker,

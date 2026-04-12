@@ -193,7 +193,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         // compare last and current coordinates
         Pair<Integer, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
-        if (timeCoordinates == null || !timeCoordinates.second().equals(coordinates)) {
+        if (timeCoordinates == null || !isSameCoordinates(timeCoordinates.second(), coordinates)) {
             // remove afk suffix if present
             if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
                 removeAfkSuffix(fPlayer);
@@ -206,6 +206,10 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             return;
         }
 
+        if (!timeCoordinates.second().equals(coordinates)) {
+            playersCoordinates.put(fPlayer.uuid(), Pair.of(timeCoordinates.first(), platformPlayerAdapter.getCoordinates(fPlayer)));
+        }
+
         // skip afk players
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
 
@@ -215,6 +219,10 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         // update afk suffix
         setAfkSuffix(fPlayer);
         sendAfkMessage(fPlayer.uuid(), true);
+    }
+
+    public boolean isSameCoordinates(PlatformPlayerAdapter.Coordinates first, PlatformPlayerAdapter.Coordinates second) {
+        return first.equals(second) || first.distance(second) <= config().radius();
     }
 
     public void sendAfkMessage(UUID fPlayerUUID, boolean isAfk) {
