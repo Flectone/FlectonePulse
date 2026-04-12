@@ -18,7 +18,7 @@ public interface ModuleListLocalization<M extends LocalizationSetting> extends M
 
     default List<String> joinMultiList(List<List<String>> values) {
         return values.stream()
-                .map(strings -> String.join("<br>", strings))
+                .map(strings -> String.join("<reset><br>", strings))
                 .toList();
     }
 
