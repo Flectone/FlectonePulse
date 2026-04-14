@@ -29,10 +29,11 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTit
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
+import java.lang.reflect.Field;
+import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -71,11 +72,25 @@ public class TelegramIntegration implements FIntegration {
         if (token.isEmpty()) return;
 
         try {
-            telegramClient = new OkHttpTelegramClient(createHttpClientBuilder().build(), token);
+            // create http client
+            OkHttpClient okHttpClient = createHttpClient();
 
+            // create telegram client
+            telegramClient = new OkHttpTelegramClient(okHttpClient, token);
+
+            // create application
             botsApplication = new TelegramBotsLongPollingApplication();
+
+            // due to jackson relocation, we can't use the constructor with the OkHttpClient change, so we do it via reflection
+            // waiting for https://github.com/rubenlagus/TelegramBots/pull/1583
+            Field okHttpClientCreatorField = TelegramBotsLongPollingApplication.class.getDeclaredField("okHttpClientCreator");
+            okHttpClientCreatorField.setAccessible(true);
+            okHttpClientCreatorField.set(botsApplication, (Supplier <OkHttpClient>) () -> okHttpClient);
+
+            // register listener
             botsApplication.registerBot(token, messageListener);
 
+            // get bot id
             botId = telegramClient.execute(new GetMe()).getId();
 
             Integration.ChannelInfo channelInfo = config().channelInfo();
@@ -171,30 +186,49 @@ public class TelegramIntegration implements FIntegration {
         }
     }
 
-    private OkHttpClient.Builder createHttpClientBuilder() {
+    private OkHttpClient createHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         Integration.Proxy proxy = config().proxy();
         if (proxy.type() == Proxy.Type.DIRECT) {
-            return builder;
+            return builder.build();
         }
 
         InetSocketAddress socketAddress = new InetSocketAddress(proxy.host(), proxy.port());
         builder.proxy(new Proxy(proxy.type(), socketAddress));
 
-        if (proxy.type() == Proxy.Type.HTTP
-                && StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
+        if (StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
+            if (proxy.type() == Proxy.Type.HTTP) {
+                builder.proxyAuthenticator((_, response) ->
+                        response.request().newBuilder()
+                                .header("Proxy-Authorization", Credentials.basic(
+                                        systemVariableResolver.substituteEnvVars(proxy.user()),
+                                        systemVariableResolver.substituteEnvVars(proxy.password())
+                                ))
+                                .build()
+                );
+            } else {
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    public PasswordAuthentication requestPasswordAuthenticationInstance(String host,
+                                                                                        InetAddress addr,
+                                                                                        int port,
+                                                                                        String protocol,
+                                                                                        String prompt,
+                                                                                        String scheme,
+                                                                                        URL url,
+                                                                                        RequestorType reqType) {
+                        if (proxy.host().equalsIgnoreCase(host) && proxy.port() == port) {
+                            return new PasswordAuthentication(proxy.user(), proxy.password().toCharArray());
+                        }
 
-            builder.authenticator((_, response) -> response.request().newBuilder()
-                    .header("Proxy-Authorization", Credentials.basic(
-                            systemVariableResolver.substituteEnvVars(proxy.user()),
-                            systemVariableResolver.substituteEnvVars(proxy.password())
-                    ))
-                    .build());
-
+                        return null;
+                    }
+                });
+            }
         }
 
-        return builder;
+        return builder.build();
     }
 
     private String getNewChatName(String value) {
