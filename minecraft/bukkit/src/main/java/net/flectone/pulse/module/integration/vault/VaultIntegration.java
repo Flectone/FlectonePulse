@@ -59,6 +59,8 @@ public class VaultIntegration implements FIntegration {
         }
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
+        if (offlinePlayer.getName() == null) return false;
+
         World world = Bukkit.getWorlds().getFirst();
 
         return permission.playerHas(world.getName(), offlinePlayer, permissionName);
