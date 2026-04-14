@@ -91,6 +91,9 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void terminateFailedPacketAdapter() {
         try {
+            // check PacketEvents class
+            Class.forName("com.github.retrooper.packetevents.PacketEvents");
+
             PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
             if (!packetEventsAPI.isInitialized()) {
                 packetEventsAPI.getInjector().uninject();
