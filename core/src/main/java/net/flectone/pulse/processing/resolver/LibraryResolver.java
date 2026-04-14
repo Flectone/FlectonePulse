@@ -34,7 +34,15 @@ public class LibraryResolver {
     }
 
     public void loadLibraries() {
-        loadLibraries(libraries);
+        try {
+            loadLibraries(libraries);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Failed to download library")) {
+                libraryManager.getLogger().error("\n\n====================\n A problem occurred while downloading the libraries, perhaps you do not have access to repository. \n Try downloading the libraries manually from https://flectone.net/files/r/FlectonePulse-libraries.zip and extract them into FlectonePulse folder \n====================\n");
+            }
+
+            throw e;
+        }
     }
 
     public void resolveRepositories() {
