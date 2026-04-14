@@ -26,7 +26,9 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -73,29 +75,30 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         String playerName = commandModuleController.getArgument(this, commandContext, 0);
-        FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
-        if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Geolocate::nullPlayer)
-                    .build()
-            );
-            return;
-        }
+        FPlayer tempFTarget = fPlayerService.getFPlayer(playerName);
 
-        String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.ip();
-        if (StringUtils.isEmpty(ip)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Geolocate::nullOrError)
-                    .build()
-            );
-            return;
+        FPlayer fTarget;
+        String ip;
+        if (tempFTarget.isUnknown()) {
+            fTarget = tempFTarget.toBuilder().name(playerName).build();
+            ip = playerName;
+        } else {
+            fTarget = tempFTarget;
+            ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.ip();
         }
 
         IpResponse response = getGeolocation(ip);
         if (response == null || !response.isSuccess()) {
+            if (fTarget.isUnknown()) {
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Command.Geolocate::nullPlayer)
+                        .build()
+                );
+                return;
+            }
+
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::nullOrError)
@@ -125,8 +128,11 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
         );
     }
 
-    private IpResponse getGeolocation(String ip) {
-        try (Scanner scanner = new Scanner(new URL(IP_API_URL.replace("<ip>", ip)).openStream(), StandardCharsets.UTF_8).useDelimiter("\\A")) {
+    @Nullable
+    private IpResponse getGeolocation(@Nullable String ip) {
+        if (ip == null) return null;
+
+        try (Scanner scanner = new Scanner(new URL(Strings.CS.replace(IP_API_URL,"<ip>", ip)).openStream(), StandardCharsets.UTF_8).useDelimiter("\\A")) {
             return objectMapper.readValue(scanner.next(), IpResponse.class);
         } catch (IOException _) {
             return null;
