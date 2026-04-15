@@ -187,6 +187,7 @@ public record Message(
             Double distance,
             Double readSpeed,
             Double handicapChars,
+            Integer hintBufferLength,
             String wordBreakHint,
             Interaction interaction,
             Modern modern,

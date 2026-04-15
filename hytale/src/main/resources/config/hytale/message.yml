@@ -49,6 +49,7 @@ bubble:
   distance: 30.0
   read_speed: 90.0
   handicap_chars: 10.0
+  hint_buffer_length: 7
   word_break_hint: "‑"
   interaction:
     enable: true

@@ -14,9 +14,9 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -80,6 +80,7 @@ public class BubbleService {
         boolean useModernBubble = bubbleRender.isModern();
         boolean useInteractionRiding = bubbleRender.isInteractionRiding();
 
+        int hintBufferLength = config.hintBufferLength();
         String wordBreakHint = config.wordBreakHint();
 
         // modern bubble
@@ -93,36 +94,70 @@ public class BubbleService {
         BubbleModule.Billboard billboard = configModern.billboard();
 
         int maxLength = fileFacade.message().bubble().maxLength();
+        if (message.length() <= maxLength) return List.of(buildBubble(
+                id, sender, message, duration, elevation, interactionHeight,
+                useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
+                animationTime, scale, billboard, receivers
+        ));
 
         List<Bubble> bubbles = new ObjectArrayList<>();
 
         StringBuilder line = new StringBuilder();
-        for (char symbol : message.toCharArray()) {
-            line.append(symbol);
-            if (line.length() < maxLength) continue;
 
-            boolean isLetter = Character.isLetter(symbol);
-            if (!isLetter && line.length() < maxLength + 5) continue;
+        char[] symbols = message.toCharArray();
+        for (int i = 0; i < symbols.length; i++) {
+            char symbol = symbols[i];
 
-            String newMessage = isLetter ? line + wordBreakHint : line.toString().trim();
+            boolean isNotLetter = isNotLetter(symbol);
+            int leftSymbolsLimitCount = maxLength - line.length();
+            if (line.length() < maxLength && (!isNotLetter || leftSymbolsLimitCount > hintBufferLength)) {
+                // going to the limit
+                line.append(symbol);
+                continue;
+            }
+
+            String bubbleMessage;
+            if (isNotLetter) {
+                // if it's not a letter, we can break line without hint
+                bubbleMessage = line.toString() + symbol;
+            } else {
+                // we need to add all the symbols up to the limit
+                for (int k = 0; k <= leftSymbolsLimitCount && i < symbols.length; i++, k++) {
+                    line.append(symbols[i]);
+                }
+
+                // update last symbol
+                symbol = symbols[i];
+
+                // symbol may not be a letter, so hint is not needed
+                bubbleMessage = line.toString() + (isNotLetter(symbol) ? symbol : wordBreakHint);
+
+                // need to step back, because 'k' moved 'i' further when exiting 'for'
+                i--;
+            }
+
+            line.setLength(0);
+
             bubbles.add(buildBubble(
-                    id, sender, newMessage, duration, elevation, interactionHeight,
+                    id, sender, bubbleMessage.trim(), duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
 
-            line.setLength(0);
+            if (bubbles.size() == config.maxCount()) {
+                return List.copyOf(bubbles);
+            }
         }
 
         if (!line.isEmpty()) {
             bubbles.add(buildBubble(
-                    id, sender, line.toString(), duration, elevation, interactionHeight,
+                    id, sender, line.toString().trim(), duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
         }
 
-        return bubbles;
+        return List.copyOf(bubbles);
     }
 
     private Bubble buildBubble(int id, FPlayer sender, String message, long duration, float elevation, float interactionHeight,
@@ -209,6 +244,13 @@ public class BubbleService {
 
         int countWords = message.split(" ").length;
         return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
+    }
+
+    private boolean isNotLetter(char symbol) {
+        if (Character.isLetter(symbol)) return false;
+        if (Character.isSpaceChar(symbol)) return true;
+
+        return !Character.isDigit(symbol);
     }
 
     private record PlayerBubbleState(
