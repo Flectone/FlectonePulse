@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.discord;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import discord4j.common.ReactorResources;
+import discord4j.common.retry.ReconnectOptions;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -12,10 +13,12 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.object.presence.Status;
+import discord4j.core.shard.GatewayBootstrap;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
+import discord4j.gateway.GatewayReactorResources;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.request.RouterOptions;
@@ -42,13 +45,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 
 import java.awt.*;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -265,12 +271,10 @@ public class DiscordIntegration implements FIntegration {
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 
-        discordClient = createDiscordClient();
+        HttpClient httpClient = createHttpClient();
 
-        gateway = discordClient.gateway()
-                .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)))
-                .login()
-                .block();
+        discordClient = createDiscordClient(httpClient);
+        gateway = createGatewayClient(discordClient, httpClient);
         if (gateway == null) return;
 
         Integration.Discord.Presence presence = config().presence();
@@ -372,15 +376,15 @@ public class DiscordIntegration implements FIntegration {
         }
     }
 
-    private DiscordClient createDiscordClient() {
-        DiscordClientBuilder<@NonNull DiscordClient, @NonNull RouterOptions> builder = DiscordClient.builder(config().token());
-
+    @Nullable
+    private HttpClient createHttpClient() {
         Integration.Proxy proxy = config().proxy();
         if (proxy.type() == Proxy.Type.DIRECT) {
-            return builder.build();
+            return null;
         }
 
-        HttpClient httpClient = HttpClient.create()
+        return HttpClient.create()
+                .keepAlive(false)
                 .proxy(typeSpec -> {
                     ProxyProvider.Builder proxyProviderBuilder = typeSpec
                             .type(proxy.type() == Proxy.Type.HTTP ? ProxyProvider.Proxy.HTTP : ProxyProvider.Proxy.SOCKS5)
@@ -392,10 +396,39 @@ public class DiscordIntegration implements FIntegration {
                                 .password(_ -> systemVariableResolver.substituteEnvVars(proxy.password()));
                     }
                 });
+    }
 
-        builder.setReactorResources(ReactorResources.builder().httpClient(httpClient).build());
+    @NonNull
+    private DiscordClient createDiscordClient(@Nullable HttpClient httpClient) {
+        DiscordClientBuilder<@NonNull DiscordClient, @NonNull RouterOptions> discordClientBuilder = DiscordClient.builder(systemVariableResolver.substituteEnvVars(config().token()));
+        if (httpClient == null) return discordClientBuilder.build();
 
-        return builder.build();
+        discordClientBuilder.setReactorResources(ReactorResources.builder()
+                .httpClient(httpClient)
+                .build()
+        );
+
+        return discordClientBuilder.build();
+    }
+
+    @Nullable
+    private GatewayDiscordClient createGatewayClient(@NonNull DiscordClient discordClient, @Nullable HttpClient httpClient) {
+        GatewayBootstrap<?> gatewayBootstrap = discordClient.gateway()
+                .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)))
+                .setReconnectOptions(ReconnectOptions.builder()
+                        .setMaxRetries(20)
+                        .setFirstBackoff(Duration.of(5, ChronoUnit.SECONDS))
+                        .build()
+                );
+
+        if (httpClient != null) {
+            gatewayBootstrap = gatewayBootstrap.setGatewayReactorResources(reactorResources -> GatewayReactorResources.builder(reactorResources)
+                    .httpClient(httpClient)
+                    .build()
+            );
+        }
+
+        return gatewayBootstrap.login().block();
     }
 
     private Optional<Snowflake> parseSnowflake(String string) {
