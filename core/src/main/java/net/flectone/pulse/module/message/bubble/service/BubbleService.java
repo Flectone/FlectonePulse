@@ -162,6 +162,7 @@ public class BubbleService {
 
             int maxCount = fileFacade.message().bubble().maxCount();
             if (bubbleState.activeBubbles.size() >= maxCount) {
+                bubbleState.waitingQueue.removeIf(_ -> true);
                 return;
             }
 
