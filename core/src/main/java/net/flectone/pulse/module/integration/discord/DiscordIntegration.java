@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.discord;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import discord4j.common.ReactorResources;
-import discord4j.common.retry.ReconnectOptions;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -52,9 +51,7 @@ import reactor.netty.transport.ProxyProvider;
 import java.awt.*;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -393,7 +390,8 @@ public class DiscordIntegration implements FIntegration {
                     if (StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
                         proxyProviderBuilder
                                 .username(systemVariableResolver.substituteEnvVars(proxy.user()))
-                                .password(_ -> systemVariableResolver.substituteEnvVars(proxy.password()));
+                                .password(_ -> systemVariableResolver.substituteEnvVars(proxy.password()))
+                                .connectTimeoutMillis(30000);
                     }
                 });
     }
@@ -414,12 +412,7 @@ public class DiscordIntegration implements FIntegration {
     @Nullable
     private GatewayDiscordClient createGatewayClient(@NonNull DiscordClient discordClient, @Nullable HttpClient httpClient) {
         GatewayBootstrap<?> gatewayBootstrap = discordClient.gateway()
-                .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)))
-                .setReconnectOptions(ReconnectOptions.builder()
-                        .setMaxRetries(20)
-                        .setFirstBackoff(Duration.of(5, ChronoUnit.SECONDS))
-                        .build()
-                );
+                .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)));
 
         if (httpClient != null) {
             gatewayBootstrap = gatewayBootstrap.setGatewayReactorResources(reactorResources -> GatewayReactorResources.builder(reactorResources)
