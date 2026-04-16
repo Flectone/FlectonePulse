@@ -34,6 +34,9 @@ public record Integration(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban")
         Advancedban advancedban,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/blazeandcave")
+        Blazeandcave blazeandcave,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/cmi")
         CMI cmi,
 
@@ -120,6 +123,14 @@ public record Integration(
             Boolean disableFlectonepulseMute,
             Boolean disableFlectonepulseWarn,
             Boolean disableFlectonepulseKick
+    ) implements EnableSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Blazeandcave(
+            Boolean enable
     ) implements EnableSetting {
     }
 

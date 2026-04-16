@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
+import net.flectone.pulse.module.integration.blazeandcave.BlazeandCaveModule;
 import net.flectone.pulse.module.integration.cmi.CMIModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
@@ -25,6 +26,8 @@ import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.checker.BukkitDatapackChecker;
+import net.flectone.pulse.util.checker.PaperDatapackChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -43,6 +46,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     private final PlatformServerAdapter platformServerAdapter;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
+    private final Injector injector;
     private final FLogger fLogger;
 
     @Inject
@@ -57,6 +61,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;
         this.moduleController = moduleController;
+        this.injector = injector;
         this.fLogger = fLogger;
     }
 
@@ -66,6 +71,10 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
             builder.add(AdvancedBanModule.class);
+        }
+
+        if (isDatapackEnabled("Blazeandcave")) {
+            builder.add(BlazeandCaveModule.class);
         }
 
         if (platformServerAdapter.hasProject("CMI")) {
@@ -276,4 +285,11 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
         return false;
     }
+
+    public boolean isDatapackEnabled(@NonNull String name) {
+        return reflectionResolver.isPaper()
+                ? injector.getInstance(PaperDatapackChecker.class).isEnabled(name)
+                : injector.getInstance(BukkitDatapackChecker.class).isEnabled(name);
+    }
+
 }

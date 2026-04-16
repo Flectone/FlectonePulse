@@ -730,6 +730,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban")
             Advancedban advancedban,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/blazeandcave")
+            Blazeandcave blazeandcave,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/cmi")
             CMI cmi,
 
@@ -810,6 +813,15 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Advancedban(
+                String name,
+                Permission.Type type
+        ) implements PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Blazeandcave(
                 String name,
                 Permission.Type type
         ) implements PermissionSetting {

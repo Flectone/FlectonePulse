@@ -540,6 +540,9 @@ integration:
   advancedban:
     name: "flectonepulse.module.integration.advancedban"
     type: "TRUE"
+  blazeandcave:
+    name: "flectonepulse.module.integration.blazeandcave"
+    type: "TRUE"
   cmi:
     name: "flectonepulse.module.integration.cmi"
     type: "TRUE"

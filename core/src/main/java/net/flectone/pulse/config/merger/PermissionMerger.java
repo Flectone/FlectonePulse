@@ -167,6 +167,7 @@ public interface PermissionMerger {
     Permission.Command.Warnlist mergeWarnlist(@MappingTarget Permission.Command.Warnlist.WarnlistBuilder target, Permission.Command.Warnlist warnlist);
 
     @Mapping(target = "advancedban", expression = "java(mergeAdvancedban(target.build().advancedban().toBuilder(), source.advancedban()))")
+    @Mapping(target = "blazeandcave", expression = "java(mergeBlazeandcave(target.build().blazeandcave().toBuilder(), source.blazeandcave()))")
     @Mapping(target = "cmi", expression = "java(mergeCmi(target.build().cmi().toBuilder(), source.cmi()))")
     @Mapping(target = "libertybans", expression = "java(mergeLibertybans(target.build().libertybans().toBuilder(), source.libertybans()))")
     @Mapping(target = "deepl", expression = "java(mergeDeepl(target.build().deepl().toBuilder(), source.deepl()))")
@@ -195,6 +196,8 @@ public interface PermissionMerger {
     Permission.Integration mergeIntegration(@MappingTarget Permission.Integration.IntegrationBuilder target, Permission.Integration source);
 
     Permission.Integration.Advancedban mergeAdvancedban(@MappingTarget Permission.Integration.Advancedban.AdvancedbanBuilder target, Permission.Integration.Advancedban advancedban);
+
+    Permission.Integration.Blazeandcave mergeBlazeandcave(@MappingTarget Permission.Integration.Blazeandcave.BlazeandcaveBuilder target, Permission.Integration.Blazeandcave blazeandcave);
 
     Permission.Integration.CMI mergeCmi(@MappingTarget Permission.Integration.CMI.CMIBuilder target, Permission.Integration.CMI cmi);
 
