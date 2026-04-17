@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitProxy implements Proxy {
@@ -55,11 +57,7 @@ public class BukkitProxy implements Proxy {
         if (!isEnable()) return false;
         if (tag == null) return false;
 
-        Player player = Bukkit.getPlayer(sender.uuid());
-        if (player == null) {
-            player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-        }
-
+        Player player = getOnlinePlayer(sender, tag);
         if (player == null) return false;
 
         player.sendPluginMessage(plugin, channel, message);
@@ -76,5 +74,20 @@ public class BukkitProxy implements Proxy {
         }
 
         return null;
+    }
+
+    @Nullable
+    private Player getOnlinePlayer(FEntity sender, ModuleName tag) {
+        Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+
+        if (tag == ModuleName.MESSAGE_QUIT) {
+            return onlinePlayers.stream()
+                    .filter(player -> !player.getUniqueId().equals(sender.uuid()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        Player player = Bukkit.getPlayer(sender.uuid());
+        return player != null ? player : Iterables.getFirst(onlinePlayers, null);
     }
 }

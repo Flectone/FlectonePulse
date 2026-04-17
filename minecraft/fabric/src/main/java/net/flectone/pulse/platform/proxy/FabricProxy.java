@@ -17,8 +17,11 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -78,11 +81,7 @@ public class FabricProxy implements Proxy {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        ServerPlayer player = minecraftServer.getPlayerList().getPlayer(sender.uuid());
-        if (player == null) {
-            player = Iterables.getFirst(minecraftServer.getPlayerList().getPlayers(), null);
-        }
-
+        ServerPlayer player = getOnlinePlayer(sender, tag);
         if (player == null) return false;
 
         ServerPlayNetworking.send(player, new ProxyPayload(channel, message));
@@ -106,4 +105,24 @@ public class FabricProxy implements Proxy {
             byte[] data
     ) implements CustomPacketPayload {
     }
+
+    @Nullable
+    private ServerPlayer getOnlinePlayer(FEntity sender, ModuleName tag) {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
+
+        PlayerList playerList = minecraftServer.getPlayerList();
+        List<ServerPlayer> onlinePlayers = playerList.getPlayers();
+
+        if (tag == ModuleName.MESSAGE_QUIT) {
+            return onlinePlayers.stream()
+                    .filter(player -> !player.getUUID().equals(sender.uuid()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        ServerPlayer player = playerList.getPlayer(sender.uuid());
+        return player != null ? player : Iterables.getFirst(onlinePlayers, null);
+    }
+
 }
