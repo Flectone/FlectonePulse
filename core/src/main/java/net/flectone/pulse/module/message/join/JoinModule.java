@@ -12,11 +12,14 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -32,6 +35,8 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
+    private final IntegrationSender integrationSender;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public ModuleName name() {
@@ -53,38 +58,68 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
         return fileFacade.localization(sender).message().join();
     }
 
+    public boolean isProxyMode() {
+        return config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+    }
+
+    public void proxySend(FPlayer fPlayer) {
+        if (isProxyMode()) {
+            privateSend(fPlayer, Range.get(Range.Type.SERVER), false, false);
+        }
+    }
+
     public void sendLater(FPlayer fPlayer) {
-        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, false), 5L);
+        if (isProxyMode()) {
+            sendToIntegration(fPlayer);
+            return;
+        }
+
+        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, config().range(), true, false), 5L);
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, ignoreVanish));
+        if (isProxyMode() && !ignoreVanish) {
+            sendToIntegration(fPlayer);
+            return;
+        }
+
+        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, config().range(), !ignoreVanish, ignoreVanish));
     }
 
-    private void privateSend(FPlayer fPlayer, boolean ignoreVanish) {
+    private void privateSend(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
+        messageDispatcher.dispatch(this, buildEventMetadata(fPlayer, range, toIntegration, ignoreVanish));
+    }
+
+    private void sendToIntegration(FPlayer fPlayer) {
+        EventMetadata<Localization.Message.Join> eventMetadata = buildEventMetadata(fPlayer, config().range(),true, false);
+        integrationSender.send(name(), eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization()), eventMetadata);
+    }
+
+    private EventMetadata<Localization.Message.Join> buildEventMetadata(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {
         PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer) || (playTime != null && playTime.sessions() > 1);
 
-        messageDispatcher.dispatch(this, JoinMetadata.<Localization.Message.Join>builder()
-                .base(EventMetadata.<Localization.Message.Join>builder()
-                        .sender(fPlayer)
-                        .format(localization -> hasPlayedBefore || !config().first() ? localization.format() : localization.formatFirstTime())
-                        .destination(config().destination())
-                        .range(config().range())
-                        .sound(soundOrThrow())
-                        .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeBoolean(hasPlayedBefore);
-                            dataOutputStream.writeBoolean(ignoreVanish);
-                        })
-                        .integration()
-                        .build()
-                )
+        EventMetadata.Builder<Localization.Message.Join> eventMetadata = EventMetadata.<Localization.Message.Join>builder()
+                .sender(fPlayer)
+                .format(localization -> hasPlayedBefore || !config().first() ? localization.format() : localization.formatFirstTime())
+                .destination(config().destination())
+                .range(range)
+                .sound(soundOrThrow())
+                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeBoolean(hasPlayedBefore);
+                    dataOutputStream.writeBoolean(ignoreVanish);
+                });
+
+        if (toIntegration) {
+            eventMetadata.integration();
+        }
+
+        return JoinMetadata.<Localization.Message.Join>builder()
+                .base(eventMetadata.build())
                 .ignoreVanish(ignoreVanish)
-                .playedBefore(hasPlayedBefore)
-                .build()
-        );
+                .build();
     }
 }

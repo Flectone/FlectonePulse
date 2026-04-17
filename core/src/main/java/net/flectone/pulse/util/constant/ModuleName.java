@@ -142,6 +142,7 @@ public enum ModuleName {
     // only for invalidation cache
     SYSTEM_COOLDOWN,
     SYSTEM_ONLINE,
+    SYSTEM_CONNECTED,
     SYSTEM_OFFLINE,
     SYSTEM_BAN,
     SYSTEM_MUTE,

@@ -12,10 +12,14 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -30,6 +34,9 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final IntegrationSender integrationSender;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public ModuleName name() {
@@ -51,32 +58,39 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
         return fileFacade.localization(sender).message().quit();
     }
 
+    public boolean isProxyMode() {
+        return config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+    }
+
+    public void proxySend(FPlayer fPlayer) {
+        if (isProxyMode()) {
+            privateSend(fPlayer, Range.get(Range.Type.SERVER), false, false, 0L);
+        }
+    }
+
     public void sendLater(FPlayer fPlayer) {
-        taskScheduler.runAsync(() -> privateSend(fPlayer, false, 5L));
+        if (isProxyMode() && platformServerAdapter.getPlatformPlayerCount() > 1) {
+            sendToIntegration(fPlayer);
+            return;
+        }
+
+        taskScheduler.runAsync(() -> privateSend(fPlayer, config().range(), true,false, 5L));
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        taskScheduler.runAsync(() -> privateSend(fPlayer, ignoreVanish, 0L));
+        if (isProxyMode() && platformServerAdapter.getPlatformPlayerCount() > 1 && !ignoreVanish) {
+            sendToIntegration(fPlayer);
+            return;
+        }
+
+        taskScheduler.runAsync(() -> privateSend(fPlayer, config().range(), !ignoreVanish, ignoreVanish, 0L));
     }
 
-    private void privateSend(FPlayer fPlayer, boolean ignoreVanish, long delay) {
+
+    private void privateSend(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish, long delay) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        EventMetadata<Localization.Message.Quit> eventMetadata = QuitMetadata.<Localization.Message.Quit>builder()
-                .base(EventMetadata.<Localization.Message.Quit>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Message.Quit::format)
-                        .destination(config().destination())
-                        .range(config().range())
-                        .sound(soundOrThrow())
-                        .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                        .integration()
-                        .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
-                        .build()
-                )
-                .ignoreVanish(ignoreVanish)
-                .build();
-
+        EventMetadata<Localization.Message.Quit> eventMetadata = buildEventMetadata(fPlayer, range, toIntegration, ignoreVanish);
         List<FPlayer> receivers = messageDispatcher.createReceivers(this, eventMetadata);
         if (receivers.isEmpty()) return;
 
@@ -89,5 +103,30 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
         } else {
             taskScheduler.runAsyncLater(() -> messageEvents.forEach(messageDispatcher::dispatch), delay);
         }
+    }
+
+    private void sendToIntegration(FPlayer fPlayer) {
+        EventMetadata<Localization.Message.Quit> eventMetadata = buildEventMetadata(fPlayer, config().range(),true, false);
+        integrationSender.send(name(), eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization()), eventMetadata);
+    }
+
+    private EventMetadata<Localization.Message.Quit> buildEventMetadata(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {
+        EventMetadata.Builder<Localization.Message.Quit> eventMetadata = EventMetadata.<Localization.Message.Quit>builder()
+                .sender(fPlayer)
+                .format(Localization.Message.Quit::format)
+                .destination(config().destination())
+                .range(range)
+                .sound(soundOrThrow())
+                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish));
+
+        if (toIntegration) {
+            eventMetadata.integration();
+        }
+
+        return QuitMetadata.<Localization.Message.Quit>builder()
+                .base(eventMetadata.build())
+                .ignoreVanish(ignoreVanish)
+                .build();
     }
 }

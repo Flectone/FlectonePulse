@@ -15,6 +15,10 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 @Plugin(
         id = "flectonepulse",
         name = "FlectonePulseVelocity",
@@ -69,8 +73,19 @@ public class FlectonePulseVelocity {
 
     @Subscribe
     public void onServerConnectedEvent(ServerConnectedEvent event) {
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+        UUID playerUUID = event.getPlayer().getUniqueId();
 
+        if (event.getPreviousServer().isEmpty()) {
+            proxyServer.getScheduler().buildTask(this, () -> {
+                byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID);
+
+                proxyServer.getAllServers().stream()
+                        .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                        .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
+            }).delay(500L, TimeUnit.MILLISECONDS).schedule();
+        }
+
+        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID);
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
                 .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
@@ -78,7 +93,9 @@ public class FlectonePulseVelocity {
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
+        UUID playerUUID = event.getPlayer().getUniqueId();
+
+        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())

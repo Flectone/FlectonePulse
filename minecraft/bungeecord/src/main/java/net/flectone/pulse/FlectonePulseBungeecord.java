@@ -6,10 +6,14 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
@@ -50,8 +54,20 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
     }
 
     @EventHandler
-    public void onServerConnectedEvent(ServerConnectedEvent event) {
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+    public void onServerSwitchEvent(ServerSwitchEvent event) {
+        UUID playerUUID = event.getPlayer().getUniqueId();
+
+        if (event.getFrom() == null) {
+            ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+                byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID);
+
+                ProxyServer.getInstance().getServers().values().stream()
+                        .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                        .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+            }, 500L, TimeUnit.MILLISECONDS);
+        }
+
+        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID);
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
@@ -60,11 +76,15 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
     @EventHandler
     public void onDisconnectEvent(PlayerDisconnectEvent event) {
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
+        UUID playerUUID = event.getPlayer().getUniqueId();
 
-        ProxyServer.getInstance().getServers().values().stream()
-                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+        ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+            byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
+
+            ProxyServer.getInstance().getServers().values().stream()
+                    .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                    .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+        }, 50L, TimeUnit.MILLISECONDS);
     }
 
     private void registerChannel() {
