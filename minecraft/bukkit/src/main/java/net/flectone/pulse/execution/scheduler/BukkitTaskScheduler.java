@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.exception.SchedulerTaskException;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -47,7 +48,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsync(SchedulerRunnable runnable, boolean independent) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!independent && isAsyncThread()) {
             wrapExceptionRunnable(runnable).run();
@@ -59,21 +60,21 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncLater(SchedulerRunnable runnable, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         taskScheduler.runTaskLaterAsynchronously(() -> wrapExceptionRunnable(runnable).run(), delay);
     }
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         taskScheduler.runTaskTimerAsynchronously(() -> wrapExceptionRunnable(runnable).run(), delay, period);
     }
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!isAsyncThread() && !reflectionResolver.isFolia()) {
             wrapExceptionRunnable(runnable).run();
@@ -85,21 +86,21 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         taskScheduler.runTaskLater(() -> wrapExceptionRunnable(runnable).run(), delay);
     }
 
     @Override
     public void runSyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         taskScheduler.runTaskTimer(() -> wrapExceptionRunnable(runnable).run(), delay, period);
     }
 
     @Override
     public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!reflectionResolver.isFolia()) {
             if (sync) {
@@ -130,7 +131,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!reflectionResolver.isFolia()) {
             runAsyncLater(runnable, delay);
@@ -148,7 +149,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!reflectionResolver.isFolia()) {
             runAsyncTimer(runnable, delay, period);
@@ -166,7 +167,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         runAsyncTimer(() -> {
             for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
@@ -186,6 +187,10 @@ public class BukkitTaskScheduler implements TaskScheduler {
                 fLogger.warning(e);
             }
         };
+    }
+
+    private boolean isDisabled() {
+        return disabled || FlectonePulseAPI.isDisabling();
     }
 
     private FPlayer convertUnknownFPlayer(FPlayer fPlayer) {

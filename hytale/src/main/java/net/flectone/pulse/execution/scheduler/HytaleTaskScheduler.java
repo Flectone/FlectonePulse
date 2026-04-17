@@ -3,6 +3,7 @@ package net.flectone.pulse.execution.scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.exception.SchedulerTaskException;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -68,7 +69,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsync(SchedulerRunnable runnable, boolean independent) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!independent && isAsyncThread()) {
             wrapExceptionRunnable(runnable).run();
@@ -80,7 +81,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncLater(SchedulerRunnable runnable, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, true);
@@ -89,7 +90,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
@@ -98,7 +99,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         if (!isAsyncThread()) {
             wrapExceptionRunnable(runnable).run();
@@ -112,7 +113,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
@@ -121,7 +122,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, false);
@@ -145,7 +146,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
 
     @Override
     public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         runAsyncTimer(() -> {
             for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
@@ -166,7 +167,7 @@ public class HytaleTaskScheduler implements TaskScheduler {
     }
 
     public void onTick() {
-        if (disabled) return;
+        if (isDisabled()) return;
 
         long tick = currentTick.getAndIncrement();
         processTasks(tick);
@@ -228,6 +229,10 @@ public class HytaleTaskScheduler implements TaskScheduler {
         };
 
         this.asyncExecutor = Executors.newFixedThreadPool(8, namedThreadFactory);
+    }
+
+    private boolean isDisabled() {
+        return disabled || FlectonePulseAPI.isDisabling();
     }
 
     private static class ScheduledTask {
