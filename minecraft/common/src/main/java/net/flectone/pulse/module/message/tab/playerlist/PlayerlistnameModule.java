@@ -227,6 +227,18 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
+        // check new settings data
+        if (fPlayer.settingsText().isEmpty()) {
+            // get fplayer from cache
+            fPlayer = fPlayerService.getFPlayer(fPlayer);
+
+            // check new settings data
+            if (fPlayer.settingsText().isEmpty()) {
+                // update cache
+                fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer));
+            }
+        }
+
         if (userProfile == null) {
             userProfile = createUserProfile(fPlayer);
         }
@@ -242,10 +254,6 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
     }
 
     private UserProfile createUserProfile(FPlayer fPlayer) {
-        if (fPlayer.settingsText().isEmpty()) {
-            fPlayer = fPlayerService.loadSettings(fPlayer);
-        }
-
         if (!scoreboardModule.hasTeam(fPlayer)) {
             scoreboardModule.create(fPlayer, true);
         }
