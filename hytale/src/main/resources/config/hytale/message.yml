@@ -292,7 +292,7 @@ greeting:
 join:
   enable: true
   first: true
-  range: "SERVER"
+  range: "PROXY"
   destination:
     type: "CHAT"
   sound:
@@ -313,7 +313,7 @@ objective:
       period: 100
 quit:
   enable: true
-  range: "SERVER"
+  range: "PROXY"
   destination:
     type: "CHAT"
   sound:
