@@ -70,18 +70,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
                 if (oldTeam == null) return;
 
-                // new info
-                Team newTeam = createTeam(fPlayer);
-                if (newTeam.name().equals(oldTeam.name())) {
-                    sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
-                } else {
-                    sendPacket(oldTeam, WrapperPlayServerTeams.TeamMode.REMOVE);
-                    sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
-                }
-
-                // update info
-                uuidTeamMap.put(fPlayer.uuid(), newTeam);
-
+                createOrUpdate(fPlayer, oldTeam);
             }, ticker.period());
         }
     }
@@ -106,10 +95,15 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 );
             }
 
-            Team team = createTeam(fPlayer);
-            sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
+            Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
+            if (oldTeam != null) {
+                createOrUpdate(fPlayer, oldTeam);
+            } else {
+                Team newTeam = createTeam(fPlayer);
+                sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
 
-            uuidTeamMap.put(fPlayer.uuid(), team);
+                uuidTeamMap.put(fPlayer.uuid(), newTeam);
+            }
         });
     }
 
@@ -128,6 +122,20 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
             uuidTeamMap.remove(fPlayer.uuid());
             sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
         });
+    }
+
+    private void createOrUpdate(FPlayer fPlayer, Team oldTeam) {
+        // new info
+        Team newTeam = createTeam(fPlayer);
+        if (newTeam.name().equals(oldTeam.name())) {
+            sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
+        } else {
+            sendPacket(oldTeam, WrapperPlayServerTeams.TeamMode.REMOVE);
+            sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
+        }
+
+        // update info
+        uuidTeamMap.put(fPlayer.uuid(), newTeam);
     }
 
     private Team createTeam(FPlayer fPlayer) {
