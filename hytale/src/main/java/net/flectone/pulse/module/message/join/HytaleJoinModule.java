@@ -9,6 +9,8 @@ import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -25,8 +27,10 @@ public class HytaleJoinModule extends JoinModule {
                             MessageDispatcher messageDispatcher,
                             ListenerRegistry listenerRegistry,
                             ModuleController moduleController,
-                            FPlayerService fPlayerService) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService);
+                            FPlayerService fPlayerService,
+                            IntegrationSender integrationSender,
+                            ProxyRegistry proxyRegistry) {
+        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService, integrationSender, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }
