@@ -48,6 +48,12 @@ public class FlectonePulseAPI {
     @Getter private static FlectonePulse instance;
 
     /**
+     * Indicates whether FlectonePulse is currently in the process of being disabled.
+     *
+     */
+    @Getter private static boolean disabling;
+
+    /**
      * Constructs the API wrapper with dependency injection.
      * This constructor is called internally by Google Guice.
      *
@@ -121,6 +127,8 @@ public class FlectonePulseAPI {
      * Called automatically by the platform on disable.
      */
     public void onDisable() {
+        disabling = true;
+
         instance.terminateFailedPacketAdapter();
 
         if (!instance.isReady()) return;
