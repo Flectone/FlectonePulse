@@ -112,7 +112,7 @@ public class FPlayerRepository {
         FPlayer cachedPlayer = offlinePlayersCache.getIfPresent(uuid);
         if (cachedPlayer != null) return cachedPlayer;
 
-        FPlayer dbPlayer = fPlayerDAO.getFPlayer(uuid);
+        FPlayer dbPlayer = getFromDatabase(uuid);
         saveToCache(dbPlayer);
 
         return dbPlayer;
@@ -141,6 +141,10 @@ public class FPlayerRepository {
         saveToCache(dbPlayer);
 
         return dbPlayer;
+    }
+
+    public FPlayer getFromDatabase(UUID uuid) {
+        return fPlayerDAO.getFPlayer(uuid);
     }
 
     private void saveToCache(FPlayer fPlayer) {

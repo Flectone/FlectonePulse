@@ -179,6 +179,10 @@ public class FPlayerService {
         fPlayerRepository.update(fPlayer);
     }
 
+    public FPlayer getFPlayerFromDatabase(UUID uuid) {
+        return fPlayerRepository.getFromDatabase(uuid);
+    }
+
     public FPlayer getFPlayer(int id) {
         return fPlayerRepository.get(id);
     }
