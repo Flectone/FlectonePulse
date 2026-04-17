@@ -22,7 +22,7 @@ public class QuitPulseListener implements PulseListener {
     private final PacketProvider packetProvider;
 
     @Pulse
-    public void onPlayerJoinEvent(PlayerQuitEvent event) {
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
         FPlayer fPlayer = event.player();
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
             // delay for vanish plugins and newer versions
