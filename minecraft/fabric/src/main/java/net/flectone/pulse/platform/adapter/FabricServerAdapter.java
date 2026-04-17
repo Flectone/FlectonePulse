@@ -106,6 +106,12 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public int getPlatformPlayerCount() {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        return minecraftServer != null ? minecraftServer.getPlayerCount() : 0;
+    }
+
+    @Override
     public int generateEntityId() {
         return randomUtil.nextInt(Integer.MAX_VALUE);
     }

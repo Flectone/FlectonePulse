@@ -48,6 +48,13 @@ public interface PlatformServerAdapter {
     int getOnlinePlayerCount();
 
     /**
+     * Gets the platform-specific online player count.
+     *
+     * @return number of online players
+     */
+    int getPlatformPlayerCount();
+
+    /**
      * Generates a new entity ID.
      *
      * @return entity ID

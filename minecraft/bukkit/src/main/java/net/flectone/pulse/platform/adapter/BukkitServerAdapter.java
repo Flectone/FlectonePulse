@@ -164,6 +164,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public int getPlatformPlayerCount() {
+        return Bukkit.getOnlinePlayers().size();
+    }
+
+    @Override
     public int generateEntityId() {
         return SpigotReflectionUtil.generateEntityId();
     }

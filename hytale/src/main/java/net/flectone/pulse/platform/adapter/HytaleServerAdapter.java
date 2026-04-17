@@ -73,6 +73,11 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public int getPlatformPlayerCount() {
+        return getOnlinePlayerCount();
+    }
+
+    @Override
     public int generateEntityId() {
         return randomUtil.nextInt(Integer.MAX_VALUE);
     }
