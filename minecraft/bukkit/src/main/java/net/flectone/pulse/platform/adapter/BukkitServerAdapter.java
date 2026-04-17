@@ -207,6 +207,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public boolean isOnlyPlayerOnline(UUID uuid) {
+        return Bukkit.getOnlinePlayers().stream().allMatch(player -> player.getUniqueId().equals(uuid));
+    }
+
+    @Override
     public boolean isPrimaryThread() {
         return Bukkit.isPrimaryThread();
     }

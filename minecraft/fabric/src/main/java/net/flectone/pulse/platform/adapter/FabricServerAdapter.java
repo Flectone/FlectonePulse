@@ -35,6 +35,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -189,6 +190,17 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (minecraftServer == null) return false;
 
         return minecraftServer.usesAuthentication();
+    }
+
+    @Override
+    public boolean isOnlyPlayerOnline(UUID uuid) {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return false;
+
+        List<ServerPlayer> onlinePlayers = minecraftServer.getPlayerList().getPlayers();
+        if (onlinePlayers.isEmpty()) return true;
+
+        return onlinePlayers.stream().allMatch(serverPlayer -> serverPlayer.getUUID().equals(uuid));
     }
 
     @Override

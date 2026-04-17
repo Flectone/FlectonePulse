@@ -119,6 +119,15 @@ public interface PlatformServerAdapter {
     boolean isOnlineMode();
 
     /**
+     * Checks if the server has only the specified player online or no players at all.
+     *
+     * @param uuid the UUID of the player to check for exclusive presence
+     * @return true if only the specified player is online or if no players are online,
+     *         false if multiple other players are present
+     */
+    boolean isOnlyPlayerOnline(UUID uuid);
+
+    /**
      * Checks if the current thread is the primary server thread.
      *
      * @return true if on primary thread

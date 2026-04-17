@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.auth.ServerAuthManager;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -145,6 +147,17 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     @Override
     public boolean isOnlineMode() {
         return ServerAuthManager.getInstance().getAuthMode() != ServerAuthManager.AuthMode.NONE;
+    }
+
+    @Override
+    public boolean isOnlyPlayerOnline(UUID uuid) {
+        Universe universe = Universe.get();
+        if (universe == null) return false;
+
+        List<PlayerRef> onlinePlayers = universe.getPlayers();
+        if (onlinePlayers.isEmpty()) return true;
+
+        return onlinePlayers.stream().allMatch(playerRef -> playerRef.getUuid().equals(uuid));
     }
 
     @Override
