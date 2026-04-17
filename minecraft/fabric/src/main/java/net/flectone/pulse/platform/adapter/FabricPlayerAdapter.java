@@ -40,7 +40,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -296,7 +295,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (potion == null) return false;
 
         ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
-        Optional<Holder.Reference<@NotNull MobEffect>> effect = BuiltInRegistries.MOB_EFFECT.get(potion.getId(clientVersion));
+        Optional<Holder.Reference<@NonNull MobEffect>> effect = BuiltInRegistries.MOB_EFFECT.get(potion.getId(clientVersion));
         if (effect.isEmpty()) return false;
 
         MobEffectInstance effectInstance = player.getEffect(effect.get());

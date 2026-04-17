@@ -18,7 +18,7 @@ import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.charset.StandardCharsets;
 
@@ -96,7 +96,7 @@ public class RedisProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(@NotNull FEntity sender, @NotNull ModuleName tag, byte @NotNull [] message, EventMetadata<?> eventMetadata) {
+    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, EventMetadata<?> eventMetadata) {
         if (!isEnable()) return false;
 
         pubSubConnection.async().publish(

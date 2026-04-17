@@ -19,8 +19,8 @@ import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtrac
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class DeathListener extends DeathSystems.OnDeathSystem {
     }
 
     @Override
-    public void onComponentAdded(@NotNull Ref<EntityStore> ref, @NotNull DeathComponent deathComponent, @NotNull Store<EntityStore> store, @NotNull CommandBuffer<EntityStore> commandBuffer) {
+    public void onComponentAdded(@NonNull Ref<EntityStore> ref, @NonNull DeathComponent deathComponent, @NonNull Store<EntityStore> store, @NonNull CommandBuffer<EntityStore> commandBuffer) {
         HytaleVanillaModule hytaleVanillaModule = hytaleVanillaModuleProvider.get();
         if (!moduleController.isEnable(hytaleVanillaModule)) return;
 

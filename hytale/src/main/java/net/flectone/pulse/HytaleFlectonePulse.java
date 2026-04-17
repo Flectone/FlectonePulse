@@ -19,9 +19,8 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.libby.HytaleLibbyResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -104,11 +103,11 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         get(FlectonePulseAPI.class).reload();
     }
 
-    @NotNull
+    @NonNull
     private LibraryManager getLibraryManager(HytaleLogger hytaleLogger) {
         LogAdapter logAdapter = new LogAdapter() {
             @Override
-            public void log(@NotNull LogLevel logLevel, @Nullable String s) {
+            public void log(@NonNull LogLevel logLevel, @Nullable String s) {
                 switch (logLevel) {
                     case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s);
                     case WARN -> hytaleLogger.at(Level.WARNING).log(s);
@@ -117,7 +116,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
             }
 
             @Override
-            public void log(@NotNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
+            public void log(@NonNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
                 switch (logLevel) {
                     case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s, throwable);
                     case WARN -> hytaleLogger.at(Level.WARNING).log(s, throwable);

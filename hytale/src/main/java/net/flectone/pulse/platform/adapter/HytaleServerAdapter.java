@@ -16,11 +16,10 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -203,7 +202,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String buildItemStack(@NonNull FPlayer fPlayer, @NonNull String material, @NonNull String title, @NotNull @NonNull String[] lore) {
+    public @NonNull String buildItemStack(@NonNull FPlayer fPlayer, @NonNull String material, @NonNull String title, @NonNull String[] lore) {
         return "";
     }
 }

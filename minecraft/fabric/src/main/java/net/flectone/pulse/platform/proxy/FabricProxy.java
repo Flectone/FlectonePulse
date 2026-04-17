@@ -20,7 +20,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -33,8 +33,8 @@ public class FabricProxy implements Proxy {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageHandler proxyMessageHandler;
 
-    private CustomPacketPayload.Type<@NotNull ProxyPayload> channel;
-    private StreamCodec<@NotNull FriendlyByteBuf, @NotNull ProxyPayload> streamCodec;
+    private CustomPacketPayload.Type<@NonNull ProxyPayload> channel;
+    private StreamCodec<@NonNull FriendlyByteBuf, @NonNull ProxyPayload> streamCodec;
 
     @Override
     public boolean isEnable() {
@@ -76,7 +76,7 @@ public class FabricProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(@NotNull FEntity sender, @NotNull ModuleName tag, byte @NotNull [] message, @Nullable EventMetadata<?> eventMetadata) {
+    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, @Nullable EventMetadata<?> eventMetadata) {
         if (!isEnable()) return false;
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
@@ -102,7 +102,7 @@ public class FabricProxy implements Proxy {
     }
 
     public record ProxyPayload(
-            CustomPacketPayload.Type<@NotNull ProxyPayload> type,
+            CustomPacketPayload.Type<@NonNull ProxyPayload> type,
             byte[] data
     ) implements CustomPacketPayload {
     }

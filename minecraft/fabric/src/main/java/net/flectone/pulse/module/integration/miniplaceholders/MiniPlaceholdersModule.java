@@ -17,7 +17,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -45,7 +45,7 @@ public class MiniPlaceholdersModule implements ModuleSimple {
     }
 
     @Override
-    public ImmutableSet.Builder<@NotNull PermissionSetting> permissionBuilder() {
+    public ImmutableSet.Builder<@NonNull PermissionSetting> permissionBuilder() {
         return ModuleSimple.super.permissionBuilder().add(permission().use());
     }
 

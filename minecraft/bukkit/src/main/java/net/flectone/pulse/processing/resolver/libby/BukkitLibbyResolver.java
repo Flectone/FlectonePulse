@@ -4,7 +4,6 @@ import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import net.flectone.pulse.util.file.FileLoader;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -97,7 +96,7 @@ public class BukkitLibbyResolver extends BukkitLibraryManager {
     }
 
     @Override
-    protected void addToClasspath(@NotNull Path path) {
+    protected void addToClasspath(@NonNull Path path) {
         if (FileLoader.ADD_FILE_TO_CLASSPATH_PREDICATE.test(path)) {
             super.addToClasspath(path);
         }
