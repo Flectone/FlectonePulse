@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -74,14 +76,13 @@ public class FabricProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, ModuleName tag, byte[] message) {
+    public boolean sendMessage(@NotNull FEntity sender, @NotNull ModuleName tag, byte @NotNull [] message, @Nullable EventMetadata<?> eventMetadata) {
         if (!isEnable()) return false;
-        if (tag == null) return false;
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        ServerPlayer player = getOnlinePlayer(sender, tag);
+        ServerPlayer player = getOnlinePlayer(sender, tag, eventMetadata);
         if (player == null) return false;
 
         ServerPlayNetworking.send(player, new ProxyPayload(channel, message));
@@ -107,14 +108,14 @@ public class FabricProxy implements Proxy {
     }
 
     @Nullable
-    private ServerPlayer getOnlinePlayer(FEntity sender, ModuleName tag) {
+    private ServerPlayer getOnlinePlayer(FEntity sender, ModuleName tag, @Nullable EventMetadata<?> eventMetadata) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return null;
 
         PlayerList playerList = minecraftServer.getPlayerList();
         List<ServerPlayer> onlinePlayers = playerList.getPlayers();
 
-        if (tag == ModuleName.MESSAGE_QUIT) {
+        if (tag == ModuleName.MESSAGE_QUIT && eventMetadata instanceof QuitMetadata<?> quitMetadata && !quitMetadata.ignoreVanish()) {
             return onlinePlayers.stream()
                     .filter(player -> !player.getUUID().equals(sender.uuid()))
                     .findFirst()

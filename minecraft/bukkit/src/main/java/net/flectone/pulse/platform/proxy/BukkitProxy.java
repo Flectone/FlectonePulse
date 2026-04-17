@@ -7,11 +7,14 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -53,11 +56,10 @@ public class BukkitProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, ModuleName tag, byte[] message) {
+    public boolean sendMessage(@NotNull FEntity sender, @NotNull ModuleName tag, byte @NotNull [] message, @Nullable EventMetadata<?> eventMetadata) {
         if (!isEnable()) return false;
-        if (tag == null) return false;
 
-        Player player = getOnlinePlayer(sender, tag);
+        Player player = getOnlinePlayer(sender, tag, eventMetadata);
         if (player == null) return false;
 
         player.sendPluginMessage(plugin, channel, message);
@@ -77,10 +79,10 @@ public class BukkitProxy implements Proxy {
     }
 
     @Nullable
-    private Player getOnlinePlayer(FEntity sender, ModuleName tag) {
+    private Player getOnlinePlayer(FEntity sender, ModuleName tag, @Nullable EventMetadata<?> eventMetadata) {
         Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 
-        if (tag == ModuleName.MESSAGE_QUIT) {
+        if (tag == ModuleName.MESSAGE_QUIT && eventMetadata instanceof QuitMetadata<?> quitMetadata && !quitMetadata.ignoreVanish()) {
             return onlinePlayers.stream()
                     .filter(player -> !player.getUniqueId().equals(sender.uuid()))
                     .findFirst()

@@ -16,6 +16,8 @@ import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,7 +60,7 @@ public class ProxySender {
      * @param eventMetadata the event metadata containing sender and data
      * @return true if message was sent to at least one proxy, false otherwise
      */
-    public boolean send(ModuleName moduleName, EventMetadata<?> eventMetadata) {
+    public boolean send(@NonNull ModuleName moduleName, @NonNull EventMetadata<?> eventMetadata) {
         ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.proxy();
         if (proxyConsumer == null) return false;
 
@@ -66,7 +68,7 @@ public class ProxySender {
         if (!range.is(Range.Type.PROXY)) return false;
 
         FEntity sender = eventMetadata.sender();
-        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid());
+        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid(), eventMetadata);
     }
 
     /**
@@ -76,7 +78,7 @@ public class ProxySender {
      * @param tag the message type tag
      * @return true if message was sent to at least one proxy, false otherwise
      */
-    public boolean send(FEntity sender, ModuleName tag) {
+    public boolean send(@NonNull FEntity sender, @NonNull ModuleName tag) {
         return send(sender, tag, _ -> {}, UUID.randomUUID());
     }
 
@@ -89,8 +91,30 @@ public class ProxySender {
      * @param metadataUUID unique identifier for this metadata
      * @return true if data was sent to at least one proxy, false otherwise
      */
-    public boolean send(FEntity sender, ModuleName tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
+    public boolean send(@NonNull FEntity sender,
+                        @NonNull ModuleName tag,
+                        @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer,
+                        @NonNull UUID metadataUUID) {
+        return send(sender, tag, outputConsumer, metadataUUID, null);
+    }
+
+    /**
+     * Sends custom data to proxy network.
+     *
+     * @param sender the entity sending the data
+     * @param tag the message type tag
+     * @param outputConsumer consumer to write custom data to output stream
+     * @param metadataUUID unique identifier for this metadata
+     * @param eventMetadata optional metadata containing additional event context
+     * @return true if data was sent to at least one proxy, false otherwise
+     */
+    public boolean send(@NonNull FEntity sender,
+                        @NonNull ModuleName tag,
+                        @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer,
+                        @NonNull UUID metadataUUID,
+                        @Nullable EventMetadata<?> eventMetadata) {
         if (!proxyRegistry.hasEnabledProxy()) return false;
+
         if (sender instanceof FPlayer fPlayer) {
             List<String> constant = fileFacade.localization(sender).message().format().names().constant();
             if (!constant.isEmpty()) {
@@ -119,7 +143,7 @@ public class ProxySender {
 
         boolean sent = false;
         for (Proxy proxy : proxyRegistry.getProxies()) {
-            if (proxy.sendMessage(sender, tag, message)) {
+            if (proxy.sendMessage(sender, tag, message, eventMetadata)) {
                 sent = true;
             }
         }
