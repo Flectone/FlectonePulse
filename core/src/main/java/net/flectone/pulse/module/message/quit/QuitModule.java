@@ -77,7 +77,10 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
                 .ignoreVanish(ignoreVanish)
                 .build();
 
-        List<MessageSendEvent> messageEvents = messageDispatcher.createReceivers(this, eventMetadata).stream()
+        List<FPlayer> receivers = messageDispatcher.createReceivers(this, eventMetadata);
+        if (receivers.isEmpty()) return;
+
+        List<MessageSendEvent> messageEvents = receivers.stream()
                 .map(fReceiver -> messageDispatcher.createMessageEvent(fReceiver, name(), this, eventMetadata))
                 .toList();
 
