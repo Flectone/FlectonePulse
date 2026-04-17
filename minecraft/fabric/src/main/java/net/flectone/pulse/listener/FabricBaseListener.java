@@ -14,18 +14,27 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricBaseListener {
+
+    private final Set<UUID> joinedPlayers = new CopyOnWriteArraySet<>();
 
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
 
     public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
+        ServerPlayer player = handler.getPlayer();
+        UUID playerUUID = player.getUUID();
+        joinedPlayers.add(playerUUID);
+
         taskScheduler.runAsyncLater(() -> {
-            ServerPlayer player = handler.getPlayer();
-            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
             eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
             eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
@@ -33,9 +42,12 @@ public class FabricBaseListener {
     }
 
     public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
+        ServerPlayer player = handler.getPlayer();
+        UUID playerUUID = player.getUUID();
+        if (!joinedPlayers.remove(playerUUID)) return;
+
         taskScheduler.runAsync(() -> {
-            ServerPlayer player = handler.getPlayer();
-            FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
             eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
             eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));

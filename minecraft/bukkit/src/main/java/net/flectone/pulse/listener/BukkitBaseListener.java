@@ -22,11 +22,15 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitBaseListener implements Listener {
+
+    private final Set<UUID> joinedPlayers = new CopyOnWriteArraySet<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -55,10 +59,11 @@ public class BukkitBaseListener implements Listener {
 
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        taskScheduler.runAsync(() -> {
-            Player player = event.getPlayer();
-            UUID uuid = player.getUniqueId();
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        joinedPlayers.add(uuid);
 
+        taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
             if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
                 String locale = getPlayerLocale(player);
@@ -72,8 +77,10 @@ public class BukkitBaseListener implements Listener {
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (!joinedPlayers.remove(uuid)) return;
+
         taskScheduler.runAsync(() -> {
-            UUID uuid = event.getPlayer().getUniqueId();
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
             eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
