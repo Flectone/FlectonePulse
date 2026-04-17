@@ -50,12 +50,12 @@ public class FlectonePulseVelocity {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
-        byte[] data = ProxyMessageProcessor.create(event.getData());
-        if (data == null) return;
+        Optional<byte[]> data = ProxyMessageProcessor.validate(event.getData());
+        if (data.isEmpty()) return;
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
+                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data.get()));
     }
 
     @Subscribe

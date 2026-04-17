@@ -41,12 +41,12 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
-        byte[] data = ProxyMessageProcessor.create(event.getData());
-        if (data == null) return;
+        Optional<byte[]> data = ProxyMessageProcessor.validate(event.getData());
+        if (data.isEmpty()) return;
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data.get()));
     }
 
     @EventHandler
