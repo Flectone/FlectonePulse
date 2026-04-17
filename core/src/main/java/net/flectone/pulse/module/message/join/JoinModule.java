@@ -24,9 +24,16 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+// Proxy mode implementation may seem strange and inefficient, but it's the only way (at least for PLUGIN_MESSAGE mode)
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class JoinModule implements ModuleLocalization<Localization.Message.Join> {
+
+    private final Set<UUID> proxyConnectMessagePlayers = new CopyOnWriteArraySet<>();
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -59,18 +66,27 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     }
 
     public boolean isProxyMode() {
-        return config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
     }
 
-    public void proxySend(FPlayer fPlayer) {
+    public void proxySend(UUID uuid) {
         if (isProxyMode()) {
-            privateSend(fPlayer, Range.get(Range.Type.SERVER), false, false);
+            // indicator for messages for integration,
+            proxyConnectMessagePlayers.add(uuid);
+            taskScheduler.runAsyncLater(() -> proxyConnectMessagePlayers.remove(uuid), 40L);
+
+            privateSend(fPlayerService.getFPlayer(uuid), Range.get(Range.Type.SERVER), false, false);
         }
     }
 
     public void sendLater(FPlayer fPlayer) {
         if (isProxyMode()) {
-            sendToIntegration(fPlayer);
+            taskScheduler.runAsyncLater(() -> {
+                if (proxyConnectMessagePlayers.remove(fPlayer.uuid())) {
+                    sendToIntegration(fPlayer);
+                }
+            });
+
             return;
         }
 
@@ -79,7 +95,12 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
         if (isProxyMode() && !ignoreVanish) {
-            sendToIntegration(fPlayer);
+            taskScheduler.runAsyncLater(() -> {
+                if (proxyConnectMessagePlayers.remove(fPlayer.uuid())) {
+                    sendToIntegration(fPlayer);
+                }
+            });
+
             return;
         }
 

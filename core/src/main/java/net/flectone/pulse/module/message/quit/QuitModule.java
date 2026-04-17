@@ -20,14 +20,21 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.IntegrationSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+// Proxy mode implementation may seem strange and inefficient, but it's the only way (at least for PLUGIN_MESSAGE mode)
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuitModule implements ModuleLocalization<Localization.Message.Quit> {
+
+    private final Set<UUID> proxyDisconnectMessagePlayers = new CopyOnWriteArraySet<>();
 
     private final FileFacade fileFacade;
     private final IntegrationModule integrationModule;
@@ -37,6 +44,7 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     private final PlatformServerAdapter platformServerAdapter;
     private final IntegrationSender integrationSender;
     private final ProxyRegistry proxyRegistry;
+    private final FPlayerService fPlayerService;
 
     @Override
     public ModuleName name() {
@@ -59,18 +67,22 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public boolean isProxyMode() {
-        return config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
     }
 
-    public void proxySend(FPlayer fPlayer) {
-        if (isProxyMode()) {
-            privateSend(fPlayer, Range.get(Range.Type.SERVER), false, false, 0L);
-        }
+    public void proxySend(UUID uuid) {
+        if (!isProxyMode()) return;
+
+        // indicator that quit message was sent from the proxy
+        proxyDisconnectMessagePlayers.add(uuid);
+        taskScheduler.runAsyncLater(() -> proxyDisconnectMessagePlayers.remove(uuid), 40L);
+
+        privateSend(fPlayerService.getFPlayer(uuid), Range.get(Range.Type.SERVER), false, false, 0L);
     }
 
     public void sendLater(FPlayer fPlayer) {
-        if (isProxyMode() && platformServerAdapter.getPlatformPlayerCount() > 1) {
-            sendToIntegration(fPlayer);
+        if (isProxyMode()) {
+            privateProxySend(fPlayer);
             return;
         }
 
@@ -78,14 +90,36 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
-        if (isProxyMode() && platformServerAdapter.getPlatformPlayerCount() > 1 && !ignoreVanish) {
-            sendToIntegration(fPlayer);
+        if (isProxyMode() && !ignoreVanish) {
+            privateProxySend(fPlayer);
             return;
         }
 
         taskScheduler.runAsync(() -> privateSend(fPlayer, config().range(), !ignoreVanish, ignoreVanish, 0L));
     }
 
+    private void privateProxySend(FPlayer fPlayer) {
+        // if there are other players on the server, a message from the proxy will definitely be sent
+        if (!platformServerAdapter.isOnlyPlayerOnline(fPlayer.uuid())) {
+            sendToIntegration(fPlayer);
+            return;
+        }
+
+        // check after a while that the player has definitely left
+        taskScheduler.runAsyncLater(() -> {
+            // if player is online, then he just switched between servers
+            if (fPlayerService.getFPlayerFromDatabase(fPlayer.uuid()).isOnline()) return;
+
+            // message has already been sent from the proxy
+            if (proxyDisconnectMessagePlayers.contains(fPlayer.uuid())) {
+                sendToIntegration(fPlayer);
+                return;
+            }
+
+            // send server message
+            privateSend(fPlayer, config().range(), true, false, 0L);
+        });
+    }
 
     private void privateSend(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish, long delay) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;

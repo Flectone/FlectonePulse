@@ -135,12 +135,12 @@ public class ProxyMessageHandler {
     }
 
     public void handleSystemConnected(UUID uuid) {
-        injector.getInstance(JoinModule.class).proxySend(fPlayerService.getFPlayer(uuid));
+        injector.getInstance(JoinModule.class).proxySend(uuid);
     }
 
     public void handleSystemOffline(UUID uuid) throws IOException {
         fPlayerService.invalidateOnline(uuid);
-        injector.getInstance(QuitModule.class).proxySend(fPlayerService.getFPlayer(uuid));
+        injector.getInstance(QuitModule.class).proxySend(uuid);
     }
 
     public void handleProxyMessage(DataInputStream input, UUID metadataUUID, ModuleName tag) throws IOException {
