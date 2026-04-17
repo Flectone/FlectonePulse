@@ -18,6 +18,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSy
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -116,12 +117,18 @@ public class BasePacketListener implements PacketListener {
         UUID uuid = event.getUser().getUUID();
         if (uuid == null) return;
 
-        taskScheduler.runAsyncLater(() -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-            if (!fPlayer.isOnline()) return;
+        if (FlectonePulseAPI.isDisabling()) {
+            persistAndDisposePlayer(uuid);
+        } else {
+            taskScheduler.runAsyncLater(() -> persistAndDisposePlayer(uuid), 5L);
+        }
+    }
 
-            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
-        }, 5L);
+    private void persistAndDisposePlayer(UUID uuid) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        if (!fPlayer.isOnline()) return;
+
+        eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
     }
 
     private void handleLoginSuccess(PacketSendEvent event) {
