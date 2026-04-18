@@ -192,21 +192,22 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             // resolve receiver localization
             Localization.Command.Nickname localization = localization(messageContext.receiver());
 
-            String displayFormat;
             if (value == null) {
-                displayFormat = localization.defaultNickname();
+                String defaultNickname = localization.defaultNickname();
 
-                // skip formatting
-                if (Strings.CS.equals(displayFormat, "<player>")) {
+                // skip module formatting
+                if (Strings.CS.equals(defaultNickname, "<player>")) {
                     return Tag.preProcessParsed(messageContext.sender().name());
                 }
-            } else {
-                displayFormat = Strings.CS.replace(
-                        permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
-                        "<value>",
-                        value
-                );
+
+                value = defaultNickname;
             }
+
+            String displayFormat = Strings.CS.replace(
+                    permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
+                    "<value>",
+                    value
+            );
 
             MessageContext nickContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), displayFormat)
                     .withFlags(messageContext.flags())
