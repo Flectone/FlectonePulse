@@ -186,15 +186,27 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
 
     public MessageContext addTag(MessageContext messageContext) {
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (_, _) -> {
+            // get nickname value
             String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
-            if (value == null) return Tag.preProcessParsed(messageContext.sender().name());
 
+            // resolve receiver localization
             Localization.Command.Nickname localization = localization(messageContext.receiver());
-            String displayFormat = Strings.CS.replace(
-                    permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
-                    "<value>",
-                    value
-            );
+
+            String displayFormat;
+            if (value == null) {
+                displayFormat = localization.defaultNickname();
+
+                // skip formatting
+                if (Strings.CS.equals(displayFormat, "<player>")) {
+                    return Tag.preProcessParsed(messageContext.sender().name());
+                }
+            } else {
+                displayFormat = Strings.CS.replace(
+                        permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
+                        "<value>",
+                        value
+                );
+            }
 
             MessageContext nickContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), displayFormat)
                     .withFlags(messageContext.flags())

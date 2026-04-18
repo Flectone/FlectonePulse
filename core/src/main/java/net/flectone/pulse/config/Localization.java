@@ -550,6 +550,7 @@ public record Localization(
         public record Nickname(
                 String nullPlayer,
                 String nullNickname,
+                String defaultNickname,
                 String display,
                 String displaySee,
                 String format
