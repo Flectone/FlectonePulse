@@ -149,7 +149,9 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     public void changeName(FPlayer fPlayer, FPlayer fTarget, String nickname) {
-        if (allowedPattern != null && !allowedPattern.matcher(nickname).matches()) {
+        boolean needClear = "clear".equalsIgnoreCase(nickname) || fTarget.name().equalsIgnoreCase(nickname);
+
+        if (!needClear && allowedPattern != null && !allowedPattern.matcher(nickname).matches()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Nickname::nullNickname)
@@ -159,7 +161,6 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             return;
         }
 
-        boolean needClear = "clear".equalsIgnoreCase(nickname) || fTarget.name().equalsIgnoreCase(nickname);
         fTarget = needClear
                 ? fTarget.withoutSetting(SettingText.NICKNAME)
                 : fTarget.withSetting(SettingText.NICKNAME, nickname);
