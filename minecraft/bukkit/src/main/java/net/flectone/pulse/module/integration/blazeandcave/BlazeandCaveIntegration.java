@@ -12,6 +12,8 @@ import net.flectone.pulse.util.logging.FLogger;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BlazeandCaveIntegration implements FIntegration {
 
+    private static boolean dispatched;
+
     private final PlatformServerAdapter platformServerAdapter;
 
     @Getter private final FLogger fLogger;
@@ -24,8 +26,12 @@ public class BlazeandCaveIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        // I think this is the only way to do it
-        platformServerAdapter.dispatchCommand("function blazeandcave:config/msg_set_vanilla_msg");
+        // no need to execute commands every time reload
+        if (!dispatched) {
+            // I think this is the only way to do it
+            platformServerAdapter.dispatchCommand("function blazeandcave:config/msg_set_vanilla_msg");
+            dispatched = true;
+        }
 
         hooked = true;
         logHook();
