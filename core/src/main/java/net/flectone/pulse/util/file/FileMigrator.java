@@ -455,9 +455,12 @@ public class FileMigrator {
             vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
         }
 
-        files.config().cache().types().put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
+        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        types.put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
 
-        return files.withMessage(files.message().withVanilla(files.message().vanilla().withTypes(vanillaMessages)));
+        return files
+                .withConfig(files.config().withCache(files.config().cache().withTypes(types)))
+                .withMessage(files.message().withVanilla(files.message().vanilla().withTypes(vanillaMessages)));
     }
 
     public FilePack migration_1_7_2(FilePack files) {
@@ -842,6 +845,13 @@ public class FileMigrator {
         }
 
         return newMap;
+    }
+
+    public FilePack migration_1_9_1(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        types.put(CacheName.ICU_MESSAGE, new Config.Cache.CacheSetting(false, 10, TimeUnit.MINUTES, 100000));
+
+        return files.withConfig(files.config().withCache(files.config().cache().withTypes(types)));
     }
 
 }
