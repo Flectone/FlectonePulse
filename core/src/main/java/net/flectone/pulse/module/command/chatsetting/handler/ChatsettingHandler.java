@@ -67,7 +67,7 @@ public class ChatsettingHandler {
                 .toList();
 
         Function<SubMenuItem, String> getItemMessage = item -> Strings.CS.replace(
-                localization.menu().chat().types().getOrDefault(item.name(), ""),
+                localization.menu().chat().types().getOrDefault(item.name(), item.name()),
                 "<chat>", item.name()
         );
 

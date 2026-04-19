@@ -107,7 +107,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
 
         String[] messages = Strings.CS.replace(
                 localization.menu().chat().item(),
-                "<chat>", currentChat
+                "<chat>", localization.menu().chat().types().getOrDefault(currentChat, currentChat)
         ).split("<br>");
 
         String title = messages.length > 0 ? messages[0] : "";
