@@ -561,6 +561,9 @@ integration:
   geyser:
     name: "flectonepulse.module.integration.geyser"
     type: "TRUE"
+  icu:
+    name: "flectonepulse.module.integration.icu"
+    type: "TRUE"
   interactivechat:
     name: "flectonepulse.module.integration.interactivechat"
     type: "TRUE"

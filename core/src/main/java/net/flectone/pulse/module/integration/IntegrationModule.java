@@ -10,6 +10,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.icu.ICUModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -53,6 +54,7 @@ public abstract class IntegrationModule implements ModuleSimple {
         return builder.add(
                 DeeplModule.class,
                 DiscordModule.class,
+                ICUModule.class,
                 TelegramModule.class,
                 TwitchModule.class,
                 YandexModule.class

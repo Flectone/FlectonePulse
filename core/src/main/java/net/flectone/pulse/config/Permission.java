@@ -748,6 +748,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser")
             Geyser geyser,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/icu")
+            Icu icu,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat")
             Interactivechat interactivechat,
 
@@ -877,6 +880,15 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Geyser(
+                String name,
+                Permission.Type type
+        ) implements PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Icu(
                 String name,
                 Permission.Type type
         ) implements PermissionSetting {

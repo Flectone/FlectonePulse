@@ -87,6 +87,11 @@ cache:
       duration: 1
       time_unit: "HOURS"
       size: 5000
+    ICU_MESSAGE:
+      invalidate_on_reload: false
+      duration: 10
+      time_unit: "MINUTES"
+      size: 100000
     LEGACY_COLOR_MESSAGE:
       invalidate_on_reload: false
       duration: 10

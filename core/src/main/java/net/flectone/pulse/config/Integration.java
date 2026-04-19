@@ -52,6 +52,9 @@ public record Integration(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/geyser")
         Geyser geyser,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/icu")
+        Icu icu,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat")
         Interactivechat interactivechat,
 
@@ -221,6 +224,62 @@ public record Integration(
     @Builder(toBuilder = true)
     @Jacksonized
     public record Geyser(Boolean enable) implements EnableSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Icu(
+            Boolean enable,
+            Bidi bidi,
+            ArabicShaping arabicShaping,
+            WordBreaking wordBreaking,
+            Normalization normalization
+    ) implements EnableSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Bidi(
+                Boolean enable
+        ) {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record ArabicShaping(
+                Boolean enable,
+                Boolean numerals
+        ) {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record WordBreaking(
+                Boolean enable,
+                Boolean thai,
+                Boolean khmer,
+                Boolean lao,
+                Boolean tibetan,
+                String breakCharacter
+        ) {}
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Normalization(
+                Boolean enable,
+                Form form
+        ) {
+
+            public enum Form {
+                NFC,
+                NFD,
+                NFKC,
+                NFKD
+            }
+
+        }
     }
 
     @With

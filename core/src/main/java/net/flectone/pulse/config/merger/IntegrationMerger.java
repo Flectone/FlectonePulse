@@ -26,6 +26,7 @@ public interface IntegrationMerger {
     @Mapping(target = "discord", expression = "java(mergeDiscord(target.build().discord().toBuilder(), source.discord()))")
     @Mapping(target = "floodgate", expression = "java(mergeFloodgate(target.build().floodgate().toBuilder(), source.floodgate()))")
     @Mapping(target = "geyser", expression = "java(mergeGeyser(target.build().geyser().toBuilder(), source.geyser()))")
+    @Mapping(target = "icu", expression = "java(mergeIcu(target.build().icu().toBuilder(), source.icu()))")
     @Mapping(target = "interactivechat", expression = "java(mergeInteractivechat(target.build().interactivechat().toBuilder(), source.interactivechat()))")
     @Mapping(target = "itemsadder", expression = "java(mergeItemsadder(target.build().itemsadder().toBuilder(), source.itemsadder()))")
     @Mapping(target = "litebans", expression = "java(mergeLitebans(target.build().litebans().toBuilder(), source.litebans()))")
@@ -71,6 +72,8 @@ public interface IntegrationMerger {
     Integration.Floodgate mergeFloodgate(@MappingTarget Integration.Floodgate.FloodgateBuilder target, Integration.Floodgate floodgate);
 
     Integration.Geyser mergeGeyser(@MappingTarget Integration.Geyser.GeyserBuilder target, Integration.Geyser geyser);
+
+    Integration.Icu mergeIcu(@MappingTarget Integration.Icu.IcuBuilder target, Integration.Icu icu);
 
     Integration.Interactivechat mergeInteractivechat(@MappingTarget Integration.Interactivechat.InteractivechatBuilder target, Integration.Interactivechat interactivechat);
 

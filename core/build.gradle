@@ -19,6 +19,7 @@ dependencies {
     compileOnly "com.h2database:h2:$h2_version"
     compileOnly "org.postgresql:postgresql:$postgresql_version"
     compileOnly "io.lettuce:lettuce-core:$lettuce_version"
+    compileOnly "com.ibm.icu:icu4j:$icu4j_version"
 }
 
 tasks.named("buildFinalJar", Jar) {

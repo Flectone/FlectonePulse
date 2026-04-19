@@ -37,6 +37,12 @@ public enum MessageFlag {
     FLOOD_MODULE(true),
 
     /**
+     * Enables ICU module processing.
+     * If PLAYER_MESSAGE = true, then ICU_MODULE will also be TRUE, regardless of this parameter
+     */
+    ICU_MODULE(false),
+
+    /**
      * Provides InteractiveChat plugin compatibility.
      */
     INTERACTIVE_CHAT_COMPAT(true),

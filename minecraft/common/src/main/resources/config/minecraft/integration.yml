@@ -60,6 +60,23 @@ floodgate:
   enable: true
 geyser:
   enable: true
+icu:
+  enable: false
+  bidi:
+    enable: true
+  arabic_shaping:
+    enable: true
+    numerals: false
+  word_breaking:
+    enable: false
+    thai: true
+    khmer: true
+    lao: true
+    tibetan: false
+    break_character: " "
+  normalization:
+    enable: false
+    form: "NFC"
 interactivechat:
   enable: true
 itemsadder:
