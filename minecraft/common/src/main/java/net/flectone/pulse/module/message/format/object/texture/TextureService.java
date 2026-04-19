@@ -255,7 +255,8 @@ public class TextureService {
     }
 
     private String getFileNameWithoutExtension(String fileName) {
-        return fileName.substring(0, fileName.lastIndexOf('.'));
+        int lastDotIndex = fileName.lastIndexOf('.');
+        return lastDotIndex != -1 ? fileName.substring(0, lastDotIndex) : fileName;
     }
 
     private BufferedImage createHead(BufferedImage original, int x, int y) {
