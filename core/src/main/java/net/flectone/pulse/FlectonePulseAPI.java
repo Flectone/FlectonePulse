@@ -3,7 +3,9 @@ package net.flectone.pulse;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.exception.ReloadException;
@@ -12,8 +14,8 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.lifecycle.EnableEvent;
-import net.flectone.pulse.model.event.lifecycle.ReloadEvent;
-import net.flectone.pulse.model.event.player.PlayerLoadEvent;
+import net.flectone.pulse.model.event.lifecycle.EndReloadEvent;
+import net.flectone.pulse.model.event.lifecycle.StartReloadEvent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
@@ -45,13 +47,17 @@ public class FlectonePulseAPI {
      *
      * @see FlectonePulse
      */
-    @Getter private static FlectonePulse instance;
+    @Getter
+    @Setter(AccessLevel.PRIVATE)
+    private static FlectonePulse instance;
 
     /**
      * Indicates whether FlectonePulse is currently in the process of being disabled.
      *
      */
-    @Getter private static boolean disabling;
+    @Getter
+    @Setter(AccessLevel.PRIVATE)
+    private static boolean disabling;
 
     /**
      * Constructs the API wrapper with dependency injection.
@@ -61,7 +67,7 @@ public class FlectonePulseAPI {
      */
     @Inject
     public FlectonePulseAPI(FlectonePulse instance) {
-        FlectonePulseAPI.instance = instance;
+        setInstance(instance);
     }
 
     /**
@@ -73,6 +79,10 @@ public class FlectonePulseAPI {
     @SneakyThrows
     public void onEnable() {
         if (!instance.isReady()) return;
+
+        // call enable event
+        EnableEvent enableEvent = instance.get(EventDispatcher.class).dispatch(new EnableEvent(instance));
+        if (enableEvent.cancelled()) return;
 
         // get configs
         FileFacade fileFacade = instance.get(FileFacade.class);
@@ -101,22 +111,19 @@ public class FlectonePulseAPI {
         // initialize packetevents
         instance.initPacketAdapter();
 
-        // reload modules and their children
-        instance.get(ModuleController.class).reload();
+        // init modules and their children
+        instance.get(ModuleController.class).initialize();
 
         // reload fplayer service
-        instance.get(FPlayerService.class).reload();
+        instance.get(FPlayerService.class).initialize(false);
 
         // enable proxy registry
         instance.get(ProxyRegistry.class).onEnable();
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
-            instance.get(MetricsService.class).reload();
+            instance.get(MetricsService.class).start();
         }
-
-        // call enable event
-        instance.get(EventDispatcher.class).dispatch(new EnableEvent(instance));
 
         // log plugin enabled
         fLogger.logEnabled();
@@ -127,38 +134,40 @@ public class FlectonePulseAPI {
      * Called automatically by the platform on disable.
      */
     public void onDisable() {
-        disabling = true;
+        setDisabling(true);
 
         instance.terminateFailedPacketAdapter();
 
         if (!instance.isReady()) return;
 
+        // call disable event
+        DisableEvent disableEvent = instance.get(EventDispatcher.class).dispatch(new DisableEvent(instance));
+        if (disableEvent.cancelled()) return;
+
+        // get flogger
         FLogger fLogger = instance.get(FLogger.class);
 
         // log plugin disabling
         fLogger.logDisabling();
 
-        // call disable event
-        instance.get(EventDispatcher.class).dispatch(new DisableEvent(instance));
-
-        // disable task scheduler
+        // disable task scheduler (it can no longer be used on disable)
         instance.get(TaskScheduler.class).shutdown();
 
         // close all open inventories
         instance.closeUIs();
+
+        // unregister all listeners
+        instance.get(ListenerRegistry.class).unregisterAll();
+
+        // disable all modules
+        instance.get(ModuleController.class).terminate();
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
 
         // update and clear all fplayers
         fPlayerService.getOnlineFPlayers().forEach(fPlayerService::clearAndSave);
-        fPlayerService.clear();
-
-        // disable all modules
-        instance.get(ModuleController.class).terminate();
-
-        // unregister all listeners
-        instance.get(ListenerRegistry.class).unregisterAll();
+        fPlayerService.invalidate();
 
         // terminate packetevents
         instance.terminatePacketAdapter();
@@ -181,8 +190,14 @@ public class FlectonePulseAPI {
     public void reload() throws ReloadException {
         if (!instance.isReady()) return;
 
-        ReloadException reloadException = null;
+        // get event dispatcher
+        EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
 
+        // start reload event
+        StartReloadEvent startReloadEvent = eventDispatcher.dispatch(new StartReloadEvent(instance));
+        if (startReloadEvent.cancelled()) return;
+
+        // get flogger
         FLogger fLogger = instance.get(FLogger.class);
 
         // log plugin reloading
@@ -191,18 +206,44 @@ public class FlectonePulseAPI {
         // close all UIs
         instance.closeUIs();
 
-        // reload ListenerRegistry and save reloadListeners to call them later
+        // clear text screens
+        instance.get(TextScreenRender.class).clear();
+
+        // get listener registry
         ListenerRegistry listenerRegistry = instance.get(ListenerRegistry.class);
 
-        Map<Event.Priority, List<UnaryOperator<Event>>> reloadListeners = listenerRegistry.getPulseListeners(ReloadEvent.class);
+        // save reloadListeners to call them later
+        Map<Event.Priority, List<UnaryOperator<Event>>> reloadListeners = listenerRegistry.getPulseListeners(EndReloadEvent.class);
 
-        listenerRegistry.reload();
+        // clear listeners and register default listeners
+        listenerRegistry.onDisable();
 
-        // reload task scheduler
-        instance.get(TaskScheduler.class).reload();
+        // clear commands
+        instance.get(CommandRegistry.class).onDisable();
 
-        // get file resolver for configuration
-        FileFacade fileFacade = instance.get(FileFacade.class);
+        // clear permissions
+        instance.get(PermissionRegistry.class).onDisable();
+
+        // reload moderation service
+        instance.get(ModerationService.class).invalidate();
+
+        // get module controller
+        ModuleController moduleController = instance.get(ModuleController.class);
+
+        // reload modules and their children
+        moduleController.terminate();
+
+        // get task scheduler
+        TaskScheduler taskScheduler = instance.get(TaskScheduler.class);
+
+        // disable task scheduler
+        taskScheduler.shutdown();
+
+        // get fplayer service
+        FPlayerService fPlayerService = instance.get(FPlayerService.class);
+
+        // invalidate players
+        fPlayerService.invalidate();
 
         // invalidate cache
         instance.get(CacheRegistry.class).invalidate();
@@ -213,6 +254,10 @@ public class FlectonePulseAPI {
         // save old database type
         Database.Type oldDatabaseType = database.config().type();
 
+        // get file resolver for configuration
+        FileFacade fileFacade = instance.get(FileFacade.class);
+
+        ReloadException reloadException = null;
         try {
             // reload configuration files
             fileFacade.reload();
@@ -220,16 +265,14 @@ public class FlectonePulseAPI {
             reloadException = new ReloadException(e);
         }
 
-        // load minecraft localizations
-        instance.get(TranslationService.class).reload();
-
-        // reload registries
-        instance.get(CommandRegistry.class).reload();
-        instance.get(PermissionRegistry.class).reload();
-        instance.get(ProxyRegistry.class).reload();
-
         // reload logger filters
         instance.get(LogFilter.class).setFilters(fileFacade.config().logger().filter());
+
+        // get proxy registry
+        ProxyRegistry proxyRegistry = instance.get(ProxyRegistry.class);
+
+        // reload registries
+        proxyRegistry.onDisable();
 
         // terminate database
         database.disconnect();
@@ -260,34 +303,32 @@ public class FlectonePulseAPI {
             }
         }
 
-        // get fplayer service
-        FPlayerService fPlayerService = instance.get(FPlayerService.class);
+        // load minecraft localizations
+        instance.get(TranslationService.class).reload();
+
+        // start scheduler
+        taskScheduler.start();
+
+        // register default listeners
+        listenerRegistry.onEnable();
 
         // reload fplayer service
-        fPlayerService.reload();
+        fPlayerService.initialize(true);
 
-        // reload moderation service
-        instance.get(ModerationService.class).reload();
+        // init modules
+        moduleController.initialize();
 
-        // reload modules and their children
-        instance.get(ModuleController.class).reload();
-
-        // clear text screens
-        instance.get(TextScreenRender.class).clear();
-
-        // process player load event for all platform fplayers
-        EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
-        fPlayerService.getPlatformFPlayers().forEach(fPlayer ->
-                eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer, true))
-        );
+        // init proxies
+        proxyRegistry.onEnable();
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
-            instance.get(MetricsService.class).reload();
+            instance.get(MetricsService.class).start();
         }
 
-        // call reload event
-        eventDispatcher.dispatch(reloadListeners, new ReloadEvent(instance, reloadException));
+        // end reload event
+        EndReloadEvent endReloadEvent = eventDispatcher.dispatch(reloadListeners, new EndReloadEvent(instance, reloadException));
+        if (endReloadEvent.cancelled()) return;
 
         // log plugin reloaded
         fLogger.logReloaded();
