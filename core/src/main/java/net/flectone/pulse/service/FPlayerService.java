@@ -5,17 +5,19 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
@@ -51,14 +53,20 @@ public class FPlayerService {
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final RandomGenerator randomUtil;
+    private final EventDispatcher eventDispatcher;
 
-    public void clear() {
+    public void invalidate() {
+        // invalidate and load console FPlayer to reload name
+        fPlayerRepository.invalid(getConsole().uuid());
+
+        // invalidate all platform players
+        platformPlayerAdapter.getOnlinePlayers().forEach(fPlayerRepository::invalid);
+
+        // clear cache
         fPlayerRepository.clearCache();
     }
 
-    public void reload() {
-        // invalidate and load console FPlayer to reload name
-        fPlayerRepository.invalid(getConsole().uuid());
+    public void initialize(boolean reload) {
         addConsole();
 
         // more like a migration for older versions below 1.9.0,
@@ -76,12 +84,18 @@ public class FPlayerService {
             });
         }
 
-        // invalidate and load all platform players
+        // load all platform players
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
-            fPlayerRepository.invalid(uuid);
-
             String name = platformPlayerAdapter.getName(uuid);
-            saveFPlayerData(loadData(addFPlayer(uuid, name)));
+
+            FPlayer fPlayer = addFPlayer(uuid, name);
+            PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer, reload));
+            if (playerLoadEvent.cancelled()) {
+                fPlayerRepository.invalid(fPlayer.uuid());
+                return;
+            }
+
+            saveFPlayerData(loadData(fPlayer));
         });
     }
 

@@ -23,7 +23,7 @@ public class MetricsService {
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
 
-    public void reload() {
+    public void start() {
         taskScheduler.runAsyncTimer(this::send, 20L * 60 * 60);
     }
 

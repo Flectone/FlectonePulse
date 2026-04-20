@@ -19,7 +19,7 @@ public class ModerationService {
     private final ModerationRepository moderationRepository;
     private final IntegrationModule integrationModule;
 
-    public void reload() {
+    public void invalidate() {
         moderationRepository.invalidateAll();
     }
 

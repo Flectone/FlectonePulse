@@ -25,7 +25,7 @@ public class PlayerPreLoginProcessor {
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
         if (fPlayerService.getOnlineFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
             // clears the cache of players who might have left from other servers
-            fPlayerService.clear();
+            fPlayerService.invalidate();
             fPlayerService.addConsole();
         }
 
