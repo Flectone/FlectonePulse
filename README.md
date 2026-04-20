@@ -148,7 +148,7 @@ And thanks to the community! Every star on GitHub and review on platforms shows 
 
 ## 📊 Project statistics
 <div align="center">
-  <a href="https://flectone.net/en/pulse/metrics" target="_blank">
+  <a href="https://flectone.net/en/pulse/docs/metrics" target="_blank">
     <img src="https://flectone.net/api/pulse/metrics/svg" alt="FlectonePulse Statistics">
   </a>
 </div>

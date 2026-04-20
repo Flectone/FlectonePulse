@@ -148,7 +148,7 @@ FlectonePulse основан на этих проектах:
 
 ## 📊 Статистика проекта
 <div align="center">
-  <a href="https://flectone.net/en/pulse/metrics" target="_blank">
+  <a href="https://flectone.net/en/pulse/docs/metrics" target="_blank">
     <img src="https://flectone.net/api/pulse/metrics/svg" alt="Статистика FlectonePulse">
   </a>
 </div>
