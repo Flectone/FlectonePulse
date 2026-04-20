@@ -3,7 +3,6 @@ dependencies {
     implementation project(":core")
 
     compileOnly "com.alessiodp.libby:libby-core:$libby_version"
-    compileOnly "net.kyori:adventure-text-serializer-ansi:$adventure_api"
     compileOnly "org.incendo:cloud-core:$cloud_core_version"
     compileOnly "com.hypixel.hytale:Server:$hytale_server_version"
 
