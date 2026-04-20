@@ -9,6 +9,8 @@ import net.flectone.pulse.BuildConfig;
 @Singleton
 public class HytaleLibraryResolver extends LibraryResolver {
 
+    private static final String LEGACY_ADVENTURE_VERSION = "4.26.1";
+
     public HytaleLibraryResolver(LibraryManager libraryManager) {
         super(libraryManager);
     }
@@ -20,7 +22,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-api")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -34,7 +36,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-ansi")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -48,7 +50,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-minimessage")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -62,7 +64,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-plain")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -76,7 +78,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-legacy")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -90,7 +92,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-nbt")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -104,7 +106,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-gson")
-                .version(BuildConfig.ADVENTURE_API)
+                .version(LEGACY_ADVENTURE_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
