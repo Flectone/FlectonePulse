@@ -227,7 +227,7 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
-        boolean updateCache = platformPlayerAdapter.isOnline(fPlayer);
+        boolean updateCache = !platformPlayerAdapter.isOnline(fPlayer);
 
         // check new settings data
         if (!updateCache && fPlayer.settingsText().isEmpty()) {
