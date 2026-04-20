@@ -287,6 +287,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     }
 
     public boolean isDatapackEnabled(@NonNull String name) {
+        if (!reflectionResolver.hasClass("org.bukkit.packs.DataPack")) return false;
+
         return reflectionResolver.isPaper()
                 ? injector.getInstance(PaperDatapackChecker.class).isEnabled(name)
                 : injector.getInstance(BukkitDatapackChecker.class).isEnabled(name);
