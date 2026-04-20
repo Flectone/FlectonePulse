@@ -1,5 +1,6 @@
 package net.flectone.pulse.execution.scheduler;
 
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.model.entity.FPlayer;
 
 import java.util.function.Consumer;
@@ -21,7 +22,7 @@ public interface TaskScheduler {
     /**
      * Reloads the scheduler configuration.
      */
-    void reload();
+    void start();
 
     /**
      * Runs a task asynchronously.
@@ -115,6 +116,31 @@ public interface TaskScheduler {
      * @param delay the period between executions in ticks
      */
     void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay);
+
+    /**
+     * Checks if the scheduler is currently in a disabled state.
+     *
+     * @return true if disabling, false otherwise
+     */
+    default boolean isDisabled() {
+        return FlectonePulseAPI.isDisabling();
+    }
+
+    /**
+     * Executes the given task only if the scheduler is currently disabled.
+     * <p>
+     * This is typically used to perform cleanup or finalization tasks during shutdown.
+     *
+     * @param runnable the task to execute
+     * @return true if the task was executed (i.e., scheduler was disabled), false otherwise
+     */
+    default boolean runDisabledTask(SchedulerRunnable runnable) {
+        if (!isDisabled()) return false;
+
+        wrapExceptionRunnable(runnable).run();
+
+        return true;
+    }
 
     /**
      * Wraps a runnable with exception handling.

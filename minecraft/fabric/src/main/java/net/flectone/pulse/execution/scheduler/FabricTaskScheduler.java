@@ -3,7 +3,6 @@ package net.flectone.pulse.execution.scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.exception.SchedulerTaskException;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -57,7 +56,7 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void reload() {
+    public void start() {
         shutdown();
 
         createExecutorService();
@@ -69,7 +68,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsync(SchedulerRunnable runnable, boolean independent) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         if (!independent && isAsyncThread()) {
             wrapExceptionRunnable(runnable).run();
@@ -81,7 +80,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncLater(SchedulerRunnable runnable, long delay) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, true);
@@ -90,7 +89,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
@@ -99,7 +98,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         if (!isAsyncThread()) {
             wrapExceptionRunnable(runnable).run();
@@ -113,7 +112,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long delay) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
@@ -122,7 +121,7 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncTimer(SchedulerRunnable runnable, long delay, long period) {
-        if (isDisabled()) return;
+        if (runDisabledTask(runnable)) return;
 
         long firstTick = currentTick.get() + delay;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, false);
@@ -146,8 +145,6 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
-        if (isDisabled()) return;
-
         runAsyncTimer(() -> {
             for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
                 runAsync(() -> fPlayerConsumer.accept(fPlayer));
@@ -164,6 +161,11 @@ public class FabricTaskScheduler implements TaskScheduler {
                 logger.warning(e);
             }
         };
+    }
+
+    @Override
+    public boolean isDisabled() {
+        return disabled || TaskScheduler.super.isDisabled();
     }
 
     public void onTick() {
@@ -229,10 +231,6 @@ public class FabricTaskScheduler implements TaskScheduler {
         };
 
         this.asyncExecutor = Executors.newFixedThreadPool(8, namedThreadFactory);
-    }
-
-    private boolean isDisabled() {
-        return disabled || FlectonePulseAPI.isDisabling();
     }
 
     private static class ScheduledTask {
