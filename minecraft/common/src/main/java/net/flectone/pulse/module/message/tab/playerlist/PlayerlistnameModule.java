@@ -227,16 +227,19 @@ public class PlayerlistnameModule implements ModuleLocalization<Localization.Mes
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
+        boolean updateCache = platformPlayerAdapter.isOnline(fPlayer);
+
         // check new settings data
-        if (fPlayer.settingsText().isEmpty()) {
+        if (!updateCache && fPlayer.settingsText().isEmpty()) {
             // get fplayer from cache
             fPlayer = fPlayerService.getFPlayer(fPlayer);
 
             // check new settings data
-            if (fPlayer.settingsText().isEmpty()) {
-                // update cache
-                fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer));
-            }
+            updateCache = fPlayer.settingsText().isEmpty();
+        }
+
+        if (updateCache) {
+            fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer));
         }
 
         if (userProfile == null) {
