@@ -180,7 +180,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
         );
 
         addLibrary(Library.builder()
-                .groupId("net{}flectone")
+                .groupId("org{}incendo")
                 .artifactId("cloud-minecraft-extras")
                 .version(BuildConfig.CLOUD_MINECRAFT_EXTRAS_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
@@ -194,7 +194,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
         );
 
         addLibrary(Library.builder()
-                .groupId("net{}flectone")
+                .groupId("org{}incendo")
                 .artifactId("cloud-paper")
                 .version(BuildConfig.CLOUD_PAPER_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
