@@ -114,24 +114,6 @@ public class ModuleController {
         return moduleChildrenMap.getOrDefault(root, Collections.emptySet());
     }
 
-    public void reload() {
-        reload(Module.class);
-    }
-
-    public void reload(Class<? extends ModuleSimple> clazz) {
-        configureHierarchy(clazz);
-
-        enable(clazz, module -> module.config().enable());
-    }
-
-    public void terminate() {
-        terminate(Module.class);
-    }
-
-    public void terminate(Class<? extends ModuleSimple> clazz) {
-        enable(clazz, _ -> false);
-    }
-
     private void configureHierarchy(Class<? extends ModuleSimple> clazz) {
         Class<? extends ModuleSimple> root = findRootSuperclass(clazz);
         moduleRootMap.put(clazz, root);
@@ -143,32 +125,51 @@ public class ModuleController {
         getChildren(root).forEach(this::configureHierarchy);
     }
 
-    public void enable(Class<? extends ModuleSimple> clazz, Predicate<ModuleSimple> enablePredicate) {
-        Class<? extends ModuleSimple> root = getRoot(clazz);
-        ModuleSimple module = injector.getInstance(root);
+    public void terminate() {
+        disable(Module.class);
+    }
 
-        if (isEnable(root)) {
+    public void disable(Class<? extends ModuleSimple> clazz) {
+        Class<? extends ModuleSimple> parent = getRoot(clazz);
+        ModuleSimple module = injector.getInstance(parent);
+
+        if (isEnable(parent)) {
             ModuleDisableEvent preDisableEvent = eventDispatcher.dispatch(new ModuleDisableEvent(module));
             if (!preDisableEvent.cancelled()) {
                 module.onDisable();
             }
         }
 
+        moduleStateMap.put(parent, false);
+
+        getChildren(parent).forEach(this::disable);
+    }
+
+    public void initialize() {
+        configureHierarchy(Module.class);
+        enable(Module.class, module -> module.config().enable());
+    }
+
+    public void enable(Class<? extends ModuleSimple> clazz, Predicate<ModuleSimple> enablePredicate) {
+        Class<? extends ModuleSimple> parent = getRoot(clazz);
+        ModuleSimple module = injector.getInstance(parent);
+
         boolean newState = enablePredicate.test(module);
-        moduleStateMap.put(root, newState);
+        moduleStateMap.put(parent, newState);
 
         if (newState) {
             ModuleEnableEvent preEnableEvent = eventDispatcher.dispatch(new ModuleEnableEvent(module));
             if (preEnableEvent.cancelled()) {
-                moduleStateMap.put(root, false);
+                moduleStateMap.put(parent, false);
             } else {
                 module.permissionBuilder().build().forEach(permissionRegistry::register);
                 module.onEnable();
             }
         }
 
-        Predicate<ModuleSimple> childPredicate = childModule -> isEnable(root) && childModule.config().enable();
-        getChildren(root).forEach(childModule -> enable(childModule, childPredicate));
+        if (isEnable(parent)) {
+            getChildren(parent).forEach(childModule -> enable(childModule, moduleSimple -> moduleSimple.config().enable()));
+        }
     }
 
     public BiPredicate<FEntity, Boolean> buildDisablePredicate(ModuleSimple module) {
