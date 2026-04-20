@@ -119,8 +119,12 @@ public class ListenerRegistry implements Registry {
     }
 
     @Override
-    public void reload() {
+    public void onDisable() {
         unregisterAll();
+    }
+
+    @Override
+    public void onEnable() {
         registerDefaultListeners();
         lock.writeLock().lock();
         try {

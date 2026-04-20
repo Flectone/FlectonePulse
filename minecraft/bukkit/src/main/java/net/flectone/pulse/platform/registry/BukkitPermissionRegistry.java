@@ -35,9 +35,4 @@ public class BukkitPermissionRegistry implements PermissionRegistry {
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    @Override
-    public void reload() {
-        // nothing
-    }
-
 }

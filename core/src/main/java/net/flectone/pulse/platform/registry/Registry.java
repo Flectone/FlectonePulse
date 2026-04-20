@@ -2,6 +2,10 @@ package net.flectone.pulse.platform.registry;
 
 public interface Registry {
 
-    void reload();
+    default void onEnable() {
+    }
+
+    default void onDisable() {
+    }
 
 }

@@ -97,7 +97,7 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
     }
 
     @Override
-    public void reload() {
+    public void onDisable() {
         if (!fileFacade.config().command().unregisterOnReload()) return;
 
         if (reflectionResolver.isPaper()) {

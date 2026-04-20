@@ -91,8 +91,4 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
         manager.deleteRootCommand(name);
     }
 
-    @Override
-    public void reload() {
-        // nothing
-    }
 }

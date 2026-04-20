@@ -84,9 +84,4 @@ public class HytaleCommandRegistry implements CommandRegistry {
         // not supported
     }
 
-    @Override
-    public void reload() {
-        // not supported
-    }
-
 }
