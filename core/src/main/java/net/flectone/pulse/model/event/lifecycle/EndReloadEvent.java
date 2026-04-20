@@ -4,15 +4,16 @@ import lombok.With;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.model.event.Event;
+import org.jspecify.annotations.Nullable;
 
 @With
-public record ReloadEvent(
+public record EndReloadEvent(
         boolean cancelled,
         FlectonePulse flectonePulse,
-        ReloadException reloadException
+        @Nullable ReloadException reloadException
 ) implements Event {
 
-    public ReloadEvent(FlectonePulse flectonePulse, ReloadException reloadException) {
+    public EndReloadEvent(FlectonePulse flectonePulse, ReloadException reloadException) {
         this(false, flectonePulse, reloadException);
     }
 
