@@ -26,7 +26,7 @@ public class FabricPermissionRegistry implements PermissionRegistry {
     }
 
     @Override
-    public void reload() {
+    public void onDisable() {
         permissions.clear();
     }
 
