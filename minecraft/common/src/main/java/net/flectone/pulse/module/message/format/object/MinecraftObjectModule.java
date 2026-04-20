@@ -222,9 +222,6 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        User user = packetProvider.getUser(messageContext.receiver());
-        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().textureTag().needExtraSpace());
-
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
@@ -237,9 +234,6 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        User user = packetProvider.getUser(messageContext.receiver());
-        if (user != null && user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)) return applyDefaultFormatting(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
-
         Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
@@ -258,32 +252,34 @@ public class MinecraftObjectModule extends ObjectModule {
 
     @Nullable
     private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
-        FPlayer fReceiver = messageContext.receiver();
+        // ViaVersion will not be able to process messages that contain Object on older versions
+        if (!isNewerThanOrEqualsV_1_21_9) {
+            return MessagePipeline.ReplacementTag.emptyTag();
+        }
 
         if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
             return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
 
-        if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION) && isNewerThanOrEqualsV_1_21_9) {
+        if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION)) {
             return null;
         }
 
+        FPlayer fReceiver = messageContext.receiver();
         if (fReceiver.isUnknown()) {
-            if (isNewerThanOrEqualsV_1_21_9) {
-                return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
-            }
-
-            return MessagePipeline.ReplacementTag.emptyTag();
+            return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
 
         // get user
         User user = packetProvider.getUser(fReceiver);
 
         // I think null user == Status (MOTD) viewer
-        if (user == null) return null;
+        if (user == null) {
+            return null;
+        }
 
         // check player version
-        if (user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+        if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
                 return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
