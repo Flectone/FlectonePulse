@@ -125,7 +125,7 @@ public class MinecraftObjectModule extends ObjectModule {
                 && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace());
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace(), true);
         if (receiverVersionTag != null) return receiverVersionTag;
 
         PlayerHeadObjectContents.Builder playerHeadBuilder = ObjectContents.playerHead();
@@ -222,7 +222,7 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace());
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace(), false);
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -234,7 +234,7 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace());
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace(), false);
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -251,21 +251,27 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     @Nullable
-    private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace) {
+    private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace, boolean skipFormattingForOldVersion) {
         // ViaVersion will not be able to process messages that contain Object on older versions
         if (!isNewerThanOrEqualsV_1_21_9) {
-            return MessagePipeline.ReplacementTag.emptyTag();
+            return skipFormattingForOldVersion
+                    ? MessagePipeline.ReplacementTag.emptyTag()
+                    : applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
 
+        // return default formatting
         if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
             return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
 
+        // continue building
         if (!messageContext.isFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION)) {
             return null;
         }
 
         FPlayer fReceiver = messageContext.receiver();
+
+        // return default formatting
         if (fReceiver.isUnknown()) {
             return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
         }
