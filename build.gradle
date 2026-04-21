@@ -5,7 +5,7 @@ plugins {
     id 'com.github.gmazzo.buildconfig' version '6.0.9'
     id 'xyz.wagyourtail.jvmdowngrader' version '1.3.6'
     id 'com.vanniktech.maven.publish' version "0.36.0"
-    id 'io.freefair.lombok' version "9.2.0"
+    id 'io.freefair.lombok' version "9.4.0"
 }
 
 group = "net.flectone.pulse"
