@@ -30,7 +30,7 @@ public class MinecraftQuitModule extends QuitModule {
                                IntegrationSender integrationSender,
                                ProxyRegistry proxyRegistry,
                                FPlayerService fPlayerService) {
-        super(fileFacade, integrationModule, taskScheduler, messageDispatcher, moduleController, platformServerAdapter, integrationSender, proxyRegistry, fPlayerService);
+        super(fileFacade, integrationModule, taskScheduler, messageDispatcher, moduleController, platformServerAdapter, integrationSender, proxyRegistry, fPlayerService, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

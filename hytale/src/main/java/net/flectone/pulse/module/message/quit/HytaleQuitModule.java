@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.quit.listener.HytaleQuitPulseListener;
+import net.flectone.pulse.module.message.quit.listener.HytalePulseQuitListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -30,7 +30,7 @@ public class HytaleQuitModule extends QuitModule {
                             IntegrationSender integrationSender,
                             ProxyRegistry proxyRegistry,
                             FPlayerService fPlayerService) {
-        super(fileFacade, integrationModule, taskScheduler, messageDispatcher, moduleController, platformServerAdapter, integrationSender, proxyRegistry, fPlayerService);
+        super(fileFacade, integrationModule, taskScheduler, messageDispatcher, moduleController, platformServerAdapter, integrationSender, proxyRegistry, fPlayerService, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }
@@ -39,7 +39,7 @@ public class HytaleQuitModule extends QuitModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(HytaleQuitPulseListener.class);
+        listenerRegistry.register(HytalePulseQuitListener.class);
     }
 
 }

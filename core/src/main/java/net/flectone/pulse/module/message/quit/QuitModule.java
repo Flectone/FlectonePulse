@@ -15,9 +15,11 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.quit.listener.PulseQuitListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.service.FPlayerService;
@@ -45,6 +47,12 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     private final IntegrationSender integrationSender;
     private final ProxyRegistry proxyRegistry;
     private final FPlayerService fPlayerService;
+    private final ListenerRegistry listenerRegistry;
+
+    @Override
+    public void onEnable() {
+        listenerRegistry.register(PulseQuitListener.class);
+    }
 
     @Override
     public ModuleName name() {
