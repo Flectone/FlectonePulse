@@ -58,47 +58,43 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
 
     @Override
     public Mono<@NonNull MessageCreateEvent> execute(MessageCreateEvent event) {
-        Message discordMessage = event.getMessage();
+        Message message = event.getMessage();
+        Member member = event.getMember().orElse(null);
+        taskScheduler.runAsync(() -> handleMessage(message, member));
 
+        return Mono.empty();
+    }
+
+    public void handleMessage(Message message, @Nullable Member member) {
         List<String> channel = config().messageChannel().get(name().name());
-        if (channel == null) return Mono.empty();
-        if (!channel.contains(discordMessage.getChannelId().asString())) return Mono.empty();
-
-        Optional<Member> optionalMember = event.getMember();
-        if (optionalMember.isPresent()) {
-            Member member = optionalMember.get();
-
-            // always ignore ourselves
-            if (member.isBot() && (config().ignoreAllBots()
-                    || member.getId().asLong() == discordIntegration.get().getClientID())) return Mono.empty();
-        }
+        if (channel == null) return;
+        if (!channel.contains(message.getChannelId().asString())) return;
+        if (member != null && member.isBot() && (config().ignoreAllBots() || member.getId().asLong() == discordIntegration.get().getClientID())) return;
 
         Webhook webhook = null;
 
-        Optional<Snowflake> webhookId = discordMessage.getWebhookId();
+        Optional<Snowflake> webhookId = message.getWebhookId();
         if (webhookId.isPresent()) {
-            if (config().ignoreAllWebhooks()) return Mono.empty();
+            if (config().ignoreAllWebhooks()) return;
 
-            webhook = discordMessage.getWebhook().block();
+            webhook = message.getWebhook().block();
 
             // always ignore ourselves
             Optional<User> creator = webhook.getCreator();
             if (creator.isPresent()
-                    && creator.get().getId().equals(discordIntegration.get().getClientID())) return Mono.empty();
+                    && creator.get().getId().equals(discordIntegration.get().getClientID())) return;
         }
 
         // check command in message
-        if (executeCommand(discordMessage)) return Mono.empty();
+        if (executeCommand(message)) return;
 
-        String content = getMessageContent(discordMessage);
+        String content = getMessageContent(message);
         sendMessage(
-                event.getMember().orElse(null),
+                member,
                 webhook,
                 content,
-                retrieveReply(discordMessage).orElse(null)
+                retrieveReply(message).orElse(null)
         );
-
-        return Mono.empty();
     }
 
     public void sendMessage(@Nullable Member member,

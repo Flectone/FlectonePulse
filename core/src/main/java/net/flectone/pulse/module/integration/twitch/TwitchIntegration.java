@@ -11,6 +11,7 @@ import feign.Logger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -33,6 +34,7 @@ public class TwitchIntegration implements FIntegration {
     private final ChannelMessageListener channelMessageListener;
     private final PlatformServerAdapter platformServerAdapter;
     private final SystemVariableResolver systemVariableResolver;
+    private final TaskScheduler taskScheduler;
     @Getter private final FLogger fLogger;
 
     @Getter private FPlayer sender = FPlayer.UNKNOWN;
@@ -78,7 +80,9 @@ public class TwitchIntegration implements FIntegration {
         });
 
         if (!integration.messageChannel().isEmpty()) {
-            twitchClient.getEventManager().onEvent(channelMessageListener.getEventType(), channelMessageListener::execute);
+            twitchClient.getEventManager().onEvent(channelMessageListener.getEventType(), channelMessageEvent ->
+                    taskScheduler.runAsync(() -> channelMessageListener.execute(channelMessageEvent))
+            );
         }
 
         logHook();

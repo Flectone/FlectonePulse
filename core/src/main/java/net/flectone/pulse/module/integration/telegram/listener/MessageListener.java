@@ -64,10 +64,13 @@ public class MessageListener implements EventListener {
 
     @Override
     public void consume(Update update) {
-        if (!update.hasMessage()) return;
+        if (update.hasMessage()) {
+            Message message = update.getMessage();
+            taskScheduler.runAsync(() -> handleMessage(message));
+        }
+    }
 
-        Message message = update.getMessage();
-
+    public void handleMessage(Message message) {
         // delete telegram bot notification
         if (isNewChatNameMessage(message)) {
             String chatId = getChatId(message);
