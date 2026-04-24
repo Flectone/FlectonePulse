@@ -106,8 +106,9 @@ public class BasePacketListener implements PacketListener {
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
                 MessageReceiveEvent messageReceiveEvent = eventDispatcher.dispatch(new MessageReceiveEvent(fPlayer, triplet.getLeft(), triplet.getRight()));
-
-                event.setCancelled(messageReceiveEvent.cancelled());
+                if (messageReceiveEvent.cancelled()) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
