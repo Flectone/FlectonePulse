@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
+import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -56,6 +57,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
+    private final Provider<OnlineModule> onlineModuleProvider;
     private final MessagePipeline messagePipeline;
 
     @Getter private final FLogger fLogger;
@@ -69,6 +71,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
                                        Provider<MuteModule> muteModuleProvider,
                                        Provider<ConditionModule> conditionModuleProvider,
                                        Provider<AfkModule> afkModuleProvider,
+                                       Provider<OnlineModule> onlineModuleProvider,
                                        MessagePipeline messagePipeline,
                                        FLogger fLogger) {
         this.fileFacade = fileFacade;
@@ -78,6 +81,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         this.muteModuleProvider = muteModuleProvider;
         this.conditionModuleProvider = conditionModuleProvider;
         this.afkModuleProvider = afkModuleProvider;
+        this.onlineModuleProvider = onlineModuleProvider;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -193,6 +197,17 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
                 .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
+                })
+                .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, queue, _) -> {
+                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+
+                    FPlayer fPlayer = fPlayerService.getFPlayer(player);
+
+                    OnlineModule onlineModule = onlineModuleProvider.get();
+                    String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, queue.pop().value());
+                    if (StringUtils.isEmpty(timeValue)) return null;
+
+                    return Tag.preProcessParsed(timeValue);
                 })
                 .audiencePlaceholder(Player.class, "condition", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());

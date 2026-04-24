@@ -20,6 +20,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
+import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -55,6 +56,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
+    private final Provider<OnlineModule> onlineModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -106,6 +108,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         if (params.equalsIgnoreCase("afk_duration_formatted")) {
             return afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer);
+        }
+
+        if (params.startsWith("online_")) {
+            String time = params.substring(7);
+            if (StringUtils.isEmpty(time)) return null;
+
+            OnlineModule onlineModule = onlineModuleProvider.get();
+            String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, time);
+            if (StringUtils.isEmpty(timeValue)) return null;
+
+            return timeValue;
         }
 
         if (params.startsWith("condition_")) {

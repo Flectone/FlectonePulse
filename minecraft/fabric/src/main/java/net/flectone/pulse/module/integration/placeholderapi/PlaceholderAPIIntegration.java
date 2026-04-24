@@ -22,6 +22,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
+import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -50,6 +51,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
+    private final Provider<OnlineModule> onlineModuleProvider;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -123,6 +125,18 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
 
             return PlaceholderResult.value(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
+        });
+
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
+
+            OnlineModule onlineModule = onlineModuleProvider.get();
+            String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, argument);
+            if (StringUtils.isEmpty(timeValue)) return null;
+
+            return PlaceholderResult.value(timeValue);
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":condition"), (context, argument) -> {

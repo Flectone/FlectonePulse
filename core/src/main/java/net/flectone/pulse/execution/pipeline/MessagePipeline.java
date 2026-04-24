@@ -186,6 +186,7 @@ public class MessagePipeline {
         CONSTANT,
         REPLACEMENT,
         MENTION,
+        ONLINE,
         SWEAR,
         QUESTION,
         TRANSLATION,
