@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.quit.listener;
+package net.flectone.pulse.module.message.join.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -6,19 +6,19 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
+import net.flectone.pulse.module.message.join.JoinModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HytaleQuitPulseListener implements PulseListener {
+public class HytalePulseJoinListener implements PulseListener {
 
-    private final QuitModule quitModule;
+    private final JoinModule joinModule;
 
     @Pulse
-    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.player();
-        quitModule.send(fPlayer, false);
+        joinModule.send(fPlayer, false);
     }
 
 }
