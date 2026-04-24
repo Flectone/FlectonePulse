@@ -9,8 +9,8 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.chat.listener.ChatBukkitListener;
-import net.flectone.pulse.module.message.chat.listener.ChatPaperListener;
+import net.flectone.pulse.module.message.chat.listener.BukkitChatListener;
+import net.flectone.pulse.module.message.chat.listener.PaperChatListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
@@ -71,7 +71,7 @@ public class BukkitChatModule extends MinecraftChatModule {
         if (mode == Message.Chat.Mode.PACKET) return; // already registered in super class
         if (mode == Message.Chat.Mode.PAPER) {
             if (reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
-                ChatPaperListener chatPaperListener = new ChatPaperListener(fPlayerService, moduleController, this);
+                PaperChatListener chatPaperListener = new PaperChatListener(fPlayerService, moduleController, this);
                 listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().priority().name()));
                 return;
             }
@@ -79,6 +79,6 @@ public class BukkitChatModule extends MinecraftChatModule {
             fLogger.warning("It is not possible to use chat in PAPER mode on your server. BUKKIT mode is currently in use.");
         }
 
-        listenerRegistry.register(ChatBukkitListener.class, config().priority());
+        listenerRegistry.register(BukkitChatListener.class, config().priority());
     }
 }

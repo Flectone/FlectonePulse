@@ -18,8 +18,8 @@ import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
-import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
-import net.flectone.pulse.module.message.format.listener.LegacyColorPulseListener;
+import net.flectone.pulse.module.message.format.listener.PulseFormatListener;
+import net.flectone.pulse.module.message.format.listener.PulseLegacyColorListener;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.names.NamesModule;
@@ -98,10 +98,10 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
         putAdventureTag(AdventureTag.PRIDE, StandardTags.pride());
         putAdventureTag(AdventureTag.SHADOW_COLOR, StandardTags.shadowColor());
 
-        listenerRegistry.register(FormatPulseListener.class);
+        listenerRegistry.register(PulseFormatListener.class);
 
         if (config().convertLegacyColor()) {
-            listenerRegistry.register(LegacyColorPulseListener.class);
+            listenerRegistry.register(PulseLegacyColorListener.class);
         }
     }
 

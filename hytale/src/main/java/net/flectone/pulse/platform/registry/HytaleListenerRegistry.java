@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.HytaleBaseListener;
-import net.flectone.pulse.listener.HytaleBasePulseListener;
+import net.flectone.pulse.listener.HytalePulseBaseListener;
 import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -51,7 +51,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
         super.registerDefaultListeners();
 
         register(HytaleBaseListener.class);
-        register(HytaleBasePulseListener.class);
+        register(HytalePulseBaseListener.class);
 
         if (!basePacketsRegistered) {
             HytaleBaseListener hytaleBaseListener = injector.getInstance(HytaleBaseListener.class);

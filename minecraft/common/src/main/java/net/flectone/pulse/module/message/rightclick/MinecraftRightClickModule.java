@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
+import net.flectone.pulse.module.message.rightclick.listener.PacketRightclickListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -35,6 +35,6 @@ public class MinecraftRightClickModule extends RightclickModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(RightclickPacketListener.class);
+        listenerRegistry.register(PacketRightclickListener.class);
     }
 }

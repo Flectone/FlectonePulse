@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
+import net.flectone.pulse.module.message.afk.listener.PulseAfkListener;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -62,7 +62,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             taskScheduler.runPlayerRegionTimer(this::updateCoordinates, config().ticker().period());
         }
 
-        listenerRegistry.register(AfkPulseListener.class);
+        listenerRegistry.register(PulseAfkListener.class);
     }
 
     @Override

@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
+import net.flectone.pulse.module.message.format.names.listener.PulseNamesListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -42,7 +42,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(NamesPulseListener.class);
+        listenerRegistry.register(PulseNamesListener.class);
     }
 
     @Override

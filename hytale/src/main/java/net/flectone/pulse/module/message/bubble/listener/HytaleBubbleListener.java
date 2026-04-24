@@ -1,0 +1,34 @@
+package net.flectone.pulse.module.message.bubble.listener;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.hypixel.hytale.server.core.event.events.player.PlayerChatEvent;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.listener.HytaleListener;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.FPlayerService;
+
+import java.util.Collections;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class HytaleBubbleListener implements HytaleListener {
+
+    private final FPlayerService fPlayerService;
+    private final BubbleModule bubbleModule;
+    private final ChatModule chatModule;
+    private final ModuleController moduleController;
+
+    public void onPlayerChatEvent(PlayerChatEvent event) {
+        if (moduleController.isEnable(chatModule) || !moduleController.isEnable(bubbleModule)) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getSender().getUuid());
+
+        String message = event.getContent();
+
+        bubbleModule.add(fPlayer, message, Collections.emptyList());
+    }
+}

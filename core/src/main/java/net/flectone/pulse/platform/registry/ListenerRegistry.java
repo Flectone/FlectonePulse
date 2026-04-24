@@ -9,11 +9,11 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.listener.BasePulseListener;
-import net.flectone.pulse.listener.MessagePulseListener;
+import net.flectone.pulse.listener.PulseBaseListener;
+import net.flectone.pulse.listener.PulseMessageListener;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.module.command.mute.listener.MutePulseListener;
+import net.flectone.pulse.module.command.mute.listener.PulseMuteListener;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
@@ -135,8 +135,8 @@ public class ListenerRegistry implements Registry {
     }
 
     public void registerDefaultListeners() {
-        register(BasePulseListener.class);
-        register(MessagePulseListener.class);
-        register(MutePulseListener.class);
+        register(PulseBaseListener.class);
+        register(PulseMessageListener.class);
+        register(PulseMuteListener.class);
     }
 }

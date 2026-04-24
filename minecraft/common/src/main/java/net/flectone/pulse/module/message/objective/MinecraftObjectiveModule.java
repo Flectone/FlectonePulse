@@ -11,9 +11,9 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
-import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.module.message.objective.belowname.MinecraftBelownameModule;
+import net.flectone.pulse.module.message.objective.tabname.MinecraftTabnameModule;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -23,12 +23,12 @@ import org.jspecify.annotations.NonNull;
 @Singleton
 public class MinecraftObjectiveModule extends ObjectiveModule {
 
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
 
     @Inject
     public MinecraftObjectiveModule(FileFacade fileFacade,
-                                    PacketSender packetSender,
+                                    MinecraftPacketSender packetSender,
                                     MessagePipeline messagePipeline) {
         super(fileFacade);
         this.packetSender = packetSender;
@@ -38,8 +38,8 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
-                BelownameModule.class,
-                TabnameModule.class
+                MinecraftBelownameModule.class,
+                MinecraftTabnameModule.class
         );
     }
 

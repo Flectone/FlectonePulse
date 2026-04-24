@@ -13,7 +13,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Toast;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.kyori.adventure.text.Component;
 
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftToastRender implements ToastRender {
 
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
 
     @Override
     public void render(FPlayer fPlayer, Component title, Component description, Toast toast) {

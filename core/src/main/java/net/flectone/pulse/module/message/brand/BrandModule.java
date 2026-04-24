@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
-import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
+import net.flectone.pulse.module.message.brand.listener.PulseBrandListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -45,7 +45,7 @@ public class BrandModule implements ModuleListLocalization<Localization.Message.
             taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
         }
 
-        listenerRegistry.register(BrandPulseListener.class);
+        listenerRegistry.register(PulseBrandListener.class);
     }
 
     @Override

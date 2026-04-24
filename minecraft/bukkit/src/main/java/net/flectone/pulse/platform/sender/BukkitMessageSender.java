@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -19,8 +19,8 @@ public class BukkitMessageSender extends MinecraftMessageSender {
     private final PaperItemStackUtil paperItemStackUtil;
 
     @Inject
-    public BukkitMessageSender(PacketSender packetSender,
-                               PacketProvider packetProvider,
+    public BukkitMessageSender(MinecraftPacketSender packetSender,
+                               MinecraftPacketProvider packetProvider,
                                IntegrationModule integrationModule,
                                FileFacade fileFacade,
                                PaperItemStackUtil paperItemStackUtil,

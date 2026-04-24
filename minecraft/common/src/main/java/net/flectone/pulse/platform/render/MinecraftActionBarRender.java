@@ -12,8 +12,8 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -21,8 +21,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftActionBarRender implements ActionBarRender {
 
-    private final PacketProvider packetProvider;
-    private final PacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
+    private final MinecraftPacketSender packetSender;
     private final TaskScheduler taskScheduler;
 
     @Override

@@ -1,0 +1,68 @@
+package net.flectone.pulse.module.integration.litebans;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.integration.litebans.listener.BukkitPulseLiteBansListener;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BukkitLiteBansModule implements ModuleSimple {
+
+    private final FileFacade fileFacade;
+    private final BukkitLiteBansIntegration liteBansIntegration;
+    private final ListenerRegistry listenerRegistry;
+    private final ModuleController moduleController;
+
+    @Override
+    public void onEnable() {
+        liteBansIntegration.hook();
+
+        listenerRegistry.register(BukkitPulseLiteBansListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        liteBansIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_LITEBANS;
+    }
+
+    @Override
+    public Integration.Litebans config() {
+        return fileFacade.integration().litebans();
+    }
+
+    @Override
+    public Permission.Integration.Litebans permission() {
+        return fileFacade.permission().integration().litebans();
+    }
+
+    public boolean isMuted(FEntity fEntity) {
+        if (moduleController.isDisabledFor(this, fEntity)) return false;
+
+        return liteBansIntegration.isMuted(fEntity);
+    }
+
+    public ExternalModeration getMute(FEntity fEntity) {
+        if (moduleController.isDisabledFor(this, fEntity)) return null;
+
+        return liteBansIntegration.getMute(fEntity);
+    }
+
+    public boolean isHooked() {
+        return liteBansIntegration.isHooked();
+    }
+}

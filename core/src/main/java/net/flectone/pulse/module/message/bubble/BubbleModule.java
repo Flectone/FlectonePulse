@@ -5,7 +5,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
+import net.flectone.pulse.module.message.bubble.listener.PulseBubbleListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -54,7 +54,7 @@ public abstract class BubbleModule implements ModuleSimple {
     public void onEnable() {
         bubbleService.startTicker();
 
-        listenerRegistry.register(BubblePulseListener.class);
+        listenerRegistry.register(PulseBubbleListener.class);
     }
 
     @Override

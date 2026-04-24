@@ -15,7 +15,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
@@ -25,8 +25,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftMessageSender implements MessageSender {
 
-    private final PacketSender packetSender;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
     private final IntegrationModule integrationModule;
     private final FLogger fLogger;
 

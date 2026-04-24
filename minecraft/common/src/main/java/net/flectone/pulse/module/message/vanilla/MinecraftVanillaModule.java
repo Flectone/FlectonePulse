@@ -14,14 +14,14 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
-import net.flectone.pulse.module.message.vanilla.listener.VanillaPacketListener;
-import net.flectone.pulse.module.message.vanilla.listener.VanillaPulseListener;
+import net.flectone.pulse.module.message.vanilla.listener.MinecraftPacketVanillaListener;
+import net.flectone.pulse.module.message.vanilla.listener.MinecraftPulseVanillaListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -47,7 +47,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final MessageDispatcher messageDispatcher;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final ModuleController moduleController;
     private final IntegrationModule integrationModule;
 
@@ -59,7 +59,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   MessageDispatcher messageDispatcher,
                                   PlatformPlayerAdapter platformPlayerAdapter,
                                   TaskScheduler taskScheduler,
-                                  PacketSender packetSender,
+                                  MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
                                   IntegrationModule integrationModule) {
         super(fileFacade);
@@ -81,8 +81,8 @@ public class MinecraftVanillaModule extends VanillaModule {
 
         extractor.reload();
 
-        listenerRegistry.register(VanillaPacketListener.class);
-        listenerRegistry.register(VanillaPulseListener.class);
+        listenerRegistry.register(MinecraftPacketVanillaListener.class);
+        listenerRegistry.register(MinecraftPulseVanillaListener.class);
     }
 
     public void send(FPlayer fPlayer, ParsedComponent parsedComponent) {

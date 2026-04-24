@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.mail.listener.MailPulseListener;
+import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
@@ -57,7 +57,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
 
-        listenerRegistry.register(MailPulseListener.class);
+        listenerRegistry.register(PulseMailListener.class);
     }
 
     @Override

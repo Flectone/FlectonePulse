@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
+import net.flectone.pulse.module.command.ban.listener.PulseBanListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -62,7 +62,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
 
-        listenerRegistry.register(BanPulseListener.class);
+        listenerRegistry.register(PulseBanListener.class);
     }
 
     @Override

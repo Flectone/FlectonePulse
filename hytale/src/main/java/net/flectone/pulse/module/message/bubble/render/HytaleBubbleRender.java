@@ -28,7 +28,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
-import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
+import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -49,7 +49,7 @@ import java.util.function.Predicate;
 @Singleton
 public class HytaleBubbleRender implements BubbleRender {
 
-    private final Map<String, List<BubbleEntity>> activeBubbles = new ConcurrentHashMap<>();
+    private final Map<String, List<HytaleBubbleEntity>> activeBubbles = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -90,7 +90,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         Transform playerTransform = playerRef.getTransform();
         world.execute(() -> {
-            List<BubbleEntity> existingBubbles = activeBubbles.getOrDefault(playerKey, new CopyOnWriteArrayList<>());
+            List<HytaleBubbleEntity> existingBubbles = activeBubbles.getOrDefault(playerKey, new CopyOnWriteArrayList<>());
             existingBubbles.removeIf(bubbleData -> !bubbleData.entityRef().isValid());
 
             existingBubbles.forEach(bubbleEntity -> {
@@ -155,7 +155,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
             Ref<EntityStore> newBubbleRef = world.getEntityStore().getStore().addEntity(holder, AddReason.SPAWN);
 
-            BubbleEntity newBubbleData = new BubbleEntity(newBubbleRef, bubble, expireTimeInstant.toEpochMilli());
+            HytaleBubbleEntity newBubbleData = new HytaleBubbleEntity(newBubbleRef, bubble, expireTimeInstant.toEpochMilli());
 
             existingBubbles.addFirst(newBubbleData);
             activeBubbles.put(playerKey, existingBubbles);
@@ -164,7 +164,7 @@ public class HytaleBubbleRender implements BubbleRender {
         });
     }
 
-    private void scheduleBubbleRemoval(BubbleEntity bubbleData, String playerKey) {
+    private void scheduleBubbleRemoval(HytaleBubbleEntity bubbleData, String playerKey) {
         long delay = bubbleData.expiryTime() - System.currentTimeMillis();
         if (delay <= 0) {
             removeBubble(bubbleData, playerKey);
@@ -174,13 +174,13 @@ public class HytaleBubbleRender implements BubbleRender {
         taskScheduler.runAsyncLater(() -> removeBubble(bubbleData, playerKey), delay / 50 + 10);
     }
 
-    private void removeBubble(BubbleEntity bubbleData, String playerKey) {
+    private void removeBubble(HytaleBubbleEntity bubbleData, String playerKey) {
         if (bubbleData.entityRef().isValid()) {
             EntityStore entityStore = bubbleData.entityRef().getStore().getExternalData();
             entityStore.getWorld().execute(() -> entityStore.getStore().removeEntity(bubbleData.entityRef(), RemoveReason.REMOVE));
         }
 
-        List<BubbleEntity> bubbles = activeBubbles.get(playerKey);
+        List<HytaleBubbleEntity> bubbles = activeBubbles.get(playerKey);
         if (bubbles != null) {
             bubbles.remove(bubbleData);
             if (bubbles.isEmpty()) {
@@ -210,7 +210,7 @@ public class HytaleBubbleRender implements BubbleRender {
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubblePredicate) {
         List<String> keysToRemove = new ObjectArrayList<>();
-        List<BubbleEntity> bubblesToRemove = new ObjectArrayList<>();
+        List<HytaleBubbleEntity> bubblesToRemove = new ObjectArrayList<>();
 
         activeBubbles.forEach((key, bubbleDataList) -> bubbleDataList.stream()
                 .filter(bubbleEntity -> bubblePredicate.test(bubbleEntity.bubble()))
@@ -224,7 +224,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         bubblesToRemove.forEach(bubbleEntity -> {
             String playerKey = null;
-            for (Map.Entry<String, List<BubbleEntity>> entry : activeBubbles.entrySet()) {
+            for (Map.Entry<String, List<HytaleBubbleEntity>> entry : activeBubbles.entrySet()) {
                 if (entry.getValue().contains(bubbleEntity)) {
                     playerKey = entry.getKey();
                     break;

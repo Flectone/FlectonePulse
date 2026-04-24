@@ -13,8 +13,8 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.platform.controller.DialogController;
-import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.platform.controller.MinecraftDialogController;
+import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
@@ -116,8 +116,8 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
     @Override
     public void closeUIs() {
         // close all open inventories
-        injector.getInstance(InventoryController.class).closeAll();
-        injector.getInstance(DialogController.class).closeAll();
+        injector.getInstance(MinecraftInventoryController.class).closeAll();
+        injector.getInstance(MinecraftDialogController.class).closeAll();
     }
 
     private void removeDefaultFabricCommands() {

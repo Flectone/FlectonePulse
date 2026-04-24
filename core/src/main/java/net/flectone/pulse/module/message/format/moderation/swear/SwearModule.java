@@ -16,7 +16,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.moderation.swear.listener.SwearPulseListener;
+import net.flectone.pulse.module.message.format.moderation.swear.listener.PulseSwearListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -57,7 +57,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
             fLogger.warning(e);
         }
 
-        listenerRegistry.register(SwearPulseListener.class);
+        listenerRegistry.register(PulseSwearListener.class);
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -44,14 +44,14 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
     public void handleSystemOnline(UUID uuid) throws IOException {
         super.handleSystemOnline(uuid);
 
-        injector.getInstance(PlayerlistnameModule.class).add(uuid);
+        injector.getInstance(MinecraftPlayerlistnameModule.class).add(uuid);
     }
 
     @Override
     public void handleSystemOffline(UUID uuid) throws IOException {
         super.handleSystemOffline(uuid);
 
-        injector.getInstance(PlayerlistnameModule.class).remove(uuid);
+        injector.getInstance(MinecraftPlayerlistnameModule.class).remove(uuid);
     }
 
 }

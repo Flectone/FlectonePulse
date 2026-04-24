@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
+import net.flectone.pulse.module.message.greeting.listener.PulseGreetingListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
@@ -34,7 +34,7 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(GreetingPulseListener.class);
+        listenerRegistry.register(PulseGreetingListener.class);
     }
 
     @Override

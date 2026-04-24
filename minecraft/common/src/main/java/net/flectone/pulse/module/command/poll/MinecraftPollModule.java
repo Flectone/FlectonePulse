@@ -7,11 +7,11 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
+import net.flectone.pulse.module.command.poll.builder.MinecraftDialogPollBuilder;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -22,8 +22,8 @@ import org.incendo.cloud.meta.CommandMeta;
 public class MinecraftPollModule extends PollModule {
 
     private final ModuleCommandController commandModuleController;
-    private final PacketProvider packetProvider;
-    private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
+    private final MinecraftPacketProvider packetProvider;
+    private final Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider;
 
     @Inject
     public MinecraftPollModule(FileFacade fileFacade,
@@ -36,8 +36,8 @@ public class MinecraftPollModule extends PollModule {
                                ModuleController moduleController,
                                ModuleCommandController commandModuleController,
                                FLogger fLogger,
-                               PacketProvider packetProvider,
-                               Provider<DialogPollBuilder> dialogPollBuilderProvider) {
+                               MinecraftPacketProvider packetProvider,
+                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider) {
         super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, fLogger);
 
         this.commandModuleController = commandModuleController;

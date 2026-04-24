@@ -12,7 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.moderation.delete.listener.DeletePulseListener;
+import net.flectone.pulse.module.message.format.moderation.delete.listener.PulseDeleteListener;
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -49,7 +49,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(DeletePulseListener.class);
+        listenerRegistry.register(PulseDeleteListener.class);
     }
 
     @Override

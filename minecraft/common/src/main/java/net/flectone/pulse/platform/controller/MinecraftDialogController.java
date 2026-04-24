@@ -1,0 +1,104 @@
+package net.flectone.pulse.platform.controller;
+
+import com.github.retrooper.packetevents.protocol.dialog.MultiActionDialog;
+import com.github.retrooper.packetevents.protocol.dialog.action.DynamicCustomAction;
+import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.inventory.MinecraftDialog;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MinecraftDialogController {
+
+    private final Map<UUID, MinecraftDialog> dialogMap = new ConcurrentHashMap<>();
+
+    private final MinecraftPacketSender packetSender;
+    private final TaskScheduler taskScheduler;
+
+    public MinecraftDialog get(UUID uuid) {
+        return dialogMap.get(uuid);
+    }
+
+    public void close(UUID uuid) {
+        MinecraftDialog dialog = dialogMap.get(uuid);
+        if (dialog == null) return;
+
+        dialog.getCloseConsumerList().forEach(closeConsumer -> closeConsumer.accept(dialog));
+        dialogMap.remove(uuid);
+    }
+
+    public void closeAll() {
+        WrapperPlayServerClearDialog wrapper = new WrapperPlayServerClearDialog();
+        dialogMap.keySet().forEach(uuid -> packetSender.send(uuid, wrapper));
+        dialogMap.clear();
+    }
+
+    public void open(FPlayer fPlayer, MinecraftDialog dialog, boolean reopen) {
+        if (reopen) {
+            MinecraftDialog oldDialog = dialogMap.get(fPlayer.uuid());
+            if (oldDialog != null) {
+                oldDialog.getCloseConsumerList().forEach(closeConsumer -> closeConsumer.accept(oldDialog));
+            }
+        }
+
+        dialogMap.put(fPlayer.uuid(), dialog);
+
+        packetSender.send(fPlayer, dialog.getWrapperDialog());
+    }
+
+    public void click(MinecraftDialog dialog, String key, NBT payload) {
+        if (!dialog.getClickConsumerMap().containsKey(key)) return;
+
+        dialog.getClickConsumerMap().get(key).accept(dialog, payload);
+    }
+
+    public void process(UUID uuid, String key, NBT payload) {
+        taskScheduler.runAsync(() -> {
+            MinecraftDialog dialog = get(uuid);
+            if (dialog == null) return;
+
+            click(dialog, key, payload);
+        });
+    }
+
+    public void changeButton(FPlayer fPlayer, MinecraftDialog dialog, String id, ActionButton actionButton) {
+        WrapperPlayServerShowDialog showDialog = dialog.getWrapperDialog();
+        if (showDialog == null || !(showDialog.getDialog() instanceof MultiActionDialog multiActionDialog)) return;
+
+        List<ActionButton> actionButtons = new ObjectArrayList<>(multiActionDialog.getActions());
+        for (int i = 0; i < actionButtons.size(); i++) {
+            ActionButton button = actionButtons.get(i);
+            if (button.getAction() instanceof DynamicCustomAction dynamicCustomAction
+                    && dynamicCustomAction.getId().getKey().equals(id)) {
+                actionButtons.set(i, actionButton);
+                break;
+            }
+        }
+
+        MultiActionDialog newMultiActionDialog = new MultiActionDialog(
+                multiActionDialog.getCommon(),
+                actionButtons,
+                multiActionDialog.getExitAction(),
+                multiActionDialog.getColumns()
+        );
+
+        dialog.setWrapperDialog(new WrapperPlayServerShowDialog(newMultiActionDialog));
+
+        open(fPlayer, dialog, true);
+    }
+
+}

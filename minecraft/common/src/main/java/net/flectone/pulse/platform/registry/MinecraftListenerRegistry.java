@@ -9,12 +9,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.flectone.pulse.listener.BasePacketListener;
-import net.flectone.pulse.listener.DialogPacketListener;
-import net.flectone.pulse.listener.InventoryPacketListener;
-import net.flectone.pulse.listener.MinecraftBasePulseListener;
+import net.flectone.pulse.listener.MinecraftBasePacketListener;
+import net.flectone.pulse.listener.MinecraftPacketDialogListener;
+import net.flectone.pulse.listener.MinecraftPacketInventoryListener;
+import net.flectone.pulse.listener.MinecraftPulseBaseListener;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
@@ -25,12 +25,12 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
     private final List<PacketListenerCommon> packetListeners = new ObjectArrayList<>();
 
     private final Injector injector;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
 
     @Inject
     public MinecraftListenerRegistry(FLogger fLogger,
                                      Injector injector,
-                                     PacketProvider packetProvider) {
+                                     MinecraftPacketProvider packetProvider) {
         super(fLogger, injector);
 
         this.injector = injector;
@@ -41,12 +41,12 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
 
-        register(MinecraftBasePulseListener.class);
-        register(BasePacketListener.class);
-        register(InventoryPacketListener.class);
+        register(MinecraftPulseBaseListener.class);
+        register(MinecraftBasePacketListener.class);
+        register(MinecraftPacketInventoryListener.class);
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
-            register(DialogPacketListener.class);
+            register(MinecraftPacketDialogListener.class);
         }
     }
 

@@ -7,7 +7,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.platform.registry.cloud.HytaleCommandManager;
 import net.flectone.pulse.platform.registry.cloud.HytaleRegistrationHandler;
-import net.flectone.pulse.processing.mapper.FPlayerMapper;
+import net.flectone.pulse.processing.mapper.HytaleFPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -26,7 +26,7 @@ import java.util.function.Function;
 public class HytaleCommandRegistry implements CommandRegistry {
 
     private final PermissionChecker permissionChecker;
-    private final FPlayerMapper fPlayerMapper;
+    private final HytaleFPlayerMapper fPlayerMapper;
     private final JavaPlugin javaPlugin;
     private final CommandExceptionHandler commandExceptionHandler;
 
@@ -34,7 +34,7 @@ public class HytaleCommandRegistry implements CommandRegistry {
 
     @Inject
     public HytaleCommandRegistry(PermissionChecker permissionChecker,
-                                 FPlayerMapper fPlayerMapper,
+                                 HytaleFPlayerMapper fPlayerMapper,
                                  JavaPlugin javaPlugin,
                                  CommandExceptionHandler commandExceptionHandler) {
         this.permissionChecker = permissionChecker;

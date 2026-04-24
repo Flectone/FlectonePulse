@@ -19,7 +19,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
+import net.flectone.pulse.module.message.format.questionanswer.listener.PulseQuestionAnswerListener;
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -65,7 +65,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
             }
         });
 
-        listenerRegistry.register(QuestionAnswerPulseListener.class);
+        listenerRegistry.register(PulseQuestionAnswerListener.class);
     }
 
     @Override

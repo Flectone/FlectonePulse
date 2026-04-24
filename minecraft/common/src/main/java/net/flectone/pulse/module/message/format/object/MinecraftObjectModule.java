@@ -10,11 +10,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.object.listener.ObjectPulseListener;
-import net.flectone.pulse.module.message.format.object.texture.TextureService;
+import net.flectone.pulse.module.message.format.object.listener.MinecraftPulseObjectListener;
+import net.flectone.pulse.module.message.format.object.texture.MinecraftTextureService;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
@@ -43,9 +43,9 @@ public class MinecraftObjectModule extends ObjectModule {
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MinecraftSkinService skinService;
-    private final TextureService textureService;
+    private final MinecraftTextureService textureService;
     private final FPlayerService fPlayerService;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
@@ -57,9 +57,9 @@ public class MinecraftObjectModule extends ObjectModule {
                                  ListenerRegistry listenerRegistry,
                                  PermissionChecker permissionChecker,
                                  MinecraftSkinService skinService,
-                                 TextureService textureService,
+                                 MinecraftTextureService textureService,
                                  FPlayerService fPlayerService,
-                                 PacketProvider packetProvider,
+                                 MinecraftPacketProvider packetProvider,
                                  IntegrationModule integrationModule,
                                  PlatformPlayerAdapter platformPlayerAdapter,
                                  ModuleController moduleController,
@@ -84,7 +84,7 @@ public class MinecraftObjectModule extends ObjectModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(ObjectPulseListener.class);
+        listenerRegistry.register(MinecraftPulseObjectListener.class);
 
         if (config().textureTag().enable()) {
             textureService.reload();

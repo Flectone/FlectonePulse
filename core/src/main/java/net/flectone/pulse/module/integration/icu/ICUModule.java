@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.integration.icu.listener.ICUMessagePulseListener;
+import net.flectone.pulse.module.integration.icu.listener.PulseICUListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -43,7 +43,7 @@ public class ICUModule implements ModuleSimple {
         reflectionResolver.hasClassOrElse("com.ibm.icu.text.ArabicShaping", this::loadLibraries);
 
         injector.getInstance(ICUIntegration.class).hook();
-        listenerRegistry.register(ICUMessagePulseListener.class);
+        listenerRegistry.register(PulseICUListener.class);
     }
 
     @Override

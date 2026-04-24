@@ -35,7 +35,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
+import net.flectone.pulse.module.integration.discord.listener.MessageListener;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -66,7 +66,7 @@ public class DiscordIntegration implements FIntegration {
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
-    private final MessageCreateListener messageCreateListener;
+    private final MessageListener messageCreateListener;
     private final MessagePipeline messagePipeline;
     private final SystemVariableResolver systemVariableResolver;
     @Getter private final FLogger fLogger;

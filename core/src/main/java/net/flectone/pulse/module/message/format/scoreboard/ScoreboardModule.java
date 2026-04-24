@@ -4,7 +4,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
+import net.flectone.pulse.module.message.format.scoreboard.listener.PulseScoreboardListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -41,7 +41,7 @@ public abstract class ScoreboardModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(ScoreboardPulseListener.class);
+        listenerRegistry.register(PulseScoreboardListener.class);
     }
 
     public boolean isInvisibleNameFor(FPlayer fPlayer) {

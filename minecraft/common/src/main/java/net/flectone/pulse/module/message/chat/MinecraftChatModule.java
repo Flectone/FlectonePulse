@@ -9,7 +9,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.chat.listener.ChatPacketListener;
+import net.flectone.pulse.module.message.chat.listener.MinecraftPacketChatListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -51,7 +51,7 @@ public class MinecraftChatModule extends ChatModule {
     @Override
     public void onEnable() {
         if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
-            listenerRegistry.register(ChatPacketListener.class);
+            listenerRegistry.register(MinecraftPacketChatListener.class);
         }
     }
 

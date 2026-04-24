@@ -9,9 +9,9 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
-import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
-import net.flectone.pulse.module.integration.supervanish.VanishModule;
+import net.flectone.pulse.module.integration.miniplaceholders.FabricMiniPlaceholdersModule;
+import net.flectone.pulse.module.integration.placeholderapi.FabricPlaceholderAPIModule;
+import net.flectone.pulse.module.integration.supervanish.FabricVanishModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -48,15 +48,15 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
-            builder.add(VanishModule.class);
+            builder.add(FabricVanishModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            builder.add(MiniPlaceholdersModule.class);
+            builder.add(FabricMiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("placeholder-api")) {
-            builder.add(PlaceholderAPIModule.class);
+            builder.add(FabricPlaceholderAPIModule.class);
         }
 
         return builder;
@@ -69,8 +69,8 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (containsEnabledChild(VanishModule.class)) {
-            return injector.getInstance(VanishModule.class).isVanished(sender);
+        if (containsEnabledChild(FabricVanishModule.class)) {
+            return injector.getInstance(FabricVanishModule.class).isVanished(sender);
         }
 
         return false;

@@ -15,7 +15,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
+import net.flectone.pulse.module.integration.twitch.listener.MessageListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.file.FileFacade;
@@ -31,7 +31,7 @@ import java.util.function.UnaryOperator;
 public class TwitchIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
-    private final ChannelMessageListener channelMessageListener;
+    private final MessageListener channelMessageListener;
     private final PlatformServerAdapter platformServerAdapter;
     private final SystemVariableResolver systemVariableResolver;
     private final TaskScheduler taskScheduler;

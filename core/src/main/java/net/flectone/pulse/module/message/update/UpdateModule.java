@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
+import net.flectone.pulse.module.message.update.listener.PulseUpdateListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -47,7 +47,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(UpdatePulseListener.class);
+        listenerRegistry.register(PulseUpdateListener.class);
 
         checkAndUpdateLatestVersion();
     }

@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.condition.listener.ConditionPulseListener;
+import net.flectone.pulse.module.message.format.condition.listener.PulseConditionListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -39,7 +39,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(ConditionPulseListener.class);
+        listenerRegistry.register(PulseConditionListener.class);
     }
 
     @Override

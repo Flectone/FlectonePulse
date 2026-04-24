@@ -15,7 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.nickname.listener.NicknamePulseListener;
+import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -84,7 +84,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
                         .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
         );
 
-        listenerRegistry.register(NicknamePulseListener.class);
+        listenerRegistry.register(PulseNicknameListener.class);
     }
 
     @Override

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.sign;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.module.message.sign.listener.SignListener;
+import net.flectone.pulse.module.message.sign.listener.BukkitSignListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
@@ -27,6 +27,6 @@ public class BukkitSignModule extends SignModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(SignListener.class);
+        listenerRegistry.register(BukkitSignListener.class);
     }
 }

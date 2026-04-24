@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.anvil;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
+import net.flectone.pulse.module.message.anvil.listener.BukkitAnvilListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -28,6 +28,6 @@ public class BukkitAnvilModule extends AnvilModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(AnvilListener.class);
+        listenerRegistry.register(BukkitAnvilListener.class);
     }
 }

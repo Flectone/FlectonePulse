@@ -20,7 +20,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.bubble.BubbleEntity;
+import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -28,11 +28,11 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.EntityUtil;
+import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
@@ -54,18 +54,18 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftBubbleRender implements BubbleRender {
 
-    private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
+    private final Map<String, Deque<MinecraftBubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
-    private final EntityUtil entityUtil;
-    private final PacketProvider packetProvider;
+    private final MinecraftEntityUtil entityUtil;
+    private final MinecraftPacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
 
     @Override
@@ -100,10 +100,10 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
-        Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
 
         // create bubble entity
-        BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
+        MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
         bubbleEntities.push(bubbleEntity);
 
         if (bubble.isInteractionRiding()) {
@@ -124,7 +124,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         activeBubbleEntities.forEach((_, bubbleEntities) -> {
             if (bubbleEntities.isEmpty()) return;
 
-            List<BubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
+            List<MinecraftBubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
                     .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
                     .toList();
 
@@ -137,14 +137,14 @@ public class MinecraftBubbleRender implements BubbleRender {
             bubbleEntities.removeAll(bubbleEntitiesToRemove);
 
             // remove space
-            BubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
+            MinecraftBubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
 
             rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
         });
     }
 
     public void rideEntities(FPlayer sender, FPlayer viewer) {
-        Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.get(sender.uuid().toString() + viewer.uuid());
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.get(sender.uuid().toString() + viewer.uuid());
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
@@ -156,7 +156,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         int playerId = platformPlayerAdapter.getEntityId(sender.uuid());
         int lastID = playerId;
 
-        for (BubbleEntity bubbleEntity : bubbleEntities) {
+        for (MinecraftBubbleEntity bubbleEntity : bubbleEntities) {
             boolean isFirstBubble = bubbleEntities.getFirst().equals(bubbleEntity);
 
             if (bubbleEntity.getEntityType() == EntityTypes.INTERACTION && !isFirstBubble) {
@@ -189,7 +189,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         }
     }
 
-    private int rideEntity(BubbleEntity nextBubbleEntity, int entityId, int[] passengersIds) {
+    private int rideEntity(MinecraftBubbleEntity nextBubbleEntity, int entityId, int[] passengersIds) {
         packetSender.send(nextBubbleEntity.getViewer(), new WrapperPlayServerSetPassengers(entityId, passengersIds), true);
 
         return nextBubbleEntity.getId();
@@ -213,27 +213,27 @@ public class MinecraftBubbleRender implements BubbleRender {
         );
     }
 
-    private BubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {
+    private MinecraftBubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {
         int id = platformServerAdapter.generateEntityId();
 
         EntityType entityType = bubble instanceof ModernBubble
                 ? EntityTypes.TEXT_DISPLAY
                 : EntityTypes.AREA_EFFECT_CLOUD;
 
-        return new BubbleEntity(id, entityType, bubble, viewer, formattedMessage);
+        return new MinecraftBubbleEntity(id, entityType, bubble, viewer, formattedMessage);
     }
 
-    private BubbleEntity createSpaceBubbleEntity(Bubble bubble, FPlayer viewer) {
+    private MinecraftBubbleEntity createSpaceBubbleEntity(Bubble bubble, FPlayer viewer) {
         int spaceEntityId = platformServerAdapter.generateEntityId();
 
         EntityType spaceBubbleEntityType = bubble.isInteractionRiding()
                 ? EntityTypes.INTERACTION
                 : EntityTypes.AREA_EFFECT_CLOUD;
 
-        return new BubbleEntity(spaceEntityId, spaceBubbleEntityType, bubble, viewer, Component.empty(), false);
+        return new MinecraftBubbleEntity(spaceEntityId, spaceBubbleEntityType, bubble, viewer, Component.empty(), false);
     }
 
-    private void despawnBubbleEntity(BubbleEntity bubbleEntity) {
+    private void despawnBubbleEntity(MinecraftBubbleEntity bubbleEntity) {
         EntityType entityType = bubbleEntity.getEntityType();
         int despawnDelay = 0;
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
@@ -252,7 +252,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         activeBubbleEntities.clear();
     }
 
-    private void spawnEntity(BubbleEntity bubbleEntity, boolean isFirstBubble) {
+    private void spawnEntity(MinecraftBubbleEntity bubbleEntity, boolean isFirstBubble) {
         if (bubbleEntity.isCreated()) return;
 
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(bubbleEntity.getBubble().getSender());
@@ -281,7 +281,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         }, 1);
     }
 
-    private void interpolate(BubbleEntity bubbleEntity, ModernBubble bubble, Vector3f scale) {
+    private void interpolate(MinecraftBubbleEntity bubbleEntity, ModernBubble bubble, Vector3f scale) {
         List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         // interpolation delay
@@ -296,7 +296,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(bubbleEntity.getId(), metadataList));
     }
 
-    private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity, boolean isFirstBubble) {
+    private List<EntityData<?>> createEntityData(MinecraftBubbleEntity bubbleEntity, boolean isFirstBubble) {
         List<EntityData<?>> metadataList = new ObjectArrayList<>();
 
         EntityType entityType = bubbleEntity.getEntityType();

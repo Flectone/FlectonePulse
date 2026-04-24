@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
-import net.flectone.pulse.processing.mapper.FPlayerMapper;
+import net.flectone.pulse.processing.mapper.FabricFPlayerMapper;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.CloudCapability;
 import org.incendo.cloud.Command;
@@ -27,7 +27,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PermissionChecker permissionChecker;
-    private final FPlayerMapper fPlayerMapper;
+    private final FabricFPlayerMapper fPlayerMapper;
     private final CommandExceptionHandler commandExceptionHandler;
 
     private CommandManager<FPlayer> manager;
@@ -36,7 +36,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
     public FabricCommandRegistry(FabricFlectonePulse fabricFlectonePulse,
                                  PermissionChecker permissionChecker,
                                  CommandExceptionHandler commandExceptionHandler,
-                                 FPlayerMapper fPlayerMapper) {
+                                 FabricFPlayerMapper fPlayerMapper) {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
         this.fPlayerMapper = fPlayerMapper;

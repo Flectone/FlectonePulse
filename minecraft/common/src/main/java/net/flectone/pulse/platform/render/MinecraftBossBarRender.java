@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.BossBar;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftBossBarRender implements BossBarRender {
 
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final TaskScheduler taskScheduler;
 
     @Override

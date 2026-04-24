@@ -6,7 +6,7 @@ import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -39,7 +39,7 @@ public class MinecraftTranslationService implements TranslationService {
     private final Map<String, String> translations = new ConcurrentHashMap<>();
     private final @Named("defaultMapper") ObjectMapper objectMapper;
     private final @Named("minecraftPath") Path minecraftPath;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final FileFacade fileFacade;
     private final WebUtil webUtil;
     private final FLogger fLogger;

@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
-import net.flectone.pulse.module.message.format.fcolor.listener.FColorPulseListener;
+import net.flectone.pulse.module.message.format.fcolor.listener.PulseFColorListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -41,7 +41,7 @@ public class FColorModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(FColorPulseListener.class);
+        listenerRegistry.register(PulseFColorListener.class);
     }
 
     @Override

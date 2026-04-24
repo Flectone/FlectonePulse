@@ -1,0 +1,120 @@
+package net.flectone.pulse.module.message.tab.header;
+
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.util.Ticker;
+import net.flectone.pulse.module.ModuleListLocalization;
+import net.flectone.pulse.module.message.tab.header.listener.MinecraftPulseHeaderListener;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.generator.RandomGenerator;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MinecraftHeaderModule implements ModuleListLocalization<Localization.Message.Tab.Header> {
+
+    private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
+
+    private final FileFacade fileFacade;
+    private final TaskScheduler taskScheduler;
+    private final ListenerRegistry listenerRegistry;
+    private final MinecraftPacketSender packetSender;
+    private final MessageDispatcher messageDispatcher;
+    private final ModuleController moduleController;
+    private final RandomGenerator randomUtil;
+
+    @Override
+    public void onEnable() {
+        Ticker ticker = config().ticker();
+        if (ticker.enable()) {
+            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
+        }
+
+        listenerRegistry.register(MinecraftPulseHeaderListener.class);
+    }
+
+    @Override
+    public void onDisable() {
+        messageIndexMap.clear();
+
+        // clear tab
+        Destination.Type destinationType = config().destination().type();
+        if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
+            packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
+        }
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_TAB_HEADER;
+    }
+
+    @Override
+    public Message.Tab.Header config() {
+        return fileFacade.message().tab().header();
+    }
+
+    @Override
+    public Permission.Message.Tab.Header permission() {
+        return fileFacade.permission().message().tab().header();
+    }
+
+    @Override
+    public Localization.Message.Tab.Header localization(FEntity sender) {
+        return fileFacade.localization(sender).message().tab().header();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(localization(fPlayer).lists());
+    }
+
+    @Override
+    public int getPlayerIndexOrDefault(int id, int defaultIndex) {
+        return messageIndexMap.getOrDefault(id, defaultIndex);
+    }
+
+    @Override
+    public int nextInt(int start, int end) {
+        return randomUtil.nextInt(start, end);
+    }
+
+    @Override
+    public void savePlayerIndex(int id, int playerIndex) {
+        messageIndexMap.put(id, playerIndex);
+    }
+
+    public void send(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+        String format = getNextMessage(fPlayer, config().random());
+        if (StringUtils.isEmpty(format)) return;
+
+        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Tab.Header>builder()
+                .sender(fPlayer)
+                .format(format)
+                .destination(config().destination())
+                .build()
+        );
+    }
+}

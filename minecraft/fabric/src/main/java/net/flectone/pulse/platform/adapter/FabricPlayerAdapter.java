@@ -17,11 +17,11 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
-import net.flectone.pulse.module.message.tab.footer.FooterModule;
-import net.flectone.pulse.module.message.tab.header.HeaderModule;
+import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
+import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
@@ -51,8 +51,8 @@ import java.util.stream.Collectors;
 public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final PacketSender packetSender;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final Injector injector;
@@ -196,7 +196,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        HeaderModule headerModule = injector.getInstance(HeaderModule.class);
+        MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
 
         if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
@@ -211,7 +211,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        FooterModule footerModule = injector.getInstance(FooterModule.class);
+        MinecraftFooterModule footerModule = injector.getInstance(MinecraftFooterModule.class);
 
         if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);

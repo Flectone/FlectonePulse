@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.serializer.PacketSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -16,7 +16,7 @@ public class MinecraftBrandRender implements BrandRender {
 
     private static final String RESET_STYLE = "§r";
 
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final PacketSerializer packetSerializer;
 
     @Override

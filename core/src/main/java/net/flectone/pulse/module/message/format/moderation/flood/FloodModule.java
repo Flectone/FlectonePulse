@@ -10,7 +10,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.format.moderation.flood.listener.FloodPulseListener;
+import net.flectone.pulse.module.message.format.moderation.flood.listener.PulseFloodListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -29,7 +29,7 @@ public class FloodModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(FloodPulseListener.class);
+        listenerRegistry.register(PulseFloodListener.class);
     }
 
     @Override

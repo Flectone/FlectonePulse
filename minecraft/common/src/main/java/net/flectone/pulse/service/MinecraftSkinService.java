@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
@@ -27,7 +27,7 @@ public class MinecraftSkinService implements SkinService {
     private final @Named("profileProperty") Cache<UUID, PlayerHeadObjectContents.ProfileProperty> profilePropertyCache;
     private final FileFacade fileFacade;
     private final MinecraftIntegrationModule integrationModule;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public void updateProfilePropertyCache(UUID uuid, PlayerHeadObjectContents.ProfileProperty profileProperty) {

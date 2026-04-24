@@ -1,0 +1,32 @@
+package net.flectone.pulse.module.integration.motd.listener;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.module.ModuleEnableEvent;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.integration.motd.BukkitMOTDModule;
+import net.flectone.pulse.module.message.status.MinecraftStatusModule;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BukkitPulseMOTDListener implements PulseListener {
+
+    private final BukkitMOTDModule motdModule;
+
+    @Pulse
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        if (!motdModule.isHooked()) return event;
+
+        ModuleSimple eventModule = event.module();
+        if (eventModule instanceof MinecraftStatusModule && motdModule.config().disableFlectonepulseStatus()) {
+            return event.withCancelled(true);
+        }
+
+        return event;
+    }
+
+}

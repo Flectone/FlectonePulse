@@ -23,7 +23,7 @@ public class MinecraftSoundPlayer implements SoundPlayer {
 
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final PermissionChecker permissionChecker;
 
     @Override

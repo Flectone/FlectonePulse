@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.book;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.module.message.book.listener.BookListener;
+import net.flectone.pulse.module.message.book.listener.BukkitBookListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -28,6 +28,6 @@ public class BukkitBookModule extends BookModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(BookListener.class);
+        listenerRegistry.register(BukkitBookListener.class);
     }
 }

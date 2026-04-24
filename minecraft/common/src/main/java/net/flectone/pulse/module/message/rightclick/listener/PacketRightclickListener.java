@@ -1,0 +1,28 @@
+package net.flectone.pulse.module.message.rightclick.listener;
+
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.module.message.rightclick.RightclickModule;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class PacketRightclickListener implements PacketListener {
+
+    private final RightclickModule rightClickModule;
+
+    @Override
+    public void onPacketReceive(PacketReceiveEvent event) {
+        if (event.getPacketType() != PacketType.Play.Client.INTERACT_ENTITY) return;
+
+        WrapperPlayClientInteractEntity wrapperPlayClientInteractEntity = new WrapperPlayClientInteractEntity(event);
+
+        if (wrapperPlayClientInteractEntity.getAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT_AT) return;
+
+        rightClickModule.send(event.getUser().getUUID(), wrapperPlayClientInteractEntity.getEntityId());
+    }
+}

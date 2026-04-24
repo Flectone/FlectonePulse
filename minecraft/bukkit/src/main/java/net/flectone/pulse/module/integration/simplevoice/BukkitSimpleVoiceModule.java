@@ -7,15 +7,15 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
-public class BukkitSimpleVoiceModule extends SimpleVoiceModule {
+public class BukkitSimpleVoiceModule extends MinecraftSimpleVoiceModule {
 
     private final Plugin plugin;
-    private final SimpleVoiceIntegration simpleVoiceIntegration;
+    private final MinecraftSimpleVoiceIntegration simpleVoiceIntegration;
 
     @Inject
     public BukkitSimpleVoiceModule(FileFacade fileFacade,
                                    Plugin plugin,
-                                   SimpleVoiceIntegration simpleVoiceIntegration) {
+                                   MinecraftSimpleVoiceIntegration simpleVoiceIntegration) {
         super(fileFacade, simpleVoiceIntegration);
 
         this.plugin = plugin;

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
-import net.flectone.pulse.processing.mapper.FPlayerMapper;
+import net.flectone.pulse.processing.mapper.BukkitFPlayerMapper;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.plugin.Plugin;
@@ -19,7 +19,7 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry imp
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        TaskScheduler taskScheduler,
-                                       FPlayerMapper fPlayerMapper) {
+                                       BukkitFPlayerMapper fPlayerMapper) {
         super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, taskScheduler, fPlayerMapper);
     }
 

@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.data.database.dao.VersionDAO;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.comparator.VersionComparator;
@@ -22,7 +22,7 @@ import java.nio.file.Path;
 public class MinecraftDatabase extends Database {
 
     private final FileFacade fileFacade;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final FLogger fLogger;
 
     @Inject
@@ -32,7 +32,7 @@ public class MinecraftDatabase extends Database {
                              SystemVariableResolver systemVariableResolver,
                              PlatformServerAdapter platformServerAdapter,
                              FLogger fLogger,
-                             PacketProvider packetProvider,
+                             MinecraftPacketProvider packetProvider,
                              ReflectionResolver reflectionResolver,
                              Provider<VersionDAO> versionDAOProvider,
                              BackupCreator backupCreator) {

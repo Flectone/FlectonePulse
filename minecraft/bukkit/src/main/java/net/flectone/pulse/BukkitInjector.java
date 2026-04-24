@@ -4,12 +4,12 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.command.spy.BukkitSpyModule;
+import net.flectone.pulse.module.command.spy.BukkitBukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.simplevoice.BukkitSimpleVoiceModule;
-import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
+import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
@@ -70,15 +70,15 @@ public class BukkitInjector extends MinecraftPlatformInjector {
 
         // Providers
         if (reflectionResolver.hasClass("org.bukkit.attribute.Attribute")) {
-            bind(AttributesProvider.class).to(ModernAttributesProvider.class);
+            bind(BukkitAttributesProvider.class).to(BukkitModernAttributesProvider.class);
         } else {
-            bind(AttributesProvider.class).to(LegacyAttributesProvider.class);
+            bind(BukkitAttributesProvider.class).to(BukkitLegacyAttributesProvider.class);
         }
 
         if (reflectionResolver.hasMethod(Player.class, "getPassengers")) {
-            bind(PassengersProvider.class).to(ModernPassengersProvider.class);
+            bind(BukkitPassengersProvider.class).to(BukkitModernPassengersProvider.class);
         } else {
-            bind(PassengersProvider.class).to(LegacyPassengersProvider.class);
+            bind(BukkitPassengersProvider.class).to(BukkitLegacyPassengersProvider.class);
         }
 
         // Registries
@@ -100,7 +100,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(MinecraftIntegrationModule.class).to(BukkitIntegrationModule.class);
 
         if (reflectionResolver.hasClass("de.maxhenkel.voicechat.api.VoicechatPlugin")) {
-            bind(SimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
+            bind(MinecraftSimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
         }
 
         if (reflectionResolver.isPaper() && reflectionResolver.hasClass("com.", "github.retrooper.packetevents.util.adventure.AdventureSerializer")) {
@@ -112,7 +112,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(AfkModule.class).to(BukkitAfkModule.class);
         bind(MinecraftChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
-        bind(SpyModule.class).to(BukkitSpyModule.class);
+        bind(SpyModule.class).to(BukkitBukkitSpyModule.class);
         bind(MinecraftJoinModule.class).to(BukkitJoinModule.class);
         bind(MinecraftQuitModule.class).to(BukkitQuitModule.class);
 

@@ -23,9 +23,9 @@ import net.flectone.pulse.model.util.TextScreen;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.render.MinecraftBubbleRender;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.util.EntityUtil;
+import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
@@ -41,11 +41,11 @@ public class MinecraftTextScreenRender implements TextScreenRender {
     private final Map<UUID, List<Integer>> livingEntities = new ConcurrentHashMap<>();
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
     private final RandomGenerator randomUtil;
-    private final EntityUtil entityUtil;
+    private final MinecraftEntityUtil entityUtil;
     private final Provider<MinecraftBubbleRender> bubbleRenderer;
     private final Provider<TitleRender> titleRender;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;

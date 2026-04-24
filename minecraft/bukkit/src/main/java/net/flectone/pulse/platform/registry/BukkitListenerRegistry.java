@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.BukkitBaseListener;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
 import org.bukkit.plugin.EventExecutor;
@@ -27,7 +27,7 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
     public BukkitListenerRegistry(Plugin plugin,
                                   FLogger fLogger,
                                   Injector injector,
-                                  PacketProvider packetProvider) {
+                                  MinecraftPacketProvider packetProvider) {
         super(fLogger, injector, packetProvider);
 
         this.plugin = plugin;

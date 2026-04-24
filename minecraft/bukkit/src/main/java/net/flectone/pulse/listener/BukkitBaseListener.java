@@ -11,7 +11,7 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -35,7 +35,7 @@ public class BukkitBaseListener implements Listener {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TaskScheduler taskScheduler;
 

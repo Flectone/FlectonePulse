@@ -10,8 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.listener.FabricBaseListener;
-import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.util.TpsTracker;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
@@ -20,16 +20,16 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final Provider<FabricBaseListener> fabricBaseListenerProvider;
     private final FabricTaskScheduler fabricTaskScheduler;
-    private final TpsTracker tpsTracker;
+    private final FabricTpsTracker tpsTracker;
 
     @Inject
     public FabricListenerRegistry(FabricFlectonePulse fabricFlectonePulse,
                                   Provider<FabricBaseListener> fabricBaseListenerProvider,
                                   FabricTaskScheduler fabricTaskScheduler,
-                                  TpsTracker tpsTracker,
+                                  FabricTpsTracker tpsTracker,
                                   FLogger fLogger,
                                   Injector injector,
-                                  PacketProvider packetProvider) {
+                                  MinecraftPacketProvider packetProvider) {
         super(fLogger, injector, packetProvider);
 
         this.fabricFlectonePulse = fabricFlectonePulse;

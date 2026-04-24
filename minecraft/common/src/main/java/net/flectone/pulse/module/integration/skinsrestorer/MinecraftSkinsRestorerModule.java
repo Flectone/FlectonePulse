@@ -1,0 +1,68 @@
+package net.flectone.pulse.module.integration.skinsrestorer;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MinecraftSkinsRestorerModule implements ModuleSimple {
+
+    private final FileFacade fileFacade;
+    private final MinecraftSkinsRestorerIntegration skinsRestorerIntegration;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final ModuleController moduleController;
+
+    @Override
+    public void onEnable() {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            // delay for init
+            skinsRestorerIntegration.hookLater();
+        } else {
+            skinsRestorerIntegration.hook();
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        skinsRestorerIntegration.unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_SKINSRESTORER;
+    }
+
+    @Override
+    public Integration.Skinsrestorer config() {
+        return fileFacade.integration().skinsrestorer();
+    }
+
+    @Override
+    public Permission.Integration.Skinsrestorer permission() {
+        return fileFacade.permission().integration().skinsrestorer();
+    }
+
+    public String getTextureUrl(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
+
+        return skinsRestorerIntegration.getTextureUrl(fPlayer);
+    }
+
+    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return null;
+
+        return skinsRestorerIntegration.getProfileProperty(fPlayer);
+    }
+
+}

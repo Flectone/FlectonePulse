@@ -15,7 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
+import net.flectone.pulse.module.command.maintenance.listener.PulseMaintenanceListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -83,7 +83,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(MaintenancePulseListener.class);
+        listenerRegistry.register(PulseMaintenanceListener.class);
 
         File file = iconPath.resolve("maintenance.png").toFile();
 

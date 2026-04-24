@@ -6,9 +6,9 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.vanilla.model.Mapping;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.EntityUtil;
+import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -49,15 +49,15 @@ public class MinecraftComponentExtractor extends ComponentExtractor<Translatable
             )
     );
 
-    private final EntityUtil entityUtil;
+    private final MinecraftEntityUtil entityUtil;
     private final FPlayerService fPlayerService;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
 
     @Inject
     public MinecraftComponentExtractor(FileFacade fileFacade,
-                                       EntityUtil entityUtil,
+                                       MinecraftEntityUtil entityUtil,
                                        FPlayerService fPlayerService,
-                                       PacketProvider packetProvider) {
+                                       MinecraftPacketProvider packetProvider) {
         super(fileFacade);
 
         this.entityUtil = entityUtil;

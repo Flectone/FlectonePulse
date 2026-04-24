@@ -8,7 +8,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
-import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
+import net.flectone.pulse.module.message.sidebar.listener.PulseSidebarListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -49,7 +49,7 @@ public abstract class SidebarModule implements ModuleListLocalization<Localizati
             taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
         }
 
-        listenerRegistry.register(SidebarPulseListener.class);
+        listenerRegistry.register(PulseSidebarListener.class);
     }
 
     @Override

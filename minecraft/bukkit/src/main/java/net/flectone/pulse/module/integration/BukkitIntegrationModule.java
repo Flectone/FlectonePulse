@@ -8,21 +8,21 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
-import net.flectone.pulse.module.integration.blazeandcave.BlazeandCaveModule;
-import net.flectone.pulse.module.integration.cmi.CMIModule;
-import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
-import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
-import net.flectone.pulse.module.integration.libertybans.LibertyBansModule;
-import net.flectone.pulse.module.integration.litebans.LiteBansModule;
-import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
-import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
-import net.flectone.pulse.module.integration.motd.MOTDModule;
-import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
-import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
-import net.flectone.pulse.module.integration.tab.TABModule;
-import net.flectone.pulse.module.integration.triton.TritonModule;
-import net.flectone.pulse.module.integration.vault.VaultModule;
+import net.flectone.pulse.module.integration.advancedban.BukkitAdvancedBanModule;
+import net.flectone.pulse.module.integration.blazeandcave.BukkitBlazeandCaveModule;
+import net.flectone.pulse.module.integration.cmi.BukkitCMIModule;
+import net.flectone.pulse.module.integration.interactivechat.BukkitInteractiveChatModule;
+import net.flectone.pulse.module.integration.itemsadder.BukkitItemsAdderModule;
+import net.flectone.pulse.module.integration.libertybans.BukkitLibertyBansModule;
+import net.flectone.pulse.module.integration.litebans.BukkitLiteBansModule;
+import net.flectone.pulse.module.integration.maintenance.BukkitMaintenanceModule;
+import net.flectone.pulse.module.integration.miniplaceholders.BukkitMiniPlaceholdersModule;
+import net.flectone.pulse.module.integration.motd.BukkitMOTDModule;
+import net.flectone.pulse.module.integration.placeholderapi.BukkitPlaceholderAPIModule;
+import net.flectone.pulse.module.integration.supervanish.BukkitSuperVanishModule;
+import net.flectone.pulse.module.integration.tab.BukkitTABModule;
+import net.flectone.pulse.module.integration.triton.BukkitTritonModule;
+import net.flectone.pulse.module.integration.vault.BukkitVaultModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -70,28 +70,28 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
-            builder.add(AdvancedBanModule.class);
+            builder.add(BukkitAdvancedBanModule.class);
         }
 
         if (isDatapackEnabled("Blazeandcave")) {
-            builder.add(BlazeandCaveModule.class);
+            builder.add(BukkitBlazeandCaveModule.class);
         }
 
         if (platformServerAdapter.hasProject("CMI")) {
-            builder.add(CMIModule.class);
+            builder.add(BukkitCMIModule.class);
         }
 
         if (platformServerAdapter.hasProject("PlaceholderAPI")) {
-            builder.add(PlaceholderAPIModule.class);
+            builder.add(BukkitPlaceholderAPIModule.class);
         }
 
         if (platformServerAdapter.hasProject("Vault")) {
-            builder.add(VaultModule.class);
+            builder.add(BukkitVaultModule.class);
         }
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
             if (reflectionResolver.hasClass("com.loohp.interactivechat.registry.Registry")) {
-                builder.add(InteractiveChatModule.class);
+                builder.add(BukkitInteractiveChatModule.class);
             } else {
                 fLogger.warning("Update InteractiveChat to the latest version");
             }
@@ -100,46 +100,46 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         if (platformServerAdapter.hasProject("ItemsAdder")) {
             Class<?> fontImageWrapper = reflectionResolver.resolveClass("dev.lone.itemsadder.api.FontImages.FontImageWrapper");
             if (fontImageWrapper != null && reflectionResolver.hasMethod(fontImageWrapper, "replaceFontImages", Permissible.class, String.class)) {
-                builder.add(ItemsAdderModule.class);
+                builder.add(BukkitItemsAdderModule.class);
             } else {
                 fLogger.warning("Update ItemsAdder to the latest version");
             }
         }
 
         if (platformServerAdapter.hasProject("LibertyBans")) {
-            builder.add(LibertyBansModule.class);
+            builder.add(BukkitLibertyBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("LiteBans")) {
-            builder.add(LiteBansModule.class);
+            builder.add(BukkitLiteBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("Maintenance")) {
-            builder.add(MaintenanceModule.class);
+            builder.add(BukkitMaintenanceModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniPlaceholders")) {
-            builder.add(MiniPlaceholdersModule.class);
+            builder.add(BukkitMiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("MOTD")) {
-            builder.add(MOTDModule.class);
+            builder.add(BukkitMOTDModule.class);
         }
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             if (reflectionResolver.hasClass("de.myzelyam.api.vanish.VanishAPI")) {
-                builder.add(SuperVanishModule.class);
+                builder.add(BukkitSuperVanishModule.class);
             } else {
                 fLogger.warning("Integration with SuperVanish is not possible. Are you using another plugin with the same name? It is only supported https://www.spigotmc.org/resources/supervanish-be-invisible.1331/");
             }
         }
 
         if (platformServerAdapter.hasProject("TAB")) {
-            builder.add(TABModule.class);
+            builder.add(BukkitTABModule.class);
         }
 
         if (platformServerAdapter.hasProject("Triton")) {
-            builder.add(TritonModule.class);
+            builder.add(BukkitTritonModule.class);
         }
 
         return builder;
@@ -149,8 +149,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     public String checkMention(FEntity fSender, String message) {
         if (moduleController.isDisabledFor(this, fSender)) return message;
 
-        if (containsEnabledChild(InteractiveChatModule.class)) {
-            return getInstance(InteractiveChatModule.class).checkMention(fSender, message);
+        if (containsEnabledChild(BukkitInteractiveChatModule.class)) {
+            return getInstance(BukkitInteractiveChatModule.class).checkMention(fSender, message);
         }
 
         return message;
@@ -160,8 +160,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         boolean value = super.hasFPlayerPermission(fPlayer, permission);
 
-        if (containsEnabledChild(VaultModule.class)) {
-            return getInstance(VaultModule.class).hasVaultPermission(fPlayer, permission);
+        if (containsEnabledChild(BukkitVaultModule.class)) {
+            return getInstance(BukkitVaultModule.class).hasVaultPermission(fPlayer, permission);
         }
 
         return value;
@@ -172,8 +172,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         String prefix = super.getPrefix(fPlayer);
         if (prefix != null) return prefix;
 
-        if (containsEnabledChild(VaultModule.class)) {
-            return getInstance(VaultModule.class).getPrefix(fPlayer);
+        if (containsEnabledChild(BukkitVaultModule.class)) {
+            return getInstance(BukkitVaultModule.class).getPrefix(fPlayer);
         }
 
         return null;
@@ -184,8 +184,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         String suffix = super.getSuffix(fPlayer);
         if (suffix != null) return suffix;
 
-        if (containsEnabledChild(VaultModule.class)) {
-            return getInstance(VaultModule.class).getSuffix(fPlayer);
+        if (containsEnabledChild(BukkitVaultModule.class)) {
+            return getInstance(BukkitVaultModule.class).getSuffix(fPlayer);
         }
 
         return null;
@@ -196,8 +196,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
         Set<String> groups = super.getGroups();
         if (!groups.isEmpty()) return groups;
 
-        if (containsEnabledChild(VaultModule.class)) {
-            return getInstance(VaultModule.class).getGroups();
+        if (containsEnabledChild(BukkitVaultModule.class)) {
+            return getInstance(BukkitVaultModule.class).getGroups();
         }
 
         return Collections.emptySet();
@@ -205,8 +205,8 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (containsEnabledChild(SuperVanishModule.class)) {
-            return getInstance(SuperVanishModule.class).isVanished(sender);
+        if (containsEnabledChild(BukkitSuperVanishModule.class)) {
+            return getInstance(BukkitSuperVanishModule.class).isVanished(sender);
         }
 
         Player player = Bukkit.getPlayer(sender.uuid());
@@ -227,20 +227,20 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isMuted(FPlayer fPlayer) {
-        if (containsEnabledChild(LiteBansModule.class)) {
-            return getInstance(LiteBansModule.class).isMuted(fPlayer);
+        if (containsEnabledChild(BukkitLiteBansModule.class)) {
+            return getInstance(BukkitLiteBansModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(AdvancedBanModule.class)) {
-            return getInstance(AdvancedBanModule.class).isMuted(fPlayer);
+        if (containsEnabledChild(BukkitAdvancedBanModule.class)) {
+            return getInstance(BukkitAdvancedBanModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(CMIModule.class)) {
-            return getInstance(CMIModule.class).isMuted(fPlayer);
+        if (containsEnabledChild(BukkitCMIModule.class)) {
+            return getInstance(BukkitCMIModule.class).isMuted(fPlayer);
         }
 
-        if (containsEnabledChild(LibertyBansModule.class)) {
-            return getInstance(LibertyBansModule.class).isMuted(fPlayer);
+        if (containsEnabledChild(BukkitLibertyBansModule.class)) {
+            return getInstance(BukkitLibertyBansModule.class).isMuted(fPlayer);
         }
 
         return false;
@@ -248,20 +248,20 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public ExternalModeration getMute(FPlayer fPlayer) {
-        if (containsEnabledChild(LiteBansModule.class)) {
-            return getInstance(LiteBansModule.class).getMute(fPlayer);
+        if (containsEnabledChild(BukkitLiteBansModule.class)) {
+            return getInstance(BukkitLiteBansModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(AdvancedBanModule.class)) {
-            return getInstance(AdvancedBanModule.class).getMute(fPlayer);
+        if (containsEnabledChild(BukkitAdvancedBanModule.class)) {
+            return getInstance(BukkitAdvancedBanModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(CMIModule.class)) {
-            return getInstance(CMIModule.class).getMute(fPlayer);
+        if (containsEnabledChild(BukkitCMIModule.class)) {
+            return getInstance(BukkitCMIModule.class).getMute(fPlayer);
         }
 
-        if (containsEnabledChild(LibertyBansModule.class)) {
-            return getInstance(LibertyBansModule.class).getMute(fPlayer);
+        if (containsEnabledChild(BukkitLibertyBansModule.class)) {
+            return getInstance(BukkitLibertyBansModule.class).getMute(fPlayer);
         }
 
         return null;
@@ -270,17 +270,17 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     @Override
     public String getTritonLocale(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return null;
-        if (!containsEnabledChild(TritonModule.class)) return null;
+        if (!containsEnabledChild(BukkitTritonModule.class)) return null;
 
-        return getInstance(TritonModule.class).getLocale(fPlayer);
+        return getInstance(BukkitTritonModule.class).getLocale(fPlayer);
     }
 
     @Override
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
         if (moduleController.isDisabledFor(this, fReceiver)) return false;
 
-        if (containsEnabledChild(InteractiveChatModule.class)) {
-            return getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);
+        if (containsEnabledChild(BukkitInteractiveChatModule.class)) {
+            return getInstance(BukkitInteractiveChatModule.class).sendMessage(fReceiver, message);
         }
 
         return false;

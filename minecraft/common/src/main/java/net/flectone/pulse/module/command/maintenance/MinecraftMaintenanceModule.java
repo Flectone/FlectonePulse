@@ -14,7 +14,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
+import net.flectone.pulse.module.command.maintenance.listener.MinecraftPacketMaintenanceListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -22,7 +22,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
+import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -35,7 +35,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
-    private final ServerStatusFormatter statusUtil;
+    private final MinecraftServerStatusFormatter statusUtil;
 
     @Inject
     public MinecraftMaintenanceModule(FileFacade fileFacade,
@@ -50,7 +50,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
                                       IconConvertor iconUtil,
-                                      ServerStatusFormatter statusUtil,
+                                      MinecraftServerStatusFormatter statusUtil,
                                       FLogger fLogger) {
         super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil, fLogger);
 
@@ -64,7 +64,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(MaintenancePacketListener.class);
+        listenerRegistry.register(MinecraftPacketMaintenanceListener.class);
     }
 
     public void updateServerData(PacketSendEvent event) {

@@ -14,9 +14,9 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -35,8 +35,8 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
-    private final PacketSender packetSender;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
 
@@ -46,8 +46,8 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   MessagePipeline messagePipeline,
                                   ListenerRegistry listenerRegistry,
                                   FPlayerService fPlayerService,
-                                  PacketSender packetSender,
-                                  PacketProvider packetProvider,
+                                  MinecraftPacketSender packetSender,
+                                  MinecraftPacketProvider packetProvider,
                                   PermissionChecker permissionChecker,
                                   ModuleController moduleController,
                                   RandomGenerator randomUtil) {

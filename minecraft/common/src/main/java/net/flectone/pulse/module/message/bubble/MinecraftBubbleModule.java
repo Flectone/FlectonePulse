@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.bubble;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.message.bubble.listener.BubblePacketListener;
+import net.flectone.pulse.module.message.bubble.listener.MinecraftPacketBubbleListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -29,7 +29,7 @@ public class MinecraftBubbleModule extends BubbleModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(BubblePacketListener.class);
+        listenerRegistry.register(MinecraftPacketBubbleListener.class);
     }
 
 }

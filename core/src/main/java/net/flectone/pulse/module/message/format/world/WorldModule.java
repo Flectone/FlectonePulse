@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.format.world.listener.WorldPulseListener;
+import net.flectone.pulse.module.message.format.world.listener.PulseWorldListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -40,7 +40,7 @@ public class WorldModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(WorldPulseListener.class);
+        listenerRegistry.register(PulseWorldListener.class);
     }
 
     @Override

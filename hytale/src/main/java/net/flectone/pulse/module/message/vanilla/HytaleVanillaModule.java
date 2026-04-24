@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
-import net.flectone.pulse.module.message.vanilla.listener.DeathListener;
+import net.flectone.pulse.module.message.vanilla.listener.HytaleDeathListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -48,7 +48,7 @@ public class HytaleVanillaModule extends VanillaModule {
                                FPlayerService fPlayerService,
                                TaskScheduler taskScheduler,
                                HytaleListenerRegistry hytaleListenerRegistry,
-                               DeathListener deathListener,
+                               HytaleDeathListener deathListener,
                                IntegrationModule integrationModule,
                                ModuleController moduleController) {
         super(fileFacade);

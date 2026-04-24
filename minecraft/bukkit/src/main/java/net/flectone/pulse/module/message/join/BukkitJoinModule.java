@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.join.listener.JoinListener;
+import net.flectone.pulse.module.message.join.listener.BukkitJoinListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -40,6 +40,6 @@ public class BukkitJoinModule extends MinecraftJoinModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(JoinListener.class);
+        listenerRegistry.register(BukkitJoinListener.class);
     }
 }

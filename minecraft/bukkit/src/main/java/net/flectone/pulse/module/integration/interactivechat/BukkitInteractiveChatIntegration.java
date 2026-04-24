@@ -1,0 +1,121 @@
+package net.flectone.pulse.module.integration.interactivechat;
+
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.loohp.interactivechat.InteractiveChat;
+import com.loohp.interactivechat.api.InteractiveChatAPI;
+import com.loohp.interactivechat.data.PlayerDataManager;
+import com.loohp.interactivechat.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.loohp.interactivechat.listeners.ChatEvents;
+import com.loohp.interactivechat.registry.Registry;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
+// I personally don't want to support InteractiveChat
+// but users really like it, so...
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BukkitInteractiveChatIntegration implements FIntegration, PulseListener {
+
+    @Getter private final FLogger fLogger;
+
+    @Override
+    public String getIntegrationName() {
+        return "InteractiveChat";
+    }
+
+    // from InteractiveChat
+    // why isn't this in the InteractiveChatAPI?
+    // why AsyncPlayerChatEvent?
+    // ...
+    public String checkMention(FEntity fSender, String message) {
+        Player sender = Bukkit.getPlayer(fSender.uuid());
+        if (sender == null) return message;
+
+        PlayerDataManager.PlayerData data = InteractiveChat.playerDataManager.getPlayerData(sender);
+        if (InteractiveChat.allowMention && (data == null || !data.isMentionDisabled())) {
+            String processedMessage;
+            if (!InteractiveChat.disableEveryone && (processedMessage = ChatEvents.checkMentionEveryone("chat", message, sender)) != null) {
+                return processedMessage;
+            }
+
+            if (!InteractiveChat.disableHere && (processedMessage = ChatEvents.checkMentionHere("chat", message, sender)) != null) {
+                return processedMessage;
+            }
+
+            if ((processedMessage = ChatEvents.checkMentionPlayers("chat", message, sender)) != null) {
+                return processedMessage;
+            }
+        }
+
+        return message;
+    }
+
+    // https://github.com/LOOHP/InteractiveChat/issues/164
+    private String markSender(FEntity fSender, String message) {
+        UUID sender = fSender.uuid();
+        if (Bukkit.getPlayer(fSender.uuid()) == null) return message;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String string : message.split(" ")) {
+            if (!Registry.MENTION_TAG_CONVERTER.containsTags(string)
+                    && !string.contains("<cmd=")
+                    && !string.contains("<chat=")) {
+                string = InteractiveChatAPI.markSender(string, sender);
+            }
+
+            stringBuilder
+                    .append(string)
+                    .append(" ");
+        }
+
+        return stringBuilder.toString().trim();
+    }
+
+    // InteractiveChat uses ProtocolLib, so it doesn't see messages from PacketEvents
+    // when support PacketEvents?
+    public boolean sendMessage(FEntity fReceiver, Component message) {
+        Player receiver = Bukkit.getPlayer(fReceiver.uuid());
+        if (receiver == null) return false;
+
+        try {
+            String serializedMessage = AdventureSerializer.serializer().gson().serialize(message);
+            var deserializedMessage = GsonComponentSerializer.gson().deserialize(serializedMessage);
+
+            InteractiveChatAPI.sendMessage(receiver, deserializedMessage);
+        } catch (Exception _) {
+            fLogger.warning("An error occurred when sending messages via InteractiveChat, message will be sent via FlectonePulse");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Pulse(priority = Event.Priority.LOWEST)
+    public Event onMessageFormattingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.context();
+        if (!messageContext.isFlag(MessageFlag.INTERACTIVE_CHAT_COMPAT)) return event;
+
+        FEntity sender = messageContext.sender();
+        String message = markSender(sender, messageContext.message());
+
+        return event.withContext(messageContext.withMessage(message));
+    }
+
+}

@@ -16,14 +16,14 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.status.icon.IconModule;
-import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
-import net.flectone.pulse.module.message.status.motd.MOTDModule;
-import net.flectone.pulse.module.message.status.players.PlayersModule;
-import net.flectone.pulse.module.message.status.version.VersionModule;
+import net.flectone.pulse.module.message.status.icon.MinecraftIconModule;
+import net.flectone.pulse.module.message.status.listener.MinecraftPacketStatusListener;
+import net.flectone.pulse.module.message.status.motd.MinecraftMOTDModule;
+import net.flectone.pulse.module.message.status.players.MinecraftPlayersModule;
+import net.flectone.pulse.module.message.status.version.MinecraftVersionModule;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.formatter.ServerStatusFormatter;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -35,31 +35,31 @@ import java.util.List;
 @Singleton
 public class MinecraftStatusModule extends StatusModule {
 
-    private final MOTDModule MOTDModule;
-    private final IconModule iconModule;
-    private final PlayersModule playersModule;
-    private final VersionModule versionModule;
+    private final MinecraftMOTDModule MOTDModule;
+    private final MinecraftIconModule iconModule;
+    private final MinecraftPlayersModule playersModule;
+    private final MinecraftVersionModule versionModule;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketProvider packetProvider;
     private final EventDispatcher eventDispatcher;
     private final ModuleController moduleController;
-    private final ServerStatusFormatter statusUtil;
+    private final MinecraftServerStatusFormatter statusUtil;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
-                                 MOTDModule motdModule,
-                                 IconModule iconModule,
-                                 PlayersModule playersModule,
-                                 VersionModule versionModule,
+                                 MinecraftMOTDModule motdModule,
+                                 MinecraftIconModule iconModule,
+                                 MinecraftPlayersModule playersModule,
+                                 MinecraftVersionModule versionModule,
                                  MessagePipeline messagePipeline,
                                  FPlayerService fPlayerService,
                                  ListenerRegistry listenerRegistry,
-                                 PacketProvider packetProvider,
+                                 MinecraftPacketProvider packetProvider,
                                  EventDispatcher eventDispatcher,
                                  ModuleController moduleController,
-                                 ServerStatusFormatter statusUtil) {
+                                 MinecraftServerStatusFormatter statusUtil) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -78,10 +78,10 @@ public class MinecraftStatusModule extends StatusModule {
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
-                MOTDModule.class,
-                IconModule.class,
-                PlayersModule.class,
-                VersionModule.class
+                MinecraftMOTDModule.class,
+                MinecraftIconModule.class,
+                MinecraftPlayersModule.class,
+                MinecraftVersionModule.class
         );
     }
 
@@ -89,7 +89,7 @@ public class MinecraftStatusModule extends StatusModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(StatusPacketListener.class);
+        listenerRegistry.register(MinecraftPacketStatusListener.class);
     }
 
     public void update(PacketSendEvent event) {

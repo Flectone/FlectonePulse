@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.online.listener.OnlinePulseListener;
+import net.flectone.pulse.module.command.online.listener.PulseOnlineListener;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -64,7 +64,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
         );
 
-        listenerRegistry.register(OnlinePulseListener.class);
+        listenerRegistry.register(PulseOnlineListener.class);
     }
 
     @Override

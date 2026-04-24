@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
+import net.flectone.pulse.module.message.join.listener.HytaleJoinPulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -39,6 +39,6 @@ public class HytaleJoinModule extends JoinModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(JoinPulseListener.class);
+        listenerRegistry.register(HytaleJoinPulseListener.class);
     }
 }

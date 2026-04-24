@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
+import net.flectone.pulse.module.message.quit.listener.MinecraftPulseQuitListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -39,7 +39,7 @@ public class MinecraftQuitModule extends QuitModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(QuitPulseListener.class);
+        listenerRegistry.register(MinecraftPulseQuitListener.class);
     }
 
 }

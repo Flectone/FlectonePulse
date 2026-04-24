@@ -14,9 +14,9 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -35,8 +35,8 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
-    private final PacketSender packetSender;
-    private final PacketProvider packetProvider;
+    private final MinecraftPacketSender packetSender;
+    private final MinecraftPacketProvider packetProvider;
     private final ModuleController moduleController;
     private final Provider<IntegrationModule> integrationModuleProvider;
 
@@ -44,8 +44,8 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     public MinecraftScoreboardModule(FileFacade fileFacade,
                                      TaskScheduler taskScheduler,
                                      MessagePipeline messagePipeline,
-                                     PacketSender packetSender,
-                                     PacketProvider packetProvider,
+                                     MinecraftPacketSender packetSender,
+                                     MinecraftPacketProvider packetProvider,
                                      ListenerRegistry listenerRegistry,
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,

@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.toponline.listener.ToponlinePulseListener;
+import net.flectone.pulse.module.command.toponline.listener.PulseToponlineListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
@@ -62,7 +62,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
 
-        listenerRegistry.register(ToponlinePulseListener.class);
+        listenerRegistry.register(PulseToponlineListener.class);
     }
 
     @Override

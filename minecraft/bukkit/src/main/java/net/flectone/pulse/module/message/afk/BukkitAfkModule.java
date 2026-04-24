@@ -6,7 +6,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.afk.listener.AfkListener;
+import net.flectone.pulse.module.message.afk.listener.BukkitAfkListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
@@ -39,6 +39,6 @@ public class BukkitAfkModule extends AfkModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(AfkListener.class);
+        listenerRegistry.register(BukkitAfkListener.class);
     }
 }

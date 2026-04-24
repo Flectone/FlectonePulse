@@ -11,10 +11,10 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.message.bossbar.listener.BossbarPacketListener;
+import net.flectone.pulse.module.message.bossbar.listener.MinecraftPacketBossbarListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -39,7 +39,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
-    private final PacketSender packetSender;
+    private final MinecraftPacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
@@ -49,7 +49,7 @@ public class MinecraftBossbarModule extends BossbarModule {
                                   MessagePipeline messagePipeline,
                                   MessageDispatcher messageDispatcher,
                                   ModuleController moduleController,
-                                  PacketSender packetSender,
+                                  MinecraftPacketSender packetSender,
                                   TaskScheduler taskScheduler) {
         super(fileFacade);
 
@@ -66,7 +66,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(BossbarPacketListener.class);
+        listenerRegistry.register(MinecraftPacketBossbarListener.class);
     }
 
     public void send(UUID playerUUID, UUID bossbarUUID, String translationKey, boolean announce, Component oldTitle) {

@@ -9,8 +9,8 @@ import com.google.inject.Stage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.platform.controller.DialogController;
-import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.platform.controller.MinecraftDialogController;
+import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
@@ -111,8 +111,8 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void closeUIs() {
         // close all open inventories
-        injector.getInstance(InventoryController.class).closeAll();
-        injector.getInstance(DialogController.class).closeAll();
+        injector.getInstance(MinecraftInventoryController.class).closeAll();
+        injector.getInstance(MinecraftDialogController.class).closeAll();
     }
 
 }

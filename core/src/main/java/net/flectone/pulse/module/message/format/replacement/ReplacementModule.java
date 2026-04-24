@@ -17,7 +17,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.replacement.listener.ReplacementPulseListener;
+import net.flectone.pulse.module.message.format.replacement.listener.PulseReplacementListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -68,7 +68,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(ReplacementPulseListener.class);
+        listenerRegistry.register(PulseReplacementListener.class);
 
         config().triggers().forEach((name, regex) ->
                 triggerPatterns.put(name, Pattern.compile(regex))

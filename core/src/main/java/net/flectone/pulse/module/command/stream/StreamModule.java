@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
+import net.flectone.pulse.module.command.stream.listener.PulseStreamListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -64,7 +64,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
 
-        listenerRegistry.register(StreamPulseListener.class);
+        listenerRegistry.register(PulseStreamListener.class);
     }
 
     @Override

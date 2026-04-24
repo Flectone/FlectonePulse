@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.animation.listener.AnimationPulseListener;
+import net.flectone.pulse.module.message.format.animation.listener.PulseAnimationListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -38,7 +38,7 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(AnimationPulseListener.class);
+        listenerRegistry.register(PulseAnimationListener.class);
     }
 
     @Override

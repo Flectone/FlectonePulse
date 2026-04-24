@@ -1,0 +1,41 @@
+package net.flectone.pulse.module.integration.maintenance.listener;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.StatusResponseEvent;
+import net.flectone.pulse.model.event.module.ModuleEnableEvent;
+import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
+import net.flectone.pulse.module.integration.maintenance.BukkitMaintenanceModule;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class BukkitPulseMaintenanceListener implements PulseListener {
+
+    private final BukkitMaintenanceModule maintenanceModule;
+
+    @Pulse
+    public Event onModuleEnableEvent(ModuleEnableEvent event) {
+        if (!maintenanceModule.isHooked()) return event;
+
+        ModuleSimple eventModule = event.module();
+        if (eventModule instanceof MaintenanceModule && maintenanceModule.config().disableFlectonepulseMaintenance()) {
+            return event.withCancelled(true);
+        }
+
+        return event;
+    }
+
+    @Pulse
+    public Event onStatusResponseEvent(StatusResponseEvent event) {
+        if (!maintenanceModule.isHooked()) return event;
+        if (!maintenanceModule.isMaintenance()) return event;
+
+        return event.withCancelled(true);
+    }
+
+}

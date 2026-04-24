@@ -18,7 +18,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
+import net.flectone.pulse.module.message.format.mention.listener.PulseMentionListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -56,7 +56,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(MentionPulseListener.class);
+        listenerRegistry.register(PulseMentionListener.class);
     }
 
     @Override

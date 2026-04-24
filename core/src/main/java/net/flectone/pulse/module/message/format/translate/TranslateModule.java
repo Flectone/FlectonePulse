@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
+import net.flectone.pulse.module.message.format.translate.listener.PulseTranslateListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -39,7 +39,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        listenerRegistry.register(TranslatePulseListener.class);
+        listenerRegistry.register(PulseTranslateListener.class);
     }
 
     @Override

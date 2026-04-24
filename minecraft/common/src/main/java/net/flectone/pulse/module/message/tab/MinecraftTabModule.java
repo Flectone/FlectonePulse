@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.tab.footer.FooterModule;
-import net.flectone.pulse.module.message.tab.header.HeaderModule;
-import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
+import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
+import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -21,9 +21,9 @@ public class MinecraftTabModule extends TabModule {
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         return super.childrenBuilder().add(
-                FooterModule.class,
-                HeaderModule.class,
-                PlayerlistnameModule.class
+                MinecraftFooterModule.class,
+                MinecraftHeaderModule.class,
+                MinecraftPlayerlistnameModule.class
         );
     }
 
