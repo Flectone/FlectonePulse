@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
@@ -19,8 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Set;
 import java.util.UUID;
@@ -58,7 +58,7 @@ public class BukkitBaseListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+    public void onPlayerJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         joinedPlayers.add(uuid);
@@ -70,21 +70,31 @@ public class BukkitBaseListener implements Listener {
                 fPlayerService.updateLocale(fPlayer, locale);
             }
 
-            eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
-            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
+            PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+            if (playerLoadEvent.cancelled()) return;
+
+            PlayerJoinEvent playerJoinEvent = eventDispatcher.dispatch(new PlayerJoinEvent(playerLoadEvent.player()));
+            if (playerJoinEvent.cancelled()) {
+                // nothing
+            }
         });
     }
 
     @EventHandler
-    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+    public void onPlayerQuitEvent(org.bukkit.event.player.PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         if (!joinedPlayers.remove(uuid)) return;
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+            PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
+            if (playerQuitEvent.cancelled()) return;
+
+            PlayerPersistAndDisposeEvent playerPersistAndDisposeEvent = eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(playerQuitEvent.player()));
+            if (playerPersistAndDisposeEvent.cancelled()) {
+                // nothing
+            }
         });
     }
 

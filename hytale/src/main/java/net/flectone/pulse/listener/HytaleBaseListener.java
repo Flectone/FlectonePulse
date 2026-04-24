@@ -55,8 +55,13 @@ public class HytaleBaseListener implements HytaleListener {
 
         fPlayerService.updateLocale(fPlayer, languageFormat(playerRef.getLanguage()));
 
-        eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
-        eventDispatcher.dispatch(new PlayerJoinEvent(fPlayer));
+        PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+        if (playerLoadEvent.cancelled()) return;
+
+        PlayerJoinEvent playerJoinEvent = eventDispatcher.dispatch(new PlayerJoinEvent(playerLoadEvent.player()));
+        if (playerJoinEvent.cancelled()) {
+            // nothing
+        }
     }
 
     // PlayerDisconnectEvent can be called multiple times, so we need to keep first disconnect and remove it later
@@ -72,8 +77,13 @@ public class HytaleBaseListener implements HytaleListener {
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
-            eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
-            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+            PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
+            if (playerQuitEvent.cancelled()) return;
+
+            PlayerPersistAndDisposeEvent playerPersistAndDisposeEvent = eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(playerQuitEvent.player()));
+            if (playerPersistAndDisposeEvent.cancelled()) {
+                // nothing
+            }
         });
 
         taskScheduler.runAsyncLater(() -> {

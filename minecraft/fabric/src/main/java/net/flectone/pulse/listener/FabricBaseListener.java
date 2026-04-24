@@ -7,8 +7,10 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,8 +38,13 @@ public class FabricBaseListener {
         taskScheduler.runAsyncLater(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
-            eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
-            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
+            PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+            if (playerLoadEvent.cancelled()) return;
+
+            PlayerJoinEvent playerJoinEvent = eventDispatcher.dispatch(new PlayerJoinEvent(playerLoadEvent.player()));
+            if (playerJoinEvent.cancelled()) {
+                // nothing
+            }
         }, 1L);
     }
 
@@ -49,8 +56,13 @@ public class FabricBaseListener {
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
-            eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-            eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
+            PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
+            if (playerQuitEvent.cancelled()) return;
+
+            PlayerPersistAndDisposeEvent playerPersistAndDisposeEvent = eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(playerQuitEvent.player()));
+            if (playerPersistAndDisposeEvent.cancelled()) {
+                // nothing
+            }
         });
     }
 
