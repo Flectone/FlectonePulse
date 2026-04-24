@@ -312,14 +312,14 @@ public class FlectonePulseAPI {
         // register default listeners
         listenerRegistry.onEnable();
 
-        // reload fplayer service
-        fPlayerService.initialize(true);
+        // init proxies
+        proxyRegistry.onEnable();
 
         // init modules
         moduleController.initialize();
 
-        // init proxies
-        proxyRegistry.onEnable();
+        // reload fplayer service
+        fPlayerService.initialize(true);
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
