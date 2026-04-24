@@ -120,6 +120,10 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         });
     }
 
+    public void removeAllAfkPlayers(String action) {
+        playersCoordinates.keySet().forEach(uuid -> removeAfk(action, fPlayerService.getFPlayer(uuid)));
+    }
+
     public FPlayer removeAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
         // skip empty afk suffix
         if (StringUtils.isEmpty(fPlayer.getSetting(SettingText.AFK_SUFFIX))) {

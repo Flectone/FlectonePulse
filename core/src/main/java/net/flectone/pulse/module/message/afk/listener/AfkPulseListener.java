@@ -8,6 +8,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -60,6 +61,11 @@ public class AfkPulseListener implements PulseListener {
         FPlayer fPlayer = event.player();
 
         return event.withPlayer(afkModule.removeAfk("quit", fPlayer));
+    }
+
+    @Pulse(priority = Event.Priority.LOW)
+    public void disableEvent(DisableEvent event) {
+        afkModule.removeAllAfkPlayers("disable");
     }
 
     @Pulse(priority = Event.Priority.HIGH)
