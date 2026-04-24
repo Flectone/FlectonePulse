@@ -62,7 +62,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
                 commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser());
             }
 
-            return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()));
+            return commandBuilder.optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(true, permission().other()));
         });
     }
 
