@@ -23,6 +23,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -39,6 +40,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
@@ -52,6 +55,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
     private final Provider<OnlineModule> onlineModuleProvider;
+    private final Provider<ToponlineModule> toponlineModuleProvider;
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     @Getter private final FLogger fLogger;
@@ -127,6 +131,15 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             return PlaceholderResult.value(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
         });
 
+        Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":toponline"), (context, argument) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            ToponlineModule toponlineModule = toponlineModuleProvider.get();
+            Optional<FPlayer> fTarget = toponlineModule.getPlayerByPosition(argument);
+
+            return PlaceholderResult.value(fTarget.isPresent() ? fTarget.get().name() : "");
+        });
+
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":online"), (context, argument) -> {
             if (!context.hasPlayer()) return PlaceholderResult.invalid();
 
@@ -134,7 +147,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
             OnlineModule onlineModule = onlineModuleProvider.get();
             String timeValue = onlineModule.parseTimeValue(fPlayer, fPlayer, argument);
-            if (StringUtils.isEmpty(timeValue)) return null;
+            if (StringUtils.isEmpty(timeValue)) return PlaceholderResult.value("");
 
             return PlaceholderResult.value(timeValue);
         });

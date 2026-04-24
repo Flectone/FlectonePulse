@@ -21,6 +21,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -40,6 +41,7 @@ import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -57,6 +59,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
     private final Provider<OnlineModule> onlineModuleProvider;
+    private final Provider<ToponlineModule> toponlineModuleProvider;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -108,6 +111,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         if (params.equalsIgnoreCase("afk_duration_formatted")) {
             return afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer);
+        }
+
+        if (params.startsWith("toponline_")) {
+            String position = params.substring(10);
+            if (StringUtils.isEmpty(position)) return null;
+
+            Optional<FPlayer> fTarget = toponlineModuleProvider.get().getPlayerByPosition(position);
+            return fTarget.isPresent() ? fTarget.get().name() : "";
         }
 
         if (params.startsWith("online_")) {

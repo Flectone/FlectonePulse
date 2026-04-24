@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -44,6 +45,7 @@ public class MiniPlaceholdersModule implements ModuleSimple {
                                   Provider<ConditionModule> conditionModuleProvider,
                                   Provider<AfkModule> afkModuleProvider,
                                   Provider<OnlineModule> onlineModuleProvider,
+                                  Provider<ToponlineModule> toponlineModuleProvider,
                                   ListenerRegistry listenerRegistry,
                                   ModuleController moduleController,
                                   MessagePipeline messagePipeline,
@@ -53,7 +55,19 @@ public class MiniPlaceholdersModule implements ModuleSimple {
         this.moduleController = moduleController;
 
         // don't use injection because we skip relocate
-        this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(fileFacade, fPlayerService, platformPlayerAdapter, platformServerAdapter, muteModuleProvider, conditionModuleProvider, afkModuleProvider, onlineModuleProvider, messagePipeline, fLogger);
+        this.miniPlaceholdersIntegration = new MiniPlaceholdersIntegration(
+                fileFacade,
+                fPlayerService,
+                platformPlayerAdapter,
+                platformServerAdapter,
+                muteModuleProvider,
+                conditionModuleProvider,
+                afkModuleProvider,
+                onlineModuleProvider,
+                toponlineModuleProvider,
+                messagePipeline,
+                fLogger
+        );
     }
 
     @Override

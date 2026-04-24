@@ -19,6 +19,7 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.condition.ConditionModule;
@@ -39,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -58,6 +60,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
     private final Provider<OnlineModule> onlineModuleProvider;
+    private final Provider<ToponlineModule> toponlineModuleProvider;
     private final MessagePipeline messagePipeline;
 
     @Getter private final FLogger fLogger;
@@ -72,6 +75,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
                                        Provider<ConditionModule> conditionModuleProvider,
                                        Provider<AfkModule> afkModuleProvider,
                                        Provider<OnlineModule> onlineModuleProvider,
+                                       Provider<ToponlineModule> toponlineModuleProvider,
                                        MessagePipeline messagePipeline,
                                        FLogger fLogger) {
         this.fileFacade = fileFacade;
@@ -82,6 +86,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
         this.conditionModuleProvider = conditionModuleProvider;
         this.afkModuleProvider = afkModuleProvider;
         this.onlineModuleProvider = onlineModuleProvider;
+        this.toponlineModuleProvider = toponlineModuleProvider;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -198,7 +203,19 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
                 })
-                .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, queue, _) -> {
+                .audiencePlaceholder(Player.class, "toponline", (player, queue, _) -> {
+                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
+
+                    FPlayer fPlayer = fPlayerService.getFPlayer(player);
+
+                    ToponlineModule toponlineModule = toponlineModuleProvider.get();
+                    Optional<FPlayer> fTarget = toponlineModule.getPlayerByPosition(queue.pop().value());
+                    if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
+
+                    String json = messagePipeline.buildJsonString(messagePipeline.createContext(fTarget.get(), fPlayer, "<display_name>"));
+                    return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
+                })
+                .audiencePlaceholder(Player.class, "online", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);

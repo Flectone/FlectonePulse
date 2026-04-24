@@ -16,21 +16,27 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.toponline.listener.ToponlinePulseListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -46,6 +52,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -54,6 +61,8 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
                 .permission(permission().name())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
+
+        listenerRegistry.register(ToponlinePulseListener.class);
     }
 
     @Override
@@ -144,4 +153,47 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     public Localization.Command.Toponline localization(FEntity sender) {
         return fileFacade.localization(sender).command().toponline();
     }
+
+    public MessageContext addTag(MessageContext messageContext) {
+        FEntity sender = messageContext.sender();
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (!(sender instanceof FPlayer)) return messageContext;
+
+        return messageContext.addTagResolver(TagResolver.resolver(MessagePipeline.ReplacementTag.TOPONLINE.getTagName(), (argumentQueue, _) -> {
+            if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
+
+            OptionalInt optionalInt = argumentQueue.pop().asInt();
+            if (optionalInt.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
+
+            Optional<FPlayer> fTarget = getPlayerByPosition(optionalInt.getAsInt());
+            if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
+
+            MessageContext toponlineContext = messagePipeline.createContext(fTarget.get(), messageContext.receiver(), "<display_name>")
+                    .withFlags(messageContext.flags())
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
+
+            return Tag.selfClosingInserting(messagePipeline.build(toponlineContext));
+        }));
+    }
+
+    public Optional<FPlayer> getPlayerByPosition(String rawPosition) {
+        int position;
+        try {
+            position = Integer.parseInt(rawPosition);
+        } catch (NumberFormatException _) {
+            return Optional.empty();
+        }
+
+        return getPlayerByPosition(position);
+    }
+
+    public Optional<FPlayer> getPlayerByPosition(int position) {
+        if (position < 1) return Optional.empty();
+
+        List<PlayTime> playTimeList = fPlayerService.getAllPlayTimes(1, position - 1);
+        if (playTimeList.isEmpty()) return Optional.empty();
+
+        return Optional.of(fPlayerService.getFPlayer(playTimeList.getFirst().playerId()));
+    }
+
 }
