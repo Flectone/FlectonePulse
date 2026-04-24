@@ -26,6 +26,7 @@ softdepend:
   - CMI
   - MOTD
   - MiniMOTD
+  - MiniPlaceholders
   - ItemsAdder
   - floodgate
   - Geyser-Spigot
