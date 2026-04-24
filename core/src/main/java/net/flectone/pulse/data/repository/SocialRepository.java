@@ -119,6 +119,16 @@ public class SocialRepository {
     }
 
     /**
+     * Saves a player's AFK time session.
+     *
+     * @param fPlayer the player whose AFK status is being updated
+     * @param afk true if the player is going AFK, false if returning
+     */
+    public void saveAfkSession(FPlayer fPlayer, boolean afk) {
+        timeDAO.saveAfk(fPlayer, afk);
+    }
+
+    /**
      * Saves a player's last seen timestamp when they quit the server.
      *
      * @param fPlayer the player whose last seen time is being saved

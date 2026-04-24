@@ -104,11 +104,11 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                             );
                             case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
                                     ? localization.formatCurrent()
-                                    : timeFormatter.format(fPlayer, System.currentTimeMillis() - playTime.last(), localization.formatLast());
+                                    : timeFormatter.format(fPlayer, System.currentTimeMillis() - (playTime.last() > 0 ? playTime.last() : playTime.last() * -1), localization.formatLast());
                             case "total" -> Strings.CS.replace(
                                     timeFormatter.format(
                                             fPlayer,
-                                            playTime.total() + (targetFPlayer.isOnline() ? System.currentTimeMillis() - playTime.last() : 0),
+                                            playTime.total() + (targetFPlayer.isOnline() && playTime.last() > 0 ? System.currentTimeMillis() - playTime.last() : 0),
                                             localization.formatTotal()
                                     ),
                                     "<sessions>",

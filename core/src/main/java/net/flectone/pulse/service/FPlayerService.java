@@ -347,6 +347,10 @@ public class FPlayerService {
         socialRepository.deleteMail(mail);
     }
 
+    public void saveAfkSession(FPlayer fPlayer, boolean afk) {
+        socialRepository.saveAfkSession(fPlayer, afk);
+    }
+
     public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
         updateCache(fPlayer);
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);

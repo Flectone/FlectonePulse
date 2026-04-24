@@ -1,6 +1,7 @@
 enable: true
 afk:
   enable: true
+  track_playtime: true
   range: "SERVER"
   delay: 3000
   radius: 1.0

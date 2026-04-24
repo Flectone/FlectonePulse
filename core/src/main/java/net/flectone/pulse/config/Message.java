@@ -104,6 +104,7 @@ public record Message(
     @Jacksonized
     public record Afk(
             Boolean enable,
+            Boolean trackPlaytime,
             Range range,
             Integer delay,
             Double radius,

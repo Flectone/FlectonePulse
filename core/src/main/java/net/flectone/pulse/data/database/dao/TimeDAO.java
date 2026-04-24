@@ -70,6 +70,33 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     }
 
     /**
+     * Updates total playtime with AFK.
+     * If the player is entering AFK, adds elapsed time to total and invert last seen.
+     * If the player is returning from AFK, updates the last seen timestamp.
+     *
+     * @param fPlayer the player whose AFK status is being updated
+     * @param afk true if the player is going AFK, false if returning
+     */
+    public void saveAfk(@NonNull FPlayer fPlayer, boolean afk) {
+        if (fPlayer.isUnknown()) return;
+
+        useTransaction(sql -> {
+            long currentTime = System.currentTimeMillis();
+
+            Optional<PlayTime> playTimeOptional = sql.findByPlayer(fPlayer.id());
+            if (playTimeOptional.isEmpty()) return;
+
+            PlayTime playTime = playTimeOptional.get();
+            if (afk) {
+                long newTotal = playTime.total() + (currentTime - playTime.last());
+                sql.updateLastSeen(playTime.last() * -1.0, newTotal, fPlayer.id());
+            } else {
+                sql.updateLastSeen(currentTime, playTime.total(), fPlayer.id());
+            }
+        });
+    }
+
+    /**
      * Records a player's quit and updates total playtime.
      *
      * @param fPlayer the player who quit
@@ -84,6 +111,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
             if (playTimeOptional.isEmpty()) return;
 
             PlayTime playTime = playTimeOptional.get();
+            if (playTime.last() < 0) return;
 
             long newTotal = playTime.total() + (currentTime - playTime.last());
 

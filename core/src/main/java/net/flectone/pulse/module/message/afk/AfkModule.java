@@ -177,7 +177,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
         playersCoordinates.remove(fPlayer.uuid());
 
-        if (!config().countAfkTime()) {
+        if (!config().trackPlaytime()) {
             fPlayerService.saveAfkSession(fPlayer, false);
         }
 
@@ -192,7 +192,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
 
-        if (!config().countAfkTime()) {
+        if (!config().trackPlaytime()) {
             fPlayerService.saveAfkSession(fPlayer, true);
         }
 
