@@ -115,6 +115,10 @@ public record FLogger(
         info(String.format(format, args));
     }
 
+    public void warning(Object object) {
+        warning(String.valueOf(object));
+    }
+
     public void warning(String string) {
         log(new LogRecord(Level.WARNING, string));
     }
