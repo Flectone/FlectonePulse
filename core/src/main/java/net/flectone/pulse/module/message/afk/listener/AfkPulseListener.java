@@ -38,13 +38,13 @@ public class AfkPulseListener implements PulseListener {
 
         int commandIndex = messageType.indexOf('_');
         String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();
-        afkModule.remove(action, fPlayer);
+        afkModule.asyncRemoveAfk(action, fPlayer);
     }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.player();
-        afkModule.remove("", fPlayer);
+        afkModule.asyncRemoveAfk("", fPlayer);
     }
 
     @Pulse
@@ -52,13 +52,14 @@ public class AfkPulseListener implements PulseListener {
         if (!event.reload()) return;
 
         FPlayer fPlayer = event.player();
-        afkModule.remove("", fPlayer);
+        afkModule.asyncRemoveAfk("", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public PlayerQuitEvent onPlayerQuit(PlayerQuitEvent event) {
         FPlayer fPlayer = event.player();
-        afkModule.remove("quit", fPlayer);
+
+        return event.withPlayer(afkModule.removeAfk("quit", fPlayer));
     }
 
     @Pulse(priority = Event.Priority.HIGH)

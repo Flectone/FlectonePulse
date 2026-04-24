@@ -59,10 +59,9 @@ public class AfkModule implements ModuleCommand<Localization.Command> {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
-            afkMessageModule.remove("afk", fPlayer);
+            fPlayer = afkMessageModule.removeAfk("afk", fPlayer);
         } else {
-            afkMessageModule.setAfkSuffix(fPlayer);
-            afkMessageModule.sendAfkMessage(fPlayer.uuid(), true);
+            fPlayer = afkMessageModule.addAfk(fPlayer);
         }
 
         soundPlayer.play(soundOrThrow(), fPlayer);

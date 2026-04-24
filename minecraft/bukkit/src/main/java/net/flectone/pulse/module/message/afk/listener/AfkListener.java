@@ -22,7 +22,7 @@ public class AfkListener implements Listener {
     public void asyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
-        afkModule.remove("chat", fPlayer);
+        afkModule.asyncRemoveAfk("chat", fPlayer);
     }
 
     @EventHandler
@@ -34,6 +34,6 @@ public class AfkListener implements Listener {
             message = message.split(" ")[0].substring(1);
         }
 
-        afkModule.remove(message, fPlayer);
+        afkModule.asyncRemoveAfk(message, fPlayer);
     }
 }
