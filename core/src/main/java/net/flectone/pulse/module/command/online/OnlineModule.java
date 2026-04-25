@@ -112,16 +112,15 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                             case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
                                     ? localization.formatCurrent()
                                     : timeFormatter.format(fPlayer, Type.LAST.getTime(fPlayer, playTime), localization.formatLast());
-                            case "TOTAL" -> Strings.CS.replace(
+                            default -> Strings.CS.replace(
                                     timeFormatter.format(
                                             fPlayer,
-                                            Type.TOTAL.getTime(fPlayer, playTime),
+                                            type.equalsIgnoreCase("TOTAL") ? Type.TOTAL.getTime(fPlayer, playTime) : Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
                                             localization.formatTotal()
                                     ),
                                     "<sessions>",
                                     String.valueOf(playTime.sessions())
                             );
-                            default -> "";
                         })
                         .destination(config().destination())
                         .sound(soundOrThrow())
@@ -212,6 +211,12 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
             }
         },
         TOTAL {
+            @Override
+            long getTime(FPlayer fPlayer, PlayTime playTime) {
+                return playTime.total();
+            }
+        },
+        TOTAL_DYNAMIC {
             @Override
             long getTime(FPlayer fPlayer, PlayTime playTime) {
                 return playTime.total() + (fPlayer.isOnline() && playTime.last() > 0 ? System.currentTimeMillis() - playTime.last() : 0);
