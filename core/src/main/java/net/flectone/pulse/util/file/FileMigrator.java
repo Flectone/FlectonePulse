@@ -858,7 +858,7 @@ public class FileMigrator {
         long delay = files.message().afk().delay();
         if (delay == 3000L) return files;
 
-        return files.withMessage(files.message().withAfk(files.message().afk().withDelay(delay * 50L)));
+        return files.withMessage(files.message().withAfk(files.message().afk().withDelay(delay * 20L)));
     }
 
 }
