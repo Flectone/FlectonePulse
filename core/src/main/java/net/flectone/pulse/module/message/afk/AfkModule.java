@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
-    private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new ConcurrentHashMap<>();
+    private final Map<UUID, Pair<Long, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -163,8 +163,8 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         if (moduleController.isDisabledFor(this, fPlayer)) return 0;
         if (StringUtils.isEmpty(fPlayer.getSetting(SettingText.AFK_SUFFIX))) return 0;
 
-        Pair<Integer, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
-        return timeCoordinates != null ? (int) (System.currentTimeMillis() / 1000) - timeCoordinates.first() : 0;
+        Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
+        return timeCoordinates != null ? (int) (System.currentTimeMillis() - timeCoordinates.first()) / 1000 : 0;
     }
 
     @NonNull
@@ -191,8 +191,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private FPlayer addAfkSetting(FPlayer fPlayer) {
         fPlayer = fPlayer.withSetting(SettingText.AFK_SUFFIX, localization().suffix());
 
-        int time = (int) (System.currentTimeMillis() / 1000);
-        playersCoordinates.put(fPlayer.uuid(), Pair.of(time, platformPlayerAdapter.getCoordinates(fPlayer)));
+        playersCoordinates.put(fPlayer.uuid(), Pair.of(System.currentTimeMillis(), platformPlayerAdapter.getCoordinates(fPlayer)));
 
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
 
@@ -218,13 +217,13 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         if (coordinates == null) return;
 
         // get current time
-        int time = (int) (System.currentTimeMillis() / 1000);
+        long currentTime = System.currentTimeMillis();
 
         // synchronize FPlayer
         fPlayer = fPlayerService.getFPlayer(fPlayer);
 
         // compare last and current coordinates
-        Pair<Integer, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
+        Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
         if (timeCoordinates == null || !isSameCoordinates(timeCoordinates.second(), coordinates)) {
             // remove afk suffix if present
             if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
@@ -233,7 +232,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             }
 
             // update last coordinates
-            playersCoordinates.put(fPlayer.uuid(), Pair.of(time, coordinates));
+            playersCoordinates.put(fPlayer.uuid(), Pair.of(currentTime, coordinates));
             return;
         }
 
@@ -245,7 +244,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
 
         // skip not full afk players
-        if (time - timeCoordinates.first() < config().delay()) return;
+        if (currentTime - timeCoordinates.first() < config().delay() * TimeFormatter.MULTIPLIER) return;
 
         // update afk suffix
         sendAfkMessage(addAfkSetting(fPlayer), true);

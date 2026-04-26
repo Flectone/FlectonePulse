@@ -188,6 +188,10 @@ public class FileFacade {
             files = fileMigrator.migration_1_9_1(files);
         }
 
+        if (versionComparator.isOlderThan(preInitVersion, "1.9.3")) {
+            files = fileMigrator.migration_1_9_3(files);
+        }
+
         files = files.withConfig(files.config().withVersion(BuildConfig.PROJECT_VERSION));
     }
 }

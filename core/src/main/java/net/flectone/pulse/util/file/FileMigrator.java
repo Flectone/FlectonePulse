@@ -854,4 +854,11 @@ public class FileMigrator {
         return files.withConfig(files.config().withCache(files.config().cache().withTypes(types)));
     }
 
+    public FilePack migration_1_9_3(FilePack files) {
+        long delay = files.message().afk().delay();
+        if (delay == 3000L) return files;
+
+        return files.withMessage(files.message().withAfk(files.message().afk().withDelay(delay * 50L)));
+    }
+
 }

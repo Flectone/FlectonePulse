@@ -106,7 +106,7 @@ public record Message(
             Boolean enable,
             Boolean trackPlaytime,
             Range range,
-            Integer delay,
+            Long delay,
             Double radius,
             List<String> ignore,
             Destination destination,
