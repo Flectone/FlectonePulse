@@ -19,7 +19,7 @@ dependencies {
 	compileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
 	compileOnly("maven.modrinth:vanish:$vanish_version")
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
-	compileOnly("net.flectone:cloud-fabric:${cloud_fabric_version}")
+	compileOnly("org.incendo:cloud-fabric:${cloud_fabric_version}")
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")

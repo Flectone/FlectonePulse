@@ -5,5 +5,5 @@ dependencies {
 
     compileOnly project(":minecraft:common")
     compileOnly project(":core")
-    compileOnly "net.flectone:cloud-paper:$cloud_paper_version"
+    compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
 }
