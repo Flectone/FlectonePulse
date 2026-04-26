@@ -68,7 +68,7 @@ public class MinecraftTextureService {
                         .resolveTransitiveDependencies(true)
                         .relocate(Relocation.builder()
                                 .pattern("com{}google{}gson")
-                                .relocatedPattern("net.flectone.pulse.library.gson")
+                                .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".gson")
                                 .build()
                         )
                         .build()

@@ -24,7 +24,7 @@ dependencies {
 }
 
 shadowJar {
-    relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
+    relocate("com.github.Anon8281", "${relocated_pattern}.universalscheduler")
 }
 
 processResources {

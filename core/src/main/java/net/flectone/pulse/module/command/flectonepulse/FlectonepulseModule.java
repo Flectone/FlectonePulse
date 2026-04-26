@@ -65,7 +65,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FlectonepulseModule implements ModuleCommand<Localization.Command.Flectonepulse> {
 
-    private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
+    private static final String SPARK_CLASS = BuildConfig.RELOCATED_PATTERN + ".spark.Service";
     private static final String PASTES_DEV_URL = "https://pastes.dev/";
     private static final URI API_PASTES_DEV = URI.create("https://api.pastes.dev/post");
 
@@ -470,7 +470,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("spark")
-                        .relocatedPattern("net.flectone.pulse.library.spark")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".spark")
                         .build()
                 )
                 .build()

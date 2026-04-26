@@ -85,7 +85,7 @@ public abstract class PlatformInjector extends AbstractModule {
 //
 //            Arrays.stream(packs)
 //                    .map(Package::getName)
-//                    .filter(string -> string.contains("net.flectone.pulse.library"))
+//                    .filter(string -> string.contains(BuildConfig.RELOCATED_PATTERN + ""))
 //                    .sorted()
 //                    .forEach(fLogger::warning);
 //

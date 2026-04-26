@@ -49,7 +49,7 @@ public class ProxyRegistry {
         if (redis.enable()) {
             warnIfLocalDatabase();
 
-            reflectionResolver.hasClassOrElse("net.flectone.pulse.library.lettuce.core.RedisClient", this::loadLibraries);
+            reflectionResolver.hasClassOrElse(BuildConfig.RELOCATED_PATTERN + ".lettuce.core.RedisClient", this::loadLibraries);
 
             RedisProxy redisProxy = injector.getInstance(RedisProxy.class);
             redisProxy.onEnable();
@@ -84,12 +84,12 @@ public class ProxyRegistry {
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("io{}lettuce")
-                        .relocatedPattern("net.flectone.pulse.library.lettuce")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".lettuce")
                         .build()
                 )
                 .relocate(Relocation.builder()
                         .pattern("io{}netty")
-                        .relocatedPattern("net.flectone.pulse.library.lettuce.netty")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".lettuce.netty")
                         .build()
                 )
                 .build()
