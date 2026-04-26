@@ -21,6 +21,20 @@ public class LibraryResolver {
         this.libraryManager = libraryManager;
     }
 
+    public List<String> getAdventureArtifactIds() {
+        return List.of(
+                "adventure-api",
+                "adventure-nbt",
+                "adventure-key",
+                "adventure-text-minimessage",
+                "adventure-text-serializer-ansi",
+                "adventure-text-serializer-plain",
+                "adventure-text-serializer-legacy",
+                "adventure-text-serializer-json-legacy-impl",
+                "adventure-text-serializer-gson"
+        );
+    }
+
     public void addLibrary(Library library) {
         libraries.add(library);
     }

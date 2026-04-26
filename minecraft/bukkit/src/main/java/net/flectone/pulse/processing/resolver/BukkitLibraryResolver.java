@@ -14,98 +14,22 @@ public class BukkitLibraryResolver extends LibraryResolver {
         super(new BukkitLibbyResolver(plugin, "libraries"));
     }
 
+    public List<String> getPacketEventsArtifactIds() {
+        return List.of(
+                "packetevents-spigot",
+                "packetevents-api",
+                "packetevents-netty-common"
+        );
+    }
+
     @Override
     public void addLibraries() {
         super.addLibraries();
 
-        addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}kyori")
-                .artifactId("adventure-api")
+                .artifactId(artifactId)
                 .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-ansi")
-                .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-minimessage")
-                .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-plain")
-                .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-legacy")
-                .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-nbt")
-                .version(BuildConfig.ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-platform-bukkit")
-                .version(BuildConfig.ADVENTURE_PLATFORM_BUKKIT_VERSION)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
@@ -121,7 +45,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-        addLibrary(Library.builder()
+        getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("com{}github{}retrooper")
                 .artifactId("packetevents-spigot")
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)

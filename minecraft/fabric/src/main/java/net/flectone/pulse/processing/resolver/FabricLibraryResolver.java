@@ -17,86 +17,14 @@ public class FabricLibraryResolver extends LibraryResolver {
     public void addLibraries() {
         super.addLibraries();
 
-        addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}kyori")
-                .artifactId("adventure-api")
+                .artifactId(artifactId)
                 .version(BuildConfig.LEGACY_ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-ansi")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-minimessage")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-gson")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-plain")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-json-legacy-impl")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-legacy")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-nbt")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-key")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
+        ));
 
         addLibrary(Library.builder()
                 .groupId("org{}incendo")

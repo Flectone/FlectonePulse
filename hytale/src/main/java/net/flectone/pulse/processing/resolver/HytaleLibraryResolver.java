@@ -17,93 +17,9 @@ public class HytaleLibraryResolver extends LibraryResolver {
     public void addLibraries() {
         super.addLibraries();
 
-        addLibrary(Library.builder()
+        getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}kyori")
-                .artifactId("adventure-api")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-ansi")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-minimessage")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-plain")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-legacy")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-nbt")
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
-                .build()
-        );
-
-        addLibrary(Library.builder()
-                .groupId("net{}kyori")
-                .artifactId("adventure-text-serializer-gson")
+                .artifactId(artifactId)
                 .version(BuildConfig.LEGACY_ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
@@ -118,8 +34,7 @@ public class HytaleLibraryResolver extends LibraryResolver {
                         .build()
                 )
                 .build()
-        );
-
+        ));
 
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
