@@ -182,6 +182,7 @@ public record Message(
     public record Bubble(
             Boolean enable,
             Boolean visibleToSelf,
+            String disallowedInput,
             Integer maxCount,
             Integer maxLength,
             Float elevation,

@@ -54,6 +54,7 @@ brand:
 bubble:
   enable: true
   visible_to_self: true
+  disallowed_input: ""
   max_count: 3
   max_length: 30
   elevation: 0.4

@@ -11,9 +11,12 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public abstract class BubbleModule implements ModuleSimple {
 
@@ -22,17 +25,22 @@ public abstract class BubbleModule implements ModuleSimple {
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
+    private final FLogger fLogger;
+
+    private Pattern disallowedPattern;
 
     protected BubbleModule(FileFacade fileFacade,
                            TaskScheduler taskScheduler,
                            BubbleService bubbleService,
                            ListenerRegistry listenerRegistry,
-                           ModuleController moduleController) {
+                           ModuleController moduleController,
+                           FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.taskScheduler = taskScheduler;
         this.bubbleService = bubbleService;
         this.listenerRegistry = listenerRegistry;
         this.moduleController = moduleController;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -52,6 +60,15 @@ public abstract class BubbleModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
+        if (!config().disallowedInput().isEmpty()) {
+            try {
+                disallowedPattern = Pattern.compile(config().disallowedInput());
+            } catch (PatternSyntaxException e) {
+                fLogger.warning(e);
+                return;
+            }
+        }
+
         bubbleService.startTicker();
 
         listenerRegistry.register(PulseBubbleListener.class);
@@ -63,6 +80,12 @@ public abstract class BubbleModule implements ModuleSimple {
     }
 
     public void add(@NonNull FPlayer fPlayer, @NonNull String inputString, List<FPlayer> receivers) {
+        add(fPlayer, inputString, inputString, receivers);
+    }
+
+    public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, List<FPlayer> receivers) {
+        if (disallowedPattern != null && disallowedPattern.matcher(rawString).matches()) return;
+
         taskScheduler.runRegion(fPlayer, () -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 

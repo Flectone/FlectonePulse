@@ -8,6 +8,7 @@ import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class MinecraftBubbleModule extends BubbleModule {
@@ -19,8 +20,9 @@ public class MinecraftBubbleModule extends BubbleModule {
                                  TaskScheduler taskScheduler,
                                  BubbleService bubbleService,
                                  ListenerRegistry listenerRegistry,
-                                 ModuleController moduleController) {
-        super(fileFacade, taskScheduler, bubbleService, listenerRegistry, moduleController);
+                                 ModuleController moduleController,
+                                 FLogger fLogger) {
+        super(fileFacade, taskScheduler, bubbleService, listenerRegistry, moduleController, fLogger);
 
         this.listenerRegistry = listenerRegistry;
     }
