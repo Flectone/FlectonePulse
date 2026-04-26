@@ -83,7 +83,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         return fileFacade.localization(sender).message().chat();
     }
 
-    public void handleChatEvent(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
+    public void handleChatEvent(FPlayer fPlayer, String rawString, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
         if (muteSender.sendIfMuted(fPlayer)) {
             cancelEvent.run();
             return;
@@ -94,7 +94,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
             return;
         }
 
-        Chat playerChat = getPlayerChat(fPlayer, eventMessage);
+        Chat playerChat = getPlayerChat(fPlayer, rawString);
         if (playerChat.config() == null || !playerChat.config().enable()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
                     .sender(fPlayer)
@@ -111,28 +111,30 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
             return;
         }
 
+        String playerMessage = rawString;
+
         String trigger = playerChat.config().trigger();
-        if (!StringUtils.isEmpty(trigger) && eventMessage.startsWith(trigger)) {
-            eventMessage = eventMessage.substring(trigger.length()).trim();
+        if (!StringUtils.isEmpty(trigger) && playerMessage.startsWith(trigger)) {
+            playerMessage = playerMessage.substring(trigger.length()).trim();
         }
 
         Range chatRange = playerChat.config().range();
 
         // in local chat you can mention it too,
         // but I don't want to full support InteractiveChat
-        String finalMessage = chatRange.is(Range.Type.PROXY)
+        playerMessage = chatRange.is(Range.Type.PROXY)
                 || chatRange.is(Range.Type.SERVER)
                 || chatRange.is(Range.Type.WORLD_NAME)
                 || chatRange.is(Range.Type.WORLD_TYPE)
-                ? integrationModule.checkMention(fPlayer, eventMessage)
-                : eventMessage;
+                ? integrationModule.checkMention(fPlayer, playerMessage)
+                : playerMessage;
 
-        successEvent.accept(finalMessage, playerChat.config().cancel());
+        successEvent.accept(playerMessage, playerChat.config().cancel());
 
-        sendMessage(fPlayer, eventMessage, finalMessage, playerChat);
+        sendMessage(fPlayer, rawString, playerMessage, playerChat);
     }
 
-    public void sendMessage(FPlayer fPlayer, String eventMessage, String finalMessage, Chat playerChat) {
+    public void sendMessage(FPlayer fPlayer, String rawString, String playerMessage, Chat playerChat) {
         String chatName = playerChat.name();
 
         ChatMetadata<Localization.Message.Chat> chatMetadata = ChatMetadata.<Localization.Message.Chat>builder()
@@ -141,12 +143,12 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
                         .format(localization -> localization.types().get(chatName))
                         .destination(playerChat.config().destination())
                         .range(playerChat.config().range())
-                        .message(finalMessage)
+                        .message(playerMessage)
                         .sound(playerChat.sound())
                         .filter(permissionFilter(chatName))
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(chatName);
-                            dataOutputStream.writeString(finalMessage);
+                            dataOutputStream.writeString(playerMessage);
                         })
                         .integration()
                         .build()
@@ -166,10 +168,10 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         }
 
         // send to spy module
-        spyModuleProvider.get().check(fPlayer, chatName, finalMessage, receivers);
+        spyModuleProvider.get().check(fPlayer, chatName, playerMessage, receivers);
 
         // send to bubble module
-        bubbleModuleProvider.get().add(fPlayer, eventMessage, receivers);
+        bubbleModuleProvider.get().add(fPlayer, rawString, playerMessage, receivers);
     }
 
     public Predicate<FPlayer> permissionFilter(String chatName) {
