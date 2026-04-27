@@ -13,6 +13,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
+import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
@@ -37,14 +38,18 @@ public class VelocityFlectonePulse {
 
     private final Set<UUID> firstJoinPlayers = new CopyOnWriteArraySet<>();
 
+
     private final ProxyServer proxyServer;
     private final FLogger fLogger;
+    private final VelocityLoginStateListener velocityLoginStateListener;
 
     @Inject
     public VelocityFlectonePulse(ProxyServer proxyServer,
+                                 VelocityLoginStateListener velocityLoginStateListener,
                                  Logger logger) {
         this.proxyServer = proxyServer;
         this.fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()), () -> null);
+        this.velocityLoginStateListener = velocityLoginStateListener;
     }
 
     @Subscribe
@@ -52,6 +57,7 @@ public class VelocityFlectonePulse {
         fLogger.logEnabling();
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
+        proxyServer.getEventManager().register(this, velocityLoginStateListener);
 
         fLogger.logEnabled();
     }
@@ -73,6 +79,7 @@ public class VelocityFlectonePulse {
         fLogger.logDisabling();
 
         proxyServer.getChannelRegistrar().unregister(IDENTIFIER);
+        proxyServer.getEventManager().unregisterListeners(this);
 
         fLogger.logDisabled();
     }
@@ -117,9 +124,8 @@ public class VelocityFlectonePulse {
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
-        if (event.getLoginStatus() != DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) return;
-
         UUID playerUUID = event.getPlayer().getUniqueId();
+        if (velocityLoginStateListener.getLoginStatus(playerUUID) != LoginStatus.CONNECTED) return;
 
         byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
 
