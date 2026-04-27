@@ -155,6 +155,10 @@ public class MinecraftTextureService {
         return textureMap.get(key);
     }
 
+    public boolean isMineSkinHooked() {
+        return mineskinIntegration != null && mineskinIntegration.isHooked();
+    }
+
     private List<Frame> loadTexture(String textureFile) throws IOException {
         File textureFileImage = imagePath.resolve(textureFile).toFile();
         String textureFileName = getFileNameWithoutExtension(textureFile);
@@ -181,7 +185,7 @@ public class MinecraftTextureService {
     }
 
     private List<Frame> loadImageTexture(File textureFileImage) throws IOException {
-        if (mineskinIntegration == null || !mineskinIntegration.isHooked()) return Collections.emptyList();
+        if (!isMineSkinHooked()) return Collections.emptyList();
         if (!textureFileImage.exists()) return Collections.emptyList();
 
         // update last modified time image
