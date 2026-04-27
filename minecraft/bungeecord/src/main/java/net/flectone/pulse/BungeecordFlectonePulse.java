@@ -1,6 +1,7 @@
 package net.flectone.pulse;
 
 import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
+import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import net.md_5.bungee.api.ProxyServer;
@@ -96,8 +97,7 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
     @EventHandler
     public void onDisconnectEvent(PlayerDisconnectEvent event) {
         UUID playerUUID = event.getPlayer().getUniqueId();
-        fLogger.warning(String.valueOf(bungeeDisconnectListener.getLoginStatus(playerUUID)));
-        if (bungeeDisconnectListener.getLoginStatus(playerUUID) != BungeecordLoginStateListener.LoginStatus.CONNECTED) return;
+        if (bungeeDisconnectListener.getLoginStatus(playerUUID) != LoginStatus.CONNECTED) return;
 
         byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
 

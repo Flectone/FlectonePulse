@@ -1,22 +1,19 @@
 package net.flectone.pulse;
 
 
+import net.flectone.pulse.util.constant.LoginStatus;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BungeecordLoginStateListener implements Listener {
 
-    private final Map<UUID, LoginStatus> loginStates = new HashMap<>();
-
-    public enum LoginStatus {
-        PRE_LOGIN, LOGIN, POST_LOGIN, CONNECTED
-    }
+    private final Map<UUID, LoginStatus> loginStates = new ConcurrentHashMap<>();
 
     public LoginStatus getLoginStatus(UUID uuid) {
         return loginStates.get(uuid);
