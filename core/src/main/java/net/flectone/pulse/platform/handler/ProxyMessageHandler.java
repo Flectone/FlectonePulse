@@ -829,28 +829,26 @@ public class ProxyMessageHandler {
         String proxyChatName = input.readUTF();
         String message = input.readUTF();
 
-        Optional<Map.Entry<String, Message.Chat.Type>> optionalChat = fileFacade.message().chat().types()
+        Message.Chat.Type chatType = fileFacade.message().chat().types()
                 .entrySet()
                 .stream()
                 .filter(chat -> chat.getKey().equals(proxyChatName))
-                .findAny();
+                .findAny()
+                .map(Map.Entry::getValue)
+                .orElse(null);
 
-        if (optionalChat.isEmpty()) return;
-        String chatName = optionalChat.get().getKey();
-        Message.Chat.Type chatType = optionalChat.get().getValue();
-
-        Chat playerChat = new Chat(chatName, chatType, module.permission().types().get(chatName));
+        Chat playerChat = new Chat(proxyChatName, chatType, module.permission().types().get(proxyChatName));
 
         messageDispatcher.dispatch(module, ChatMetadata.<Localization.Message.Chat>builder()
                 .base(EventMetadata.<Localization.Message.Chat>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .format(s -> s.types().get(chatName))
+                        .format(localization -> localization.types().get(proxyChatName))
                         .range(Range.get(Range.Type.SERVER))
-                        .destination(chatType.destination())
+                        .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
                         .message(message)
                         .sound(playerChat.sound())
-                        .filter(module.permissionFilter(chatName))
+                        .filter(module.permissionFilter(proxyChatName))
                         .build()
                 )
                 .chat(playerChat)
