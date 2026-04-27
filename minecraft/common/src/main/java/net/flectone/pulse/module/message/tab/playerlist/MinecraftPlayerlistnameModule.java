@@ -124,7 +124,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
-        fPlayerService.getFPlayersWhoCanSee(fPlayer)
+        fPlayerService.getPlatformFPlayers().stream()
+                .filter(viewer -> integrationModule.canSeeVanished(fPlayer, viewer))
                 .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
     }
 
@@ -139,7 +140,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
         UserProfile userProfile = createUserProfile(fPlayer);
 
-        fPlayerService.getOnlineFPlayers().stream()
+        fPlayerService.getPlatformFPlayers().stream()
                 .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, createPlayerInfo(fPlayer, fReceiver, userProfile))));
     }

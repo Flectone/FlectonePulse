@@ -273,13 +273,6 @@ public class FPlayerService {
                 .toList();
     }
 
-    public List<FPlayer> getFPlayersWhoCanSee(FPlayer target) {
-        return getOnlineFPlayers()
-                .stream()
-                .filter(viewer -> integrationModule.canSeeVanished(target, viewer))
-                .toList();
-    }
-
     public List<FPlayer> getPlatformFPlayers() {
         return fPlayerRepository.getOnlinePlayers().stream()
                 .filter(platformPlayerAdapter::isOnline)
