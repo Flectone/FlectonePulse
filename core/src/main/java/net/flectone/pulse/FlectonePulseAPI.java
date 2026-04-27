@@ -166,7 +166,7 @@ public class FlectonePulseAPI {
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
 
         // update and clear all fplayers
-        fPlayerService.getOnlineFPlayers().forEach(fPlayerService::clearAndSave);
+        fPlayerService.getPlatformFPlayers().forEach(fPlayerService::clearAndSave);
         fPlayerService.invalidate();
 
         // terminate packetevents
