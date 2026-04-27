@@ -31,7 +31,7 @@ public class MinecraftSoundPlayer implements SoundPlayer {
         if (soundPermission == null) return;
 
         Sound sound = soundPermission.first();
-        if (!sound.enable()) return;
+        if (sound == null || !sound.enable()) return;
         if (!permissionChecker.check(sender, soundPermission.second())) return;
 
         packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(
@@ -47,7 +47,7 @@ public class MinecraftSoundPlayer implements SoundPlayer {
         if (soundPermission == null) return;
 
         Sound sound = soundPermission.first();
-        if (!sound.enable()) return;
+        if (sound == null || !sound.enable()) return;
         if (!permissionChecker.check(sender, soundPermission.second())) return;
 
         fPlayerService.getOnlineFPlayers().stream()

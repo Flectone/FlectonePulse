@@ -35,7 +35,7 @@ public class HytaleSoundPlayer implements SoundPlayer {
         if (soundPermission == null) return;
 
         Sound sound = soundPermission.first();
-        if (!sound.enable()) return;
+        if (sound == null || !sound.enable()) return;
         if (!permissionChecker.check(sender, soundPermission.second())) return;
 
         Object player = platformPlayerAdapter.convertToPlatformPlayer(receiver);
