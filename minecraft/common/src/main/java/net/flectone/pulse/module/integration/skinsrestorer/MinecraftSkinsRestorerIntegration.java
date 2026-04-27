@@ -19,8 +19,10 @@ import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.event.SkinApplyEvent;
+import net.skinsrestorer.api.property.MojangSkinDataResult;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.storage.PlayerStorage;
+import net.skinsrestorer.api.storage.SkinStorage;
 
 import java.util.Optional;
 
@@ -102,7 +104,8 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private PlayerHeadObjectContents.ProfileProperty convertToProfileProperty(SkinProperty skinProperty) {
         return PlayerHeadObjectContents.property(
                 "textures",
-                skinProperty.getValue()
+                skinProperty.getValue(),
+                skinProperty.getSignature()
         );
     }
 }
