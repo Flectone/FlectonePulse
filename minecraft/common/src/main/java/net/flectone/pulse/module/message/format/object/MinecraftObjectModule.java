@@ -22,6 +22,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -285,7 +286,7 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         // check player version
-        if (user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+        if (user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
                 return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
