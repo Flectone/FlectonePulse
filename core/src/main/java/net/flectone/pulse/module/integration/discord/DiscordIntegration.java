@@ -268,10 +268,8 @@ public class DiscordIntegration implements FIntegration {
         String token = systemVariableResolver.substituteEnvVars(config().token());
         if (token.isEmpty()) return;
 
-        HttpClient httpClient = createHttpClient();
-
-        discordClient = createDiscordClient(httpClient);
-        gateway = createGatewayClient(discordClient, httpClient);
+        discordClient = createDiscordClient(createHttpClient());
+        gateway = createGatewayClient(discordClient, createHttpClient());
         if (gateway == null) return;
 
         Integration.Discord.Presence presence = config().presence();
@@ -382,6 +380,8 @@ public class DiscordIntegration implements FIntegration {
 
         return HttpClient.create()
                 .keepAlive(false)
+                .compress(true)
+                .followRedirect(true)
                 .proxy(typeSpec -> {
                     ProxyProvider.Builder proxyProviderBuilder = typeSpec
                             .type(proxy.type() == Proxy.Type.HTTP ? ProxyProvider.Proxy.HTTP : ProxyProvider.Proxy.SOCKS5)

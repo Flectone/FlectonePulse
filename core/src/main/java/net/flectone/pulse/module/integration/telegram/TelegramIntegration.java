@@ -16,7 +16,9 @@ import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -33,6 +35,7 @@ import java.lang.reflect.Field;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -72,11 +75,8 @@ public class TelegramIntegration implements FIntegration {
         if (token.isEmpty()) return;
 
         try {
-            // create http client
-            OkHttpClient okHttpClient = createHttpClient();
-
             // create telegram client
-            telegramClient = new OkHttpTelegramClient(okHttpClient, token);
+            telegramClient = new OkHttpTelegramClient(createHttpClient(), token);
 
             // create application
             botsApplication = new TelegramBotsLongPollingApplication();
@@ -85,7 +85,7 @@ public class TelegramIntegration implements FIntegration {
             // waiting for https://github.com/rubenlagus/TelegramBots/pull/1583
             Field okHttpClientCreatorField = TelegramBotsLongPollingApplication.class.getDeclaredField("okHttpClientCreator");
             okHttpClientCreatorField.setAccessible(true);
-            okHttpClientCreatorField.set(botsApplication, (Supplier <OkHttpClient>) () -> okHttpClient);
+            okHttpClientCreatorField.set(botsApplication, (Supplier <OkHttpClient>) () -> createHttpClient());
 
             // register listener
             botsApplication.registerBot(token, messageListener);
@@ -187,7 +187,21 @@ public class TelegramIntegration implements FIntegration {
     }
 
     private OkHttpClient createHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(100);
+        dispatcher.setMaxRequestsPerHost(100);
+
+        OkHttpClient.Builder builder = new OkHttpClient()
+                .newBuilder()
+                .dispatcher(dispatcher)
+                .connectionPool(new ConnectionPool(
+                        100,
+                        75,
+                        TimeUnit.SECONDS
+                ))
+                .readTimeout(100, TimeUnit.SECONDS)
+                .writeTimeout(70, TimeUnit.SECONDS)
+                .connectTimeout(75, TimeUnit.SECONDS);
 
         Integration.Proxy proxy = config().proxy();
         if (proxy.type() == Proxy.Type.DIRECT) {
