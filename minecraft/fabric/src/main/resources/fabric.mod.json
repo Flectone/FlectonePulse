@@ -22,7 +22,7 @@
               "net.flectone.pulse.FabricFlectonePulse"
         ],
 		"voicechat": [
-			"net.flectone.pulse.module.integration.simplevoice.SimpleVoiceIntegration"
+			"net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceIntegration"
         ]
 	},
 	"depends": {
