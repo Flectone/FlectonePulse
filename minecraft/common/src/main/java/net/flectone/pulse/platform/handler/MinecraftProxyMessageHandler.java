@@ -8,9 +8,11 @@ import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Singleton
 public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
 
+    private final FPlayerService fPlayerService;
     private final Injector injector;
 
     @Inject
@@ -37,6 +40,7 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
                                         ModuleController moduleController) {
         super(injector, fileFacade, fPlayerService, fLogger, moderationService, gson, taskScheduler, cooldownRepository, messagePipeline, messageDispatcher, moduleController);
 
+        this.fPlayerService = fPlayerService;
         this.injector = injector;
     }
 
@@ -52,6 +56,14 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
         super.handleSystemOffline(uuid);
 
         injector.getInstance(MinecraftPlayerlistnameModule.class).remove(uuid);
+    }
+
+    @Override
+    public void handleSystemSkin(UUID uuid) {
+        super.handleSystemSkin(uuid);
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        injector.getInstance(MinecraftSkinService.class).updateProfilePropertyCache(fPlayer);
     }
 
 }

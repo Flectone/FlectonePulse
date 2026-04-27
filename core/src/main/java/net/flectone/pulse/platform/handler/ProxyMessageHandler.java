@@ -143,6 +143,10 @@ public class ProxyMessageHandler {
         injector.getInstance(QuitModule.class).proxySend(uuid);
     }
 
+    public void handleSystemSkin(UUID uuid) {
+        // nothing
+    }
+
     public void handleProxyMessage(DataInputStream input, UUID metadataUUID, ModuleName tag) throws IOException {
         Set<String> proxyClusters = gson.fromJson(input.readUTF(), new TypeToken<Set<String>>() {}.getType());
 
@@ -151,7 +155,7 @@ public class ProxyMessageHandler {
         if (handleSystemCooldown(tag, input)) return;
 
         FEntity fEntity = optionalFEntity.get();
-        if (handleModerationInvalidation(tag, fEntity)) {
+        if (handleEntityInvalidation(tag, fEntity)) {
             return;
         }
 
@@ -202,7 +206,7 @@ public class ProxyMessageHandler {
         }
     }
 
-    private boolean handleModerationInvalidation(ModuleName tag, FEntity fEntity) {
+    private boolean handleEntityInvalidation(ModuleName tag, FEntity fEntity) {
         return switch (tag) {
             case SYSTEM_BAN -> {
                 moderationService.invalidateBans(fEntity.uuid());
@@ -214,6 +218,10 @@ public class ProxyMessageHandler {
             }
             case SYSTEM_WARN -> {
                 moderationService.invalidateWarns(fEntity.uuid());
+                yield true;
+            }
+            case SYSTEM_SKIN -> {
+                handleSystemSkin(fEntity.uuid());
                 yield true;
             }
             default -> false;

@@ -9,10 +9,11 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.skinsrestorer.api.PropertyUtils;
@@ -34,8 +35,8 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Provider<MinecraftSkinService> skinServiceProvider;
-    private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
     private final TaskScheduler taskScheduler;
+    private final ProxySender proxySender;
     @Getter private final FLogger fLogger;
 
     private SkinsRestorer skinsRestorer;
@@ -56,8 +57,10 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 
-                    skinServiceProvider.get().updateProfilePropertyCache(fPlayer.uuid(), convertToProfileProperty(event.getProperty()));
-                    taskScheduler.runAsyncLater(() -> playerlistnameModuleProvider.get().send(fPlayer), 2L);
+                    // update proxy cache
+                    if (!proxySender.send(fPlayer, ModuleName.SYSTEM_SKIN)) {
+                        skinServiceProvider.get().updateProfilePropertyCache(fPlayer);
+                    }
                 });
 
                 skinApplyEventSubscribed = true;

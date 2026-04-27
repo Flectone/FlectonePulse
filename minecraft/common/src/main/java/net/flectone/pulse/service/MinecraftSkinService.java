@@ -4,12 +4,15 @@ import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.common.cache.Cache;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
+import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.file.FileFacade;
@@ -29,9 +32,20 @@ public class MinecraftSkinService implements SkinService {
     private final MinecraftIntegrationModule integrationModule;
     private final MinecraftPacketProvider packetProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final TaskScheduler taskScheduler;
+    private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
 
-    public void updateProfilePropertyCache(UUID uuid, PlayerHeadObjectContents.ProfileProperty profileProperty) {
-        profilePropertyCache.put(uuid, profileProperty);
+    public void updateProfilePropertyCache(FPlayer fPlayer) {
+        profilePropertyCache.put(fPlayer.uuid(), getProfileProperty(fPlayer));
+
+        MinecraftPlayerlistnameModule minecraftPlayerlistnameModule = playerlistnameModuleProvider.get();
+
+        if (platformPlayerAdapter.isOnline(fPlayer)) {
+            taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModule.send(fPlayer), 2L);
+        } else {
+            minecraftPlayerlistnameModule.remove(fPlayer.uuid());
+            minecraftPlayerlistnameModule.update();
+        }
     }
 
     public PlayerHeadObjectContents.@NonNull ProfileProperty getProfilePropertyFromCache(FEntity entity) {

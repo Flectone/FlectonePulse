@@ -147,7 +147,8 @@ public enum ModuleName {
     SYSTEM_OFFLINE,
     SYSTEM_BAN,
     SYSTEM_MUTE,
-    SYSTEM_WARN;
+    SYSTEM_WARN,
+    SYSTEM_SKIN;
 
     private static final Map<String, ModuleName> ENUM_BY_PROXY_KEY = Arrays.stream(ModuleName.values())
             .collect(Collectors.toUnmodifiableMap(
