@@ -92,10 +92,14 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private SkinProperty getSkinProperty(FPlayer fPlayer) {
         if (skinsRestorer == null) return null;
 
-        PlayerStorage storage = skinsRestorer.getPlayerStorage();
+        PlayerStorage playerStorage = skinsRestorer.getPlayerStorage();
         try {
-            Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
-            return skin.orElse(null);
+            Optional<SkinProperty> skinProperty = playerStorage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
+            if (skinProperty.isPresent()) return skinProperty.get();
+
+            SkinStorage skinStorage = skinsRestorer.getSkinStorage();
+            Optional<MojangSkinDataResult> skinDataResult = skinStorage.getPlayerSkin(fPlayer.uuid().toString(), false);
+            return skinDataResult.map(MojangSkinDataResult::getSkinProperty).orElse(null);
         } catch (Exception _) {
             return null;
         }
