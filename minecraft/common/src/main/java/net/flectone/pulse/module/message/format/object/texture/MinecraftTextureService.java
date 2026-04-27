@@ -166,7 +166,7 @@ public class MinecraftTextureService {
 
             if (!texture.frames().isEmpty()
                     // if image has been changed, then our json is out of date
-                    && (!textureFileImage.exists() || texture.lastModified() == textureFileImage.lastModified())) {
+                    && (!textureFileImage.exists() || texture.lastModified() == textureFileImage.lastModified()) || !isMineSkinHooked()) {
                 return texture.frames();
             }
         }
