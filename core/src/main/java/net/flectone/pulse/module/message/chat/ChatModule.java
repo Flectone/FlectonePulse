@@ -33,6 +33,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -167,11 +168,17 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
             taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, receivers, playerChat), 1L);
         }
 
+        // receivers can be empty due to proxy mode
+        List<FPlayer> receiversWithSender = new ArrayList<>(receivers);
+        if (!receiversWithSender.contains(fPlayer)) {
+            receiversWithSender.add(fPlayer);
+        }
+
         // send to spy module
-        spyModuleProvider.get().check(fPlayer, chatName, playerMessage, receivers);
+        spyModuleProvider.get().check(fPlayer, chatName, playerMessage, receiversWithSender);
 
         // send to bubble module
-        bubbleModuleProvider.get().add(fPlayer, rawString, playerMessage, receivers);
+        bubbleModuleProvider.get().add(fPlayer, rawString, playerMessage, receiversWithSender);
     }
 
     public Predicate<FPlayer> permissionFilter(String chatName) {
