@@ -269,20 +269,8 @@ public class DiscordIntegration implements FIntegration {
         if (token.isEmpty()) return;
 
         discordClient = createDiscordClient(createHttpClient());
-        gateway = createGatewayClient(discordClient, createHttpClient());
+        gateway = createGatewayClient(discordClient, createHttpClient(), createClientPresence());
         if (gateway == null) return;
-
-        Integration.Discord.Presence presence = config().presence();
-
-        if (presence.enable()) {
-            Integration.Discord.Presence.Activity activity = presence.activity();
-
-            ClientActivity clientActivity = activity.enable()
-                    ? ClientActivity.of(Activity.Type.valueOf(activity.type()), activity.name(), activity.url())
-                    : null;
-
-            gateway.updatePresence(ClientPresence.of(Status.valueOf(presence.status()), clientActivity)).block();
-        }
 
         Integration.ChannelInfo channelInfo = config().channelInfo();
 
@@ -372,6 +360,20 @@ public class DiscordIntegration implements FIntegration {
     }
 
     @Nullable
+    private ClientPresence createClientPresence() {
+        Integration.Discord.Presence presence = config().presence();
+        if (!presence.enable()) return null;
+
+        Integration.Discord.Presence.Activity activity = presence.activity();
+
+        ClientActivity clientActivity = activity.enable()
+                ? ClientActivity.of(Activity.Type.valueOf(activity.type()), activity.name(), activity.url())
+                : null;
+
+        return ClientPresence.of(Status.valueOf(presence.status()), clientActivity);
+    }
+
+    @Nullable
     private HttpClient createHttpClient() {
         Integration.Proxy proxy = config().proxy();
         if (proxy.type() == Proxy.Type.DIRECT) {
@@ -410,9 +412,13 @@ public class DiscordIntegration implements FIntegration {
     }
 
     @Nullable
-    private GatewayDiscordClient createGatewayClient(@NonNull DiscordClient discordClient, @Nullable HttpClient httpClient) {
+    private GatewayDiscordClient createGatewayClient(@NonNull DiscordClient discordClient, @Nullable HttpClient httpClient, @Nullable ClientPresence clientPresence) {
         GatewayBootstrap<?> gatewayBootstrap = discordClient.gateway()
                 .setEnabledIntents(IntentSet.nonPrivileged().or(IntentSet.of(Intent.MESSAGE_CONTENT, Intent.GUILD_PRESENCES)));
+
+        if (clientPresence != null) {
+            gatewayBootstrap = gatewayBootstrap.setInitialPresence(_ -> clientPresence);
+        }
 
         if (httpClient != null) {
             gatewayBootstrap = gatewayBootstrap.setGatewayReactorResources(reactorResources -> GatewayReactorResources.builder(reactorResources)
