@@ -39,7 +39,11 @@ public class Bubble {
     private boolean created;
 
     public boolean isExpired() {
-        return System.currentTimeMillis() > creationTime + duration;
+        return System.currentTimeMillis() > getExpireTime();
+    }
+
+    public long getExpireTime() {
+        return creationTime + duration;
     }
 
     public boolean equals(Bubble bubble) {
