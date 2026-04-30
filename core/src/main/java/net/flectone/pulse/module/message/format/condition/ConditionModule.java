@@ -108,6 +108,8 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
                     double maxNumber = Double.MIN_VALUE;
 
                     for (String configKey : values.keySet()) {
+                        if ("default".equalsIgnoreCase(configKey)) continue;
+
                         double configNumber = Double.parseDouble(configKey);
 
                         if (number >= configNumber && configNumber > maxNumber) {
