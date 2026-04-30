@@ -132,7 +132,7 @@ public class MinecraftTextScreenRender implements TextScreenRender {
 
         // scale
         Vector3f scale = textScreen.hasAnimation()
-                ? new Vector3f()
+                ? Vector3f.zero()
                 : new Vector3f(textScreen.scale(), textScreen.scale(), textScreen.scale());
         metadataList.add(new EntityData<>(entityUtil.displayOffset() + 3, EntityDataTypes.VECTOR3F, scale));
 

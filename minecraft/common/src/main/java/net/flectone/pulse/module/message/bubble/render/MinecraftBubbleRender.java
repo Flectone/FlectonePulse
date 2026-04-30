@@ -237,7 +237,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         EntityType entityType = bubbleEntity.getEntityType();
         int despawnDelay = 0;
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
-            interpolate(bubbleEntity, bubble, new Vector3f());
+            interpolate(bubbleEntity, bubble, Vector3f.zero());
             despawnDelay = bubble.getAnimationTime();
         }
 
@@ -306,7 +306,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
 
             // scale
-            metadataList.add(new EntityData<>(entityUtil.displayOffset() + 3, EntityDataTypes.VECTOR3F, new Vector3f()));
+            metadataList.add(new EntityData<>(entityUtil.displayOffset() + 3, EntityDataTypes.VECTOR3F, Vector3f.zero()));
 
             // center for viewer
             metadataList.add(new EntityData<>(entityUtil.displayOffset() + 6, EntityDataTypes.BYTE, (byte) bubble.getBillboard().ordinal()));
