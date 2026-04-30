@@ -19,10 +19,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,6 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleService {
+
+    private static final long MIN_DISPLAY_TIME = 2000L;
 
     private final Map<UUID, PlayerBubbleState> playerBubbleStates = new ConcurrentHashMap<>();
     private final FileFacade fileFacade;
@@ -197,7 +196,13 @@ public class BubbleService {
 
             int maxCount = fileFacade.message().bubble().maxCount();
             if (bubbleState.activeBubbles.size() >= maxCount) {
-                bubbleState.waitingQueue.removeIf(_ -> true);
+                bubbleState.activeBubbles.stream()
+                        .min(Comparator.comparingLong(Bubble::getExpireTime))
+                        .map(Bubble::getExpireTime)
+                        .ifPresent(lastActiveExpireTime -> bubbleState.waitingQueue.removeIf(bubble ->
+                                bubble.getExpireTime() - lastActiveExpireTime < MIN_DISPLAY_TIME)
+                        );
+
                 return;
             }
 
