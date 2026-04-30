@@ -131,7 +131,8 @@ public class ProxyMessageHandler {
     }
 
     public void handleSystemOnline(UUID uuid) throws IOException {
-        fPlayerService.invalidateOffline(uuid);
+        // delay is needed for proper sync Proxy
+        taskScheduler.runAsyncLater(() -> fPlayerService.invalidateOffline(uuid), 5L);
     }
 
     public void handleSystemConnected(UUID uuid) {

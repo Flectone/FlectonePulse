@@ -159,6 +159,14 @@ public class FPlayerService {
 
     public void invalidateOffline(UUID uuid) {
         fPlayerRepository.removeOffline(uuid);
+
+        // idk why, but sometimes Proxy player offline, although he is already on the server.
+        // I think that request that player is logged in is sent before request as player exits.
+        // this is the only way to fix it
+        FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
+        if (!fPlayer.isOnline()) {
+            updateFPlayer(fPlayer.withOnline(true));
+        }
     }
 
     public void invalidateOnline(UUID uuid) {
