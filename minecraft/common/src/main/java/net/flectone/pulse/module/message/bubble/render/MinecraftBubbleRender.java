@@ -234,10 +234,12 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     private void despawnBubbleEntity(MinecraftBubbleEntity bubbleEntity) {
-        EntityType entityType = bubbleEntity.getEntityType();
         int despawnDelay = 0;
-        if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
-            interpolate(bubbleEntity, bubble, Vector3f.zero());
+        if (bubbleEntity.getBubble() instanceof ModernBubble bubble) {
+            if (bubbleEntity.getEntityType() == EntityTypes.TEXT_DISPLAY) {
+                interpolate(bubbleEntity, bubble, Vector3f.zero());
+            }
+
             despawnDelay = bubble.getAnimationTime();
         }
 
