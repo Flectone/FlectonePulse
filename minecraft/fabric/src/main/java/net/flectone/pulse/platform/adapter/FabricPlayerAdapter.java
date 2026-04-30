@@ -149,7 +149,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @Nullable String getIp(@NonNull UUID uuid) {
         ServerPlayer player = getPlayer(uuid);
         if (player != null) {
-            return player.connection.getRemoteAddress().toString();
+            return player.getIpAddress();
         }
 
         return packetProvider.getHostAddress(uuid);
