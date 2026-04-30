@@ -22,7 +22,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -314,14 +313,16 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag applyDefaultFormatting(MessageContext messageContext, Component component, boolean needExtraSpace) {
         if (!Component.IS_NOT_EMPTY.test(component)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        if (!messageContext.isFlag(MessageFlag.PLAYER_MESSAGE) && needExtraSpace) {
+        boolean isPlayerMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
+
+        if (!isPlayerMessage && needExtraSpace) {
             component = component.append(Component.space());
         }
 
-        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
+        if (isPlayerMessage) {
             component = component.color(NamedTextColor.WHITE);
         }
 
-        return Tag.inserting(component);
+        return isPlayerMessage ? Tag.selfClosingInserting(component) : Tag.inserting(component);
     }
 }
