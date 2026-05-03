@@ -105,7 +105,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
                     double number = Double.parseDouble(buildCriteriaString(fPlayer, fReceiver, criteria.value(), flags));
 
                     String key = null;
-                    double maxNumber = Double.MIN_VALUE;
+                    double maxNumber = -Double.MIN_VALUE;
 
                     for (String configKey : values.keySet()) {
                         if ("default".equalsIgnoreCase(configKey)) continue;
