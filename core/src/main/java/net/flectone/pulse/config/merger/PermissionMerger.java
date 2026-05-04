@@ -266,6 +266,7 @@ public interface PermissionMerger {
     @Mapping(target = "objective", expression = "java(mergeMessageObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeMessageQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeMessageRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "serverlink", expression = "java(mergeMessageServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeMessageSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "sign", expression = "java(mergeMessageSign(target.build().sign().toBuilder(), source.sign()))")
     @Mapping(target = "status", expression = "java(mergeMessageStatus(target.build().status().toBuilder(), source.status()))")
@@ -297,6 +298,8 @@ public interface PermissionMerger {
     Permission.Message.Quit mergeMessageQuit(@MappingTarget Permission.Message.Quit.QuitBuilder target, Permission.Message.Quit quit);
 
     Permission.Message.Rightclick mergeMessageRightclick(@MappingTarget Permission.Message.Rightclick.RightclickBuilder target, Permission.Message.Rightclick rightclick);
+
+    Permission.Message.Serverlink mergeMessageServerlink(@MappingTarget Permission.Message.Serverlink.ServerlinkBuilder target, Permission.Message.Serverlink serverlink);
 
     Permission.Message.Sidebar mergeMessageSidebar(@MappingTarget Permission.Message.Sidebar.SidebarBuilder target, Permission.Message.Sidebar sidebar);
 

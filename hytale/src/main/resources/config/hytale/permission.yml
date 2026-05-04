@@ -1020,6 +1020,9 @@ message:
     sound:
       name: "flectonepulse.module.message.rightclick.sound"
       type: "TRUE"
+  serverlink:
+    name: "flectonepulse.module.message.serverlink"
+    type: "TRUE"
   sidebar:
     name: "flectonepulse.module.message.sidebar"
     type: "TRUE"

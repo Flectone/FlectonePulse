@@ -981,6 +981,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
             Rightclick rightclick,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
+            Serverlink serverlink,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar")
             Sidebar sidebar,
 
@@ -1207,6 +1210,14 @@ public record Localization(
         public record Join(
                 String format,
                 String formatFirstTime
+        ) implements LocalizationSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Serverlink(
+                Map<String, String> values
         ) implements LocalizationSetting {
         }
 

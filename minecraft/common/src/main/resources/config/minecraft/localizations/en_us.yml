@@ -625,6 +625,10 @@ message:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:
     format: "<fcolor:1>◁ <target> ▷"
+  serverlink:
+    values:
+      example1: "<fcolor:1><sprite_or:\"[!]\":gui:icon/info>Server information"
+      example2: "<fcolor:1><sprite_or:\"[+]\":gui:icon/trial_available>Support server"
   sidebar:
     values:
     - - " "

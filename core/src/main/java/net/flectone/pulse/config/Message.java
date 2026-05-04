@@ -79,6 +79,9 @@ public record Message(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
         Rightclick rightclick,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
+        Serverlink serverlink,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar")
         Sidebar sidebar,
 
@@ -599,6 +602,16 @@ public record Message(
             Destination destination,
             Sound sound
     ) implements EnableSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Serverlink(
+            Boolean enable,
+            Map<String, String> values,
+            Ticker ticker
+    ) implements EnableSetting {
     }
 
     @With

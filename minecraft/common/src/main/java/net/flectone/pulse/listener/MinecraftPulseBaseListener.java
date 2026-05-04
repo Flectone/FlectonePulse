@@ -10,6 +10,7 @@ import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.sprite.SpriteModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.serverlink.MinecraftServerlinkModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
@@ -27,6 +28,12 @@ public class MinecraftPulseBaseListener implements PulseListener {
         if (eventModule instanceof BubbleModule
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             fLogger.warning("Bubble module is not supported on this version of Minecraft");
+            return event.withCancelled(true);
+        }
+
+        if (eventModule instanceof MinecraftServerlinkModule
+                && packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_21)) {
+            fLogger.warning("Link module is not supported on this version of Minecraft");
             return event.withCancelled(true);
         }
 

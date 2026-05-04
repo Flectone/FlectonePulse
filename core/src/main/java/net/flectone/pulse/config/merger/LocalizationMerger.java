@@ -218,6 +218,7 @@ public interface LocalizationMerger {
     @Mapping(target = "objective", expression = "java(mergeObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "serverlink", expression = "java(mergeServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "status", expression = "java(mergeStatus2(target.build().status().toBuilder(), source.status()))")
     @Mapping(target = "tab", expression = "java(mergeTab(target.build().tab().toBuilder(), source.tab()))")
@@ -290,6 +291,8 @@ public interface LocalizationMerger {
     Localization.Message.Quit mergeQuit(@MappingTarget Localization.Message.Quit.QuitBuilder target, Localization.Message.Quit quit);
 
     Localization.Message.Rightclick mergeRightclick(@MappingTarget Localization.Message.Rightclick.RightclickBuilder target, Localization.Message.Rightclick rightclick);
+
+    Localization.Message.Serverlink mergeServerlink(@MappingTarget Localization.Message.Serverlink.ServerlinkBuilder target, Localization.Message.Serverlink serverlink);
 
     Localization.Message.Sidebar mergeSidebar(@MappingTarget Localization.Message.Sidebar.SidebarBuilder target, Localization.Message.Sidebar sidebar);
 

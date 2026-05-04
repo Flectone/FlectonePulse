@@ -1,0 +1,89 @@
+package net.flectone.pulse.module.message.serverlink;
+
+import com.github.retrooper.packetevents.wrapper.common.server.WrapperCommonServerServerLinks;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerServerLinks;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.message.serverlink.listener.MinecraftPulseServerlinkListener;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.Component;
+
+import java.util.List;
+import java.util.Map;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class MinecraftServerlinkModule implements ModuleLocalization<Localization.Message.Serverlink> {
+
+    private final FileFacade fileFacade;
+    private final ModuleController moduleController;
+    private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
+    private final MinecraftPacketSender packetSender;
+    private final MessagePipeline messagePipeline;
+
+    @Override
+    public void onEnable() {
+        listenerRegistry.register(MinecraftPulseServerlinkListener.class);
+
+        if (config().ticker().enable()) {
+            taskScheduler.runPlayerRegionTimer(this::sendLinks, config().ticker().period());
+        }
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.MESSAGE_SERVERLINK;
+    }
+
+    @Override
+    public Localization.Message.Serverlink localization(FEntity sender) {
+        return fileFacade.localization(sender).message().serverlink();
+    }
+
+    @Override
+    public Message.Serverlink config() {
+        return fileFacade.message().serverlink();
+    }
+
+    @Override
+    public Permission.Message.Serverlink permission() {
+        return fileFacade.permission().message().serverlink();
+    }
+
+    public void sendLinks(FPlayer fPlayer) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+        Map<String, String> links = config().values();
+        Map<String, String> linksMessages = localization(fPlayer).values();
+
+        List<WrapperCommonServerServerLinks.ServerLink> serverLinks = links.entrySet().stream()
+                .map(entry -> {
+                    String link = entry.getValue();
+
+                    String linkMessage = linksMessages.getOrDefault(entry.getKey(), link);
+
+                    MessageContext linkContext = messagePipeline.createContext(fPlayer, linkMessage);
+                    Component linkComponent = messagePipeline.build(linkContext);
+
+                    return new WrapperCommonServerServerLinks.ServerLink(linkComponent, link);
+                }).toList();
+
+        packetSender.send(fPlayer, new WrapperPlayServerServerLinks(serverLinks));
+    }
+
+}

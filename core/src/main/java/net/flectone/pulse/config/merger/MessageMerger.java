@@ -32,6 +32,7 @@ public interface MessageMerger {
     @Mapping(target = "objective", expression = "java(mergeObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "serverlink", expression = "java(mergeServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "sign", expression = "java(mergeSign(target.build().sign().toBuilder(), source.sign()))")
     @Mapping(target = "status", expression = "java(mergeStatus(target.build().status().toBuilder(), source.status()))")
@@ -133,6 +134,8 @@ public interface MessageMerger {
     Message.Quit mergeQuit(@MappingTarget Message.Quit.QuitBuilder target, Message.Quit quit);
 
     Message.Rightclick mergeRightclick(@MappingTarget Message.Rightclick.RightclickBuilder target, Message.Rightclick rightclick);
+
+    Message.Serverlink mergeServerlink(@MappingTarget Message.Serverlink.ServerlinkBuilder target, Message.Serverlink serverlink);
 
     Message.Sidebar mergeSidebar(@MappingTarget Message.Sidebar.SidebarBuilder target, Message.Sidebar sidebar);
 

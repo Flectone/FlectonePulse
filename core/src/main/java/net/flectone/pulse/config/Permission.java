@@ -1119,6 +1119,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
             Rightclick rightclick,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
+            Serverlink serverlink,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar")
             Sidebar sidebar,
 
@@ -1507,6 +1510,15 @@ public record Permission(
                 Permission.Type type,
                 PermissionEntry sound
         ) implements SoundPermissionSetting, PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Serverlink(
+                String name,
+                Permission.Type type
+        ) implements PermissionSetting {
         }
 
         @With

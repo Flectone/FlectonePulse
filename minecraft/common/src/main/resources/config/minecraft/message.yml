@@ -364,6 +364,14 @@ rightclick:
     enable: false
   sound:
     enable: false
+serverlink:
+  enable: false
+  values:
+    example1: "https://flectone.net/pulse"
+    example2: "https://boosty.to/thefaser"
+  ticker:
+    enable: true
+    period: 100
 sidebar:
   enable: false
   random: true
