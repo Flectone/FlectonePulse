@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.proxy;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -8,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
@@ -16,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Collection;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -59,8 +55,8 @@ public class BukkitProxy implements Proxy {
     public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, @Nullable EventMetadata<?> eventMetadata) {
         if (!isEnable()) return false;
 
-        Player player = getOnlinePlayer(sender, tag, eventMetadata);
-        if (player == null) return false;
+        Player player = getOnlinePlayer(sender);
+        if (player == null || !player.isOnline()) return false;
 
         player.sendPluginMessage(plugin, channel, message);
         return true;
@@ -79,17 +75,11 @@ public class BukkitProxy implements Proxy {
     }
 
     @Nullable
-    private Player getOnlinePlayer(FEntity sender, ModuleName tag, @Nullable EventMetadata<?> eventMetadata) {
-        Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-
-        if (tag == ModuleName.MESSAGE_QUIT && eventMetadata instanceof QuitMetadata<?> quitMetadata && !quitMetadata.ignoreVanish()) {
-            return onlinePlayers.stream()
-                    .filter(player -> !player.getUniqueId().equals(sender.uuid()))
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        Player player = Bukkit.getPlayer(sender.uuid());
-        return player != null ? player : Iterables.getFirst(onlinePlayers, null);
+    private Player getOnlinePlayer(FEntity sender) {
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Player.class::cast)
+                .filter(player -> !player.getUniqueId().equals(sender.uuid())) // we always need another player, because sender may no longer be on the server
+                .findFirst()
+                .orElse(Bukkit.getPlayer(sender.uuid()));
     }
 }

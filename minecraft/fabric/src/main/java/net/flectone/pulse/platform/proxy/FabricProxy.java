@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.proxy;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -22,8 +20,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -82,7 +78,7 @@ public class FabricProxy implements Proxy {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return false;
 
-        ServerPlayer player = getOnlinePlayer(sender, tag, eventMetadata);
+        ServerPlayer player = getOnlinePlayer(sender);
         if (player == null) return false;
 
         ServerPlayNetworking.send(player, new ProxyPayload(channel, message));
@@ -108,22 +104,15 @@ public class FabricProxy implements Proxy {
     }
 
     @Nullable
-    private ServerPlayer getOnlinePlayer(FEntity sender, ModuleName tag, @Nullable EventMetadata<?> eventMetadata) {
+    private ServerPlayer getOnlinePlayer(FEntity sender) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return null;
 
         PlayerList playerList = minecraftServer.getPlayerList();
-        List<ServerPlayer> onlinePlayers = playerList.getPlayers();
-
-        if (tag == ModuleName.MESSAGE_QUIT && eventMetadata instanceof QuitMetadata<?> quitMetadata && !quitMetadata.ignoreVanish()) {
-            return onlinePlayers.stream()
-                    .filter(player -> !player.getUUID().equals(sender.uuid()))
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        ServerPlayer player = playerList.getPlayer(sender.uuid());
-        return player != null ? player : Iterables.getFirst(onlinePlayers, null);
+        return playerList.getPlayers().stream()
+                .filter(player -> !player.getUUID().equals(sender.uuid())) // we always need another player, because sender may no longer be on the server
+                .findFirst()
+                .orElse(playerList.getPlayer(sender.uuid()));
     }
 
 }
