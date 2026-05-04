@@ -180,7 +180,9 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
             String line = StringUtils.replaceEach(
                     localization(fPlayer).lineElement(),
                     new String[]{"<atlas>", "<sprite>"},
-                    new String[]{atlas, sprite}
+                    // "chest" atlas in game files is called "chest", but to display it, you need to use the name "chests"
+                    // Why Mojang?
+                    new String[]{"chest".equalsIgnoreCase(atlas) ? "chests" : atlas, sprite}
             );
 
             spriteLine.append(line);
