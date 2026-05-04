@@ -27,26 +27,26 @@ public class MinecraftPulseBaseListener implements PulseListener {
         ModuleSimple eventModule = event.module();
         if (eventModule instanceof BubbleModule
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
-            fLogger.warning("Bubble module is not supported on this version of Minecraft");
+            fLogger.warning("Bubble module is only supported in Minecraft versions 1.13+");
             return event.withCancelled(true);
         }
 
         if (eventModule instanceof MinecraftServerlinkModule
                 && packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_21)) {
-            fLogger.warning("Link module is not supported on this version of Minecraft");
+            fLogger.warning("Server link module is only supported in Minecraft versions 1.21+");
             return event.withCancelled(true);
         }
 
         if (eventModule instanceof TabModule
                 && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
-            fLogger.warning("TAB module is not supported on this version of Minecraft");
+            fLogger.warning("Server link module is only supported in Minecraft versions 1.8.8, 1.8.9 and 1.10+");
             return event.withCancelled(true);
         }
 
         if (eventModule instanceof SpriteModule
                 && packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_21_9)) {
-            fLogger.warning("Sprite module command is not supported on this version of Minecraft");
+            fLogger.warning("Sprite module is only supported in Minecraft versions 1.21.9+");
             return event.withCancelled(true);
         }
 
