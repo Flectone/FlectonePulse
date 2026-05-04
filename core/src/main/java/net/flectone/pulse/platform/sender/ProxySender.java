@@ -17,7 +17,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class ProxySender {
         if (!range.is(Range.Type.PROXY)) return false;
 
         FEntity sender = eventMetadata.sender();
-        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid(), eventMetadata);
+        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid());
     }
 
     /**
@@ -95,24 +94,6 @@ public class ProxySender {
                         @NonNull ModuleName tag,
                         @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer,
                         @NonNull UUID metadataUUID) {
-        return send(sender, tag, outputConsumer, metadataUUID, null);
-    }
-
-    /**
-     * Sends custom data to proxy network.
-     *
-     * @param sender the entity sending the data
-     * @param tag the message type tag
-     * @param outputConsumer consumer to write custom data to output stream
-     * @param metadataUUID unique identifier for this metadata
-     * @param eventMetadata optional metadata containing additional event context
-     * @return true if data was sent to at least one proxy, false otherwise
-     */
-    public boolean send(@NonNull FEntity sender,
-                        @NonNull ModuleName tag,
-                        @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer,
-                        @NonNull UUID metadataUUID,
-                        @Nullable EventMetadata<?> eventMetadata) {
         if (!proxyRegistry.hasEnabledProxy()) return false;
 
         if (sender instanceof FPlayer fPlayer) {
@@ -143,7 +124,7 @@ public class ProxySender {
 
         boolean sent = false;
         for (Proxy proxy : proxyRegistry.getProxies()) {
-            if (proxy.sendMessage(sender, tag, message, eventMetadata)) {
+            if (proxy.sendMessage(sender, tag, message)) {
                 sent = true;
             }
         }

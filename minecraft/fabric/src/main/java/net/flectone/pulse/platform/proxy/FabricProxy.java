@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -72,7 +71,7 @@ public class FabricProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, @Nullable EventMetadata<?> eventMetadata) {
+    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message) {
         if (!isEnable()) return false;
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();

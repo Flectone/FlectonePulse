@@ -96,7 +96,7 @@ public class RedisProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, EventMetadata<?> eventMetadata) {
+    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message) {
         if (!isEnable()) return false;
 
         pubSubConnection.async().publish(

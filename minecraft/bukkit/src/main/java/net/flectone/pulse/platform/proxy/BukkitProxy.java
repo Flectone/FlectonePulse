@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
@@ -52,7 +51,7 @@ public class BukkitProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message, @Nullable EventMetadata<?> eventMetadata) {
+    public boolean sendMessage(@NonNull FEntity sender, @NonNull ModuleName tag, byte @NonNull [] message) {
         if (!isEnable()) return false;
 
         Player player = getOnlinePlayer(sender);
