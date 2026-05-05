@@ -66,112 +66,112 @@ public interface CommandMerger {
     @Mapping(target = "warnlist", expression = "java(mergeWarnlist(target.build().warnlist().toBuilder(), source.warnlist()))")
     Command merge(@MappingTarget Command.CommandBuilder target, Command source);
 
-    Command.Afk mergeAfk(@MappingTarget Command.Afk.AfkBuilder target, Command.Afk afk);
+    Command.Afk mergeAfk(@MappingTarget Command.Afk.AfkBuilder target, Command.Afk source);
 
-    Command.Anon mergeAnon(@MappingTarget Command.Anon.AnonBuilder target, Command.Anon anon);
+    Command.Anon mergeAnon(@MappingTarget Command.Anon.AnonBuilder target, Command.Anon source);
 
-    Command.Ball mergeBall(@MappingTarget Command.Ball.BallBuilder target, Command.Ball ball);
+    Command.Ball mergeBall(@MappingTarget Command.Ball.BallBuilder target, Command.Ball source);
 
-    Command.Ban mergeBan(@MappingTarget Command.Ban.BanBuilder target, Command.Ban ban);
+    Command.Ban mergeBan(@MappingTarget Command.Ban.BanBuilder target, Command.Ban source);
 
-    Command.Banlist mergeBanlist(@MappingTarget Command.Banlist.BanlistBuilder target, Command.Banlist banlist);
+    Command.Banlist mergeBanlist(@MappingTarget Command.Banlist.BanlistBuilder target, Command.Banlist source);
 
-    Command.Broadcast mergeBroadcast(@MappingTarget Command.Broadcast.BroadcastBuilder target, Command.Broadcast broadcast);
+    Command.Broadcast mergeBroadcast(@MappingTarget Command.Broadcast.BroadcastBuilder target, Command.Broadcast source);
 
-    Command.Chatcolor mergeChatcolor(@MappingTarget Command.Chatcolor.ChatcolorBuilder target, Command.Chatcolor chatcolor);
+    Command.Chatcolor mergeChatcolor(@MappingTarget Command.Chatcolor.ChatcolorBuilder target, Command.Chatcolor source);
 
-    @Mapping(target = "modern", expression = "java(mergeModern(target.build().modern().toBuilder(), source.modern()))")
-    @Mapping(target = "checkbox", expression = "java(mergeCheckbox(target.build().checkbox().toBuilder(), source.checkbox()))")
-    @Mapping(target = "menu", expression = "java(mergeMenu(target.build().menu().toBuilder(), source.menu()))")
+    @Mapping(target = "modern", expression = "java(mergeChatsettingModern(target.build().modern().toBuilder(), source.modern()))")
+    @Mapping(target = "checkbox", expression = "java(mergeChatsettingCheckbox(target.build().checkbox().toBuilder(), source.checkbox()))")
+    @Mapping(target = "menu", expression = "java(mergeChatsettingMenu(target.build().menu().toBuilder(), source.menu()))")
     Command.Chatsetting mergeChatsetting(@MappingTarget Command.Chatsetting.ChatsettingBuilder target, Command.Chatsetting source);
 
-    Command.Chatsetting.Modern mergeModern(@MappingTarget Command.Chatsetting.Modern.ModernBuilder target, Command.Chatsetting.Modern modern);
+    Command.Chatsetting.Modern mergeChatsettingModern(@MappingTarget Command.Chatsetting.Modern.ModernBuilder target, Command.Chatsetting.Modern source);
 
-    Command.Chatsetting.Checkbox mergeCheckbox(@MappingTarget Command.Chatsetting.Checkbox.CheckboxBuilder target, Command.Chatsetting.Checkbox checkbox);
+    Command.Chatsetting.Checkbox mergeChatsettingCheckbox(@MappingTarget Command.Chatsetting.Checkbox.CheckboxBuilder target, Command.Chatsetting.Checkbox source);
 
-    @Mapping(target = "chat", expression = "java(mergeChat(target.build().chat().toBuilder(), source.chat()))")
-    @Mapping(target = "see", expression = "java(mergeColor(target.build().see().toBuilder(), source.see()))")
-    @Mapping(target = "out", expression = "java(mergeColor(target.build().out().toBuilder(), source.out()))")
-    Command.Chatsetting.Menu mergeMenu(@MappingTarget Command.Chatsetting.Menu.MenuBuilder target, Command.Chatsetting.Menu source);
+    @Mapping(target = "chat", expression = "java(mergeChatsettingMenuChat(target.build().chat().toBuilder(), source.chat()))")
+    @Mapping(target = "see", expression = "java(mergeChatsettingMenuColor(target.build().see().toBuilder(), source.see()))")
+    @Mapping(target = "out", expression = "java(mergeChatsettingMenuColor(target.build().out().toBuilder(), source.out()))")
+    Command.Chatsetting.Menu mergeChatsettingMenu(@MappingTarget Command.Chatsetting.Menu.MenuBuilder target, Command.Chatsetting.Menu source);
 
-    Command.Chatsetting.Menu.Chat mergeChat(@MappingTarget Command.Chatsetting.Menu.Chat.ChatBuilder target, Command.Chatsetting.Menu.Chat chat);
+    Command.Chatsetting.Menu.Chat mergeChatsettingMenuChat(@MappingTarget Command.Chatsetting.Menu.Chat.ChatBuilder target, Command.Chatsetting.Menu.Chat source);
 
-    Command.Chatsetting.Menu.Color mergeColor(@MappingTarget Command.Chatsetting.Menu.Color.ColorBuilder target, Command.Chatsetting.Menu.Color color);
+    Command.Chatsetting.Menu.Color mergeChatsettingMenuColor(@MappingTarget Command.Chatsetting.Menu.Color.ColorBuilder target, Command.Chatsetting.Menu.Color source);
 
-    Command.Clearchat mergeClearchat(@MappingTarget Command.Clearchat.ClearchatBuilder target, Command.Clearchat clearchat);
+    Command.Clearchat mergeClearchat(@MappingTarget Command.Clearchat.ClearchatBuilder target, Command.Clearchat source);
 
-    Command.Clearmail mergeClearmail(@MappingTarget Command.Clearmail.ClearmailBuilder target, Command.Clearmail clearmail);
+    Command.Clearmail mergeClearmail(@MappingTarget Command.Clearmail.ClearmailBuilder target, Command.Clearmail source);
 
-    Command.Coin mergeCoin(@MappingTarget Command.Coin.CoinBuilder target, Command.Coin coin);
+    Command.Coin mergeCoin(@MappingTarget Command.Coin.CoinBuilder target, Command.Coin source);
 
-    Command.Deletemessage mergeDeletemessage(@MappingTarget Command.Deletemessage.DeletemessageBuilder target, Command.Deletemessage deletemessage);
+    Command.Deletemessage mergeDeletemessage(@MappingTarget Command.Deletemessage.DeletemessageBuilder target, Command.Deletemessage source);
 
-    Command.Dice mergeDice(@MappingTarget Command.Dice.DiceBuilder target, Command.Dice dice);
+    Command.Dice mergeDice(@MappingTarget Command.Dice.DiceBuilder target, Command.Dice source);
 
-    Command.CommandDo mergeCommandDo(@MappingTarget Command.CommandDo.CommandDoBuilder target, Command.CommandDo commandDo);
+    Command.CommandDo mergeCommandDo(@MappingTarget Command.CommandDo.CommandDoBuilder target, Command.CommandDo source);
 
-    Command.Emit mergeEmit(@MappingTarget Command.Emit.EmitBuilder target, Command.Emit emit);
+    Command.Emit mergeEmit(@MappingTarget Command.Emit.EmitBuilder target, Command.Emit source);
 
-    Command.Flectonepulse mergeFlectonepulse(@MappingTarget Command.Flectonepulse.FlectonepulseBuilder target, Command.Flectonepulse flectonepulse);
+    Command.Flectonepulse mergeFlectonepulse(@MappingTarget Command.Flectonepulse.FlectonepulseBuilder target, Command.Flectonepulse source);
 
-    Command.Geolocate mergeGeolocate(@MappingTarget Command.Geolocate.GeolocateBuilder target, Command.Geolocate geolocate);
+    Command.Geolocate mergeGeolocate(@MappingTarget Command.Geolocate.GeolocateBuilder target, Command.Geolocate source);
 
-    Command.Helper mergeHelper(@MappingTarget Command.Helper.HelperBuilder target, Command.Helper helper);
+    Command.Helper mergeHelper(@MappingTarget Command.Helper.HelperBuilder target, Command.Helper source);
 
-    Command.Ignore mergeIgnore(@MappingTarget Command.Ignore.IgnoreBuilder target, Command.Ignore ignore);
+    Command.Ignore mergeIgnore(@MappingTarget Command.Ignore.IgnoreBuilder target, Command.Ignore source);
 
-    Command.Ignorelist mergeIgnorelist(@MappingTarget Command.Ignorelist.IgnorelistBuilder target, Command.Ignorelist ignorelist);
+    Command.Ignorelist mergeIgnorelist(@MappingTarget Command.Ignorelist.IgnorelistBuilder target, Command.Ignorelist source);
 
-    Command.Kick mergeKick(@MappingTarget Command.Kick.KickBuilder target, Command.Kick kick);
+    Command.Kick mergeKick(@MappingTarget Command.Kick.KickBuilder target, Command.Kick source);
 
-    Command.Mail mergeMail(@MappingTarget Command.Mail.MailBuilder target, Command.Mail mail);
+    Command.Mail mergeMail(@MappingTarget Command.Mail.MailBuilder target, Command.Mail source);
 
-    Command.Maintenance mergeMaintenance(@MappingTarget Command.Maintenance.MaintenanceBuilder target, Command.Maintenance maintenance);
+    Command.Maintenance mergeMaintenance(@MappingTarget Command.Maintenance.MaintenanceBuilder target, Command.Maintenance source);
 
-    Command.Me mergeMe(@MappingTarget Command.Me.MeBuilder target, Command.Me me);
+    Command.Me mergeMe(@MappingTarget Command.Me.MeBuilder target, Command.Me source);
 
-    Command.Mute mergeMute(@MappingTarget Command.Mute.MuteBuilder target, Command.Mute mute);
+    Command.Mute mergeMute(@MappingTarget Command.Mute.MuteBuilder target, Command.Mute source);
 
-    Command.Mutelist mergeMutelist(@MappingTarget Command.Mutelist.MutelistBuilder target, Command.Mutelist mutelist);
+    Command.Mutelist mergeMutelist(@MappingTarget Command.Mutelist.MutelistBuilder target, Command.Mutelist source);
 
-    Command.Nickname mergeNickname(@MappingTarget Command.Nickname.NicknameBuilder target, Command.Nickname nickname);
+    Command.Nickname mergeNickname(@MappingTarget Command.Nickname.NicknameBuilder target, Command.Nickname source);
 
-    Command.Online mergeOnline(@MappingTarget Command.Online.OnlineBuilder target, Command.Online online);
+    Command.Online mergeOnline(@MappingTarget Command.Online.OnlineBuilder target, Command.Online source);
 
-    Command.Ping mergePing(@MappingTarget Command.Ping.PingBuilder target, Command.Ping ping);
+    Command.Ping mergePing(@MappingTarget Command.Ping.PingBuilder target, Command.Ping source);
 
-    Command.Poll mergePoll(@MappingTarget Command.Poll.PollBuilder target, Command.Poll poll);
+    Command.Poll mergePoll(@MappingTarget Command.Poll.PollBuilder target, Command.Poll source);
 
-    Command.Reply mergeReply(@MappingTarget Command.Reply.ReplyBuilder target, Command.Reply reply);
+    Command.Reply mergeReply(@MappingTarget Command.Reply.ReplyBuilder target, Command.Reply source);
 
-    Command.Rockpaperscissors mergeRockpaperscissors(@MappingTarget Command.Rockpaperscissors.RockpaperscissorsBuilder target, Command.Rockpaperscissors rockpaperscissors);
+    Command.Rockpaperscissors mergeRockpaperscissors(@MappingTarget Command.Rockpaperscissors.RockpaperscissorsBuilder target, Command.Rockpaperscissors source);
 
-    Command.Sprite mergeSprite(@MappingTarget Command.Sprite.SpriteBuilder target, Command.Sprite sprite);
+    Command.Sprite mergeSprite(@MappingTarget Command.Sprite.SpriteBuilder target, Command.Sprite source);
 
-    Command.Spy mergeSpy(@MappingTarget Command.Spy.SpyBuilder target, Command.Spy spy);
+    Command.Spy mergeSpy(@MappingTarget Command.Spy.SpyBuilder target, Command.Spy source);
 
-    Command.Stream mergeStream(@MappingTarget Command.Stream.StreamBuilder target, Command.Stream stream);
+    Command.Stream mergeStream(@MappingTarget Command.Stream.StreamBuilder target, Command.Stream source);
 
-    Command.Symbol mergeSymbol(@MappingTarget Command.Symbol.SymbolBuilder target, Command.Symbol symbol);
+    Command.Symbol mergeSymbol(@MappingTarget Command.Symbol.SymbolBuilder target, Command.Symbol source);
 
-    Command.Tell mergeTell(@MappingTarget Command.Tell.TellBuilder target, Command.Tell tell);
+    Command.Tell mergeTell(@MappingTarget Command.Tell.TellBuilder target, Command.Tell source);
 
-    Command.Tictactoe mergeTictactoe(@MappingTarget Command.Tictactoe.TictactoeBuilder target, Command.Tictactoe tictactoe);
+    Command.Tictactoe mergeTictactoe(@MappingTarget Command.Tictactoe.TictactoeBuilder target, Command.Tictactoe source);
 
-    Command.Toponline mergeToponline(@MappingTarget Command.Toponline.ToponlineBuilder target, Command.Toponline toponline);
+    Command.Toponline mergeToponline(@MappingTarget Command.Toponline.ToponlineBuilder target, Command.Toponline source);
 
-    Command.Translateto mergeTranslateto(@MappingTarget Command.Translateto.TranslatetoBuilder target, Command.Translateto translateto);
+    Command.Translateto mergeTranslateto(@MappingTarget Command.Translateto.TranslatetoBuilder target, Command.Translateto source);
 
-    Command.CommandTry mergeCommandTry(@MappingTarget Command.CommandTry.CommandTryBuilder target, Command.CommandTry commandTry);
+    Command.CommandTry mergeCommandTry(@MappingTarget Command.CommandTry.CommandTryBuilder target, Command.CommandTry source);
 
-    Command.Unban mergeUnban(@MappingTarget Command.Unban.UnbanBuilder target, Command.Unban unban);
+    Command.Unban mergeUnban(@MappingTarget Command.Unban.UnbanBuilder target, Command.Unban source);
 
-    Command.Unmute mergeUnmute(@MappingTarget Command.Unmute.UnmuteBuilder target, Command.Unmute unmute);
+    Command.Unmute mergeUnmute(@MappingTarget Command.Unmute.UnmuteBuilder target, Command.Unmute source);
 
-    Command.Unwarn mergeUnwarn(@MappingTarget Command.Unwarn.UnwarnBuilder target, Command.Unwarn unwarn);
+    Command.Unwarn mergeUnwarn(@MappingTarget Command.Unwarn.UnwarnBuilder target, Command.Unwarn source);
 
-    Command.Warn mergeWarn(@MappingTarget Command.Warn.WarnBuilder target, Command.Warn warn);
+    Command.Warn mergeWarn(@MappingTarget Command.Warn.WarnBuilder target, Command.Warn source);
 
-    Command.Warnlist mergeWarnlist(@MappingTarget Command.Warnlist.WarnlistBuilder target, Command.Warnlist warnlist);
+    Command.Warnlist mergeWarnlist(@MappingTarget Command.Warnlist.WarnlistBuilder target, Command.Warnlist source);
 
 }

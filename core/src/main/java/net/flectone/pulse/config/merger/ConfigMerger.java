@@ -29,25 +29,25 @@ public interface ConfigMerger {
     @Mapping(target = "metrics", expression = "java(mergeMetrics(target.build().metrics().toBuilder(), source.metrics()))")
     Config merge(@MappingTarget Config.ConfigBuilder target, Config source);
 
-    Config.Language mergeLanguage(@MappingTarget Config.Language.LanguageBuilder target, Config.Language language);
+    Config.Language mergeLanguage(@MappingTarget Config.Language.LanguageBuilder target, Config.Language source);
 
-    Config.Database mergeDatabase(@MappingTarget Config.Database.DatabaseBuilder target, Config.Database database);
+    Config.Database mergeDatabase(@MappingTarget Config.Database.DatabaseBuilder target, Config.Database source);
 
     @Mapping(target = "redis", expression = "java(mergeProxyRedis(target.build().redis().toBuilder(), source.redis()))")
     Config.Proxy mergeProxy(@MappingTarget Config.Proxy.ProxyBuilder target, Config.Proxy source);
 
-    Config.Proxy.Redis mergeProxyRedis(@MappingTarget Config.Proxy.Redis.RedisBuilder target, Config.Proxy.Redis redis);
+    Config.Proxy.Redis mergeProxyRedis(@MappingTarget Config.Proxy.Redis.RedisBuilder target, Config.Proxy.Redis source);
 
-    Config.Command mergeCommand(@MappingTarget Config.Command.CommandBuilder target, Config.Command command);
+    Config.Command mergeCommand(@MappingTarget Config.Command.CommandBuilder target, Config.Command source);
 
-    Config.Module mergeModule(@MappingTarget Config.Module.ModuleBuilder target, Config.Module module);
+    Config.Module mergeModule(@MappingTarget Config.Module.ModuleBuilder target, Config.Module source);
 
-    Config.Editor mergeEditor(@MappingTarget Config.Editor.EditorBuilder target, Config.Editor editor);
+    Config.Editor mergeEditor(@MappingTarget Config.Editor.EditorBuilder target, Config.Editor source);
 
-    Config.Logger mergeLogger(@MappingTarget Config.Logger.LoggerBuilder target, Config.Logger logger);
+    Config.Logger mergeLogger(@MappingTarget Config.Logger.LoggerBuilder target, Config.Logger source);
 
-    Config.Cache mergeCache(@MappingTarget Config.Cache.CacheBuilder target, Config.Cache cache);
+    Config.Cache mergeCache(@MappingTarget Config.Cache.CacheBuilder target, Config.Cache source);
 
-    Config.Metrics mergeMetrics(@MappingTarget Config.Metrics.MetricsBuilder target, Config.Metrics metrics);
+    Config.Metrics mergeMetrics(@MappingTarget Config.Metrics.MetricsBuilder target, Config.Metrics source);
 
 }

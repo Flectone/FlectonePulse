@@ -48,70 +48,70 @@ public interface IntegrationMerger {
     @Mapping(target = "yandex", expression = "java(mergeYandex(target.build().yandex().toBuilder(), source.yandex()))")
     Integration merge(@MappingTarget Integration.IntegrationBuilder target, Integration source);
 
-    Integration.Advancedban mergeAdvancedban(@MappingTarget Integration.Advancedban.AdvancedbanBuilder target, Integration.Advancedban advancedban);
+    Integration.Advancedban mergeAdvancedban(@MappingTarget Integration.Advancedban.AdvancedbanBuilder target, Integration.Advancedban source);
 
-    Integration.Blazeandcave mergeBlazeandcave(@MappingTarget Integration.Blazeandcave.BlazeandcaveBuilder target, Integration.Blazeandcave blazeandcave);
+    Integration.Blazeandcave mergeBlazeandcave(@MappingTarget Integration.Blazeandcave.BlazeandcaveBuilder target, Integration.Blazeandcave source);
 
-    Integration.CMI mergeCmi(@MappingTarget Integration.CMI.CMIBuilder target, Integration.CMI cmi);
+    Integration.CMI mergeCmi(@MappingTarget Integration.CMI.CMIBuilder target, Integration.CMI source);
 
-    Integration.Libertybans mergeLibertybans(@MappingTarget Integration.Libertybans.LibertybansBuilder target, Integration.Libertybans libertybans);
+    Integration.Libertybans mergeLibertybans(@MappingTarget Integration.Libertybans.LibertybansBuilder target, Integration.Libertybans source);
 
-    Integration.Deepl mergeDeepl(@MappingTarget Integration.Deepl.DeeplBuilder target, Integration.Deepl deepl);
+    Integration.Deepl mergeDeepl(@MappingTarget Integration.Deepl.DeeplBuilder target, Integration.Deepl source);
 
-    @Mapping(target = "presence", expression = "java(mergePresence(target.build().presence().toBuilder(), source.presence()))")
+    @Mapping(target = "presence", expression = "java(mergeDiscordPresence(target.build().presence().toBuilder(), source.presence()))")
     @Mapping(target = "channelInfo", expression = "java(mergeChannelInfo(target.build().channelInfo().toBuilder(), source.channelInfo()))")
     Integration.Discord mergeDiscord(@MappingTarget Integration.Discord.DiscordBuilder target, Integration.Discord source);
 
-    @Mapping(target = "activity", expression = "java(mergeActivity(target.build().activity().toBuilder(), source.activity()))")
-    Integration.Discord.Presence mergePresence(@MappingTarget Integration.Discord.Presence.PresenceBuilder target, Integration.Discord.Presence source);
+    @Mapping(target = "activity", expression = "java(mergeDiscordPresenceActivity(target.build().activity().toBuilder(), source.activity()))")
+    Integration.Discord.Presence mergeDiscordPresence(@MappingTarget Integration.Discord.Presence.PresenceBuilder target, Integration.Discord.Presence source);
 
-    Integration.Discord.Presence.Activity mergeActivity(@MappingTarget Integration.Discord.Presence.Activity.ActivityBuilder target, Integration.Discord.Presence.Activity activity);
+    Integration.Discord.Presence.Activity mergeDiscordPresenceActivity(@MappingTarget Integration.Discord.Presence.Activity.ActivityBuilder target, Integration.Discord.Presence.Activity source);
 
-    Integration.ChannelInfo mergeChannelInfo(@MappingTarget Integration.ChannelInfo.ChannelInfoBuilder target, Integration.ChannelInfo channelInfo);
+    Integration.ChannelInfo mergeChannelInfo(@MappingTarget Integration.ChannelInfo.ChannelInfoBuilder target, Integration.ChannelInfo source);
 
-    Integration.Floodgate mergeFloodgate(@MappingTarget Integration.Floodgate.FloodgateBuilder target, Integration.Floodgate floodgate);
+    Integration.Floodgate mergeFloodgate(@MappingTarget Integration.Floodgate.FloodgateBuilder target, Integration.Floodgate source);
 
-    Integration.Geyser mergeGeyser(@MappingTarget Integration.Geyser.GeyserBuilder target, Integration.Geyser geyser);
+    Integration.Geyser mergeGeyser(@MappingTarget Integration.Geyser.GeyserBuilder target, Integration.Geyser source);
 
-    Integration.Icu mergeIcu(@MappingTarget Integration.Icu.IcuBuilder target, Integration.Icu icu);
+    Integration.Icu mergeIcu(@MappingTarget Integration.Icu.IcuBuilder target, Integration.Icu source);
 
-    Integration.Interactivechat mergeInteractivechat(@MappingTarget Integration.Interactivechat.InteractivechatBuilder target, Integration.Interactivechat interactivechat);
+    Integration.Interactivechat mergeInteractivechat(@MappingTarget Integration.Interactivechat.InteractivechatBuilder target, Integration.Interactivechat source);
 
-    Integration.Itemsadder mergeItemsadder(@MappingTarget Integration.Itemsadder.ItemsadderBuilder target, Integration.Itemsadder itemsadder);
+    Integration.Itemsadder mergeItemsadder(@MappingTarget Integration.Itemsadder.ItemsadderBuilder target, Integration.Itemsadder source);
 
-    Integration.Litebans mergeLitebans(@MappingTarget Integration.Litebans.LitebansBuilder target, Integration.Litebans litebans);
+    Integration.Litebans mergeLitebans(@MappingTarget Integration.Litebans.LitebansBuilder target, Integration.Litebans source);
 
-    Integration.Luckperms mergeLuckperms(@MappingTarget Integration.Luckperms.LuckpermsBuilder target, Integration.Luckperms luckperms);
+    Integration.Luckperms mergeLuckperms(@MappingTarget Integration.Luckperms.LuckpermsBuilder target, Integration.Luckperms source);
 
-    Integration.Maintenance mergeMaintenance(@MappingTarget Integration.Maintenance.MaintenanceBuilder target, Integration.Maintenance maintenance);
+    Integration.Maintenance mergeMaintenance(@MappingTarget Integration.Maintenance.MaintenanceBuilder target, Integration.Maintenance source);
 
-    Integration.MiniMOTD mergeMiniMOTD(@MappingTarget Integration.MiniMOTD.MiniMOTDBuilder target, Integration.MiniMOTD miniMOTD);
+    Integration.MiniMOTD mergeMiniMOTD(@MappingTarget Integration.MiniMOTD.MiniMOTDBuilder target, Integration.MiniMOTD source);
 
-    Integration.MiniPlaceholders mergeMiniPlaceholders(@MappingTarget Integration.MiniPlaceholders.MiniPlaceholdersBuilder target, Integration.MiniPlaceholders miniPlaceholders);
+    Integration.MiniPlaceholders mergeMiniPlaceholders(@MappingTarget Integration.MiniPlaceholders.MiniPlaceholdersBuilder target, Integration.MiniPlaceholders source);
 
-    Integration.MOTD mergeMOTD(@MappingTarget Integration.MOTD.MOTDBuilder target, Integration.MOTD motd);
+    Integration.MOTD mergeMOTD(@MappingTarget Integration.MOTD.MOTDBuilder target, Integration.MOTD source);
 
-    Integration.Placeholderapi mergePlaceholderapi(@MappingTarget Integration.Placeholderapi.PlaceholderapiBuilder target, Integration.Placeholderapi placeholderapi);
+    Integration.Placeholderapi mergePlaceholderapi(@MappingTarget Integration.Placeholderapi.PlaceholderapiBuilder target, Integration.Placeholderapi source);
 
-    Integration.Plasmovoice mergePlasmovoice(@MappingTarget Integration.Plasmovoice.PlasmovoiceBuilder target, Integration.Plasmovoice plasmovoice);
+    Integration.Plasmovoice mergePlasmovoice(@MappingTarget Integration.Plasmovoice.PlasmovoiceBuilder target, Integration.Plasmovoice source);
 
-    Integration.Simplevoice mergeSimplevoice(@MappingTarget Integration.Simplevoice.SimplevoiceBuilder target, Integration.Simplevoice simplevoice);
+    Integration.Simplevoice mergeSimplevoice(@MappingTarget Integration.Simplevoice.SimplevoiceBuilder target, Integration.Simplevoice source);
 
-    Integration.Skinsrestorer mergeSkinsrestorer(@MappingTarget Integration.Skinsrestorer.SkinsrestorerBuilder target, Integration.Skinsrestorer skinsrestorer);
+    Integration.Skinsrestorer mergeSkinsrestorer(@MappingTarget Integration.Skinsrestorer.SkinsrestorerBuilder target, Integration.Skinsrestorer source);
 
-    Integration.Supervanish mergeSupervanish(@MappingTarget Integration.Supervanish.SupervanishBuilder target, Integration.Supervanish supervanish);
+    Integration.Supervanish mergeSupervanish(@MappingTarget Integration.Supervanish.SupervanishBuilder target, Integration.Supervanish source);
 
-    Integration.Tab mergeTab(@MappingTarget Integration.Tab.TabBuilder target, Integration.Tab tab);
+    Integration.Tab mergeTab(@MappingTarget Integration.Tab.TabBuilder target, Integration.Tab source);
 
     @Mapping(target = "channelInfo", expression = "java(mergeChannelInfo(target.build().channelInfo().toBuilder(), source.channelInfo()))")
     Integration.Telegram mergeTelegram(@MappingTarget Integration.Telegram.TelegramBuilder target, Integration.Telegram source);
 
-    Integration.Triton mergeTriton(@MappingTarget Integration.Triton.TritonBuilder target, Integration.Triton triton);
+    Integration.Triton mergeTriton(@MappingTarget Integration.Triton.TritonBuilder target, Integration.Triton source);
 
-    Integration.Twitch mergeTwitch(@MappingTarget Integration.Twitch.TwitchBuilder target, Integration.Twitch twitch);
+    Integration.Twitch mergeTwitch(@MappingTarget Integration.Twitch.TwitchBuilder target, Integration.Twitch source);
 
-    Integration.Vault mergeVault(@MappingTarget Integration.Vault.VaultBuilder target, Integration.Vault vault);
+    Integration.Vault mergeVault(@MappingTarget Integration.Vault.VaultBuilder target, Integration.Vault source);
 
-    Integration.Yandex mergeYandex(@MappingTarget Integration.Yandex.YandexBuilder target, Integration.Yandex yandex);
+    Integration.Yandex mergeYandex(@MappingTarget Integration.Yandex.YandexBuilder target, Integration.Yandex source);
 
 }
