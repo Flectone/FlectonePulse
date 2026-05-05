@@ -24,7 +24,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.scoreboard.MinecraftScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPulsePlayerlistnameListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;

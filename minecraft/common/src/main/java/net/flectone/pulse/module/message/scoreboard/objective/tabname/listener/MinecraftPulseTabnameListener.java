@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.scoreboard.listener;
+package net.flectone.pulse.module.message.scoreboard.objective.tabname.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,18 +9,18 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.objective.tabname.MinecraftTabnameModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PulseScoreboardListener implements PulseListener {
+public class MinecraftPulseTabnameListener implements PulseListener {
 
-    private final ScoreboardModule scoreboardModule;
+    private final MinecraftTabnameModule tabnameModule;
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.player();
-        scoreboardModule.create(fPlayer, false);
+        tabnameModule.create(fPlayer);
     }
 
     @Pulse
@@ -28,13 +28,13 @@ public class PulseScoreboardListener implements PulseListener {
         if (!event.reload()) return;
 
         FPlayer fPlayer = event.player();
-        scoreboardModule.create(fPlayer, true);
+        tabnameModule.create(fPlayer);
     }
 
     @Pulse
-    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         FPlayer fPlayer = event.player();
-        scoreboardModule.remove(fPlayer);
+        tabnameModule.remove(fPlayer);
     }
 
 }

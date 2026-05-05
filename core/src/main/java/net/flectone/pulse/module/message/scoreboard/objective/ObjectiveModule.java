@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective;
+package net.flectone.pulse.module.message.scoreboard.objective;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -21,13 +21,13 @@ public class ObjectiveModule implements ModuleSimple {
     }
 
     @Override
-    public Message.Objective config() {
-        return fileFacade.message().objective();
+    public Message.Scoreboard.Objective config() {
+        return fileFacade.message().scoreboard().objective();
     }
 
     @Override
-    public Permission.Message.Objective permission() {
-        return fileFacade.permission().message().objective();
+    public Permission.Message.Scoreboard.Objective permission() {
+        return fileFacade.permission().message().scoreboard().objective();
     }
 
 }

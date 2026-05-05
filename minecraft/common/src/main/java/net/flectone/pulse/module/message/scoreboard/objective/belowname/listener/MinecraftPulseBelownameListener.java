@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective.belowname.listener;
+package net.flectone.pulse.module.message.scoreboard.objective.belowname.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,7 +8,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.module.message.objective.belowname.MinecraftBelownameModule;
+import net.flectone.pulse.module.message.scoreboard.objective.belowname.MinecraftBelownameModule;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

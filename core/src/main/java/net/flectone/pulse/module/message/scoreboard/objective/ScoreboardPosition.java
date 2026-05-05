@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective;
+package net.flectone.pulse.module.message.scoreboard.objective;
 
 public enum ScoreboardPosition {
 

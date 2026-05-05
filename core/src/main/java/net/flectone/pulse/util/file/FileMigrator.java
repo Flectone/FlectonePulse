@@ -861,4 +861,76 @@ public class FileMigrator {
         return files.withMessage(files.message().withAfk(files.message().afk().withDelay(delay * 20L)));
     }
 
+    public FilePack migration_1_9_4(FilePack files) {
+        Message.Format.DeprecatedScoreboard deprecatedScoreboard = files.message().format().scoreboard();
+        if (deprecatedScoreboard != null) {
+            files = files.withMessage(files.message()
+                    .withScoreboard(files.message().scoreboard()
+                            .withEnable(deprecatedScoreboard.enable())
+                            .withNameVisible(deprecatedScoreboard.nameVisible())
+                            .withHideNameWhenSneaking(deprecatedScoreboard.hideNameWhenSneaking())
+                            .withColor(deprecatedScoreboard.color())
+                            .withTicker(deprecatedScoreboard.ticker())
+            ));
+        }
+
+        Message.DeprecatedObjective deprecatedObjective = files.message().objective();
+        if (deprecatedObjective != null) {
+            files = files.withMessage(files.message()
+                    .withScoreboard(files.message().scoreboard()
+                            .withObjective(files.message().scoreboard().objective()
+                                    .withEnable(deprecatedObjective.enable())
+                                    .withBelowname(files.message().scoreboard().objective().belowname()
+                                            .withEnable(deprecatedObjective.belowname().enable())
+                                            .withTicker(deprecatedObjective.belowname().ticker())
+                                    )
+                                    .withTabname(files.message().scoreboard().objective().tabname()
+                                            .withEnable(deprecatedObjective.tabname().enable())
+                                            .withTicker(deprecatedObjective.tabname().ticker())
+                                    )
+                            )
+                    ));
+        }
+
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
+
+        for (Localization localization : files.localizations().values()) {
+
+            if (deprecatedScoreboard != null) {
+                localization = localization
+                        .withMessage(localization.message()
+                                .withScoreboard(localization.message().scoreboard()
+                                        .withPrefix(deprecatedScoreboard.prefix())
+                                        .withSuffix(deprecatedScoreboard.suffix())
+                                )
+                        );
+            }
+
+            Localization.Message.DeprecatedObjective localizationDeprecatedObjective = localization.message().objective();
+            if (localizationDeprecatedObjective != null) {
+                localization = localization
+                        .withMessage(localization.message()
+                                .withScoreboard(localization.message().scoreboard()
+                                        .withObjective(localization.message().scoreboard().objective()
+                                                .withBelowname(localization.message().scoreboard().objective().belowname()
+                                                        .withScore(localizationDeprecatedObjective.belowname().score())
+                                                        .withDisplayFormat(localizationDeprecatedObjective.belowname().displayFormat())
+                                                        .withScoreFormat(localizationDeprecatedObjective.belowname().scoreFormat())
+                                                )
+                                                .withTabname(localization.message().scoreboard().objective().tabname()
+                                                        .withScore(localizationDeprecatedObjective.tabname().score())
+                                                        .withDisplayFormat(localizationDeprecatedObjective.tabname().displayFormat())
+                                                        .withScoreFormat(localizationDeprecatedObjective.tabname().scoreFormat())
+                                                )
+                                        )
+                                )
+                        );
+            }
+
+            newLocalizations.put(localization.language(), localization);
+        }
+
+        return files.withLocalizations(newLocalizations);
+    }
+
 }

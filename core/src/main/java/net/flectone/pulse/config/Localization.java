@@ -972,14 +972,17 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective")
-            Objective objective,
+            @Deprecated(forRemoval = true)
+            DeprecatedObjective objective,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
             Rightclick rightclick,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard")
+            Scoreboard scoreboard,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
             Serverlink serverlink,
@@ -1216,6 +1219,55 @@ public record Localization(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
+        public record Scoreboard(
+                String prefix,
+                String suffix,
+
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective")
+                Objective objective
+
+        ) implements LocalizationSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Objective(
+
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective/belowname")
+                    Belowname belowname,
+
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective/tabname")
+                    Tabname tabname
+
+            ) implements LocalizationSetting {
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Belowname(
+                        String score,
+                        String displayFormat,
+                        String scoreFormat
+                ) implements LocalizationSetting {
+                }
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Tabname(
+                        String score,
+                        String displayFormat,
+                        String scoreFormat
+                ) implements LocalizationSetting {
+                }
+
+            }
+
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
         public record Serverlink(
                 Map<String, String> values
         ) implements LocalizationSetting {
@@ -1224,17 +1276,19 @@ public record Localization(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Objective(
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/belowname")
+        @Deprecated(forRemoval = true)
+        public record DeprecatedObjective(
+                @Deprecated(forRemoval = true)
                 Belowname belowname,
 
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/tabname")
+                @Deprecated(forRemoval = true)
                 Tabname tabname
         ) implements LocalizationSetting {
 
             @With
             @Builder(toBuilder = true)
             @Jacksonized
+            @Deprecated(forRemoval = true)
             public record Belowname(
                     String score,
                     String displayFormat,
@@ -1245,6 +1299,7 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             @Jacksonized
+            @Deprecated(forRemoval = true)
             public record Tabname(
                     String score,
                     String displayFormat,

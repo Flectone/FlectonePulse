@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.scoreboard;
+package net.flectone.pulse.module.message.scoreboard;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.scoreboard.model.Team;
+import net.flectone.pulse.module.message.scoreboard.model.Team;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -143,15 +143,15 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         Component displayName = Component.text(teamName);
 
         Component prefix = Component.empty();
-        if (!config().prefix().isEmpty()) {
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, config().prefix())
+        if (!localization().prefix().isEmpty()) {
+            MessageContext prefixContext = messagePipeline.createContext(fPlayer, localization().prefix())
                     .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
             prefix = messagePipeline.build(prefixContext);
         }
 
         Component suffix = Component.empty();
-        if (!config().suffix().isEmpty()) {
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, config().suffix())
+        if (!localization().suffix().isEmpty()) {
+            MessageContext suffixContext = messagePipeline.createContext(fPlayer, localization().suffix())
                     .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
             suffix = messagePipeline.build(suffixContext);
         }

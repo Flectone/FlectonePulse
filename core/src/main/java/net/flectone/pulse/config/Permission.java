@@ -1110,14 +1110,14 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective")
-            Objective objective,
-
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
             Rightclick rightclick,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard")
+            Scoreboard scoreboard,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
             Serverlink serverlink,
@@ -1267,9 +1267,6 @@ public record Permission(
 
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement")
                 Replacement replacement,
-
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/scoreboard")
-                Scoreboard scoreboard,
 
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate")
                 Translate translate,
@@ -1427,15 +1424,6 @@ public record Permission(
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Scoreboard(
-                    String name,
-                    Permission.Type type
-            ) implements PermissionSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
             public record QuestionAnswer(
                     String name,
                     Permission.Type type,
@@ -1515,44 +1503,59 @@ public record Permission(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
+        public record Scoreboard(
+                String name,
+                Permission.Type type,
+
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective")
+                Objective objective
+
+        ) implements PermissionSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Objective(
+                    String name,
+                    Permission.Type type,
+
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective/belowname")
+                    Belowname belowname,
+
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective/tabname")
+                    Tabname tabname
+            ) implements PermissionSetting {
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Belowname(
+                        String name,
+                        Permission.Type type
+                ) implements PermissionSetting {
+                }
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Tabname(
+                        String name,
+                        Permission.Type type
+                ) implements PermissionSetting {
+                }
+            }
+
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
         public record Serverlink(
                 String name,
                 Permission.Type type
         ) implements PermissionSetting {
         }
 
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
-        public record Objective(
-                String name,
-                Permission.Type type,
-
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/belowname")
-                Belowname belowname,
-
-                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/tabname")
-                Tabname tabname
-        ) implements PermissionSetting {
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            public record Belowname(
-                    String name,
-                    Permission.Type type
-            ) implements PermissionSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            public record Tabname(
-                    String name,
-                    Permission.Type type
-            ) implements PermissionSetting {
-            }
-        }
 
         @With
         @Builder(toBuilder = true)

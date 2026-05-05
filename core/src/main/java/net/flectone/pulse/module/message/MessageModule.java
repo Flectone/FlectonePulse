@@ -18,9 +18,9 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.status.StatusModule;
@@ -51,9 +51,9 @@ public class MessageModule implements ModuleSimple {
                 FormatModule.class,
                 GreetingModule.class,
                 JoinModule.class,
-                ObjectiveModule.class,
                 QuitModule.class,
                 RightclickModule.class,
+                ScoreboardModule.class,
                 SidebarModule.class,
                 SignModule.class,
                 StatusModule.class,

@@ -612,19 +612,22 @@ message:
   join:
     format: "<color:#4eff52>→ <display_name>"
     format_first_time: "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!"
-  objective:
-    belowname:
-      score: "<replacement:ping>"
-      display_format: "<fcolor:1>мс"
-      score_format: "<fcolor:1><score>"
-    tabname:
-      score: "<replacement:ping>"
-      display_format: ""
-      score_format: "<fcolor:1><score> мс"
   quit:
     format: "<color:#ff4e4e>← <display_name>"
   rightclick:
     format: "<fcolor:1>◁ <target> ▷"
+  scoreboard:
+    prefix: "<prefix><stream>"
+    suffix: "<afk><suffix>"
+    objective:
+      belowname:
+        score: "<replacement:ping>"
+        display_format: "<fcolor:1>мс"
+        score_format: "<fcolor:1><score>"
+      tabname:
+        score: "<replacement:ping>"
+        display_format: ""
+        score_format: "<fcolor:1><score> мс"
   serverlink:
     values:
       example1: "<fcolor:1><sprite_or:\"[!]\":gui:icon/info>Информация про сервер"

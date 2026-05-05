@@ -29,9 +29,9 @@ public interface MessageMerger {
     @Mapping(target = "format", expression = "java(mergeFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeJoin(target.build().join().toBuilder(), source.join()))")
-    @Mapping(target = "objective", expression = "java(mergeObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "scoreboard", expression = "java(mergeScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
     @Mapping(target = "serverlink", expression = "java(mergeServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "sign", expression = "java(mergeSign(target.build().sign().toBuilder(), source.sign()))")
@@ -73,7 +73,6 @@ public interface MessageMerger {
     @Mapping(target = "object", expression = "java(mergeObject(target.build().object().toBuilder(), source.object()))")
     @Mapping(target = "questionAnswer", expression = "java(mergeQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeReplacement(target.build().replacement().toBuilder(), source.replacement()))")
-    @Mapping(target = "scoreboard", expression = "java(mergeScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
     @Mapping(target = "translate", expression = "java(mergeTranslate(target.build().translate().toBuilder(), source.translate()))")
     @Mapping(target = "world", expression = "java(mergeWorld(target.build().world().toBuilder(), source.world()))")
     Message.Format mergeFormat(@MappingTarget Message.Format.FormatBuilder target, Message.Format source);
@@ -113,8 +112,6 @@ public interface MessageMerger {
 
     Message.Format.Replacement mergeReplacement(@MappingTarget Message.Format.Replacement.ReplacementBuilder target, Message.Format.Replacement replacement);
 
-    Message.Format.Scoreboard mergeScoreboard(@MappingTarget Message.Format.Scoreboard.ScoreboardBuilder target, Message.Format.Scoreboard scoreboard);
-
     Message.Format.Translate mergeTranslate(@MappingTarget Message.Format.Translate.TranslateBuilder target, Message.Format.Translate translate);
 
     Message.Format.World mergeWorld(@MappingTarget Message.Format.World.WorldBuilder target, Message.Format.World world);
@@ -123,17 +120,20 @@ public interface MessageMerger {
 
     Message.Join mergeJoin(@MappingTarget Message.Join.JoinBuilder target, Message.Join join);
 
-    @Mapping(target = "belowname", expression = "java(mergeBelowname(target.build().belowname().toBuilder(), source.belowname()))")
-    @Mapping(target = "tabname", expression = "java(mergeTabname(target.build().tabname().toBuilder(), source.tabname()))")
-    Message.Objective mergeObjective(@MappingTarget Message.Objective.ObjectiveBuilder target, Message.Objective source);
-
-    Message.Objective.Belowname mergeBelowname(@MappingTarget Message.Objective.Belowname.BelownameBuilder target, Message.Objective.Belowname belowname);
-
-    Message.Objective.Tabname mergeTabname(@MappingTarget Message.Objective.Tabname.TabnameBuilder target, Message.Objective.Tabname tabname);
-
     Message.Quit mergeQuit(@MappingTarget Message.Quit.QuitBuilder target, Message.Quit quit);
 
     Message.Rightclick mergeRightclick(@MappingTarget Message.Rightclick.RightclickBuilder target, Message.Rightclick rightclick);
+
+    @Mapping(target = "objective", expression = "java(mergeScoreboardObjective(target.build().objective().toBuilder(), source.objective()))")
+    Message.Scoreboard mergeScoreboard(@MappingTarget Message.Scoreboard.ScoreboardBuilder target, Message.Scoreboard source);
+
+    @Mapping(target = "belowname", expression = "java(mergeScoreboardObjectiveBelowname(target.build().belowname().toBuilder(), source.belowname()))")
+    @Mapping(target = "tabname", expression = "java(mergeScoreboardObjectiveTabname(target.build().tabname().toBuilder(), source.tabname()))")
+    Message.Scoreboard.Objective mergeScoreboardObjective(@MappingTarget Message.Scoreboard.Objective.ObjectiveBuilder target, Message.Scoreboard.Objective source);
+
+    Message.Scoreboard.Objective.Belowname mergeScoreboardObjectiveBelowname(@MappingTarget Message.Scoreboard.Objective.Belowname.BelownameBuilder target, Message.Scoreboard.Objective.Belowname belowname);
+
+    Message.Scoreboard.Objective.Tabname mergeScoreboardObjectiveTabname(@MappingTarget Message.Scoreboard.Objective.Tabname.TabnameBuilder target, Message.Scoreboard.Objective.Tabname tabname);
 
     Message.Serverlink mergeServerlink(@MappingTarget Message.Serverlink.ServerlinkBuilder target, Message.Serverlink serverlink);
 

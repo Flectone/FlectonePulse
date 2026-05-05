@@ -70,14 +70,17 @@ public record Message(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
         Join join,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective")
-        Objective objective,
+        @Deprecated(forRemoval = true)
+        DeprecatedObjective objective,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
         Quit quit,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick")
         Rightclick rightclick,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard")
+        Scoreboard scoreboard,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/serverlink")
         Serverlink serverlink,
@@ -304,8 +307,8 @@ public record Message(
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/replacement")
             Replacement replacement,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/scoreboard")
-            Scoreboard scoreboard,
+            @Deprecated(forRemoval = true)
+            DeprecatedScoreboard scoreboard,
 
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/translate")
             Translate translate,
@@ -553,7 +556,8 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Scoreboard(
+        @Deprecated(forRemoval = true)
+        public record DeprecatedScoreboard(
                 Boolean enable,
                 Boolean nameVisible,
                 Boolean hideNameWhenSneaking,
@@ -617,21 +621,23 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Objective(
+    @Deprecated(forRemoval = true)
+    public record DeprecatedObjective(
             Boolean enable,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/belowname")
-            Belowname belowname,
+            @Deprecated(forRemoval = true)
+            DeprecatedBelowname belowname,
 
-            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/objective/tabname")
-            Tabname tabname
+            @Deprecated(forRemoval = true)
+            DeprecatedTabname tabname
 
     ) implements EnableSetting {
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Belowname(
+        @Deprecated(forRemoval = true)
+        public record DeprecatedBelowname(
                 Boolean enable,
                 Ticker ticker
         ) implements EnableSetting {
@@ -640,7 +646,8 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Tabname(
+        @Deprecated(forRemoval = true)
+        public record DeprecatedTabname(
                 Boolean enable,
                 Ticker ticker
         ) implements EnableSetting {
@@ -670,6 +677,56 @@ public record Message(
             Cooldown cooldown,
             Sound sound
     ) implements EnableSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Scoreboard(
+            Boolean enable,
+            Boolean nameVisible,
+            Boolean hideNameWhenSneaking,
+            String color,
+            Ticker ticker,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/scoreboard/objective")
+            Objective objective
+
+    ) implements EnableSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Objective(
+                Boolean enable,
+
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/scoreboard/objective/belowname")
+                Belowname belowname,
+
+                @JsonPropertyDescription("https://flectone.net/pulse/docs/message/scoreboard/objective/tabname")
+                Tabname tabname
+
+        ) implements EnableSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Belowname(
+                    Boolean enable,
+                    Ticker ticker
+            ) implements EnableSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Tabname(
+                    Boolean enable,
+                    Ticker ticker
+            ) implements EnableSetting {
+            }
+        }
+
     }
 
     @With

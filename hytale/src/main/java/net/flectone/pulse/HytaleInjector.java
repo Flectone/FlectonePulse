@@ -17,7 +17,7 @@ import net.flectone.pulse.module.message.bubble.render.HytaleBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
 import net.flectone.pulse.module.message.format.scoreboard.HytaleScoreboardModule;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.HytaleWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.join.HytaleJoinModule;

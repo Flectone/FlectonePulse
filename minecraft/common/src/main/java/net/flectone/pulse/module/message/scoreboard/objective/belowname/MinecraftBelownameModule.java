@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective.tabname;
+package net.flectone.pulse.module.message.scoreboard.objective.belowname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,9 +11,9 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.message.objective.MinecraftObjectiveModule;
-import net.flectone.pulse.module.message.objective.ScoreboardPosition;
-import net.flectone.pulse.module.message.objective.tabname.listener.MinecraftPulseTabnameListener;
+import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
+import net.flectone.pulse.module.message.scoreboard.objective.ScoreboardPosition;
+import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPulseBelownameListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -23,7 +23,7 @@ import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftTabnameModule implements ModuleLocalization<Localization.Message.Objective.Tabname> {
+public class MinecraftBelownameModule implements ModuleLocalization<Localization.Message.Scoreboard.Objective.Belowname> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -39,7 +39,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
             taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
         }
 
-        listenerRegistry.register(MinecraftPulseTabnameListener.class);
+        listenerRegistry.register(MinecraftPulseBelownameListener.class);
     }
 
     @Override
@@ -49,32 +49,32 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_OBJECTIVE_TABNAME;
+        return ModuleName.MESSAGE_OBJECTIVE_BELOWNAME;
     }
 
     @Override
-    public Message.Objective.Tabname config() {
-        return fileFacade.message().objective().tabname();
+    public Message.Scoreboard.Objective.Belowname config() {
+        return fileFacade.message().scoreboard().objective().belowname();
     }
 
     @Override
-    public Permission.Message.Objective.Tabname permission() {
-        return fileFacade.permission().message().objective().tabname();
+    public Permission.Message.Scoreboard.Objective.Belowname permission() {
+        return fileFacade.permission().message().scoreboard().objective().belowname();
     }
 
     @Override
-    public Localization.Message.Objective.Tabname localization(FEntity sender) {
-        return fileFacade.localization(sender).message().objective().tabname();
+    public Localization.Message.Scoreboard.Objective.Belowname localization(FEntity sender) {
+        return fileFacade.localization(sender).message().scoreboard().objective().belowname();
     }
 
     public void create(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        Localization.Message.Objective.Tabname localization = localization(fPlayer);
+        Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
         Component displayFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.score(), localization.displayFormat());
         Component scoreFormat = objectiveModule.buildFormat(fPlayer, fPlayer, localization.score(), localization.scoreFormat());
 
-        objectiveModule.createObjective(fPlayer, displayFormat, scoreFormat, ScoreboardPosition.TABLIST);
+        objectiveModule.createObjective(fPlayer, displayFormat, scoreFormat, ScoreboardPosition.BELOWNAME);
         updateScore(fPlayer);
     }
 
@@ -82,16 +82,18 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
-            Localization.Message.Objective.Tabname localization = localization(fPlayer);
+            Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
             Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
 
-            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.TABLIST);
+            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
         });
     }
 
     public void remove(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        objectiveModule.removeObjective(fPlayer, ScoreboardPosition.TABLIST);
+        objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }
+
+
 }

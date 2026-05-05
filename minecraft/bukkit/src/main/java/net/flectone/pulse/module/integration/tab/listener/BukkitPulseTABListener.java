@@ -10,9 +10,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.tab.BukkitTABModule;
-import net.flectone.pulse.module.message.format.scoreboard.MinecraftScoreboardModule;
-import net.flectone.pulse.module.message.objective.belowname.MinecraftBelownameModule;
-import net.flectone.pulse.module.message.objective.tabname.MinecraftTabnameModule;
+import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
@@ -33,7 +31,7 @@ public class BukkitPulseTABListener implements PulseListener {
         if ((eventModule instanceof MinecraftHeaderModule && config.disableFlectonepulseHeader())
                 || (eventModule instanceof MinecraftFooterModule && config.disableFlectonepulseFooter())
                 || (eventModule instanceof MinecraftPlayerlistnameModule && config.disableFlectonepulsePlayerlistname())
-                || ((eventModule instanceof MinecraftScoreboardModule || eventModule instanceof MinecraftBelownameModule || eventModule instanceof MinecraftTabnameModule) && config.disableFlectonepulseScoreboard())) {
+                || (eventModule instanceof MinecraftScoreboardModule && config.disableFlectonepulseScoreboard())) {
             return event.withCancelled(true);
         }
 

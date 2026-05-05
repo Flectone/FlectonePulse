@@ -265,15 +265,6 @@ format:
       underline: "(?<!\\S)__([^__\\n]+)__(?!\\S)"
       obfuscated: "(?<!\\S)\\?\\?([^\\?\\?\\n]+)\\?\\?(?!\\S)"
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
-  scoreboard:
-    enable: true
-    name_visible: true
-    hide_name_when_sneaking: false
-    color: "<white>"
-    prefix: "<prefix><stream> <white>"
-    suffix: " <afk><suffix>"
-    ticker:
-      enable: false
   translate:
     enable: true
   world:
@@ -299,20 +290,6 @@ join:
     type: "CHAT"
   sound:
     enable: false
-objective:
-  enable: false
-  belowname:
-    enable: false
-    mode: "PING"
-    ticker:
-      enable: true
-      period: 100
-  tabname:
-    enable: false
-    mode: "PING"
-    ticker:
-      enable: true
-      period: 100
 quit:
   enable: true
   range: "PROXY"
@@ -333,6 +310,25 @@ rightclick:
     enable: false
   sound:
     enable: false
+scoreboard:
+  enable: true
+  name_visible: false
+  hide_name_when_sneaking: false
+  color: "<white>"
+  ticker:
+    enable: false
+  objective:
+    enable: true
+    belowname:
+      enable: false
+      ticker:
+        enable: true
+        period: 100
+    tabname:
+      enable: false
+      ticker:
+        enable: true
+        period: 100
 serverlink:
   enable: false
   values:

@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective;
+package net.flectone.pulse.module.message.scoreboard.objective;
 
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
@@ -11,8 +11,8 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.objective.belowname.MinecraftBelownameModule;
-import net.flectone.pulse.module.message.objective.tabname.MinecraftTabnameModule;
+import net.flectone.pulse.module.message.scoreboard.objective.belowname.MinecraftBelownameModule;
+import net.flectone.pulse.module.message.scoreboard.objective.tabname.MinecraftTabnameModule;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;

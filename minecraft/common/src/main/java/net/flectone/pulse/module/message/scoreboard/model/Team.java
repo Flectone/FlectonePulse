@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.scoreboard.model;
+package net.flectone.pulse.module.message.scoreboard.model;
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 

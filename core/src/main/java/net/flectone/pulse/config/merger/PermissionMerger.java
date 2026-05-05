@@ -263,9 +263,9 @@ public interface PermissionMerger {
     @Mapping(target = "format", expression = "java(mergeMessageFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeMessageGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeMessageJoin(target.build().join().toBuilder(), source.join()))")
-    @Mapping(target = "objective", expression = "java(mergeMessageObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeMessageQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeMessageRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "scoreboard", expression = "java(mergeMessageScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
     @Mapping(target = "serverlink", expression = "java(mergeMessageServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeMessageSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "sign", expression = "java(mergeMessageSign(target.build().sign().toBuilder(), source.sign()))")
@@ -299,6 +299,17 @@ public interface PermissionMerger {
 
     Permission.Message.Rightclick mergeMessageRightclick(@MappingTarget Permission.Message.Rightclick.RightclickBuilder target, Permission.Message.Rightclick rightclick);
 
+    @Mapping(target = "objective", expression = "java(mergeMessageScoreboardObjective(target.build().objective().toBuilder(), source.objective()))")
+    Permission.Message.Scoreboard mergeMessageScoreboard(@MappingTarget Permission.Message.Scoreboard.ScoreboardBuilder target, Permission.Message.Scoreboard source);
+
+    @Mapping(target = "belowname", expression = "java(mergeMessageScoreboardObjectiveBelowname(target.build().belowname().toBuilder(), source.belowname()))")
+    @Mapping(target = "tabname", expression = "java(mergeMessageScoreboardObjectiveTabname(target.build().tabname().toBuilder(), source.tabname()))")
+    Permission.Message.Scoreboard.Objective mergeMessageScoreboardObjective(@MappingTarget Permission.Message.Scoreboard.Objective.ObjectiveBuilder target, Permission.Message.Scoreboard.Objective source);
+
+    Permission.Message.Scoreboard.Objective.Belowname mergeMessageScoreboardObjectiveBelowname(@MappingTarget Permission.Message.Scoreboard.Objective.Belowname.BelownameBuilder target, Permission.Message.Scoreboard.Objective.Belowname belowname);
+
+    Permission.Message.Scoreboard.Objective.Tabname mergeMessageScoreboardObjectiveTabname(@MappingTarget Permission.Message.Scoreboard.Objective.Tabname.TabnameBuilder target, Permission.Message.Scoreboard.Objective.Tabname tabname);
+
     Permission.Message.Serverlink mergeMessageServerlink(@MappingTarget Permission.Message.Serverlink.ServerlinkBuilder target, Permission.Message.Serverlink serverlink);
 
     Permission.Message.Sidebar mergeMessageSidebar(@MappingTarget Permission.Message.Sidebar.SidebarBuilder target, Permission.Message.Sidebar sidebar);
@@ -319,7 +330,6 @@ public interface PermissionMerger {
     @Mapping(target = "object", expression = "java(mergeMessageFormatObject(target.build().object().toBuilder(), source.object()))")
     @Mapping(target = "questionAnswer", expression = "java(mergeMessageFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
-    @Mapping(target = "scoreboard", expression = "java(mergeMessageFormatScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
     @Mapping(target = "translate", expression = "java(mergeMessageFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
     @Mapping(target = "world", expression = "java(mergeMessageFormatWorld(target.build().world().toBuilder(), source.world()))")
     Permission.Message.Format mergeMessageFormat(@MappingTarget Permission.Message.Format.FormatBuilder target, Permission.Message.Format source);
@@ -355,8 +365,6 @@ public interface PermissionMerger {
 
     Permission.Message.Format.Object mergeMessageFormatObject(@MappingTarget Permission.Message.Format.Object.ObjectBuilder target, Permission.Message.Format.Object object);
 
-    Permission.Message.Format.Scoreboard mergeMessageFormatScoreboard(@MappingTarget Permission.Message.Format.Scoreboard.ScoreboardBuilder target, Permission.Message.Format.Scoreboard scoreboard);
-
     Permission.Message.Format.QuestionAnswer mergeMessageFormatQuestionAnswer(@MappingTarget Permission.Message.Format.QuestionAnswer.QuestionAnswerBuilder target, Permission.Message.Format.QuestionAnswer questionAnswer);
 
     Permission.Message.Format.Replacement mergeMessageFormatReplacement(@MappingTarget Permission.Message.Format.Replacement.ReplacementBuilder target, Permission.Message.Format.Replacement replacement);
@@ -364,14 +372,6 @@ public interface PermissionMerger {
     Permission.Message.Format.Translate mergeMessageFormatTranslate(@MappingTarget Permission.Message.Format.Translate.TranslateBuilder target, Permission.Message.Format.Translate translate);
 
     Permission.Message.Format.World mergeMessageFormatWorld(@MappingTarget Permission.Message.Format.World.WorldBuilder target, Permission.Message.Format.World world);
-
-    @Mapping(target = "belowname", expression = "java(mergeMessageObjectiveBelowname(target.build().belowname().toBuilder(), source.belowname()))")
-    @Mapping(target = "tabname", expression = "java(mergeMessageObjectiveTabname(target.build().tabname().toBuilder(), source.tabname()))")
-    Permission.Message.Objective mergeMessageObjective(@MappingTarget Permission.Message.Objective.ObjectiveBuilder target, Permission.Message.Objective source);
-
-    Permission.Message.Objective.Belowname mergeMessageObjectiveBelowname(@MappingTarget Permission.Message.Objective.Belowname.BelownameBuilder target, Permission.Message.Objective.Belowname belowname);
-
-    Permission.Message.Objective.Tabname mergeMessageObjectiveTabname(@MappingTarget Permission.Message.Objective.Tabname.TabnameBuilder target, Permission.Message.Objective.Tabname tabname);
 
     @Mapping(target = "icon", expression = "java(mergeMessageStatusIcon(target.build().icon().toBuilder(), source.icon()))")
     @Mapping(target = "motd", expression = "java(mergeMessageStatusMOTD(target.build().motd().toBuilder(), source.motd()))")

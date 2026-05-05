@@ -26,7 +26,6 @@ import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -70,7 +69,6 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
                 ObjectModule.class,
                 QuestionAnswerModule.class,
                 ReplacementModule.class,
-                ScoreboardModule.class,
                 TranslateModule.class,
                 WorldModule.class
         );

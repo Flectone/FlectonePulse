@@ -215,9 +215,9 @@ public interface LocalizationMerger {
     @Mapping(target = "format", expression = "java(mergeFormat(target.build().format().toBuilder(), source.format()))")
     @Mapping(target = "greeting", expression = "java(mergeGreeting(target.build().greeting().toBuilder(), source.greeting()))")
     @Mapping(target = "join", expression = "java(mergeJoin(target.build().join().toBuilder(), source.join()))")
-    @Mapping(target = "objective", expression = "java(mergeObjective(target.build().objective().toBuilder(), source.objective()))")
     @Mapping(target = "quit", expression = "java(mergeQuit(target.build().quit().toBuilder(), source.quit()))")
     @Mapping(target = "rightclick", expression = "java(mergeRightclick(target.build().rightclick().toBuilder(), source.rightclick()))")
+    @Mapping(target = "scoreboard", expression = "java(mergeScoreboard(target.build().scoreboard().toBuilder(), source.scoreboard()))")
     @Mapping(target = "serverlink", expression = "java(mergeServerlink(target.build().serverlink().toBuilder(), source.serverlink()))")
     @Mapping(target = "sidebar", expression = "java(mergeSidebar(target.build().sidebar().toBuilder(), source.sidebar()))")
     @Mapping(target = "status", expression = "java(mergeStatus2(target.build().status().toBuilder(), source.status()))")
@@ -280,17 +280,20 @@ public interface LocalizationMerger {
 
     Localization.Message.Join mergeJoin(@MappingTarget Localization.Message.Join.JoinBuilder target, Localization.Message.Join join);
 
-    @Mapping(target = "belowname", expression = "java(mergeBelowname(target.build().belowname().toBuilder(), source.belowname()))")
-    @Mapping(target = "tabname", expression = "java(mergeTabname(target.build().tabname().toBuilder(), source.tabname()))")
-    Localization.Message.Objective mergeObjective(@MappingTarget Localization.Message.Objective.ObjectiveBuilder target, Localization.Message.Objective source);
-
-    Localization.Message.Objective.Belowname mergeBelowname(@MappingTarget Localization.Message.Objective.Belowname.BelownameBuilder target, Localization.Message.Objective.Belowname belowname);
-
-    Localization.Message.Objective.Tabname mergeTabname(@MappingTarget Localization.Message.Objective.Tabname.TabnameBuilder target, Localization.Message.Objective.Tabname tabname);
-
     Localization.Message.Quit mergeQuit(@MappingTarget Localization.Message.Quit.QuitBuilder target, Localization.Message.Quit quit);
 
     Localization.Message.Rightclick mergeRightclick(@MappingTarget Localization.Message.Rightclick.RightclickBuilder target, Localization.Message.Rightclick rightclick);
+
+    @Mapping(target = "objective", expression = "java(mergeMessageScoreboardObjective(target.build().objective().toBuilder(), source.objective()))")
+    Localization.Message.Scoreboard mergeScoreboard(@MappingTarget Localization.Message.Scoreboard.ScoreboardBuilder target, Localization.Message.Scoreboard source);
+
+    @Mapping(target = "belowname", expression = "java(mergeMessageScoreboardObjectiveBelowname(target.build().belowname().toBuilder(), source.belowname()))")
+    @Mapping(target = "tabname", expression = "java(mergeMessageScoreboardObjectiveTabname(target.build().tabname().toBuilder(), source.tabname()))")
+    Localization.Message.Scoreboard.Objective mergeMessageScoreboardObjective(@MappingTarget Localization.Message.Scoreboard.Objective.ObjectiveBuilder target, Localization.Message.Scoreboard.Objective source);
+
+    Localization.Message.Scoreboard.Objective.Belowname mergeMessageScoreboardObjectiveBelowname(@MappingTarget Localization.Message.Scoreboard.Objective.Belowname.BelownameBuilder target, Localization.Message.Scoreboard.Objective.Belowname belowname);
+
+    Localization.Message.Scoreboard.Objective.Tabname mergeMessageScoreboardObjectiveTabname(@MappingTarget Localization.Message.Scoreboard.Objective.Tabname.TabnameBuilder target, Localization.Message.Scoreboard.Objective.Tabname tabname);
 
     Localization.Message.Serverlink mergeServerlink(@MappingTarget Localization.Message.Serverlink.ServerlinkBuilder target, Localization.Message.Serverlink serverlink);
 

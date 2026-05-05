@@ -972,9 +972,6 @@ message:
         strikethrough:
           name: "flectonepulse.module.message.format.replacement.strikethrough"
           type: "TRUE"
-    scoreboard:
-      name: "flectonepulse.module.message.format.scoreboard"
-      type: "TRUE"
     spoiler:
       name: "flectonepulse.module.message.format.spoiler"
       type: "TRUE"
@@ -996,15 +993,6 @@ message:
     sound:
       name: "flectonepulse.module.message.join.sound"
       type: "TRUE"
-  objective:
-    name: "flectonepulse.module.message.objective"
-    type: "TRUE"
-    belowname:
-      name: "flectonepulse.module.message.objective.belowname"
-      type: "TRUE"
-    tabname:
-      name: "flectonepulse.module.message.objective.tabname"
-      type: "TRUE"
   quit:
     name: "flectonepulse.module.message.quit"
     type: "TRUE"
@@ -1020,6 +1008,18 @@ message:
     sound:
       name: "flectonepulse.module.message.rightclick.sound"
       type: "TRUE"
+  scoreboard:
+    name: "flectonepulse.module.message.scoreboard"
+    type: "TRUE"
+    objective:
+      name: "flectonepulse.module.message.scoreboard.objective"
+      type: "TRUE"
+      belowname:
+        name: "flectonepulse.module.message.scoreboard.objective.belowname"
+        type: "TRUE"
+      tabname:
+        name: "flectonepulse.module.message.scoreboard.objective.tabname"
+        type: "TRUE"
   serverlink:
     name: "flectonepulse.module.message.serverlink"
     type: "TRUE"

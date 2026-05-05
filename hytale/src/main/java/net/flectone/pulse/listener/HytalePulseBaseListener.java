@@ -16,7 +16,7 @@ import net.flectone.pulse.module.message.book.BookModule;
 import net.flectone.pulse.module.message.bossbar.BossbarModule;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.status.StatusModule;
