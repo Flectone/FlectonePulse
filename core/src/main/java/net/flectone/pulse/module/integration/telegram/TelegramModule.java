@@ -7,9 +7,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -20,7 +22,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TelegramModule implements ModuleSimple {
+public class TelegramModule implements ModuleLocalization<Localization.Integration.Telegram> {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -83,9 +85,14 @@ public class TelegramModule implements ModuleSimple {
         return fileFacade.permission().integration().telegram();
     }
 
+    @Override
+    public Localization.Integration.Telegram localization(FEntity sender) {
+        return fileFacade.localization(sender).integration().telegram();
+    }
+
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
         if (moduleController.isDisabledFor(this, sender)) return;
 
-        injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageName, telegramString);
+        injector.getInstance(TelegramSender.class).sendMessage(sender, messageName, telegramString);
     }
 }

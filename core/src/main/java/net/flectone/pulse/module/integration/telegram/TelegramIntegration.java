@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,52 +9,34 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.module.integration.telegram.listener.TelegramMessageListener;
+import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
+import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import okhttp3.ConnectionPool;
-import okhttp3.Credentials;
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
-import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-import org.telegram.telegrambots.meta.api.methods.GetMe;
+import org.jspecify.annotations.NonNull;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.forum.EditForumTopic;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTitle;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.lang.reflect.Field;
-import java.net.*;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramIntegration implements FIntegration {
 
     private final FileFacade fileFacade;
-    private final SystemVariableResolver systemVariableResolver;
-    private final MessageListener messageListener;
+    private final TelegramClientProvider telegramClientProvider;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
-    @Getter private final FLogger fLogger;
+    private final Injector injector;
 
-    @Getter private FPlayer sender = FPlayer.UNKNOWN;
-    private TelegramBotsLongPollingApplication botsApplication;
-    private OkHttpTelegramClient telegramClient;
-    @Getter private Long botId;
+    @Getter private final FLogger fLogger;
 
     public Integration.Telegram config() {
         return fileFacade.integration().telegram();
@@ -66,32 +49,13 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = FPlayer.builder()
-                .integration(true)
-                .name(fileFacade.localization().integration().telegram().senderName())
-                .build();
-
-        String token = systemVariableResolver.substituteEnvVars(config().token());
-        if (token.isEmpty()) return;
+        TelegramClient telegramClient = telegramClientProvider.create();
+        if (telegramClient == null) return;
 
         try {
-            // create telegram client
-            telegramClient = new OkHttpTelegramClient(createHttpClient(), token);
-
-            // create application
-            botsApplication = new TelegramBotsLongPollingApplication();
-
-            // due to jackson relocation, we can't use the constructor with the OkHttpClient change, so we do it via reflection
-            // waiting for https://github.com/rubenlagus/TelegramBots/pull/1583
-            Field okHttpClientCreatorField = TelegramBotsLongPollingApplication.class.getDeclaredField("okHttpClientCreator");
-            okHttpClientCreatorField.setAccessible(true);
-            okHttpClientCreatorField.set(botsApplication, (Supplier <OkHttpClient>) () -> createHttpClient());
-
             // register listener
-            botsApplication.registerBot(token, messageListener);
-
-            // get bot id
-            botId = telegramClient.execute(new GetMe()).getId();
+            TelegramMessageListener telegramMessageListener = injector.getInstance(TelegramMessageListener.class);
+            telegramClient.registerListener(telegramMessageListener);
 
             Integration.ChannelInfo channelInfo = config().channelInfo();
 
@@ -102,54 +66,18 @@ public class TelegramIntegration implements FIntegration {
             }
 
             logHook();
-        } catch (Exception e) {
+        } catch (TelegramApiException e) {
             fLogger.warning(e);
-        }
-    }
-
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
-        if (botsApplication == null) return;
-
-        List<String> channels = config().messageChannel().get(messageName);
-        if (channels == null) return;
-        if (channels.isEmpty()) return;
-
-        Localization.Integration.Telegram localization = fileFacade.localization().integration().telegram();
-        String message = localization.messageChannel().getOrDefault(messageName, "<final_message>");
-        if (StringUtils.isEmpty(message)) return;
-
-        message = telegramString.apply(message);
-        if (StringUtils.isEmpty(message)) return;
-
-        for (String chat : channels) {
-
-            SendMessage.SendMessageBuilder<?, ?> sendMessageBuilder = SendMessage.builder()
-                    .chatId(chat)
-                    .text(message);
-
-            if (chat.contains("_")) {
-                sendMessageBuilder
-                        .messageThreadId(Integer.parseInt(chat.split("_")[1]));
-            }
-
-            SendMessage sendMessage = sendMessageBuilder.build();
-
-            switch (config().parseMode()) {
-                case MARKDOWN -> sendMessage.enableMarkdown(true);
-                case MARKDOWN_V2 -> sendMessage.enableMarkdownV2(true);
-                case HTML -> sendMessage.enableHtml(true);
-            }
-
-            executeMethod(sendMessage);
         }
     }
 
     @Override
     public void unhook() {
-        if (botsApplication == null) return;
+        TelegramClient telegramClient = telegramClientProvider.get();
+        if (telegramClient == null) return;
 
         try {
-            botsApplication.close();
+            telegramClient.application().close();
         } catch (Exception e) {
             fLogger.warning(e);
         }
@@ -158,11 +86,14 @@ public class TelegramIntegration implements FIntegration {
     }
 
     public void updateChannelInfo() {
-        if (botsApplication == null) return;
+        TelegramClient telegramClient = telegramClientProvider.get();
+        if (telegramClient == null) return;
         if (!config().channelInfo().enable()) return;
 
         Localization.Integration.Telegram localization = fileFacade.localization().integration().telegram();
         for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
+            BotApiMethod<?> botApiMethod;
+
             String chatId = entry.getKey();
             if (chatId.contains("_")) {
                 String[] ids = chatId.split("_");
@@ -170,91 +101,30 @@ public class TelegramIntegration implements FIntegration {
                 if (!NumberUtils.isParsable(ids[0])) continue;
                 if (!NumberUtils.isParsable(ids[1])) continue;
 
-                executeMethod(EditForumTopic.builder()
+                botApiMethod = EditForumTopic.builder()
                         .chatId(ids[0])
                         .messageThreadId(Integer.parseInt(ids[1]))
                         .name(getNewChatName(entry.getValue()))
-                        .build()
-                );
+                        .build();
             } else {
-                executeMethod(SetChatTitle.builder()
+                botApiMethod = SetChatTitle.builder()
                         .chatId(chatId)
                         .title(getNewChatName(entry.getValue()))
-                        .build()
-                );
+                        .build();
+            }
+
+            try {
+                telegramClient.executeMethod(botApiMethod);
+            } catch (TelegramApiException e) {
+                fLogger.warning(e);
             }
         }
     }
 
-    private OkHttpClient createHttpClient() {
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(100);
-        dispatcher.setMaxRequestsPerHost(100);
-
-        OkHttpClient.Builder builder = new OkHttpClient()
-                .newBuilder()
-                .dispatcher(dispatcher)
-                .connectionPool(new ConnectionPool(
-                        100,
-                        75,
-                        TimeUnit.SECONDS
-                ))
-                .readTimeout(100, TimeUnit.SECONDS)
-                .writeTimeout(70, TimeUnit.SECONDS)
-                .connectTimeout(75, TimeUnit.SECONDS);
-
-        Integration.Proxy proxy = config().proxy();
-        if (proxy.type() == Proxy.Type.DIRECT) {
-            return builder.build();
-        }
-
-        InetSocketAddress socketAddress = new InetSocketAddress(proxy.host(), proxy.port());
-        builder.proxy(new Proxy(proxy.type(), socketAddress));
-
-        if (StringUtils.isNotEmpty(proxy.user()) && StringUtils.isNotEmpty(proxy.password())) {
-            if (proxy.type() == Proxy.Type.HTTP) {
-                builder.proxyAuthenticator((_, response) ->
-                        response.request().newBuilder()
-                                .header("Proxy-Authorization", Credentials.basic(
-                                        systemVariableResolver.substituteEnvVars(proxy.user()),
-                                        systemVariableResolver.substituteEnvVars(proxy.password())
-                                ))
-                                .build()
-                );
-            } else {
-                Authenticator.setDefault(new Authenticator() {
-                    @Override
-                    public PasswordAuthentication requestPasswordAuthenticationInstance(String host,
-                                                                                        InetAddress addr,
-                                                                                        int port,
-                                                                                        String protocol,
-                                                                                        String prompt,
-                                                                                        String scheme,
-                                                                                        URL url,
-                                                                                        RequestorType reqType) {
-                        if (proxy.host().equalsIgnoreCase(host) && proxy.port() == port) {
-                            return new PasswordAuthentication(proxy.user(), proxy.password().toCharArray());
-                        }
-
-                        return null;
-                    }
-                });
-            }
-        }
-
-        return builder.build();
-    }
-
-    private String getNewChatName(String value) {
+    @NonNull
+    private String getNewChatName(@NonNull String value) {
         MessageContext messageContext = messagePipeline.createContext(value);
         return messagePipeline.buildPlain(messageContext);
     }
 
-    public void executeMethod(BotApiMethod<?> method) {
-        try {
-            telegramClient.executeAsync(method);
-        } catch (TelegramApiException e) {
-            fLogger.warning(e);
-        }
-    }
 }
