@@ -856,7 +856,7 @@ public class FileMigrator {
 
     public FilePack migration_1_9_3(FilePack files) {
         long delay = files.message().afk().delay();
-        if (delay == 3000L) return files;
+        if (delay != 3000L) return files;
 
         return files.withMessage(files.message().withAfk(files.message().afk().withDelay(delay * 20L)));
     }
