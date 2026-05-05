@@ -8,9 +8,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -22,7 +24,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DiscordModule implements ModuleSimple {
+public class DiscordModule implements ModuleLocalization<Localization.Integration.Discord> {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -61,6 +63,11 @@ public class DiscordModule implements ModuleSimple {
         return fileFacade.permission().integration().discord();
     }
 
+    @Override
+    public Localization.Integration.Discord localization(FEntity sender) {
+        return fileFacade.localization(sender).integration().discord();
+    }
+
     private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}discord4j")
@@ -85,6 +92,6 @@ public class DiscordModule implements ModuleSimple {
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (moduleController.isDisabledFor(this, sender)) return;
 
-        injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageName, discordString);
+        injector.getInstance(DiscordSender.class).sendMessage(sender, messageName, discordString);
     }
 }
