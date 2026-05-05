@@ -8,9 +8,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -21,7 +23,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TwitchModule implements ModuleSimple {
+public class TwitchModule implements ModuleLocalization<Localization.Integration.Twitch> {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -38,6 +40,32 @@ public class TwitchModule implements ModuleSimple {
     @Override
     public void onDisable() {
         injector.getInstance(TwitchIntegration.class).unhook();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.INTEGRATION_TWITCH;
+    }
+
+    @Override
+    public Integration.Twitch config() {
+        return fileFacade.integration().twitch();
+    }
+
+    @Override
+    public Permission.Integration.Twitch permission() {
+        return fileFacade.permission().integration().twitch();
+    }
+
+    @Override
+    public Localization.Integration.Twitch localization(FEntity sender) {
+        return fileFacade.localization(sender).integration().twitch();
+    }
+
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
+        if (moduleController.isDisabledFor(this, sender)) return;
+
+        injector.getInstance(TwitchSender.class).sendMessage(sender, messageName, twitchString);
     }
 
     // I hate this library...
@@ -430,26 +458,5 @@ public class TwitchModule implements ModuleSimple {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
-    }
-
-    @Override
-    public ModuleName name() {
-        return ModuleName.INTEGRATION_TWITCH;
-    }
-
-    @Override
-    public Integration.Twitch config() {
-        return fileFacade.integration().twitch();
-    }
-
-    @Override
-    public Permission.Integration.Twitch permission() {
-        return fileFacade.permission().integration().twitch();
-    }
-
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
-        if (moduleController.isDisabledFor(this, sender)) return;
-
-        injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageName, twitchString);
     }
 }

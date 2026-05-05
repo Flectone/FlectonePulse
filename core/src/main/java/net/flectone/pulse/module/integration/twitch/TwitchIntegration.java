@@ -1,44 +1,34 @@
 package net.flectone.pulse.module.integration.twitch;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import feign.Logger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.integration.twitch.listener.MessageListener;
+import net.flectone.pulse.module.integration.twitch.listener.TwitchMessageListener;
+import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
+import net.flectone.pulse.module.integration.twitch.provider.TwitchClientProvider;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.SystemVariableResolver;
-import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.apache.commons.lang3.StringUtils;
 
-import java.net.Proxy;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TwitchIntegration implements FIntegration {
 
-    private final FileFacade fileFacade;
-    private final MessageListener channelMessageListener;
+    private final TwitchModule twitchModule;
+    private final TwitchClientProvider twitchClientProvider;
     private final PlatformServerAdapter platformServerAdapter;
-    private final SystemVariableResolver systemVariableResolver;
     private final TaskScheduler taskScheduler;
-    @Getter private final FLogger fLogger;
+    private final Injector injector;
 
-    @Getter private FPlayer sender = FPlayer.UNKNOWN;
-    private TwitchClient twitchClient;
+    @Getter private final FLogger fLogger;
 
     @Override
     public String getIntegrationName() {
@@ -47,30 +37,24 @@ public class TwitchIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        sender = FPlayer.builder()
-                .integration(true)
-                .name(fileFacade.localization().integration().twitch().senderName())
-                .build();
+        TwitchClient twitchClient = twitchClientProvider.create();
+        if (twitchClient == null) return;
 
-        Integration.Twitch integration = fileFacade.integration().twitch();
-        String token = systemVariableResolver.substituteEnvVars(integration.token());
-        String identityProvider = systemVariableResolver.substituteEnvVars(integration.clientID());
-        if (token.isEmpty() || identityProvider.isEmpty()) return;
-
-        twitchClient = createTwitchClient(identityProvider, token);
-
+        Integration.Twitch integration = twitchModule.config();
         for (List<String> channels : integration.messageChannel().values()) {
             for (String channel : channels) {
-                if (twitchClient.getChat().isChannelJoined(channel)) continue;
-                twitchClient.getChat().joinChannel(channel);
+                TwitchChat twitchChat = twitchClient.client().getChat();
+                if (!twitchChat.isChannelJoined(channel)) {
+                    twitchChat.joinChannel(channel);
+                }
             }
         }
 
         for (String channel : integration.followChannel().keySet()) {
-            twitchClient.getClientHelper().enableStreamEventListener(channel);
+            twitchClient.client().getClientHelper().enableStreamEventListener(channel);
         }
 
-        twitchClient.getEventManager().onEvent(ChannelGoLiveEvent.class, event -> {
+        twitchClient.client().getEventManager().onEvent(ChannelGoLiveEvent.class, event -> {
             String channelName = event.getChannel().getName();
 
             List<String> commands = integration.followChannel().get(channelName);
@@ -80,66 +64,23 @@ public class TwitchIntegration implements FIntegration {
         });
 
         if (!integration.messageChannel().isEmpty()) {
-            twitchClient.getEventManager().onEvent(channelMessageListener.getEventType(), channelMessageEvent ->
-                    taskScheduler.runAsync(() -> channelMessageListener.execute(channelMessageEvent))
+            TwitchMessageListener twitchMessageListener = injector.getInstance(TwitchMessageListener.class);
+
+            twitchClient.client().getEventManager().onEvent(twitchMessageListener.getEventType(), channelMessageEvent ->
+                    taskScheduler.runAsync(() -> twitchMessageListener.execute(channelMessageEvent))
             );
         }
 
         logHook();
     }
 
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
-        List<String> channels = fileFacade.integration().twitch().messageChannel().get(messageName);
-        if (channels == null) return;
-        if (channels.isEmpty()) return;
-
-        String message = fileFacade.localization().integration().twitch().messageChannel().getOrDefault(messageName, "<final_message>");
-        if (StringUtils.isEmpty(message)) return;
-
-        message = twitchString.apply(message);
-        if (StringUtils.isEmpty(message)) return;
-
-        for (String channel : channels) {
-            sendMessage(channel, message);
-        }
-    }
-
-    public void sendMessage(String channel, String message) {
-        twitchClient.getChat().sendMessage(channel, message);
-    }
-
     @Override
     public void unhook() {
+        TwitchClient twitchClient = twitchClientProvider.get();
         if (twitchClient == null) return;
 
-        twitchClient.close();
+        twitchClient.client().close();
 
         logUnhook();
-    }
-
-    private TwitchClient createTwitchClient(String identityProvider, String token) {
-        OAuth2Credential oAuth2Credential = new OAuth2Credential(identityProvider, token);
-
-        TwitchClientBuilder twitchClientBuilder = TwitchClientBuilder.builder()
-                .withEnableChat(true)
-                .withEnableEventSocket(true)
-                .withEnableHelix(true)
-                .withFeignLogLevel(Logger.Level.NONE)
-                .withDefaultAuthToken(oAuth2Credential)
-                .withChatAccount(oAuth2Credential);
-
-        Integration.Proxy proxy = fileFacade.integration().twitch().proxy();
-        if (proxy.type() == Proxy.Type.DIRECT || proxy.type() == Proxy.Type.SOCKS) {
-            return twitchClientBuilder.build();
-        }
-
-        ProxyConfig proxyConfig = ProxyConfig.builder()
-                .hostname(proxy.host())
-                .port(proxy.port())
-                .username(StringUtils.isNotEmpty(proxy.user()) ? systemVariableResolver.substituteEnvVars(proxy.user()) : null)
-                .password(StringUtils.isNotEmpty(proxy.password()) ? systemVariableResolver.substituteEnvVars(proxy.password()).toCharArray() : null)
-                .build();
-
-        return twitchClientBuilder.withProxyConfig(proxyConfig).build();
     }
 }
