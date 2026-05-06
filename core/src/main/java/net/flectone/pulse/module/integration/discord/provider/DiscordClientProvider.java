@@ -41,15 +41,17 @@ public class DiscordClientProvider {
 
     @Nullable
     public DiscordClient create() {
+        discordClient = null;
+
         String token = systemVariableResolver.substituteEnvVars(discordModule.config().token());
-        if (token.isEmpty()) return null;
+        if (StringUtils.isEmpty(token)) return discordClient;
 
         discord4j.core.DiscordClient discord4JClient = createDiscord4JClient(createHttpClient());
         GatewayDiscordClient gateway = createGatewayClient(discord4JClient, createHttpClient(), createClientPresence());
-        if (gateway == null) return null;
+        if (gateway == null) return discordClient;
 
         ApplicationInfo applicationInfo = gateway.getApplicationInfo().block();
-        if (applicationInfo == null) return null;
+        if (applicationInfo == null) return discordClient;
 
         long clientID = applicationInfo.getId().asLong();
 

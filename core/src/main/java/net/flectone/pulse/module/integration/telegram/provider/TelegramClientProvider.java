@@ -37,8 +37,10 @@ public class TelegramClientProvider {
 
     @Nullable
     public TelegramClient create() {
+        telegramClient = null;
+
         String token = systemVariableResolver.substituteEnvVars(telegramModule.config().token());
-        if (token.isEmpty()) return null;
+        if (StringUtils.isEmpty(token)) return telegramClient;
 
         try {
             // create client

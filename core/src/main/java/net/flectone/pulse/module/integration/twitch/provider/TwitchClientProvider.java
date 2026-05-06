@@ -14,6 +14,7 @@ import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.Proxy;
 
@@ -26,11 +27,14 @@ public class TwitchClientProvider {
 
     private volatile TwitchClient twitchClient;
 
+    @Nullable
     public TwitchClient create() {
+        twitchClient = null;
+
         Integration.Twitch integration = twitchModule.config();
         String token = systemVariableResolver.substituteEnvVars(integration.token());
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.clientID());
-        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(identityProvider)) return null;
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(identityProvider)) return twitchClient;
 
         com.github.twitch4j.TwitchClient client = createTwitch4JClient(identityProvider, token);
 
@@ -44,6 +48,7 @@ public class TwitchClientProvider {
         return twitchClient;
     }
 
+    @Nullable
     public TwitchClient get() {
         return twitchClient;
     }
