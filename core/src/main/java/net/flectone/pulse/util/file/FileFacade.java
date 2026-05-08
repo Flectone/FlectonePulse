@@ -12,9 +12,11 @@ import net.flectone.pulse.model.file.FilePack;
 import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.creator.BackupCreator;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -64,6 +66,11 @@ public class FileFacade {
 
         // load local files
         updateFiles();
+
+        boolean serverUuidEmpty = StringUtils.isEmpty(files.config().serverUuid());
+        if (serverUuidEmpty) {
+            files = files.withConfig(files.config().withServerUuid(UUID.randomUUID().toString()));
+        }
 
         // migrate if version changed
         if (versionChanged) {

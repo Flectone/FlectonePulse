@@ -1,3 +1,4 @@
+server_uuid: ""
 version: "1.9.4-SNAPSHOT"
 language:
   type: "en_us"

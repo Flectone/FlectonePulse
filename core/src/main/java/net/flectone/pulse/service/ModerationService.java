@@ -7,7 +7,6 @@ import net.flectone.pulse.data.repository.ModerationRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -23,7 +22,6 @@ public class ModerationService {
     private final ModerationRepository moderationRepository;
     private final IntegrationModule integrationModule;
     private final FileFacade fileFacade;
-    private final PlatformServerAdapter platformServerAdapter;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
@@ -103,7 +101,7 @@ public class ModerationService {
 
     @Nullable
     public Moderation add(FPlayer fPlayer, long time, String reason, int moderator, Moderation.Type type) {
-        return add(fPlayer, System.currentTimeMillis(), time, reason, moderator, type, platformServerAdapter.getServerUUID());
+        return add(fPlayer, System.currentTimeMillis(), time, reason, moderator, type, fileFacade.config().serverUuid());
     }
 
     @Nullable
@@ -115,12 +113,12 @@ public class ModerationService {
 
     @Nullable
     public Moderation remove(FPlayer fPlayer, List<Moderation> moderations) {
-        return remove(fPlayer, moderations, "", platformServerAdapter.getServerUUID());
+        return remove(fPlayer, moderations, "", fileFacade.config().serverUuid());
     }
 
     @Nullable
     public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason) {
-        return remove(fPlayer, moderations, reason, platformServerAdapter.getServerUUID());
+        return remove(fPlayer, moderations, reason, fileFacade.config().serverUuid());
     }
 
     @Nullable
@@ -166,7 +164,7 @@ public class ModerationService {
         return type == Moderation.Type.BAN && fileFacade.command().ban().filterByServer()
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
-                ? platformServerAdapter.getServerUUID()
+                ? fileFacade.config().serverUuid()
                 : null;
     }
 }

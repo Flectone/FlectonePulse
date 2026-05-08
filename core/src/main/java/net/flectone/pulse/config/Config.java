@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public record Config(
 
         @JsonPropertyDescription(" Don't change it if you don't know what it is")
+        String serverUuid,
         String version,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/language")
