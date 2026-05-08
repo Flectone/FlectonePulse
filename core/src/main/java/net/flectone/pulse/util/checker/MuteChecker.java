@@ -28,16 +28,16 @@ public class MuteChecker {
             return Status.LOCAL;
         }
 
+        if (newbieModuleProvider.get().isNewBie(fPlayer)) {
+            return Status.NEWBIE;
+        }
+
         if (capsModuleProvider.get().isRestricted(fPlayer.uuid())) {
             return Status.CAPS;
         }
 
         if (floodModuleProvider.get().isRestricted(fPlayer.uuid())) {
             return Status.FLOOD;
-        }
-
-        if (newbieModuleProvider.get().isNewBie(fPlayer)) {
-            return Status.NEWBIE;
         }
 
         if (swearModuleProvider.get().isRestricted(fPlayer.uuid())) {
