@@ -113,16 +113,21 @@ public class ProxyMessageHandler {
             try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
                  DataInputStream input = new DataInputStream(byteStream)) {
 
-                ModuleName tag = ModuleName.fromProxyString(input.readUTF());
-                if (tag == null) return;
+                ModuleName moduleName = ModuleName.fromProxyString(input.readUTF());
+                if (moduleName == null) return;
 
-                UUID uuid = UUID.fromString(input.readUTF());
+                UUID messageUUID = UUID.fromString(input.readUTF());
 
-                switch (tag) {
-                    case SYSTEM_ONLINE -> handleSystemOnline(uuid);
-                    case SYSTEM_CONNECTED -> handleSystemConnected(uuid);
-                    case SYSTEM_OFFLINE -> handleSystemOffline(uuid);
-                    default -> handleProxyMessage(input, uuid, tag);
+                String fromServer = input.readUTF();
+                if (fromServer.equals(fileFacade.config().serverUuid())) {
+                    fLogger.warning("Duplicate server_uuid detected " + fromServer + ". Please set a unique server_uuid in config.yml. Otherwise cross-server data (bans, mutes, etc.) may fail or mix up");
+                }
+
+                switch (moduleName) {
+                    case SYSTEM_ONLINE -> handleSystemOnline(messageUUID);
+                    case SYSTEM_CONNECTED -> handleSystemConnected(messageUUID);
+                    case SYSTEM_OFFLINE -> handleSystemOffline(messageUUID);
+                    default -> handleProxyMessage(input, messageUUID, moduleName);
                 }
             } catch (IOException e) {
                 fLogger.warning(e);
