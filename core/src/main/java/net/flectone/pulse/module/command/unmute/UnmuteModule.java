@@ -146,7 +146,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        Moderation unmute = moderationService.remove(fTarget, mutes);
+        Moderation unmute = moderationService.remove(fTarget, mutes, reason);
         if (unmute == null) return;
 
         proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);

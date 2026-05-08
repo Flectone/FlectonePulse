@@ -147,7 +147,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        Moderation unwarn = moderationService.remove(fTarget, warns);
+        Moderation unwarn = moderationService.remove(fTarget, warns, reason);
         if (unwarn == null) return;
 
         proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
