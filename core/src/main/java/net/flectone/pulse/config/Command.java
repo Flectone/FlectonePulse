@@ -219,6 +219,7 @@ public record Command(
     @Jacksonized
     public record Ban(
             Boolean enable,
+            Boolean filterByServer,
             Boolean suggestOfflinePlayers,
             Boolean showConnectionAttempts,
             Boolean checkGroupWeight,
@@ -566,6 +567,7 @@ public record Command(
     @Jacksonized
     public record Mute(
             Boolean enable,
+            Boolean filterByServer,
             Boolean suggestOfflinePlayers,
             Boolean checkGroupWeight,
             Range range,
@@ -840,6 +842,7 @@ public record Command(
     @Jacksonized
     public record Warn(
             Boolean enable,
+            Boolean filterByServer,
             Boolean suggestOfflinePlayers,
             Boolean checkGroupWeight,
             Range range,

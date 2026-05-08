@@ -116,7 +116,9 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
         if (warn == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+        }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(EventMetadata.<Localization.Command.Warn>builder()

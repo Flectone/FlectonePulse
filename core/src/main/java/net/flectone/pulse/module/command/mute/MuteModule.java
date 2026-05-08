@@ -117,7 +117,9 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.id());
         if (mute == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+        }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
                 .base(EventMetadata.<Localization.Command.Mute>builder()

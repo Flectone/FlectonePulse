@@ -34,6 +34,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jspecify.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -253,7 +254,7 @@ public class Database {
         }
     }
 
-    private void checkMigration() {
+    private void checkMigration() throws IOException {
         if (!versionComparator.isOlderThan(fileFacade.getPreInitVersion(), fileFacade.config().version())) return;
 
         backupCreator.backup(config());
@@ -282,6 +283,17 @@ public class Database {
 
         if (versionTest.test("1.8.2")) {
             migration("1_8_2");
+        }
+
+        if (versionTest.test("1.9.4")) {
+            // rename fp_moderation to fp_moderation_old
+            migration("pre_1_9_4");
+
+            // create new fp_moderation
+            executeInitSQLDatabaseFile();
+
+            // migrate fp_moderation_old data to new fp_moderation
+            migration("post_1_9_4");
         }
 
         versionDAO.insertOrUpdate(fileFacade.config().version());

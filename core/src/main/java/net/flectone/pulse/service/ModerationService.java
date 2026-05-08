@@ -7,6 +7,8 @@ import net.flectone.pulse.data.repository.ModerationRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -20,6 +22,8 @@ public class ModerationService {
 
     private final ModerationRepository moderationRepository;
     private final IntegrationModule integrationModule;
+    private final FileFacade fileFacade;
+    private final PlatformServerAdapter platformServerAdapter;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
@@ -56,6 +60,11 @@ public class ModerationService {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WARN);
     }
 
+    @Nullable
+    public Moderation kick(FPlayer fPlayer, String reason, int moderator) {
+        return add(fPlayer, -1, reason, moderator, Moderation.Type.KICK);
+    }
+
     public List<Moderation> getValidMutes(FPlayer fPlayer) {
         return getValid(fPlayer, Moderation.Type.MUTE);
     }
@@ -81,36 +90,41 @@ public class ModerationService {
     }
 
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
-        return moderationRepository.getValid(fPlayer, type);
+        return moderationRepository.getValid(fPlayer, type, getServer(type));
     }
 
     public List<Moderation> getValid(Moderation.Type type) {
-        return moderationRepository.getValid(type);
+        return moderationRepository.getValid(type, getServer(type));
     }
 
     public List<String> getValidNames(Moderation.Type type) {
-        return moderationRepository.getValidNames(type);
-    }
-
-    @Nullable
-    public Moderation kick(FPlayer fPlayer, String reason, int moderator) {
-        return moderationRepository.save(fPlayer, -1, reason, moderator, Moderation.Type.KICK);
+        return moderationRepository.getValidNames(type, getServer(type));
     }
 
     @Nullable
     public Moderation add(FPlayer fPlayer, long time, String reason, int moderator, Moderation.Type type) {
+        return add(fPlayer, System.currentTimeMillis(), time, reason, moderator, type, platformServerAdapter.getServerUUID());
+    }
+
+    @Nullable
+    public Moderation add(FPlayer fPlayer, long date, long time, String reason, int moderator, Moderation.Type type, @Nullable String server) {
         moderationRepository.invalidate(fPlayer.uuid(), type);
 
-        return moderationRepository.save(fPlayer, time, reason, moderator, type);
+        return moderationRepository.save(fPlayer, date, time, reason, moderator, type, server);
     }
 
     @Nullable
     public Moderation remove(FPlayer fPlayer, List<Moderation> moderations) {
-        return remove(fPlayer, moderations, "");
+        return remove(fPlayer, moderations, "", platformServerAdapter.getServerUUID());
     }
 
     @Nullable
     public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason) {
+        return remove(fPlayer, moderations, reason, platformServerAdapter.getServerUUID());
+    }
+
+    @Nullable
+    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason, @Nullable String server) {
         if (moderations.isEmpty()) return null;
 
         Moderation firstModeration = moderations.getFirst();
@@ -121,12 +135,12 @@ public class ModerationService {
         }
 
         // save to un-moderation database
-        return moderationRepository.save(fPlayer, -1, reason, firstModeration.moderator(), switch (firstModeration.type()) {
+        return moderationRepository.save(fPlayer, System.currentTimeMillis(), -1, reason, firstModeration.moderator(), switch (firstModeration.type()) {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
             case WARN -> Moderation.Type.UNWARN;
             default -> throw new IllegalArgumentException("Unknown un-moderation type: " + firstModeration.type());
-        });
+        }, server);
     }
 
     public boolean isAllowedTime(FPlayer fPlayer, long time, Map<Integer, Long> timeLimits) {
@@ -146,5 +160,13 @@ public class ModerationService {
         }
 
         return time != -1 && timeLimit != -1 && timeLimit >= time;
+    }
+
+    private String getServer(Moderation.Type type) {
+        return type == Moderation.Type.BAN && fileFacade.command().ban().filterByServer()
+                || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
+                || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
+                ? platformServerAdapter.getServerUUID()
+                : null;
     }
 }

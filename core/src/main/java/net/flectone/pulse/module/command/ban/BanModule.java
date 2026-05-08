@@ -145,7 +145,9 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.id());
         if (ban == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
+        }
 
         kick(fPlayer, fTarget, ban);
 

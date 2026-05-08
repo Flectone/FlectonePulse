@@ -13,7 +13,8 @@ public record Moderation(
         String reason,
         int moderator,
         Type type,
-        boolean valid
+        boolean valid,
+        String server
 ) {
     public static final int PERMANENT_TIME = -1;
 
@@ -25,10 +26,10 @@ public record Moderation(
             @ColumnName("time") long time,
             @ColumnName("reason") String reason,
             @ColumnName("moderator") int moderator,
-            @ColumnName("type") int typeOrdinal,
-            @ColumnName("valid") boolean valid) {
-        this(id, player, date, time, reason, moderator, Moderation.Type.values()[typeOrdinal], valid);
             @ColumnName("type") String typeName,
+            @ColumnName("valid") boolean valid,
+            @ColumnName("server") String server) {
+        this(id, player, date, time, reason, moderator, Moderation.Type.valueOf(typeName.toUpperCase()), valid, server);
     }
 
     public boolean isActive() {
@@ -40,13 +41,11 @@ public record Moderation(
     }
 
     public boolean isExpired() {
-        if (time == PERMANENT_TIME) return false;
-        return System.currentTimeMillis() > time;
+        return !isPermanent() && System.currentTimeMillis() > time;
     }
 
     public long getRemainingTime() {
-        if (time == PERMANENT_TIME) return PERMANENT_TIME;
-        return time - System.currentTimeMillis();
+        return isPermanent() ? PERMANENT_TIME : time - System.currentTimeMillis();
     }
 
     public long getOriginalTime() {

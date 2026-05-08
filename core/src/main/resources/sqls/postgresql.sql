@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS "fp_moderation" (
     "moderator" INTEGER NOT NULL,
     "type" TEXT NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
+    "server" TEXT,
     FOREIGN KEY("player") REFERENCES "fp_player"("id"),
     FOREIGN KEY("moderator") REFERENCES "fp_player"("id")
 );

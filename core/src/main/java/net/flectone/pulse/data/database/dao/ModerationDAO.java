@@ -41,11 +41,12 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      *
      * @param player the player
      * @param type the moderation type
+     * @param server the server ID
      * @return list of moderation actions, empty list if player is unknown
      */
-    public List<Moderation> get(@NonNull FPlayer player, Moderation.Type type) {
+    public List<Moderation> get(@NonNull FPlayer player, Moderation.Type type, @Nullable String server) {
         if (player.isUnknown()) return Collections.emptyList();
-        return withHandle(sql -> sql.findByPlayerAndType(player.id(), type.ordinal()));
+        return withHandle(sql -> sql.findByPlayerAndType(player.id(), type.name(), server));
     }
 
     /**
@@ -53,14 +54,16 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      *
      * @param player the player
      * @param type the moderation type
+     * @param server the server ID
      * @return list of valid moderation actions, empty list if player is unknown
      */
-    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type) {
+    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server) {
         if (player.isUnknown()) return Collections.emptyList();
         return withHandle(sql -> sql.findValidByPlayerAndType(
                 player.id(),
                 type.name(),
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                server
         ));
     }
 
@@ -68,12 +71,14 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * Gets all valid moderation actions of a type.
      *
      * @param type the moderation type
+     * @param server the server ID
      * @return list of valid moderation actions
      */
-    public List<Moderation> getValid(Moderation.Type type) {
+    public List<Moderation> getValid(Moderation.Type type, @Nullable String server) {
         return withHandle(sql -> sql.findValidByType(
                 type.name(),
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                server
         ));
     }
 
@@ -81,12 +86,14 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * Gets names of players with valid moderation actions of a type.
      *
      * @param type the moderation type
+     * @param server the server ID
      * @return list of player names
      */
-    public List<String> getValidPlayersNames(Moderation.Type type) {
+    public List<String> getValidPlayersNames(Moderation.Type type, @Nullable String server) {
         return withHandle(sql -> sql.findValidPlayerNamesByType(
                 type.name(),
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                server
         ));
     }
 
@@ -94,25 +101,26 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * Inserts a new moderation action.
      *
      * @param target the target player
+     * @param date the moderation date
      * @param time the expiration timestamp (-1 for permanent)
      * @param reason the moderation reason
      * @param moderatorId the moderator ID
      * @param type the moderation type
+     * @param server the server ID
      * @return the created moderation action, or null if player is unknown
      */
-    public @Nullable Moderation insert(@NonNull FPlayer target, long time, String reason, int moderatorId, Moderation.Type type) {
+    public @Nullable Moderation insert(@NonNull FPlayer target, long date, long time, String reason, int moderatorId, Moderation.Type type, String server) {
         if (target.isUnknown()) return null;
 
         return inTransaction(sql -> {
-            long date = System.currentTimeMillis();
             int id = sql.insert(
                     target.id(),
                     date,
                     time,
                     reason,
                     moderatorId,
-                    type.ordinal()
                     type.name(),
+                    server
             );
 
             return new Moderation(
@@ -123,7 +131,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
                     reason,
                     moderatorId,
                     type,
-                    true
+                    true,
+                    server
             );
         });
     }

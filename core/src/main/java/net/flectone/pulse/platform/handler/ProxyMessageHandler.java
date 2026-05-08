@@ -210,15 +210,21 @@ public class ProxyMessageHandler {
     private boolean handleEntityInvalidation(ModuleName tag, FEntity fEntity) {
         return switch (tag) {
             case SYSTEM_BAN -> {
-                moderationService.invalidateBans(fEntity.uuid());
+                if (!injector.getInstance(BanModule.class).config().filterByServer()) {
+                    moderationService.invalidateBans(fEntity.uuid());
+                }
                 yield true;
             }
             case SYSTEM_MUTE -> {
-                moderationService.invalidateMutes(fEntity.uuid());
+                if (!injector.getInstance(MuteModule.class).config().filterByServer()) {
+                    moderationService.invalidateMutes(fEntity.uuid());
+                }
                 yield true;
             }
             case SYSTEM_WARN -> {
-                moderationService.invalidateWarns(fEntity.uuid());
+                if (!injector.getInstance(WarnModule.class).config().filterByServer()) {
+                    moderationService.invalidateWarns(fEntity.uuid());
+                }
                 yield true;
             }
             case SYSTEM_SKIN -> {
@@ -301,6 +307,7 @@ public class ProxyMessageHandler {
 
     private void handleBanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         BanModule module = injector.getInstance(BanModule.class);
+        if (module.config().filterByServer()) return;
 
         Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -486,6 +493,7 @@ public class ProxyMessageHandler {
 
     private void handleMuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         MuteModule module = injector.getInstance(MuteModule.class);
+        if (module.config().filterByServer()) return;
 
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -519,6 +527,8 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        if (injector.getInstance(BanModule.class).config().filterByServer()) return;
+
         List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unban = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -549,6 +559,8 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnmuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        if (injector.getInstance(MuteModule.class).config().filterByServer()) return;
+
         List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unmute = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -579,6 +591,8 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnwarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        if (injector.getInstance(WarnModule.class).config().filterByServer()) return;
+
         List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unwarn = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -748,6 +762,7 @@ public class ProxyMessageHandler {
 
     private void handleWarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         WarnModule module = injector.getInstance(WarnModule.class);
+        if (module.config().filterByServer()) return;
 
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 

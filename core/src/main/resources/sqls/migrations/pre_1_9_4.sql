@@ -1,0 +1,1 @@
+ALTER TABLE `fp_moderation` RENAME TO `fp_moderation_old`;

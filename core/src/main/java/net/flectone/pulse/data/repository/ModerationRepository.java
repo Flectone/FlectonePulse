@@ -10,9 +10,11 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,12 +36,22 @@ public class ModerationRepository {
      *
      * @param player the player
      * @param type the moderation type
+     * @param server the server ID
      * @return list of valid moderation's
      */
-    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type) {
+    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server) {
         try {
             Pair<UUID, Moderation.Type> key = Pair.of(player.uuid(), type);
-            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type));
+
+            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type, server));
+
+            // cache should be saved only for backend server, i.e. who last used this method
+            if (cached.stream().anyMatch(moderation -> !Objects.equals(server, moderation.server()))) {
+                List<Moderation> newCached = moderationDAO.getValid(player, type, server);
+                moderationCache.put(key, newCached);
+                return newCached;
+            }
+
             if (cached.stream().anyMatch(Moderation::isActive)) {
                 return cached;
             }
@@ -90,44 +102,49 @@ public class ModerationRepository {
      *
      * @param fPlayer the player
      * @param type the moderation type
+     * @param server the server ID
      * @return list of all moderation's
      */
-    public List<Moderation> get(@NonNull FPlayer fPlayer, Moderation.Type type) {
-        return moderationDAO.get(fPlayer, type);
+    public List<Moderation> get(@NonNull FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        return moderationDAO.get(fPlayer, type, server);
     }
 
     /**
      * Saves a new moderation.
      *
      * @param fTarget the target player
+     * @param date the moderation date
      * @param time the expiration timestamp (-1 for permanent)
      * @param reason the moderation reason
      * @param moderatorID the moderator ID
      * @param type the moderation type
+     * @param server the server ID
      * @return the created moderation
      */
-    public Moderation save(@NonNull FPlayer fTarget, long time, String reason, int moderatorID, Moderation.Type type) {
-        return moderationDAO.insert(fTarget, time, reason, moderatorID, type);
+    public Moderation save(@NonNull FPlayer fTarget, long date, long time, String reason, int moderatorID, Moderation.Type type, String server) {
+        return moderationDAO.insert(fTarget, date, time, reason, moderatorID, type, server);
     }
 
     /**
      * Gets all valid moderation's of a type.
      *
      * @param type the moderation type
+     * @param server the server ID
      * @return list of valid moderation's
      */
-    public List<Moderation> getValid(Moderation.Type type) {
-        return moderationDAO.getValid(type);
+    public List<Moderation> getValid(Moderation.Type type, @Nullable String server) {
+        return moderationDAO.getValid(type, server);
     }
 
     /**
      * Gets names of players with valid moderation's of a type.
      *
      * @param type the moderation type
+     * @param server the server ID
      * @return list of player names
      */
-    public List<String> getValidNames(Moderation.Type type) {
-        return moderationDAO.getValidPlayersNames(type);
+    public List<String> getValidNames(Moderation.Type type, @Nullable String server) {
+        return moderationDAO.getValidPlayersNames(type, server);
     }
 
     /**

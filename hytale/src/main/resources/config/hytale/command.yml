@@ -32,6 +32,7 @@ ball:
     enable: false
 ban:
   enable: true
+  filter_by_server: false
   suggest_offline_players: true
   show_connection_attempts: true
   check_group_weight: true
@@ -554,6 +555,7 @@ me:
     enable: false
 mute:
   enable: true
+  filter_by_server: false
   suggest_offline_players: true
   check_group_weight: true
   range: "PROXY"
@@ -842,6 +844,7 @@ unwarn:
     enable: false
 warn:
   enable: true
+  filter_by_server: false
   suggest_offline_players: true
   check_group_weight: true
   range: "PROXY"
