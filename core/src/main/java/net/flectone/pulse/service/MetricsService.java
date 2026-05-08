@@ -31,6 +31,8 @@ public class MetricsService {
         Config config = fileFacade.config();
 
         return MetricsDTO.builder()
+                // we need to understand different servers, so don't use the serverUUID from FileFacade
+                // due to the user tending to copy config.yml to different servers
                 .serverUUID(platformServerAdapter.getServerUUID())
                 .serverCore(platformServerAdapter.getServerCore())
                 .serverVersion(platformServerAdapter.getServerVersionName())
