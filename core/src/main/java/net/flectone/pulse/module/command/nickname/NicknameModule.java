@@ -36,6 +36,7 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -56,13 +57,13 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     private final ModuleCommandController commandModuleController;
     private final FLogger fLogger;
 
-    private Pattern allowedPattern;
+    private Predicate<String> allowedPredicate;
 
     @Override
     public void onEnable() {
         if (!config().allowedInput().isEmpty()) {
             try {
-                allowedPattern = Pattern.compile(config().allowedInput());
+                allowedPredicate = Pattern.compile(config().allowedInput()).asMatchPredicate();
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
                 return;
@@ -151,7 +152,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     public void changeName(FPlayer fPlayer, FPlayer fTarget, String nickname) {
         boolean needClear = "clear".equalsIgnoreCase(nickname) || fTarget.name().equalsIgnoreCase(nickname);
 
-        if (!needClear && allowedPattern != null && !allowedPattern.matcher(nickname).matches()) {
+        if (!needClear && allowedPredicate != null && !allowedPredicate.test(nickname)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Nickname::nullNickname)

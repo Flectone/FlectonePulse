@@ -15,6 +15,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -27,7 +28,7 @@ public abstract class BubbleModule implements ModuleSimple {
     private final ModuleController moduleController;
     private final FLogger fLogger;
 
-    private Pattern disallowedPattern;
+    private Predicate<String> disallowedPredicate;
 
     protected BubbleModule(FileFacade fileFacade,
                            TaskScheduler taskScheduler,
@@ -62,7 +63,7 @@ public abstract class BubbleModule implements ModuleSimple {
     public void onEnable() {
         if (!config().disallowedInput().isEmpty()) {
             try {
-                disallowedPattern = Pattern.compile(config().disallowedInput());
+                disallowedPredicate = Pattern.compile(config().disallowedInput()).asMatchPredicate();
             } catch (PatternSyntaxException e) {
                 fLogger.warning(e);
                 return;
@@ -84,7 +85,7 @@ public abstract class BubbleModule implements ModuleSimple {
     }
 
     public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, List<FPlayer> receivers) {
-        if (disallowedPattern != null && disallowedPattern.matcher(rawString).matches()) return;
+        if (disallowedPredicate != null && disallowedPredicate.test(rawString)) return;
 
         taskScheduler.runRegion(fPlayer, () -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
