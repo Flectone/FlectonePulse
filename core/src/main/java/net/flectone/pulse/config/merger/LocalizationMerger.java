@@ -259,12 +259,18 @@ public interface LocalizationMerger {
 
     Localization.Message.Format.Mention mergeMessageFormatMention(@MappingTarget Localization.Message.Format.Mention.MentionBuilder target, Localization.Message.Format.Mention source);
 
+    @Mapping(target = "caps", expression = "java(mergeMessageFormatModerationCaps(target.build().caps().toBuilder(), source.caps()))")
     @Mapping(target = "delete", expression = "java(mergeMessageFormatModerationDelete(target.build().delete().toBuilder(), source.delete()))")
+    @Mapping(target = "flood", expression = "java(mergeMessageFormatModerationFlood(target.build().flood().toBuilder(), source.flood()))")
     @Mapping(target = "newbie", expression = "java(mergeMessageFormatModerationNewbie(target.build().newbie().toBuilder(), source.newbie()))")
     @Mapping(target = "swear", expression = "java(mergeMessageFormatModerationSwear(target.build().swear().toBuilder(), source.swear()))")
     Localization.Message.Format.Moderation mergeMessageFormatModeration(@MappingTarget Localization.Message.Format.Moderation.ModerationBuilder target, Localization.Message.Format.Moderation source);
 
+    Localization.Message.Format.Moderation.Caps mergeMessageFormatModerationCaps(@MappingTarget Localization.Message.Format.Moderation.Caps.CapsBuilder target, Localization.Message.Format.Moderation.Caps source);
+
     Localization.Message.Format.Moderation.Delete mergeMessageFormatModerationDelete(@MappingTarget Localization.Message.Format.Moderation.Delete.DeleteBuilder target, Localization.Message.Format.Moderation.Delete source);
+
+    Localization.Message.Format.Moderation.Flood mergeMessageFormatModerationFlood(@MappingTarget Localization.Message.Format.Moderation.Flood.FloodBuilder target, Localization.Message.Format.Moderation.Flood source);
 
     Localization.Message.Format.Moderation.Newbie mergeMessageFormatModerationNewbie(@MappingTarget Localization.Message.Format.Moderation.Newbie.NewbieBuilder target, Localization.Message.Format.Moderation.Newbie source);
 

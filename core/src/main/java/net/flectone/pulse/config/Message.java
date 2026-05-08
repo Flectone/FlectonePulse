@@ -7,10 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
-import net.flectone.pulse.config.setting.CooldownConfigSetting;
-import net.flectone.pulse.config.setting.EnableSetting;
-import net.flectone.pulse.config.setting.LocalizationSetting;
-import net.flectone.pulse.config.setting.SoundConfigSetting;
+import net.flectone.pulse.config.setting.*;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -422,8 +419,10 @@ public record Message(
             @Jacksonized
             public record Caps(
                     Boolean enable,
+                    Integer violationLimit,
+                    Long violationResetTime,
                     Double trigger
-            ) implements EnableSetting {
+            ) implements EnableSetting, ViolationSetting {
             }
 
             @With
@@ -433,6 +432,19 @@ public record Message(
                     Boolean enable,
                     Integer historyLength
             ) implements EnableSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Flood(
+                    Boolean enable,
+                    Boolean trimToSingle,
+                    Integer violationLimit,
+                    Long violationResetTime,
+                    Integer maxRepeatedSymbols,
+                    Integer maxRepeatedWords
+            ) implements EnableSetting, ViolationSetting {
             }
 
             @With
@@ -452,22 +464,13 @@ public record Message(
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Flood(
-                    Boolean enable,
-                    Boolean trimToSingle,
-                    Integer maxRepeatedSymbols,
-                    Integer maxRepeatedWords
-            ) implements EnableSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
             public record Swear(
                     Boolean enable,
+                    Integer violationLimit,
+                    Long violationResetTime,
                     List<String> ignore,
                     List<String> trigger
-            ) implements EnableSetting {
+            ) implements EnableSetting, ViolationSetting {
             }
         }
 

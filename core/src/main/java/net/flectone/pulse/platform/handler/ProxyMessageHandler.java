@@ -159,6 +159,7 @@ public class ProxyMessageHandler {
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
         if (optionalFEntity.isEmpty()) return;
         if (handleSystemCooldown(tag, input)) return;
+        if (handleSystemViolation(tag, input)) return;
 
         FEntity fEntity = optionalFEntity.get();
         if (handleEntityInvalidation(tag, fEntity)) {
@@ -248,6 +249,16 @@ public class ProxyMessageHandler {
         long newExpireTime = input.readLong();
 
         cooldownRepository.updateCache(uuid, cooldownClass, newExpireTime);
+        return true;
+    }
+
+    private boolean handleSystemViolation(ModuleName tag, DataInputStream input) throws IOException {
+        if (tag != ModuleName.SYSTEM_VIOLATION) return false;
+
+        ModerationService.ViolationKey violationKey = gson.fromJson(input.readUTF(), ModerationService.ViolationKey.class);
+        long violationValue = input.readLong();
+
+        moderationService.addViolation(violationKey, violationValue);
         return true;
     }
 

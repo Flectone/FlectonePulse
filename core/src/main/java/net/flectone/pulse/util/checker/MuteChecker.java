@@ -6,7 +6,10 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
+import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
+import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.ModerationService;
 
 @Singleton
@@ -15,15 +18,30 @@ public class MuteChecker {
 
     private final ModerationService moderationService;
     private final Provider<IntegrationModule> integrationModuleProvider;
-    private final Provider<NewbieModule> newbieModule;
+    private final Provider<CapsModule> capsModuleProvider;
+    private final Provider<FloodModule> floodModuleProvider;
+    private final Provider<NewbieModule> newbieModuleProvider;
+    private final Provider<SwearModule> swearModuleProvider;
 
     public Status check(FPlayer fPlayer) {
         if (!moderationService.getValidMutes(fPlayer).isEmpty()) {
             return Status.LOCAL;
         }
 
-        if (newbieModule.get().isNewBie(fPlayer)) {
+        if (capsModuleProvider.get().isRestricted(fPlayer.uuid())) {
+            return Status.CAPS;
+        }
+
+        if (floodModuleProvider.get().isRestricted(fPlayer.uuid())) {
+            return Status.FLOOD;
+        }
+
+        if (newbieModuleProvider.get().isNewBie(fPlayer)) {
             return Status.NEWBIE;
+        }
+
+        if (swearModuleProvider.get().isRestricted(fPlayer.uuid())) {
+            return Status.SWEAR;
         }
 
         if (integrationModuleProvider.get().isMuted(fPlayer)) {
@@ -36,7 +54,10 @@ public class MuteChecker {
     public enum Status {
         LOCAL,
         EXTERNAL,
+        CAPS,
+        FLOOD,
         NEWBIE,
+        SWEAR,
         NONE
     }
 

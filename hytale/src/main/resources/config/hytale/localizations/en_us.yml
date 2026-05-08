@@ -566,14 +566,19 @@ message:
       person: "<fcolor:2>You were mentioned!"
       format: "<fcolor:2>@<target>"
     moderation:
+      caps:
+        format_restrict: "<color:#ff7171>[!] You cannot communicate because you often used all caps (<time_left> remaining)"
       delete:
         placeholder: "<color:#ff7171><hover:show_text:\"<color:#ff7171>Click to delete message\"><click:run_command:\"/deletemessage <uuid>\">[x] "
         format: "<fcolor:3><i>Message deleted</i>"
+      flood:
+        format_restrict: "<color:#ff7171>[!] You cannot communicate because you often flooded (<time_left> remaining)"
       newbie:
-        reason: "You're still too new"
+        format_restrict: "<color:#ff7171>[!] You cannot communicate because you have played little on the server (<time_left> remaining)"
       swear:
         symbol: "*"
         format_see: "<symbols>"
+        format_restrict: "<color:#ff7171>[!] You cannot communicate because you often used offensive language (<time_left> remaining)"
     names:
       constant: []
       display:

@@ -138,6 +138,13 @@ public enum MessageFlag {
     TRANSLATE_MODULE(true),
 
     /**
+     * Enables Violation processing.
+     *
+     * @see net.flectone.pulse.service.ModerationService
+     */
+    VIOLATION_PROCESSING(true),
+
+    /**
      * Enables URL detection and processing.
      */
     URL_PROCESSING(true);

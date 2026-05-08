@@ -19,6 +19,7 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.swear.listener.PulseSwearListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -30,6 +31,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +48,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final ModerationService moderationService;
 
     @Getter private Pattern combinedPattern;
 
@@ -94,16 +97,21 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        String contextMessage = messageContext.message();
-        if (StringUtils.isEmpty(contextMessage)) return messageContext;
+        String message = messageContext.message();
+        if (StringUtils.isEmpty(message)) return messageContext;
         if (permissionChecker.check(sender, permission().bypass())) return messageContext;
 
         String formattedMessage;
         try {
-            formattedMessage = messageCache.get(contextMessage, () -> replace(contextMessage));
+            formattedMessage = messageCache.get(message, () -> replace(message));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            formattedMessage = replace(contextMessage);
+            formattedMessage = replace(message);
+        }
+
+        if (messageContext.isFlag(MessageFlag.VIOLATION_PROCESSING) && config().violationLimit() > 0
+                && messageContext.receiver().equals(messageContext.sender()) && !formattedMessage.trim().equals(message)) {
+            moderationService.addViolation(sender.uuid(), this, config());
         }
 
         return messageContext.withMessage(formattedMessage);
@@ -140,6 +148,10 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
 
             return Tag.selfClosingInserting(component);
         });
+    }
+
+    public boolean isRestricted(UUID uuid) {
+        return moduleController.isEnable(this) && moderationService.isViolationRestricted(uuid, this, config());
     }
 
     private String replace(String string) {

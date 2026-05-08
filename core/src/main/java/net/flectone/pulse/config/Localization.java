@@ -1148,8 +1148,14 @@ public record Localization(
             @Builder(toBuilder = true)
             @Jacksonized
             public record Moderation(
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/caps")
+                    Caps caps,
+
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/delete")
                     Delete delete,
+
+                    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/flood")
+                    Flood flood,
 
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/newbie")
                     Newbie newbie,
@@ -1157,6 +1163,12 @@ public record Localization(
                     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear")
                     Swear swear
             ) implements LocalizationSetting {
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Caps(String formatRestrict) implements LocalizationSetting {
+                }
 
                 @With
                 @Builder(toBuilder = true)
@@ -1170,13 +1182,19 @@ public record Localization(
                 @With
                 @Builder(toBuilder = true)
                 @Jacksonized
-                public record Newbie(String reason) implements LocalizationSetting {
+                public record Flood(String formatRestrict) implements LocalizationSetting {
                 }
 
                 @With
                 @Builder(toBuilder = true)
                 @Jacksonized
-                public record Swear(String symbol, String formatSee) implements LocalizationSetting {
+                public record Newbie(String formatRestrict) implements LocalizationSetting {
+                }
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Swear(String symbol, String formatSee, String formatRestrict) implements LocalizationSetting {
                 }
             }
 

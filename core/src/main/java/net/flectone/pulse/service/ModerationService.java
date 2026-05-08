@@ -3,32 +3,47 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.setting.ViolationSetting;
 import net.flectone.pulse.data.repository.ModerationRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationService {
 
+    private final Map<ViolationKey, List<Long>> playerViolations = new ConcurrentHashMap<>();
+
     private final ModerationRepository moderationRepository;
     private final IntegrationModule integrationModule;
     private final FileFacade fileFacade;
+    private final ProxySender proxySender;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
+        playerViolations.clear();
     }
 
     public void invalidate(UUID uuid) {
         moderationRepository.invalidateAll(uuid);
+        Arrays.stream(MuteChecker.Status.values()).forEach(status -> playerViolations.remove(Pair.of(uuid, status)));
     }
 
     public void invalidateMutes(UUID uuid) {
@@ -111,6 +126,56 @@ public class ModerationService {
         return moderationRepository.save(fPlayer, date, time, reason, moderator, type, server);
     }
 
+    public void addViolation(UUID uuid, ModuleSimple moduleSimple, ViolationSetting violationSetting) {
+        // create key
+        ViolationKey violationKey = new ViolationKey(uuid, moduleSimple.name());
+
+        // create value
+        long violationValue = System.currentTimeMillis() + violationSetting.violationResetTime() * TimeFormatter.MULTIPLIER;
+
+        // save to cache
+        addViolation(violationKey, violationValue);
+
+        // send to proxy
+        proxySender.send(FPlayer.UNKNOWN, ModuleName.SYSTEM_VIOLATION, outputStream -> {
+            outputStream.writeAsJson(violationKey);
+            outputStream.writeLong(violationValue);
+        }, UUID.randomUUID());
+    }
+
+    public void addViolation(ViolationKey violationKey, Long violationValue) {
+        // get timestamps
+        List<Long> timestamps = playerViolations.getOrDefault(violationKey, new CopyOnWriteArrayList<>());
+
+        // get current time
+        long currentTimestamp = System.currentTimeMillis();
+
+        // remove old timestamps
+        timestamps.removeIf(timestamp -> currentTimestamp > timestamp);
+
+        // add new timestamp
+        timestamps.add(violationValue);
+
+        // save to cache
+        playerViolations.put(violationKey, timestamps);
+    }
+
+    public boolean isViolationRestricted(UUID uuid, ModuleSimple moduleSimple, ViolationSetting violationSetting) {
+        List<Long> timestamps = playerViolations.get(Pair.of(uuid, moduleSimple.name()));
+        if (timestamps == null || timestamps.isEmpty()) return false;
+
+        long currentTimestamp = System.currentTimeMillis();
+        return timestamps.stream().filter(timestamp -> timestamp > currentTimestamp).count() >= violationSetting.violationLimit();
+    }
+
+    public Long getFirstViolationTimestamp(UUID uuid, ModuleSimple moduleSimple) {
+        List<Long> timestamps = playerViolations.get(Pair.of(uuid, moduleSimple.name()));
+        if (timestamps == null || timestamps.isEmpty()) return null;
+
+        return timestamps.getLast();
+    }
+
+
     @Nullable
     public Moderation remove(FPlayer fPlayer, List<Moderation> moderations) {
         return remove(fPlayer, moderations, "", fileFacade.config().serverUuid());
@@ -167,4 +232,9 @@ public class ModerationService {
                 ? fileFacade.config().serverUuid()
                 : null;
     }
+
+    public record ViolationKey(
+            UUID sender,
+            ModuleName module
+    ){}
 }

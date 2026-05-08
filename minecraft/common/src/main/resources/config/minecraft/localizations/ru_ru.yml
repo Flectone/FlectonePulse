@@ -595,14 +595,19 @@ message:
       person: "<fcolor:2>Тебя упомянули!"
       format: "<fcolor:2>@<target>"
     moderation:
+      caps:
+        format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что часто писал капсом (<time_left> осталось)"
       delete:
         placeholder: "<color:#ff7171><hover:show_text:\"<color:#ff7171>Нажми, чтобы удалить\"><click:run_command:\"/deletemessage <uuid>\">[x] "
         format: "<fcolor:3><i>Сообщение удалено</i>"
+      flood:
+        format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что часто флудил (<time_left> осталось)"
       newbie:
-        reason: "Ты ещё слишком новичок"
+        format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что мало играл на сервере (<time_left> осталось)"
       swear:
         symbol: "❤"
         format_see: "<hover:show_text:\"<swear>\"><symbols></hover>"
+        format_restrict: "<color:#ff7171>🔒 Ты не можешь общаться, потому что часто обзывался (<time_left> осталось)"
     names:
       constant: []
       display:

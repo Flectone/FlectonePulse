@@ -187,21 +187,27 @@ format:
     enable: true
     caps:
       enable: false
+      violation_limit: 5
+      violation_reset_time: 200
       trigger: 0.7
     delete:
       enable: false
       history_length: 100
+    flood:
+      enable: false
+      trim_to_single: false
+      violation_limit: 5
+      violation_reset_time: 200
+      max_repeated_symbols: 10
+      max_repeated_words: 2
     newbie:
       enable: false
       mode: "PLAYED_TIME"
       timeout: 3600
-    flood:
-      enable: false
-      trim_to_single: false
-      max_repeated_symbols: 10
-      max_repeated_words: 2
     swear:
       enable: false
+      violation_limit: 5
+      violation_reset_time: 200
       ignore:
       - "тебя"
       - "тебе"

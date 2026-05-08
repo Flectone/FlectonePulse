@@ -11,7 +11,10 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
+import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
+import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.MuteChecker;
@@ -29,20 +32,86 @@ public class ModerationMessageFormatter {
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
     private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<CapsModule> capsModuleProvider;
+    private final Provider<FloodModule> floodModuleProvider;
     private final Provider<NewbieModule> newbieModuleProvider;
+    private final Provider<SwearModule> swearModuleProvider;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
 
-    public String replacePlaceholders(String message,
-                                      String moderationId,
-                                      String reason,
-                                      String date,
-                                      String time,
-                                      String timeLeft) {
-        return StringUtils.replaceEach(message,
-                new String[]{"<id>", "<reason>", "<date>", "<time>", "<time_left>"},
-                new String[]{moderationId, reason, date, time, timeLeft}
-        );
+    public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
+        return switch (status) {
+            case LOCAL -> {
+                List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
+                if (mutes.isEmpty()) yield Optional.empty();
+
+                String format = fileFacade.localization(fPlayer).command().mute().person();
+
+                Moderation mute = mutes.getFirst();
+
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())));
+
+                yield Optional.of(muteContext);
+            }
+            case EXTERNAL -> {
+                ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
+                if (mute == null) yield Optional.empty();
+
+                String format = fileFacade.localization(fPlayer).command().mute().person();
+
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
+
+                yield Optional.of(muteContext);
+            }
+            case CAPS -> {
+                CapsModule capsModule = capsModuleProvider.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), capsModule);
+                if (timestamp == null) yield Optional.empty();
+
+                String format = capsModule.localization(fPlayer).formatRestrict();
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                yield Optional.of(muteContext);
+            }
+            case FLOOD -> {
+                FloodModule floodModule = floodModuleProvider.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), floodModule);
+                if (timestamp == null) yield Optional.empty();
+
+                String format = floodModule.localization(fPlayer).formatRestrict();
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                yield Optional.of(muteContext);
+            }
+            case NEWBIE -> {
+                NewbieModule newbieModule = newbieModuleProvider.get();
+
+                ExternalModeration mute = newbieModule.getModeration(fPlayer);
+                if (mute == null) yield Optional.empty();
+
+                String format = newbieModule.localization(fPlayer).formatRestrict();
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                yield Optional.of(muteContext);
+            }
+            case SWEAR -> {
+                SwearModule swearModule = swearModuleProvider.get();
+                Long timestamp = moderationService.getFirstViolationTimestamp(fPlayer.uuid(), swearModule);
+                if (timestamp == null) yield Optional.empty();
+
+                String format = swearModule.localization(fPlayer).formatRestrict();
+                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
+                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                yield Optional.of(muteContext);
+            }
+            default -> Optional.empty();
+        };
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
@@ -59,65 +128,35 @@ public class ModerationMessageFormatter {
         };
 
         String reason = constantReasons.getConstant(moderation.reason());
-        String date = timeFormatter.formatDate(moderation.date());
-        String time = moderation.isPermanent()
-                ? localization.time().permanent()
-                : timeFormatter.format(fReceiver, moderation.getOriginalTime());
-        String timeLeft = moderation.isPermanent()
-                ? localization.time().permanent()
-                : timeFormatter.format(fReceiver, moderation.getRemainingTime());
-
-        return replacePlaceholders(message, String.valueOf(moderation.id()), reason, date, time, timeLeft);
+        return replacePlaceholders(message, fReceiver, moderation.id(), moderation.date(), moderation.time(), reason, moderation.isPermanent());
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
-        Localization localization = fileFacade.localization(fReceiver);
-
-        String date = timeFormatter.formatDate(moderation.date());
-        String time = moderation.permanent()
-                ? localization.time().permanent()
-                : timeFormatter.format(fReceiver, moderation.time());
-        String timeLeft = moderation.permanent()
-                ? localization.time().permanent()
-                : timeFormatter.format(fReceiver, moderation.time() - System.currentTimeMillis());
-
-        return replacePlaceholders(message, String.valueOf(moderation.moderationId()), moderation.reason(), date, time, timeLeft);
+        return replacePlaceholders(message, fReceiver, moderation.moderationId(), moderation.date(), moderation.time(), moderation.reason(), moderation.permanent());
     }
 
-    public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
-        String format = fileFacade.localization(fPlayer).command().mute().person();
+    public String replacePlaceholders(String message, FPlayer fReceiver, Long timestamp) {
+        return replacePlaceholders(message, fReceiver, -1, System.currentTimeMillis(), timestamp, "", false);
+    }
 
-        return switch (status) {
-            case LOCAL -> {
-                List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
-                if (mutes.isEmpty()) yield Optional.empty();
+    public String replacePlaceholders(String message, FPlayer fReceiver, long moderationId, long date, long time, String reason, boolean permanent) {
+        Localization localization = fileFacade.localization(fReceiver);
 
-                Moderation mute = mutes.getFirst();
+        String formatDate = timeFormatter.formatDate(date);
+        String formatTime = permanent
+                ? localization.time().permanent()
+                : timeFormatter.format(fReceiver, (Math.abs(date - time) + 500) / 1000 * 1000);
+        String formatTimeLeft = permanent
+                ? localization.time().permanent()
+                : timeFormatter.format(fReceiver, time - System.currentTimeMillis());
 
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())));
+        return replacePlaceholders(message, String.valueOf(moderationId), reason, formatDate, formatTime, formatTimeLeft);
+    }
 
-                yield Optional.of(muteContext);
-            }
-            case EXTERNAL -> {
-                ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
-                if (mute == null) yield Optional.empty();
-
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
-
-                yield Optional.of(muteContext);
-            }
-            case NEWBIE -> {
-                ExternalModeration mute = newbieModuleProvider.get().getModeration(fPlayer);
-                if (mute == null) yield Optional.empty();
-
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
-
-                yield Optional.of(muteContext);
-            }
-            default -> Optional.empty();
-        };
+    public String replacePlaceholders(String message, String moderationId, String reason, String date, String time, String timeLeft) {
+        return StringUtils.replaceEach(message,
+                new String[]{"<id>", "<reason>", "<date>", "<time>", "<time_left>"},
+                new String[]{moderationId, reason, date, time, timeLeft}
+        );
     }
 }
