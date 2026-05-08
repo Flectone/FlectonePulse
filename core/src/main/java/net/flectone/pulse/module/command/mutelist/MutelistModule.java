@@ -147,7 +147,7 @@ public class MutelistModule implements ModuleCommand<Localization.Command.Muteli
         for (Moderation moderation : finalModerationList) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
-            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name() + " <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)

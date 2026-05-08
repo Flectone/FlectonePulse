@@ -147,7 +147,7 @@ public class WarnlistModule implements ModuleCommand<Localization.Command.Warnli
         for (Moderation moderation : finalModerationList) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
-            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unwarnModule) + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unwarnModule) + " " + fTarget.name() + " <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)

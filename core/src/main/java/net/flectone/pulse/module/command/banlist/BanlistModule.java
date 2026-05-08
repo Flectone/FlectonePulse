@@ -147,7 +147,7 @@ public class BanlistModule implements ModuleCommand<Localization.Command.Banlist
         for (Moderation moderation : finalModerationList) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
-            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.line(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name() + " <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
