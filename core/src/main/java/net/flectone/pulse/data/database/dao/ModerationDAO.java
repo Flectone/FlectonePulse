@@ -59,7 +59,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
         if (player.isUnknown()) return Collections.emptyList();
         return withHandle(sql -> sql.findValidByPlayerAndType(
                 player.id(),
-                type.ordinal(),
+                type.name(),
                 System.currentTimeMillis()
         ));
     }
@@ -72,7 +72,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      */
     public List<Moderation> getValid(Moderation.Type type) {
         return withHandle(sql -> sql.findValidByType(
-                type.ordinal(),
+                type.name(),
                 System.currentTimeMillis()
         ));
     }
@@ -85,7 +85,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      */
     public List<String> getValidPlayersNames(Moderation.Type type) {
         return withHandle(sql -> sql.findValidPlayerNamesByType(
-                type.ordinal(),
+                type.name(),
                 System.currentTimeMillis()
         ));
     }
@@ -112,6 +112,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
                     reason,
                     moderatorId,
                     type.ordinal()
+                    type.name(),
             );
 
             return new Moderation(

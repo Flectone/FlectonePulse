@@ -28,6 +28,7 @@ public record Moderation(
             @ColumnName("type") int typeOrdinal,
             @ColumnName("valid") boolean valid) {
         this(id, player, date, time, reason, moderator, Moderation.Type.values()[typeOrdinal], valid);
+            @ColumnName("type") String typeName,
     }
 
     public boolean isActive() {

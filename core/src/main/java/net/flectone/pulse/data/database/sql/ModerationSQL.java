@@ -25,7 +25,7 @@ public interface ModerationSQL extends SQL {
      * @return list of moderation's
      */
     @SqlQuery("SELECT * FROM `fp_moderation` WHERE `player` = :player AND `type` = :type")
-    List<Moderation> findByPlayerAndType(@Bind("player") int playerId, @Bind("type") int type);
+    List<Moderation> findByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type);
 
     /**
      * Finds valid moderation's for a player by type.
@@ -36,7 +36,7 @@ public interface ModerationSQL extends SQL {
      * @return list of valid moderation's
      */
     @SqlQuery("SELECT * FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime)")
-    List<Moderation> findValidByPlayerAndType(@Bind("player") int playerId, @Bind("type") int type, @Bind("currentTime") long currentTime);
+    List<Moderation> findValidByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("currentTime") long currentTime);
 
     /**
      * Finds valid moderation's by type.
@@ -46,7 +46,7 @@ public interface ModerationSQL extends SQL {
      * @return list of valid moderation's
      */
     @SqlQuery("SELECT * FROM `fp_moderation` WHERE `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime)")
-    List<Moderation> findValidByType(@Bind("type") int type, @Bind("currentTime") long currentTime);
+    List<Moderation> findValidByType(@Bind("type") String type, @Bind("currentTime") long currentTime);
 
     /**
      * Finds player names with valid moderation's by type.
@@ -56,7 +56,7 @@ public interface ModerationSQL extends SQL {
      * @return list of player names
      */
     @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime)")
-    List<String> findValidPlayerNamesByType(@Bind("type") int type, @Bind("currentTime") long currentTime);
+    List<String> findValidPlayerNamesByType(@Bind("type") String type, @Bind("currentTime") long currentTime);
 
     /**
      * Inserts a new moderation.
@@ -70,8 +70,8 @@ public interface ModerationSQL extends SQL {
      * @return the generated moderation ID
      */
     @GetGeneratedKeys("id")
-    @SqlUpdate("INSERT INTO `fp_moderation` (`player`, `date`, `time`, `reason`, `moderator`, `type`, `valid`) VALUES (:player, :date, :time, :reason, :moderator, :type, true)")
-    int insert(@Bind("player") int playerId, @Bind("date") long date, @Bind("time") long time, @Bind("reason") String reason, @Bind("moderator") int moderatorId, @Bind("type") int type);
+    @SqlUpdate("INSERT INTO `fp_moderation` (`player`, `date`, `time`, `reason`, `moderator`, `type`, `valid`, `server`) VALUES (:player, :date, :time, :reason, :moderator, :type, true, :server)")
+    int insert(@Bind("player") int playerId, @Bind("date") long date, @Bind("time") long time, @Bind("reason") String reason, @Bind("moderator") int moderatorId, @Bind("type") String type, @Bind("server") String server);
 
     /**
      * Invalidates a moderation.

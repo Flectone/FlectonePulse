@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `fp_moderation` (
 	`time` BIGINT NOT NULL,
 	`reason` TEXT,
 	`moderator` INTEGER NOT NULL,
-    `type` INTEGER NOT NULL,
+    `type` TEXT NOT NULL,
     `valid` INTEGER NOT NULL DEFAULT '1',
 FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
 FOREIGN KEY(`moderator`) REFERENCES `fp_player`(`id`)
