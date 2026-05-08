@@ -13,13 +13,10 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -28,29 +25,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PlatformServerAdapter platformServerAdapter;
     private final ModuleController moduleController;
-    private final FLogger fLogger;
-
-    @Override
-    public void onEnable() {
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                && config().mode() == Message.Format.Moderation.Newbie.Mode.PLAYED_TIME) {
-            fLogger.warning("Newbie module with Mode PLAYED_TIME is not supported on Fabric, SINCE_JOIN will be used");
-
-            fileFacade.updateFilePack(filePack -> filePack.withMessage(
-                    filePack.message().withFormat(
-                            filePack.message().format().withModeration(
-                                    filePack.message().format().moderation().withNewbie(
-                                            filePack.message().format().moderation().newbie().withMode(
-                                                    Message.Format.Moderation.Newbie.Mode.SINCE_JOIN
-                                            )
-                                    )
-                            )
-                    )
-            ));
-        }
-    }
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
