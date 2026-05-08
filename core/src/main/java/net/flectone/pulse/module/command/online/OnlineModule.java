@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -73,7 +74,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (_, _) -> Arrays.stream(Type.values())
+        return (_, _) -> Arrays.stream(TimeType.values())
                 .map(type -> Suggestion.suggestion(type.name().toLowerCase()))
                 .toList();
     }
@@ -106,16 +107,16 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                         .format(localization -> switch (type.toUpperCase()) {
                             case "FIRST" -> timeFormatter.format(
                                     fPlayer,
-                                    Type.FIRST.getTime(fPlayer, playTime),
+                                    TimeType.FIRST.getTime(fPlayer, playTime),
                                     localization.formatFirst()
                             );
                             case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
                                     ? localization.formatCurrent()
-                                    : timeFormatter.format(fPlayer, Type.LAST.getTime(fPlayer, playTime), localization.formatLast());
+                                    : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
                             default -> Strings.CS.replace(
                                     timeFormatter.format(
                                             fPlayer,
-                                            type.equalsIgnoreCase("TOTAL") ? Type.TOTAL.getTime(fPlayer, playTime) : Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
+                                            type.equalsIgnoreCase("TOTAL") ? TimeType.TOTAL.getTime(fPlayer, playTime) : TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
                                             localization.formatTotal()
                                     ),
                                     "<sessions>",
@@ -173,14 +174,14 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
             time = time.substring(0, lastIndex);
         }
 
-        Optional<OnlineModule.Type> optionalType = OnlineModule.Type.fromString(time);
+        Optional<TimeType> optionalType = TimeType.fromString(time);
         if (optionalType.isEmpty()) return "";
 
-        OnlineModule.Type type = optionalType.get();
+        TimeType type = optionalType.get();
         return lastIndex != -1 ? getTimeFormatted(fPlayer, fReceiver, type) : String.valueOf(getTime(fPlayer, type));
     }
 
-    public int getTime(FPlayer fPlayer, Type type) {
+    public int getTime(FPlayer fPlayer, TimeType type) {
         if (moduleController.isDisabledFor(this, fPlayer)) return 0;
 
         PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
@@ -190,47 +191,11 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     }
 
     @NonNull
-    public String getTimeFormatted(FPlayer fPlayer, FPlayer fReceiver, Type type) {
+    public String getTimeFormatted(FPlayer fPlayer, FPlayer fReceiver, TimeType type) {
         int time = getTime(fPlayer, type);
         if (time == 0) return "";
 
         return timeFormatter.format(fReceiver, time * 1000L);
-    }
-
-    public enum Type {
-        FIRST {
-            @Override
-            public long getTime(FPlayer fPlayer, PlayTime playTime) {
-                return System.currentTimeMillis() - playTime.first();
-            }
-        },
-        LAST {
-            @Override
-            public long getTime(FPlayer fPlayer, PlayTime playTime) {
-                return System.currentTimeMillis() - (playTime.last() > 0 ? playTime.last() : playTime.last() * -1);
-            }
-        },
-        TOTAL {
-            @Override
-            public long getTime(FPlayer fPlayer, PlayTime playTime) {
-                return playTime.total();
-            }
-        },
-        TOTAL_DYNAMIC {
-            @Override
-            public long getTime(FPlayer fPlayer, PlayTime playTime) {
-                return playTime.total() + (fPlayer.isOnline() && playTime.last() > 0 ? System.currentTimeMillis() - playTime.last() : 0);
-            }
-        };
-
-        public abstract long getTime(FPlayer fPlayer, PlayTime playTime);
-
-        public static Optional<Type> fromString(String string) {
-            return Arrays.stream(Type.values())
-                    .filter(type -> type.name().equalsIgnoreCase(string))
-                    .findFirst();
-        }
-
     }
 
 }

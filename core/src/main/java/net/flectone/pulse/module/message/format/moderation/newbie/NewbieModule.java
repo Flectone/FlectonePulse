@@ -13,12 +13,12 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -63,8 +63,8 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         if (playTime == null) return false;
 
         long timeToCheck = switch (config().mode()) {
-            case SINCE_JOIN -> OnlineModule.Type.FIRST.getTime(fPlayer, playTime);
-            case PLAYED_TIME -> OnlineModule.Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime);
+            case SINCE_JOIN -> TimeType.FIRST.getTime(fPlayer, playTime);
+            case PLAYED_TIME -> TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime);
         };
 
         long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
@@ -83,7 +83,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
 
         long moderationTime = switch (config().mode()) {
             case SINCE_JOIN -> firstPlayed + timeout;
-            case PLAYED_TIME -> System.currentTimeMillis() + (timeout - OnlineModule.Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime));
+            case PLAYED_TIME -> System.currentTimeMillis() + (timeout - TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime));
         };
 
         return new ExternalModeration(fPlayer.name(),
