@@ -14,6 +14,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -26,6 +27,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
+    private final FPlayerService fPlayerService;
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
@@ -78,7 +80,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         };
 
         return new ExternalModeration(fPlayer.name(),
-                FEntity.UNKNOWN_NAME,
+                fPlayerService.getConsole().name(),
                 localization().formatRestrict(),
                 1,
                 firstPlayed,
