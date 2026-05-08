@@ -930,7 +930,17 @@ public class FileMigrator {
             newLocalizations.put(localization.language(), localization);
         }
 
-        return files.withLocalizations(newLocalizations);
+        return files
+                .withLocalizations(newLocalizations)
+                .withMessage(files.message()
+                        .withFormat(files.message().format()
+                                .withModeration(files.message().format().moderation()
+                                        .withNewbie(files.message().format().moderation().newbie()
+                                                .withTimeout(files.message().format().moderation().newbie().timeout() * 20L)
+                                        )
+                                )
+                        )
+                );
     }
 
 }

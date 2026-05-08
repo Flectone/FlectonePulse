@@ -213,7 +213,7 @@ format:
     newbie:
       enable: false
       mode: "PLAYED_TIME"
-      timeout: 3600
+      timeout: 72000
     swear:
       enable: false
       violation_limit: 5

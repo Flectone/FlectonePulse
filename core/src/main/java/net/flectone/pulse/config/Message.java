@@ -453,7 +453,7 @@ public record Message(
             public record Newbie(
                     Boolean enable,
                     Mode mode,
-                    long timeout
+                    Long timeout
             ) implements EnableSetting {
                 public enum Mode {
                     PLAYED_TIME,

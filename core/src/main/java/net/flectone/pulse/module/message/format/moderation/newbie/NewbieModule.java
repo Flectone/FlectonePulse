@@ -14,6 +14,7 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -63,7 +64,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
             case PLAYED_TIME -> platformPlayerAdapter.getAllTimePlayed(fPlayer);
         };
 
-        long timeout = config().timeout() * 1000L;
+        long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
 
         return timeToCheck <= timeout;
     }
@@ -71,7 +72,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     public ExternalModeration getModeration(FPlayer fPlayer) {
         if (!isNewBie(fPlayer)) return null;
 
-        long timeout = config().timeout() * 1000L;
+        long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
         long firstPlayed = platformPlayerAdapter.getFirstPlayed(fPlayer);
 
         long moderationTime = switch (config().mode()) {
