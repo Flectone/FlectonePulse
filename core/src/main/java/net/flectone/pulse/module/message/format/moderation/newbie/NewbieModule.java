@@ -104,7 +104,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
 
         return new ExternalModeration(fPlayer.name(),
                 FEntity.UNKNOWN_NAME,
-                localization().reason(),
+                localization().formatRestrict(),
                 1,
                 firstPlayed,
                 moderationTime,
