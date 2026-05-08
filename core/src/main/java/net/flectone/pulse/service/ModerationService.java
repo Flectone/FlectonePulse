@@ -7,6 +7,8 @@ import net.flectone.pulse.data.repository.ModerationRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -39,14 +41,17 @@ public class ModerationService {
         moderationRepository.invalidate(uuid, Moderation.Type.WARN);
     }
 
+    @Nullable
     public Moderation ban(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.BAN);
     }
 
+    @Nullable
     public Moderation mute(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.MUTE);
     }
 
+    @Nullable
     public Moderation warn(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WARN);
     }
@@ -87,24 +92,41 @@ public class ModerationService {
         return moderationRepository.getValidNames(type);
     }
 
+    @Nullable
     public Moderation kick(FPlayer fPlayer, String reason, int moderator) {
         return moderationRepository.save(fPlayer, -1, reason, moderator, Moderation.Type.KICK);
     }
 
+    @Nullable
     public Moderation add(FPlayer fPlayer, long time, String reason, int moderator, Moderation.Type type) {
         moderationRepository.invalidate(fPlayer.uuid(), type);
 
         return moderationRepository.save(fPlayer, time, reason, moderator, type);
     }
 
-    public void remove(FPlayer fPlayer, List<Moderation> moderations) {
-        if (moderations.isEmpty()) return;
+    @Nullable
+    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations) {
+        return remove(fPlayer, moderations, "");
+    }
 
-        moderationRepository.invalidate(fPlayer.uuid(), moderations.getFirst().type());
+    @Nullable
+    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason) {
+        if (moderations.isEmpty()) return null;
+
+        Moderation firstModeration = moderations.getFirst();
+        moderationRepository.invalidate(fPlayer.uuid(), firstModeration.type());
 
         for (Moderation moderation : moderations) {
             moderationRepository.updateValid(moderation.withValid(false));
         }
+
+        // save to un-moderation database
+        return moderationRepository.save(fPlayer, -1, reason, firstModeration.moderator(), switch (firstModeration.type()) {
+            case BAN -> Moderation.Type.UNBAN;
+            case MUTE -> Moderation.Type.UNMUTE;
+            case WARN -> Moderation.Type.UNWARN;
+            default -> throw new IllegalArgumentException("Unknown un-moderation type: " + firstModeration.type());
+        });
     }
 
     public boolean isAllowedTime(FPlayer fPlayer, long time, Map<Integer, Long> timeLimits) {

@@ -406,17 +406,23 @@ command:
     null_player: "<color:#ff7171>Игрок не найден"
     not_banned: "<color:#ff7171>Игрок не заблокирован"
     lower_weight_group: "<color:#ff7171>Ты не можешь разбанить игрока с такими же или большими правами"
-    format: "<color:#98FB98><moderator> разблокировал игрока <display_name>"
+    reasons:
+      default: "Ты разблокирован на этом сервере"
+    format: "<color:#98FB98><moderator> разблокировал игрока <display_name> <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   unmute:
     null_player: "<color:#ff7171>Игрок не найден"
     not_muted: "<color:#ff7171>Игрок не замучен"
     lower_weight_group: "<color:#ff7171>Ты не можешь размутить игрока с такими же или большими правами"
-    format: "<color:#98FB98><moderator> размутил игрока <display_name>"
+    reasons:
+      default: "Ты был размучен на сервере"
+    format: "<color:#98FB98><moderator> размутил игрока <display_name> <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   unwarn:
     null_player: "<color:#ff7171>Игрок не найден"
     not_warned: "<color:#ff7171>Игрок не имеет предупреждений"
     lower_weight_group: "<color:#ff7171>Ты не можешь снять предупреждение с игрока с такими же или большими правами"
-    format: "<color:#98FB98><moderator> снял предупреждение с игрока <display_name>"
+    reasons:
+      default: "С тебя сняли предупреждение"
+    format: "<color:#98FB98><moderator> снял предупреждение с игрока <display_name> <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   warn:
     null_player: "<color:#ff7171>Игрок не найден"
     null_time: "<color:#ff7171>Невозможное время"

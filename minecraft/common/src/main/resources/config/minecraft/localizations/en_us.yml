@@ -406,17 +406,23 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not banned"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unban a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <moderator> unbanned the player <display_name>"
+    reasons:
+      default: "You have been unbanned on the server"
+    format: "<color:#98FB98>🔓 <moderator> unbanned the player <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   unmute:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not muted"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unmute a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <moderator> unmutted the player <display_name>"
+    reasons:
+      default: "You have been unmuted on the server"
+    format: "<color:#98FB98>🔓 <moderator> unmutted the player <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   unwarn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     not_warned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player is not warned"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot unwarn a player with equal or higher permissions"
-    format: "<color:#98FB98>🔓 <moderator> unwarned the player <display_name>"
+    reasons:
+      default: "You have been unwarned on the server"
+    format: "<color:#98FB98>🔓 <moderator> unwarned the player <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
   warn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"

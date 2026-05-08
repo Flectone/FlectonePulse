@@ -406,17 +406,23 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     not_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не заблокирован"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь разбанить игрока с такими же или большими правами"
-    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> разблокировал игрока <display_name>"
+    reasons:
+      default: "Ты разблокирован на этом сервере"
+    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> разблокировал игрока <fcolor:1><display_name> <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
   unmute:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     not_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не замучен"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь размутить игрока с такими же или большими правами"
-    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> размутил игрока <display_name>"
+    reasons:
+      default: "Ты был размучен на сервере"
+    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> размутил игрока <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
   unwarn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     not_warned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не имеет предупреждений"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Ты не можешь снять предупреждение с игрока с такими же или большими правами"
-    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> снял предупреждение с игрока <display_name>"
+    reasons:
+      default: "С тебя сняли предупреждение"
+    format: "<color:#98FB98>🔓 <moderator><color:#98FB98> снял предупреждение с игрока <display_name> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
   warn:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игрок не найден"
     null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Невозможное время"

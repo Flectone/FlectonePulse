@@ -60,6 +60,9 @@ public record Moderation(
         MUTE,
         BAN,
         WARN,
-        KICK
+        KICK,
+        UNMUTE,
+        UNBAN,
+        UNWARN
     }
 }

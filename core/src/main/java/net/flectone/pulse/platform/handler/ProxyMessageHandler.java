@@ -519,18 +519,23 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        Moderation unban = gson.fromJson(input.readUTF(), Moderation.class);
+
         UnbanModule module = injector.getInstance(UnbanModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
+        FPlayer fModerator = fPlayerService.getFPlayer(unban.moderator());
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
-        List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
         messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(Localization.Command.Unban::format)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unban)
+                        )
                         .destination(fileFacade.command().unban().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
@@ -544,18 +549,23 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnmuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        Moderation unmute = gson.fromJson(input.readUTF(), Moderation.class);
+
         UnmuteModule module = injector.getInstance(UnmuteModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
+        FPlayer fModerator = fPlayerService.getFPlayer(unmute.moderator());
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
-        List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
         messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .base(EventMetadata.<Localization.Command.Unmute>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(Localization.Command.Unmute::format)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unmute)
+                        )
                         .destination(fileFacade.command().unmute().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())
@@ -569,18 +579,23 @@ public class ProxyMessageHandler {
     }
 
     private void handleUnwarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        Moderation unwarn = gson.fromJson(input.readUTF(), Moderation.class);
+
         UnwarnModule module = injector.getInstance(UnwarnModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.FPlayerImpl.class);
+        FPlayer fModerator = fPlayerService.getFPlayer(unwarn.moderator());
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
-        List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
         messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .uuid(metadataUUID)
                         .sender(fEntity)
-                        .format(Localization.Command.Unwarn::format)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unwarn)
+                        )
                         .destination(fileFacade.command().unwarn().destination())
                         .range(Range.get(Range.Type.SERVER))
                         .sound(module.soundOrThrow())

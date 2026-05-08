@@ -779,6 +779,7 @@ public record Localization(
                 String nullPlayer,
                 String notBanned,
                 String lowerWeightGroup,
+                ReasonMap reasons,
                 String format
         ) implements LocalizationSetting {
         }
@@ -790,6 +791,7 @@ public record Localization(
                 String nullPlayer,
                 String notMuted,
                 String lowerWeightGroup,
+                ReasonMap reasons,
                 String format
         ) implements LocalizationSetting {
         }
@@ -801,6 +803,7 @@ public record Localization(
                 String nullPlayer,
                 String notWarned,
                 String lowerWeightGroup,
+                ReasonMap reasons,
                 String format
         ) implements LocalizationSetting {
         }

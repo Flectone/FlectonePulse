@@ -50,8 +50,11 @@ public class ModerationMessageFormatter {
 
         Localization.ReasonMap constantReasons = switch (moderation.type()) {
             case BAN -> localization.command().ban().reasons();
+            case UNBAN -> localization.command().unban().reasons();
             case MUTE -> localization.command().mute().reasons();
+            case UNMUTE -> localization.command().unmute().reasons();
             case WARN -> localization.command().warn().reasons();
+            case UNWARN -> localization.command().unwarn().reasons();
             case KICK -> localization.command().kick().reasons();
         };
 

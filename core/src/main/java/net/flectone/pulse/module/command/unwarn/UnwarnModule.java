@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -24,6 +25,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -36,6 +38,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
+    private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final MessagePipeline messagePipeline;
@@ -46,11 +49,11 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
     @Override
     public void onEnable() {
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
-        String promptId = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::id);
+        String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
                 .required(promptPlayer, commandParserProvider.warnedParser())
-                .optional(promptId, commandParserProvider.integerParser())
+                .optional(promptReason, commandParserProvider.messageParser())
         );
     }
 
@@ -65,11 +68,18 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
 
         String target = commandModuleController.getArgument(this, commandContext, 0);
 
-        String promptId = commandModuleController.getPrompt(this, 1);
-        Optional<Integer> optionalId = commandContext.optional(promptId);
-        int id = optionalId.orElse(-1);
+        String promptReason = commandModuleController.getPrompt(this, 1);
+        Optional<String> optionalReason = commandContext.optional(promptReason);
+        String reason = optionalReason.orElse("");
+        String[] reasonWords = reason.split(" ");
 
-        unwarn(fPlayer, target, id);
+        int id = -1;
+        if (reasonWords.length > 0 && StringUtils.isNumeric(reasonWords[0])) {
+            id = Integer.parseInt(reasonWords[0]);
+            reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
+        }
+
+        unwarn(fPlayer, target, id, reason);
     }
 
     @Override
@@ -92,7 +102,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
         return fileFacade.localization(sender).command().unwarn();
     }
 
-    public void unwarn(FPlayer fPlayer, String target, int id) {
+    public void unwarn(FPlayer fPlayer, String target, int id, String reason) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
@@ -137,20 +147,23 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        moderationService.remove(fTarget, warns);
+        Moderation unwarn = moderationService.remove(fTarget, warns);
+        if (unwarn == null) return;
 
         proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
                         .sender(fTarget)
-                        .format(Localization.Command.Unwarn::format)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unwarn)
+                        )
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
                         .proxy(dataOutputStream -> {
-                            dataOutputStream.writeAsJson(fPlayer);
                             dataOutputStream.writeAsJson(warns);
+                            dataOutputStream.writeAsJson(unwarn);
                         })
                         .integration()
                         .tagResolvers(fResolver -> new TagResolver[]{
