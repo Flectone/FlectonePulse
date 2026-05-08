@@ -19,6 +19,8 @@
     <a href="https://papermc.io/"><img src="https://flectone.net/pulse/paper.svg" alt="paper" class="hover-brightness"></a>
     <a href="https://purpurmc.org/"><img src="https://flectone.net/pulse/purpur.svg" alt="purpur" class="hover-brightness"></a>
     <a href="https://papermc.io/software/folia"><img src="https://flectone.net/pulse/folia.svg" alt="folia" class="hover-brightness"></a>
+    <a href="https://fabricmc.net/"><img src="https://flectone.net/pulse/fabric.svg" height="40" alt="fabric" class="hover-brightness"></a>
+    <a href="https://hytale.com/"><img src="https://flectone.net/pulse/hytale.svg" alt="hytale" class="hover-brightness"></a>
     <a href="https://www.spigotmc.org/wiki/bungeecord/"><img src="https://flectone.net/pulse/bungeecord.svg" alt="bungeecord" class="hover-brightness"></a>
     <a href="https://papermc.io/software/velocity"><img src="https://flectone.net/pulse/velocity.svg" alt="velocity" class="hover-brightness"></a>
     <h1>FlectonePulse — Every message under your control!</h1>
@@ -36,7 +38,7 @@ FlectonePulse is a plugin and mod for Minecraft servers that takes control of ch
 
 - All operations are performed asynchronously, the main server thread is not affected
 - Uses Google Guice for dependency injection, which simplifies extending functionality
-- Supports all popular platforms Bukkit, Spigot, Paper, Purpur, Folia, Fabric, BungeeCord, Waterfall, and Velocity on versions 1.8.8 to the latest
+- Supports all popular platforms Bukkit, Spigot, Paper, Purpur, Folia, Fabric, BungeeCord, Waterfall, and Velocity on versions 1.8.8 to the latest (and Hytale)
 
 ## 🎨 Flexible text formatting
 
