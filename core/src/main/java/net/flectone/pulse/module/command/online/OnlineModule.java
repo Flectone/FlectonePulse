@@ -200,30 +200,30 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     public enum Type {
         FIRST {
             @Override
-            long getTime(FPlayer fPlayer, PlayTime playTime) {
+            public long getTime(FPlayer fPlayer, PlayTime playTime) {
                 return System.currentTimeMillis() - playTime.first();
             }
         },
         LAST {
             @Override
-            long getTime(FPlayer fPlayer, PlayTime playTime) {
+            public long getTime(FPlayer fPlayer, PlayTime playTime) {
                 return System.currentTimeMillis() - (playTime.last() > 0 ? playTime.last() : playTime.last() * -1);
             }
         },
         TOTAL {
             @Override
-            long getTime(FPlayer fPlayer, PlayTime playTime) {
+            public long getTime(FPlayer fPlayer, PlayTime playTime) {
                 return playTime.total();
             }
         },
         TOTAL_DYNAMIC {
             @Override
-            long getTime(FPlayer fPlayer, PlayTime playTime) {
+            public long getTime(FPlayer fPlayer, PlayTime playTime) {
                 return playTime.total() + (fPlayer.isOnline() && playTime.last() > 0 ? System.currentTimeMillis() - playTime.last() : 0);
             }
         };
 
-        abstract long getTime(FPlayer fPlayer, PlayTime playTime);
+        public abstract long getTime(FPlayer fPlayer, PlayTime playTime);
 
         public static Optional<Type> fromString(String string) {
             return Arrays.stream(Type.values())

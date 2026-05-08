@@ -309,21 +309,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public long getFirstPlayed(@NonNull UUID uuid) {
-        return 0;
-    }
-
-    @Override
-    public long getLastPlayed(@NonNull UUID uuid) {
-        return 0;
-    }
-
-    @Override
-    public long getAllTimePlayed(@NonNull UUID uuid) {
-        return 0;
-    }
-
-    @Override
     public void updateInventory(@NonNull UUID uuid) {
         ServerPlayer player = getPlayer(uuid);
         if (player == null) return;

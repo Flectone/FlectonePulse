@@ -249,27 +249,6 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public long getFirstPlayed(@NonNull UUID uuid) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-
-        return player.getFirstPlayed();
-    }
-
-    @Override
-    public long getLastPlayed(@NonNull UUID uuid) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-
-        return player.getLastPlayed();
-    }
-
-    @Override
-    public long getAllTimePlayed(@NonNull UUID uuid) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-
-        return player.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L;
-    }
-
-    @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
         MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
 

@@ -281,42 +281,6 @@ public interface PlatformPlayerAdapter {
     }
 
     /**
-     * Gets the first played timestamp.
-     *
-     * @param uuid the player UUID
-     * @return the first played timestamp
-     */
-    long getFirstPlayed(@NonNull UUID uuid);
-
-    default long getFirstPlayed(@NonNull FEntity entity) {
-        return getFirstPlayed(entity.uuid());
-    }
-
-    /**
-     * Gets the last played timestamp.
-     *
-     * @param uuid the player UUID
-     * @return the last played timestamp
-     */
-    long getLastPlayed(@NonNull UUID uuid);
-
-    default long getLastPlayed(@NonNull FEntity entity) {
-        return getLastPlayed(entity.uuid());
-    }
-
-    /**
-     * Gets the total played time.
-     *
-     * @param uuid the player UUID
-     * @return the total played time in milliseconds
-     */
-    long getAllTimePlayed(@NonNull UUID uuid);
-
-    default long getAllTimePlayed(@NonNull FEntity entity) {
-        return getAllTimePlayed(entity.uuid());
-    }
-
-    /**
      * Updates the player's inventory.
      *
      * @param uuid the player UUID

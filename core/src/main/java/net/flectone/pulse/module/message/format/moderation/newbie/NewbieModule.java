@@ -11,8 +11,9 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.module.command.online.OnlineModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
@@ -26,7 +27,6 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
 
@@ -59,9 +59,12 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         if (moduleController.isDisabledFor(this, fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission().bypass())) return false;
 
+        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        if (playTime == null) return false;
+
         long timeToCheck = switch (config().mode()) {
-            case SINCE_JOIN -> System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(fPlayer);
-            case PLAYED_TIME -> platformPlayerAdapter.getAllTimePlayed(fPlayer);
+            case SINCE_JOIN -> OnlineModule.Type.FIRST.getTime(fPlayer, playTime);
+            case PLAYED_TIME -> OnlineModule.Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime);
         };
 
         long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
@@ -72,12 +75,15 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     public ExternalModeration getModeration(FPlayer fPlayer) {
         if (!isNewBie(fPlayer)) return null;
 
+        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        if (playTime == null) return null;
+
         long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
-        long firstPlayed = platformPlayerAdapter.getFirstPlayed(fPlayer);
+        long firstPlayed = playTime.first();
 
         long moderationTime = switch (config().mode()) {
             case SINCE_JOIN -> firstPlayed + timeout;
-            case PLAYED_TIME -> System.currentTimeMillis() + (timeout - platformPlayerAdapter.getAllTimePlayed(fPlayer));
+            case PLAYED_TIME -> System.currentTimeMillis() + (timeout - OnlineModule.Type.TOTAL_DYNAMIC.getTime(fPlayer, playTime));
         };
 
         return new ExternalModeration(fPlayer.name(),
