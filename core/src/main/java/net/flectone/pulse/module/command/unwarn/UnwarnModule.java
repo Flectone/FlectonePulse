@@ -140,7 +140,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
         if (warns.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unwarn::notWarned)
+                    .format(Localization.Command.Unwarn::nullId)
                     .build()
             );
 

@@ -777,6 +777,7 @@ public record Localization(
         @Jacksonized
         public record Unban(
                 String nullPlayer,
+                String nullId,
                 String notBanned,
                 String lowerWeightGroup,
                 ReasonMap reasons,
@@ -789,6 +790,7 @@ public record Localization(
         @Jacksonized
         public record Unmute(
                 String nullPlayer,
+                String nullId,
                 String notMuted,
                 String lowerWeightGroup,
                 ReasonMap reasons,
@@ -801,6 +803,7 @@ public record Localization(
         @Jacksonized
         public record Unwarn(
                 String nullPlayer,
+                String nullId,
                 String notWarned,
                 String lowerWeightGroup,
                 ReasonMap reasons,

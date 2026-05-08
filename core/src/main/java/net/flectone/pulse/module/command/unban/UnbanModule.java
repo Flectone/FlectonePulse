@@ -140,7 +140,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
         if (bans.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unban::notBanned)
+                    .format(Localization.Command.Unban::nullId)
                     .build()
             );
 

@@ -139,7 +139,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
         if (mutes.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
-                    .format(Localization.Command.Unmute::notMuted)
+                    .format(Localization.Command.Unmute::nullId)
                     .build()
             );
 

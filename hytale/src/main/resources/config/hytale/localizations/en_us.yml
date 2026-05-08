@@ -404,6 +404,7 @@ command:
     format_false: "<color:#F08080>[-] <display_name> <message><reset> <color:#F08080><percent>%"
   unban:
     null_player: "<color:#ff7171>This player does not exist"
+    null_id: "<color:#ff7171>Ban with this id not found"
     not_banned: "<color:#ff7171>This player is not banned"
     lower_weight_group: "<color:#ff7171>You cannot unban a player with equal or higher permissions"
     reasons:
@@ -411,6 +412,7 @@ command:
     format: "<color:#98FB98><moderator> unbanned the player <display_name> <fcolor:1><br>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>"
   unmute:
     null_player: "<color:#ff7171>This player does not exist"
+    null_id: "<color:#ff7171>Mute with this id not found"
     not_muted: "<color:#ff7171>This player is not muted"
     lower_weight_group: "<color:#ff7171>You cannot unmute a player with equal or higher permissions"
     reasons:
@@ -418,6 +420,7 @@ command:
     format: "<color:#98FB98><moderator> unmutted the player <display_name> <fcolor:1><br>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>"
   unwarn:
     null_player: "<color:#ff7171>This player does not exist"
+    null_id: "<color:#ff7171>Warn with this id not found"
     not_warned: "<color:#ff7171>This player is not warned"
     lower_weight_group: "<color:#ff7171>You cannot unwarn a player with equal or higher permissions"
     reasons:

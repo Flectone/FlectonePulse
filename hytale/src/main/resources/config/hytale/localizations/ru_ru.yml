@@ -404,6 +404,7 @@ command:
     format_false: "<color:#F08080>[-] <display_name> <message><reset> <color:#F08080><percent>%"
   unban:
     null_player: "<color:#ff7171>Игрок не найден"
+    null_id: "<color:#ff7171>Бан с таким айди не найден"
     not_banned: "<color:#ff7171>Игрок не заблокирован"
     lower_weight_group: "<color:#ff7171>Ты не можешь разбанить игрока с такими же или большими правами"
     reasons:
@@ -411,6 +412,7 @@ command:
     format: "<color:#98FB98><moderator> разблокировал игрока <display_name> <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   unmute:
     null_player: "<color:#ff7171>Игрок не найден"
+    null_id: "<color:#ff7171>Мут с таким айди не найден"
     not_muted: "<color:#ff7171>Игрок не замучен"
     lower_weight_group: "<color:#ff7171>Ты не можешь размутить игрока с такими же или большими правами"
     reasons:
@@ -418,6 +420,7 @@ command:
     format: "<color:#98FB98><moderator> размутил игрока <display_name> <fcolor:1><br>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
   unwarn:
     null_player: "<color:#ff7171>Игрок не найден"
+    null_id: "<color:#ff7171>Предупреждение с таким айди не найдено"
     not_warned: "<color:#ff7171>Игрок не имеет предупреждений"
     lower_weight_group: "<color:#ff7171>Ты не можешь снять предупреждение с игрока с такими же или большими правами"
     reasons:
