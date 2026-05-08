@@ -95,7 +95,7 @@ public class Database {
         jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(PlayTime.class));
 
-        executeSQLFile(platformServerAdapter.getResource("sqls/" + config().type().name().toLowerCase() + ".sql"));
+        executeInitSQLDatabaseFile();
 
         checkMigration();
 
@@ -231,31 +231,25 @@ public class Database {
     }
 
     private void executeSQLFile(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder builder = new StringBuilder();
+        String sql = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            line = line.trim();
-            if (line.isEmpty() || line.startsWith("--")) continue;
+        String[] statements = sql.split(";");
 
-            builder.append(line);
+        for (String statement : statements) {
+            String trimmed = statement.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("--")) continue;
 
-            if (line.endsWith(";")) {
-                String sql = builder.toString();
-                getJdbi().useHandle(handle -> {
-                    try {
-                        handle.execute(sql);
-                    } catch (Exception e) {
-                        // skip MySQL "index already exists"
-                        if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists")) {
-                            throw e;
-                        }
+            String finalStatement = trimmed + ";";
+            getJdbi().useHandle(handle -> {
+                try {
+                    handle.execute(finalStatement);
+                } catch (Exception e) {
+                    // skip MySQL "index already exists"
+                    if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists")) {
+                        throw e;
                     }
-                });
-
-                builder.setLength(0);
-            }
+                }
+            });
         }
     }
 
@@ -356,6 +350,10 @@ public class Database {
                     )
             );
         }
+    }
+
+    private void executeInitSQLDatabaseFile() throws IOException {
+        executeSQLFile(platformServerAdapter.getResource("sqls/" + config().type().name().toLowerCase() + ".sql"));
     }
 
     /**
