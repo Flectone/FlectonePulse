@@ -11,14 +11,11 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +40,9 @@ public class ModerationService {
 
     public void invalidate(UUID uuid) {
         moderationRepository.invalidateAll(uuid);
-        Arrays.stream(MuteChecker.Status.values()).forEach(status -> playerViolations.remove(Pair.of(uuid, status)));
+        playerViolations.keySet().stream()
+                .filter(violationKey -> violationKey.sender().equals(uuid))
+                .forEach(playerViolations::remove);
     }
 
     public void invalidateMutes(UUID uuid) {
@@ -161,7 +160,7 @@ public class ModerationService {
     }
 
     public boolean isViolationRestricted(UUID uuid, ModuleSimple moduleSimple, ViolationSetting violationSetting) {
-        List<Long> timestamps = playerViolations.get(Pair.of(uuid, moduleSimple.name()));
+        List<Long> timestamps = playerViolations.get(new ViolationKey(uuid, moduleSimple.name()));
         if (timestamps == null || timestamps.isEmpty()) return false;
 
         long currentTimestamp = System.currentTimeMillis();
@@ -169,7 +168,7 @@ public class ModerationService {
     }
 
     public Long getFirstViolationTimestamp(UUID uuid, ModuleSimple moduleSimple) {
-        List<Long> timestamps = playerViolations.get(Pair.of(uuid, moduleSimple.name()));
+        List<Long> timestamps = playerViolations.get(new ViolationKey(uuid, moduleSimple.name()));
         if (timestamps == null || timestamps.isEmpty()) return null;
 
         return timestamps.getLast();
