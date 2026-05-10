@@ -138,7 +138,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     public void sendMessage(FPlayer fPlayer, String rawString, String playerMessage, Chat playerChat) {
         String chatName = playerChat.name();
 
-        ChatMetadata<Localization.Message.Chat> chatMetadata = ChatMetadata.<Localization.Message.Chat>builder()
+        ChatMetadata<Localization.Message.Chat> chatMetadata = messageDispatcher.dispatch(this, ChatMetadata.<Localization.Message.Chat>builder()
                 .base(EventMetadata.<Localization.Message.Chat>builder()
                         .sender(fPlayer)
                         .format(localization -> localization.types().get(chatName))
@@ -155,21 +155,18 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
                         .build()
                 )
                 .chat(playerChat)
-                .build();
-
-        List<FPlayer> receivers = messageDispatcher.createReceivers(this, chatMetadata);
-
-        messageDispatcher.dispatch(receivers, this, chatMetadata);
+                .build()
+        );
 
         // send null receiver message
         if (playerChat.config().destination().type() != Destination.Type.CHAT) {
-            checkReceiversLater(fPlayer, receivers, playerChat);
+            checkReceiversLater(fPlayer, chatMetadata.receivers(), playerChat);
         } else {
-            taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, receivers, playerChat), 1L);
+            taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, chatMetadata.receivers(), playerChat), 1L);
         }
 
         // receivers can be empty due to proxy mode
-        List<FPlayer> receiversWithSender = new ArrayList<>(receivers);
+        List<FPlayer> receiversWithSender = new ArrayList<>(chatMetadata.receivers());
         if (!receiversWithSender.contains(fPlayer)) {
             receiversWithSender.add(fPlayer);
         }

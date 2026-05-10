@@ -132,11 +132,10 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     private void privateSend(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish, long delay) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        EventMetadata<Localization.Message.Quit> eventMetadata = buildEventMetadata(fPlayer, range, toIntegration, ignoreVanish);
-        List<FPlayer> receivers = messageDispatcher.createReceivers(this, eventMetadata);
-        if (receivers.isEmpty()) return;
+        EventMetadata<Localization.Message.Quit> eventMetadata = messageDispatcher.createReceivers(this, buildEventMetadata(fPlayer, range, toIntegration, ignoreVanish));
+        if (eventMetadata.receivers().isEmpty()) return;
 
-        List<MessageSendEvent> messageEvents = receivers.stream()
+        List<MessageSendEvent> messageEvents = eventMetadata.receivers().stream()
                 .map(fReceiver -> messageDispatcher.createMessageEvent(fReceiver, name(), this, eventMetadata))
                 .toList();
 

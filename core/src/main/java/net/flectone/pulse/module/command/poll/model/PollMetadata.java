@@ -1,14 +1,17 @@
 package net.flectone.pulse.module.command.poll.model;
 
 import lombok.Builder;
+import lombok.With;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.command.poll.PollModule;
 import org.jspecify.annotations.NonNull;
 
+@With
 @Builder
 public record PollMetadata<L extends LocalizationSetting>(
-        @NonNull EventMetadata<L> base,
+        @NonNull BaseEventMetadata<L> base,
         @NonNull Poll poll,
         PollModule.@NonNull Status status,
         PollModule.@NonNull Action action

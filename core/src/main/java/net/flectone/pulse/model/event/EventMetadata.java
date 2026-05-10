@@ -1,5 +1,6 @@
 package net.flectone.pulse.model.event;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
@@ -27,7 +28,9 @@ public interface EventMetadata<L extends LocalizationSetting> {
         return new Builder<>();
     }
 
-    EventMetadata<L> base();
+    BaseEventMetadata<L> base();
+
+    EventMetadata<L> withBase(BaseEventMetadata<L> baseEventMetadata);
 
     default @NonNull UUID uuid() {
         return base().uuid();
@@ -89,14 +92,19 @@ public interface EventMetadata<L extends LocalizationSetting> {
         return base().resolveFormat(player, localization);
     }
 
+    default @NonNull List<FPlayer> receivers() {
+        return base().receivers();
+    }
+
     final class Builder<L extends LocalizationSetting> {
 
         private final Map<MessageFlag, Boolean> flags = new EnumMap<>(MessageFlag.class);
+        private final List<FPlayer> receivers = new ObjectArrayList<>();
 
         private UUID uuid = UUID.randomUUID();
         private FEntity sender;
         private FPlayer filterPlayer;
-        private Predicate<FPlayer> filter = p -> true;
+        private Predicate<FPlayer> filter = _ -> true;
         private BiFunction<FPlayer, L, String> format;
         private Destination destination = Destination.EMPTY_CHAT;
         private Range range;
@@ -190,7 +198,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
         }
 
         public Builder<L> proxy() {
-            this.proxy = out -> {};
+            this.proxy = _ -> {};
             return this;
         }
 
@@ -204,7 +212,12 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return this;
         }
 
-        public EventMetadata<L> build() {
+        public Builder<L> receivers(Collection<FPlayer> receivers) {
+            this.receivers.addAll(receivers);
+            return this;
+        }
+
+        public BaseEventMetadata<L> build() {
             Objects.requireNonNull(sender);
             Objects.requireNonNull(format);
             Objects.requireNonNull(range);
@@ -222,7 +235,8 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     message,
                     tagResolvers,
                     proxy,
-                    integration
+                    integration,
+                    receivers
             );
         }
     }
