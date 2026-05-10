@@ -159,6 +159,7 @@ public class FPlayerService {
 
     public void invalidateOffline(UUID uuid) {
         fPlayerRepository.removeOffline(uuid);
+        socialRepository.invalidatePlaytime(uuid);
 
         // idk why, but sometimes Proxy player offline, although he is already on the server.
         // I think that request that player is logged in is sent before request as player exits.
@@ -171,6 +172,7 @@ public class FPlayerService {
 
     public void invalidateOnline(UUID uuid) {
         fPlayerRepository.removeOnline(uuid);
+        socialRepository.invalidatePlaytime(uuid);
     }
 
     public FPlayer clearAndSave(FPlayer fPlayer) {
@@ -183,6 +185,7 @@ public class FPlayerService {
 
         if (isPlaytimeTracking()) {
             socialRepository.saveLastSeen(fPlayer);
+            socialRepository.invalidatePlaytime(fPlayer.uuid());
         }
 
         updateFPlayer(fPlayer);
@@ -193,6 +196,7 @@ public class FPlayerService {
     public void saveJoinSession(FPlayer fPlayer) {
         if (isPlaytimeTracking()) {
             socialRepository.saveJoinSession(fPlayer);
+            socialRepository.invalidatePlaytime(fPlayer.uuid());
         }
     }
 
@@ -350,6 +354,7 @@ public class FPlayerService {
 
     public void saveAfkSession(FPlayer fPlayer, boolean afk) {
         socialRepository.saveAfkSession(fPlayer, afk);
+        socialRepository.invalidatePlaytime(fPlayer.uuid());
     }
 
     public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {

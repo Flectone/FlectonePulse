@@ -128,5 +128,10 @@ cache:
       duration: 1
       time_unit: "HOURS"
       size: 1000
+    PLAYTIME:
+      invalidate_on_reload: true
+      duration: 10
+      time_unit: "MINUTES"
+      size: 100
 metrics:
   enable: true

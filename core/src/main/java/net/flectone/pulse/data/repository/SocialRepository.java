@@ -1,7 +1,9 @@
 package net.flectone.pulse.data.repository;
 
+import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.IgnoreDAO;
 import net.flectone.pulse.data.database.dao.MailDAO;
@@ -13,6 +15,8 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository for managing social interactions in FlectonePulse.
@@ -24,6 +28,8 @@ import java.util.List;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SocialRepository {
+
+    private final @Named("playtime") Cache<UUID, PlayTime> playTimeCache;
 
     private final IgnoreDAO ignoreDAO;
     private final MailDAO mailDAO;
@@ -144,7 +150,13 @@ public class SocialRepository {
      * @return the player's play time statistics, or null if not found
      */
     public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        return timeDAO.getByPlayer(fPlayer).orElse(null);
+        PlayTime cached = playTimeCache.getIfPresent(fPlayer.uuid());
+        if (cached != null) return cached;
+
+        Optional<PlayTime> playTime = timeDAO.getByPlayer(fPlayer);
+        playTime.ifPresent(time -> playTimeCache.put(fPlayer.uuid(), time));
+
+        return playTime.orElse(null);
     }
 
     /**
@@ -165,6 +177,10 @@ public class SocialRepository {
      */
     public List<PlayTime> getAllPlayTimes(int limit, int offset) {
         return timeDAO.getAllPlayTimes(limit, offset);
+    }
+
+    public void invalidatePlaytime(UUID uuid) {
+        playTimeCache.invalidate(uuid);
     }
 
 }

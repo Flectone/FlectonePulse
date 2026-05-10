@@ -930,6 +930,9 @@ public class FileMigrator {
             newLocalizations.put(localization.language(), localization);
         }
 
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new EnumMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 100));
+
         return files
                 .withLocalizations(newLocalizations)
                 .withMessage(files.message()
@@ -939,6 +942,11 @@ public class FileMigrator {
                                                 .withTimeout(files.message().format().moderation().newbie().timeout() * 20L)
                                         )
                                 )
+                        )
+                )
+                .withConfig(files.config()
+                        .withCache(files.config().cache()
+                                .withTypes(cacheTypes)
                         )
                 );
     }

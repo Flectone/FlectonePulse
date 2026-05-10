@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -115,6 +116,13 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("profileProperty")
     public Cache<UUID, PlayerHeadObjectContents.ProfileProperty> provideProfilePropertyCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.PROFILE_PROPERTY);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playtime")
+    public Cache<UUID, PlayTime> providePlaytimeCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYTIME);
     }
 
     @Provides
