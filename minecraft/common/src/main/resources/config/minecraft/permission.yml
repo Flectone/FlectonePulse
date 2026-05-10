@@ -838,6 +838,9 @@ message:
     names:
       name: "flectonepulse.module.message.format.names"
       type: "TRUE"
+      invisible:
+        name: "flectonepulse.module.message.format.names.invisible"
+        type: "TRUE"
     object:
       name: "flectonepulse.module.message.format.object"
       type: "TRUE"

@@ -1,11 +1,13 @@
 package net.flectone.pulse.module.message.format.names;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,6 +18,7 @@ import net.flectone.pulse.module.message.format.names.listener.PulseNamesListene
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -39,10 +42,16 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final PermissionChecker permissionChecker;
 
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseNamesListener.class);
+    }
+
+    @Override
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
+        return ModuleLocalization.super.permissionBuilder().add(permission().invisible());
     }
 
     @Override
@@ -201,7 +210,8 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
     public boolean isInvisible(FEntity entity) {
         return config().shouldCheckInvisibility()
-                && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME);
+                && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME)
+                && permissionChecker.check(entity, permission().invisible());
     }
 
     private Tag buildVaultTag(FPlayer fPlayer, FPlayer fReceiver, String vaultTag, MessageContext messageContext) {

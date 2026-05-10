@@ -1405,7 +1405,8 @@ public record Permission(
             @Jacksonized
             public record Names(
                     String name,
-                    Permission.Type type
+                    Permission.Type type,
+                    PermissionEntry invisible
             ) implements PermissionSetting {
             }
 
