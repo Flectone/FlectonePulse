@@ -1,6 +1,6 @@
 enable: true
-avatar_api_url: ""
-body_api_url: ""
+avatar_api_url: "https://crafthead.net/hytale/avatar/<skin>"
+body_api_url: "https://crafthead.net/hytale/body/<skin>"
 advancedban:
   enable: true
   disable_flectonepulse_ban: true
