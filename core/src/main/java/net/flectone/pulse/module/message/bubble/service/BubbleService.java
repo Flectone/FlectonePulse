@@ -125,6 +125,9 @@ public class BubbleService {
                     line.append(symbols[i]);
                 }
 
+                // break for last symbol
+                if (i >= symbols.length) break;
+
                 // update last symbol
                 symbol = symbols[i];
 
