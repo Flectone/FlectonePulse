@@ -42,7 +42,8 @@ public class PulseAutoTranslateListener implements PulseListener {
         String senderLocale = sender.getSetting(SettingText.LOCALE);
         if (senderLocale == null) senderLocale = "en_us";
 
-        // Translate to all unique locales on server
+        // Translate to all unique locales on server asynchronously
+        // Original text is available immediately, translations are added in background
         TranslatedMessage translatedMessage = translateModule.translateToAllLocales(message, senderLocale);
         if (translatedMessage != null) {
             // Store for later use in MessageSendEvent

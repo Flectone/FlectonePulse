@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.TranslationCacheService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final UUIDParser uuidParser;
     private final FPlayerService fPlayerService;
     private final TranslatetoModule translatetoModule;
+    private final TranslationCacheService translationCacheService;
 
     @Override
     public void onEnable() {
@@ -55,6 +58,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     @Override
     public void onDisable() {
         messageCache.invalidateAll();
+        translationCacheService.shutdown();
     }
 
     @Override
@@ -120,28 +124,35 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         uniqueLocales.add(sourceLang);
 
-        TranslatedMessage.TranslatedMessageBuilder builder = TranslatedMessage.builder()
-                .originalText(originalText)
-                .originalLang(sourceLang);
-
         Map<String, Component> translations = new ConcurrentHashMap<>();
 
-        for (String targetLang : uniqueLocales) {
-            Component translatedComponent;
+        translations.put(sourceLang, Component.text(originalText));
 
-            if (targetLang.equals(sourceLang)) {
-                translatedComponent = Component.text(originalText);
-            } else {
-                String translated = translatetoModule.translate(FPlayer.UNKNOWN, sourceLang, targetLang, originalText);
-                translatedComponent = translated.isEmpty()
-                        ? Component.text(originalText)
-                        : Component.text(translated);
-            }
+        TranslatedMessage translatedMessage = TranslatedMessage.builder()
+                .originalText(originalText)
+                .originalLang(sourceLang)
+                .translations(translations)
+                .build();
 
-            translations.put(targetLang, translatedComponent);
-        }
+        List<CompletableFuture<Void>> futures = uniqueLocales.stream()
+                .filter(targetLang -> !targetLang.equals(sourceLang))
+                .map(targetLang -> translationCacheService.translateWithMyMemoryAsync(sourceLang, targetLang, originalText)
+                        .thenAccept(translated -> {
+                            Component translatedComponent = (translated != null && !translated.isEmpty())
+                                    ? Component.text(translated)
+                                    : Component.text(originalText);
+                            translations.put(targetLang, translatedComponent);
+                        })
+                        .exceptionally(throwable -> {
+                            translations.put(targetLang, Component.text(originalText));
+                            return null;
+                        })
+                )
+                .toList();
 
-        return builder.translations(translations).build();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        return translatedMessage;
     }
 
     @Nullable

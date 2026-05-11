@@ -768,6 +768,7 @@ public record Command(
             Boolean enable,
             Range range,
             Service service,
+            Boolean useMyMemory,
             List<String> aliases,
             List<String> languages,
             Destination destination,
@@ -778,7 +779,8 @@ public record Command(
         public enum Service {
             DEEPL,
             GOOGLE,
-            YANDEX
+            YANDEX,
+            MYMEMORY
         }
     }
 

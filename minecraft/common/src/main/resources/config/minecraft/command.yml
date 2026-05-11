@@ -780,6 +780,7 @@ translateto:
   enable: true
   range: "PLAYER"
   service: "GOOGLE"
+  use_my_memory: true
   aliases:
   - "translateto"
   languages:
