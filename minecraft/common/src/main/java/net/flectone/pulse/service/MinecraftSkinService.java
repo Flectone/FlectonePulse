@@ -90,14 +90,17 @@ public class MinecraftSkinService implements SkinService {
         return PlayerHeadObjectContents.property(entity.name(), "");
     }
 
+    @Override
     public String getAvatarUrl(FEntity entity) {
         return Strings.CS.replace(fileFacade.integration().avatarApiUrl(), "<skin>", getSkin(entity));
     }
 
+    @Override
     public String getBodyUrl(FEntity entity) {
         return Strings.CS.replace(fileFacade.integration().bodyApiUrl(), "<skin>", getSkin(entity));
     }
 
+    @Override
     public String getSkin(FEntity entity) {
         String texture = integrationModule.getTextureUrl(entity);
         return texture != null ? texture : entity.uuid().toString();
