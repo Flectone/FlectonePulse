@@ -1,5 +1,7 @@
 package net.flectone.pulse.processing.parser.moderation;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.service.ModerationService;
@@ -11,7 +13,15 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 public abstract class ModerationParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
+
+    private final Cache<String, List<String>> suggestionCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(5, TimeUnit.SECONDS)
+            .maximumSize(10)
+            .build();
 
     private final Moderation.Type type;
     private final ModerationService moderationService;
@@ -31,6 +41,15 @@ public abstract class ModerationParser implements ArgumentParser<FPlayer, String
 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
-        return moderationService.getValidNames(type);
+        String cacheKey = type.name() + moderationService.getServer(type);
+
+        List<String> cached = suggestionCache.getIfPresent(cacheKey);
+        if (cached != null) return cached;
+
+        List<String> suggestions = moderationService.getValidNames(type);
+        suggestionCache.put(cacheKey, suggestions);
+
+        return suggestions;
     }
+
 }

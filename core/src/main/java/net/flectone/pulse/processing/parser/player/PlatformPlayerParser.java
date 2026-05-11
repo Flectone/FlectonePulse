@@ -9,9 +9,8 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
-import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.context.CommandInput;
-import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 @Singleton
 public class PlatformPlayerParser extends PlayerParser {
@@ -34,12 +33,13 @@ public class PlatformPlayerParser extends PlayerParser {
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
+    public List<String> createSuggestions(FPlayer sender) {
         return platformPlayerAdapter.getOnlinePlayers().stream()
                 .map(fPlayerService::getFPlayer)
-                .filter(player -> integrationModule.canSeeVanished(player, context.sender()))
-                .filter(fPlayer -> isVisible(context.sender(), fPlayer))
+                .filter(player -> integrationModule.canSeeVanished(player, sender))
+                .filter(fPlayer -> isVisible(sender, fPlayer))
                 .map(FEntity::name)
                 .toList();
     }
+
 }
