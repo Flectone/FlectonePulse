@@ -76,7 +76,7 @@ public class ModerationService {
         String server = getServer(type);
 
         if (id == -1) {
-            return getTotalValidCount(fTarget, type, server) != 0;
+            return !getValid(fTarget, type, 1, 0).isEmpty();
         }
 
         return getValid(server, id).isPresent();
