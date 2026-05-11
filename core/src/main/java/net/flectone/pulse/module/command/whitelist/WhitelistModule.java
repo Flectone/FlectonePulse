@@ -48,7 +48,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -153,16 +152,14 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         return moderationService.whitelist(fTarget, time != -1 ? time + System.currentTimeMillis() : -1, reason, fModerator.id());
     }
 
-    public List<Moderation> getWhitelist(FPlayer fPlayer) {
-        return moderationService.getValid(fPlayer, Moderation.Type.WHITELIST);
+    public boolean isWhitelisted(FPlayer fPlayer) {
+        return moderationService.hasValid(fPlayer, Moderation.Type.WHITELIST, -1);
     }
 
     private void startKickTicker() {
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
             if (!config().turnedOn()) return;
-
-            List<Moderation> whitelist = getWhitelist(fPlayer);
-            if (!whitelist.isEmpty()) return;
+            if (isWhitelisted(fPlayer)) return;
 
             kickPlayer(fPlayerService.getConsole(), fPlayer);
         }, 20L);
@@ -309,8 +306,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             id = -1;
         }
 
-        List<Moderation> whitelist = moderationService.getValid(fTarget, Moderation.Type.WHITELIST, id);
-        if (whitelist.isEmpty()) {
+        if (!moderationService.hasValid(fTarget, Moderation.Type.WHITELIST, id)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Whitelist::alreadyRemove)
@@ -320,7 +316,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }
 
         // invalidate whitelist moderations and add unwhitelist moderation
-        Moderation unwhitelist = moderationService.remove(fTarget, whitelist, reason);
+        Moderation unwhitelist = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, id, reason);
         if (unwhitelist == null) return;
 
         if (!config().filterByServer()) {
@@ -338,7 +334,6 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                         .range(config().range())
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeInt(Action.REMOVE.ordinal());
-                            dataOutputStream.writeAsJson(whitelist);
                             dataOutputStream.writeAsJson(unwhitelist);
                         })
                         .integration(string ->
@@ -349,7 +344,6 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                         })
                         .build()
                 )
-                .moderations(whitelist)
                 .unmoderation(unwhitelist)
                 .build()
         );
@@ -427,8 +421,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
             fTarget = fPlayerService.getFPlayer(uuid);
         } else {
-            List<Moderation> whitelist = moderationService.getValid(fTarget, Moderation.Type.WHITELIST);
-            if (!whitelist.isEmpty() && config().checkDuplicate()) {
+            if (config().checkDuplicate() && isWhitelisted(fTarget)) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Whitelist::alreadyAdd)
@@ -444,7 +437,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private void kickPlayer(FPlayer fPlayer, FPlayer fTarget) {
         if (!platformPlayerAdapter.isOnline(fTarget)) return;
         if (permissionChecker.check(fTarget, permission().bypass())) return;
-        if (!getWhitelist(fTarget).isEmpty()) return;
+        if (isWhitelisted(fTarget)) return;
 
         MessageContext messageContext = messagePipeline.createContext(fPlayer, fTarget, localization(fTarget).person());
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(messageContext));

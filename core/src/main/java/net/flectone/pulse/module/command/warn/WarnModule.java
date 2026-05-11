@@ -31,7 +31,6 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -144,12 +143,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
 
         sendForTarget(fPlayer, fTarget, warn);
 
-        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN);
-        if (warns.isEmpty()) return;
-
-        int countWarns = warns.stream()
-                .filter(Moderation::isActive)
-                .toList().size();
+        int countWarns = moderationService.getTotalValidCount(fTarget, Moderation.Type.WARN, moderationService.getServer(Moderation.Type.WARN));
 
         String action = config().actions().get(countWarns);
         if (StringUtils.isEmpty(action)) return;

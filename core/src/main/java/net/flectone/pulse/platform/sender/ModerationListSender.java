@@ -61,18 +61,18 @@ public class ModerationListSender {
 
         ListArgument listArgument = optionalListArgument.get();
 
-        List<Moderation> moderationList;
+        int size;
         Localization.ListTypeMessage localizationType;
         if (listArgument.target() != null) {
-            moderationList = moderationService.getValid(listArgument.target(), type);
-            localizationType = module.localization(fPlayer).player();
             nextPageCommand+= " " + listArgument.target().name();
+            size = moderationService.getTotalValidCount(listArgument.target(), type, moderationService.getServer(type));
+            localizationType = module.localization(fPlayer).player();
         } else {
-            moderationList = moderationService.getValid(type);
+            size = moderationService.getTotalValidCount(type, moderationService.getServer(type));
             localizationType = module.localization(fPlayer).global();
         }
 
-        if (moderationList.isEmpty()) {
+        if (size == 0) {
             messageDispatcher.dispatchError(module, EventMetadata.<L>builder()
                     .sender(fPlayer)
                     .format(ModerationListLocalizationSetting::empty)
@@ -81,7 +81,6 @@ public class ModerationListSender {
             return;
         }
 
-        int size = moderationList.size();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (listArgument.page() > countPage || listArgument.page() < 1) {
@@ -93,16 +92,18 @@ public class ModerationListSender {
             return;
         }
 
-        List<Moderation> finalModerationList = moderationList.stream()
-                .skip((long) (listArgument.page() - 1) * perPage)
-                .limit(perPage)
-                .toList();
+        List<Moderation> moderations;
+        if (listArgument.target() != null) {
+            moderations = moderationService.getValid(listArgument.target(), type, perPage, (listArgument.page() - 1) * perPage);
+        } else {
+            moderations = moderationService.getValid(type, perPage, (listArgument.page() - 1) * perPage);
+        }
 
         String header = Strings.CS.replace(localizationType.header(), "<count>", String.valueOf(size));
         MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
         Component component = messagePipeline.build(headerContext).append(Component.newline());
 
-        for (Moderation moderation : finalModerationList) {
+        for (Moderation moderation : moderations) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
 
             String line = moderationMessageFormatter.replacePlaceholders(

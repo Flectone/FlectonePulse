@@ -47,7 +47,7 @@ public class PulseBanListener implements PulseListener {
 
         // get player bans
         FPlayer fPlayer = event.player();
-        List<Moderation> bans = moderationService.getValid(fPlayer, Moderation.Type.BAN);
+        List<Moderation> bans = moderationService.getValid(fPlayer, Moderation.Type.BAN, 1, 0);
         if (bans.isEmpty()) return event;
 
         // get moderator

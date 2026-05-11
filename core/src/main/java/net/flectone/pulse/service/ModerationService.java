@@ -16,9 +16,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -74,22 +72,38 @@ public class ModerationService {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WHITELIST);
     }
 
-    public List<Moderation> getValid(FPlayer fTarget, Moderation.Type type, int id) {
-        return getValid(fTarget, type).stream()
-                .filter(moderation -> id == -1 || moderation.id() == id)
-                .toList();
+    public boolean hasValid(FPlayer fTarget, Moderation.Type type, int id) {
+        String server = getServer(type);
+
+        if (id == -1) {
+            return getTotalValidCount(fTarget, type, server) != 0;
+        }
+
+        return getValid(server, id).isPresent();
     }
 
-    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
-        return moderationRepository.getValid(fPlayer, type, getServer(type));
+    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, int limit, int offset) {
+        return moderationRepository.getValid(fPlayer, type, getServer(type), limit, offset);
     }
 
-    public List<Moderation> getValid(Moderation.Type type) {
-        return moderationRepository.getValid(type, getServer(type));
+    public List<Moderation> getValid(Moderation.Type type, int limit, int offset) {
+        return moderationRepository.getValid(type, getServer(type), limit, offset);
+    }
+
+    public Optional<Moderation> getValid(@Nullable String server, int id) {
+        return moderationRepository.getValid(server, id);
     }
 
     public List<String> getValidNames(Moderation.Type type) {
         return moderationRepository.getValidNames(type, getServer(type));
+    }
+
+    public int getTotalValidCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        return moderationRepository.getTotalValidCount(fPlayer, type, server);
+    }
+
+    public int getTotalValidCount(Moderation.Type type, @Nullable String server) {
+        return moderationRepository.getTotalValidCount(type, server);
     }
 
     @Nullable
@@ -155,33 +169,27 @@ public class ModerationService {
 
 
     @Nullable
-    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations) {
-        return remove(fPlayer, moderations, "", fileFacade.config().serverUuid());
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @NonNull String reason) {
+        return remove(fModerator, fTarget, type, id, reason, getServer(type));
     }
 
     @Nullable
-    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason) {
-        return remove(fPlayer, moderations, reason, fileFacade.config().serverUuid());
-    }
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @NonNull String reason, @Nullable String server) {
+        moderationRepository.invalidate(fTarget.uuid(), type);
 
-    @Nullable
-    public Moderation remove(FPlayer fPlayer, List<Moderation> moderations, @NonNull String reason, @Nullable String server) {
-        if (moderations.isEmpty()) return null;
-
-        Moderation firstModeration = moderations.getFirst();
-        moderationRepository.invalidate(fPlayer.uuid(), firstModeration.type());
-
-        for (Moderation moderation : moderations) {
-            moderationRepository.updateValid(moderation.withValid(false));
+        if (id == -1) {
+            moderationRepository.updateValid(type, server);
+        } else {
+            moderationRepository.updateValid(id, server);
         }
 
         // save to un-moderation database
-        return moderationRepository.save(fPlayer, System.currentTimeMillis(), -1, reason, firstModeration.moderator(), switch (firstModeration.type()) {
+        return moderationRepository.save(fTarget, System.currentTimeMillis(), -1, reason, fModerator.id(), switch (type) {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
             case WARN -> Moderation.Type.UNWARN;
             case WHITELIST -> Moderation.Type.UNWHITELIST;
-            default -> throw new IllegalArgumentException("Unknown un-moderation type: " + firstModeration.type());
+            default -> throw new IllegalArgumentException("Unknown un-moderation type: " + type);
         }, server);
     }
 
@@ -204,7 +212,7 @@ public class ModerationService {
         return time != -1 && timeLimit != -1 && timeLimit >= time;
     }
 
-    private String getServer(Moderation.Type type) {
+    public String getServer(Moderation.Type type) {
         return type == Moderation.Type.BAN && fileFacade.command().ban().filterByServer()
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()

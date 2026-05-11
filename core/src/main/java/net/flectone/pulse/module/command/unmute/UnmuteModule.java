@@ -27,7 +27,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -124,8 +123,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        List<Moderation> mutes = moderationService.getValid(fTarget, Moderation.Type.MUTE, id);
-        if (mutes.isEmpty()) {
+        if (!moderationService.hasValid(fTarget, Moderation.Type.MUTE, id)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::nullId)
@@ -135,7 +133,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        Moderation unmute = moderationService.remove(fTarget, mutes, reason);
+        Moderation unmute = moderationService.remove(fPlayer, fTarget, Moderation.Type.MUTE, id, reason);
         if (unmute == null) return;
 
         if (!fileFacade.command().mute().filterByServer()) {
@@ -151,17 +149,15 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeAsJson(mutes);
-                            dataOutputStream.writeAsJson(unmute);
-                        })
+                        .proxy(dataOutputStream ->
+                                dataOutputStream.writeAsJson(unmute)
+                        )
                         .integration()
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })
                         .build()
                 )
-                .moderations(mutes)
                 .unmoderation(unmute)
                 .build()
         );

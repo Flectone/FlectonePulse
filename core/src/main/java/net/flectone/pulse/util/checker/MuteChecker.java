@@ -24,7 +24,7 @@ public class MuteChecker {
     private final Provider<SwearModule> swearModuleProvider;
 
     public Status check(FPlayer fPlayer) {
-        if (!moderationService.getValid(fPlayer, Moderation.Type.MUTE).isEmpty()) {
+        if (moderationService.hasValid(fPlayer, Moderation.Type.MUTE, -1)) {
             return Status.LOCAL;
         }
 

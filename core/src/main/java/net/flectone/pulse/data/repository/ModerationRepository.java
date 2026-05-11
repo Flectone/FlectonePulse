@@ -12,10 +12,7 @@ import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Repository for managing moderation data in FlectonePulse.
@@ -32,22 +29,26 @@ public class ModerationRepository {
     private final ModerationDAO moderationDAO;
 
     /**
-     * Gets valid moderation's for a player with caching.
+     * Retrieves valid (non-expired) moderations for a player with caching support.
+     * Checks cache consistency across servers and refreshes if server mismatch is detected.
+     * Only returns active moderations and updates cache accordingly.
      *
-     * @param player the player
-     * @param type the moderation type
-     * @param server the server ID
-     * @return list of valid moderation's
+     * @param player the player to retrieve moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global search)
+     * @param limit maximum number of results to return
+     * @param offset number of results to skip for pagination
+     * @return list of valid moderation actions, or empty list if an error occurs
      */
-    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server) {
+    public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
         try {
             Pair<UUID, Moderation.Type> key = Pair.of(player.uuid(), type);
 
-            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type, server));
+            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type, server, limit, offset));
 
             // cache should be saved only for backend server, i.e. who last used this method
             if (cached.stream().anyMatch(moderation -> !Objects.equals(server, moderation.server()))) {
-                List<Moderation> newCached = moderationDAO.getValid(player, type, server);
+                List<Moderation> newCached = moderationDAO.getValid(player, type, server, limit, offset);
                 moderationCache.put(key, newCached);
                 return newCached;
             }
@@ -126,14 +127,29 @@ public class ModerationRepository {
     }
 
     /**
-     * Gets all valid moderation's of a type.
+     * Retrieves valid (non-expired) moderations by type across all players with pagination.
+     * This method does not use caching and queries the database directly.
      *
-     * @param type the moderation type
-     * @param server the server ID
-     * @return list of valid moderation's
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global search)
+     * @param limit maximum number of results to return
+     * @param offset number of results to skip for pagination
+     * @return list of valid moderation actions matching the criteria
      */
-    public List<Moderation> getValid(Moderation.Type type, @Nullable String server) {
-        return moderationDAO.getValid(type, server);
+    public List<Moderation> getValid(Moderation.Type type, @Nullable String server, int limit, int offset) {
+        return moderationDAO.getValid(type, server, limit, offset);
+    }
+
+    /**
+     * Retrieves a single valid moderation entry by its unique identifier.
+     * Checks that the moderation is valid and not expired.
+     *
+     * @param server the server ID (can be null for global search)
+     * @param id the unique moderation entry identifier
+     * @return an Optional containing the moderation if found and valid, or empty otherwise
+     */
+    public Optional<Moderation> getValid(@Nullable String server, int id) {
+        return moderationDAO.getValidById(server, id);
     }
 
     /**
@@ -148,11 +164,50 @@ public class ModerationRepository {
     }
 
     /**
-     * Updates a moderation's validity.
+     * Counts the total number of valid moderations for a specific player and type.
+     * Only includes non-expired moderations.
      *
-     * @param moderation the moderation record to update
+     * @param fPlayer the player to count moderations for
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global count)
+     * @return the count of valid moderations matching the criteria
      */
-    public void updateValid(@NonNull Moderation moderation) {
-        moderationDAO.updateValid(moderation);
+    public int getTotalValidCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        return moderationDAO.getTotalValidCount(fPlayer, type, server);
     }
+
+    /**
+     * Counts the total number of valid moderations by type across all players.
+     * Only includes non-expired moderations.
+     *
+     * @param type the moderation type to filter by
+     * @param server the server ID (can be null for global count)
+     * @return the count of valid moderations matching the criteria
+     */
+    public int getTotalValidCount(Moderation.Type type, @Nullable String server) {
+        return moderationDAO.getTotalValidCount(type, server);
+    }
+
+    /**
+     * Invalidates a specific moderation entry by setting its valid flag to false.
+     * This effectively removes it from active moderation lists without deleting the record.
+     *
+     * @param id the unique moderation entry identifier to invalidate
+     * @param server the server ID (can be null for global invalidation)
+     */
+    public void updateValid(int id, @Nullable String server) {
+        moderationDAO.updateValid(id, server);
+    }
+
+    /**
+     * Invalidates all moderation entries of a specific type by setting their valid flag to false.
+     * Can be filtered by server to target server-specific moderations only.
+     *
+     * @param type the moderation type to invalidate
+     * @param server the server ID (can be null for global invalidation)
+     */
+    public void updateValid(Moderation.@NonNull Type type, @Nullable String server) {
+        moderationDAO.updateValid(type, server);
+    }
+
 }

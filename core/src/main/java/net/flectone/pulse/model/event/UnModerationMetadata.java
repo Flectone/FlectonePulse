@@ -6,13 +6,10 @@ import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.util.Moderation;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-
 @With
 @Builder
 public record UnModerationMetadata<L extends LocalizationSetting>(
         @NonNull BaseEventMetadata<L> base,
-        @NonNull List<Moderation> moderations,
         @NonNull Moderation unmoderation
 ) implements EventMetadata<L> {
 }

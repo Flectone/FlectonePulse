@@ -27,7 +27,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -125,8 +124,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN, id);
-        if (warns.isEmpty()) {
+        if (!moderationService.hasValid(fTarget, Moderation.Type.WARN, id)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::nullId)
@@ -136,7 +134,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        Moderation unwarn = moderationService.remove(fTarget, warns, reason);
+        Moderation unwarn = moderationService.remove(fPlayer, fTarget, Moderation.Type.WARN, id, reason);
         if (unwarn == null) return;
 
         if (!fileFacade.command().warn().filterByServer()) {
@@ -152,17 +150,15 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeAsJson(warns);
-                            dataOutputStream.writeAsJson(unwarn);
-                        })
+                        .proxy(dataOutputStream ->
+                                dataOutputStream.writeAsJson(unwarn)
+                        )
                         .integration()
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })
                         .build()
                 )
-                .moderations(warns)
                 .unmoderation(unwarn)
                 .build()
         );

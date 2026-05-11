@@ -554,7 +554,6 @@ public class ProxyMessageHandler {
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (injector.getInstance(BanModule.class).config().filterByServer()) return;
 
-        List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unban = gson.fromJson(input.readUTF(), Moderation.class);
 
         UnbanModule module = injector.getInstance(UnbanModule.class);
@@ -577,7 +576,6 @@ public class ProxyMessageHandler {
                         .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
-                .moderations(bans)
                 .unmoderation(unban)
                 .build()
         );
@@ -586,7 +584,6 @@ public class ProxyMessageHandler {
     private void handleUnmuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (injector.getInstance(MuteModule.class).config().filterByServer()) return;
 
-        List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unmute = gson.fromJson(input.readUTF(), Moderation.class);
 
         UnmuteModule module = injector.getInstance(UnmuteModule.class);
@@ -609,7 +606,6 @@ public class ProxyMessageHandler {
                         .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
-                .moderations(mutes)
                 .unmoderation(unmute)
                 .build()
         );
@@ -618,7 +614,6 @@ public class ProxyMessageHandler {
     private void handleUnwarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (injector.getInstance(WarnModule.class).config().filterByServer()) return;
 
-        List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
         Moderation unwarn = gson.fromJson(input.readUTF(), Moderation.class);
 
         UnwarnModule module = injector.getInstance(UnwarnModule.class);
@@ -641,7 +636,6 @@ public class ProxyMessageHandler {
                         .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
                         .build()
                 )
-                .moderations(warns)
                 .unmoderation(unwarn)
                 .build()
         );
@@ -867,7 +861,6 @@ public class ProxyMessageHandler {
                 );
             }
             case REMOVE -> {
-                List<Moderation> whitelist = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
                 Moderation unwhitelist = gson.fromJson(input.readUTF(), Moderation.class);
 
                 FPlayer fTarget = fPlayerService.getFPlayer(unwhitelist.player());
@@ -889,7 +882,6 @@ public class ProxyMessageHandler {
                                 })
                                 .build()
                         )
-                        .moderations(whitelist)
                         .unmoderation(unwhitelist)
                         .build()
                 );

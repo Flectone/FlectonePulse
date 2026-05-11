@@ -21,6 +21,7 @@ import net.flectone.pulse.module.command.whitelist.WhitelistModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.kyori.adventure.text.Component;
 
@@ -36,6 +37,7 @@ public class PulseWhitelistListener implements PulseListener {
     private final MessageDispatcher messageDispatcher;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
+    private final ModerationService moderationService;
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
@@ -46,7 +48,7 @@ public class PulseWhitelistListener implements PulseListener {
         // get player whitelist
         FPlayer fPlayer = event.player();
         if (permissionChecker.check(fPlayer, whitelistModule.permission().bypass())) return event;
-        if (!whitelistModule.getWhitelist(fPlayer).isEmpty()) return event;
+        if (whitelistModule.isWhitelisted(fPlayer)) return event;
 
         // load custom player colors
         fPlayer = fPlayerService.loadColors(fPlayer);
@@ -81,7 +83,7 @@ public class PulseWhitelistListener implements PulseListener {
         long time = whitelistModule.config().autoAddDuration() * TimeFormatter.MULTIPLIER;
 
         FPlayer fPlayer = event.player();
-        List<Moderation> whitelist = whitelistModule.getWhitelist(fPlayer);
+        List<Moderation> whitelist = moderationService.getValid(fPlayer, Moderation.Type.WHITELIST, 1, 0);
         if (whitelist.stream().noneMatch(moderation -> moderation.isPermanent() || moderation.getRemainingTime() > time)) {
             whitelistModule.add(fPlayerService.getConsole(), fPlayer, time, null);
         }

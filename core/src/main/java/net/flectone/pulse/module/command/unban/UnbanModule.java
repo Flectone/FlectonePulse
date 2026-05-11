@@ -27,7 +27,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -111,7 +110,6 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
                     .format(Localization.Command.Unban::nullPlayer)
                     .build()
             );
-
             return;
         }
 
@@ -124,18 +122,16 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             return;
         }
 
-        List<Moderation> bans = moderationService.getValid(fTarget, Moderation.Type.BAN, id);
-        if (bans.isEmpty()) {
+        if (!moderationService.hasValid(fTarget, Moderation.Type.BAN, id)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::nullId)
                     .build()
             );
-
             return;
         }
 
-        Moderation unban = moderationService.remove(fTarget, bans, reason);
+        Moderation unban = moderationService.remove(fPlayer, fTarget, Moderation.Type.BAN, id, reason);
         if (unban == null) return;
 
         if (!fileFacade.command().ban().filterByServer()) {
@@ -151,17 +147,15 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeAsJson(bans);
-                            dataOutputStream.writeAsJson(unban);
-                        })
+                        .proxy(dataOutputStream ->
+                                dataOutputStream.writeAsJson(unban)
+                        )
                         .integration()
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })
                         .build()
                 )
-                .moderations(bans)
                 .unmoderation(unban)
                 .build()
         );
