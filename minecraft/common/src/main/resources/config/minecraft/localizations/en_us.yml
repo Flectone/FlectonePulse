@@ -645,7 +645,7 @@ message:
         server: "<fcolor:2>[Answer] @<player><fcolor:1>, this is a vanilla server in minecraft!"
         flectone: "<fcolor:2>[Answer] @<player><fcolor:1>, this is a brand and projects created by TheFaser"
     translate:
-      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
+      action: " <click:run_command:\"/toggleoriginal <message>\"><hover:show_text:\"<fcolor:2>Show original/translation\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
     format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <nickname><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:

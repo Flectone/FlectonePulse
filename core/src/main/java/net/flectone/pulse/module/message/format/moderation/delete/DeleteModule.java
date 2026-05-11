@@ -110,13 +110,17 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     }
 
     public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
+        save(receiver, messageUUID, component, null, needToCache);
+    }
+
+    public void save(FPlayer receiver, UUID messageUUID, Component component, net.flectone.pulse.module.message.format.translate.model.TranslatedMessage translatedMessage, boolean needToCache) {
         // skip console
         if (receiver.isUnknown()) return;
         // skip offline history
         if (!receiver.isOnline()) return;
 
         UUID playerUUID = receiver.uuid();
-        HistoryMessage historyMessage = new HistoryMessage(messageUUID, component);
+        HistoryMessage historyMessage = new HistoryMessage(messageUUID, component, translatedMessage);
 
         List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, _ -> new ObjectArrayList<>());
 
@@ -184,6 +188,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
         if (history == null) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+        String playerLocale = fPlayer.getSetting(net.flectone.pulse.util.constant.SettingText.LOCALE);
 
         // empty messages
         for (int i = 0; i < config().historyLength(); i++) {
@@ -193,7 +198,34 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
         }
 
         history.forEach(historyMessage ->
-                messageSender.sendMessage(fPlayer, historyMessage.component(), true)
+                messageSender.sendMessage(fPlayer, historyMessage.getDisplayComponent(playerLocale), true)
         );
+    }
+
+    public boolean toggleOriginal(FPlayer fPlayer, UUID messageUUID) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return false;
+        if (messageUUID == null) return false;
+
+        UUID playerUUID = fPlayer.uuid();
+        List<HistoryMessage> history = playersHistory.get(playerUUID);
+        if (history == null) return false;
+
+        boolean updated = false;
+        for (int i = 0; i < history.size(); i++) {
+            HistoryMessage historyMessage = history.get(i);
+            if (messageUUID.equals(historyMessage.uuid()) && historyMessage.hasTranslations()) {
+                // Toggle showOriginal flag
+                HistoryMessage updatedMessage = historyMessage.withShowOriginal(!historyMessage.showOriginal());
+                history.set(i, updatedMessage);
+                updated = true;
+                break;
+            }
+        }
+
+        if (updated) {
+            sendUpdate(playerUUID);
+        }
+
+        return updated;
     }
 }

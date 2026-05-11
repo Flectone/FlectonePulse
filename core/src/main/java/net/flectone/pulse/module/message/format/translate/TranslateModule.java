@@ -13,20 +13,25 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.message.format.translate.listener.PulseTranslateListener;
+import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -38,10 +43,13 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final UUIDParser uuidParser;
+    private final FPlayerService fPlayerService;
+    private final TranslatetoModule translatetoModule;
 
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseTranslateListener.class);
+        listenerRegistry.register(net.flectone.pulse.module.message.format.translate.listener.PulseAutoTranslateListener.class);
     }
 
     @Override
@@ -86,30 +94,10 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         FPlayer receiver = messageContext.receiver();
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
-            String firstLang = "auto";
-            String secondLang = receiver.getSetting(SettingText.LOCALE);
-
-            if (argumentQueue.hasNext()) {
-                Tag.Argument first = argumentQueue.pop();
-
-                if (argumentQueue.hasNext()) {
-                    Tag.Argument second = argumentQueue.pop();
-
-                    if (argumentQueue.hasNext()) {
-                        // translateto language language message
-                        firstLang = first.value();
-                        secondLang = second.value();
-                    } else {
-                        // translateto auto language message
-                        secondLang = first.value();
-                    }
-                }
-            }
+            UUID messageUUID = messageContext.messageUUID();
 
             String action = localization(receiver).action();
-            action = Strings.CS.replaceOnce(action, "<language>", firstLang);
-            action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
-            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
+            action = Strings.CS.replace(action, "<message>", messageUUID.toString());
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())
@@ -120,6 +108,40 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         });
+    }
+
+    public @Nullable TranslatedMessage translateToAllLocales(String originalText, String sourceLang) {
+        if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) return null;
+
+        Set<String> uniqueLocales = fPlayerService.getOnlineFPlayers().stream()
+                .map(player -> player.getSetting(SettingText.LOCALE))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        uniqueLocales.add(sourceLang);
+
+        TranslatedMessage.TranslatedMessageBuilder builder = TranslatedMessage.builder()
+                .originalText(originalText)
+                .originalLang(sourceLang);
+
+        Map<String, Component> translations = new ConcurrentHashMap<>();
+
+        for (String targetLang : uniqueLocales) {
+            Component translatedComponent;
+
+            if (targetLang.equals(sourceLang)) {
+                translatedComponent = Component.text(originalText);
+            } else {
+                String translated = translatetoModule.translate(FPlayer.UNKNOWN, sourceLang, targetLang, originalText);
+                translatedComponent = translated.isEmpty()
+                        ? Component.text(originalText)
+                        : Component.text(translated);
+            }
+
+            translations.put(targetLang, translatedComponent);
+        }
+
+        return builder.translations(translations).build();
     }
 
     @Nullable
