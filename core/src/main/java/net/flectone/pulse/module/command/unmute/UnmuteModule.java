@@ -172,6 +172,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                 )
                 .moderator(fPlayer)
                 .moderations(mutes)
+                .unmoderation(unmute)
                 .build()
         );
     }

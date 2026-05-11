@@ -14,6 +14,7 @@ import java.util.List;
 public record UnModerationMetadata<L extends LocalizationSetting>(
         @NonNull BaseEventMetadata<L> base,
         @NonNull FPlayer moderator,
-        @NonNull List<Moderation> moderations
+        @NonNull List<Moderation> moderations,
+        @NonNull Moderation unmoderation
 ) implements EventMetadata<L> {
 }

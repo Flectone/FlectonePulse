@@ -173,6 +173,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
                 )
                 .moderator(fPlayer)
                 .moderations(bans)
+                .unmoderation(unban)
                 .build()
         );
     }

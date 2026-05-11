@@ -570,6 +570,7 @@ public class ProxyMessageHandler {
                 )
                 .moderator(fModerator)
                 .moderations(bans)
+                .unmoderation(unban)
                 .build()
         );
     }
@@ -602,6 +603,7 @@ public class ProxyMessageHandler {
                 )
                 .moderator(fModerator)
                 .moderations(mutes)
+                .unmoderation(unmute)
                 .build()
         );
     }
@@ -634,6 +636,7 @@ public class ProxyMessageHandler {
                 )
                 .moderator(fModerator)
                 .moderations(warns)
+                .unmoderation(unwarn)
                 .build()
         );
     }
