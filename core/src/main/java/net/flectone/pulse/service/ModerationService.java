@@ -44,7 +44,7 @@ public class ModerationService {
     }
 
     public void invalidate(UUID uuid, Moderation.Type type) {
-        moderationRepository.invalidate(uuid, type);
+        moderationRepository.invalidate(uuid, type, getServer(type));
     }
 
     @Nullable
@@ -113,7 +113,7 @@ public class ModerationService {
 
     @Nullable
     public Moderation add(FPlayer fPlayer, long date, long time, String reason, int moderator, Moderation.Type type, @Nullable String server) {
-        moderationRepository.invalidate(fPlayer.uuid(), type);
+        invalidate(fPlayer.uuid(), type);
 
         return moderationRepository.save(fPlayer, date, time, reason, moderator, type, server);
     }
@@ -175,7 +175,7 @@ public class ModerationService {
 
     @Nullable
     public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @NonNull String reason, @Nullable String server) {
-        moderationRepository.invalidate(fTarget.uuid(), type);
+        invalidate(fTarget.uuid(), type);
 
         if (id == -1) {
             moderationRepository.updateValid(fTarget.id(), type, server);

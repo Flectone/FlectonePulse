@@ -12,7 +12,10 @@ import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository for managing moderation data in FlectonePulse.
@@ -25,7 +28,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationRepository {
 
-    private final @Named("moderation") Cache<Pair<UUID, Moderation.Type>, List<Moderation>> moderationCache;
+    private final @Named("moderation") Cache<Pair<UUID, String>, List<Moderation>> moderationCache;
     private final ModerationDAO moderationDAO;
 
     /**
@@ -41,33 +44,32 @@ public class ModerationRepository {
      * @return list of valid moderation actions, or empty list if an error occurs
      */
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        try {
-            Pair<UUID, Moderation.Type> key = Pair.of(player.uuid(), type);
+        Pair<UUID, String> key = Pair.of(player.uuid(), type.name() + server);
 
-            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type, server, limit, offset));
+        List<Moderation> cache = moderationCache.getIfPresent(key);
+        if (cache == null) {
+            cache = moderationDAO.getValid(player, type, server, limit, offset);
 
-            // cache should be saved only for backend server, i.e. who last used this method
-            if (cached.stream().anyMatch(moderation -> !Objects.equals(server, moderation.server()))) {
-                List<Moderation> newCached = moderationDAO.getValid(player, type, server, limit, offset);
-                moderationCache.put(key, newCached);
-                return newCached;
+            moderationCache.put(key, cache);
+
+            if (cache.stream().anyMatch(Moderation::isActive)) {
+                return cache;
             }
 
-            if (cached.stream().anyMatch(Moderation::isActive)) {
-                return cached;
-            }
-
-            List<Moderation> valid = cached.stream()
-                    .filter(Moderation::isActive)
-                    .toList();
-
-            moderationCache.put(key, valid);
-
-            return valid;
-
-        } catch (Exception _) {
             return Collections.emptyList();
         }
+
+        if (cache.stream().allMatch(Moderation::isActive)) {
+            return cache;
+        }
+
+        List<Moderation> valid = cache.stream()
+                .filter(Moderation::isActive)
+                .toList();
+
+        moderationCache.put(key, valid);
+
+        return valid;
     }
 
     /**
@@ -76,8 +78,8 @@ public class ModerationRepository {
      * @param playerId the player UUID
      * @param type the moderation type
      */
-    public void invalidate(@NonNull UUID playerId, Moderation.Type type) {
-        moderationCache.invalidate(Pair.of(playerId, type));
+    public void invalidate(@NonNull UUID playerId, Moderation.Type type, @Nullable String server) {
+        moderationCache.invalidate(Pair.of(playerId, type.name() + server));
     }
 
     /**
