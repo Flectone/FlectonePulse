@@ -242,7 +242,7 @@ public class FPlayerService {
         UUID uuid = platformPlayerAdapter.getUUID(player);
         if (uuid == null) {
             if (platformPlayerAdapter.isConsole(player)) {
-                return getFPlayer(-1);
+                return getConsole();
             }
 
             return FPlayer.builder().name(name).build();
