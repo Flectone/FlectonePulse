@@ -13,6 +13,10 @@ public class VersionComparator {
     }
 
     public boolean isOlderThan(String first, String second) {
+        return isOlderThan(first, second, true);
+    }
+
+    public boolean isOlderThan(String first, String second, boolean checkSnapshot) {
         String[] subFirst = parseVersionNumbers(first);
         if (subFirst.length != 3) return false;
 
@@ -32,7 +36,7 @@ public class VersionComparator {
             }
         }
 
-        return isSnapshot(first) && !isSnapshot(second);
+        return checkSnapshot && isSnapshot(first) && !isSnapshot(second);
     }
 
     private String[] parseVersionNumbers(String string) {

@@ -246,7 +246,7 @@ public class Database {
                     handle.execute(finalStatement);
                 } catch (Exception e) {
                     // skip MySQL "index already exists"
-                    if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists")) {
+                    if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists") && !e.getMessage().contains("Incorrect prefix key")) {
                         throw e;
                     }
                 }
@@ -255,47 +255,51 @@ public class Database {
     }
 
     private void checkMigration() throws IOException {
-        if (!versionComparator.isOlderThan(fileFacade.getPreInitVersion(), fileFacade.config().version())) return;
-
-        backupCreator.backup(config());
-
         VersionDAO versionDAO = versionDAOProvider.get();
-        Optional<String> versionName = versionDAO.find();
 
-        if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.3.0")) {
-            migration("1_3_0");
-        }
+        if (versionComparator.isOlderThan(fileFacade.getPreInitVersion(), fileFacade.config().version())) {
+            backupCreator.backup(config());
 
-        if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.6.0")) {
-            if (config().type() == Type.POSTGRESQL) {
-                migration("1_6_0_postgre");
-            } else {
-                migration("1_6_0");
+            Optional<String> versionName = versionDAO.find();
+
+            if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.3.0")) {
+                migration("1_3_0");
+            }
+
+            if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.6.0")) {
+                if (config().type() == Type.POSTGRESQL) {
+                    migration("1_6_0_postgre");
+                } else {
+                    migration("1_6_0");
+                }
+            }
+
+            String oldDatabaseVersion = versionName.orElse(null);
+
+            Predicate<String> versionTest = version -> {
+                if (StringUtils.isEmpty(oldDatabaseVersion)) return true;
+
+                return versionComparator.isOlderThan(fileFacade.getPreInitVersion(), version)
+                        && versionComparator.isOlderThan(oldDatabaseVersion, version, false);
+            };
+
+            if (versionTest.test("1.8.2")) {
+                migration("1_8_2");
+            }
+
+            if (versionTest.test("1.9.4")) {
+                // rename fp_moderation to fp_moderation_old
+                migration("pre_1_9_4");
+
+                // create new fp_moderation
+                executeInitSQLDatabaseFile();
+
+                // migrate fp_moderation_old data to new fp_moderation
+                migration("post_1_9_4");
             }
         }
 
-        Predicate<String> versionTest = version -> {
-            String oldDatabaseVersion = versionName.orElse(null);
-            if (StringUtils.isEmpty(oldDatabaseVersion)) return true;
-            return versionComparator.isOlderThan(fileFacade.getPreInitVersion(), version)
-                    && versionComparator.isOlderThan(oldDatabaseVersion, version);
-        };
-
-        if (versionTest.test("1.8.2")) {
-            migration("1_8_2");
-        }
-
-        if (versionTest.test("1.9.4")) {
-            // rename fp_moderation to fp_moderation_old
-            migration("pre_1_9_4");
-
-            // create new fp_moderation
-            executeInitSQLDatabaseFile();
-
-            // migrate fp_moderation_old data to new fp_moderation
-            migration("post_1_9_4");
-        }
-
+        // always update to latest version
         versionDAO.insertOrUpdate(fileFacade.config().version());
     }
 
