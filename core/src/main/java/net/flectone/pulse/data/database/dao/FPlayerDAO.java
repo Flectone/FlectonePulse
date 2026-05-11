@@ -47,9 +47,10 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      *
      * @param uuid the player's UUID
      * @param name the player's name
+     * @param server the server where the player
      * @return true if a new player was inserted, false if an existing player was updated
      */
-    public boolean insert(@NonNull UUID uuid, @NonNull String name) {
+    public boolean insert(@NonNull UUID uuid, @NonNull String name, @NonNull String server) {
         return inTransaction(sql -> {
             Optional<PlayerInfo> existingByUUID = sql.findByUUID(uuid.toString());
             if (existingByUUID.isPresent()) {
@@ -59,7 +60,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 if (!name.equalsIgnoreCase(existingName)) {
                     logger.warning("Player with UUID '%s' changed name: '%s' -> '%s'", uuid, existingName, name);
 
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
+                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip(), server);
                 }
 
                 return false;
@@ -73,13 +74,13 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 if (!uuid.equals(existingUuid)) {
                     logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
 
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
+                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip(), server);
                 }
 
                 return false;
             }
 
-            sql.insert(uuid.toString(), name);
+            sql.insert(uuid.toString(), name, server);
 
             return true;
         });
@@ -95,7 +96,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
             Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.uuid().toString());
 
             if (existingPlayer.isEmpty()) {
-                sql.insertWithId(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name());
+                sql.insertWithId(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name(), fPlayer.server());
             }
         });
     }
@@ -113,7 +114,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 fPlayer.isOnline(),
                 fPlayer.uuid().toString(),
                 fPlayer.name(),
-                fPlayer.ip()
+                fPlayer.ip(),
+                fPlayer.server()
         ));
     }
 

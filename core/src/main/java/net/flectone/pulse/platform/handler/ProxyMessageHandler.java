@@ -121,8 +121,8 @@ public class ProxyMessageHandler {
                 UUID messageUUID = UUID.fromString(input.readUTF());
 
                 String fromServer = input.readUTF();
-                if (fromServer.equals(fileFacade.config().serverUuid())) {
-                    fLogger.warning("Duplicate server_uuid detected %s. Please set a unique server_uuid in config.yml. Otherwise cross-server data (bans, mutes, etc.) may fail or mix up", fromServer);
+                if (fromServer.equals(fileFacade.config().server())) {
+                    fLogger.warning("Duplicate 'server' detected %s. Please set a unique 'server' in config.yml. Otherwise cross-server data (bans, mutes, etc.) may fail or mix up", fromServer);
                 }
 
                 switch (moduleName) {

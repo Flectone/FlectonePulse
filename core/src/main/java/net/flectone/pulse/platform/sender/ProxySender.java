@@ -112,7 +112,7 @@ public class ProxySender {
 
             output.writeUTF(tag.toProxyTag());
             output.writeUTF(metadataUUID.toString());
-            output.writeUTF(fileFacade.config().serverUuid());
+            output.writeUTF(fileFacade.config().server());
             output.writeAsJson(fileFacade.config().proxy().clusters());
             output.writeAsJson(sender);
             outputConsumer.accept(output);

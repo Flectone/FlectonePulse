@@ -108,7 +108,7 @@ public class ModerationService {
 
     @Nullable
     public Moderation add(FPlayer fPlayer, long time, String reason, int moderator, Moderation.Type type) {
-        return add(fPlayer, System.currentTimeMillis(), time, reason, moderator, type, fileFacade.config().serverUuid());
+        return add(fPlayer, System.currentTimeMillis(), time, reason, moderator, type, fileFacade.config().server());
     }
 
     @Nullable
@@ -217,7 +217,7 @@ public class ModerationService {
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
                 || type == Moderation.Type.WHITELIST && fileFacade.command().whitelist().filterByServer()
-                ? fileFacade.config().serverUuid()
+                ? fileFacade.config().server()
                 : null;
     }
 

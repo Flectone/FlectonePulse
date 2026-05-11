@@ -177,6 +177,7 @@ public class MessagePipeline {
         CONDITION,
         MUTE,
         STREAM,
+        SERVER,
         SUFFIX,
         PREFIX,
         DELETE,

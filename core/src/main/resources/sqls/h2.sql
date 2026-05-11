@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `fp_player` (
     `uuid` VARCHAR(36) NOT NULL UNIQUE,
     `name` VARCHAR(255) NOT NULL,
     `ip` VARCHAR(39),
+    `server` VARCHAR(255),
     UNIQUE(`uuid`, `name`)
 );
 

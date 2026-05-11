@@ -52,6 +52,8 @@ public interface FPlayer extends FEntity {
 
     String ip();
 
+    String server();
+
     Map<FColor.Type, Set<FColor>> fColors();
 
     Map<String, Boolean> settingsBoolean();
@@ -118,7 +120,8 @@ public interface FPlayer extends FEntity {
             boolean console,
             boolean integration,
             boolean online,
-            String ip,
+            @Nullable String ip,
+            @Nullable String server,
             Map<FColor.Type, Set<FColor>> fColors,
             Map<String, Boolean> settingsBoolean,
             Map<SettingText, String> settingsText,

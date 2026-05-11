@@ -67,9 +67,9 @@ public class FileFacade {
         // load local files
         updateFiles();
 
-        boolean serverUuidEmpty = StringUtils.isEmpty(files.config().serverUuid());
-        if (serverUuidEmpty) {
-            files = files.withConfig(files.config().withServerUuid(UUID.randomUUID().toString()));
+        boolean serverEmpty = StringUtils.isEmpty(files.config().server());
+        if (serverEmpty) {
+            files = files.withConfig(files.config().withServer(UUID.randomUUID().toString()));
         }
 
         // migrate if version changed

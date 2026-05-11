@@ -162,8 +162,8 @@ public class FPlayerRepository {
      * @param name the player name
      * @return true if a new player was inserted, false if existing player was updated
      */
-    public boolean save(@NonNull UUID uuid, @NonNull String name) {
-        return fPlayerDAO.insert(uuid, name);
+    public boolean save(@NonNull UUID uuid, @NonNull String name, @NonNull String server) {
+        return fPlayerDAO.insert(uuid, name, server);
     }
 
     /**

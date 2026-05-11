@@ -129,13 +129,17 @@ public class FPlayerService {
             fPlayer = fPlayerRepository.get(uuid);
         }
 
-        // most often this is not a real IP (this is server ip) on login,
-        // need to update it before calling saveFPlayerData from PlayerJoinEvent
-        fPlayer = fPlayer.withIp(platformPlayerAdapter.getIp(fPlayer));
-
-        // player is not fully online on server,
-        // but it should already be
-        fPlayer = fPlayer.withOnline(true);
+        fPlayer = fPlayer.toBuilder()
+                // most often this is not a real IP (this is server ip) on login,
+                // need to update it before calling saveFPlayerData from PlayerJoinEvent
+                .ip(platformPlayerAdapter.getIp(fPlayer))
+                // player is not fully online on server,
+                // but it should already be
+                .online(true)
+                // save current server
+                .server(fileFacade.config().server())
+                // build
+                .build();
 
         // add player to online cache and remove from offline
         fPlayerRepository.add(fPlayer);
@@ -149,7 +153,7 @@ public class FPlayerService {
     }
 
     public boolean save(@NonNull UUID uuid, @NonNull String name) {
-        return fPlayerRepository.save(uuid, name);
+        return fPlayerRepository.save(uuid, name, fileFacade.config().server());
     }
 
     public void saveFPlayerData(FPlayer fPlayer) {

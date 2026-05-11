@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.ModuleSimple;
@@ -37,8 +38,10 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.util.EnumMap;
@@ -141,13 +144,20 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
 
+        if (sender instanceof FPlayer fPlayer && !isUserMessage) {
+            messageContext = messageContext.addTagResolver(
+                    Placeholder.unparsed("server", StringUtils.defaultString(fPlayer.server()))
+            );
+        }
+
+        FPlayer fReceiver = messageContext.receiver();
         return messageContext.addTagResolvers(tagResolverMap
                 .entrySet()
                 .stream()
                 .filter(entry -> isCorrectTag(entry.getKey(), sender, isUserMessage))
                 .map(entry -> {
                     if (entry.getKey() == AdventureTag.GRADIENT
-                            && integrationModule.isBedrockPlayer(messageContext.receiver())) {
+                            && integrationModule.isBedrockPlayer(fReceiver)) {
                         return bedrockGradientTag();
                     }
 

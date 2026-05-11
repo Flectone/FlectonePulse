@@ -58,9 +58,10 @@ public interface FPlayerSQL extends SQL {
      *
      * @param uuid the player UUID
      * @param name the player name
+     * @param server the server where the player
      */
-    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`) VALUES (:uuid, :name)")
-    void insert(@Bind("uuid") String uuid, @Bind("name") String name);
+    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`, `server`) VALUES (:uuid, :name, :server)")
+    void insert(@Bind("uuid") String uuid, @Bind("name") String name, @Bind("server") String server);
 
     /**
      * Inserts a new player with a specific ID.
@@ -68,9 +69,10 @@ public interface FPlayerSQL extends SQL {
      * @param id the player database ID
      * @param uuid the player UUID
      * @param name the player name
+     * @param server the server where the player
      */
-    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
-    void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
+    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`, `server`) VALUES (:id, :uuid, :name, :server)")
+    void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("server") String server);
 
     /**
      * Updates player information.
@@ -80,9 +82,10 @@ public interface FPlayerSQL extends SQL {
      * @param uuid the player UUID
      * @param name the player name
      * @param ip the player IP address
+     * @param server the server where the player
      */
-    @SqlUpdate("UPDATE `fp_player` SET `online` = :online, `uuid` = :uuid, `name` = :name, `ip` = :ip WHERE `id` = :id")
-    void update(@Bind("id") int id, @Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip);
+    @SqlUpdate("UPDATE `fp_player` SET `online` = :online, `uuid` = :uuid, `name` = :name, `ip` = :ip, `server` = :server WHERE `id` = :id")
+    void update(@Bind("id") int id, @Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip, @Bind("server") String server);
 
     /**
      * Gets all online players.
