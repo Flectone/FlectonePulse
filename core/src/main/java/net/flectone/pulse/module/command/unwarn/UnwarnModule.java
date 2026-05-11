@@ -171,7 +171,6 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
                         })
                         .build()
                 )
-                .moderator(fPlayer)
                 .moderations(warns)
                 .unmoderation(unwarn)
                 .build()
