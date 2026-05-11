@@ -72,7 +72,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
     public FPlayer load(@NonNull FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return fPlayer;
 
-        return withHandle(sql -> {
+        return inTransaction(sql -> {
             FPlayer newFPlayer = fPlayer;
             for (FColor.Type type : FColor.Type.values()) {
                 newFPlayer = loadType(sql, newFPlayer, type);
