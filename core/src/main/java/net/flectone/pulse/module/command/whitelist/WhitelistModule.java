@@ -1,0 +1,461 @@
+package net.flectone.pulse.module.command.whitelist;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.setting.PermissionSetting;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.ModerationMetadata;
+import net.flectone.pulse.model.event.UnModerationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.whitelist.listener.PulseWhitelistListener;
+import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleCommandController;
+import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.ModerationListSender;
+import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.parser.string.UUIDParser;
+import net.flectone.pulse.processing.resolver.ProfileResolver;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class WhitelistModule implements ModuleCommand<Localization.Command.Whitelist> {
+
+    private final FileFacade fileFacade;
+    private final ModuleController moduleController;
+    private final CommandParserProvider commandParserProvider;
+    private final ModuleCommandController commandModuleController;
+    private final MessageDispatcher messageDispatcher;
+    private final FPlayerService fPlayerService;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PermissionChecker permissionChecker;
+    private final ModerationService moderationService;
+    private final ListenerRegistry listenerRegistry;
+    private final ModerationMessageFormatter moderationMessageFormatter;
+    private final ModerationListSender moderationListSender;
+    private final ProfileResolver profileResolver;
+    private final TaskScheduler taskScheduler;
+    private final MessagePipeline messagePipeline;
+    private final ProxySender proxySender;
+    private final UUIDParser uuidParser;
+    private final FLogger fLogger;
+
+    @Override
+    public void onEnable() {
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
+        String promptReason = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::reason);
+        String promptTime = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::time);
+        commandModuleController.registerCommand(this, manager -> manager
+                .permission(permission().name())
+                .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .optional(promptPlayer, commandParserProvider.whitelistedParser())
+                .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
+        );
+
+        listenerRegistry.register(PulseWhitelistListener.class);
+
+        if (config().turnedOn()) {
+            startKickTicker();
+        }
+    }
+
+    @Override
+    public Localization.Command.Whitelist localization(FEntity sender) {
+        return fileFacade.localization(sender).command().whitelist();
+    }
+
+    @Override
+    public ModuleName name() {
+        return ModuleName.COMMAND_WHITELIST;
+    }
+
+    @Override
+    public Command.Whitelist config() {
+        return fileFacade.command().whitelist();
+    }
+
+    @Override
+    public Permission.Command.Whitelist permission() {
+        return fileFacade.permission().command().whitelist();
+    }
+
+    @Override
+    public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
+        return ModuleCommand.super.permissionBuilder().add(permission().bypass());
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+
+        // get action type
+        String type = commandModuleController.getArgument(this, commandContext, 0);
+        Action action = Arrays.stream(Action.values())
+                .filter(actionType -> actionType.name().equalsIgnoreCase(type))
+                .findAny()
+                .orElse(null);
+        if (action == null) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::nullType)
+                    .build()
+            );
+            return;
+        }
+
+        switch (action) {
+            case ON, OFF -> actionOnOff(fPlayer, action == Action.ON);
+            case ADD -> actionAdd(fPlayer, commandContext);
+            case REMOVE -> actionRemove(fPlayer, commandContext);
+            case LIST -> actionList(fPlayer, commandContext);
+        }
+    }
+
+    @Nullable
+    public Moderation add(@NonNull FPlayer fModerator, @NonNull FPlayer fTarget, long time, @Nullable String reason) {
+        return moderationService.whitelist(fTarget, time != -1 ? time + System.currentTimeMillis() : -1, reason, fModerator.id());
+    }
+
+    public List<Moderation> getWhitelist(FPlayer fPlayer) {
+        return moderationService.getValid(fPlayer, Moderation.Type.WHITELIST);
+    }
+
+    private void startKickTicker() {
+        taskScheduler.runPlayerRegionTimer(fPlayer -> {
+            if (!config().turnedOn()) return;
+
+            List<Moderation> whitelist = getWhitelist(fPlayer);
+            if (!whitelist.isEmpty()) return;
+
+            kickPlayer(fPlayerService.getConsole(), fPlayer);
+        }, 20L);
+    }
+
+    private void actionOnOff(FPlayer fPlayer, boolean turnedOn) {
+        if (turnedOn && config().turnedOn()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::alreadyOn)
+                    .build()
+            );
+            return;
+        }
+
+        if (!turnedOn && !config().turnedOn()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::alreadyOff)
+                    .build()
+            );
+            return;
+        }
+
+        // save state to file
+        fileFacade.updateFilePack(filePack -> filePack
+                .withCommand(filePack.command()
+                        .withWhitelist(
+                                filePack.command().whitelist().withTurnedOn(turnedOn)
+                        )
+                )
+        );
+
+        try {
+            fileFacade.saveFiles();
+        } catch (Exception e) {
+            fLogger.warning(e);
+            return;
+        }
+
+        messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
+                .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                        .sender(fPlayer)
+                        .format(localization -> turnedOn ? localization.formatOn() : localization.formatOff())
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .range(config().range())
+                        .proxy(dataOutputStream -> dataOutputStream.writeInt(turnedOn ? Action.ON.ordinal() : Action.OFF.ordinal()))
+                        .integration()
+                        .build()
+                )
+                .turnedOn(turnedOn)
+                .build()
+        );
+
+        if (turnedOn) {
+            fPlayerService.getOnlineFPlayers().forEach(fReceiver -> kickPlayer(fPlayer, fReceiver));
+            startKickTicker();
+        }
+    }
+
+    private void actionAdd(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        Optional<String> optionalPlayer = getPlayerNameArgument(fPlayer, commandContext);
+        if (optionalPlayer.isEmpty()) return;
+
+        String playerName = optionalPlayer.get();
+
+        // save new FPlayer
+        FPlayer fTarget = parseFPlayerAndSaveNew(fPlayer, playerName);
+        if (fTarget == null) return;
+
+        Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
+
+        // save whitelist moderation
+        Moderation whitelist = add(fPlayer, fTarget, timeReasonPair.first(), timeReasonPair.second());
+        if (whitelist == null) return;
+
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
+                .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                        .sender(fPlayer)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
+                        )
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .range(config().range())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeInt(Action.ADD.ordinal());
+                            dataOutputStream.writeAsJson(whitelist);
+                        })
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist)
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fTarget)
+                        })
+                        .build()
+                )
+                .moderation(whitelist)
+                .build()
+        );
+    }
+
+    private void actionRemove(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        Optional<String> optionalPlayer = getPlayerNameArgument(fPlayer, commandContext);
+        if (optionalPlayer.isEmpty()) return;
+
+        String playerName = optionalPlayer.get();
+
+        // check playerName, maybe this is UUID
+        UUID uuid = uuidParser.parse(playerName);
+
+        FPlayer fTarget = uuid != null ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
+        if (fTarget.isUnknown()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::nullPlayer)
+                    .build()
+            );
+            return;
+        }
+
+        Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
+
+        long time = timeReasonPair.first();
+        String reason = timeReasonPair.second();
+        if (time != -1) {
+            reason = reason != null ? time + " " + reason : String.valueOf(time);
+        } else if (reason == null) {
+            reason = "";
+        }
+
+        String[] reasonWords = reason.split(" ");
+
+        int id;
+        if (reasonWords.length > 0 && StringUtils.isNumeric(reasonWords[0])) {
+            id = Integer.parseInt(reasonWords[0]);
+            reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
+        } else {
+            id = -1;
+        }
+
+        List<Moderation> whitelist = moderationService.getValid(fTarget, Moderation.Type.WHITELIST, id);
+        if (whitelist.isEmpty()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::alreadyRemove)
+                    .build()
+            );
+            return;
+        }
+
+        // invalidate whitelist moderations and add unwhitelist moderation
+        Moderation unwhitelist = moderationService.remove(fTarget, whitelist, reason);
+        if (unwhitelist == null) return;
+
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
+        }
+
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()
+                .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                        .sender(fPlayer)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
+                        )
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .range(config().range())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeInt(Action.REMOVE.ordinal());
+                            dataOutputStream.writeAsJson(whitelist);
+                            dataOutputStream.writeAsJson(unwhitelist);
+                        })
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist)
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag(fResolver, fTarget)
+                        })
+                        .build()
+                )
+                .moderations(whitelist)
+                .unmoderation(unwhitelist)
+                .build()
+        );
+
+        kickPlayer(fPlayer, fTarget);
+    }
+
+    private void actionList(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        moderationListSender.send(
+                this,
+                fPlayer,
+                commandContext,
+                Moderation.Type.WHITELIST,
+                1,
+                config().perPage(),
+                "/" + commandModuleController.getCommandName(this) + " list",
+                fTarget -> "/" + commandModuleController.getCommandName(this) + " remove " + fTarget.uuid() + " <id>"
+        );
+    }
+
+    private Optional<String> getPlayerNameArgument(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        String promptPlayer = commandModuleController.getPrompt(this, 1);
+        Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
+        if (optionalPlayer.isEmpty()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::nullPlayer)
+                    .build()
+            );
+        }
+
+        return optionalPlayer;
+    }
+
+    private Pair<Long, String> getTimeReasonArgument(CommandContext<FPlayer> commandContext) {
+        String promptReason = commandModuleController.getPrompt(this, 2);
+        String promptTime = commandModuleController.getPrompt(this, 3);
+
+        Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
+        return optionalTime.orElse(Pair.of(-1L, null));
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (_, _) -> Arrays.stream(Action.values())
+                .map(type -> Suggestion.suggestion(type.name().toLowerCase()))
+                .toList();
+    }
+
+    @Nullable
+    private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String playerName) {
+        UUID uuid = uuidParser.parse(playerName);
+
+        FPlayer fTarget = uuid != null ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
+        if (fTarget.isUnknown()) {
+            boolean isUuid = uuid != null;
+            if (isUuid) {
+                // just save empty string for update in feature
+                fPlayerService.save(uuid, platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : "");
+            } else {
+                uuid = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineUUID(playerName) : profileResolver.resolveOfflineUUID(playerName);
+                if (uuid == null) {
+                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                            .sender(fPlayer)
+                            .format(Localization.Command.Whitelist::nullPlayer)
+                            .build()
+                    );
+                    return null;
+                }
+
+                fPlayerService.save(uuid, playerName);
+            }
+
+            // invalidate cached unknown player
+            fPlayerService.invalidateOffline(uuid, false);
+
+            fTarget = fPlayerService.getFPlayer(uuid);
+        } else {
+            List<Moderation> whitelist = moderationService.getValid(fTarget, Moderation.Type.WHITELIST);
+            if (!whitelist.isEmpty() && config().checkDuplicate()) {
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Command.Whitelist::alreadyAdd)
+                        .build()
+                );
+                return null;
+            }
+        }
+
+        return fTarget;
+    }
+
+    private void kickPlayer(FPlayer fPlayer, FPlayer fTarget) {
+        if (!platformPlayerAdapter.isOnline(fTarget)) return;
+        if (permissionChecker.check(fTarget, permission().bypass())) return;
+        if (!getWhitelist(fTarget).isEmpty()) return;
+
+        MessageContext messageContext = messagePipeline.createContext(fPlayer, fTarget, localization(fTarget).person());
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(messageContext));
+    }
+
+    public enum Action {
+        ADD,
+        LIST,
+        OFF,
+        ON,
+        REMOVE
+    }
+
+}

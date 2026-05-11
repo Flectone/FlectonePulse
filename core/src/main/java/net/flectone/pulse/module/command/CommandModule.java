@@ -54,6 +54,7 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
+import net.flectone.pulse.module.command.whitelist.WhitelistModule;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
@@ -112,7 +113,8 @@ public class CommandModule implements ModuleSimple {
                 UnmuteModule.class,
                 UnwarnModule.class,
                 WarnModule.class,
-                WarnlistModule.class
+                WarnlistModule.class,
+                WhitelistModule.class
         );
     }
 

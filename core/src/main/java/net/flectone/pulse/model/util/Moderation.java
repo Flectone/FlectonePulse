@@ -60,9 +60,11 @@ public record Moderation(
         MUTE,
         BAN,
         WARN,
+        WHITELIST,
         KICK,
         UNMUTE,
         UNBAN,
-        UNWARN
+        UNWARN,
+        UNWHITELIST
     }
 }

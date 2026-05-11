@@ -60,6 +60,8 @@ import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
+import net.flectone.pulse.module.command.whitelist.WhitelistModule;
+import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
@@ -201,6 +203,7 @@ public class ProxyMessageHandler {
             case COMMAND_TRANSLATETO -> handleTranslateToCommand(input, fEntity, metadataUUID);
             case COMMAND_TRY -> handleTryCommand(input, fEntity, metadataUUID);
             case COMMAND_WARN -> handleWarnCommand(input, fEntity, metadataUUID);
+            case COMMAND_WHITELIST -> handleWhitelistCommand(input, fEntity, metadataUUID);
             case COMMAND_KICK -> handleKickCommand(input, fEntity, metadataUUID);
             case COMMAND_TICTACTOE -> handleTicTacToeCommand(input, fEntity, metadataUUID);
             case MESSAGE_CHAT -> handleChatMessage(input, fEntity, metadataUUID);
@@ -230,6 +233,12 @@ public class ProxyMessageHandler {
             case SYSTEM_WARN -> {
                 if (!injector.getInstance(WarnModule.class).config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.WARN);
+                }
+                yield true;
+            }
+            case SYSTEM_WHITELIST -> {
+                if (!injector.getInstance(WhitelistModule.class).config().filterByServer()) {
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.WHITELIST);
                 }
                 yield true;
             }
@@ -805,6 +814,87 @@ public class ProxyMessageHandler {
         );
 
         module.sendForTarget(fModerator, (FPlayer) fEntity, warn);
+    }
+
+    private void handleWhitelistCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        WhitelistModule module = injector.getInstance(WhitelistModule.class);
+        if (module.config().filterByServer()) return;
+        if (moduleController.isDisabledFor(module, fEntity)) return;
+        if (!(fEntity instanceof FPlayer fPlayer)) return;
+
+        WhitelistModule.Action action = WhitelistModule.Action.values()[input.readInt()];
+        switch (action) {
+            case ON, OFF -> {
+                boolean turnedOn = action == WhitelistModule.Action.ON;
+
+                messageDispatcher.dispatch(module, WhitelistMetadata.<Localization.Command.Whitelist>builder()
+                        .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                                .sender(fPlayer)
+                                .format(localization -> turnedOn ? localization.formatOn() : localization.formatOff())
+                                .destination(module.config().destination())
+                                .sound(module.soundOrThrow())
+                                .range(Range.get(Range.Type.SERVER))
+                                .build()
+                        )
+                        .turnedOn(turnedOn)
+                        .build()
+                );
+            }
+            case ADD -> {
+                Moderation whitelist = gson.fromJson(input.readUTF(), Moderation.class);
+
+                FPlayer fTarget = fPlayerService.getFPlayer(whitelist.player());
+
+                ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
+                messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Whitelist>builder()
+                        .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .format((fReceiver, localization) ->
+                                        moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
+                                )
+                                .range(Range.get(Range.Type.SERVER))
+                                .destination(module.config().destination())
+                                .sound(module.soundOrThrow())
+                                .tagResolvers(fResolver -> new TagResolver[]{
+                                        messagePipeline.targetTag(fResolver, fTarget)
+                                })
+                                .build()
+                        )
+                        .moderation(whitelist)
+                        .build()
+                );
+            }
+            case REMOVE -> {
+                List<Moderation> whitelist = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+                Moderation unwhitelist = gson.fromJson(input.readUTF(), Moderation.class);
+
+                FPlayer fTarget = fPlayerService.getFPlayer(unwhitelist.player());
+
+                ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
+                messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Whitelist>builder()
+                        .base(EventMetadata.<Localization.Command.Whitelist>builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .format((fReceiver, localization) ->
+                                        moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
+                                )
+                                .destination(fileFacade.command().unwarn().destination())
+                                .range(Range.get(Range.Type.SERVER))
+                                .sound(module.soundOrThrow())
+                                .tagResolvers(fResolver -> new TagResolver[]{
+                                        messagePipeline.targetTag("moderator", fResolver, fTarget)
+                                })
+                                .build()
+                        )
+                        .moderations(whitelist)
+                        .unmoderation(unwhitelist)
+                        .build()
+                );
+            }
+        }
     }
 
     private void handleKickCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

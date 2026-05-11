@@ -64,6 +64,7 @@ public interface CommandMerger {
     @Mapping(target = "unwarn", expression = "java(mergeUnwarn(target.build().unwarn().toBuilder(), source.unwarn()))")
     @Mapping(target = "warn", expression = "java(mergeWarn(target.build().warn().toBuilder(), source.warn()))")
     @Mapping(target = "warnlist", expression = "java(mergeWarnlist(target.build().warnlist().toBuilder(), source.warnlist()))")
+    @Mapping(target = "whitelist", expression = "java(mergeWhitelist(target.build().whitelist().toBuilder(), source.whitelist()))")
     Command merge(@MappingTarget Command.CommandBuilder target, Command source);
 
     Command.Afk mergeAfk(@MappingTarget Command.Afk.AfkBuilder target, Command.Afk source);
@@ -173,5 +174,7 @@ public interface CommandMerger {
     Command.Warn mergeWarn(@MappingTarget Command.Warn.WarnBuilder target, Command.Warn source);
 
     Command.Warnlist mergeWarnlist(@MappingTarget Command.Warnlist.WarnlistBuilder target, Command.Warnlist source);
+
+    Command.Whitelist mergeWhitelist(@MappingTarget Command.Whitelist.WhitelistBuilder target, Command.Whitelist source);
 
 }

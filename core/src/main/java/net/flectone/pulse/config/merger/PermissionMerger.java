@@ -72,6 +72,7 @@ public interface PermissionMerger {
     @Mapping(target = "unwarn", expression = "java(mergeCommandUnwarn(target.build().unwarn().toBuilder(), source.unwarn()))")
     @Mapping(target = "warn", expression = "java(mergeCommandWarn(target.build().warn().toBuilder(), source.warn()))")
     @Mapping(target = "warnlist", expression = "java(mergeCommandWarnlist(target.build().warnlist().toBuilder(), source.warnlist()))")
+    @Mapping(target = "whitelist", expression = "java(mergeCommandWhitelist(target.build().whitelist().toBuilder(), source.whitelist()))")
     Permission.Command mergeCommand(@MappingTarget Permission.Command.CommandBuilder target, Permission.Command source);
 
     Permission.Command.Afk mergeCommandAfk(@MappingTarget Permission.Command.Afk.AfkBuilder target, Permission.Command.Afk source);
@@ -165,6 +166,8 @@ public interface PermissionMerger {
     Permission.Command.Warn mergeCommandWarn(@MappingTarget Permission.Command.Warn.WarnBuilder target, Permission.Command.Warn source);
 
     Permission.Command.Warnlist mergeCommandWarnlist(@MappingTarget Permission.Command.Warnlist.WarnlistBuilder target, Permission.Command.Warnlist source);
+
+    Permission.Command.Whitelist mergeCommandWhitelist(@MappingTarget Permission.Command.Whitelist.WhitelistBuilder target, Permission.Command.Whitelist source);
 
     @Mapping(target = "advancedban", expression = "java(mergeIntegrationAdvancedban(target.build().advancedban().toBuilder(), source.advancedban()))")
     @Mapping(target = "blazeandcave", expression = "java(mergeIntegrationBlazeandcave(target.build().blazeandcave().toBuilder(), source.blazeandcave()))")

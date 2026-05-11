@@ -173,7 +173,10 @@ public record Command(
         Warn warn,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist")
-        Warnlist warnlist
+        Warnlist warnlist,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
+        Whitelist whitelist
 
 ) implements EnableSetting {
 
@@ -866,4 +869,25 @@ public record Command(
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
     }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Whitelist(
+            Boolean enable,
+            Boolean autoAdd,
+            Long autoAddDuration,
+            Boolean checkDuplicate,
+            Boolean filterByServer,
+            Boolean showConnectionAttempts,
+            Boolean turnedOn,
+            Integer perPage,
+            Range range,
+            List<String> aliases,
+            Destination destination,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
 }

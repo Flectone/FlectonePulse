@@ -534,6 +534,18 @@ command:
     sound:
       name: "flectonepulse.module.command.warnlist.sound"
       type: "TRUE"
+  whitelist:
+    name: "flectonepulse.module.command.whitelist"
+    type: "OP"
+    bypass:
+      name: "flectonepulse.module.command.whitelist.bypass"
+      type: "OP"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.whitelist.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.whitelist.sound"
+      type: "TRUE"
 integration:
   name: "flectonepulse.module.integration"
   type: "TRUE"

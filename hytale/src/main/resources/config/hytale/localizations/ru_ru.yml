@@ -446,6 +446,31 @@ command:
       header: "<fcolor:2>| Все предупреждения: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
+  whitelist:
+    empty: "<color:#98FB98> Белый список пустой"
+    null_page: "<color:#ff7171>Страница не найдена"
+    null_player: "<color:#ff7171>Игрок не найден"
+    null_type: "<color:#ff7171>Тип введён неверно"
+    already_add: "<color:#ff7171>Игрок уже в белом списке"
+    already_remove: "<color:#ff7171>Игрока нет в белом списке"
+    already_on: "<color:#ff7171>Белый список уже включен"
+    already_off: "<color:#ff7171>Белый список уже выключен"
+    format_add: "<fcolor:1>[=] Игрок <target> добавлен в белый список <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <display_name><br>Причина: <reason>"
+    format_off: "<fcolor:1>[=] Белый список <fcolor:2>выключен"
+    format_on: "<fcolor:1>[=] Белый список <fcolor:2>включен"
+    format_remove: "<fcolor:1>[=] Игрок <target> удалён из белого списка <br><fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <display_name><br>Причина: <reason>"
+    person: "<color:#ff7171>[=] Тебя нет в белом списке сервера"
+    connection_attempt: "<color:#ff7171>[=] Игрок <display_name>, которого нет в белом списке, попытался подключиться"
+    reasons:
+      default: "Ты добавлен в белый список сервера"
+    global:
+      header: "<fcolor:2>| Игроки в белом списке: <count> <br>"
+      line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
+    player:
+      header: "<fcolor:2>| Записи игрока в белом списке: <count> <br>"
+      line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"
+      footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
 integration:
   discord:
     null_player: "Игрок не найден"

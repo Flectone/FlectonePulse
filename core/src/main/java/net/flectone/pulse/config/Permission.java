@@ -191,7 +191,10 @@ public record Permission(
             Warn warn,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist")
-            Warnlist warnlist
+            Warnlist warnlist,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
+            Whitelist whitelist
     ) implements PermissionSetting {
 
         @With
@@ -714,6 +717,18 @@ public record Permission(
         public record Warnlist(
                 String name,
                 Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Whitelist(
+                String name,
+                Permission.Type type,
+                PermissionEntry bypass,
                 PermissionEntry cooldownBypass,
                 PermissionEntry sound
         ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {

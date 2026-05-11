@@ -73,6 +73,7 @@ public interface LocalizationMerger {
     @Mapping(target = "unwarn", expression = "java(mergeCommandUnwarn(target.build().unwarn().toBuilder(), source.unwarn()))")
     @Mapping(target = "warn", expression = "java(mergeCommandWarn(target.build().warn().toBuilder(), source.warn()))")
     @Mapping(target = "warnlist", expression = "java(mergeCommandWarnlist(target.build().warnlist().toBuilder(), source.warnlist()))")
+    @Mapping(target = "whitelist", expression = "java(mergeCommandWhitelist(target.build().whitelist().toBuilder(), source.whitelist()))")
     Localization.Command mergeCommand(@MappingTarget Localization.Command.CommandBuilder target, Localization.Command source);
 
     Localization.Command.Exception mergeCommandException(@MappingTarget Localization.Command.Exception.ExceptionBuilder target, Localization.Command.Exception source);
@@ -194,6 +195,10 @@ public interface LocalizationMerger {
     @Mapping(target = "global", expression = "java(mergeListTypeMessage(target.build().global().toBuilder(), source.global()))")
     @Mapping(target = "player", expression = "java(mergeListTypeMessage(target.build().player().toBuilder(), source.player()))")
     Localization.Command.Warnlist mergeCommandWarnlist(@MappingTarget Localization.Command.Warnlist.WarnlistBuilder target, Localization.Command.Warnlist source);
+
+    @Mapping(target = "global", expression = "java(mergeListTypeMessage(target.build().global().toBuilder(), source.global()))")
+    @Mapping(target = "player", expression = "java(mergeListTypeMessage(target.build().player().toBuilder(), source.player()))")
+    Localization.Command.Whitelist mergeCommandWhitelist(@MappingTarget Localization.Command.Whitelist.WhitelistBuilder target, Localization.Command.Whitelist source);
 
     @Mapping(target = "discord", expression = "java(mergeIntegrationDiscord(target.build().discord().toBuilder(), source.discord()))")
     @Mapping(target = "telegram", expression = "java(mergeIntegrationTelegram(target.build().telegram().toBuilder(), source.telegram()))")

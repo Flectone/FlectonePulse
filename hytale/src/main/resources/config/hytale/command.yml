@@ -871,3 +871,21 @@ warnlist:
     enable: false
   sound:
     enable: false
+whitelist:
+  enable: true
+  auto_add: false
+  auto_add_duration: -1
+  check_duplicate: true
+  filter_by_server: false
+  show_connection_attempts: true
+  turned_on: false
+  per_page: 4
+  range: "PLAYER"
+  aliases:
+    - "whitelist"
+  destination:
+    type: "CHAT"
+  cooldown:
+    enable: false
+  sound:
+    enable: false

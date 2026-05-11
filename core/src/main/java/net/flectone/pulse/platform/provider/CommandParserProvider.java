@@ -11,6 +11,7 @@ import net.flectone.pulse.processing.parser.integer.DurationReasonParser;
 import net.flectone.pulse.processing.parser.moderation.BanModerationParser;
 import net.flectone.pulse.processing.parser.moderation.MuteModerationParser;
 import net.flectone.pulse.processing.parser.moderation.WarnModerationParser;
+import net.flectone.pulse.processing.parser.moderation.WhitelistModerationParser;
 import net.flectone.pulse.processing.parser.player.OfflinePlayerParser;
 import net.flectone.pulse.processing.parser.player.PlatformPlayerParser;
 import net.flectone.pulse.processing.parser.player.PlayerParser;
@@ -41,6 +42,7 @@ public class CommandParserProvider {
     private final BanModerationParser banModerationParser;
     private final MuteModerationParser muteModerationParser;
     private final WarnModerationParser warnModerationParser;
+    private final WhitelistModerationParser whitelistModerationParser;
     private final ColorParser colorParser;
     private final MessageParser messageParser;
     private final SingleMessageParser singleMessageParser;
@@ -104,6 +106,10 @@ public class CommandParserProvider {
 
     public @NonNull ParserDescriptor<FPlayer, String> warnedParser() {
         return ParserDescriptor.of(warnModerationParser, String.class);
+    }
+
+    public @NonNull ParserDescriptor<FPlayer, String> whitelistedParser() {
+        return ParserDescriptor.of(whitelistModerationParser, String.class);
     }
 
     public @NonNull ParserDescriptor<FPlayer, Pair<Long, String>> durationReasonParser() {

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
+import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import org.apache.commons.lang3.StringUtils;
 
@@ -197,7 +198,10 @@ public record Localization(
             Warn warn,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist")
-            Warnlist warnlist
+            Warnlist warnlist,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
+            Whitelist whitelist
     ) implements LocalizationSetting {
 
         @With
@@ -266,15 +270,6 @@ public record Localization(
                 String person,
                 String connectionAttempt
         ) implements LocalizationSetting {
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            public record Type(
-                    String connectionAttempt,
-                    ReasonMap reasons
-            ) {
-            }
         }
 
         @With
@@ -831,6 +826,30 @@ public record Localization(
                 String empty,
                 String nullPage,
                 String nullPlayer,
+                ListTypeMessage global,
+                ListTypeMessage player
+        ) implements LocalizationSetting, ModerationListLocalizationSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Whitelist(
+                String empty,
+                String nullPage,
+                String nullPlayer,
+                String nullType,
+                ReasonMap reasons,
+                String alreadyAdd,
+                String alreadyOff,
+                String alreadyOn,
+                String alreadyRemove,
+                String formatAdd,
+                String formatOff,
+                String formatOn,
+                String formatRemove,
+                String person,
+                String connectionAttempt,
                 ListTypeMessage global,
                 ListTypeMessage player
         ) implements LocalizationSetting, ModerationListLocalizationSetting {
