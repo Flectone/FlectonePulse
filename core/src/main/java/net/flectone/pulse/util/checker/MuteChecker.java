@@ -14,6 +14,9 @@ import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
 
+import java.time.Duration;
+import java.time.Instant;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MuteChecker {
@@ -24,8 +27,6 @@ public class MuteChecker {
     private final Provider<FloodModule> floodModuleProvider;
     private final Provider<NewbieModule> newbieModuleProvider;
     private final Provider<SwearModule> swearModuleProvider;
-
-    private final FLogger fLogger;
 
     public Status check(FPlayer fPlayer) {
         if (moderationService.hasValid(fPlayer, Moderation.Type.MUTE, -1)) {
@@ -51,8 +52,6 @@ public class MuteChecker {
         if (integrationModuleProvider.get().isMuted(fPlayer)) {
             return Status.EXTERNAL;
         }
-
-//        fLogger.warning(fPlayer.name() + " LETS GO");
 
         return Status.NONE;
     }

@@ -26,7 +26,9 @@ public class PulseMaintenanceListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (maintenanceModule.isAllowed(fPlayer)) return event;
 
-        fPlayer = fPlayerService.loadColors(fPlayer);
+        if (fPlayer.fColors().isEmpty()) {
+            fPlayer = fPlayerService.loadColors(fPlayer);
+        }
 
         String reasonMessage = maintenanceModule.localization(fPlayer).kick();
         MessageContext messageContext = messagePipeline.createContext(fPlayer, reasonMessage);

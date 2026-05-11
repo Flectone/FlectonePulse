@@ -380,7 +380,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
-        FPlayer fPlayer = fPlayerService.updateCache(fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity)));
+        FPlayer fPlayer = fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity));
 
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!moduleController.isEnable(module)) return;

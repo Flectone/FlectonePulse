@@ -312,14 +312,18 @@ public interface FPlayer extends FEntity {
         public FPlayer withFColors(FColor.@NonNull Type type, @Nullable Set<FColor> fColors) {
             boolean newFColorsEmpty = fColors == null || fColors.isEmpty();
             boolean oldFColorsEmpty = this.fColors.isEmpty();
-            if (newFColorsEmpty && oldFColorsEmpty) return this;
+            if (newFColorsEmpty && oldFColorsEmpty) {
+                return toBuilder()
+                        .fColors(Map.of(type, Collections.emptySet()))
+                        .build();
+            }
 
             Map<FColor.Type, Set<FColor>> fColorMap = oldFColorsEmpty
                     ? new EnumMap<>(FColor.Type.class)
                     : new EnumMap<>(this.fColors);
 
             if (newFColorsEmpty) {
-                fColorMap.remove(type);
+                fColorMap.put(type, Collections.emptySet());
             } else {
                 fColorMap.put(type, Collections.unmodifiableSet(fColors));
             }

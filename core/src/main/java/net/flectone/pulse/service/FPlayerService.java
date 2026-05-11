@@ -307,7 +307,7 @@ public class FPlayerService {
     }
 
     public FPlayer loadColors(FPlayer fPlayer) {
-        return fPlayerRepository.loadColors(fPlayer);
+        return updateCache(fPlayerRepository.loadColors(fPlayer));
     }
 
     public void saveColors(FPlayer fPlayer) {

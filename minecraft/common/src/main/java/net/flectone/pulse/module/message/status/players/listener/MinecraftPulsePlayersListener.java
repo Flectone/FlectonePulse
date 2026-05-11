@@ -27,7 +27,9 @@ public class MinecraftPulsePlayersListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (playersModule.isAllowed(fPlayer)) return event;
 
-        fPlayer = fPlayerService.loadColors(fPlayer);
+        if (fPlayer.fColors().isEmpty()) {
+            fPlayer = fPlayerService.loadColors(fPlayer);
+        }
 
         String reasonMessage = playersModule.localization(fPlayer).full();
         MessageContext reasonContext = messagePipeline.createContext(fPlayer, reasonMessage);

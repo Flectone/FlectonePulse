@@ -51,7 +51,9 @@ public class PulseWhitelistListener implements PulseListener {
         if (whitelistModule.isWhitelisted(fPlayer)) return event;
 
         // load custom player colors
-        fPlayer = fPlayerService.loadColors(fPlayer);
+        if (fPlayer.fColors().isEmpty()) {
+            fPlayer = fPlayerService.loadColors(fPlayer);
+        }
 
         // build message
         MessageContext messageContext = messagePipeline.createContext(fPlayer, whitelistModule.localization(fPlayer).person());

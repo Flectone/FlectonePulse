@@ -98,7 +98,9 @@ public class MinecraftStatusModule extends StatusModule {
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        fPlayer = fPlayerService.loadColors(fPlayer);
+        if (fPlayer.fColors().isEmpty()) {
+            fPlayer = fPlayerService.loadColors(fPlayer);
+        }
 
         JsonObject responseJson = new JsonObject();
 
