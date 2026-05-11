@@ -14,11 +14,13 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -51,6 +53,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -61,6 +64,8 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
         );
+
+        listenerRegistry.register(PulseTellListener.class);
     }
 
     @Override
@@ -133,7 +138,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         // save for sender
-        senderReceiverMap.put(fPlayer.uuid(), fReceiver.name());
+        saveReceiver(fPlayer.uuid(), fReceiver.name());
 
         if (!fPlayer.isConsole() && !fReceiver.isConsole()) {
             String receiverUUID = fReceiver.uuid().toString();
@@ -177,8 +182,16 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         );
 
         if (!isSenderToSender) {
-            senderReceiverMap.put(fReceiver.uuid(), sender.name());
+            saveReceiver(fReceiver.uuid(), sender.name());
         }
+    }
+
+    public void saveReceiver(UUID player, String receiver) {
+        senderReceiverMap.put(player, receiver);
+    }
+
+    public void removeReceiver(FPlayer fPlayer) {
+        senderReceiverMap.remove(fPlayer.uuid());
     }
 
     public @Nullable String getReceiverFor(FPlayer fPlayer) {
