@@ -42,7 +42,7 @@ public class ModerationMessageFormatter {
     public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
         return switch (status) {
             case LOCAL -> {
-                List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
+                List<Moderation> mutes = moderationService.getValid(fPlayer, Moderation.Type.MUTE);
                 if (mutes.isEmpty()) yield Optional.empty();
 
                 String format = fileFacade.localization(fPlayer).command().mute().person();
@@ -125,6 +125,7 @@ public class ModerationMessageFormatter {
             case WARN -> localization.command().warn().reasons();
             case UNWARN -> localization.command().unwarn().reasons();
             case KICK -> localization.command().kick().reasons();
+            case WHITELIST, UNWHITELIST -> localization.command().whitelist().reasons();
         };
 
         String reason = constantReasons.getConstant(moderation.reason());

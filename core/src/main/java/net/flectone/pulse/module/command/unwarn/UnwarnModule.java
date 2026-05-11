@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.unwarn;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -126,17 +125,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        List<Moderation> warns = new ObjectArrayList<>();
-
-        if (id == -1) {
-            warns.addAll(moderationService.getValidWarns(fTarget));
-        } else {
-            moderationService.getValidWarns(fTarget).stream()
-                    .filter(warn -> warn.id() == id)
-                    .findAny()
-                    .ifPresent(warns::add);
-        }
-
+        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN, id);
         if (warns.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unwarn>builder()
                     .sender(fPlayer)

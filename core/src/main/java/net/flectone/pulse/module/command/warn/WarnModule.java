@@ -144,7 +144,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
 
         sendForTarget(fPlayer, fTarget, warn);
 
-        List<Moderation> warns = moderationService.getValidWarns(fTarget);
+        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN);
         if (warns.isEmpty()) return;
 
         int countWarns = warns.stream()

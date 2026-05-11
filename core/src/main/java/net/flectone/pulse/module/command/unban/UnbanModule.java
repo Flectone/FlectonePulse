@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.unban;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -125,18 +124,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             return;
         }
 
-        List<Moderation> bans = new ObjectArrayList<>();
-
-        if (id == -1) {
-            bans.addAll(moderationService.getValidBans(fTarget));
-        } else {
-            moderationService.getValidBans(fTarget)
-                    .stream()
-                    .filter(moderation -> moderation.id() == id)
-                    .findAny()
-                    .ifPresent(bans::add);
-        }
-
+        List<Moderation> bans = moderationService.getValid(fTarget, Moderation.Type.BAN, id);
         if (bans.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)

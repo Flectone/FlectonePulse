@@ -89,16 +89,10 @@ public class ModerationService {
         return getValid(fPlayer, Moderation.Type.BAN);
     }
 
-    public List<Moderation> getValidBans() {
-        return getValid(Moderation.Type.BAN);
-    }
-
-    public List<Moderation> getValidWarns(FPlayer fPlayer) {
-        return getValid(fPlayer, Moderation.Type.WARN);
-    }
-
-    public List<Moderation> getValidWarns() {
-        return getValid(Moderation.Type.WARN);
+    public List<Moderation> getValid(FPlayer fTarget, Moderation.Type type, int id) {
+        return getValid(fTarget, type).stream()
+                .filter(moderation -> id == -1 || moderation.id() == id)
+                .toList();
     }
 
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {

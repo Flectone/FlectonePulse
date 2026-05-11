@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.unmute;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -125,17 +124,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        List<Moderation> mutes = new ObjectArrayList<>();
-
-        if (id == -1) {
-            mutes.addAll(moderationService.getValidMutes(fTarget));
-        } else {
-            moderationService.getValidMutes(fTarget).stream()
-                    .filter(moderation -> moderation.id() == id)
-                    .findAny()
-                    .ifPresent(mutes::add);
-        }
-
+        List<Moderation> mutes = moderationService.getValid(fTarget, Moderation.Type.MUTE, id);
         if (mutes.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
