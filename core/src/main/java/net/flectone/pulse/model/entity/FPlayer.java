@@ -64,7 +64,13 @@ public interface FPlayer extends FEntity {
 
     List<Component> constants();
 
+    FPlayer withName(String name);
+
+    FPlayer withUuid(UUID uuid);
+
     FPlayer withOnline(boolean online);
+
+    FPlayer withId(Integer id);
 
     FPlayer withIp(String ip);
 
