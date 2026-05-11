@@ -3,7 +3,6 @@ package net.flectone.pulse.util.checker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -38,12 +37,7 @@ public class HytalePermissionChecker implements PermissionChecker {
             value = hytalePlayerAdapter.isOperator(fPlayer);
         }
 
-        PlayerRef player = hytalePlayerAdapter.getPlayer(entity.uuid());
-        if (player != null) {
-            value = value && PermissionsModule.get().hasPermission(entity.uuid(), permission); // player has no default permissions
-        }
-
-        return value;
+        return PermissionsModule.get().hasPermission(entity.uuid(), permission, value);
     }
 
 }
