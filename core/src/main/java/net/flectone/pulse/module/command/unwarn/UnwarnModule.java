@@ -153,7 +153,9 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
                         .proxy(dataOutputStream ->
                                 dataOutputStream.writeAsJson(unwarn)
                         )
-                        .integration()
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwarn)
+                        )
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })

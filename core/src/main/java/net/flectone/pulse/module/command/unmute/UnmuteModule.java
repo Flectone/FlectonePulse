@@ -152,7 +152,9 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                         .proxy(dataOutputStream ->
                                 dataOutputStream.writeAsJson(unmute)
                         )
-                        .integration()
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unmute)
+                        )
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })
