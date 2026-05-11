@@ -286,7 +286,7 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {
+        ) implements LocalizationSetting, ModerationListLocalizationSetting {
         }
 
         @With
@@ -541,7 +541,7 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {
+        ) implements LocalizationSetting, ModerationListLocalizationSetting {
         }
 
         @With
@@ -833,7 +833,7 @@ public record Localization(
                 String nullPlayer,
                 ListTypeMessage global,
                 ListTypeMessage player
-        ) implements LocalizationSetting {
+        ) implements LocalizationSetting, ModerationListLocalizationSetting {
         }
     }
 
