@@ -18,6 +18,7 @@ import net.flectone.pulse.module.message.format.names.listener.PulseNamesListene
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -43,6 +44,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final PermissionChecker permissionChecker;
+    private final ProfileResolver profileResolver;
 
     @Override
     public void onEnable() {
@@ -164,7 +166,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                             Localization.Message.Format.Names localization = localization(fReceiver);
                             String displayName = fPlayer.isUnknown() || localization.display().isEmpty()
-                                    ? Strings.CS.replace(localization.unknown(), "<name>", fPlayer.name())
+                                    ? Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer))
                                     : localization.display().get(displayNameIndex);
 
                             MessageContext displayContext = messagePipeline.createContext(sender, fReceiver, displayName)
@@ -187,7 +189,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
                         TagResolver.resolver(playerNameTags, (_, _) ->
-                                Tag.preProcessParsed(fPlayer.name())
+                                Tag.preProcessParsed(profileResolver.resolveName(fPlayer))
                         )
                 );
     }

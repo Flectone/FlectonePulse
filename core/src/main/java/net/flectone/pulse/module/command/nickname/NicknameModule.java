@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -55,6 +56,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     private final ProxySender proxySender;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProfileResolver profileResolver;
     private final FLogger fLogger;
 
     private Predicate<String> allowedPredicate;
@@ -198,7 +200,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
 
                 // skip module formatting
                 if (Strings.CS.equals(defaultNickname, "<player>")) {
-                    return Tag.preProcessParsed(messageContext.sender().name());
+                    return Tag.preProcessParsed(profileResolver.resolveName(messageContext.sender()));
                 }
 
                 value = defaultNickname;
