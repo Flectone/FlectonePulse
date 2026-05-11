@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.command.clearmail;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,19 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ClearmailModule implements ModuleCommand<Localization.Command.Clearmail> {
+
+    private final Cache<UUID, List<String>> suggestionCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(5, TimeUnit.SECONDS)
+            .maximumSize(10)
+            .build();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -47,10 +57,16 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
                 .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, _) -> {
                     FPlayer fPlayer = commandContext.sender();
 
-                    return fPlayerService.getSenderMails(fPlayer)
+                    List<String> cache = suggestionCache.getIfPresent(fPlayer.uuid());
+                    if (cache != null) return cache;
+
+                    List<String> suggestion = fPlayerService.getSenderMails(fPlayer)
                             .stream()
                             .map(mail -> String.valueOf(mail.id()))
                             .toList();
+                    suggestionCache.put(fPlayer.uuid(), suggestion);
+
+                    return suggestion;
                 }))
         );
     }
