@@ -18,6 +18,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
@@ -114,9 +115,9 @@ public class FPlayerService {
         return fPlayer;
     }
 
-    public FPlayer addFPlayer(UUID uuid, String name) {
+    public FPlayer addFPlayer(@NonNull UUID uuid, @NonNull String name) {
         // insert to database
-        fPlayerRepository.save(uuid, name);
+        save(uuid, name);
 
         moderationService.invalidate(uuid);
 
@@ -145,6 +146,10 @@ public class FPlayerService {
     // load player data
     public FPlayer loadData(FPlayer fPlayer) {
         return loadIgnores(loadColors(loadSettings(fPlayer)));
+    }
+
+    public boolean save(@NonNull UUID uuid, @NonNull String name) {
+        return fPlayerRepository.save(uuid, name);
     }
 
     public void saveFPlayerData(FPlayer fPlayer) {
