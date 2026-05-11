@@ -217,19 +217,19 @@ public class ProxyMessageHandler {
         return switch (tag) {
             case SYSTEM_BAN -> {
                 if (!injector.getInstance(BanModule.class).config().filterByServer()) {
-                    moderationService.invalidateBans(fEntity.uuid());
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.BAN);
                 }
                 yield true;
             }
             case SYSTEM_MUTE -> {
                 if (!injector.getInstance(MuteModule.class).config().filterByServer()) {
-                    moderationService.invalidateMutes(fEntity.uuid());
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.MUTE);
                 }
                 yield true;
             }
             case SYSTEM_WARN -> {
                 if (!injector.getInstance(WarnModule.class).config().filterByServer()) {
-                    moderationService.invalidateWarns(fEntity.uuid());
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.WARN);
                 }
                 yield true;
             }

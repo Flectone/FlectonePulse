@@ -45,16 +45,8 @@ public class ModerationService {
                 .forEach(playerViolations::remove);
     }
 
-    public void invalidateMutes(UUID uuid) {
-        moderationRepository.invalidate(uuid, Moderation.Type.MUTE);
-    }
-
-    public void invalidateBans(UUID uuid) {
-        moderationRepository.invalidate(uuid, Moderation.Type.BAN);
-    }
-
-    public void invalidateWarns(UUID uuid) {
-        moderationRepository.invalidate(uuid, Moderation.Type.WARN);
+    public void invalidate(UUID uuid, Moderation.Type type) {
+        moderationRepository.invalidate(uuid, type);
     }
 
     @Nullable
@@ -77,16 +69,9 @@ public class ModerationService {
         return add(fPlayer, -1, reason, moderator, Moderation.Type.KICK);
     }
 
-    public List<Moderation> getValidMutes(FPlayer fPlayer) {
-        return getValid(fPlayer, Moderation.Type.MUTE);
-    }
-
-    public List<Moderation> getValidMutes() {
-        return getValid(Moderation.Type.MUTE);
-    }
-
-    public List<Moderation> getValidBans(FPlayer fPlayer) {
-        return getValid(fPlayer, Moderation.Type.BAN);
+    @Nullable
+    public Moderation whitelist(FPlayer fPlayer, long time, String reason, int moderator) {
+        return add(fPlayer, time, reason, moderator, Moderation.Type.WHITELIST);
     }
 
     public List<Moderation> getValid(FPlayer fTarget, Moderation.Type type, int id) {
@@ -195,6 +180,7 @@ public class ModerationService {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
             case WARN -> Moderation.Type.UNWARN;
+            case WHITELIST -> Moderation.Type.UNWHITELIST;
             default -> throw new IllegalArgumentException("Unknown un-moderation type: " + firstModeration.type());
         }, server);
     }
@@ -222,6 +208,7 @@ public class ModerationService {
         return type == Moderation.Type.BAN && fileFacade.command().ban().filterByServer()
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
+                || type == Moderation.Type.WHITELIST && fileFacade.command().whitelist().filterByServer()
                 ? fileFacade.config().serverUuid()
                 : null;
     }
