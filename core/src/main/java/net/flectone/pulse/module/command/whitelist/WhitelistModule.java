@@ -160,6 +160,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private void startKickTicker() {
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
             if (!config().turnedOn()) return;
+            if (permissionChecker.check(fPlayer, permission().bypass())) return;
             if (isWhitelisted(fPlayer)) return;
 
             kickPlayer(fPlayerService.getConsole(), fPlayer);
