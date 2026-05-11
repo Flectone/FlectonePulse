@@ -68,6 +68,8 @@ public interface FPlayer extends FEntity {
 
     FPlayer withUuid(UUID uuid);
 
+    FPlayer withConsole(boolean console);
+
     FPlayer withOnline(boolean online);
 
     FPlayer withId(Integer id);

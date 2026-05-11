@@ -68,8 +68,16 @@ public class FPlayerRepository {
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
 
-        // don't save offline console
-        if (id != -1) {
+        if (id == -1) {
+            // invalid console cache
+            invalid(dbPlayer.uuid());
+
+            // indicate console
+            dbPlayer = dbPlayer.withConsole(true);
+
+            // save to cache
+            onlinePlayers.put(dbPlayer.uuid(), dbPlayer);
+        } else {
             saveToCache(dbPlayer);
         }
 
