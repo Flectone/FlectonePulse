@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS "fp_moderation" (
     "time" BIGINT NOT NULL,
     "reason" TEXT,
     "moderator" INTEGER NOT NULL,
-    "type" TEXT NOT NULL,
+    "type" VARCHAR(255) NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
-    "server" TEXT,
+    "server" VARCHAR(255),
     FOREIGN KEY("player") REFERENCES "fp_player"("id"),
     FOREIGN KEY("moderator") REFERENCES "fp_player"("id")
 );
@@ -73,29 +73,28 @@ CREATE TABLE IF NOT EXISTS "fp_player_fcolor" (
     "number" INTEGER NOT NULL,
     "player" INTEGER NOT NULL,
     "fcolor" INTEGER NOT NULL,
-    "type" TEXT NOT NULL,
+    "type" VARCHAR(255) NOT NULL,
     FOREIGN KEY("player") REFERENCES "fp_player"("id"),
     FOREIGN KEY("fcolor") REFERENCES "fp_fcolor"("id")
 );
 
 CREATE TABLE IF NOT EXISTS "fp_version" (
     "id" INTEGER PRIMARY KEY CHECK ("id" = 1),
-    "name" TEXT NOT NULL
+    "name" VARCHAR(32) NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS "idx_fp_player_ip" ON "fp_player"("ip");
 CREATE INDEX IF NOT EXISTS "idx_fp_player_online" ON "fp_player"("online");
 
-CREATE INDEX IF NOT EXISTS "idx_fp_mail_receiver_valid_date" ON "fp_mail"("receiver", "valid", "date");
-CREATE INDEX IF NOT EXISTS "idx_fp_mail_sender_valid_date" ON "fp_mail"("sender", "valid", "date");
+CREATE INDEX IF NOT EXISTS "idx_fp_time_total" ON "fp_time"("total" DESC);
 
-CREATE INDEX IF NOT EXISTS "idx_fp_ignore_initiator_target_valid" ON "fp_ignore"("initiator", "target", "valid");
-CREATE INDEX IF NOT EXISTS "idx_fp_ignore_target_valid" ON "fp_ignore"("target", "valid");
+CREATE INDEX IF NOT EXISTS "idx_fp_mail_receiver_valid" ON "fp_mail"("receiver", "valid");
+CREATE INDEX IF NOT EXISTS "idx_fp_mail_sender_valid" ON "fp_mail"("sender", "valid");
 
-CREATE INDEX IF NOT EXISTS "idx_fp_moderation_player_valid_time" ON "fp_moderation"("player", "valid", "time");
-CREATE INDEX IF NOT EXISTS "idx_fp_moderation_player_type_valid" ON "fp_moderation"("player", "type", "valid");
-CREATE INDEX IF NOT EXISTS "idx_fp_moderation_moderator_valid" ON "fp_moderation"("moderator", "valid");
-CREATE INDEX IF NOT EXISTS "idx_fp_moderation_valid_time" ON "fp_moderation"("valid", "time");
+CREATE INDEX IF NOT EXISTS "idx_fp_ignore_initiator_valid" ON "fp_ignore"("initiator", "valid");
+
+CREATE INDEX IF NOT EXISTS "idx_fp_moderation_player_type_valid_time" ON "fp_moderation"("player", "type", "valid", "time");
+CREATE INDEX IF NOT EXISTS "idx_fp_moderation_type_valid_time" ON "fp_moderation"("type", "valid", "time");
+CREATE INDEX IF NOT EXISTS "idx_fp_moderation_moderator" ON "fp_moderation"("moderator");
 
 CREATE INDEX IF NOT EXISTS "idx_fp_player_fcolor_player_type" ON "fp_player_fcolor"("player", "type");
-CREATE INDEX IF NOT EXISTS "idx_fp_player_fcolor_player_type_number" ON "fp_player_fcolor"("player", "type", "number");
