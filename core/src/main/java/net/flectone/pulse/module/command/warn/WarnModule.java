@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -119,24 +120,28 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
             proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
-                .base(EventMetadata.<Localization.Command.Warn>builder()
-                        .sender(fTarget)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
-                        )
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Warn> baseMetadataBuilder = EventMetadata.<Localization.Command.Warn>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
                 )
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
+                .base(baseMetadataBuilder.build())
                 .moderation(warn)
                 .build()
         );

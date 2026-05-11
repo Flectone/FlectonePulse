@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.PulseBanListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -151,24 +152,30 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
 
         kick(fPlayer, fTarget, ban);
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Ban>builder()
-                .base(EventMetadata.<Localization.Command.Ban>builder()
-                        .sender(fTarget)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, ban)
-                        )
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .proxy(dataOutputStream ->
-                                dataOutputStream.writeAsJson(ban)
-                        )
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fPlayer)})
-                        .build()
+        EventMetadata.Builder<Localization.Command.Ban> baseMetadataBuilder = EventMetadata.<Localization.Command.Ban>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, ban)
                 )
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream ->
+                        dataOutputStream.writeAsJson(ban)
+                )
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Ban>builder()
+                .base(baseMetadataBuilder.build())
                 .moderation(ban)
                 .build()
         );

@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -94,24 +95,28 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
 
         kick(fPlayer, fTarget, kick);
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()
-                .base(EventMetadata.<Localization.Command.Kick>builder()
-                        .sender(fTarget)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, kick)
-                        )
-                        .destination(config().destination())
-                        .range(config().range())
-                        .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Kick> baseMetadataBuilder = EventMetadata.<Localization.Command.Kick>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, kick)
                 )
+                .destination(config().destination())
+                .range(config().range())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()
+                .base(baseMetadataBuilder.build())
                 .moderation(kick)
                 .build()
         );

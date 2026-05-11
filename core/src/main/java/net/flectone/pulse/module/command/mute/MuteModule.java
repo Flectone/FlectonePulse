@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -121,24 +122,28 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
-                .base(EventMetadata.<Localization.Command.Mute>builder()
-                        .sender(fTarget)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, mute)
-                        )
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Mute> baseMetadataBuilder = EventMetadata.<Localization.Command.Mute>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, mute)
                 )
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
+                .base(baseMetadataBuilder.build())
                 .moderation(mute)
                 .build()
         );

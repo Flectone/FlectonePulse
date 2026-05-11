@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -138,26 +139,30 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
         }
 
-        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()
-                .base(EventMetadata.<Localization.Command.Unban>builder()
-                        .sender(fTarget)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unban)
-                        )
-                        .destination(config().destination())
-                        .range(config().range())
-                        .sound(soundOrThrow())
-                        .proxy(dataOutputStream ->
-                                dataOutputStream.writeAsJson(unban)
-                        )
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unban)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Unban> baseMetadataBuilder = EventMetadata.<Localization.Command.Unban>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unban)
                 )
+                .destination(config().destination())
+                .range(config().range())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream ->
+                        dataOutputStream.writeAsJson(unban)
+                )
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unban)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()
+                .base(baseMetadataBuilder.build())
                 .unmoderation(unban)
                 .build()
         );
