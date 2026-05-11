@@ -75,7 +75,7 @@ public class FPlayerService {
         // and also we cannot add information about all players,
         // because players may not be in the database
         if (getPlayTimesCount() == 0) {
-            fPlayerRepository.getAllPlayersDatabase().forEach(fPlayer -> {
+            findAllFPlayers().forEach(fPlayer -> {
                 if (fPlayer.isUnknown()) return;
 
                 PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
