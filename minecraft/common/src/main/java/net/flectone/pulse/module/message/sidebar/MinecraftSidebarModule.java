@@ -95,7 +95,7 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
         taskScheduler.runRegion(fPlayer, () -> {
-            if (!permissionChecker.check(fPlayer, permission())) {
+            if (!permissionChecker.check(fPlayer, permission()) || !fPlayer.isSetting(name())) {
                 remove(fPlayer);
                 return;
             }
