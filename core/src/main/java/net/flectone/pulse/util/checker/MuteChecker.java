@@ -5,12 +5,14 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,6 +24,8 @@ public class MuteChecker {
     private final Provider<FloodModule> floodModuleProvider;
     private final Provider<NewbieModule> newbieModuleProvider;
     private final Provider<SwearModule> swearModuleProvider;
+
+    private final FLogger fLogger;
 
     public Status check(FPlayer fPlayer) {
         if (moderationService.hasValid(fPlayer, Moderation.Type.MUTE, -1)) {
@@ -47,6 +51,8 @@ public class MuteChecker {
         if (integrationModuleProvider.get().isMuted(fPlayer)) {
             return Status.EXTERNAL;
         }
+
+//        fLogger.warning(fPlayer.name() + " LETS GO");
 
         return Status.NONE;
     }

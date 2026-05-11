@@ -209,14 +209,15 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
     }
 
     /**
-     * Invalidates all moderation entries of a specific type by setting their valid flag to false.
+     * Invalidates all player moderation entries of a specific type by setting their valid flag to false.
      * Can be filtered by server to target server-specific moderations only.
      *
+     * @param playerId the player ID
      * @param type the moderation type to invalidate
      * @param server the server ID (can be null for global invalidation)
      */
-    public void updateValid(Moderation.@NonNull Type type, @Nullable String server) {
-        useHandle(sql -> sql.invalidate(type.name(), server));
+    public void updateValid(int playerId, Moderation.@NonNull Type type, @Nullable String server) {
+        useHandle(sql -> sql.invalidate(playerId, type.name(), server));
     }
 
 }

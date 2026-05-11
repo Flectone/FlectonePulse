@@ -200,14 +200,15 @@ public class ModerationRepository {
     }
 
     /**
-     * Invalidates all moderation entries of a specific type by setting their valid flag to false.
+     * Invalidates all player moderation entries of a specific type by setting their valid flag to false.
      * Can be filtered by server to target server-specific moderations only.
      *
+     * @param playerId the player ID
      * @param type the moderation type to invalidate
      * @param server the server ID (can be null for global invalidation)
      */
-    public void updateValid(Moderation.@NonNull Type type, @Nullable String server) {
-        moderationDAO.updateValid(type, server);
+    public void updateValid(int playerId, Moderation.@NonNull Type type, @Nullable String server) {
+        moderationDAO.updateValid(playerId, type, server);
     }
 
 }

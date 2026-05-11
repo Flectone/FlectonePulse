@@ -178,7 +178,7 @@ public class ModerationService {
         moderationRepository.invalidate(fTarget.uuid(), type);
 
         if (id == -1) {
-            moderationRepository.updateValid(type, server);
+            moderationRepository.updateValid(fTarget.id(), type, server);
         } else {
             moderationRepository.updateValid(id, server);
         }

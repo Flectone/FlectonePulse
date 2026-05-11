@@ -133,13 +133,14 @@ public interface ModerationSQL extends SQL {
     void invalidate(@Bind("id") int id, @Bind("server") String server);
 
     /**
-     * Invalidates all moderations of a specific type.
+     * Invalidates all moderations of a specific type for player.
      * Sets the valid flag to false for all matching entries, optionally filtered by server.
      *
+     * @param playerId the player ID
      * @param type the moderation type to invalidate
      * @param server the server ID (can be null for global invalidation)
      */
-    @SqlUpdate("UPDATE `fp_moderation` SET `valid` = false WHERE `type` = :type AND (:server IS NULL OR `server` = :server)")
-    void invalidate(@Bind("type") String type, @Bind("server") String server);
+    @SqlUpdate("UPDATE `fp_moderation` SET `valid` = false WHERE `player` = :player AND `type` = :type AND (:server IS NULL OR `server` = :server)")
+    void invalidate(@Bind("player") int playerId, @Bind("type") String type, @Bind("server") String server);
 
 }
