@@ -66,20 +66,12 @@ public class FPlayerRepository {
                 .findFirst();
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
-        FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
-
         if (id == -1) {
-            // invalid console cache
-            invalid(dbPlayer.uuid());
-
-            // indicate console
-            dbPlayer = dbPlayer.withConsole(true);
-
-            // save to cache
-            onlinePlayers.put(dbPlayer.uuid(), dbPlayer);
-        } else {
-            saveToCache(dbPlayer);
+            throw new IllegalArgumentException("Unable to load a player with ID = -1");
         }
+
+        FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
+        saveToCache(dbPlayer);
 
         return dbPlayer;
     }

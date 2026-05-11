@@ -106,6 +106,7 @@ public class FPlayerService {
                 .name(fileFacade.config().logger().console())
                 .build();
 
+        fPlayerRepository.invalid(console.uuid());
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
     }
