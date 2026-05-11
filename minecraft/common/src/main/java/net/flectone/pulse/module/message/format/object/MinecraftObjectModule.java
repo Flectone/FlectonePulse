@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -50,6 +51,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
     private final MessagePipeline messagePipeline;
+    private final UUIDParser uuidParser;
     private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
@@ -64,6 +66,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  PlatformPlayerAdapter platformPlayerAdapter,
                                  ModuleController moduleController,
                                  MessagePipeline messagePipeline,
+                                 UUIDParser uuidParser,
                                  @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
         super(fileFacade);
 
@@ -77,6 +80,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.moduleController = moduleController;
         this.messagePipeline = messagePipeline;
+        this.uuidParser = uuidParser;
         this.isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
     }
 
@@ -148,12 +152,12 @@ public class MinecraftObjectModule extends ObjectModule {
         if (playerHead.length() > 16) {
             playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
         } else {
-            try {
-                UUID playerHeadUUID = UUID.fromString(playerHead);
+            UUID playerHeadUUID = uuidParser.parse(playerHead);
+            if (playerHeadUUID != null) {
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
 
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
-            } catch (IllegalArgumentException _) {
+            } else {
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
 
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));

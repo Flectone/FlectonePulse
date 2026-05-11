@@ -16,6 +16,7 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.PulseTranslateListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -36,6 +37,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final UUIDParser uuidParser;
 
     @Override
     public void onEnable() {
@@ -120,14 +122,10 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         });
     }
 
+    @Nullable
     public String getMessage(String stringUUID) {
-        try {
-            UUID uuid = UUID.fromString(stringUUID);
-
-            return getMessage(uuid);
-        } catch (IllegalArgumentException _) {
-            return null;
-        }
+        UUID uuid = uuidParser.parse(stringUUID);
+        return uuid != null ? getMessage(uuid) : null;
     }
 
     public @Nullable String getMessage(UUID uuid) {
