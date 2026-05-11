@@ -120,11 +120,6 @@ public class ProxyMessageHandler {
 
                 UUID messageUUID = UUID.fromString(input.readUTF());
 
-                String fromServer = input.readUTF();
-                if (fromServer.equals(fileFacade.config().server())) {
-                    fLogger.warning("Duplicate 'server' detected %s. Please set a unique 'server' in config.yml. Otherwise cross-server data (bans, mutes, etc.) may fail or mix up", fromServer);
-                }
-
                 switch (moduleName) {
                     case SYSTEM_ONLINE -> handleSystemOnline(messageUUID);
                     case SYSTEM_CONNECTED -> handleSystemConnected(messageUUID);
@@ -156,6 +151,11 @@ public class ProxyMessageHandler {
     }
 
     public void handleProxyMessage(DataInputStream input, UUID metadataUUID, ModuleName tag) throws IOException {
+        String fromServer = input.readUTF();
+        if (fromServer.equals(fileFacade.config().server())) {
+            fLogger.warning("Duplicate 'server' detected %s. Please set a unique 'server' in config.yml. Otherwise cross-server data (bans, mutes, etc.) may fail or mix up", fromServer);
+        }
+
         Set<String> proxyClusters = gson.fromJson(input.readUTF(), new TypeToken<Set<String>>() {}.getType());
 
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
