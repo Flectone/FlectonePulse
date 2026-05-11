@@ -67,7 +67,11 @@ public class FPlayerRepository {
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
-        saveToCache(dbPlayer);
+
+        // don't save offline console
+        if (id != -1) {
+            saveToCache(dbPlayer);
+        }
 
         return dbPlayer;
     }
