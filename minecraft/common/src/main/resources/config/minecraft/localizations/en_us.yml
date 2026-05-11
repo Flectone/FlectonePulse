@@ -455,10 +455,10 @@ command:
     already_remove: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Player is not in the whitelist"
     already_on: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Whitelist is already enabled"
     already_off: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Whitelist is already disabled"
-    format_add: "<fcolor:1>☰ Player <target> has been added to the whitelist <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <display_name><br>Reason: <reason>\">[INFO]</hover>"
+    format_add: "<fcolor:1>☰ Player <display_name> has been added to the whitelist <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     format_off: "<fcolor:1>☰ Whitelist <fcolor:2>disabled"
     format_on: "<fcolor:1>☰ Whitelist <fcolor:2>enabled"
-    format_remove: "<fcolor:1>☰ Player <target> has been removed from the whitelist <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <display_name><br>Reason: <reason>\">[INFO]</hover>"
+    format_remove: "<fcolor:1>☰ Player <display_name> has been removed from the whitelist <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>☰ You are not on the server whitelist"
     connection_attempt: "<color:#ff7171>☰ Player <display_name>, who is not on the whitelist, attempted to connect"
     reasons:

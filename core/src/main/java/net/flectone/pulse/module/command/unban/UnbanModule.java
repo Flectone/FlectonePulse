@@ -150,7 +150,9 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
                         .proxy(dataOutputStream ->
                                 dataOutputStream.writeAsJson(unban)
                         )
-                        .integration()
+                        .integration(string ->
+                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unban)
+                        )
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag("moderator", fResolver, fPlayer)
                         })

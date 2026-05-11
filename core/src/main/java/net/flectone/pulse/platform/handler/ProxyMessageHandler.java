@@ -813,17 +813,17 @@ public class ProxyMessageHandler {
     private void handleWhitelistCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         WhitelistModule module = injector.getInstance(WhitelistModule.class);
         if (module.config().filterByServer()) return;
-        if (moduleController.isDisabledFor(module, fEntity)) return;
-        if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         WhitelistModule.Action action = WhitelistModule.Action.values()[input.readInt()];
         switch (action) {
             case ON, OFF -> {
+                if (moduleController.isDisabledFor(module, fEntity)) return;
+
                 boolean turnedOn = action == WhitelistModule.Action.ON;
 
                 messageDispatcher.dispatch(module, WhitelistMetadata.<Localization.Command.Whitelist>builder()
                         .base(EventMetadata.<Localization.Command.Whitelist>builder()
-                                .sender(fPlayer)
+                                .sender(fEntity)
                                 .format(localization -> turnedOn ? localization.formatOn() : localization.formatOff())
                                 .destination(module.config().destination())
                                 .sound(module.soundOrThrow())
@@ -837,14 +837,15 @@ public class ProxyMessageHandler {
             case ADD -> {
                 Moderation whitelist = gson.fromJson(input.readUTF(), Moderation.class);
 
-                FPlayer fTarget = fPlayerService.getFPlayer(whitelist.player());
+                FPlayer fModerator = fPlayerService.getFPlayer(whitelist.moderator());
+                if (moduleController.isDisabledFor(module, fModerator)) return;
 
                 ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
                 messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Whitelist>builder()
                         .base(EventMetadata.<Localization.Command.Whitelist>builder()
                                 .uuid(metadataUUID)
-                                .sender(fPlayer)
+                                .sender(fEntity)
                                 .format((fReceiver, localization) ->
                                         moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
                                 )
@@ -852,7 +853,7 @@ public class ProxyMessageHandler {
                                 .destination(module.config().destination())
                                 .sound(module.soundOrThrow())
                                 .tagResolvers(fResolver -> new TagResolver[]{
-                                        messagePipeline.targetTag(fResolver, fTarget)
+                                        messagePipeline.targetTag("moderator", fResolver, fModerator)
                                 })
                                 .build()
                         )
@@ -863,14 +864,15 @@ public class ProxyMessageHandler {
             case REMOVE -> {
                 Moderation unwhitelist = gson.fromJson(input.readUTF(), Moderation.class);
 
-                FPlayer fTarget = fPlayerService.getFPlayer(unwhitelist.player());
+                FPlayer fModerator = fPlayerService.getFPlayer(unwhitelist.moderator());
+                if (moduleController.isDisabledFor(module, fModerator)) return;
 
                 ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
                 messageDispatcher.dispatch(module, UnModerationMetadata.<Localization.Command.Whitelist>builder()
                         .base(EventMetadata.<Localization.Command.Whitelist>builder()
                                 .uuid(metadataUUID)
-                                .sender(fPlayer)
+                                .sender(fEntity)
                                 .format((fReceiver, localization) ->
                                         moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
                                 )
@@ -878,7 +880,7 @@ public class ProxyMessageHandler {
                                 .range(Range.get(Range.Type.SERVER))
                                 .sound(module.soundOrThrow())
                                 .tagResolvers(fResolver -> new TagResolver[]{
-                                        messagePipeline.targetTag("moderator", fResolver, fTarget)
+                                        messagePipeline.targetTag("moderator", fResolver, fModerator)
                                 })
                                 .build()
                         )

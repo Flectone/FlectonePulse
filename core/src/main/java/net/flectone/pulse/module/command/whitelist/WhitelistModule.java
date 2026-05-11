@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.whitelist.listener.PulseWhitelistListener;
 import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
@@ -241,27 +242,31 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
-                .base(EventMetadata.<Localization.Command.Whitelist>builder()
-                        .sender(fPlayer)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
-                        )
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .range(config().range())
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeInt(Action.ADD.ordinal());
-                            dataOutputStream.writeAsJson(whitelist);
-                        })
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fTarget)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
                 )
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .range(config().range())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(Action.ADD.ordinal());
+                    dataOutputStream.writeAsJson(whitelist);
+                })
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
+                .base(baseMetadataBuilder.build())
                 .moderation(whitelist)
                 .build()
         );
@@ -323,27 +328,31 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
         }
 
-        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()
-                .base(EventMetadata.<Localization.Command.Whitelist>builder()
-                        .sender(fPlayer)
-                        .format((fReceiver, localization) ->
-                                moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
-                        )
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .range(config().range())
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeInt(Action.REMOVE.ordinal());
-                            dataOutputStream.writeAsJson(unwhitelist);
-                        })
-                        .integration(string ->
-                                moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist)
-                        )
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fTarget)
-                        })
-                        .build()
+        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
                 )
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .range(config().range())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(Action.REMOVE.ordinal());
+                    dataOutputStream.writeAsJson(unwhitelist);
+                })
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()
+                .base(baseMetadataBuilder.build())
                 .unmoderation(unwhitelist)
                 .build()
         );
