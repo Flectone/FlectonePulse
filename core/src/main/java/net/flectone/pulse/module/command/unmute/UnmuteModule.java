@@ -149,7 +149,9 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
         Moderation unmute = moderationService.remove(fTarget, mutes, reason);
         if (unmute == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+        if (!fileFacade.command().mute().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+        }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .base(EventMetadata.<Localization.Command.Unmute>builder()

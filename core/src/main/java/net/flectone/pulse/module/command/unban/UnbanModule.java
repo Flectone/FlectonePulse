@@ -150,7 +150,9 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
         Moderation unban = moderationService.remove(fTarget, bans, reason);
         if (unban == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
+        if (!fileFacade.command().ban().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
+        }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()
                 .base(EventMetadata.<Localization.Command.Unban>builder()

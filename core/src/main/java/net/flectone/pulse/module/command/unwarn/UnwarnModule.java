@@ -150,7 +150,9 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
         Moderation unwarn = moderationService.remove(fTarget, warns, reason);
         if (unwarn == null) return;
 
-        proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+        if (!fileFacade.command().warn().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+        }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(EventMetadata.<Localization.Command.Unwarn>builder()
