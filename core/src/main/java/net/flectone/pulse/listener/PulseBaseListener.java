@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -19,22 +20,31 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseBaseListener implements PulseListener {
 
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ProxySender proxySender;
     private final IntegrationSender integrationSender;
     private final SoundPlayer soundPlayer;
+    private final TaskScheduler taskScheduler;
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
     public PlayerJoinEvent onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.player().withIp(platformPlayerAdapter.getIp(event.player()));
+        FPlayer fPlayer = event.player()
+                .withIp(platformPlayerAdapter.getIp(event.player()))
+                .withSetting(SettingText.SERVER, fileFacade.config().server());
 
-        fPlayerService.saveFPlayerData(fPlayer);
+        taskScheduler.runAsync(() -> {
+            fPlayerService.saveFPlayerData(fPlayer);
+            fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SERVER);
+        });
 
         return event.withPlayer(fPlayer);
     }

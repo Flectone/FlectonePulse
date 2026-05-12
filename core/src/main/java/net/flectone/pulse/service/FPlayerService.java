@@ -156,13 +156,11 @@ public class FPlayerService {
     }
 
     public void saveFPlayerData(FPlayer fPlayer) {
-        taskScheduler.runAsync(() -> {
-            // skip offline FPlayer
-            if (!platformPlayerAdapter.isOnline(fPlayer)) return;
+        // skip offline FPlayer
+        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
-            // update data in database
-            updateFPlayer(fPlayer);
-        });
+        // update data in database
+        updateFPlayer(fPlayer);
     }
 
     public void invalidateOffline(UUID uuid, boolean proxy) {
