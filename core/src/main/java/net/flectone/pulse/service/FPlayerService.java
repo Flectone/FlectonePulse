@@ -220,11 +220,13 @@ public class FPlayerService {
     }
 
     public FPlayer getFPlayer(int id) {
+        if (id == -1) return getConsole();
+
         return fPlayerRepository.get(id);
     }
 
     public FPlayer getConsole() {
-        return fPlayerRepository.get(-1);
+        return getFPlayer(FEntity.UNKNOWN_UUID);
     }
 
     public FPlayer getFPlayer(String name) {
