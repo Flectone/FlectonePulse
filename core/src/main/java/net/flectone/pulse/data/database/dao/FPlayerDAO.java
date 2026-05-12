@@ -144,7 +144,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull String name) {
         return withHandle(sql -> sql.findByName(name)
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.withName(name))
+                .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
         );
     }
 
@@ -157,7 +157,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull InetAddress inetAddress) {
         return withHandle(sql -> sql.findByIp(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.withIp(inetAddress.getHostAddress()))
+                .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
         );
     }
 
@@ -183,7 +183,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(int id) {
         return withHandle(sql -> sql.findById(id)
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.withId(id))
+                .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
     }
 
