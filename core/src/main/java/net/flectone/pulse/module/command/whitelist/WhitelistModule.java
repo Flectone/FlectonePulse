@@ -322,7 +322,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }
 
         // invalidate whitelist moderations and add unwhitelist moderation
-        Moderation unwhitelist = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, id, reason);
+        Moderation unwhitelist = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, id, StringUtils.isEmpty(reason) ? null : reason);
         if (unwhitelist == null) return;
 
         if (!config().filterByServer()) {

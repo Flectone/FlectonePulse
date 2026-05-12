@@ -78,7 +78,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
         }
 
-        unmute(fPlayer, target, id, reason);
+        unmute(fPlayer, target, id, StringUtils.isEmpty(reason) ? null : reason);
     }
 
     @Override

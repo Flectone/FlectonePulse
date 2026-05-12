@@ -13,10 +13,12 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -169,12 +171,12 @@ public class ModerationService {
 
 
     @Nullable
-    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @NonNull String reason) {
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @Nullable String reason) {
         return remove(fModerator, fTarget, type, id, reason, getServer(type));
     }
 
     @Nullable
-    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @NonNull String reason, @Nullable String server) {
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @Nullable String reason, @Nullable String server) {
         invalidate(fTarget.uuid(), type);
 
         if (id == -1) {

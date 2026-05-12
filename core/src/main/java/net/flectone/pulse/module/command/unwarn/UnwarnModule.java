@@ -78,7 +78,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
         }
 
-        unwarn(fPlayer, target, id, reason);
+        unwarn(fPlayer, target, id, StringUtils.isEmpty(reason) ? null : reason);
     }
 
     @Override

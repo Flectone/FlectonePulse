@@ -78,7 +78,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             reason = StringUtils.join(reasonWords, " ", 1, reasonWords.length);
         }
 
-        unban(fPlayer, target, id, reason);
+        unban(fPlayer, target, id, StringUtils.isEmpty(reason) ? null : reason);
     }
 
     @Override
