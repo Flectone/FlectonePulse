@@ -137,8 +137,6 @@ public class FPlayerService {
                 // player is not fully online on server,
                 // but it should already be
                 .online(true)
-                // save current server
-                .server(fileFacade.config().server())
                 // build
                 .build();
 
@@ -154,7 +152,7 @@ public class FPlayerService {
     }
 
     public boolean save(@NonNull UUID uuid, @NonNull String name) {
-        return fPlayerRepository.save(uuid, name, fileFacade.config().server());
+        return fPlayerRepository.save(uuid, name);
     }
 
     public void saveFPlayerData(FPlayer fPlayer) {

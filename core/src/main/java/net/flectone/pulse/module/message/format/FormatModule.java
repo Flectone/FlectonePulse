@@ -35,6 +35,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -146,7 +147,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
 
         if (sender instanceof FPlayer fPlayer && !isUserMessage) {
             messageContext = messageContext.addTagResolver(
-                    Placeholder.unparsed("server", StringUtils.defaultString(fPlayer.server()))
+                    Placeholder.unparsed("server", StringUtils.defaultString(fPlayer.getSetting(SettingText.SERVER)))
             );
         }
 

@@ -12,6 +12,7 @@ public enum SettingText {
     LOCALE,
     WORLD_PREFIX,
     STREAM_PREFIX,
+    SERVER,
     SPY_STATUS,
     AFK_SUFFIX,
     NICKNAME;

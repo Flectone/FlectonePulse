@@ -66,10 +66,6 @@ public class FPlayerRepository {
                 .findFirst();
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
-        if (id == -1) {
-            throw new IllegalArgumentException("Unable to load a player with ID = -1");
-        }
-
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
         saveToCache(dbPlayer);
 
@@ -152,7 +148,7 @@ public class FPlayerRepository {
     }
 
     private void saveToCache(FPlayer fPlayer) {
-        if (fPlayer.isOnline()) {
+        if (fPlayer.isOnline() || fPlayer.isConsole()) {
             onlinePlayers.put(fPlayer.uuid(), fPlayer);
         } else {
             offlinePlayersCache.put(fPlayer.uuid(), fPlayer);
@@ -166,8 +162,8 @@ public class FPlayerRepository {
      * @param name the player name
      * @return true if a new player was inserted, false if existing player was updated
      */
-    public boolean save(@NonNull UUID uuid, @NonNull String name, @NonNull String server) {
-        return fPlayerDAO.insert(uuid, name, server);
+    public boolean save(@NonNull UUID uuid, @NonNull String name) {
+        return fPlayerDAO.insert(uuid, name);
     }
 
     /**
