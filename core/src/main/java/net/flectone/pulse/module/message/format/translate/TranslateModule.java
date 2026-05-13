@@ -98,6 +98,13 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         FPlayer receiver = messageContext.receiver();
 
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
+            long uniqueLocaleCount = fPlayerService.getOnlineFPlayers().stream()
+                    .map(player -> player.getSetting(SettingText.LOCALE))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .count();
+            if (uniqueLocaleCount <= 1) return Tag.selfClosingInserting(Component.empty());
+
             UUID messageUUID = messageContext.messageUUID();
 
             String action = localization(receiver).action();
@@ -123,6 +130,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 .collect(Collectors.toSet());
 
         uniqueLocales.add(sourceLang);
+
+        if (uniqueLocales.size() <= 1) return null;
 
         Map<String, Component> translations = new ConcurrentHashMap<>();
 
