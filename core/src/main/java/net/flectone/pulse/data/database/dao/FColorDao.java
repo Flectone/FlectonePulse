@@ -7,7 +7,6 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.fcolor.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.logging.FLogger;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.Nested;
 import org.jspecify.annotations.NonNull;
@@ -104,8 +103,6 @@ public class FColorDao implements BaseDAO<FColorSQL> {
                         )
                 ));
     }
-
-    private final FLogger fLogger;
 
     private void saveType(Handle handle, FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
         if (newFColors.equals(oldFColors)) return;
