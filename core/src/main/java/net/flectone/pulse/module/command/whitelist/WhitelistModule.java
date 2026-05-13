@@ -406,9 +406,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String playerName) {
         UUID uuid = uuidParser.parse(playerName);
 
-        FPlayer fTarget = uuid != null ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
+        boolean isUuid = uuid != null;
+        if (!isUuid) {
+            playerName = StringUtils.left(playerName, 16);
+        }
+
+        FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown()) {
-            boolean isUuid = uuid != null;
             if (isUuid) {
                 // just save empty string for update in feature
                 fPlayerService.save(uuid, platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : "");
