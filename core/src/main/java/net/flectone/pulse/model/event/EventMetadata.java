@@ -227,7 +227,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     sender,
                     filterPlayer,
                     filter,
-                    Collections.unmodifiableMap(flags),
+                    Map.copyOf(flags),
                     format,
                     destination,
                     range,

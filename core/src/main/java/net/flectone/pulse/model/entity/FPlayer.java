@@ -183,7 +183,7 @@ public interface FPlayer extends FEntity {
             newSettings.put(messageType, value);
 
             return toBuilder()
-                    .settingsBoolean(Collections.unmodifiableMap(newSettings))
+                    .settingsBoolean(Map.copyOf(newSettings))
                     .build();
         }
 
@@ -193,10 +193,14 @@ public interface FPlayer extends FEntity {
                     ? new EnumMap<>(SettingText.class)
                     : new EnumMap<>(this.settingsText);
 
-            newSettings.put(settingText, value);
+            if (value == null) {
+                newSettings.remove(settingText);
+            } else {
+                newSettings.put(settingText, value);
+            }
 
             return toBuilder()
-                    .settingsText(Collections.unmodifiableMap(newSettings))
+                    .settingsText(Map.copyOf(newSettings))
                     .build();
         }
 
@@ -208,7 +212,7 @@ public interface FPlayer extends FEntity {
             newIgnores.add(ignore);
 
             return toBuilder()
-                    .ignores(Collections.unmodifiableList(newIgnores))
+                    .ignores(List.copyOf(newIgnores))
                     .build();
         }
 
@@ -246,7 +250,7 @@ public interface FPlayer extends FEntity {
             newSettings.remove(settingText);
 
             return toBuilder()
-                    .settingsText(Collections.unmodifiableMap(newSettings))
+                    .settingsText(Map.copyOf(newSettings))
                     .build();
         }
 
@@ -259,7 +263,7 @@ public interface FPlayer extends FEntity {
             newSettings.remove(moduleName);
 
             return toBuilder()
-                    .settingsBoolean(Collections.unmodifiableMap(newSettings))
+                    .settingsBoolean(Map.copyOf(newSettings))
                     .build();
         }
 
@@ -276,7 +280,7 @@ public interface FPlayer extends FEntity {
             newIgnores.removeIf(filter -> filter.id() == ignore.id());
 
             return toBuilder()
-                    .ignores(Collections.unmodifiableList(newIgnores))
+                    .ignores(List.copyOf(newIgnores))
                     .build();
         }
 
@@ -306,7 +310,7 @@ public interface FPlayer extends FEntity {
                             Int2ObjectArrayMap::new
                     ));
 
-            return Collections.unmodifiableMap(result);
+            return Map.copyOf(result);
         }
 
         @Override
@@ -326,11 +330,11 @@ public interface FPlayer extends FEntity {
             if (newFColorsEmpty) {
                 fColorMap.put(type, Collections.emptySet());
             } else {
-                fColorMap.put(type, Collections.unmodifiableSet(fColors));
+                fColorMap.put(type, Set.copyOf(fColors));
             }
 
             return toBuilder()
-                    .fColors(Collections.unmodifiableMap(fColorMap))
+                    .fColors(Map.copyOf(fColorMap))
                     .build();
         }
 
@@ -345,7 +349,7 @@ public interface FPlayer extends FEntity {
             }
 
             return toBuilder()
-                    .ignores(Collections.unmodifiableList(ignores))
+                    .ignores(List.copyOf(ignores))
                     .build();
         }
 
@@ -360,7 +364,7 @@ public interface FPlayer extends FEntity {
             }
 
             return toBuilder()
-                    .constants(Collections.unmodifiableList(constants))
+                    .constants(List.copyOf(constants))
                     .build();
         }
 

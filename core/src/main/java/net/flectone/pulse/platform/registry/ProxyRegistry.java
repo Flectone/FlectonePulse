@@ -5,6 +5,7 @@ import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
@@ -16,8 +17,6 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -25,16 +24,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxyRegistry {
 
+    @Getter
     private final List<Proxy> proxies = new CopyOnWriteArrayList<>();
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
     private final Injector injector;
-
-    public Collection<Proxy> getProxies() {
-        return Collections.unmodifiableList(proxies);
-    }
 
     public boolean hasEnabledProxy() {
         return proxies.stream().anyMatch(Proxy::isEnable);

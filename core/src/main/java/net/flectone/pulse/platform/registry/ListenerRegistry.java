@@ -40,7 +40,7 @@ public class ListenerRegistry implements Registry {
         lock.readLock().lock();
         try {
             Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
-            return enumMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(enumMap);
+            return enumMap == null ? Collections.emptyMap() : Map.copyOf(enumMap);
         } finally {
             lock.readLock().unlock();
         }

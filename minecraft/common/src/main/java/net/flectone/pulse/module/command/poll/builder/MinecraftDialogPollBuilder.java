@@ -240,6 +240,6 @@ public class MinecraftDialogPollBuilder {
             answers.add(answerValue);
         }
 
-        return new NBTPoll(inputName, multiple, endTime, repeatTime, Collections.unmodifiableList(answers));
+        return new NBTPoll(inputName, multiple, endTime, repeatTime, List.copyOf(answers));
     }
 }
