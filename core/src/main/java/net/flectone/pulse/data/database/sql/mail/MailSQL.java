@@ -1,5 +1,6 @@
-package net.flectone.pulse.data.database.sql;
+package net.flectone.pulse.data.database.sql.mail;
 
+import net.flectone.pulse.data.database.sql.SQL;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;

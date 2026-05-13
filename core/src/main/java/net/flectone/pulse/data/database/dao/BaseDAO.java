@@ -28,7 +28,7 @@ public interface BaseDAO<S extends SQL> {
      *
      * @return the SQL interface class
      */
-    Class<S> sqlClass();
+    Class<? extends S> sqlClass();
 
     /**
      * Attaches the SQL interface to the given handle.
@@ -49,6 +49,15 @@ public interface BaseDAO<S extends SQL> {
         database().getJdbi().useTransaction(handle ->
                 action.accept(getSQL(handle))
         );
+    }
+
+    /**
+     * Executes an action within a transaction.
+     *
+     * @param action the action to execute with handle
+     */
+    default void useCustomTransaction(Consumer<Handle> action) {
+        database().getJdbi().useTransaction(action::accept);
     }
 
     /**

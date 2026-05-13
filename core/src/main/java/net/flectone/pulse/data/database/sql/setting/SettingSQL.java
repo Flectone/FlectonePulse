@@ -1,10 +1,11 @@
-package net.flectone.pulse.data.database.sql;
+package net.flectone.pulse.data.database.sql.setting;
 
+import net.flectone.pulse.data.database.sql.SQL;
+import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import org.jdbi.v3.sqlobject.config.KeyColumn;
 import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
-import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.Map;
 
@@ -29,24 +30,15 @@ public interface SettingSQL extends SQL {
     Map<String, String> findByPlayer(@Bind("player") int playerId);
 
     /**
-     * Inserts a new player setting.
+     * Inserts or updates a player setting.
      *
      * @param playerId the player ID
      * @param type the setting type
      * @param value the setting value
+     * @throws UnsupportedDatabaseOperationException if not overridden by a dialect-specific implementation
      */
-    @SqlUpdate("INSERT INTO `fp_setting` (`player`, `type`, `value`) VALUES (:player, :type, :value)")
-    void insert(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
-
-    /**
-     * Updates an existing player setting.
-     *
-     * @param playerId the player ID
-     * @param type the setting type
-     * @param value the new setting value
-     * @return the number of rows updated
-     */
-    @SqlUpdate("UPDATE `fp_setting` SET `value` = :value WHERE `player` = :player AND `type` = :type")
-    int update(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
+    default void upsert(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value) {
+        throw new UnsupportedDatabaseOperationException();
+    }
 
 }

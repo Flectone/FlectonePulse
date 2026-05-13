@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.TimeSQL;
+import net.flectone.pulse.data.database.sql.time.*;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
 import org.jspecify.annotations.NonNull;
@@ -31,8 +31,14 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     }
 
     @Override
-    public Class<TimeSQL> sqlClass() {
-        return TimeSQL.class;
+    public Class<? extends TimeSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> TimeH2.class;
+            case MARIADB -> TimeMariaDB.class;
+            case MYSQL -> TimeMySQL.class;
+            case POSTGRESQL -> TimePostgreSQL.class;
+            case SQLITE -> TimeSQLite.class;
+        };
     }
 
     /**
@@ -58,15 +64,13 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
     public void saveSession(@NonNull PlayTime playTime) {
         if (playTime.id() != -1) return;
 
-        useTransaction(sql -> {
-            Optional<PlayTime> playTimeOptional = sql.findByPlayer(playTime.playerId());
-
-            if (playTimeOptional.isPresent()) {
-                sql.incrementSessions(playTime.last(), playTime.playerId());
-            } else {
-                sql.insert(playTime.playerId(), playTime.first(), playTime.last(), playTime.total(), playTime.sessions());
-            }
-        });
+        useHandle(sql -> sql.upsert(
+                playTime.playerId(),
+                playTime.first(),
+                playTime.last(),
+                playTime.total(),
+                playTime.sessions()
+        ));
     }
 
     /**
@@ -77,23 +81,17 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @param fPlayer the player whose AFK status is being updated
      * @param afk true if the player is going AFK, false if returning
      */
-    public void saveAfk(@NonNull FPlayer fPlayer, boolean afk) {
+    public void saveAfk(@NonNull FPlayer fPlayer, boolean afk, PlayTime playTime) {
         if (fPlayer.isUnknown()) return;
 
-        useTransaction(sql -> {
-            long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
 
-            Optional<PlayTime> playTimeOptional = sql.findByPlayer(fPlayer.id());
-            if (playTimeOptional.isEmpty()) return;
-
-            PlayTime playTime = playTimeOptional.get();
-            if (afk) {
-                long newTotal = playTime.total() + (currentTime - playTime.last());
-                sql.updateLastSeen(playTime.last() * -1.0, newTotal, fPlayer.id());
-            } else {
-                sql.updateLastSeen(currentTime, playTime.total(), fPlayer.id());
-            }
-        });
+        if (afk) {
+            long newTotal = playTime.total() + (currentTime - playTime.last());
+            useHandle(sql -> sql.updateLastSeen(playTime.last() * -1.0, newTotal, fPlayer.id()));
+        } else {
+            useHandle(sql -> sql.updateLastSeen(currentTime, playTime.total(), fPlayer.id()));
+        }
     }
 
     /**
@@ -101,22 +99,13 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      *
      * @param fPlayer the player who quit
      */
-    public void saveQuit(@NonNull FPlayer fPlayer) {
+    public void saveQuit(@NonNull FPlayer fPlayer, PlayTime playTime) {
         if (fPlayer.isUnknown()) return;
+        if (playTime.last() < 0) return;
 
-        useTransaction(sql -> {
-            long currentTime = System.currentTimeMillis();
-
-            Optional<PlayTime> playTimeOptional = sql.findByPlayer(fPlayer.id());
-            if (playTimeOptional.isEmpty()) return;
-
-            PlayTime playTime = playTimeOptional.get();
-            if (playTime.last() < 0) return;
-
-            long newTotal = playTime.total() + (currentTime - playTime.last());
-
-            sql.updateLastSeen(currentTime, newTotal, fPlayer.id());
-        });
+        long currentTime = System.currentTimeMillis();
+        long newTotal = playTime.total() + (currentTime - playTime.last());
+        useHandle(sql -> sql.updateLastSeen(currentTime, newTotal, fPlayer.id()));
     }
 
     /**

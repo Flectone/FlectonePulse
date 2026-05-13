@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.ModerationSQL;
+import net.flectone.pulse.data.database.sql.moderation.ModerationSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import org.jspecify.annotations.NonNull;
@@ -33,7 +33,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
     }
 
     @Override
-    public Class<ModerationSQL> sqlClass() {
+    public Class<? extends ModerationSQL> sqlClass() {
         return ModerationSQL.class;
     }
 
@@ -172,29 +172,19 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
     public @Nullable Moderation insert(@NonNull FPlayer target, long date, long time, String reason, int moderatorId, Moderation.Type type, String server) {
         if (target.isUnknown()) return null;
 
-        return inTransaction(sql -> {
-            int id = sql.insert(
-                    target.id(),
-                    date,
-                    time,
-                    reason,
-                    moderatorId,
-                    type.name(),
-                    server
-            );
+        int id = withHandle(sql -> sql.insert(target.id(), date, time, reason, moderatorId, type.name(), server));
 
-            return new Moderation(
-                    id,
-                    target.id(),
-                    date,
-                    time,
-                    reason,
-                    moderatorId,
-                    type,
-                    true,
-                    server
-            );
-        });
+        return new Moderation(
+                id,
+                target.id(),
+                date,
+                time,
+                reason,
+                moderatorId,
+                type,
+                true,
+                server
+        );
     }
 
     /**

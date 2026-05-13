@@ -1,7 +1,9 @@
-package net.flectone.pulse.data.database.sql;
+package net.flectone.pulse.data.database.sql.fplayer;
 
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.reducer.PlayerInfoReducer;
+import net.flectone.pulse.data.database.sql.SQL;
+import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -28,6 +30,12 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 
+    /**
+     * Finds a player by name (case-insensitive) and load settings.
+     *
+     * @param name the player name
+     * @return optional containing player info if found
+     */
     @SqlQuery(
             """
             SELECT p.*, s.`type`, s.`value`
@@ -47,6 +55,12 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `fp_player` WHERE `uuid` = :uuid")
     Optional<FPlayerDAO.PlayerInfo> findByUUID(@Bind("uuid") String uuid);
 
+    /**
+     * Finds a player by UUID and load settings.
+     *
+     * @param uuid the player UUID
+     * @return optional containing player info if found
+     */
     @SqlQuery(
             """
             SELECT p.*, s.`type`, s.`value`
@@ -59,32 +73,28 @@ public interface FPlayerSQL extends SQL {
     Optional<FPlayerDAO.PlayerInfo> findByUUIDWithSettings(@Bind("uuid") String uuid);
 
     /**
-     * Finds a player by IP address.
+     * Finds a player by IP address and load settings.
      *
      * @param ip the IP address
      * @return optional containing player info if found
      */
-    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1")
-    Optional<FPlayerDAO.PlayerInfo> findByIp(@Bind("ip") String ip);
-
-    @SqlQuery("""
-    SELECT p.*, s.`type`, s.`value`
-    FROM (SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1) p
-    LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
-    """)
+    @SqlQuery(
+            """
+            SELECT p.*, s.`type`, s.`value`
+            FROM (SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1) p
+            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
+            """
+    )
     @UseRowReducer(PlayerInfoReducer.class)
     Optional<FPlayerDAO.PlayerInfo> findByIpWithSettings(@Bind("ip") String ip);
 
+
     /**
-     * Finds a player by database ID.
+     * Finds a player by database ID and load settings.
      *
      * @param id the player database ID
      * @return optional containing player info if found
      */
-    @SqlQuery("SELECT * FROM `fp_player` WHERE `id` = :id")
-    Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
-
-
     @SqlQuery(
             """
             SELECT p.*, s.`type`, s.`value`
@@ -104,16 +114,6 @@ public interface FPlayerSQL extends SQL {
      */
     @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`) VALUES (:uuid, :name)")
     void insert(@Bind("uuid") String uuid, @Bind("name") String name);
-
-    /**
-     * Inserts a new player with a specific ID.
-     *
-     * @param id the player database ID
-     * @param uuid the player UUID
-     * @param name the player name
-     */
-    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
-    void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
 
     /**
      * Updates player information.
@@ -142,5 +142,17 @@ public interface FPlayerSQL extends SQL {
      */
     @SqlQuery("SELECT * FROM `fp_player`")
     List<FPlayerDAO.PlayerInfo> getAllPlayers();
+
+    /**
+     * Inserts a player with the given ID, or does nothing if a conflict occurs.
+     *
+     * @param id the player database ID
+     * @param uuid the player UUID
+     * @param name the player name
+     * @throws UnsupportedDatabaseOperationException if not overridden
+     */
+    default void insertOrIgnore(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name) {
+        throw new UnsupportedDatabaseOperationException();
+    }
 
 }

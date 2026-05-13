@@ -131,7 +131,7 @@ public class SocialRepository {
      * @param afk true if the player is going AFK, false if returning
      */
     public void saveAfkSession(FPlayer fPlayer, boolean afk) {
-        timeDAO.saveAfk(fPlayer, afk);
+        timeDAO.saveAfk(fPlayer, afk, getPlayTime(fPlayer));
     }
 
     /**
@@ -140,7 +140,7 @@ public class SocialRepository {
      * @param fPlayer the player whose last seen time is being saved
      */
     public void saveLastSeen(FPlayer fPlayer) {
-        timeDAO.saveQuit(fPlayer);
+        timeDAO.saveQuit(fPlayer, getPlayTime(fPlayer));
     }
 
     /**

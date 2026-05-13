@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.MailSQL;
+import net.flectone.pulse.data.database.sql.mail.MailSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.NonNull;
@@ -32,7 +32,7 @@ public class MailDAO implements BaseDAO<MailSQL> {
     }
 
     @Override
-    public Class<MailSQL> sqlClass() {
+    public Class<? extends MailSQL> sqlClass() {
         return MailSQL.class;
     }
 
@@ -47,11 +47,10 @@ public class MailDAO implements BaseDAO<MailSQL> {
     public @Nullable Mail insert(@NonNull FPlayer sender, @NonNull FPlayer receiver, @NonNull String message) {
         if (sender.isUnknown() || receiver.isUnknown()) return null;
 
-        return inTransaction(mailSQL -> {
-            long date = System.currentTimeMillis();
-            int id = mailSQL.insert(date, sender.id(), receiver.id(), message);
-            return new Mail(id, date, sender.id(), receiver.id(), message);
-        });
+        long date = System.currentTimeMillis();
+        int id = withHandle(sql -> sql.insert(date, sender.id(), receiver.id(), message));
+
+        return new Mail(id, date, sender.id(), receiver.id(), message);
     }
 
     /**

@@ -2,12 +2,13 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.FColorSQL;
+import net.flectone.pulse.data.database.sql.fcolor.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.logging.FLogger;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.Nested;
 import org.jspecify.annotations.NonNull;
 
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ColorsDAO implements BaseDAO<FColorSQL> {
+public class FColorDao implements BaseDAO<FColorSQL> {
 
     private final Database database;
 
@@ -33,8 +34,14 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
     }
 
     @Override
-    public Class<FColorSQL> sqlClass() {
-        return FColorSQL.class;
+    public Class<? extends FColorSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> FColorH2.class;
+            case MARIADB -> FColorMariaDB.class;
+            case MYSQL -> FColorMySQL.class;
+            case POSTGRESQL -> FColorPostgreSQL.class;
+            case SQLITE -> FColorSQLite.class;
+        };
     }
 
     /**
@@ -48,7 +55,9 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             return;
         }
 
-        useTransaction(sql -> {
+        useCustomTransaction(handle -> {
+            FColorSQL sql = getSQL(handle);
+
             Map<FColor.Type, Set<FColor>> newFColors = fPlayer.fColors();
             Map<FColor.Type, Set<FColor>> oldFColors = findFColors(sql, fPlayer);
             if (newFColors.equals(oldFColors) || newFColors.isEmpty() && oldFColors.isEmpty()) return;
@@ -59,7 +68,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             }
 
             Arrays.stream(FColor.Type.values()).forEach(type ->
-                    saveType(sql, fPlayer, type, newFColors.getOrDefault(type, Collections.emptySet()), oldFColors.getOrDefault(type, Collections.emptySet()))
+                    saveType(handle, sql, fPlayer, type, newFColors.getOrDefault(type, Collections.emptySet()), oldFColors.getOrDefault(type, Collections.emptySet()))
             );
         });
     }
@@ -96,38 +105,49 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
                 ));
     }
 
-    private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
+    private final FLogger fLogger;
+
+    private void saveType(Handle handle, FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
         if (newFColors.equals(oldFColors)) return;
         if (newFColors.isEmpty()) {
             sql.deleteFColors(fPlayer.id(), type.name());
             return;
         }
 
-        IntArrayList fColorsToDelete = new IntArrayList(oldFColors.stream()
+        List<FColor> toUpsert = newFColors.stream()
+                .filter(c -> !oldFColors.contains(c))
+                .toList();
+
+        Set<Integer> newNumbers = newFColors.stream()
                 .map(FColor::number)
-                .toList()
-        );
+                .collect(Collectors.toSet());
 
-        newFColors.forEach(newFColor -> {
-            fColorsToDelete.rem(newFColor.number());
+        List<Integer> toDelete = oldFColors.stream()
+                .map(FColor::number)
+                .filter(n -> !newNumbers.contains(n))
+                .toList();
 
-            Optional<FColor> optionalOldFColor = oldFColors.stream()
-                    .filter(oldFColor -> oldFColor.number() == newFColor.number())
-                    .findAny();
-            if (optionalOldFColor.isPresent() && optionalOldFColor.get().equals(newFColor)) return;
+        if (toUpsert.isEmpty() && toDelete.isEmpty()) return;
 
-            int fColorId = sql.findFColorIdByName(newFColor.name()).orElseGet(() -> sql.insertFColor(newFColor.name()));
+        if (!toUpsert.isEmpty()) {
+            List<String> names = toUpsert.stream().map(FColor::name).distinct().toList();
 
-            if (optionalOldFColor.isPresent()) {
-                sql.updateFColor(fPlayer.id(), newFColor.number(), fColorId, type.name());
-            } else {
-                sql.insertFColor(fPlayer.id(), newFColor.number(), fColorId, type.name());
-            }
-        });
+            sql.insertFColorsIfAbsent(names);
 
-        if (!fColorsToDelete.isEmpty()) {
-            sql.deleteFColors(fPlayer.id(), type.name(), fColorsToDelete);
+            Map<String, Integer> nameToId  = sql.findFColorIdsByNames(handle, names);
+
+            sql.batchUpsertPlayerFColors(
+                    fPlayer.id(),
+                    toUpsert.stream().map(FColor::number).toList(),
+                    toUpsert.stream().map(fColor -> nameToId.get(fColor.name())).toList(),
+                    type.name()
+            );
         }
+
+        if (!toDelete.isEmpty()) {
+            sql.deleteFColors(fPlayer.id(), type.name(), toDelete);
+        }
+
     }
 
     /**

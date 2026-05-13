@@ -10,7 +10,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.data.database.dao.ColorsDAO;
+import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
 import net.flectone.pulse.model.util.Moderation;
@@ -91,7 +91,7 @@ public class Database {
 
         setupTemplateEngine();
 
-        jdbi.registerRowMapper(ConstructorMapper.factory(ColorsDAO.FColorInfo.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(FColorDao.FColorInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));

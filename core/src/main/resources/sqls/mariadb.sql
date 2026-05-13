@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS `fp_player_fcolor` (
     `fcolor` INTEGER NOT NULL,
     `type` VARCHAR(255) NOT NULL,
     FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
-    FOREIGN KEY(`fcolor`) REFERENCES `fp_fcolor`(`id`)
+    FOREIGN KEY(`fcolor`) REFERENCES `fp_fcolor`(`id`),
+    UNIQUE(`number`, `player`, `type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `fp_version` (

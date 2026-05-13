@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.data.database.dao.ColorsDAO;
+import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -39,7 +39,7 @@ public class FPlayerRepository {
     private final @Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache;
     private final FPlayerDAO fPlayerDAO;
     private final SettingDAO settingDAO;
-    private final ColorsDAO colorsDAO;
+    private final FColorDao FColorDao;
 
     /**
      * Invalidates a player from all caches.
@@ -305,7 +305,7 @@ public class FPlayerRepository {
      * @return new FPlayer with colors
      */
     public FPlayer loadColors(@NonNull FPlayer fPlayer) {
-        return colorsDAO.load(fPlayer);
+        return FColorDao.load(fPlayer);
     }
 
     /**
@@ -314,7 +314,7 @@ public class FPlayerRepository {
      * @param fPlayer the player to save colors for
      */
     public void saveColors(@NonNull FPlayer fPlayer) {
-        colorsDAO.save(fPlayer);
+        FColorDao.save(fPlayer);
     }
 
     /**

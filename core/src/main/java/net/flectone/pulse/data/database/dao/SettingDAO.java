@@ -5,14 +5,11 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.SettingSQL;
+import net.flectone.pulse.data.database.sql.setting.*;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.logging.FLogger;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -28,7 +25,6 @@ import java.util.Map;
 public class SettingDAO implements BaseDAO<SettingSQL> {
 
     private final Database database;
-    private final FLogger fLogger;
 
     @Override
     public Database database() {
@@ -36,8 +32,14 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
     }
 
     @Override
-    public Class<SettingSQL> sqlClass() {
-        return SettingSQL.class;
+    public Class<? extends SettingSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> SettingH2.class;
+            case MARIADB -> SettingMariaDB.class;
+            case MYSQL -> SettingMySQL.class;
+            case POSTGRESQL -> SettingPostgreSQL.class;
+            case SQLITE -> SettingSQLite.class;
+        };
     }
 
     /**
@@ -58,16 +60,7 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
     }
 
     private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
-        int updated = sql.update(player.id(), type, value);
-        if (updated == 0) {
-            try {
-                sql.insert(player.id(), type, value);
-            } catch (UnableToExecuteStatementException e) {
-                if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                    sql.update(player.id(), type, value);
-                } else throw e;
-            }
-        }
+        sql.upsert(player.id(), type, value);
     }
 
     /**

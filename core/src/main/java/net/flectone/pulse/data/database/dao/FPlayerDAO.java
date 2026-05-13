@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.FPlayerSQL;
+import net.flectone.pulse.data.database.sql.fplayer.*;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
@@ -12,7 +12,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Data Access Object for player data in FlectonePulse.
@@ -34,8 +37,14 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     @Override
-    public Class<FPlayerSQL> sqlClass() {
-        return FPlayerSQL.class;
+    public Class<? extends FPlayerSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> FPlayerH2.class;
+            case MARIADB -> FPlayerMariaDB.class;
+            case MYSQL -> FPlayerMySQL.class;
+            case POSTGRESQL -> FPlayerPostgreSQL.class;
+            case SQLITE -> FPlayerSQLite.class;
+        };
     }
 
     /**
@@ -88,13 +97,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @param fPlayer the player to insert
      */
     public void insertOrIgnore(@NonNull FPlayer fPlayer) {
-        useHandle(sql -> {
-            Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.uuid().toString());
-
-            if (existingPlayer.isEmpty()) {
-                sql.insertWithId(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name());
-            }
-        });
+        useHandle(sql -> sql.insertOrIgnore(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name()));
     }
 
     /**

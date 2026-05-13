@@ -1,5 +1,6 @@
-package net.flectone.pulse.data.database.sql;
+package net.flectone.pulse.data.database.sql.moderation;
 
+import net.flectone.pulse.data.database.sql.SQL;
 import net.flectone.pulse.model.util.Moderation;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;

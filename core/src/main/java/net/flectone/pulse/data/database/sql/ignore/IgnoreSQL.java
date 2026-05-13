@@ -1,8 +1,9 @@
-package net.flectone.pulse.data.database.sql;
+package net.flectone.pulse.data.database.sql.ignore;
 
+import net.flectone.pulse.data.database.sql.SQL;
+import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -17,29 +18,6 @@ import java.util.Optional;
  * @since 0.9.0
  */
 public interface IgnoreSQL extends SQL {
-
-    /**
-     * Inserts a new ignore relationship.
-     *
-     * @param date the timestamp when the ignore was created
-     * @param initiatorId the ID of the player who is ignoring
-     * @param targetId the ID of the player being ignored
-     * @return the generated ignore ID
-     */
-    @GetGeneratedKeys("id")
-    @SqlUpdate("INSERT INTO `fp_ignore` (`date`, `initiator`, `target`) VALUES (:date, :initiator, :target)")
-    int insert(@Bind("date") long date, @Bind("initiator") int initiatorId, @Bind("target") int targetId);
-
-    /**
-     * Updates an existing ignore relationship.
-     *
-     * @param date the new timestamp
-     * @param initiatorId the ID of the player who is ignoring
-     * @param targetId the ID of the player being ignored
-     * @return the number of rows updated
-     */
-    @SqlUpdate("UPDATE `fp_ignore` SET `date` = :date, `valid` = true WHERE `initiator` = :initiator AND `target` = :target")
-    int update(@Bind("date") long date, @Bind("initiator") int initiatorId, @Bind("target") int targetId);
 
     /**
      * Invalidates an ignore relationship.
@@ -67,5 +45,17 @@ public interface IgnoreSQL extends SQL {
      */
     @SqlQuery("SELECT * FROM `fp_ignore` WHERE `initiator` = :initiator AND `target` = :target AND `valid` = true")
     Optional<Ignore> findByInitiatorAndTarget(@Bind("initiator") int initiatorId, @Bind("target") int targetId);
+
+    /**
+     * Inserts a new ignore or reactivates an existing one.
+     *
+     * @param date the timestamp
+     * @param initiatorId the ID of the player who is ignoring
+     * @param targetId the ID of the player being ignored
+     * @throws UnsupportedDatabaseOperationException if not overridden
+     */
+    default void upsert(@Bind("date") long date, @Bind("initiator") int initiatorId, @Bind("target") int targetId) {
+        throw new UnsupportedDatabaseOperationException();
+    }
 
 }
