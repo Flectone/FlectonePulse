@@ -135,7 +135,7 @@ public abstract class PlatformInjector extends AbstractModule {
     @Provides
     @Singleton
     @Named("moderation")
-    public Cache<Pair<UUID, String>, List<Moderation>> provideModerationCache(CacheRegistry cacheRegistry) {
+    public Cache<UUID, Map<String, List<Moderation>>> provideModerationCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.MODERATION);
     }
 

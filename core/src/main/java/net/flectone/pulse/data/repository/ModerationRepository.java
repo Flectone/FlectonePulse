@@ -8,14 +8,14 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.ModerationDAO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Repository for managing moderation data in FlectonePulse.
@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationRepository {
 
-    private final @Named("moderation") Cache<Pair<UUID, String>, List<Moderation>> moderationCache;
+    private final @Named("moderation") Cache<UUID, Map<String, List<Moderation>>> moderationCache;
     private final ModerationDAO moderationDAO;
 
     /**
@@ -44,30 +44,33 @@ public class ModerationRepository {
      * @return list of valid moderation actions, or empty list if an error occurs
      */
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        Pair<UUID, String> key = Pair.of(player.uuid(), type.name() + server);
-
-        List<Moderation> cache = moderationCache.getIfPresent(key);
-        if (cache == null) {
-            cache = moderationDAO.getValid(player, type, server, limit, offset);
-
-            moderationCache.put(key, cache);
-
-            if (cache.stream().anyMatch(Moderation::isActive)) {
-                return cache;
-            }
-
-            return Collections.emptyList();
+        Map<String, List<Moderation>> playerModerations = moderationCache.getIfPresent(player.uuid());
+        if (playerModerations == null) {
+            playerModerations = new ConcurrentHashMap<>();
+            moderationCache.put(player.uuid(), playerModerations);
         }
 
-        if (cache.stream().allMatch(Moderation::isActive)) {
-            return cache;
+        String typeServerKey = type.name() + server;
+        List<Moderation> moderations = playerModerations.get(typeServerKey);
+        if (moderations == null) {
+            // get from database
+            moderations = moderationDAO.getValid(player, type, server, limit, offset);
+
+            // add to cache
+            playerModerations.put(typeServerKey, moderations);
+
+            return moderations;
         }
 
-        List<Moderation> valid = cache.stream()
+        if (moderations.stream().allMatch(Moderation::isActive)) {
+            return moderations;
+        }
+
+        List<Moderation> valid = moderations.stream()
                 .filter(Moderation::isActive)
                 .toList();
 
-        moderationCache.put(key, valid);
+        playerModerations.put(typeServerKey, valid);
 
         return valid;
     }
@@ -79,7 +82,15 @@ public class ModerationRepository {
      * @param type the moderation type
      */
     public void invalidate(@NonNull UUID playerId, Moderation.Type type, @Nullable String server) {
-        moderationCache.invalidate(Pair.of(playerId, type.name() + server));
+        Map<String, List<Moderation>> playerModerations = moderationCache.getIfPresent(playerId);
+        if (playerModerations == null) return;
+
+        playerModerations.remove(type.name() + server);
+
+        // remove cache key if map empty
+        if (playerModerations.isEmpty()) {
+            moderationCache.invalidate(playerId);
+        }
     }
 
     /**
@@ -95,9 +106,7 @@ public class ModerationRepository {
      * @param playerId the player UUID
      */
     public void invalidateAll(@NonNull UUID playerId) {
-        moderationCache.asMap().keySet().removeIf(key ->
-                key.first().equals(playerId)
-        );
+        moderationCache.invalidate(playerId);
     }
 
     /**
