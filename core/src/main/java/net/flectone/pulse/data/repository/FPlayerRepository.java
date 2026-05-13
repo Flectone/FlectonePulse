@@ -11,11 +11,11 @@ import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +32,10 @@ public class FPlayerRepository {
 
     private final Map<UUID, FPlayer> onlinePlayers = new ConcurrentHashMap<>();
 
+    private final Map<String, UUID> nameToUuidIndex = new ConcurrentHashMap<>();
+    private final Map<Integer, UUID> idToUuidIndex = new ConcurrentHashMap<>();
+    private final Map<String, UUID> ipToUuidIndex = new ConcurrentHashMap<>();
+
     private final @Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache;
     private final FPlayerDAO fPlayerDAO;
     private final SettingDAO settingDAO;
@@ -43,8 +47,16 @@ public class FPlayerRepository {
      * @param uuid the player UUID to invalidate
      */
     public void invalid(@NonNull UUID uuid) {
-        onlinePlayers.remove(uuid);
-        offlinePlayersCache.invalidate(uuid);
+        FPlayer fPlayer = onlinePlayers.remove(uuid);
+        if (fPlayer != null) {
+            removeFromIndexes(fPlayer);
+        }
+
+        fPlayer = offlinePlayersCache.getIfPresent(uuid);
+        if (fPlayer != null) {
+            offlinePlayersCache.invalidate(uuid);
+            removeFromIndexes(fPlayer);
+        }
     }
 
     /**
@@ -54,22 +66,15 @@ public class FPlayerRepository {
      * @return the player
      */
     public FPlayer get(int id) {
-        Optional<FPlayer> onlinePlayer = onlinePlayers.values()
-                .stream()
-                .filter(fPlayer -> fPlayer.id() == id)
-                .findFirst();
-        if (onlinePlayer.isPresent()) return onlinePlayer.get();
+        UUID uuid = idToUuidIndex.get(id);
 
-        Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
-                .stream()
-                .filter(fPlayer -> fPlayer.id() == id)
-                .findFirst();
-        if (cachedPlayer.isPresent()) return cachedPlayer.get();
+        FPlayer cache = getFromCache(uuid);
+        if (cache != null) return cache;
 
-        FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
-        saveToCache(dbPlayer);
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(id);
+        saveToCache(fPlayer);
 
-        return dbPlayer;
+        return fPlayer;
     }
 
     /**
@@ -81,22 +86,15 @@ public class FPlayerRepository {
     public FPlayer get(@NonNull InetAddress inetAddress) {
         String ip = inetAddress.getHostAddress();
 
-        Optional<FPlayer> onlinePlayer = onlinePlayers.values()
-                .stream()
-                .filter(fPlayer -> ip.equals(fPlayer.ip()))
-                .findFirst();
-        if (onlinePlayer.isPresent()) return onlinePlayer.get();
+        UUID uuid = ipToUuidIndex.get(ip);
 
-        Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
-                .stream()
-                .filter(fPlayer -> ip.equals(fPlayer.ip()))
-                .findFirst();
-        if (cachedPlayer.isPresent()) return cachedPlayer.get();
+        FPlayer cache = getFromCache(uuid);
+        if (cache != null) return cache;
 
-        FPlayer dbPlayer = fPlayerDAO.getFPlayer(inetAddress);
-        saveToCache(dbPlayer);
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(inetAddress);
+        saveToCache(fPlayer);
 
-        return dbPlayer;
+        return fPlayer;
     }
 
     /**
@@ -106,16 +104,16 @@ public class FPlayerRepository {
      * @return the player
      */
     public FPlayer get(@NonNull UUID uuid) {
-        FPlayer onlinePlayer = onlinePlayers.get(uuid);
-        if (onlinePlayer != null) return onlinePlayer;
+        FPlayer cacheOnline = onlinePlayers.get(uuid);
+        if (cacheOnline != null) return cacheOnline;
 
-        FPlayer cachedPlayer = offlinePlayersCache.getIfPresent(uuid);
-        if (cachedPlayer != null) return cachedPlayer;
+        FPlayer cacheOffline = offlinePlayersCache.getIfPresent(uuid);
+        if (cacheOffline != null) return cacheOffline;
 
-        FPlayer dbPlayer = getFromDatabase(uuid);
-        saveToCache(dbPlayer);
+        FPlayer fPlayer = getFromDatabase(uuid);
+        saveToCache(fPlayer);
 
-        return dbPlayer;
+        return fPlayer;
     }
 
     /**
@@ -125,34 +123,108 @@ public class FPlayerRepository {
      * @return the player
      */
     public FPlayer get(@NonNull String playerName) {
-        Optional<FPlayer> onlinePlayer = onlinePlayers.values()
-                .stream()
-                .filter(fPlayer -> fPlayer.name().equalsIgnoreCase(playerName))
-                .findFirst();
-        if (onlinePlayer.isPresent()) return onlinePlayer.get();
+        UUID uuid = nameToUuidIndex.get(playerName.toLowerCase());
 
-        Optional<FPlayer> cachedPlayer = offlinePlayersCache.asMap().values()
-                .stream()
-                .filter(fPlayer -> fPlayer.name().equalsIgnoreCase(playerName))
-                .findFirst();
-        if (cachedPlayer.isPresent()) return cachedPlayer.get();
+        FPlayer cache = getFromCache(uuid);
+        if (cache != null) return cache;
 
-        FPlayer dbPlayer = fPlayerDAO.getFPlayer(playerName);
-        saveToCache(dbPlayer);
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(playerName);
+        saveToCache(fPlayer);
 
-        return dbPlayer;
+        return fPlayer;
     }
 
+    @NonNull
     public FPlayer getFromDatabase(UUID uuid) {
         return fPlayerDAO.getFPlayer(uuid);
     }
 
-    private void saveToCache(FPlayer fPlayer) {
-        if (fPlayer.isOnline() || fPlayer.isConsole()) {
-            onlinePlayers.put(fPlayer.uuid(), fPlayer);
-        } else {
-            offlinePlayersCache.put(fPlayer.uuid(), fPlayer);
+    @Nullable
+    public FPlayer getFromCache(@Nullable UUID uuid) {
+        if (uuid == null) return null;
+
+        FPlayer fPlayer = onlinePlayers.get(uuid);
+        if (fPlayer != null) return fPlayer;
+
+        return offlinePlayersCache.getIfPresent(uuid);
+    }
+
+    /**
+     * Removes a player from the offline cache.
+     *
+     * @param uuid the player UUID
+     */
+    public void removeOffline(@NonNull UUID uuid) {
+        FPlayer offlineFPlayer = offlinePlayersCache.getIfPresent(uuid);
+        if (offlineFPlayer == null) return;
+
+        offlinePlayersCache.invalidate(uuid);
+
+        FPlayer fPlayer = get(uuid);
+        saveToCacheOnline(fPlayer);
+    }
+
+    /**
+     * Moves a player from online to offline cache.
+     *
+     * @param uuid the player UUID
+     */
+    public void removeOnline(@NonNull UUID uuid) {
+        FPlayer fPlayer = onlinePlayers.remove(uuid);
+        if (fPlayer != null) {
+            removeOnline(fPlayer);
         }
+    }
+
+    /**
+     * Moves a player from online to offline cache.
+     *
+     * @param fPlayer the player
+     */
+    public void removeOnline(@NonNull FPlayer fPlayer) {
+        onlinePlayers.remove(fPlayer.uuid());
+        saveToCacheOffline(fPlayer);
+    }
+
+    /**
+     * Adds a player to the online cache.
+     *
+     * @param fPlayer the player to add
+     */
+    public void add(@NonNull FPlayer fPlayer) {
+        onlinePlayers.put(fPlayer.uuid(), fPlayer);
+        addToIndexes(fPlayer);
+        offlinePlayersCache.invalidate(fPlayer.uuid());
+    }
+
+    /**
+     * Updates the cache with the latest player data
+     *
+     * @param fPlayer the player data to update in cache
+     */
+    public void updateCache(FPlayer fPlayer) {
+        FPlayer cacheFPlayer = onlinePlayers.get(fPlayer.uuid());
+        if (cacheFPlayer != null) {
+            offlinePlayersCache.invalidate(fPlayer.uuid());
+            saveToCacheOnline(fPlayer);
+            return;
+        }
+
+        cacheFPlayer = offlinePlayersCache.getIfPresent(fPlayer.uuid());
+        if (cacheFPlayer != null) {
+            saveToCacheOffline(fPlayer);
+        }
+    }
+
+    /**
+     * Clears all caches
+     */
+    public void clearCache() {
+        onlinePlayers.clear();
+        offlinePlayersCache.invalidateAll();
+        nameToUuidIndex.clear();
+        idToUuidIndex.clear();
+        ipToUuidIndex.clear();
     }
 
     /**
@@ -185,45 +257,6 @@ public class FPlayerRepository {
     }
 
     /**
-     * Removes a player from the offline cache.
-     *
-     * @param uuid the player UUID
-     */
-    public void removeOffline(@NonNull UUID uuid) {
-        offlinePlayersCache.invalidate(uuid);
-    }
-
-    /**
-     * Moves a player from online to offline cache.
-     *
-     * @param uuid the player UUID
-     */
-    public void removeOnline(@NonNull UUID uuid) {
-        FPlayer fPlayer = onlinePlayers.get(uuid);
-        if (fPlayer != null) {
-            offlinePlayersCache.put(uuid, fPlayer.withOnline(false));
-        }
-
-        onlinePlayers.remove(uuid);
-    }
-
-    public void removeOnline(@NonNull FPlayer fPlayer) {
-        onlinePlayers.remove(fPlayer.uuid());
-
-        offlinePlayersCache.put(fPlayer.uuid(), fPlayer.isOnline() ? fPlayer.withOnline(false) : fPlayer);
-    }
-
-    /**
-     * Adds a player to the online cache.
-     *
-     * @param fPlayer the player to add
-     */
-    public void add(@NonNull FPlayer fPlayer) {
-        onlinePlayers.put(fPlayer.uuid(), fPlayer);
-        offlinePlayersCache.invalidate(fPlayer.uuid());
-    }
-
-    /**
      * Gets all players from the database.
      *
      * @return list of all players
@@ -238,7 +271,9 @@ public class FPlayerRepository {
      * @return list of online players
      */
     public List<FPlayer> getOnlinePlayersDatabase() {
-        return fPlayerDAO.getOnlineFPlayers().stream().filter(fPlayer -> !fPlayer.isConsole()).toList();
+        return fPlayerDAO.getOnlineFPlayers().stream()
+                .filter(fPlayer -> !fPlayer.isConsole())
+                .toList();
     }
 
     /**
@@ -247,7 +282,9 @@ public class FPlayerRepository {
      * @return list of online players
      */
     public List<FPlayer> getOnlinePlayers() {
-        return onlinePlayers.values().stream().filter(FPlayer::isOnline).toList();
+        return onlinePlayers.values().stream()
+                .filter(FPlayer::isOnline)
+                .toList();
     }
 
     /**
@@ -256,15 +293,9 @@ public class FPlayerRepository {
      * @return list of online players and console
      */
     public List<FPlayer> getOnlineFPlayersWithConsole() {
-        return onlinePlayers.values().stream().filter(fPlayer -> fPlayer.isOnline() || fPlayer.isConsole()).toList();
-    }
-
-    /**
-     * Clears all caches.
-     */
-    public void clearCache() {
-        onlinePlayers.clear();
-        offlinePlayersCache.invalidateAll();
+        return onlinePlayers.values().stream()
+                .filter(fPlayer -> fPlayer.isOnline() || fPlayer.isConsole())
+                .toList();
     }
 
     /**
@@ -324,20 +355,46 @@ public class FPlayerRepository {
         settingDAO.insertOrUpdate(fPlayer, setting);
     }
 
-    /**
-     * Updates the cache with the latest player data
-     *
-     * @param fPlayer the player data to update in cache
-     */
-    public void updateCache(FPlayer fPlayer) {
-        if (onlinePlayers.containsKey(fPlayer.uuid())) {
-            onlinePlayers.put(fPlayer.uuid(), fPlayer);
-            return;
+    private void saveToCache(FPlayer fPlayer) {
+        if (fPlayer.isOnline() || fPlayer.isConsole()) {
+            saveToCacheOnline(fPlayer);
+        } else {
+            saveToCacheOffline(fPlayer);
         }
+    }
 
-        FPlayer offlineFPlayer = offlinePlayersCache.getIfPresent(fPlayer.uuid());
-        if (offlineFPlayer != null) {
-            offlinePlayersCache.put(fPlayer.uuid(), fPlayer.isOnline() ? fPlayer.withOnline(false) : fPlayer);
+    private void saveToCacheOnline(FPlayer fPlayer) {
+        removeFromIndexes(fPlayer);
+
+        onlinePlayers.put(fPlayer.uuid(), fPlayer);
+
+        addToIndexes(fPlayer);
+    }
+
+    private void saveToCacheOffline(FPlayer fPlayer) {
+        removeFromIndexes(fPlayer);
+
+        FPlayer offlineFPlayer = fPlayer.isOnline() ? fPlayer.withOnline(false) : fPlayer;
+
+        offlinePlayersCache.put(fPlayer.uuid(), offlineFPlayer);
+
+        addToIndexes(offlineFPlayer);
+    }
+
+    private void addToIndexes(FPlayer fPlayer) {
+        UUID uuid = fPlayer.uuid();
+        nameToUuidIndex.put(fPlayer.name().toLowerCase(), uuid);
+        idToUuidIndex.put(fPlayer.id(), uuid);
+        if (fPlayer.ip() != null) {
+            ipToUuidIndex.put(fPlayer.ip(), uuid);
+        }
+    }
+
+    private void removeFromIndexes(FPlayer fPlayer) {
+        nameToUuidIndex.remove(fPlayer.name().toLowerCase());
+        idToUuidIndex.remove(fPlayer.id());
+        if (fPlayer.ip() != null) {
+            ipToUuidIndex.remove(fPlayer.ip());
         }
     }
 }
