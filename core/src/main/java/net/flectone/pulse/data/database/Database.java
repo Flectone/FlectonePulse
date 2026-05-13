@@ -10,9 +10,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
-import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -33,7 +33,9 @@ import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jspecify.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -89,7 +91,7 @@ public class Database {
 
         setupTemplateEngine();
 
-        jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(ColorsDAO.FColorInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));

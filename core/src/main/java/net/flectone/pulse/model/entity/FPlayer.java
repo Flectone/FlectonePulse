@@ -102,6 +102,8 @@ public interface FPlayer extends FEntity {
 
     Map<Integer, String> getFColors(FColor.Type type);
 
+    FPlayer withFColors(Map<FColor.Type, Set<FColor>> fColors);
+
     FPlayer withFColors(FColor.Type type, Set<FColor> fColors);
 
     FPlayer withIgnores(List<Ignore> ignores);

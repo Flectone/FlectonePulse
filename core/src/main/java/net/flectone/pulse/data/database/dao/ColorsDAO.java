@@ -8,12 +8,11 @@ import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FColorSQL;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.jdbi.v3.core.mapper.Nested;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Data Access Object for color data operations in FlectonePulse.
@@ -49,9 +48,20 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
             return;
         }
 
-        useTransaction(sql -> Arrays.stream(FColor.Type.values())
-                .forEach(type -> saveType(sql, fPlayer, type))
-        );
+        useTransaction(sql -> {
+            Map<FColor.Type, Set<FColor>> newFColors = fPlayer.fColors();
+            Map<FColor.Type, Set<FColor>> oldFColors = findFColors(sql, fPlayer);
+            if (newFColors.equals(oldFColors) || newFColors.isEmpty() && oldFColors.isEmpty()) return;
+
+            if (newFColors.isEmpty()) {
+                sql.deleteFColors(fPlayer.id());
+                return;
+            }
+
+            Arrays.stream(FColor.Type.values()).forEach(type ->
+                    saveType(sql, fPlayer, type, newFColors.getOrDefault(type, Collections.emptySet()), oldFColors.getOrDefault(type, Collections.emptySet()))
+            );
+        });
     }
 
     /**
@@ -72,23 +82,22 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
     public FPlayer load(@NonNull FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return fPlayer;
 
-        return inTransaction(sql -> {
-            FPlayer newFPlayer = fPlayer;
-            for (FColor.Type type : FColor.Type.values()) {
-                newFPlayer = loadType(sql, newFPlayer, type);
-            }
-
-            return newFPlayer;
-        });
+        return withHandle(sql -> fPlayer.withFColors(findFColors(sql, fPlayer)));
     }
 
-    private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
-        Set<FColor> newFColors = fPlayer.fColors().getOrDefault(type, Collections.emptySet());
-        Set<FColor> oldFColors = sql.findFColors(fPlayer.id(), type.name());
-        if (newFColors.equals(oldFColors)) {
-            return;
-        }
+    private Map<FColor.Type, Set<FColor>> findFColors(FColorSQL sql, FPlayer fPlayer) {
+        return sql.findFColors(fPlayer.id()).stream()
+                .collect(Collectors.groupingBy(
+                        FColorInfo::type,
+                        Collectors.mapping(
+                                FColorInfo::fColor,
+                                Collectors.toSet()
+                        )
+                ));
+    }
 
+    private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type, @NonNull Set<FColor> newFColors, @NonNull Set<FColor> oldFColors) {
+        if (newFColors.equals(oldFColors)) return;
         if (newFColors.isEmpty()) {
             sql.deleteFColors(fPlayer.id(), type.name());
             return;
@@ -121,8 +130,18 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
         }
     }
 
-    private FPlayer loadType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
-        Set<FColor> newFColors = sql.findFColors(fPlayer.id(), type.name());
-        return fPlayer.withFColors(type, newFColors);
-    }
+    /**
+     * Represents colors information retrieved from the database.
+     *
+     * @param fColor the color instance containing color details
+     * @param type the classification type of the color
+     */
+    public record FColorInfo(
+            @NonNull
+            @Nested
+            FColor fColor,
+
+            FColor.@NonNull Type type
+    ){}
+
 }

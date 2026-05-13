@@ -1,6 +1,6 @@
 package net.flectone.pulse.data.database.sql;
 
-import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.data.database.dao.ColorsDAO;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
@@ -9,7 +9,6 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * SQL interface for player color data operations in FlectonePulse.
@@ -21,14 +20,13 @@ import java.util.Set;
 public interface FColorSQL extends SQL {
 
     /**
-     * Finds colors for a player by type.
+     * Finds colors for a player.
      *
      * @param playerId the player ID
-     * @param type the color type
-     * @return set of colors for the player
+     * @return list of colors info for the player
      */
-    @SqlQuery("SELECT `number`, `fp_fcolor`.`name`, `type` FROM `fp_player_fcolor` LEFT JOIN `fp_fcolor` ON `fp_player_fcolor`.`fcolor` = `fp_fcolor`.`id` WHERE `fp_player_fcolor`.`player` = :playerId AND `type` = :type")
-    Set<FColor> findFColors(@Bind("playerId") int playerId, @Bind("type") String type);
+    @SqlQuery("SELECT `number`, `fp_fcolor`.`name`, `type` FROM `fp_player_fcolor` LEFT JOIN `fp_fcolor` ON `fp_player_fcolor`.`fcolor` = `fp_fcolor`.`id` WHERE `fp_player_fcolor`.`player` = :playerId")
+    List<ColorsDAO.FColorInfo> findFColors(@Bind("playerId") int playerId);
 
     /**
      * Inserts a color for a player.
