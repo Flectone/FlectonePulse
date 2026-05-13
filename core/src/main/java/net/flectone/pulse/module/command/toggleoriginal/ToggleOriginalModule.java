@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ToggleOriginalModule implements ModuleCommand<Localization.Command.Translateto> {
+public class ToggleOriginalModule implements ModuleCommand<Localization.Command.Deletemessage> {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -31,24 +31,22 @@ public class ToggleOriginalModule implements ModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
-        commandModuleController.registerCommand(this, manager -> manager
-                .literal("toggleoriginal")
-                .required(promptMessage, commandParserProvider.singleMessageParser())
-                .permission(permission().name())
+        commandModuleController.registerCustomCommand(manager -> manager
+                .commandBuilder("toggleoriginal")
+                .required("message", commandParserProvider.singleMessageParser())
+                .handler(this)
         );
     }
 
     @Override
     public void onDisable() {
-        commandModuleController.clearPrompts(this);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (moduleController.isDisabledFor(this, fPlayer, true)) return;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        String messageUuidString = commandModuleController.getArgument(this, commandContext, 0);
+        String messageUuidString = commandContext.get("message");
 
         try {
             UUID messageUuid = UUID.fromString(messageUuidString);
@@ -60,21 +58,21 @@ public class ToggleOriginalModule implements ModuleCommand<Localization.Command.
 
     @Override
     public ModuleName name() {
-        return ModuleName.COMMAND_TRANSLATETO;
+        return ModuleName.COMMAND_TOGGLEORIGINAL;
     }
 
     @Override
-    public Command.Translateto config() {
-        return fileFacade.command().translateto();
+    public Command.Deletemessage config() {
+        return fileFacade.command().deletemessage();
     }
 
     @Override
-    public Permission.Command.Translateto permission() {
-        return fileFacade.permission().command().translateto();
+    public Permission.Command.Deletemessage permission() {
+        return fileFacade.permission().command().deletemessage();
     }
 
     @Override
-    public Localization.Command.Translateto localization(FEntity sender) {
-        return fileFacade.localization(sender).command().translateto();
+    public Localization.Command.Deletemessage localization(FEntity sender) {
+        return fileFacade.localization(sender).command().deletemessage();
     }
 }

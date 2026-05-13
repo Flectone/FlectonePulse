@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 public class TranslationCacheService {
 
     private final CacheRegistry cacheRegistry;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     private Cache<String, String> getCache() {
         return cacheRegistry.getCache(CacheName.TRANSLATION_CACHE);
@@ -150,6 +150,8 @@ public class TranslationCacheService {
      * Shutdown executor service.
      */
     public void shutdown() {
-        executorService.shutdown();
+        ExecutorService old = executorService;
+        executorService = Executors.newFixedThreadPool(4);
+        old.shutdown();
     }
 }

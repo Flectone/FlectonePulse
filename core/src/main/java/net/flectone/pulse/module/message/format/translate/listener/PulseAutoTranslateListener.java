@@ -3,8 +3,11 @@ package net.flectone.pulse.module.message.format.translate.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
@@ -18,7 +21,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -26,7 +29,9 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     private final TranslateModule translateModule;
     private final DeleteModule deleteModule;
-    private final ConcurrentHashMap<UUID, TranslatedMessage> preparedTranslations = new ConcurrentHashMap<>();
+    private final Cache<UUID, TranslatedMessage> preparedTranslations = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build();
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
@@ -37,8 +42,8 @@ public class PulseAutoTranslateListener implements PulseListener {
         String message = metadata.message();
         if (message == null || message.isEmpty()) return;
 
-        // Get sender locale
-        FPlayer sender = (FPlayer) metadata.sender();
+        FEntity senderEntity = metadata.sender();
+        if (!(senderEntity instanceof FPlayer sender)) return;
         String senderLocale = sender.getSetting(SettingText.LOCALE);
         if (senderLocale == null) senderLocale = "en_us";
 
@@ -51,31 +56,26 @@ public class PulseAutoTranslateListener implements PulseListener {
         }
     }
 
-    @Pulse(priority = Event.Priority.MONITOR)
-    public void onMessageSendEvent(MessageSendEvent event) {
+    @Pulse(priority = Event.Priority.HIGH)
+    public MessageSendEvent onMessageSendEvent(MessageSendEvent event) {
         // Only handle chat messages
-        if (event.eventMetadata().destination().type() != Destination.Type.CHAT) return;
+        if (event.eventMetadata().destination().type() != Destination.Type.CHAT) return event;
 
         UUID messageUUID = event.eventMetadata().uuid();
-        TranslatedMessage translatedMessage = preparedTranslations.get(messageUUID);
+        TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
 
-        if (translatedMessage == null) return;
+        if (translatedMessage == null) return event;
 
         FPlayer receiver = event.receiver();
-        Component message = event.message();
 
         // Get receiver locale
         String receiverLocale = receiver.getSetting(SettingText.LOCALE);
         if (receiverLocale == null) receiverLocale = "en_us";
 
-        // Get translated component for receiver
         Component translatedComponent = translatedMessage.getTranslation(receiverLocale);
 
-        // Save to history with translations
         deleteModule.save(receiver, messageUUID, translatedComponent, translatedMessage, true);
 
-        // Clean up after all receivers processed
-        // Note: This is a simple cleanup, might need improvement for concurrent access
-        preparedTranslations.remove(messageUUID);
+        return event.withMessage(translatedComponent);
     }
 }

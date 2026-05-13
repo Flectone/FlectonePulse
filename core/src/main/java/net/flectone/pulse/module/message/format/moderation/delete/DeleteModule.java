@@ -124,6 +124,8 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
 
         List<HistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, _ -> new ObjectArrayList<>());
 
+        if (history.stream().anyMatch(h -> h.uuid().equals(messageUUID))) return;
+
         if (history.size() >= config().historyLength()) {
             history.removeFirst();
         }
