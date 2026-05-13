@@ -1,20 +1,18 @@
 package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FPlayerSQL;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Data Access Object for player data in FlectonePulse.
@@ -29,7 +27,6 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
     private final Database database;
     private final FLogger logger;
-    private final Provider<SettingDAO> settingDAOProvider;
 
     @Override
     public Database database() {
@@ -142,7 +139,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull String name) {
-        return withHandle(sql -> sql.findByName(name)
+        return withHandle(sql -> sql.findByNameWithSettings(name)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
         );
@@ -155,7 +152,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull InetAddress inetAddress) {
-        return withHandle(sql -> sql.findByIp(inetAddress.getHostAddress())
+        return withHandle(sql -> sql.findByIpWithSettings(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
         );
@@ -168,7 +165,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull UUID uuid) {
-        return withHandle(sql -> sql.findByUUID(uuid.toString())
+        return withHandle(sql -> sql.findByUUIDWithSettings(uuid.toString())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.withUuid(uuid))
         );
@@ -181,7 +178,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(int id) {
-        return withHandle(sql -> sql.findById(id)
+        return withHandle(sql -> sql.findByIdWithSettings(id)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
@@ -192,15 +189,26 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     private FPlayer convertToFPlayer(PlayerInfo info, boolean loadSetting) {
-        FPlayer fPlayer = FPlayer.builder()
+        FPlayer.FPlayerImpl.FPlayerImplBuilder fPlayer = FPlayer.builder()
                 .id(info.id())
                 .name(info.name())
                 .uuid(UUID.fromString(info.uuid()))
                 .online(info.online())
-                .ip(info.ip())
-                .build();
+                .ip(info.ip());
 
-        return loadSetting ? settingDAOProvider.get().load(fPlayer) : fPlayer;
+        if (loadSetting) {
+            Map<String, Boolean> settingsBoolean = info.settingsBoolean();
+            if (settingsBoolean != null && !settingsBoolean.isEmpty()) {
+                fPlayer = fPlayer.settingsBoolean(Map.copyOf(settingsBoolean));
+            }
+
+            Map<SettingText, String> settingsText = info.settingsText();
+            if (settingsText != null && !settingsText.isEmpty()) {
+                fPlayer = fPlayer.settingsText(Map.copyOf(settingsText));
+            }
+        }
+
+        return fPlayer.build();
     }
 
     private List<FPlayer> convertToFPlayers(List<PlayerInfo> entities) {
@@ -223,7 +231,13 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
             boolean online,
             @NonNull String uuid,
             @NonNull String name,
-            @Nullable String ip
+            @Nullable String ip,
+
+            // ignore value for sql
+            @Nullable Map<String, Boolean> settingsBoolean,
+
+            // ignore value for sql
+            @Nullable Map<SettingText, String> settingsText
     ) {
     }
 }

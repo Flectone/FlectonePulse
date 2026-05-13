@@ -1,9 +1,11 @@
 package net.flectone.pulse.data.database.sql;
 
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
+import net.flectone.pulse.data.database.reducer.PlayerInfoReducer;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,16 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 
+    @SqlQuery(
+            """
+            SELECT p.*, s.`type`, s.`value`
+            FROM (SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1) p
+            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
+            """
+    )
+    @UseRowReducer(PlayerInfoReducer.class)
+    Optional<FPlayerDAO.PlayerInfo> findByNameWithSettings(@Bind("name") String name);
+
     /**
      * Finds a player by UUID.
      *
@@ -34,6 +46,17 @@ public interface FPlayerSQL extends SQL {
      */
     @SqlQuery("SELECT * FROM `fp_player` WHERE `uuid` = :uuid")
     Optional<FPlayerDAO.PlayerInfo> findByUUID(@Bind("uuid") String uuid);
+
+    @SqlQuery(
+            """
+            SELECT p.*, s.`type`, s.`value`
+            FROM `fp_player` p
+            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
+            WHERE p.`uuid` = :uuid
+            """
+    )
+    @UseRowReducer(PlayerInfoReducer.class)
+    Optional<FPlayerDAO.PlayerInfo> findByUUIDWithSettings(@Bind("uuid") String uuid);
 
     /**
      * Finds a player by IP address.
@@ -44,6 +67,14 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByIp(@Bind("ip") String ip);
 
+    @SqlQuery("""
+    SELECT p.*, s.`type`, s.`value`
+    FROM (SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1) p
+    LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
+    """)
+    @UseRowReducer(PlayerInfoReducer.class)
+    Optional<FPlayerDAO.PlayerInfo> findByIpWithSettings(@Bind("ip") String ip);
+
     /**
      * Finds a player by database ID.
      *
@@ -52,6 +83,18 @@ public interface FPlayerSQL extends SQL {
      */
     @SqlQuery("SELECT * FROM `fp_player` WHERE `id` = :id")
     Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
+
+
+    @SqlQuery(
+            """
+            SELECT p.*, s.`type`, s.`value`
+            FROM `fp_player` p
+            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
+            WHERE p.`id` = :id
+            """
+    )
+    @UseRowReducer(PlayerInfoReducer.class)
+    Optional<FPlayerDAO.PlayerInfo> findByIdWithSettings(@Bind("id") int id);
 
     /**
      * Inserts a new player.

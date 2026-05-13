@@ -13,7 +13,6 @@ import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -84,22 +83,20 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
         Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
 
         withHandle(sql -> sql.findByPlayer(id)).forEach((key, value) -> {
+            if (value == null) return;
+
             SettingText setting = SettingText.fromString(key);
             if (setting != null) {
                 settingsText.put(setting, value);
                 return;
             }
 
-            try {
-                settingsBoolean.put(key.toUpperCase(), "1".equals(value));
-            } catch (IllegalArgumentException e) {
-                fLogger.warning(e);
-            }
+            settingsBoolean.put(key.toUpperCase(), "1".equals(value));
         });
 
         return player.toBuilder()
-                .settingsText(Collections.unmodifiableMap(settingsText))
-                .settingsBoolean(Collections.unmodifiableMap(settingsBoolean))
+                .settingsText(Map.copyOf(settingsText))
+                .settingsBoolean(Map.copyOf(settingsBoolean))
                 .build();
     }
 
