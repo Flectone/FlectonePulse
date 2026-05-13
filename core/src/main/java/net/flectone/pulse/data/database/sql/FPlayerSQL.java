@@ -59,7 +59,7 @@ public interface FPlayerSQL extends SQL {
      * @param uuid the player UUID
      * @param name the player name
      */
-    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`, `server`) VALUES (:uuid, :name)")
+    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`) VALUES (:uuid, :name)")
     void insert(@Bind("uuid") String uuid, @Bind("name") String name);
 
     /**
@@ -69,7 +69,7 @@ public interface FPlayerSQL extends SQL {
      * @param uuid the player UUID
      * @param name the player name
      */
-    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`, `server`) VALUES (:id, :uuid, :name)")
+    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
     void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
 
     /**
