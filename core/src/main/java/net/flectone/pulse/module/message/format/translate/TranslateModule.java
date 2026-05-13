@@ -132,7 +132,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return messageCache.asMap().entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().equals(uuid))
-                .findFirst()
+                .findAny()
                 .map(Map.Entry::getKey)
                 .orElse(null);
     }

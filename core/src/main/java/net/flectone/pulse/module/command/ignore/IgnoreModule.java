@@ -81,7 +81,7 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
         Optional<Ignore> optionalIgnore = fPlayer.ignores()
                 .stream()
                 .filter(i -> i.target() == fTarget.id())
-                .findFirst();
+                .findAny();
 
         Ignore metadataIgnore = optionalIgnore.orElse(null);
         if (optionalIgnore.isPresent()) {

@@ -78,7 +78,7 @@ public class BukkitProxy implements Proxy {
         return Bukkit.getOnlinePlayers().stream()
                 .map(Player.class::cast)
                 .filter(player -> !player.getUniqueId().equals(sender.uuid())) // we always need another player, because sender may no longer be on the server
-                .findFirst()
+                .findAny()
                 .orElse(Bukkit.getPlayer(sender.uuid()));
     }
 }

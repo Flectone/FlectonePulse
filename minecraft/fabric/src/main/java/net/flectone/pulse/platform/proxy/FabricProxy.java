@@ -110,7 +110,7 @@ public class FabricProxy implements Proxy {
         PlayerList playerList = minecraftServer.getPlayerList();
         return playerList.getPlayers().stream()
                 .filter(player -> !player.getUUID().equals(sender.uuid())) // we always need another player, because sender may no longer be on the server
-                .findFirst()
+                .findAny()
                 .orElse(playerList.getPlayer(sender.uuid()));
     }
 

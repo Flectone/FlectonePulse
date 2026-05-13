@@ -206,7 +206,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
         return integrationModule.getGroups()
                 .stream()
                 .filter(string -> string.equalsIgnoreCase(finalGroup))
-                .findFirst();
+                .findAny();
     }
 
     public void sendMention(UUID processId, FPlayer fPlayer) {

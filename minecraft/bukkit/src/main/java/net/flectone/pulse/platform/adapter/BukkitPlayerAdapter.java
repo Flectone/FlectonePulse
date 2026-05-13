@@ -94,7 +94,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @Nullable UUID getPlayerByEntityId(int entityId) {
         return Bukkit.getOnlinePlayers().stream()
                 .filter(player -> player.getEntityId() == entityId)
-                .findFirst()
+                .findAny()
                 .map(Entity::getUniqueId)
                 .orElse(null);
     }

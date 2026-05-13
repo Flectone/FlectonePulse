@@ -104,7 +104,7 @@ public class ColorsDAO implements BaseDAO<FColorSQL> {
 
             Optional<FColor> optionalOldFColor = oldFColors.stream()
                     .filter(oldFColor -> oldFColor.number() == newFColor.number())
-                    .findFirst();
+                    .findAny();
             if (optionalOldFColor.isPresent() && optionalOldFColor.get().equals(newFColor)) return;
 
             int fColorId = sql.findFColorIdByName(newFColor.name()).orElseGet(() -> sql.insertFColor(newFColor.name()));
