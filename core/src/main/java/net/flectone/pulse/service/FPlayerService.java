@@ -122,12 +122,23 @@ public class FPlayerService {
 
         moderationService.invalidate(uuid);
 
-        // player can be in cache and be unknown
-        // or uuid and name can be invalid
+        // player can be in cache
         FPlayer fPlayer = fPlayerRepository.get(uuid);
-        if (fPlayer.isUnknown() || !fPlayer.uuid().equals(uuid) || !fPlayer.name().equals(name)) {
+
+        // check uuid and name
+        boolean mismatchedUuid = !fPlayer.uuid().equals(uuid);
+        boolean mismatchedName = !fPlayer.name().equalsIgnoreCase(name);
+        if (fPlayer.isUnknown() || mismatchedUuid || mismatchedName) {
+            // invalidate real player uuid in cache
             fPlayerRepository.invalid(uuid);
-            fPlayer = fPlayerRepository.get(uuid);
+
+            // invalidate old variant of player with a different UUID
+            if (mismatchedUuid || mismatchedName) {
+                fPlayerRepository.invalid(fPlayer.uuid());
+            }
+
+            // get player
+            fPlayer = fPlayerRepository.getFromDatabase(uuid);
         }
 
         fPlayer = fPlayer.toBuilder()
