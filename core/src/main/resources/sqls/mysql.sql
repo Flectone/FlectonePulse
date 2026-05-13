@@ -93,8 +93,8 @@ CREATE INDEX `idx_fp_mail_sender_valid` ON `fp_mail`(`sender`, `valid`);
 
 CREATE INDEX `idx_fp_ignore_initiator_valid` ON `fp_ignore`(`initiator`, `valid`);
 
-CREATE INDEX `idx_fp_moderation_player_type_valid_time` ON `fp_moderation`(`player`, `type`(100), `valid`, `time`);
-CREATE INDEX `idx_fp_moderation_type_valid_time` ON `fp_moderation`(`type`(100), `valid`, `time`);
+CREATE INDEX `idx_fp_moderation_player_type_valid_time` ON `fp_moderation`(`player`, `type`, `valid`, `time`);
+CREATE INDEX `idx_fp_moderation_type_valid_time` ON `fp_moderation`(`type`, `valid`, `time`);
 CREATE INDEX `idx_fp_moderation_moderator` ON `fp_moderation`(`moderator`);
 
-CREATE INDEX `idx_fp_player_fcolor_player_type` ON `fp_player_fcolor`(`player`, `type`(100));
+CREATE INDEX `idx_fp_player_fcolor_player_type` ON `fp_player_fcolor`(`player`, `type`);
