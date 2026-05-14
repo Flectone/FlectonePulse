@@ -287,6 +287,12 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         FPlayer fPlayer = fPlayerService.getFPlayer(receiverUUID);
         String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
 
+        // Fill missing per-message translations from the global cache before drawing.
+        // A failed initial attempt (e.g. Google 429) leaves TranslatedMessage.translations
+        // empty; if the same text got translated later for another message, the global
+        // cache has it and we can use it here without firing another API call.
+        fillTranslationsFromCache(history, playerLocale);
+
         int len = historyLength();
         int emptyLines = Math.max(0, len - history.size());
         fLogger.info("[Toggle] sendUpdate: player=%s locale=%s historyEntries=%d emptyLines=%d",
@@ -300,6 +306,27 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         history.forEach(entry ->
                 messageSender.sendMessage(fPlayer, entry.getDisplayComponent(playerLocale), true)
         );
+    }
+
+    private void fillTranslationsFromCache(List<TranslateHistoryMessage> history, String receiverLocale) {
+        if (receiverLocale == null) return;
+        for (TranslateHistoryMessage entry : history) {
+            TranslatedMessage tm = entry.translatedMessage();
+            if (tm == null) continue;
+            if (receiverLocale.equals(tm.originalLang())) continue;
+            if (tm.hasTranslation(receiverLocale)) {
+                String existing = tm.getTranslation(receiverLocale);
+                // Skip if we already have a real translation. If existing == originalText
+                // (a failed attempt), still consult the cache below to fill it in properly.
+                if (existing != null && !existing.isEmpty() && !existing.equals(entry.originalText())) continue;
+            }
+            String cached = translationCacheService.get(tm.originalLang(), receiverLocale, entry.originalText());
+            if (cached != null && !cached.isEmpty() && !cached.equals(entry.originalText())) {
+                tm.translations().put(receiverLocale, cached);
+                fLogger.info("[Toggle] sendUpdate: filled %s→%s translation from global cache for uuid=%s = '%s'",
+                        tm.originalLang(), receiverLocale, entry.uuid(), cached);
+            }
+        }
     }
 
     public boolean toggleOriginal(FPlayer fPlayer, UUID messageUUID) {
@@ -329,6 +356,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         boolean updated = false;
         boolean foundButNoTranslations = false;
+        TranslateHistoryMessage updatedEntry = null;
         for (int i = 0; i < history.size(); i++) {
             TranslateHistoryMessage entry = history.get(i);
             if (messageUUID.equals(entry.uuid())) {
@@ -340,7 +368,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 }
                 boolean oldFlag = entry.showOriginal();
                 boolean newFlag = !oldFlag;
-                history.set(i, entry.withShowOriginal(newFlag));
+                updatedEntry = entry.withShowOriginal(newFlag);
+                history.set(i, updatedEntry);
                 updated = true;
                 fLogger.info("[Toggle] flipped showOriginal: %s → %s for uuid=%s (originalText='%s')",
                         oldFlag, newFlag, messageUUID, entry.originalText());
@@ -354,10 +383,47 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         if (updated) {
+            // If we just toggled TO "show translation" but no usable translation
+            // exists for this receiver's locale, kick off a retry via the chain.
+            // Debounced via inFlight dedup in TranslationCacheService — back-to-back
+            // clicks won't spam API.
+            if (!updatedEntry.showOriginal()) {
+                maybeRetryTranslation(fPlayer, updatedEntry);
+            }
             fLogger.info("[Toggle] triggering sendUpdate for player=%s", fPlayer.name());
             sendUpdate(playerUUID);
         }
         return updated;
+    }
+
+    private void maybeRetryTranslation(FPlayer fPlayer, TranslateHistoryMessage entry) {
+        TranslatedMessage tm = entry.translatedMessage();
+        if (tm == null) return;
+
+        String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
+        if (playerLocale == null) return;
+        if (playerLocale.equals(tm.originalLang())) return;
+
+        String existing = tm.getTranslation(playerLocale);
+        boolean usable = existing != null && !existing.isEmpty() && !existing.equals(entry.originalText());
+        if (usable) return;
+
+        fLogger.info("[Toggle] no usable translation for %s→%s on uuid=%s, kicking off retry via chain",
+                tm.originalLang(), playerLocale, entry.uuid());
+
+        UUID receiverUUID = fPlayer.uuid();
+        translationCacheService.translateAsync(tm.originalLang(), playerLocale, entry.originalText(), config().providers())
+                .thenAccept(result -> {
+                    if (result == null || result.isEmpty() || result.equals(entry.originalText())) {
+                        fLogger.info("[Toggle] retry %s→%s for uuid=%s produced no usable translation",
+                                tm.originalLang(), playerLocale, entry.uuid());
+                        return;
+                    }
+                    tm.translations().put(playerLocale, result);
+                    fLogger.info("[Toggle] retry %s→%s for uuid=%s succeeded with '%s', redrawing",
+                            tm.originalLang(), playerLocale, entry.uuid(), result);
+                    sendUpdate(receiverUUID);
+                });
     }
 
     /**

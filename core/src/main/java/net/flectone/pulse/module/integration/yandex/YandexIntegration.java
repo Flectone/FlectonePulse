@@ -46,11 +46,28 @@ public class YandexIntegration implements FIntegration {
     @Override
     public void hook() {
         try {
-            factory = ServiceFactory.builder()
-                    .credentialProvider(Auth.oauthTokenBuilder().oauth(fileFacade.integration().yandex().token()))
-                    .requestTimeout(Duration.ofMinutes(1))
-                    .build();
+            String iamToken = fileFacade.integration().yandex().iamToken();
+            String oauthToken = fileFacade.integration().yandex().token();
 
+            ServiceFactory.ServiceFactoryBuilder builder = ServiceFactory.builder()
+                    .requestTimeout(Duration.ofMinutes(1));
+
+            if (iamToken != null && !iamToken.isBlank()) {
+                // Modern path: IAM token (Yandex Cloud "yc iam create-token", 12h TTL).
+                // Recommended — OAuth is deprecated and stops working end of 2026.
+                builder.credentialProvider(Auth.iamTokenBuilder().token(iamToken));
+                fLogger.info("Yandex integration: using IAM token credentials");
+            } else if (oauthToken != null && !oauthToken.isBlank()) {
+                // Legacy path: OAuth token. Deprecated by Yandex — kept for backward compat.
+                builder.credentialProvider(Auth.oauthTokenBuilder().oauth(oauthToken));
+                fLogger.warning("Yandex integration: using deprecated OAuth token. "
+                        + "Switch to iamToken in config/integration.yml — run 'yc iam create-token' to get one.");
+            } else {
+                fLogger.warning("Yandex integration: no credentials configured (need iamToken or token in config/integration.yml)");
+                return;
+            }
+
+            factory = builder.build();
             logHook();
         } catch (Exception e) {
             fLogger.warning(e);
