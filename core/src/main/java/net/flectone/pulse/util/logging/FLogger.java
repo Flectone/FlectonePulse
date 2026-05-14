@@ -115,6 +115,21 @@ public record FLogger(
         info(String.format(format, args));
     }
 
+    /**
+     * INFO-level log gated by {@link #DEBUG_ENABLED} — only printed when the
+     * JVM is started with {@code -Dflectonepulse.debug=true}. Use for verbose
+     * diagnostic logs that would spam production but are useful for debugging.
+     */
+    public void debug(String string) {
+        if (!DEBUG_ENABLED) return;
+        info(string);
+    }
+
+    public void debug(String format, Object... args) {
+        if (!DEBUG_ENABLED) return;
+        info(format, args);
+    }
+
     public void warning(Object object) {
         warning(String.valueOf(object));
     }

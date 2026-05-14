@@ -75,18 +75,18 @@ public class PulseAutoTranslateListener implements PulseListener {
 
         String dedupKey = sender.uuid() + ":" + senderLocale + ":" + message;
         if (recentMessages.getIfPresent(dedupKey) != null) {
-            fLogger.info("[AutoTranslate] PrepareEvent: skip uuid=%s — duplicate of recent message (sender=%s text='%s')",
+            fLogger.debug("[AutoTranslate] PrepareEvent: skip uuid=%s — duplicate of recent message (sender=%s text='%s')",
                     messageUUID, sender.name(), message);
             return;
         }
         recentMessages.put(dedupKey, Boolean.TRUE);
 
-        fLogger.info("[AutoTranslate] PrepareEvent: uuid=%s sender=%s senderLocale=%s message='%s'",
+        fLogger.debug("[AutoTranslate] PrepareEvent: uuid=%s sender=%s senderLocale=%s message='%s'",
                 messageUUID, sender.name(), senderLocale, message);
 
         TranslatedMessage translatedMessage = translateModule.translateToAllLocales(message, senderLocale);
         if (translatedMessage == null) {
-            fLogger.info("[AutoTranslate] PrepareEvent: uuid=%s — nothing to translate (single locale or module disabled)",
+            fLogger.debug("[AutoTranslate] PrepareEvent: uuid=%s — nothing to translate (single locale or module disabled)",
                     messageUUID);
             return;
         }
