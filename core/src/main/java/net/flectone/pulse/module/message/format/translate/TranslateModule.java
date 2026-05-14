@@ -4,7 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -45,11 +44,22 @@ import java.util.stream.Collectors;
 public class TranslateModule implements ModuleLocalization<Localization.Message.Format.Translate> {
 
     /**
-     * Auto-translate chat history kept inside TranslateModule — by analogy with
-     * DeleteModule's playersHistory but fully independent. Each module owns its
-     * own state; no shared service.
+     * Global server-wide chat history, time-ordered. Each entry carries the
+     * formatted Component and a {@code Set<UUID> viewers} — every player who
+     * saw it. Memory: 100 players seeing one message = 1 entry with a 100-set
+     * of viewer UUIDs, not 100 duplicated Component trees.
+     *
+     * <p>Synchronize on this list for add/remove operations; iteration during
+     * a snapshot (sendUpdate, toggle lookup) takes a local copy under lock.
      */
-    private final Map<UUID, List<TranslateHistoryMessage>> playersHistory = new ConcurrentHashMap<>();
+    private final List<TranslateHistoryMessage> globalHistory = new java.util.ArrayList<>();
+
+    /**
+     * Per-player toggle state: which message UUIDs that player has flipped to
+     * "show original". Stored separately from the history entries because it's
+     * per-player; the entries themselves are shared.
+     */
+    private final Map<UUID, Set<UUID>> playerOriginalToggles = new ConcurrentHashMap<>();
 
     /** Components originated by FlectonePulse itself — dedup against MessageReceiveEvent. */
     private final List<Component> selfOriginatedComponents = new CopyOnWriteArrayList<>();
@@ -74,7 +84,10 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     @Override
     public void onDisable() {
         messageCache.invalidateAll();
-        playersHistory.clear();
+        synchronized (globalHistory) {
+            globalHistory.clear();
+        }
+        playerOriginalToggles.clear();
         selfOriginatedComponents.clear();
         translationCacheService.shutdown();
     }
@@ -233,8 +246,14 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 .forEach(player -> sendUpdate(player.uuid()));
     }
 
-    // ---- Self-contained chat history & replay (mirrors DeleteModule pattern) ----
+    // ---- Global chat history & per-player replay ----
 
+    /**
+     * Store the chat event in the global history, adding this receiver to the
+     * viewer set of the entry. If the message UUID already exists (because
+     * another receiver saved it first), we just add this receiver to viewers;
+     * the Component itself is shared.
+     */
     public void save(FPlayer receiver,
                      UUID messageUUID,
                      Component component,
@@ -244,16 +263,32 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         if (receiver.isUnknown()) return;
         if (!receiver.isOnline()) return;
 
-        UUID playerUUID = receiver.uuid();
-        TranslateHistoryMessage entry = new TranslateHistoryMessage(messageUUID, component, originalText, translatedMessage);
+        UUID receiverUUID = receiver.uuid();
 
-        List<TranslateHistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, _ -> new ObjectArrayList<>());
-        if (history.stream().anyMatch(h -> h.uuid().equals(messageUUID))) return;
+        synchronized (globalHistory) {
+            TranslateHistoryMessage existing = null;
+            for (TranslateHistoryMessage e : globalHistory) {
+                if (e.uuid().equals(messageUUID)) {
+                    existing = e;
+                    break;
+                }
+            }
 
-        if (history.size() >= historyLength()) {
-            history.removeFirst();
+            if (existing != null) {
+                existing.viewers().add(receiverUUID);
+            } else {
+                Set<UUID> viewers = ConcurrentHashMap.newKeySet();
+                viewers.add(receiverUUID);
+                TranslateHistoryMessage entry = new TranslateHistoryMessage(
+                        messageUUID, component, originalText, translatedMessage, viewers
+                );
+                globalHistory.add(entry);
+                // FIFO trim of oldest when the global buffer overflows.
+                while (globalHistory.size() > historyLength()) {
+                    globalHistory.remove(0);
+                }
+            }
         }
-        history.add(entry);
 
         if (needToCache && !isCached(component)) {
             selfOriginatedComponents.add(component);
@@ -268,56 +303,76 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         selfOriginatedComponents.remove(component);
     }
 
+    /**
+     * Player left — drop them from every viewer set and discard their toggle state.
+     * Entries themselves stay (other players may still view them).
+     */
     public void clearHistory(FPlayer fPlayer) {
-        playersHistory.remove(fPlayer.uuid());
+        UUID playerUUID = fPlayer.uuid();
+        synchronized (globalHistory) {
+            for (TranslateHistoryMessage entry : globalHistory) {
+                entry.viewers().remove(playerUUID);
+            }
+        }
+        playerOriginalToggles.remove(playerUUID);
     }
 
     /**
-     * Brute-force chat redraw — spam empty newlines to push old chat off-screen,
-     * then reprint history with each entry rendering its current state
-     * (original vs translation based on showOriginal + receiver locale).
+     * Brute-force chat redraw for one receiver: filter the global history to
+     * entries this receiver saw, fill any missing translations from the global
+     * cache, then push enough empty newlines to scroll old chat off-screen
+     * before reprinting.
      */
     public void sendUpdate(UUID receiverUUID) {
-        List<TranslateHistoryMessage> history = playersHistory.get(receiverUUID);
-        if (history == null) {
-            fLogger.info("[Toggle] sendUpdate: no history for receiverUUID=%s", receiverUUID);
-            return;
-        }
-
         FPlayer fPlayer = fPlayerService.getFPlayer(receiverUUID);
         String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
 
-        // Fill missing per-message translations from the global cache before drawing.
-        // A failed initial attempt (e.g. Google 429) leaves TranslatedMessage.translations
-        // empty; if the same text got translated later for another message, the global
-        // cache has it and we can use it here without firing another API call.
-        fillTranslationsFromCache(history, playerLocale);
+        List<TranslateHistoryMessage> visible;
+        synchronized (globalHistory) {
+            visible = globalHistory.stream()
+                    .filter(e -> e.viewers().contains(receiverUUID))
+                    .toList();
+        }
+
+        if (visible.isEmpty()) {
+            fLogger.info("[Toggle] sendUpdate: nothing to redraw for player=%s (no entries with this viewer)",
+                    fPlayer.name());
+            return;
+        }
+
+        fillTranslationsFromCache(visible, playerLocale);
+
+        Set<UUID> toggles = playerOriginalToggles.getOrDefault(receiverUUID, java.util.Set.of());
 
         int len = historyLength();
-        int emptyLines = Math.max(0, len - history.size());
-        fLogger.info("[Toggle] sendUpdate: player=%s locale=%s historyEntries=%d emptyLines=%d",
-                fPlayer.name(), playerLocale, history.size(), emptyLines);
+        int emptyLines = Math.max(0, len - visible.size());
+        fLogger.info("[Toggle] sendUpdate: player=%s locale=%s visibleEntries=%d emptyLines=%d globalSize=%d",
+                fPlayer.name(), playerLocale, visible.size(), emptyLines,
+                globalHistorySize());
 
-        for (int i = 0; i < len; i++) {
-            if (i >= history.size()) {
-                messageSender.sendMessage(fPlayer, Component.newline(), true);
-            }
+        for (int i = 0; i < emptyLines; i++) {
+            messageSender.sendMessage(fPlayer, Component.newline(), true);
         }
-        history.forEach(entry ->
-                messageSender.sendMessage(fPlayer, entry.getDisplayComponent(playerLocale), true)
-        );
+        for (TranslateHistoryMessage entry : visible) {
+            boolean showOriginal = toggles.contains(entry.uuid());
+            messageSender.sendMessage(fPlayer, entry.getDisplayComponent(playerLocale, showOriginal), true);
+        }
     }
 
-    private void fillTranslationsFromCache(List<TranslateHistoryMessage> history, String receiverLocale) {
+    private int globalHistorySize() {
+        synchronized (globalHistory) {
+            return globalHistory.size();
+        }
+    }
+
+    private void fillTranslationsFromCache(List<TranslateHistoryMessage> entries, String receiverLocale) {
         if (receiverLocale == null) return;
-        for (TranslateHistoryMessage entry : history) {
+        for (TranslateHistoryMessage entry : entries) {
             TranslatedMessage tm = entry.translatedMessage();
             if (tm == null) continue;
             if (receiverLocale.equals(tm.originalLang())) continue;
             if (tm.hasTranslation(receiverLocale)) {
                 String existing = tm.getTranslation(receiverLocale);
-                // Skip if we already have a real translation. If existing == originalText
-                // (a failed attempt), still consult the cache below to fill it in properly.
                 if (existing != null && !existing.isEmpty() && !existing.equals(entry.originalText())) continue;
             }
             String cached = translationCacheService.get(tm.originalLang(), receiverLocale, entry.originalText());
@@ -344,56 +399,45 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         UUID playerUUID = fPlayer.uuid();
-        List<TranslateHistoryMessage> history = playersHistory.get(playerUUID);
-        if (history == null) {
-            fLogger.info("[Toggle] skip: no history for player=%s (playerUUID=%s)",
-                    fPlayer.name(), playerUUID);
+
+        TranslateHistoryMessage entry = null;
+        synchronized (globalHistory) {
+            for (TranslateHistoryMessage e : globalHistory) {
+                if (e.uuid().equals(messageUUID)) {
+                    entry = e;
+                    break;
+                }
+            }
+        }
+
+        if (entry == null) {
+            fLogger.info("[Toggle] skip: entry uuid=%s not found in global history", messageUUID);
+            return false;
+        }
+        if (!entry.viewers().contains(playerUUID)) {
+            fLogger.info("[Toggle] skip: player=%s did not see uuid=%s", fPlayer.name(), messageUUID);
+            return false;
+        }
+        if (!entry.hasTranslations()) {
+            fLogger.info("[Toggle] skip: entry uuid=%s has no translations (server/system message)", messageUUID);
             return false;
         }
 
-        fLogger.info("[Toggle] history for player=%s has %d entries, looking for uuid=%s",
-                fPlayer.name(), history.size(), messageUUID);
+        Set<UUID> toggles = playerOriginalToggles.computeIfAbsent(playerUUID, _ -> ConcurrentHashMap.newKeySet());
+        boolean wasShowingOriginal = toggles.contains(messageUUID);
+        boolean nowShowingOriginal = !wasShowingOriginal;
+        if (nowShowingOriginal) toggles.add(messageUUID);
+        else toggles.remove(messageUUID);
 
-        boolean updated = false;
-        boolean foundButNoTranslations = false;
-        TranslateHistoryMessage updatedEntry = null;
-        for (int i = 0; i < history.size(); i++) {
-            TranslateHistoryMessage entry = history.get(i);
-            if (messageUUID.equals(entry.uuid())) {
-                if (!entry.hasTranslations()) {
-                    foundButNoTranslations = true;
-                    fLogger.info("[Toggle] found entry uuid=%s but hasTranslations=false (server/system message or no translation prepared)",
-                            messageUUID);
-                    break;
-                }
-                boolean oldFlag = entry.showOriginal();
-                boolean newFlag = !oldFlag;
-                updatedEntry = entry.withShowOriginal(newFlag);
-                history.set(i, updatedEntry);
-                updated = true;
-                fLogger.info("[Toggle] flipped showOriginal: %s → %s for uuid=%s (originalText='%s')",
-                        oldFlag, newFlag, messageUUID, entry.originalText());
-                break;
-            }
-        }
+        fLogger.info("[Toggle] flipped player=%s showOriginal for uuid=%s: %s → %s (originalText='%s')",
+                fPlayer.name(), messageUUID, wasShowingOriginal, nowShowingOriginal, entry.originalText());
 
-        if (!updated && !foundButNoTranslations) {
-            fLogger.info("[Toggle] entry not found in player=%s history for uuid=%s",
-                    fPlayer.name(), messageUUID);
+        // If toggled to "show translation" but no usable translation exists, kick off retry.
+        if (!nowShowingOriginal) {
+            maybeRetryTranslation(fPlayer, entry);
         }
-
-        if (updated) {
-            // If we just toggled TO "show translation" but no usable translation
-            // exists for this receiver's locale, kick off a retry via the chain.
-            // Debounced via inFlight dedup in TranslationCacheService — back-to-back
-            // clicks won't spam API.
-            if (!updatedEntry.showOriginal()) {
-                maybeRetryTranslation(fPlayer, updatedEntry);
-            }
-            fLogger.info("[Toggle] triggering sendUpdate for player=%s", fPlayer.name());
-            sendUpdate(playerUUID);
-        }
-        return updated;
+        sendUpdate(playerUUID);
+        return true;
     }
 
     private void maybeRetryTranslation(FPlayer fPlayer, TranslateHistoryMessage entry) {
