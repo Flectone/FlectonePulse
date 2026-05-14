@@ -59,6 +59,8 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
+        if (!isAutoMode()) return;
+
         EventMetadata<?> metadata = event.eventMetadata();
         UUID messageUUID = metadata.uuid();
 
@@ -102,6 +104,7 @@ public class PulseAutoTranslateListener implements PulseListener {
      */
     @Pulse(priority = Event.Priority.HIGH)
     public MessageSendEvent onMessageSendEvent(MessageSendEvent event) {
+        if (!isAutoMode()) return event;
         if (event.eventMetadata().destination().type() != Destination.Type.CHAT) return event;
 
         UUID messageUUID = event.eventMetadata().uuid();
@@ -126,6 +129,7 @@ public class PulseAutoTranslateListener implements PulseListener {
      */
     @Pulse(priority = Event.Priority.MONITOR)
     public void onMessageReceiveEvent(MessageReceiveEvent event) {
+        if (!isAutoMode()) return;
         if (event.overlay()) return;
 
         Component component = event.component();
@@ -144,5 +148,10 @@ public class PulseAutoTranslateListener implements PulseListener {
     @Pulse(priority = Event.Priority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         translateModule.clearHistory(event.player());
+    }
+
+    /** True when message.format.translate.auto is enabled (default). */
+    private boolean isAutoMode() {
+        return !Boolean.FALSE.equals(translateModule.config().auto());
     }
 }

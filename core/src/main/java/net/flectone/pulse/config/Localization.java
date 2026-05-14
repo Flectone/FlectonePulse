@@ -1240,7 +1240,7 @@ public record Localization(
             @With
             @Builder(toBuilder = true)
             @Jacksonized
-            public record Translate(String action) implements LocalizationSetting {
+            public record Translate(String action, String actionManual) implements LocalizationSetting {
             }
         }
 

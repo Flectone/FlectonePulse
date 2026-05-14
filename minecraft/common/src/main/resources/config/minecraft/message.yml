@@ -300,6 +300,12 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    # auto: true  → async auto-translation per receiver locale, ⇄ button toggles
+    #               between translation and original via /toggleoriginal
+    # auto: false → author's classic mode: nothing is pre-translated; the
+    #               ⇄ button runs /translateto on click, dispatching the
+    #               translated message as a new chat line
+    auto: true
     # Provider chain — tried in order until one returns a useful translation.
     # If a provider fails (non-200 / null / returns input verbatim), the next is tried.
     # Allowed values: GOOGLE, MYMEMORY, DEEPL, YANDEX.

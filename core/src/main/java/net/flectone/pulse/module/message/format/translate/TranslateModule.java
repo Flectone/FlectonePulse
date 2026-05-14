@@ -123,33 +123,68 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     }
 
     /**
-     * Adds the {@code <translation>} tag resolver. The button is hidden when the
-     * receiver shares the sender's locale (no translation will be done for them,
-     * so there's nothing to toggle).
+     * Adds the {@code <translation>} tag resolver. Two button modes:
+     *
+     * <ul>
+     *   <li><b>auto: true</b> (default) — our async-translate path. Button runs
+     *       {@code /toggleoriginal <uuid>}. Hidden for same-locale receivers
+     *       (no translation done for them so nothing to toggle).</li>
+     *   <li><b>auto: false</b> — author's classic on-demand path. Button runs
+     *       {@code /translateto <src> <dst> <uuid>} which synchronously
+     *       translates and dispatches a new chat line. No history, no toggle.</li>
+     * </ul>
      */
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
+        boolean autoMode = !Boolean.FALSE.equals(config().auto()); // default true
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (_, _) -> {
-            // Only player-to-player messages go through auto-translate — hide button otherwise
-            if (!(sender instanceof FPlayer fSender)) {
-                return Tag.selfClosingInserting(Component.empty());
-            }
-            String senderLocale = fSender.getSetting(SettingText.LOCALE);
+        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
+            String senderLocale = sender instanceof FPlayer fSender ? fSender.getSetting(SettingText.LOCALE) : null;
             String receiverLocale = receiver != null ? receiver.getSetting(SettingText.LOCALE) : null;
 
-            // Same-locale receiver — no translation, no button
-            if (senderLocale != null && senderLocale.equals(receiverLocale)) {
-                return Tag.selfClosingInserting(Component.empty());
-            }
-
             UUID messageUUID = messageContext.messageUUID();
+            String action;
 
-            String action = localization(receiver).action();
-            action = Strings.CS.replace(action, "<message>", messageUUID.toString());
+            if (autoMode) {
+                // Auto-translate mode — only player-to-player messages get the button
+                if (!(sender instanceof FPlayer)) {
+                    return Tag.selfClosingInserting(Component.empty());
+                }
+                // Same-locale receiver — no translation done, no button
+                if (senderLocale != null && senderLocale.equals(receiverLocale)) {
+                    return Tag.selfClosingInserting(Component.empty());
+                }
+                action = localization(receiver).action();
+                action = Strings.CS.replace(action, "<message>", messageUUID.toString());
+            } else {
+                // Classic /translateto mode — author's original behavior.
+                // Parse optional <translation:src:dst> args, fallback to auto/receiver-locale.
+                String firstLang = "auto";
+                String secondLang = receiverLocale;
+                if (argumentQueue.hasNext()) {
+                    Tag.Argument first = argumentQueue.pop();
+                    if (argumentQueue.hasNext()) {
+                        Tag.Argument second = argumentQueue.pop();
+                        if (argumentQueue.hasNext()) {
+                            firstLang = first.value();
+                            secondLang = second.value();
+                        } else {
+                            secondLang = first.value();
+                        }
+                    }
+                }
+                action = localization(receiver).actionManual();
+                if (action == null || action.isEmpty()) {
+                    // Fallback to auto-mode template if user didn't set actionManual.
+                    action = localization(receiver).action();
+                }
+                action = Strings.CS.replaceOnce(action, "<language>", firstLang);
+                action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
+                action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
+            }
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())

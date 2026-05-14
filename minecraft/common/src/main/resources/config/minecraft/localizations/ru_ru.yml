@@ -646,6 +646,7 @@ message:
         flectone: "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом"
     translate:
       action: " <click:run_command:\"/toggleoriginal <message>\"><hover:show_text:\"<fcolor:2>Показать оригинал/перевод\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
+      action_manual: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1><sprite_or:⇄:gui:icon/language>"
   greeting:
     format: "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <nickname><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>"
   join:
