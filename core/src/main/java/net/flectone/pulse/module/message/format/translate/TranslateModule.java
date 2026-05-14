@@ -243,27 +243,43 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         java.util.List<String> providers = config().providers();
         fLogger.debug("[AutoTranslate] translateToAllLocales: provider chain=%s", providers);
 
-        targetLangs.forEach(targetLang ->
-                translationCacheService.translateAsync(sourceLang, targetLang, originalText, providers)
-                        .thenAccept(translated -> {
-                            String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
-                            translations.put(targetLang, text);
-                            if (text.equals(originalText)) {
-                                fLogger.debug("[AutoTranslate] translation %s→%s == original (or no provider succeeded), skipping replay",
-                                        sourceLang, targetLang);
-                            } else {
-                                fLogger.debug("[AutoTranslate] translation arrived %s→%s, triggering replay for matching receivers",
-                                        sourceLang, targetLang);
-                                replayForLocale(targetLang);
-                            }
-                        })
-                        .exceptionally(throwable -> {
-                            fLogger.warning(throwable, "[AutoTranslate] chain failed %s, falling back to original",
-                                    sourceLang + "→" + targetLang);
-                            translations.put(targetLang, originalText);
-                            return null;
-                        })
-        );
+        targetLangs.forEach(targetLang -> {
+            // SYNC cache hit → populate translations immediately, NO replay needed.
+            // The receiver's MessageSendEvent will pick up the cached value via its
+            // own sync check and apply replaceText to the outgoing Component.
+            // Triggering replay here would race against SendEvent and re-render
+            // stale history, causing visible "ghost" duplicates of older messages.
+            String cached = translationCacheService.get(sourceLang, targetLang, originalText);
+            if (cached != null && !cached.isEmpty() && !cached.equals(originalText)) {
+                translations.put(targetLang, cached);
+                fLogger.debug("[AutoTranslate] translateToAllLocales: %s→%s cache HIT='%s' — populated translations, no async, no replay",
+                        sourceLang, targetLang, cached);
+                return;
+            }
+
+            // Cache miss — kick off async chain. On success, fire replay so older
+            // history entries (which were originally sent before this translation
+            // existed) update to the translated version.
+            translationCacheService.translateAsync(sourceLang, targetLang, originalText, providers)
+                    .thenAccept(translated -> {
+                        String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
+                        translations.put(targetLang, text);
+                        if (text.equals(originalText)) {
+                            fLogger.debug("[AutoTranslate] translation %s→%s == original (or no provider succeeded), skipping replay",
+                                    sourceLang, targetLang);
+                        } else {
+                            fLogger.debug("[AutoTranslate] translation arrived %s→%s, triggering replay for matching receivers",
+                                    sourceLang, targetLang);
+                            replayForLocale(targetLang);
+                        }
+                    })
+                    .exceptionally(throwable -> {
+                        fLogger.warning(throwable, "[AutoTranslate] chain failed %s, falling back to original",
+                                sourceLang + "→" + targetLang);
+                        translations.put(targetLang, originalText);
+                        return null;
+                    });
+        });
 
         return translatedMessage;
     }
