@@ -18,7 +18,6 @@ import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.util.constant.SettingText;
-import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -66,16 +65,12 @@ public class PulseAutoTranslateListener implements PulseListener {
 
         if (translatedMessage == null) return event;
 
-        FPlayer receiver = event.receiver();
+        // Save formatted message to history with translations for toggle functionality.
+        // event.message() is the full formatted component (player name + colors + translation button),
+        // NOT the raw text. Previously event.withMessage(translatedComponent) was called here which
+        // replaced the full format with plain text, causing the white-text-in-chat bug.
+        deleteModule.save(event.receiver(), messageUUID, event.message(), translatedMessage, true);
 
-        // Get receiver locale
-        String receiverLocale = receiver.getSetting(SettingText.LOCALE);
-        if (receiverLocale == null) receiverLocale = "en_us";
-
-        Component translatedComponent = translatedMessage.getTranslation(receiverLocale);
-
-        deleteModule.save(receiver, messageUUID, translatedComponent, translatedMessage, true);
-
-        return event.withMessage(translatedComponent);
+        return event;
     }
 }
