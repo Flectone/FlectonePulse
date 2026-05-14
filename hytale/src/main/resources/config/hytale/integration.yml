@@ -193,5 +193,3 @@ yandex:
   enable: false
   token: ""
   folder_id: ""
-  # IAM token (12-hour TTL). Get via: yc iam create-token
-  iam_token: ""

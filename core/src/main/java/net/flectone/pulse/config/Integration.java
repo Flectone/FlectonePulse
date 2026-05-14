@@ -439,7 +439,7 @@ public record Integration(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Yandex(Boolean enable, String token, String folderId, String iamToken) implements EnableSetting {
+    public record Yandex(Boolean enable, String token, String folderId) implements EnableSetting {
     }
 
     @With
