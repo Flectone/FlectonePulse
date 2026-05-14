@@ -91,9 +91,11 @@ public class PulseAutoTranslateListener implements PulseListener {
         TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
         if (translatedMessage == null) return event;
 
-        // Save the formatted component (with button) into TranslateModule's own history,
-        // bringing the TranslatedMessage along so redraw can pick the right version.
-        translateModule.save(receiver, messageUUID, event.message(), translatedMessage, true);
+        // Save the formatted component plus the raw player text — Component.replaceText
+        // uses the raw text as the literal to swap when a translation lands.
+        String originalText = event.eventMetadata().message();
+        if (originalText == null) originalText = "";
+        translateModule.save(receiver, messageUUID, event.message(), originalText, translatedMessage, true);
 
         return event;
     }

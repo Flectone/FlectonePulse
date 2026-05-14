@@ -176,8 +176,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             return null;
         }
 
-        Map<String, Component> translations = new ConcurrentHashMap<>();
-        translations.put(sourceLang, Component.text(originalText));
+        Map<String, String> translations = new ConcurrentHashMap<>();
+        translations.put(sourceLang, originalText);
 
         TranslatedMessage translatedMessage = TranslatedMessage.builder()
                 .originalText(originalText)
@@ -195,10 +195,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         targetLangs.forEach(targetLang ->
                 translationCacheService.translateWithMyMemoryAsync(sourceLang, targetLang, originalText)
                         .thenAccept(translated -> {
-                            Component translatedComponent = (translated != null && !translated.isEmpty())
-                                    ? Component.text(translated)
-                                    : Component.text(originalText);
-                            translations.put(targetLang, translatedComponent);
+                            String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
+                            translations.put(targetLang, text);
                             fLogger.info("[AutoTranslate] translation arrived %s→%s, triggering replay for matching receivers",
                                     sourceLang, targetLang);
                             replayForLocale(targetLang);
@@ -206,7 +204,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                         .exceptionally(throwable -> {
                             fLogger.warning(throwable, "[AutoTranslate] translation %s failed, falling back to original",
                                     sourceLang + "→" + targetLang);
-                            translations.put(targetLang, Component.text(originalText));
+                            translations.put(targetLang, originalText);
                             return null;
                         })
         );
@@ -229,20 +227,17 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
     // ---- Self-contained chat history & replay (mirrors DeleteModule pattern) ----
 
-    public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
-        save(receiver, messageUUID, component, null, needToCache);
-    }
-
     public void save(FPlayer receiver,
                      UUID messageUUID,
                      Component component,
+                     String originalText,
                      @Nullable TranslatedMessage translatedMessage,
                      boolean needToCache) {
         if (receiver.isUnknown()) return;
         if (!receiver.isOnline()) return;
 
         UUID playerUUID = receiver.uuid();
-        TranslateHistoryMessage entry = new TranslateHistoryMessage(messageUUID, component, translatedMessage);
+        TranslateHistoryMessage entry = new TranslateHistoryMessage(messageUUID, component, originalText, translatedMessage);
 
         List<TranslateHistoryMessage> history = playersHistory.computeIfAbsent(playerUUID, _ -> new ObjectArrayList<>());
         if (history.stream().anyMatch(h -> h.uuid().equals(messageUUID))) return;
