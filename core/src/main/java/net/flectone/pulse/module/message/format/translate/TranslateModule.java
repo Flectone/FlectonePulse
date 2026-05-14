@@ -264,6 +264,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         if (!receiver.isOnline()) return;
 
         UUID receiverUUID = receiver.uuid();
+        String receiverLocale = receiver.getSetting(SettingText.LOCALE);
 
         synchronized (globalHistory) {
             TranslateHistoryMessage existing = null;
@@ -276,14 +277,19 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
             if (existing != null) {
                 existing.viewers().add(receiverUUID);
+                // Store the per-locale Component variant. Different receivers may
+                // share the same locale → same Component; receivers of a different
+                // locale (e.g. with vs without the toggle button) get a different
+                // entry in the map.
+                if (receiverLocale != null && !existing.componentsByLocale().containsKey(receiverLocale)) {
+                    existing.componentsByLocale().put(receiverLocale, component);
+                }
             } else {
-                Set<UUID> viewers = ConcurrentHashMap.newKeySet();
-                viewers.add(receiverUUID);
-                TranslateHistoryMessage entry = new TranslateHistoryMessage(
-                        messageUUID, component, originalText, translatedMessage, viewers
+                TranslateHistoryMessage entry = TranslateHistoryMessage.create(
+                        messageUUID, receiverLocale, component, originalText, translatedMessage
                 );
+                entry.viewers().add(receiverUUID);
                 globalHistory.add(entry);
-                // FIFO trim of oldest when the global buffer overflows.
                 while (globalHistory.size() > historyLength()) {
                     globalHistory.remove(0);
                 }

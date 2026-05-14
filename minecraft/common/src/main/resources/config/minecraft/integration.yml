@@ -191,5 +191,9 @@ vault:
   enable: true
 yandex:
   enable: false
+  # OAuth token — deprecated by Yandex Cloud, ends 2026. Prefer iam_token below.
   token: ""
   folder_id: ""
+  # IAM token (12-hour TTL). Get via: yc iam create-token
+  # If set, takes precedence over the OAuth token above.
+  iam_token: ""
