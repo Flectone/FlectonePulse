@@ -12,33 +12,29 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Drives auto-translation of chat messages.
+ * Drives auto-translation of chat plus captures the full chat stream so the
+ * replay (triggered on translation arrival or toggle click) restores all
+ * messages a player has seen — chat, server announcements, join/quit, etc.
  *
- * <p>Flow:
- * <ol>
- *   <li>{@link MessagePrepareEvent}: kick off async translations for every online
- *       locale that differs from the sender's. The {@link TranslatedMessage} is
- *       cached by message UUID so the per-receiver {@link MessageSendEvent} can
- *       attach it to the receiver's history.</li>
- *   <li>{@link MessageSendEvent}: the original formatted component has already
- *       gone to the receiver — record it into TranslateModule's own history,
- *       attaching the {@link TranslatedMessage}. When a translation lands, the
- *       module will redraw the chat for receivers in that locale.</li>
- * </ol>
+ * <p>Without the full stream, replay would only redraw player chat and push
+ * server messages off-screen, since the brute-redraw rewrites the visible
+ * chat area from scratch.
  *
- * <p>Self-contained: no reference to DeleteModule. TranslateModule owns its own
- * history + replay mechanism by analogy with DeleteModule but independent.
+ * <p>Self-contained: no reference to DeleteModule.
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -47,7 +43,7 @@ public class PulseAutoTranslateListener implements PulseListener {
     private final TranslateModule translateModule;
     private final FLogger fLogger;
 
-    /** Short-lived bridge from PrepareEvent (per-message) to SendEvent (per-receiver). */
+    /** Bridges per-message PrepareEvent to per-receiver SendEvent. */
     private final Cache<UUID, TranslatedMessage> preparedTranslations = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build();
@@ -81,22 +77,55 @@ public class PulseAutoTranslateListener implements PulseListener {
         preparedTranslations.put(messageUUID, translatedMessage);
     }
 
+    /**
+     * Per-receiver chat send — record EVERY chat into history, with or without
+     * translation. This is critical for replay: when a translation lands and
+     * we redraw chat, we must also redraw all other player chat that came in
+     * between, otherwise it gets pushed off-screen.
+     */
     @Pulse(priority = Event.Priority.HIGH)
     public MessageSendEvent onMessageSendEvent(MessageSendEvent event) {
         if (event.eventMetadata().destination().type() != Destination.Type.CHAT) return event;
 
         UUID messageUUID = event.eventMetadata().uuid();
         FPlayer receiver = event.receiver();
-
-        TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
-        if (translatedMessage == null) return event;
-
-        // Save the formatted component plus the raw player text — Component.replaceText
-        // uses the raw text as the literal to swap when a translation lands.
         String originalText = event.eventMetadata().message();
         if (originalText == null) originalText = "";
+
+        TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
+
         translateModule.save(receiver, messageUUID, event.message(), originalText, translatedMessage, true);
 
         return event;
+    }
+
+    /**
+     * Server-originated messages (join/quit, vanilla broadcasts, other plugins'
+     * messages) arrive here. Save them into the same history so chat redraw
+     * preserves them.
+     *
+     * <p>Self-originated components (those the plugin sent in onMessageSendEvent
+     * just above) get filtered out via the isCached flag to avoid duplicates.
+     */
+    @Pulse(priority = Event.Priority.MONITOR)
+    public void onMessageReceiveEvent(MessageReceiveEvent event) {
+        if (event.overlay()) return;
+
+        Component component = event.component();
+
+        if (translateModule.isCached(component)) {
+            translateModule.removeCache(component);
+            return;
+        }
+
+        FPlayer receiver = event.player();
+        UUID messageUUID = UUID.randomUUID();
+
+        translateModule.save(receiver, messageUUID, component, "", null, false);
+    }
+
+    @Pulse(priority = Event.Priority.MONITOR)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        translateModule.clearHistory(event.player());
     }
 }

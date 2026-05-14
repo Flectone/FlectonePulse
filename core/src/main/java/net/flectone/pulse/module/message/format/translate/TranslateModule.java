@@ -284,12 +284,19 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
      */
     public void sendUpdate(UUID receiverUUID) {
         List<TranslateHistoryMessage> history = playersHistory.get(receiverUUID);
-        if (history == null) return;
+        if (history == null) {
+            fLogger.info("[Toggle] sendUpdate: no history for receiverUUID=%s", receiverUUID);
+            return;
+        }
 
         FPlayer fPlayer = fPlayerService.getFPlayer(receiverUUID);
         String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
 
         int len = historyLength();
+        int emptyLines = Math.max(0, len - history.size());
+        fLogger.info("[Toggle] sendUpdate: player=%s locale=%s historyEntries=%d emptyLines=%d",
+                fPlayer.name(), playerLocale, history.size(), emptyLines);
+
         for (int i = 0; i < len; i++) {
             if (i >= history.size()) {
                 messageSender.sendMessage(fPlayer, Component.newline(), true);
@@ -301,24 +308,58 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     }
 
     public boolean toggleOriginal(FPlayer fPlayer, UUID messageUUID) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return false;
-        if (messageUUID == null) return false;
+        fLogger.info("[Toggle] toggleOriginal called: player=%s uuid=%s",
+                fPlayer == null ? "null" : fPlayer.name(), messageUUID);
+
+        if (moduleController.isDisabledFor(this, fPlayer)) {
+            fLogger.info("[Toggle] skip: module disabled for player=%s",
+                    fPlayer == null ? "null" : fPlayer.name());
+            return false;
+        }
+        if (messageUUID == null) {
+            fLogger.info("[Toggle] skip: messageUUID is null");
+            return false;
+        }
 
         UUID playerUUID = fPlayer.uuid();
         List<TranslateHistoryMessage> history = playersHistory.get(playerUUID);
-        if (history == null) return false;
+        if (history == null) {
+            fLogger.info("[Toggle] skip: no history for player=%s (playerUUID=%s)",
+                    fPlayer.name(), playerUUID);
+            return false;
+        }
+
+        fLogger.info("[Toggle] history for player=%s has %d entries, looking for uuid=%s",
+                fPlayer.name(), history.size(), messageUUID);
 
         boolean updated = false;
+        boolean foundButNoTranslations = false;
         for (int i = 0; i < history.size(); i++) {
             TranslateHistoryMessage entry = history.get(i);
-            if (messageUUID.equals(entry.uuid()) && entry.hasTranslations()) {
-                history.set(i, entry.withShowOriginal(!entry.showOriginal()));
+            if (messageUUID.equals(entry.uuid())) {
+                if (!entry.hasTranslations()) {
+                    foundButNoTranslations = true;
+                    fLogger.info("[Toggle] found entry uuid=%s but hasTranslations=false (server/system message or no translation prepared)",
+                            messageUUID);
+                    break;
+                }
+                boolean oldFlag = entry.showOriginal();
+                boolean newFlag = !oldFlag;
+                history.set(i, entry.withShowOriginal(newFlag));
                 updated = true;
+                fLogger.info("[Toggle] flipped showOriginal: %s → %s for uuid=%s (originalText='%s')",
+                        oldFlag, newFlag, messageUUID, entry.originalText());
                 break;
             }
         }
 
+        if (!updated && !foundButNoTranslations) {
+            fLogger.info("[Toggle] entry not found in player=%s history for uuid=%s",
+                    fPlayer.name(), messageUUID);
+        }
+
         if (updated) {
+            fLogger.info("[Toggle] triggering sendUpdate for player=%s", fPlayer.name());
             sendUpdate(playerUUID);
         }
         return updated;
