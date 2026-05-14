@@ -5,8 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.logging.FLogger;
@@ -18,7 +21,10 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +34,11 @@ public class TranslationCacheService {
 
     private final CacheRegistry cacheRegistry;
     private final FLogger fLogger;
+    private final Provider<IntegrationModule> integrationModuleProvider;
     private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+    /** In-flight requests deduplication — same (source, target, text) returns the same future. */
+    private final Map<String, CompletableFuture<String>> inFlight = new ConcurrentHashMap<>();
 
     private Cache<String, String> getCache() {
         return cacheRegistry.getCache(CacheName.TRANSLATION_CACHE);
@@ -129,6 +139,90 @@ public class TranslationCacheService {
 
     public CompletableFuture<String> translateWithGoogleAsync(String sourceLang, String targetLang, String text) {
         return submitAsync("Google", sourceLang, targetLang, text, this::translateWithGoogle);
+    }
+
+    /**
+     * Run the configured provider chain — try each in order, return the first
+     * non-null/non-empty translation that differs from the input text. Any 200-OK
+     * with text==input or any error response moves on to the next provider.
+     *
+     * <p>De-duplicated by (source, target, text) — concurrent requests for the
+     * same key share a single future. Empty providers list → warning with a
+     * config example, auto-translate is effectively disabled for this call.
+     */
+    public CompletableFuture<String> translateAsync(String sourceLang,
+                                                    String targetLang,
+                                                    String text,
+                                                    @Nullable List<String> providers) {
+        String cached = get(sourceLang, targetLang, text);
+        if (cached != null && !cached.isEmpty()) {
+            fLogger.info("[AutoTranslate] chain %s→%s: cache HIT, returning immediately", sourceLang, targetLang);
+            return CompletableFuture.completedFuture(cached);
+        }
+
+        String key = sourceLang + ":" + targetLang + ":" + text;
+        CompletableFuture<String> existing = inFlight.get(key);
+        if (existing != null) {
+            fLogger.info("[AutoTranslate] chain %s→%s: request in flight, joining existing future", sourceLang, targetLang);
+            return existing;
+        }
+
+        if (providers == null || providers.isEmpty()) {
+            fLogger.warning("[AutoTranslate] chain: no providers configured. Add to config/message.yml under format.translate:%n"
+                    + "  providers:%n"
+                    + "    - GOOGLE%n"
+                    + "    - MYMEMORY%n"
+                    + "    - DEEPL%n"
+                    + "    - YANDEX%n"
+                    + "Auto-translate disabled until configured.");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(
+                () -> iterateProviders(sourceLang, targetLang, text, providers),
+                executorService
+        );
+        inFlight.put(key, future);
+        future.whenComplete((result, throwable) -> inFlight.remove(key));
+        return future;
+    }
+
+    private @Nullable String iterateProviders(String sourceLang, String targetLang, String text, List<String> providers) {
+        for (String provider : providers) {
+            String upper = provider == null ? "" : provider.trim().toUpperCase();
+            fLogger.info("[AutoTranslate] chain %s→%s: trying provider %s", sourceLang, targetLang, upper);
+
+            String result = callProvider(upper, sourceLang, targetLang, text);
+            if (result != null && !result.isEmpty() && !result.equals(text)) {
+                fLogger.info("[AutoTranslate] chain %s→%s: %s succeeded with '%s'",
+                        sourceLang, targetLang, upper, result);
+                put(sourceLang, targetLang, text, result);
+                return result;
+            }
+            fLogger.info("[AutoTranslate] chain %s→%s: %s failed or returned input verbatim, trying next",
+                    sourceLang, targetLang, upper);
+        }
+        fLogger.warning("[AutoTranslate] chain %s→%s: ALL providers failed for text='%s'",
+                sourceLang, targetLang, text);
+        return null;
+    }
+
+    private @Nullable String callProvider(String provider, String sourceLang, String targetLang, String text) {
+        try {
+            return switch (provider) {
+                case "GOOGLE" -> translateWithGoogle(sourceLang, targetLang, text);
+                case "MYMEMORY" -> translateWithMyMemory(sourceLang, targetLang, text);
+                case "DEEPL" -> integrationModuleProvider.get().deeplTranslate(FPlayer.UNKNOWN, sourceLang, targetLang, text);
+                case "YANDEX" -> integrationModuleProvider.get().yandexTranslate(FPlayer.UNKNOWN, sourceLang, targetLang, text);
+                default -> {
+                    fLogger.warning("[AutoTranslate] chain: unknown provider name '%s' (allowed: GOOGLE, MYMEMORY, DEEPL, YANDEX)", provider);
+                    yield null;
+                }
+            };
+        } catch (Exception e) {
+            fLogger.warning(e, "[AutoTranslate] chain: provider %s threw exception", provider);
+            return null;
+        }
     }
 
     private CompletableFuture<String> submitAsync(String providerLabel,

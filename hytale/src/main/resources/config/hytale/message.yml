@@ -273,7 +273,11 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
-    use_my_memory: false
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"

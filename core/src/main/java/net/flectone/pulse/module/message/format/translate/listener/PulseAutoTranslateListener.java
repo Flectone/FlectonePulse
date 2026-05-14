@@ -48,6 +48,15 @@ public class PulseAutoTranslateListener implements PulseListener {
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build();
 
+    /**
+     * Dedupes duplicate PrepareEvent fires within 1s for the same (sender, text).
+     * On Paper/Purpur the chat pipeline sometimes dispatches twice — without this
+     * we'd issue 2 API calls, save 2 history entries, and trigger 2 replays.
+     */
+    private final Cache<String, Boolean> recentMessages = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .build();
+
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
         EventMetadata<?> metadata = event.eventMetadata();
@@ -63,6 +72,14 @@ public class PulseAutoTranslateListener implements PulseListener {
 
         String senderLocale = sender.getSetting(SettingText.LOCALE);
         if (senderLocale == null) senderLocale = "en_us";
+
+        String dedupKey = sender.uuid() + ":" + senderLocale + ":" + message;
+        if (recentMessages.getIfPresent(dedupKey) != null) {
+            fLogger.info("[AutoTranslate] PrepareEvent: skip uuid=%s — duplicate of recent message (sender=%s text='%s')",
+                    messageUUID, sender.name(), message);
+            return;
+        }
+        recentMessages.put(dedupKey, Boolean.TRUE);
 
         fLogger.info("[AutoTranslate] PrepareEvent: uuid=%s sender=%s senderLocale=%s message='%s'",
                 messageUUID, sender.name(), senderLocale, message);

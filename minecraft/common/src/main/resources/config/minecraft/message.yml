@@ -300,9 +300,15 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
-    # use_my_memory: false → use Google Translate (free public gtx endpoint, no API key)
-    # use_my_memory: true  → use MyMemory (1000 words/day per IP, weaker for auto-detect)
-    use_my_memory: false
+    # Provider chain — tried in order until one returns a useful translation.
+    # If a provider fails (non-200 / null / returns input verbatim), the next is tried.
+    # Allowed values: GOOGLE, MYMEMORY, DEEPL, YANDEX.
+    # Empty list disables auto-translate entirely.
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"
