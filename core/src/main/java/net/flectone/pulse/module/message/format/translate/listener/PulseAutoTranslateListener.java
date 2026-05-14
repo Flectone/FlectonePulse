@@ -114,7 +114,35 @@ public class PulseAutoTranslateListener implements PulseListener {
 
         TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
 
-        translateModule.save(receiver, messageUUID, event.message(), originalText, translatedMessage, true);
+        Component originalComponent = event.message();
+
+        // Synchronous cache check — if the translation for this receiver's
+        // locale is already cached, apply it to the outgoing Component right
+        // now via replaceText. Avoids the race where an async cache HIT fires
+        // replayForLocale BEFORE MessageSendEvent has populated history, which
+        // made cached translations only visible after the *next* chat message.
+        if (translatedMessage != null && receiver != null && !originalText.isEmpty()) {
+            String sourceLang = translatedMessage.originalLang();
+            String receiverLocale = receiver.getSetting(SettingText.LOCALE);
+            if (receiverLocale != null && !receiverLocale.equals(sourceLang)) {
+                String cached = translateModule.getCachedTranslation(sourceLang, receiverLocale, originalText);
+                if (cached != null && !cached.isEmpty() && !cached.equals(originalText)) {
+                    String literal = originalText;
+                    Component translatedComponent = originalComponent.replaceText(b -> b
+                            .matchLiteral(literal)
+                            .replacement(cached));
+                    translatedMessage.translations().put(receiverLocale, cached);
+                    event = event.withMessage(translatedComponent);
+                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly",
+                            sourceLang, receiverLocale, messageUUID, receiver.name());
+                }
+            }
+        }
+
+        // Save the ORIGINAL component to history (not the translated one). Toggle
+        // and replay rebuild the translated variant on demand via replaceText
+        // against this original, so the showOriginal=true branch keeps working.
+        translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, true);
 
         return event;
     }

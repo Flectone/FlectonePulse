@@ -268,6 +268,11 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return translatedMessage;
     }
 
+    /** Synchronous cache lookup — returns the cached translation if present. */
+    public @Nullable String getCachedTranslation(String sourceLang, String targetLang, String text) {
+        return translationCacheService.get(sourceLang, targetLang, text);
+    }
+
     /**
      * After a translation lands for {@code locale}, redraw chat for every online
      * receiver whose locale matches — they had the original; now they see the
