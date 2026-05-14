@@ -46,7 +46,6 @@ import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.symbol.SymbolModule;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
-import net.flectone.pulse.module.command.toggleoriginal.ToggleOriginalModule;
 import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.try_.TryModule;
@@ -107,7 +106,6 @@ public class CommandModule implements ModuleSimple {
                 SymbolModule.class,
                 TellModule.class,
                 TictactoeModule.class,
-                ToggleOriginalModule.class,
                 ToponlineModule.class,
                 TranslatetoModule.class,
                 TryModule.class,

@@ -13,28 +13,20 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.message.format.translate.listener.PulseTranslateListener;
-import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.TranslationCacheService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -46,21 +38,15 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final UUIDParser uuidParser;
-    private final FPlayerService fPlayerService;
-    private final TranslatetoModule translatetoModule;
-    private final TranslationCacheService translationCacheService;
-    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseTranslateListener.class);
-        listenerRegistry.register(net.flectone.pulse.module.message.format.translate.listener.PulseAutoTranslateListener.class);
     }
 
     @Override
     public void onDisable() {
         messageCache.invalidateAll();
-        translationCacheService.shutdown();
     }
 
     @Override
@@ -95,40 +81,35 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
+        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+
         FPlayer receiver = messageContext.receiver();
 
-        if (moduleController.isDisabledFor(this, sender)) {
-            fLogger.info("[Translate] addTag: skip — module disabled for sender=%s",
-                    sender == null ? "null" : sender.name());
-            return messageContext;
-        }
-
-        fLogger.info("[Translate] addTag: register <translation> resolver for sender=%s receiver=%s",
-                sender == null ? "null" : sender.name(),
-                receiver == null ? "null" : receiver.name());
-
         return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
-            long uniqueLocaleCount = fPlayerService.getOnlineFPlayers().stream()
-                    .map(player -> player.getSetting(SettingText.LOCALE))
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .count();
+            String firstLang = "auto";
+            String secondLang = receiver.getSetting(SettingText.LOCALE);
 
-            fLogger.info("[Translate] addTag.resolver: uniqueLocaleCount=%d receiver=%s",
-                    uniqueLocaleCount, receiver == null ? "null" : receiver.name());
+            if (argumentQueue.hasNext()) {
+                Tag.Argument first = argumentQueue.pop();
 
-            if (uniqueLocaleCount <= 1) {
-                fLogger.info("[Translate] addTag.resolver: hide button — only %d unique locale(s) online",
-                        uniqueLocaleCount);
-                return Tag.selfClosingInserting(Component.empty());
+                if (argumentQueue.hasNext()) {
+                    Tag.Argument second = argumentQueue.pop();
+
+                    if (argumentQueue.hasNext()) {
+                        // translateto language language message
+                        firstLang = first.value();
+                        secondLang = second.value();
+                    } else {
+                        // translateto auto language message
+                        secondLang = first.value();
+                    }
+                }
             }
 
-            UUID messageUUID = messageContext.messageUUID();
-
             String action = localization(receiver).action();
-            action = Strings.CS.replace(action, "<message>", messageUUID.toString());
-
-            fLogger.info("[Translate] addTag.resolver: building button for uuid=%s", messageUUID);
+            action = Strings.CS.replaceOnce(action, "<language>", firstLang);
+            action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
+            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
 
             MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
                     .withFlags(messageContext.flags())
@@ -139,78 +120,6 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         });
-    }
-
-    public @Nullable TranslatedMessage translateToAllLocales(String originalText, String sourceLang) {
-        fLogger.info("[AutoTranslate] translateToAllLocales: enter source=%s text='%s'", sourceLang, originalText);
-
-        if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) {
-            fLogger.info("[AutoTranslate] translateToAllLocales: skip — module disabled globally");
-            return null;
-        }
-
-        Set<String> uniqueLocales = fPlayerService.getOnlineFPlayers().stream()
-                .map(player -> player.getSetting(SettingText.LOCALE))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        int onlineCount = fPlayerService.getOnlineFPlayers().size();
-        fLogger.info("[AutoTranslate] translateToAllLocales: online players=%d, unique locales from settings=%s",
-                onlineCount, uniqueLocales);
-
-        uniqueLocales.add(sourceLang);
-
-        if (uniqueLocales.size() <= 1) {
-            fLogger.info("[AutoTranslate] translateToAllLocales: skip — only %d unique locale(s) including source (%s)",
-                    uniqueLocales.size(), sourceLang);
-            return null;
-        }
-
-        Map<String, Component> translations = new ConcurrentHashMap<>();
-
-        translations.put(sourceLang, Component.text(originalText));
-
-        TranslatedMessage translatedMessage = TranslatedMessage.builder()
-                .originalText(originalText)
-                .originalLang(sourceLang)
-                .translations(translations)
-                .build();
-
-        List<String> targetLangs = uniqueLocales.stream()
-                .filter(targetLang -> !targetLang.equals(sourceLang))
-                .toList();
-
-        fLogger.info("[AutoTranslate] translateToAllLocales: launching %d async translation(s): %s → %s",
-                targetLangs.size(), sourceLang, targetLangs);
-
-        List<CompletableFuture<Void>> futures = targetLangs.stream()
-                .map(targetLang -> translationCacheService.translateWithMyMemoryAsync(sourceLang, targetLang, originalText)
-                        .thenAccept(translated -> {
-                            if (translated != null && !translated.isEmpty()) {
-                                fLogger.info("[AutoTranslate] translateToAllLocales: %s→%s SUCCESS → '%s'",
-                                        sourceLang, targetLang, translated);
-                                translations.put(targetLang, Component.text(translated));
-                            } else {
-                                fLogger.info("[AutoTranslate] translateToAllLocales: %s→%s returned null/empty, fallback to original",
-                                        sourceLang, targetLang);
-                                translations.put(targetLang, Component.text(originalText));
-                            }
-                        })
-                        .exceptionally(throwable -> {
-                            fLogger.warning(throwable, "[AutoTranslate] translateToAllLocales: %s FAILED, fallback to original",
-                                    sourceLang + "→" + targetLang);
-                            translations.put(targetLang, Component.text(originalText));
-                            return null;
-                        })
-                )
-                .toList();
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-
-        fLogger.info("[AutoTranslate] translateToAllLocales: returning TranslatedMessage (async tasks still running in background), current translations=%s",
-                translations.keySet());
-
-        return translatedMessage;
     }
 
     @Nullable

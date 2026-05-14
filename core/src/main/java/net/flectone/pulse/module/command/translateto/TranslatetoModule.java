@@ -46,7 +46,6 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
-    private final net.flectone.pulse.service.TranslationCacheService translationCacheService;
 
     @Override
     public void onEnable() {
@@ -146,34 +145,11 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     }
 
     public String translate(FPlayer fPlayer, String source, String target, String text) {
-        // Check cache first if MyMemory is enabled
-        if (config().useMyMemory() != null && config().useMyMemory()) {
-            String cached = translationCacheService.get(source, target, text);
-            if (cached != null) {
-                return cached;
-            }
-
-            // Try MyMemory API
-            String myMemoryTranslation = translationCacheService.translateWithMyMemory(source, target, text);
-            if (myMemoryTranslation != null && !myMemoryTranslation.isEmpty()) {
-                return myMemoryTranslation;
-            }
-        }
-
-        // Fallback to configured service
-        String translation = switch (config().service()) {
+        return switch (config().service()) {
             case DEEPL -> integrationModule.deeplTranslate(fPlayer, source, target, text);
             case GOOGLE -> googleTranslate(source, target, text);
             case YANDEX -> integrationModule.yandexTranslate(fPlayer, source, target, text);
-            case MYMEMORY -> translationCacheService.translateWithMyMemory(source, target, text);
         };
-
-        // Cache the result if MyMemory is enabled
-        if (config().useMyMemory() != null && config().useMyMemory() && translation != null && !translation.isEmpty()) {
-            translationCacheService.put(source, target, text, translation);
-        }
-
-        return translation != null ? translation : "";
     }
 
     public String googleTranslate(String source, String lang, String text) {
