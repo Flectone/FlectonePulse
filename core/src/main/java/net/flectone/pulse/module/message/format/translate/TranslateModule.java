@@ -192,22 +192,35 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         fLogger.info("[AutoTranslate] translateToAllLocales: launching %d async translation(s) %s → %s",
                 targetLangs.size(), sourceLang, targetLangs);
 
-        targetLangs.forEach(targetLang ->
-                translationCacheService.translateWithMyMemoryAsync(sourceLang, targetLang, originalText)
-                        .thenAccept(translated -> {
-                            String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
-                            translations.put(targetLang, text);
+        boolean useMyMemory = Boolean.TRUE.equals(config().useMyMemory());
+        String providerLabel = useMyMemory ? "MyMemory" : "Google";
+        fLogger.info("[AutoTranslate] translateToAllLocales: using provider %s (useMyMemory=%s)",
+                providerLabel, useMyMemory);
+
+        targetLangs.forEach(targetLang -> {
+            CompletableFuture<String> future = useMyMemory
+                    ? translationCacheService.translateWithMyMemoryAsync(sourceLang, targetLang, originalText)
+                    : translationCacheService.translateWithGoogleAsync(sourceLang, targetLang, originalText);
+
+            future.thenAccept(translated -> {
+                        String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
+                        translations.put(targetLang, text);
+                        if (text.equals(originalText)) {
+                            fLogger.info("[AutoTranslate] translation %s→%s == original, skipping replay (nothing to update)",
+                                    sourceLang, targetLang);
+                        } else {
                             fLogger.info("[AutoTranslate] translation arrived %s→%s, triggering replay for matching receivers",
                                     sourceLang, targetLang);
                             replayForLocale(targetLang);
-                        })
-                        .exceptionally(throwable -> {
-                            fLogger.warning(throwable, "[AutoTranslate] translation %s failed, falling back to original",
-                                    sourceLang + "→" + targetLang);
-                            translations.put(targetLang, originalText);
-                            return null;
-                        })
-        );
+                        }
+                    })
+                    .exceptionally(throwable -> {
+                        fLogger.warning(throwable, "[AutoTranslate] translation %s failed, falling back to original",
+                                sourceLang + "→" + targetLang);
+                        translations.put(targetLang, originalText);
+                        return null;
+                    });
+        });
 
         return translatedMessage;
     }

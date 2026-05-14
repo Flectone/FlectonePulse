@@ -124,24 +124,125 @@ public class TranslationCacheService {
     }
 
     public CompletableFuture<String> translateWithMyMemoryAsync(String sourceLang, String targetLang, String text) {
+        return submitAsync("MyMemory", sourceLang, targetLang, text, this::translateWithMyMemory);
+    }
+
+    public CompletableFuture<String> translateWithGoogleAsync(String sourceLang, String targetLang, String text) {
+        return submitAsync("Google", sourceLang, targetLang, text, this::translateWithGoogle);
+    }
+
+    private CompletableFuture<String> submitAsync(String providerLabel,
+                                                  String sourceLang,
+                                                  String targetLang,
+                                                  String text,
+                                                  TranslateFn fn) {
         String cached = get(sourceLang, targetLang, text);
         if (cached != null && !cached.isEmpty()) {
-            fLogger.info("[AutoTranslate] async %s→%s: using cached translation, skip API call", sourceLang, targetLang);
+            fLogger.info("[AutoTranslate] async %s %s→%s: using cached translation, skip API call",
+                    providerLabel, sourceLang, targetLang);
             return CompletableFuture.completedFuture(cached);
         }
 
-        fLogger.info("[AutoTranslate] async %s→%s: submitting MyMemory API task to executor", sourceLang, targetLang);
+        fLogger.info("[AutoTranslate] async %s %s→%s: submitting API task to executor",
+                providerLabel, sourceLang, targetLang);
         return CompletableFuture.supplyAsync(() -> {
-            fLogger.info("[AutoTranslate] async %s→%s: executor started task on thread=%s",
-                    sourceLang, targetLang, Thread.currentThread().getName());
-            String translation = translateWithMyMemory(sourceLang, targetLang, text);
+            fLogger.info("[AutoTranslate] async %s %s→%s: executor started task on thread=%s",
+                    providerLabel, sourceLang, targetLang, Thread.currentThread().getName());
+            String translation = fn.translate(sourceLang, targetLang, text);
             if (translation != null && !translation.isEmpty()) {
                 put(sourceLang, targetLang, text, translation);
             } else {
-                fLogger.info("[AutoTranslate] async %s→%s: API returned null/empty, not caching", sourceLang, targetLang);
+                fLogger.info("[AutoTranslate] async %s %s→%s: API returned null/empty, not caching",
+                        providerLabel, sourceLang, targetLang);
             }
             return translation;
         }, executorService);
+    }
+
+    @FunctionalInterface
+    private interface TranslateFn {
+        @Nullable String translate(String sourceLang, String targetLang, String text);
+    }
+
+    /**
+     * Translate via free Google Translate gtx endpoint — no API key required.
+     * Used as the default auto-translate provider; MyMemory is opt-in because
+     * it tends to return Azerbaijani/etc on auto-detect and has a 1000 word/day
+     * IP rate limit.
+     */
+    public @Nullable String translateWithGoogle(String sourceLang, String targetLang, String text) {
+        try {
+            String normalizedSource = normalizeLangCode(sourceLang);
+            String normalizedTarget = normalizeLangCode(targetLang);
+
+            String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
+            String urlString = "https://translate.googleapis.com/translate_a/single?client=gtx"
+                    + "&sl=" + normalizedSource
+                    + "&tl=" + normalizedTarget
+                    + "&dt=t&ie=UTF-8&oe=UTF-8&q=" + encodedText;
+
+            fLogger.info("[AutoTranslate] Google: GET %s", urlString);
+
+            URI uri = new URI(urlString);
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; FlectonePulse/1.9.4)");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int responseCode = connection.getResponseCode();
+            fLogger.info("[AutoTranslate] Google: response code=%d for %s→%s",
+                    responseCode, normalizedSource, normalizedTarget);
+
+            if (responseCode != 200) {
+                fLogger.warning("[AutoTranslate] Google: non-200 response (%d), returning null", responseCode);
+                return null;
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            String jsonResponse = response.toString();
+            String preview = jsonResponse.length() > 300 ? jsonResponse.substring(0, 300) + "...[truncated]" : jsonResponse;
+            fLogger.info("[AutoTranslate] Google: response body (preview)=%s", preview);
+
+            // Response shape: [[["translated text","original",null,null,1]],null,"en",...]
+            JsonElement root = new JsonParser().parse(jsonResponse);
+            if (!root.isJsonArray()) {
+                fLogger.warning("[AutoTranslate] Google: response is not a JSON array");
+                return null;
+            }
+            JsonElement segments = root.getAsJsonArray().get(0);
+            if (segments == null || !segments.isJsonArray()) {
+                fLogger.warning("[AutoTranslate] Google: missing segments array");
+                return null;
+            }
+
+            StringBuilder translatedBuilder = new StringBuilder();
+            segments.getAsJsonArray().forEach(seg -> {
+                if (seg.isJsonArray() && seg.getAsJsonArray().size() > 0) {
+                    JsonElement piece = seg.getAsJsonArray().get(0);
+                    if (piece != null && !piece.isJsonNull()) {
+                        translatedBuilder.append(piece.getAsString());
+                    }
+                }
+            });
+            String translation = translatedBuilder.toString();
+
+            fLogger.info("[AutoTranslate] Google: parsed translation %s→%s = '%s'",
+                    normalizedSource, normalizedTarget, translation);
+
+            return translation.isEmpty() ? null : translation;
+        } catch (Exception e) {
+            fLogger.warning(e, "[AutoTranslate] Google: exception during request for %s",
+                    sourceLang + "→" + targetLang);
+            return null;
+        }
     }
 
     /**

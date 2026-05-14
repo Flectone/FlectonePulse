@@ -273,6 +273,7 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    use_my_memory: false
   world:
     enable: true
     mode: "TYPE"
