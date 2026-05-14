@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.util.constant.CacheName;
+import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
 public class TranslationCacheService {
 
     private final CacheRegistry cacheRegistry;
+    private final FLogger fLogger;
     private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     private Cache<String, String> getCache() {
@@ -41,7 +43,9 @@ public class TranslationCacheService {
      */
     public @Nullable String get(String sourceLang, String targetLang, String text) {
         String key = getCacheKey(sourceLang, targetLang, text);
-        return getCache().getIfPresent(key);
+        String cached = getCache().getIfPresent(key);
+        fLogger.info("[AutoTranslate] cache GET %s → %s", key, cached == null ? "MISS" : "HIT='" + cached + "'");
+        return cached;
     }
 
     /**
@@ -50,6 +54,7 @@ public class TranslationCacheService {
     public void put(String sourceLang, String targetLang, String text, String translation) {
         String key = getCacheKey(sourceLang, targetLang, text);
         getCache().put(key, translation);
+        fLogger.info("[AutoTranslate] cache PUT %s → '%s'", key, translation);
     }
 
     /**
@@ -63,8 +68,11 @@ public class TranslationCacheService {
             String normalizedTarget = normalizeLangCode(targetLang);
 
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
+            // Pipe character must be URL-encoded as %7C — java.net.URI (RFC 3986 strict) rejects raw `|` in query.
             String urlString = "https://api.mymemory.translated.net/get?q=" + encodedText
-                + "&langpair=" + normalizedSource + "|" + normalizedTarget;
+                + "&langpair=" + normalizedSource + "%7C" + normalizedTarget;
+
+            fLogger.info("[AutoTranslate] MyMemory: GET %s", urlString);
 
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
@@ -74,7 +82,11 @@ public class TranslationCacheService {
             connection.setReadTimeout(5000);
 
             int responseCode = connection.getResponseCode();
+            fLogger.info("[AutoTranslate] MyMemory: response code=%d for %s→%s", responseCode, normalizedSource, normalizedTarget);
+
             if (responseCode != 200) {
+                fLogger.warning("[AutoTranslate] MyMemory: non-200 response (%d) for %s→%s, returning null",
+                        responseCode, normalizedSource, normalizedTarget);
                 return null;
             }
 
@@ -87,16 +99,21 @@ public class TranslationCacheService {
             }
             in.close();
 
-            // Parse JSON response: {"responseData":{"translatedText":"..."}}
             String jsonResponse = response.toString();
+            String preview = jsonResponse.length() > 300 ? jsonResponse.substring(0, 300) + "...[truncated]" : jsonResponse;
+            fLogger.info("[AutoTranslate] MyMemory: response body (preview)=%s", preview);
+
+            // Parse JSON response: {"responseData":{"translatedText":"..."}}
             int startIndex = jsonResponse.indexOf("\"translatedText\":\"");
             if (startIndex == -1) {
+                fLogger.warning("[AutoTranslate] MyMemory: could not find translatedText in response, returning null");
                 return null;
             }
 
             startIndex += 18; // length of "translatedText":"
             int endIndex = jsonResponse.indexOf("\"", startIndex);
             if (endIndex == -1) {
+                fLogger.warning("[AutoTranslate] MyMemory: could not find closing quote for translatedText, returning null");
                 return null;
             }
 
@@ -109,8 +126,13 @@ public class TranslationCacheService {
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");
 
+            fLogger.info("[AutoTranslate] MyMemory: parsed translation %s→%s = '%s'",
+                    normalizedSource, normalizedTarget, translation);
+
             return translation;
-        } catch (Exception _) {
+        } catch (Exception e) {
+            fLogger.warning(e, "[AutoTranslate] MyMemory: exception during request for %s",
+                    sourceLang + "→" + targetLang);
             return null;
         }
     }
@@ -119,10 +141,22 @@ public class TranslationCacheService {
      * Translate text asynchronously using MyMemory API.
      */
     public CompletableFuture<String> translateWithMyMemoryAsync(String sourceLang, String targetLang, String text) {
+        // Check cache before launching API call
+        String cached = get(sourceLang, targetLang, text);
+        if (cached != null && !cached.isEmpty()) {
+            fLogger.info("[AutoTranslate] async %s→%s: using cached translation, skip API call", sourceLang, targetLang);
+            return CompletableFuture.completedFuture(cached);
+        }
+
+        fLogger.info("[AutoTranslate] async %s→%s: submitting MyMemory API task to executor", sourceLang, targetLang);
         return CompletableFuture.supplyAsync(() -> {
+            fLogger.info("[AutoTranslate] async %s→%s: executor started task on thread=%s",
+                    sourceLang, targetLang, Thread.currentThread().getName());
             String translation = translateWithMyMemory(sourceLang, targetLang, text);
             if (translation != null && !translation.isEmpty()) {
                 put(sourceLang, targetLang, text, translation);
+            } else {
+                fLogger.info("[AutoTranslate] async %s→%s: API returned null/empty, not caching", sourceLang, targetLang);
             }
             return translation;
         }, executorService);
