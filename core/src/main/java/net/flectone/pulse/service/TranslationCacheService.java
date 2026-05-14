@@ -1,6 +1,9 @@
 package net.flectone.pulse.service;
 
 import com.google.common.cache.Cache;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -31,16 +34,10 @@ public class TranslationCacheService {
         return cacheRegistry.getCache(CacheName.TRANSLATION_CACHE);
     }
 
-    /**
-     * Generate cache key from source language, target language and text.
-     */
     private String getCacheKey(String sourceLang, String targetLang, String text) {
         return sourceLang + ":" + targetLang + ":" + text;
     }
 
-    /**
-     * Get translation from cache.
-     */
     public @Nullable String get(String sourceLang, String targetLang, String text) {
         String key = getCacheKey(sourceLang, targetLang, text);
         String cached = getCache().getIfPresent(key);
@@ -48,9 +45,6 @@ public class TranslationCacheService {
         return cached;
     }
 
-    /**
-     * Put translation to cache.
-     */
     public void put(String sourceLang, String targetLang, String text, String translation) {
         String key = getCacheKey(sourceLang, targetLang, text);
         getCache().put(key, translation);
@@ -58,17 +52,16 @@ public class TranslationCacheService {
     }
 
     /**
-     * Translate text using MyMemory API.
-     * Returns null if translation failed.
+     * Translate via MyMemory public API. Returns null on any failure.
+     * Response JSON is parsed with Gson so unicode escapes are decoded properly.
      */
     public @Nullable String translateWithMyMemory(String sourceLang, String targetLang, String text) {
         try {
-            // Normalize language codes (en_us -> en, ru_ru -> ru)
             String normalizedSource = normalizeLangCode(sourceLang);
             String normalizedTarget = normalizeLangCode(targetLang);
 
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
-            // Pipe character must be URL-encoded as %7C — java.net.URI (RFC 3986 strict) rejects raw `|` in query.
+            // Pipe is encoded as %7C — java.net.URI (RFC 3986 strict) rejects raw pipe in query.
             String urlString = "https://api.mymemory.translated.net/get?q=" + encodedText
                 + "&langpair=" + normalizedSource + "%7C" + normalizedTarget;
 
@@ -93,7 +86,6 @@ public class TranslationCacheService {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder response = new StringBuilder();
             String inputLine;
-
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
@@ -103,28 +95,22 @@ public class TranslationCacheService {
             String preview = jsonResponse.length() > 300 ? jsonResponse.substring(0, 300) + "...[truncated]" : jsonResponse;
             fLogger.info("[AutoTranslate] MyMemory: response body (preview)=%s", preview);
 
-            // Parse JSON response: {"responseData":{"translatedText":"..."}}
-            int startIndex = jsonResponse.indexOf("\"translatedText\":\"");
-            if (startIndex == -1) {
-                fLogger.warning("[AutoTranslate] MyMemory: could not find translatedText in response, returning null");
+            JsonElement root = new JsonParser().parse(jsonResponse);
+            if (!root.isJsonObject()) {
+                fLogger.warning("[AutoTranslate] MyMemory: response is not a JSON object");
                 return null;
             }
-
-            startIndex += 18; // length of "translatedText":"
-            int endIndex = jsonResponse.indexOf("\"", startIndex);
-            if (endIndex == -1) {
-                fLogger.warning("[AutoTranslate] MyMemory: could not find closing quote for translatedText, returning null");
+            JsonObject responseData = root.getAsJsonObject().getAsJsonObject("responseData");
+            if (responseData == null) {
+                fLogger.warning("[AutoTranslate] MyMemory: missing responseData in JSON");
                 return null;
             }
-
-            String translation = jsonResponse.substring(startIndex, endIndex);
-
-            // Unescape JSON string
-            translation = translation.replace("\\n", "\n")
-                .replace("\\r", "\r")
-                .replace("\\t", "\t")
-                .replace("\\\"", "\"")
-                .replace("\\\\", "\\");
+            JsonElement translatedTextEl = responseData.get("translatedText");
+            if (translatedTextEl == null || translatedTextEl.isJsonNull()) {
+                fLogger.warning("[AutoTranslate] MyMemory: missing translatedText in responseData");
+                return null;
+            }
+            String translation = translatedTextEl.getAsString();
 
             fLogger.info("[AutoTranslate] MyMemory: parsed translation %s→%s = '%s'",
                     normalizedSource, normalizedTarget, translation);
@@ -137,11 +123,7 @@ public class TranslationCacheService {
         }
     }
 
-    /**
-     * Translate text asynchronously using MyMemory API.
-     */
     public CompletableFuture<String> translateWithMyMemoryAsync(String sourceLang, String targetLang, String text) {
-        // Check cache before launching API call
         String cached = get(sourceLang, targetLang, text);
         if (cached != null && !cached.isEmpty()) {
             fLogger.info("[AutoTranslate] async %s→%s: using cached translation, skip API call", sourceLang, targetLang);
@@ -164,25 +146,19 @@ public class TranslationCacheService {
 
     /**
      * Normalize language code from minecraft format to ISO 639-1.
-     * Examples: en_us -> en, ru_ru -> ru, zh_cn -> zh
+     * Examples: en_us → en, ru_ru → ru, zh_cn → zh.
      */
     private String normalizeLangCode(String langCode) {
         if (langCode == null || langCode.isEmpty()) {
             return "en";
         }
-
-        // Extract first part before underscore
         int underscoreIndex = langCode.indexOf('_');
         if (underscoreIndex > 0) {
             return langCode.substring(0, underscoreIndex).toLowerCase();
         }
-
         return langCode.toLowerCase();
     }
 
-    /**
-     * Shutdown executor service.
-     */
     public void shutdown() {
         ExecutorService old = executorService;
         executorService = Executors.newFixedThreadPool(4);
