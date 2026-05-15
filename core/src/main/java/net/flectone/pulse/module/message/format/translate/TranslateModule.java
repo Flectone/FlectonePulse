@@ -354,6 +354,26 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 if (receiverLocale != null && !existing.componentsByLocale().containsKey(receiverLocale)) {
                     existing.componentsByLocale().put(receiverLocale, component);
                 }
+                // Merge translatedMessage into existing entry. Save() is called multiple
+                // times per messageUUID (once per receiver). The first call may have a
+                // null TranslatedMessage (e.g. for the sender themselves whose locale
+                // matches the source so no translation was synthesized); a later call
+                // for another receiver may have synthesized one from cache. Without this
+                // merge the entry would be stuck with the first save's null TM and
+                // toggle would report 'has no translations'.
+                if (translatedMessage != null) {
+                    if (existing.translatedMessage() == null) {
+                        // Replace the entry in-place — record fields are final.
+                        TranslateHistoryMessage updated = existing.withTranslatedMessage(translatedMessage);
+                        int idx = globalHistory.indexOf(existing);
+                        if (idx >= 0) globalHistory.set(idx, updated);
+                        existing = updated;
+                    } else {
+                        // Both non-null — merge per-locale translations into the
+                        // existing TranslatedMessage's mutable translations map.
+                        existing.translatedMessage().translations().putAll(translatedMessage.translations());
+                    }
+                }
                 wasExisting = true;
                 newViewersCount = existing.viewers().size();
             } else {
