@@ -184,6 +184,19 @@ public class PulseAutoTranslateListener implements PulseListener {
             return;
         }
 
+        // Skip components whose plain-text serialization is blank — these are
+        // typically chat-pipeline echoes (bubble updates, internal newlines, the
+        // plugin's own already-sent chat caught on the return trip) that bloat
+        // the global history with empty-text entries. The visible chat doesn't
+        // care about them, and replay rendering would show empty lines.
+        String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+                .serialize(component);
+        if (plain.isBlank()) {
+            fLogger.debug("[History.receive] skip — empty/blank plain text from MessageReceiveEvent for receiver=%s",
+                    event.player() == null ? "null" : event.player().name());
+            return;
+        }
+
         FPlayer receiver = event.player();
         UUID messageUUID = UUID.randomUUID();
 
