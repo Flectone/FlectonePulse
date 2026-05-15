@@ -113,16 +113,26 @@ public class PulseAutoTranslateListener implements PulseListener {
         if (originalText == null) originalText = "";
 
         TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
-
         Component originalComponent = event.message();
 
-        // Synchronous cache check — if the translation for this receiver's
-        // locale is already cached, apply it to the outgoing Component right
-        // now via replaceText. Avoids the race where an async cache HIT fires
-        // replayForLocale BEFORE MessageSendEvent has populated history, which
-        // made cached translations only visible after the *next* chat message.
-        if (translatedMessage != null && receiver != null && !originalText.isEmpty()) {
-            String sourceLang = translatedMessage.originalLang();
+        // Determine source language. PrepareEvent normally puts a TranslatedMessage
+        // into the bridge cache, but dedup-skipped chats (rapid repeats of the
+        // same text within 1s) don't go through PrepareEvent — fall back to the
+        // sender's own locale so we can still consult the cache.
+        String sourceLang = null;
+        if (translatedMessage != null) {
+            sourceLang = translatedMessage.originalLang();
+        } else if (event.eventMetadata().sender() instanceof FPlayer fSender) {
+            sourceLang = fSender.getSetting(SettingText.LOCALE);
+            if (sourceLang == null) sourceLang = "en_us";
+        }
+
+        // Synchronous cache check — applies for both prepared and dedup-skipped
+        // sends. The cache is global, so any prior translation of this same text
+        // covers this message even though no async fetch was kicked off for THIS
+        // uuid. Avoids the race where async cache HIT fires replayForLocale
+        // before MessageSendEvent populates history.
+        if (receiver != null && !originalText.isEmpty() && sourceLang != null) {
             String receiverLocale = receiver.getSetting(SettingText.LOCALE);
             if (receiverLocale != null && !receiverLocale.equals(sourceLang)) {
                 String cached = translateModule.getCachedTranslation(sourceLang, receiverLocale, originalText);
@@ -131,18 +141,25 @@ public class PulseAutoTranslateListener implements PulseListener {
                     Component translatedComponent = originalComponent.replaceText(b -> b
                             .matchLiteral(literal)
                             .replacement(cached));
-                    translatedMessage.translations().put(receiverLocale, cached);
+                    if (translatedMessage != null) {
+                        translatedMessage.translations().put(receiverLocale, cached);
+                    }
                     event = event.withMessage(translatedComponent);
-                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly",
-                            sourceLang, receiverLocale, messageUUID, receiver.name());
+                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly%s",
+                            sourceLang, receiverLocale, messageUUID, receiver.name(),
+                            translatedMessage == null ? " (dedup-skipped, history not stored)" : "");
                 }
             }
         }
 
-        // Save the ORIGINAL component to history (not the translated one). Toggle
-        // and replay rebuild the translated variant on demand via replaceText
-        // against this original, so the showOriginal=true branch keeps working.
-        translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, true);
+        // Save ORIGINAL component to history only when PrepareEvent prepared a
+        // TranslatedMessage. Dedup-skipped messages already got the translation
+        // applied to event.message() above; we skip history for them to avoid
+        // bloating the global buffer with spam (toggle won't work for those —
+        // acceptable trade-off since spam isn't toggled in practice).
+        if (translatedMessage != null) {
+            translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, true);
+        }
 
         return event;
     }
