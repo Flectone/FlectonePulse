@@ -158,8 +158,17 @@ public class PulseAutoTranslateListener implements PulseListener {
         // bloating the global buffer with spam (toggle won't work for those —
         // acceptable trade-off since spam isn't toggled in practice).
         if (translatedMessage != null) {
-            translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, true);
+            // needToCache=false: do NOT add originalComponent to selfOriginatedComponents,
+            // because the packet actually carries event.message() (which may have been
+            // replaced by withMessage(translatedComponent)). Caching the wrong variant
+            // would silently break ReceiveEvent dedup and cause duplicate history entries.
+            translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, false);
         }
+
+        // Always register what we're actually about to send so the corresponding
+        // outgoing PacketSendEvent → MessageReceiveEvent gets skipped. event.message()
+        // here reflects any prior withMessage(translatedComponent) substitution.
+        translateModule.markSelfOriginated(event.message());
 
         return event;
     }

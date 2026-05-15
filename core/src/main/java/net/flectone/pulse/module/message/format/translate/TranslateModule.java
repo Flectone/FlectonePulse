@@ -390,6 +390,23 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     }
 
     /**
+     * Register a Component as plugin-originated for ReceiveEvent dedup.
+     *
+     * <p>Caller must pass the EXACT Component instance that will be carried by
+     * the outgoing packet — i.e. the result of any prior {@code event.withMessage(...)}
+     * substitution, not the pre-modification original. PacketEvents forwards
+     * the same reference back via {@code wrapper.getMessage()}; {@link #isCached}
+     * compares by reference, so passing the wrong variant silently breaks dedup
+     * and the listener saves a duplicate history entry.
+     */
+    public void markSelfOriginated(Component sentComponent) {
+        if (sentComponent == null) return;
+        if (!selfOriginatedComponents.contains(sentComponent)) {
+            selfOriginatedComponents.add(sentComponent);
+        }
+    }
+
+    /**
      * Player left — drop them from every viewer set and discard their toggle state.
      * Entries themselves stay (other players may still view them).
      */
