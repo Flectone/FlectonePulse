@@ -22,7 +22,9 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -128,10 +130,8 @@ public class PulseAutoTranslateListener implements PulseListener {
         }
 
         // Synchronous cache check — applies for both prepared and dedup-skipped
-        // sends. The cache is global, so any prior translation of this same text
-        // covers this message even though no async fetch was kicked off for THIS
-        // uuid. Avoids the race where async cache HIT fires replayForLocale
-        // before MessageSendEvent populates history.
+        // sends. If the cache already has a translation for this receiver's
+        // locale, apply it inline so the chat is translated on first display.
         if (receiver != null && !originalText.isEmpty() && sourceLang != null) {
             String receiverLocale = receiver.getSetting(SettingText.LOCALE);
             if (receiverLocale != null && !receiverLocale.equals(sourceLang)) {
@@ -141,33 +141,46 @@ public class PulseAutoTranslateListener implements PulseListener {
                     Component translatedComponent = originalComponent.replaceText(b -> b
                             .matchLiteral(literal)
                             .replacement(cached));
-                    if (translatedMessage != null) {
+
+                    // For dedup-skipped chats PrepareEvent didn't create a TranslatedMessage.
+                    // Synthesize one so the entry that's about to land in history carries the
+                    // translation data — toggle works for these too, history isn't a black hole.
+                    if (translatedMessage == null) {
+                        Map<String, String> translations = new ConcurrentHashMap<>();
+                        translations.put(sourceLang, originalText);
+                        translations.put(receiverLocale, cached);
+                        translatedMessage = TranslatedMessage.builder()
+                                .originalText(originalText)
+                                .originalLang(sourceLang)
+                                .translations(translations)
+                                .build();
+                        fLogger.debug("[AutoTranslate] SendEvent: synthesized TranslatedMessage for dedup-skipped uuid=%s",
+                                messageUUID);
+                    } else {
                         translatedMessage.translations().put(receiverLocale, cached);
                     }
+
                     event = event.withMessage(translatedComponent);
-                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly%s",
-                            sourceLang, receiverLocale, messageUUID, receiver.name(),
-                            translatedMessage == null ? " (dedup-skipped, history not stored)" : "");
+                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly",
+                            sourceLang, receiverLocale, messageUUID, receiver.name());
                 }
             }
         }
 
-        // Save ORIGINAL component to history only when PrepareEvent prepared a
-        // TranslatedMessage. Dedup-skipped messages already got the translation
-        // applied to event.message() above; we skip history for them to avoid
-        // bloating the global buffer with spam (toggle won't work for those —
-        // acceptable trade-off since spam isn't toggled in practice).
-        if (translatedMessage != null) {
-            // needToCache=false: do NOT add originalComponent to selfOriginatedComponents,
-            // because the packet actually carries event.message() (which may have been
-            // replaced by withMessage(translatedComponent)). Caching the wrong variant
-            // would silently break ReceiveEvent dedup and cause duplicate history entries.
-            translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, false);
-        }
+        // Always save to history. Three cases:
+        //   - Player chat with TranslatedMessage → full toggle support.
+        //   - Dedup-skipped repeat with cache HIT → TranslatedMessage was just synthesized
+        //     above, toggle also works.
+        //   - System / server-side messages (join/quit, /give output, plugin announcements)
+        //     where sender isn't FPlayer → translatedMessage is null, entry is not toggleable
+        //     but is still redrawn during sendUpdate so chat history stays intact.
+        // needToCache=false on save: dedup against the outgoing packet is handled below by
+        // markSelfOriginated against event.message(), which reflects any prior withMessage.
+        translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, false);
 
-        // Always register what we're actually about to send so the corresponding
-        // outgoing PacketSendEvent → MessageReceiveEvent gets skipped. event.message()
-        // here reflects any prior withMessage(translatedComponent) substitution.
+        // Register what is actually about to be sent (may be a translated variant after
+        // event.withMessage). The outgoing PacketSendEvent → MessageReceiveEvent will see
+        // the same Component reference and isCached will skip it — no duplicate entries.
         translateModule.markSelfOriginated(event.message());
 
         return event;
