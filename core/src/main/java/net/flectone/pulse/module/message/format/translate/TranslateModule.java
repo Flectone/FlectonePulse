@@ -151,14 +151,23 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             if (autoMode) {
                 // Auto-translate mode — only player-to-player messages get the button
                 if (!(sender instanceof FPlayer)) {
+                    fLogger.debug("[History.addTag] no button — sender is not FPlayer (uuid=%s)", messageUUID);
                     return Tag.selfClosingInserting(Component.empty());
                 }
                 // Same-locale receiver — no translation done, no button
                 if (senderLocale != null && senderLocale.equals(receiverLocale)) {
+                    fLogger.debug("[History.addTag] no button — same locale %s for sender=%s receiver=%s uuid=%s",
+                            senderLocale,
+                            sender instanceof FPlayer fp ? fp.name() : "?",
+                            receiver == null ? "null" : receiver.name(),
+                            messageUUID);
                     return Tag.selfClosingInserting(Component.empty());
                 }
                 action = localization(receiver).action();
                 action = Strings.CS.replace(action, "<message>", messageUUID.toString());
+                fLogger.debug("[History.addTag] auto button: receiver=%s receiverLocale=%s senderLocale=%s uuid=%s → /toggleoriginal %s",
+                        receiver == null ? "null" : receiver.name(),
+                        receiverLocale, senderLocale, messageUUID, messageUUID);
             } else {
                 // Classic /translateto mode — author's original behavior.
                 // Parse optional <translation:src:dst> args, fallback to auto/receiver-locale.
@@ -316,12 +325,21 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                      String originalText,
                      @Nullable TranslatedMessage translatedMessage,
                      boolean needToCache) {
-        if (receiver.isUnknown()) return;
-        if (!receiver.isOnline()) return;
+        if (receiver.isUnknown()) {
+            fLogger.debug("[History.save] skip — receiver is UNKNOWN (console etc), uuid=%s", messageUUID);
+            return;
+        }
+        if (!receiver.isOnline()) {
+            fLogger.debug("[History.save] skip — receiver=%s is offline, uuid=%s", receiver.name(), messageUUID);
+            return;
+        }
 
         UUID receiverUUID = receiver.uuid();
         String receiverLocale = receiver.getSetting(SettingText.LOCALE);
 
+        int newGlobalSize;
+        boolean wasExisting;
+        int newViewersCount;
         synchronized (globalHistory) {
             TranslateHistoryMessage existing = null;
             for (TranslateHistoryMessage e : globalHistory) {
@@ -333,13 +351,11 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
             if (existing != null) {
                 existing.viewers().add(receiverUUID);
-                // Store the per-locale Component variant. Different receivers may
-                // share the same locale → same Component; receivers of a different
-                // locale (e.g. with vs without the toggle button) get a different
-                // entry in the map.
                 if (receiverLocale != null && !existing.componentsByLocale().containsKey(receiverLocale)) {
                     existing.componentsByLocale().put(receiverLocale, component);
                 }
+                wasExisting = true;
+                newViewersCount = existing.viewers().size();
             } else {
                 TranslateHistoryMessage entry = TranslateHistoryMessage.create(
                         messageUUID, receiverLocale, component, originalText, translatedMessage
@@ -349,8 +365,16 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 while (globalHistory.size() > historyLength()) {
                     globalHistory.remove(0);
                 }
+                wasExisting = false;
+                newViewersCount = entry.viewers().size();
             }
+            newGlobalSize = globalHistory.size();
         }
+
+        fLogger.debug("[History.save] uuid=%s receiver=%s locale=%s text='%s' hasTranslatedMessage=%s mode=%s viewersNow=%d globalSize=%d",
+                messageUUID, receiver.name(), receiverLocale, originalText,
+                translatedMessage != null, wasExisting ? "UPDATE" : "CREATE",
+                newViewersCount, newGlobalSize);
 
         if (needToCache && !isCached(component)) {
             selfOriginatedComponents.add(component);
@@ -415,8 +439,15 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         for (int i = 0; i < emptyLines; i++) {
             messageSender.sendMessage(fPlayer, Component.newline(), true);
         }
+        int idx = 0;
         for (TranslateHistoryMessage entry : visible) {
             boolean showOriginal = toggles.contains(entry.uuid());
+            String translationText = entry.translatedMessage() != null
+                    ? entry.translatedMessage().getTranslation(playerLocale)
+                    : null;
+            fLogger.debug("[Toggle] sendUpdate:  [%d/%d] uuid=%s text='%s' showOriginal=%s translationForLocale=%s",
+                    idx++, visible.size(), entry.uuid(), entry.originalText(),
+                    showOriginal, translationText == null ? "<none>" : "'" + translationText + "'");
             messageSender.sendMessage(fPlayer, entry.getDisplayComponent(playerLocale, showOriginal), true);
         }
     }
