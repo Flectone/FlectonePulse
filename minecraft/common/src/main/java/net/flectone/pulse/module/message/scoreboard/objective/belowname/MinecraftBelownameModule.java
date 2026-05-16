@@ -49,7 +49,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_OBJECTIVE_BELOWNAME;
+        return ModuleName.MESSAGE_SCOREBOARD_OBJECTIVE_BELOWNAME;
     }
 
     @Override

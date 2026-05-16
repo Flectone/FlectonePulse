@@ -37,7 +37,7 @@ public abstract class ScoreboardModule implements ModuleLocalization<Localizatio
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_FORMAT_SCOREBOARD;
+        return ModuleName.MESSAGE_SCOREBOARD;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_OBJECTIVE_TABNAME;
+        return ModuleName.MESSAGE_SCOREBOARD_OBJECTIVE_TABNAME;
     }
 
     @Override

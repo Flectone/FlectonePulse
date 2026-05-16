@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.scoreboard;
+package net.flectone.pulse.module.message.scoreboard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,7 +11,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
-import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
