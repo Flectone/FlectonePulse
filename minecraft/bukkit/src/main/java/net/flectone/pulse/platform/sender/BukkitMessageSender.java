@@ -45,13 +45,15 @@ public class BukkitMessageSender extends MinecraftMessageSender {
             return;
         }
 
-        paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component));
+        if (!paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
+            super.sendMessage(fPlayer, component, true);
+        }
     }
 
     private Component replaceItemMarkToEmpty(Component component) {
         return component.replaceText(TextReplacementConfig.builder()
                 .match(PaperItemStackUtil.FLECTONEPULSE_ITEM_MARK_PATTERN)
-                .replacement((matchResult, builder) -> Component.text(""))
+                .replacement((_, _) -> Component.text(""))
                 .build()
         );
     }

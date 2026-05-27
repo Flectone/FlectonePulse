@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +30,8 @@ public class PaperItemStackUtil {
             .maximumSize(100)
             .build();
 
+    private final FLogger fLogger;
+
     public String saveItem(UUID key, ItemStack itemStack) {
         ItemStack cachedItemStack = getItem(key);
         if (cachedItemStack == null) {
@@ -42,17 +45,19 @@ public class PaperItemStackUtil {
         return uuidItemStackCache.getIfPresent(key);
     }
 
-    public void sendMessage(FPlayer fPlayer, String serialized) {
+    public boolean sendMessage(FPlayer fPlayer, String serialized) {
         Player player = Bukkit.getPlayer(fPlayer.uuid());
-        if (player == null) return;
+        if (player == null) return false;
 
-        Component component = AdventureSerializer.serializer().gson().deserialize(serialized);
-        player.sendMessage(replaceItemMark(component));
         try {
             Component component = GsonComponentSerializer.gson().deserialize(serialized);
             player.sendMessage(replaceItemMark(component));
         } catch (Exception e) {
+            fLogger.warning(e, "Failed to deserialize message %s", serialized);
+            return false;
         }
+
+        return true;
     }
 
     private Component replaceItemMark(Component component) {
