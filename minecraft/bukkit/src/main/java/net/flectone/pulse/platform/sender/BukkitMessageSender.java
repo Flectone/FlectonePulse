@@ -46,7 +46,7 @@ public class BukkitMessageSender extends MinecraftMessageSender {
         }
 
         if (!paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
-            super.sendMessage(fPlayer, component, true);
+            super.sendMessage(fPlayer, replaceItemMarkToEmpty(component), true);
         }
     }
 
