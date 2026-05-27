@@ -103,7 +103,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
             bind(MinecraftSimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
         }
 
-        if (reflectionResolver.isPaper() && reflectionResolver.hasClass("com.", "github.retrooper.packetevents.util.adventure.AdventureSerializer")) {
+        if (reflectionResolver.isPaper()) {
             bind(MinecraftMessageSender.class).to(BukkitMessageSender.class);
         }
 

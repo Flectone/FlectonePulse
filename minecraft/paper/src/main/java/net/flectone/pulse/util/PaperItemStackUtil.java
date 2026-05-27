@@ -1,6 +1,5 @@
 package net.flectone.pulse.util;
 
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
@@ -10,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,6 +48,11 @@ public class PaperItemStackUtil {
 
         Component component = AdventureSerializer.serializer().gson().deserialize(serialized);
         player.sendMessage(replaceItemMark(component));
+        try {
+            Component component = GsonComponentSerializer.gson().deserialize(serialized);
+            player.sendMessage(replaceItemMark(component));
+        } catch (Exception e) {
+        }
     }
 
     private Component replaceItemMark(Component component) {
