@@ -21,26 +21,30 @@ public class WebUtil {
 
     private final FLogger fLogger;
 
-    public boolean downloadFile(String fileUrl, Path outputPath) {
+    public int downloadFile(String fileUrl, Path outputPath, boolean warn404) {
         try {
             HttpURLConnection connection = createConnection(fileUrl);
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 fLogger.info("Downloading %s", fileUrl);
 
                 try (InputStream inputStream = connection.getInputStream()) {
                     Files.createDirectories(outputPath.getParent());
                     Files.copy(inputStream, outputPath);
                     outputPath.toFile().setLastModified(FileWriter.LAST_MODIFIED_TIME);
-                    return true;
                 }
+
+            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND && warn404) {
+                fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), connection.getResponseCode(), fileUrl);
             }
 
-            fLogger.warning("Failed to download %s. HTTP response: %s - %s", outputPath.getFileName(), connection.getResponseCode(), fileUrl);
+            return responseCode;
         } catch (IOException _) {
             fLogger.warning("Failed to download %s file", outputPath.getFileName());
         }
 
-        return false;
+        return -1;
     }
 
     public HttpURLConnection createConnection(String url) throws IOException {

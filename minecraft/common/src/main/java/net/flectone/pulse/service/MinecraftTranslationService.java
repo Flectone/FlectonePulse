@@ -87,7 +87,7 @@ public class MinecraftTranslationService implements TranslationService {
         if (formattedLanguage == null) return false;
 
         String url = buildLocalizationUrl(getVersion(), formattedLanguage, isModern ? ".json" : ".lang");
-        return webUtil.downloadFile(url, outputPath);
+        return webUtil.downloadFile(url, outputPath, true) == HttpURLConnection.HTTP_OK;
     }
 
     public void loadTranslations() {

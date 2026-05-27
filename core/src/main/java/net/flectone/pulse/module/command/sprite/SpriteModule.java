@@ -37,6 +37,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -119,7 +120,8 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                     .build()
             );
 
-            if (!downloadAtlasFile(atlas)) {
+            int responseCode = downloadAtlasFile(atlas);
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
                         .sender(fPlayer)
                         .format(Localization.Command.Sprite::downloadError)
@@ -258,9 +260,9 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
         });
     }
 
-    private boolean downloadAtlasFile(String atlasName) {
+    private int downloadAtlasFile(String atlasName) {
         Path outputPath = resolveAtlasesFolder().resolve(Strings.CS.replace(ATLAS_FILE_NAME, "<atlas>", atlasName));
-        if (Files.exists(outputPath)) return true;
+        if (Files.exists(outputPath)) return HttpURLConnection.HTTP_OK;
 
         String url = StringUtils.replaceEach(
                 FLECTONEPULSE_ATLAS_API,
@@ -268,7 +270,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 new String[]{platformServerAdapter.getServerVersionName(), atlasName}
         );
 
-        return webUtil.downloadFile(url, outputPath);
+        return webUtil.downloadFile(url, outputPath, false);
     }
 
     private Path resolveAtlasesFolder() {
