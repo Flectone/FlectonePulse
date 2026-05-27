@@ -98,7 +98,7 @@ public class MessagePipeline {
         String serializedComponent = MiniMessage.miniMessage().serialize(build(context));
 
         // remove last space
-        return StringUtils.chop(serializedComponent);
+        return Strings.CS.removeEnd(serializedComponent, " ");
     }
 
     public String buildPlain(MessageContext context) {
