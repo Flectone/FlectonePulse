@@ -124,7 +124,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
                         .sender(fPlayer)
-                        .format(Localization.Command.Sprite::downloadError)
+                        .format(localization -> responseCode != HttpURLConnection.HTTP_NOT_FOUND ? localization.downloadError() : localization.nullAtlas())
                         .build()
                 );
                 return;
