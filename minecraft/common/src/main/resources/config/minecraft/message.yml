@@ -433,7 +433,7 @@ tab:
     hide_invisible: false
     hide_spectator: false
     spectator_list_order: false
-    proxy_mode: true
+    range: "PROXY"
     ticker:
       enable: true
       period: 100

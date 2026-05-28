@@ -21,6 +21,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -28,6 +29,7 @@ import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPulsePlayerlistnameListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -45,6 +47,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -76,6 +79,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     private final ModuleController moduleController;
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
+    private final RangeFilter rangeFilter;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
     @Override
@@ -124,9 +128,11 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
+        Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fPlayer, config().range());
+
         fPlayerService.getPlatformFPlayers().stream()
                 .filter(viewer -> integrationModule.canSeeVanished(fPlayer, viewer))
-                .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
+                .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver, listedFilter));
     }
 
     public void add(UUID uuid) {
@@ -153,7 +159,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         );
     }
 
-    private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver) {
+    private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver, Predicate<FPlayer> listedFilter) {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
@@ -171,7 +177,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
-                    isListed(fPlayer, gameMode),
+                    isListed(fPlayer, gameMode) && listedFilter.test(fReceiver),
                     platformPlayerAdapter.getPing(fPlayer),
                     gameMode,
                     name,
@@ -194,7 +200,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     public boolean isProxyMode() {
-        return moduleController.isEnable(this) && config().proxyMode() && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().is(Range.Type.PROXY) && proxyRegistry.hasEnabledProxy();
     }
 
     private boolean isListed(FPlayer fPlayer, GameMode gameMode) {
