@@ -119,6 +119,8 @@ skinsrestorer:
   load_mojang_skin: false
 supervanish:
   enable: true
+  show_fake_quit: true
+  show_fake_join: true
 tab:
   enable: true
   disable_flectonepulse_scoreboard: true

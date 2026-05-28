@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import org.bukkit.event.Listener;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitSuperVanishIntegration implements Listener, FIntegration {
 
+    private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final QuitModule quitModule;
     private final JoinModule joinModule;
@@ -34,6 +36,7 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
     @EventHandler
     public void onHide(PlayerHideEvent event) {
         if (event.isCancelled()) return;
+        if (!fileFacade.integration().supervanish().showFakeQuit()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         quitModule.send(fPlayer, true);
@@ -44,6 +47,7 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
     @EventHandler
     public void onShow(PlayerShowEvent event) {
         if (event.isCancelled()) return;
+        if (!fileFacade.integration().supervanish().showFakeJoin()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         joinModule.send(fPlayer, true);

@@ -12,21 +12,25 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.MinecraftServer;
 
 @Singleton
 public class FabricVanishIntegration implements FIntegration {
 
+    private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
     @Getter private final FLogger fLogger;
 
     @Inject
-    public FabricVanishIntegration(FabricFlectonePulse fabricFlectonePulse,
+    public FabricVanishIntegration(FileFacade fileFacade,
+                                   FabricFlectonePulse fabricFlectonePulse,
                                    FPlayerService fPlayerService,
                                    QuitModule quitModule,
                                    JoinModule joinModule,
                                    FLogger fLogger) {
+        this.fileFacade = fileFacade;
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fLogger = fLogger;
 
@@ -34,9 +38,13 @@ public class FabricVanishIntegration implements FIntegration {
             FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
 
             if (vanish) {
-                quitModule.send(fPlayer, true);
+                if (fileFacade.integration().supervanish().showFakeQuit()) {
+                    quitModule.send(fPlayer, true);
+                }
             } else {
-                joinModule.send(fPlayer, true);
+                if (fileFacade.integration().supervanish().showFakeJoin()) {
+                    joinModule.send(fPlayer, true);
+                }
             }
         });
     }

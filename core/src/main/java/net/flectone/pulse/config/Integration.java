@@ -370,7 +370,11 @@ public record Integration(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Supervanish(Boolean enable) implements EnableSetting {
+    public record Supervanish(
+            Boolean enable,
+            Boolean showFakeQuit,
+            Boolean showFakeJoin
+    ) implements EnableSetting {
     }
 
     @With
