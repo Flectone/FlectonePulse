@@ -124,8 +124,6 @@ public class HytaleMenuBuilder implements MenuBuilder {
             );
 
             uiContext.updatePage(true);
-
-            chatsettingModule.saveSetting(finalFTarget, messageType);
         }));
     }
 

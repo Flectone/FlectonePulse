@@ -123,8 +123,6 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                     );
 
                     dialogController.changeButton(fPlayer, dialog, id, invertButton);
-
-                    chatsettingModule.saveSetting(finalFTarget, messageType);
                 });
     }
 

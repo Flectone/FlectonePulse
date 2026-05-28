@@ -77,7 +77,7 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
 
         return inventoryBuilder
                 .addItem(slot, (ItemStack) platformServerAdapter.buildItemStack(fTarget, material, title, lore))
-                .addClickHandler(slot, (itemStack, inventory) -> {
+                .addClickHandler(slot, (_, inventory) -> {
                     ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
                     if (status == ChatsettingHandler.Status.DENIED) return;
 
@@ -90,8 +90,6 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
 
                     ItemStack newItemStack = (ItemStack) platformServerAdapter.buildItemStack(finalFTarget, invertMaterial, invertTitle, invertLore);
                     inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
-
-                    chatsettingModule.saveSetting(finalFTarget, messageType);
                 });
     }
 

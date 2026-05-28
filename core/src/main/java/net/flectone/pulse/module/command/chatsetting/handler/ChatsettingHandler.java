@@ -177,7 +177,9 @@ public class ChatsettingHandler {
 
         fTarget = syncFPlayer(fTarget);
         boolean currentEnabled = fTarget.isSetting(messageType);
-        fPlayerService.updateCache(fTarget.withSetting(messageType, !currentEnabled));
+
+        fTarget = fPlayerService.updateCache(fTarget.withSetting(messageType, !currentEnabled));
+        chatsettingModule.saveSetting(fTarget, messageType);
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
     }
