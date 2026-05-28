@@ -364,7 +364,7 @@ public record Integration(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Skinsrestorer(Boolean enable) implements EnableSetting {
+    public record Skinsrestorer(Boolean enable, Boolean loadMojangSkin) implements EnableSetting {
     }
 
     @With
