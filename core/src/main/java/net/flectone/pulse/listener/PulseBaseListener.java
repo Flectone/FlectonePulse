@@ -23,6 +23,8 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
+import java.util.Objects;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseBaseListener implements PulseListener {
@@ -37,16 +39,32 @@ public class PulseBaseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
     public PlayerJoinEvent onPlayerJoinEvent(PlayerJoinEvent event) {
-        FPlayer fPlayer = event.player()
-                .withIp(platformPlayerAdapter.getIp(event.player()))
-                .withSetting(SettingText.SERVER, fileFacade.config().server());
+        FPlayer fPlayer = event.player();
 
+        String platformIp = platformPlayerAdapter.getIp(fPlayer);
+        boolean anotherIp = !Objects.equals(fPlayer.ip(), platformIp);
+        if (anotherIp) {
+            fPlayer = fPlayer.withIp(platformIp);
+        }
+
+        String server = fileFacade.config().server();
+        boolean anotherServer = !Objects.equals(fPlayer.getSetting(SettingText.SERVER), server);
+        if (anotherServer) {
+            fPlayer = fPlayer.withSetting(SettingText.SERVER, server);
+        }
+
+        FPlayer finalFPlayer = fPlayer;
         taskScheduler.runAsync(() -> {
-            fPlayerService.saveFPlayerData(fPlayer);
-            fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SERVER);
+            if (anotherIp) {
+                fPlayerService.saveFPlayerData(finalFPlayer);
+            }
+
+            if (anotherServer) {
+                fPlayerService.saveOrUpdateSetting(finalFPlayer, SettingText.SERVER);
+            }
         });
 
-        return event.withPlayer(fPlayer);
+        return event.withPlayer(finalFPlayer);
     }
 
     @Pulse
