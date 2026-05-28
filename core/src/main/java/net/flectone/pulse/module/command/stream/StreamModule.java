@@ -33,10 +33,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -157,6 +154,8 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     public void setStreamPrefix(FPlayer fPlayer, String prefix) {
+        if (Objects.equals(prefix, fPlayer.getSetting(SettingText.STREAM_PREFIX))) return;
+
         fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.STREAM_PREFIX, prefix), SettingText.STREAM_PREFIX);
     }
 

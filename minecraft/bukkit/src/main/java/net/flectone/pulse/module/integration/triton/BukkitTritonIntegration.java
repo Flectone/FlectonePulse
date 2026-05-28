@@ -16,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitTritonIntegration implements Listener, FIntegration {
@@ -36,6 +38,8 @@ public class BukkitTritonIntegration implements Listener, FIntegration {
         String newLanguage = event.getNewLanguage().getLanguageId();
 
         SettingText setting = SettingText.LOCALE;
+        if (Objects.equals(fPlayer.getSetting(setting), newLanguage)) return;
+
         fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(setting, newLanguage), setting);
     }
 
