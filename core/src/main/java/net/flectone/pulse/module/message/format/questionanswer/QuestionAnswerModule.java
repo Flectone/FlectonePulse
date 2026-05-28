@@ -32,8 +32,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -43,7 +41,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuestionAnswerModule implements ModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
-    private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
 
     private final FileFacade fileFacade;
@@ -83,7 +80,6 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
 
     @Override
     public void onDisable() {
-        processedQuestions.clear();
         patternMap.clear();
     }
 
@@ -136,7 +132,6 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        UUID processId = messageContext.messageUUID();
         FEntity receiver = messageContext.receiver();
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.QUESTION.getTagName(), (argumentQueue, _) -> {
@@ -146,21 +141,13 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
             String questionKey = questionTag.value();
             if (questionKey.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-            sendAnswer(processId, sender, receiver, questionKey);
+            sendAnswer(sender, receiver, questionKey);
 
             return MessagePipeline.ReplacementTag.emptyTag();
         }));
     }
 
-    private void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {
-        if (processedQuestions.containsKey(processId)) return;
-
-        processedQuestions.put(processId, true);
-
-        sendAnswerLater(sender, receiver, question);
-    }
-
-    private void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
+    private void sendAnswer(FEntity sender, FEntity receiver, String question) {
         Message.Format.QuestionAnswer.Question questionMessage = config().questions().get(question);
         if (questionMessage == null) return;
 

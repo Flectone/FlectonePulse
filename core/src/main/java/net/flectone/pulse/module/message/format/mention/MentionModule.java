@@ -33,15 +33,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.util.Optional;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MentionModule implements ModuleLocalization<Localization.Message.Format.Mention> {
-
-    private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
     private final @Named("mentionMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
@@ -66,7 +62,6 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
     @Override
     public void onDisable() {
-        processedMentions.clear();
         messageCache.invalidateAll();
     }
 
@@ -113,7 +108,6 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        UUID processId = messageContext.messageUUID();
         FPlayer receiver = messageContext.receiver();
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.MENTION.getTagName(), (argumentQueue, _) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
@@ -127,14 +121,15 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
             Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
                 if (permissionChecker.check(sender, permission().group().name() + "." + group.get())) {
-                    sendMention(processId, receiver);
+                    sendMention(receiver);
+
                     return mentionTag(messageContext, mention);
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
                     if (mentionFPlayer.equals(receiver)) {
-                        sendMention(processId, mentionFPlayer);
+                        sendMention(mentionFPlayer);
                     }
 
                     return mentionTag(messageContext, mention);
@@ -209,11 +204,8 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
                 .findAny();
     }
 
-    public void sendMention(UUID processId, FPlayer fPlayer) {
+    public void sendMention(FPlayer fPlayer) {
         if (permissionChecker.check(fPlayer, permission().bypass())) return;
-        if (processedMentions.containsKey(processId)) return;
-
-        processedMentions.put(processId, true);
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Format.Mention>builder()
                 .sender(fPlayer)
