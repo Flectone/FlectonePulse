@@ -13,9 +13,12 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -25,9 +28,8 @@ import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.BiFunction;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.emptyResolver;
 
@@ -143,13 +145,13 @@ public class MessagePipeline {
     }
 
     public TagResolver messageTag(Component message) {
-        return TagResolver.resolver("message", (_, _) -> Tag.inserting(message));
+        return resolver("message", (_, _) -> Tag.inserting(message));
     }
 
     public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
         if (target == null) return emptyResolver(tag);
 
-        return TagResolver.resolver(tag, (argumentQueue, _) -> {
+        return resolver(tag, (argumentQueue, _) -> {
             int targetIndex = 0;
             if (argumentQueue.hasNext()) {
                 targetIndex = argumentQueue.pop().asInt().orElse(0);
@@ -169,6 +171,84 @@ public class MessagePipeline {
 
     public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
         return targetTag("target", receiver, target);
+    }
+
+    public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
+        return resolver(Collections.singleton(name), handler);
+    }
+
+    public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull Tag tag) {
+        return resolver(name, (_, _) -> tag);
+    }
+
+    public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull Component component) {
+        return resolver(name, (_, _) -> Tag.selfClosingInserting(component));
+    }
+
+    public @NonNull TagResolver resolver(@NonNull Set<String> names, @NonNull Tag tag) {
+        return resolver(names, (_, _) -> tag);
+    }
+
+    public @NonNull TagResolver resolver(@NonNull Set<String> names, @NonNull Component component) {
+        return resolver(names, (_, _) -> Tag.selfClosingInserting(component));
+    }
+
+    // wait for https://github.com/PaperMC/adventure/issues/1424
+    public @NonNull TagResolver resolver(@NonNull Set<String> names, @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
+        return new TagResolver() {
+
+            private String cachedKey;
+            private Tag cachedTag;
+            private Map<String, Tag> cachedTags; // lazy map
+
+            @Override
+            public @Nullable Tag resolve(@NonNull String name, @NonNull ArgumentQueue arguments, @NonNull Context context) throws ParsingException {
+                if (!names.contains(name)) return null;
+
+                // build cache key from tag name + all arguments
+                String key = name + ":" + arguments;
+
+                // multiple unique keys seen, use map
+                if (cachedTags != null) {
+                    return cachedTags.computeIfAbsent(key, _ -> handler.apply(arguments, context));
+                }
+
+                // first call, store in fields to avoid map allocation
+                if (cachedKey == null) {
+                    cachedKey = key;
+                    cachedTag = handler.apply(arguments, context);
+                    return cachedTag;
+                }
+
+                // same key as before, return cached result
+                if (cachedKey.equals(key)) return cachedTag;
+
+                // second unique key seen, upgrade to map
+                cachedTags = new HashMap<>();
+                cachedTags.put(cachedKey, cachedTag);
+
+                try {
+                    // create tag
+                    Tag tag = handler.apply(arguments, context);
+
+                    // save to cache
+                    cachedTags.put(key, tag);
+
+                    // return tag
+                    return tag;
+                } catch (ParsingException e) {
+                    fLogger.warning(e);
+                }
+
+                return null;
+            }
+
+            @Override
+            public boolean has(final @NonNull String name) {
+                return names.contains(name);
+            }
+
+        };
     }
 
     public enum ReplacementTag {

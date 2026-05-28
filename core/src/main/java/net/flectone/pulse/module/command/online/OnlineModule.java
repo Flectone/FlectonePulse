@@ -157,7 +157,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String timeValue = parseTimeValue(fPlayer, messageContext.receiver(), argumentQueue.pop().value());

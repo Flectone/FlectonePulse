@@ -26,7 +26,6 @@ import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -83,7 +82,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
         FPlayer fReceiver = messageContext.receiver();
 
         if (!(sender instanceof FPlayer fPlayer)) {
-            return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DISPLAY_NAME, (_, _) -> {
+            return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (_, _) -> {
                 Localization.Message.Format.Names localizationName = localization(fReceiver);
 
                 Component showEntityName = sender.showEntityName();
@@ -115,7 +114,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                                         new String[]{sender.type(), sender.uuid().toString()}
                                 )
                         )
-                        .addTagResolver(TagResolver.resolver("name", (_, _) -> Tag.selfClosingInserting(showEntityName)))
+                        .addTagResolver(messagePipeline.resolver("name", showEntityName))
                         .withFlags(messageContext.flags())
                         .addFlags(
                                 new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
@@ -124,7 +123,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                 Component displayName = messagePipeline.build(displayContext);
                 return Tag.selfClosingInserting(displayName);
-            });
+            }));
         }
 
         // Nickname module can be disabled in config, but its placeholder is used, so we need to add it
@@ -134,7 +133,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
         return messageContext
                 .addTagResolvers(
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
+                        messagePipeline.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
                             List<Component> constants = fPlayer.constants();
                             if (constants.isEmpty()) {
                                 List<String> stringConstants = localization(fPlayer).constant();
@@ -155,7 +154,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                             return Tag.inserting(constants.get(constantIndex));
                         }),
-                        TagResolver.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
+                        messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
                             int displayNameIndex = 0;
                             if (argumentQueue.hasNext()) {
                                 displayNameIndex = argumentQueue.pop().asInt().orElse(0);
@@ -180,15 +179,15 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                             return Tag.selfClosingInserting(displayNameComponent);
                         }),
-                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (_, _) -> {
+                        messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.PREFIX.getTagName(), "vault_prefix"), (_, _) -> {
                             String prefix = integrationModule.getPrefix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, prefix, messageContext);
                         }),
-                        TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (_, _) -> {
+                        messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.SUFFIX.getTagName(), "vault_suffix"), (_, _) -> {
                             String suffix = integrationModule.getSuffix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
-                        TagResolver.resolver(playerNameTags, (_, _) ->
+                        messagePipeline.resolver(playerNameTags, (_, _) ->
                                 Tag.preProcessParsed(profileResolver.resolveName(fPlayer))
                         )
                 );
@@ -199,7 +198,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER),
+        return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), MessagePipeline.ReplacementTag.PLAYER.getTagName()),
                 (_, _) -> {
                     String formatInvisible = localization(receiver).invisible();
                     MessageContext invisibleContext = messagePipeline.createContext(sender, receiver, formatInvisible);
@@ -207,7 +206,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
 
                     return Tag.selfClosingInserting(name);
                 }
-        );
+        ));
     }
 
     public boolean isInvisible(FEntity entity) {

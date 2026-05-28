@@ -122,7 +122,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.SWEAR.getTagName(), (argumentQueue, _) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -147,7 +147,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
             }
 
             return Tag.selfClosingInserting(component);
-        });
+        }));
     }
 
     public boolean isRestricted(UUID uuid) {

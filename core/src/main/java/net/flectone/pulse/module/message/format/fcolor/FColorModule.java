@@ -38,6 +38,7 @@ public class FColorModule implements ModuleSimple {
     private final ListenerRegistry listenerRegistry;
     private final LegacyColorConvertor legacyColorConvertor;
     private final ModuleController moduleController;
+    private final MessagePipeline messagePipeline;
 
     @Override
     public void onEnable() {
@@ -80,7 +81,7 @@ public class FColorModule implements ModuleSimple {
 
         boolean isSenderColorOut = messageContext.isFlag(MessageFlag.COLOR_CONTEXT_SENDER);
 
-        messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, _) -> {
+        messageContext = messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.FCOLOR.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt number = argumentQueue.pop().asInt();
@@ -101,7 +102,7 @@ public class FColorModule implements ModuleSimple {
             color = legacyColorConvertor.convert(StringUtils.defaultString(color));
 
             return Tag.preProcessParsed(color);
-        });
+        }));
 
         // replace deprecated tag
         if (message.contains("/fcolor")) {

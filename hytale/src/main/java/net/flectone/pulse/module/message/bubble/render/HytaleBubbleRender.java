@@ -28,14 +28,13 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
-import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
+import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.time.Instant;
@@ -203,7 +202,7 @@ public class HytaleBubbleRender implements BubbleRender {
         return messagePipeline.build(messageContext
                 .withMessage(localization.format())
                 .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
+                .addTagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
         );
     }
 

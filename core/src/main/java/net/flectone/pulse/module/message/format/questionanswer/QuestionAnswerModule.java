@@ -53,6 +53,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     private final CooldownChecker cooldownChecker;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
 
     @Override
@@ -138,7 +139,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         UUID processId = messageContext.messageUUID();
         FEntity receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.QUESTION.getTagName(), (argumentQueue, _) -> {
             Tag.Argument questionTag = argumentQueue.peek();
             if (questionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -148,7 +149,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
             sendAnswer(processId, sender, receiver, questionKey);
 
             return MessagePipeline.ReplacementTag.emptyTag();
-        });
+        }));
     }
 
     private void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {

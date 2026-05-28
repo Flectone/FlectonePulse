@@ -70,7 +70,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.CONDITION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.CONDITION.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String conditionName = argumentQueue.pop().lowerValue();
@@ -82,7 +82,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
                     .withFlags(messageContext.flags());
 
             return Tag.inserting(messagePipeline.build(conditionValueContext));
-        });
+        }));
     }
 
     @Nullable

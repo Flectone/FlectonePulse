@@ -20,8 +20,8 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
@@ -38,7 +38,6 @@ import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
@@ -209,7 +208,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         return messagePipeline.build(messageContext
                 .withMessage(localization.format())
                 .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
+                .addTagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
         );
     }
 

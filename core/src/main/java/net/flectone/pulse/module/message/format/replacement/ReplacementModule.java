@@ -32,7 +32,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -131,7 +130,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
         FPlayer receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.REPLACEMENT.getTagName(), (argumentQueue, _) -> {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -193,7 +192,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                     yield Tag.selfClosingInserting(component);
                 }
             };
-        });
+        }));
     }
 
     private String processMessage(FEntity sender, String message) {
@@ -416,7 +415,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(TagResolver.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
+                .addTagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);
 
@@ -434,7 +433,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(TagResolver.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)));
+                .addTagResolver(messagePipeline.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)));
 
         Component componentFormat = messagePipeline.build(newContext);
 
@@ -488,7 +487,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
                 )
-                .addTagResolver(TagResolver.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
+                .addTagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
 
         Component component = messagePipeline.build(newContext);
 

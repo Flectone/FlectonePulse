@@ -89,7 +89,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
 
         UUID messageUUID = messageContext.messageUUID();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DELETE, (_, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DELETE.getTagName(), (_, _) -> {
             String placeholder = Strings.CS.replace(
                     localization(receiver).placeholder(),
                     "<uuid>",
@@ -106,7 +106,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
             Component componentPlaceholder = messagePipeline.build(newContext);
 
             return Tag.selfClosingInserting(componentPlaceholder);
-        });
+        }));
     }
 
     public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {

@@ -1,13 +1,9 @@
 package net.flectone.pulse.model.event.message.context;
 
 import lombok.With;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.kyori.adventure.text.minimessage.Context;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,8 +12,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 @With
 public record MessageContext(
@@ -88,24 +82,6 @@ public record MessageContext(
         if (resolvers == null || resolvers.length == 0) return this;
 
         return addTagResolvers(Arrays.asList(resolvers));
-    }
-
-    @CheckReturnValue
-    public MessageContext addTagResolver(MessagePipeline.@NonNull ReplacementTag replacementTag,
-                                         @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
-        return addTagResolver(TagResolver.resolver(replacementTag.getTagName(), handler));
-    }
-
-    @CheckReturnValue
-    public MessageContext addTagResolver(@NonNull Set<MessagePipeline.ReplacementTag> replacementTags,
-                                         @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
-        if (replacementTags.isEmpty()) return this;
-
-        Set<String> tags = replacementTags.stream()
-                .map(MessagePipeline.ReplacementTag::getTagName)
-                .collect(Collectors.toSet());
-
-        return addTagResolver(TagResolver.resolver(tags, handler));
     }
 
     public boolean isFlag(MessageFlag flag) {

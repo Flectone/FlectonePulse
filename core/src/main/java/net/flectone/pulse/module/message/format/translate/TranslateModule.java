@@ -85,7 +85,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         FPlayer receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TRANSLATION.getTagName(), (argumentQueue, _) -> {
             String firstLang = "auto";
             String secondLang = receiver.getSetting(SettingText.LOCALE);
 
@@ -119,7 +119,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                     );
 
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));
-        });
+        }));
     }
 
     @Nullable

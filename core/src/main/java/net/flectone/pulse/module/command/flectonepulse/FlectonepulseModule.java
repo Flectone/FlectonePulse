@@ -16,6 +16,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
 import net.flectone.pulse.model.entity.FEntity;
@@ -36,7 +37,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -81,6 +81,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     private final ModuleCommandController commandModuleController;
     private final SimpleDateFormat simpleDateFormat;
     private final MetricsService metricsService;
+    private final MessagePipeline messagePipeline;
     private final Gson gson;
     private final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     private final HttpClient httpClient;
@@ -169,9 +170,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::formatFalse)
                     .tagResolvers(_ -> new TagResolver[]{
-                            TagResolver.resolver("error", (_, _) ->
-                                    Tag.selfClosingInserting(Component.text(e.getLocalizedMessage()))
-                            )
+                            messagePipeline.resolver("error", Component.text(e.getLocalizedMessage()))
                     })
                     .destination(config().destination())
                     .build()

@@ -74,7 +74,7 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.ANIMATION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ANIMATION.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String animation = argumentQueue.pop().value();

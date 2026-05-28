@@ -115,7 +115,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
         UUID processId = messageContext.messageUUID();
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.MENTION.getTagName(), (argumentQueue, _) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -142,7 +142,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
             }
 
             return Tag.preProcessParsed(config().trigger() + mention);
-        });
+        }));
     }
 
     private boolean isUnknownSender(FEntity sender) {

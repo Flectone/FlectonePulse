@@ -28,7 +28,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
@@ -112,14 +111,14 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
                         createPlayerHeadTag(
                                 messageContext,
                                 localization(messageContext.receiver()).defaultSymbol(),
                                 argumentQueue
                         )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), (argumentQueue, _) ->
                         createPlayerHeadTag(
                                 messageContext,
                                 argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),
@@ -198,14 +197,14 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), (argumentQueue, _) ->
                         createSpriteTag(
                                 messageContext,
                                 localization(messageContext.receiver()).defaultSymbol(),
                                 argumentQueue
                         )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, _) ->
                         createSpriteTag(
                                 messageContext,
                                 argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),
@@ -225,14 +224,14 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), (argumentQueue, _) ->
                         createTextureTag(
                                 messageContext,
                                 localization(messageContext.receiver()).defaultSymbol(),
                                 argumentQueue
                         )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, _) ->
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, _) ->
                         createTextureTag(
                                 messageContext,
                                 argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),

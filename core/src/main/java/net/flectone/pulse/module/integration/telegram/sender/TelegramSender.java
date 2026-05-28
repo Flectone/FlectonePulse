@@ -132,13 +132,13 @@ public class TelegramSender {
                         .range(Range.get(Range.Type.PROXY))
                         .destination(telegramModule.config().destination())
                         .sound(telegramModule.soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (_, _) -> {
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
                             MessageContext tagContext = messagePipeline.createContext(telegramModule.localization(fResolver).formatReply())
                                     .addTagResolvers(
-                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            TagResolver.resolver("reply_message", (_, _) -> {
+                                            messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
+                                            messagePipeline.resolver("reply_message", (_, _) -> {
                                                 MessageContext replyContext = messagePipeline.createContext(telegramClient.sender(), fResolver, reply.second())
                                                         .addFlag(MessageFlag.PLAYER_MESSAGE, true);
 

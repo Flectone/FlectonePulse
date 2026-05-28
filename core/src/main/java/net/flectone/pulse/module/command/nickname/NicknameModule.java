@@ -188,7 +188,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (_, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.NICKNAME.getTagName(), (_, _) -> {
             // get nickname value
             String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
 
@@ -222,7 +222,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             Component nickComponent = messagePipeline.build(nickContext);
 
             return Tag.inserting(nickComponent);
-        });
+        }));
     }
 
 }
