@@ -164,11 +164,15 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             return;
         }
 
-        fTarget = needClear
-                ? fTarget.withoutSetting(SettingText.NICKNAME)
-                : fTarget.withSetting(SettingText.NICKNAME, nickname);
-
-        fPlayerService.saveOrUpdateSetting(fTarget, SettingText.NICKNAME);
+        if (needClear) {
+            if (fTarget.getSetting(SettingText.NICKNAME) != null) {
+                fTarget = fTarget.withoutSetting(SettingText.NICKNAME);
+                fPlayerService.saveOrUpdateSetting(fTarget, SettingText.NICKNAME);
+            }
+        } else {
+            fTarget = fTarget.withSetting(SettingText.NICKNAME, nickname);
+            fPlayerService.saveOrUpdateSetting(fTarget, SettingText.NICKNAME);
+        }
 
         messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
                 .base(EventMetadata.<Localization.Command.Nickname>builder()
