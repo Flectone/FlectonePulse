@@ -987,6 +987,8 @@ message:
       death.attack.sting: "<fcolor:1>☠ <argument:0> изжален до смерти"
       death.attack.sting.item: "<fcolor:1>☠ <argument:0> был изжален до смерти <argument:1> с помощью <fcolor:2><argument:2><fcolor:1>"
       death.attack.sting.player: "<fcolor:1>☠ <argument:0> изжален до смерти <argument:1>"
+      death.attack.sulfurCubeHot: "<fcolor:1>☠ <argument:0> обнаружил, что лавой может быть не только пол"
+      death.attack.sulfurCubeHot.player: "<fcolor:1>☠ <argument:0> показал <argument:1>, что не только пол — это лава"
       death.attack.sweetBerryBush: "<fcolor:1>☠ <argument:0> искололся до смерти в кустах сладких ягод"
       death.attack.sweetBerryBush.player: "<fcolor:1>☠ <argument:0> искололся до смерти в кустах сладких ягод, спасаясь от <argument:1>"
       death.attack.thorns: "<fcolor:1>☠ <argument:0> был убит, пытаясь навредить <argument:1>"
