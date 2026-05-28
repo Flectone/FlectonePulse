@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -154,7 +153,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
         Universe universe = Universe.get();
         if (universe == null) return false;
 
-        List<PlayerRef> onlinePlayers = universe.getPlayers();
+        Collection<PlayerRef> onlinePlayers = universe.getPlayers();
         if (onlinePlayers.isEmpty()) return true;
 
         return onlinePlayers.stream().allMatch(playerRef -> playerRef.getUuid().equals(uuid));

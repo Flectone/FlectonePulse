@@ -7,9 +7,8 @@ import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.protocol.MountController;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
@@ -36,6 +35,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.joml.Vector3d;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -100,15 +100,15 @@ public class HytaleBubbleRender implements BubbleRender {
                 TransformComponent transform = entityStore.getStore().getComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType());
                 if (transform != null) {
                     Vector3d currentPosition = transform.getPosition();
-                    Vector3d newPosition = new Vector3d(currentPosition.getX(), currentPosition.getY() + bubble.getInteractionHeight(), currentPosition.getZ());
+                    Vector3d newPosition = new Vector3d(currentPosition.x(), currentPosition.y() + bubble.getInteractionHeight(), currentPosition.z());
                     TransformComponent newTransform = new TransformComponent(newPosition, transform.getRotation());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType(), newTransform);
                 }
 
                 MountedComponent mounted = entityStore.getStore().getComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType());
                 if (mounted != null) {
-                    Vector3f currentOffset = mounted.getAttachmentOffset();
-                    Vector3f newOffset = new Vector3f(currentOffset.getX(), currentOffset.getY() + bubble.getInteractionHeight(), currentOffset.getZ());
+                    Rotation3f currentOffset = mounted.getAttachmentOffset();
+                    Rotation3f newOffset = new Rotation3f(currentOffset.x(), currentOffset.y() + bubble.getInteractionHeight(), currentOffset.z());
                     MountedComponent newMounted = new MountedComponent(playerRef.getReference(), newOffset, mounted.getControllerType());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType(), newMounted);
                 }
@@ -120,9 +120,11 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(ProjectileComponent.getComponentType(), projectileComponent);
 
             double baseHeight = bubble.getElevation();
+            Vector3d playerPosition = playerTransform.getPosition();
+
             holder.putComponent(TransformComponent.getComponentType(),
                     new TransformComponent(
-                            playerTransform.getPosition().add(new Vector3d(0, baseHeight, 0)).clone(),
+                            new Vector3d(playerPosition.x(), playerPosition.y() + baseHeight, playerPosition.z()),
                             playerTransform.getRotation().clone()
                     )
             );
@@ -147,7 +149,7 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(MountedComponent.getComponentType(),
                     new MountedComponent(
                             playerRef.getReference(),
-                            new Vector3f(0.0F, (float) baseHeight, 0.0F),
+                            new Rotation3f(0.0F, (float) baseHeight, 0.0F),
                             MountController.Minecart
                     )
             );
