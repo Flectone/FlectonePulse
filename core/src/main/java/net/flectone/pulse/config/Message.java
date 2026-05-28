@@ -883,6 +883,7 @@ public record Message(
     @Jacksonized
     public record Vanilla(
             Boolean enable,
+            Boolean cancelDefaultDeathScreen,
             List<VanillaMessage> types
     ) implements EnableSetting {
 

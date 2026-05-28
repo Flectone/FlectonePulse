@@ -412,6 +412,7 @@ update:
     enable: false
 vanilla:
   enable: true
+  cancel_default_death_screen: true
   types:
     - name: "DEATH"
       multi_message: true

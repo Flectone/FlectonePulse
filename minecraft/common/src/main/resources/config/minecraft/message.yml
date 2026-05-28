@@ -445,6 +445,7 @@ update:
     enable: false
 vanilla:
   enable: true
+  cancel_default_death_screen: true
   types:
   - destination:
       type: "ACTION_BAR"

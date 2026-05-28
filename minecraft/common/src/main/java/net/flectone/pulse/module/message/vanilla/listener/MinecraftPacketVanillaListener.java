@@ -31,6 +31,11 @@ public class MinecraftPacketVanillaListener implements PacketListener {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        if (event.getPacketType() == PacketType.Play.Server.DEATH_COMBAT_EVENT && vanillaModule.config().cancelDefaultDeathScreen()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (event.getPacketType() != PacketType.Play.Server.CHANGE_GAME_STATE) return;
 
         WrapperPlayServerChangeGameState wrapper = new WrapperPlayServerChangeGameState(event);

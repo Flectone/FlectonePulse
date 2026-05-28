@@ -292,6 +292,6 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component)));
+        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component), config().cancelDefaultDeathScreen()));
     }
 }
