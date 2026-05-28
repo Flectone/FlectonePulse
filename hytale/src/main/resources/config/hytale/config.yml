@@ -68,6 +68,11 @@ logger:
   - "FlectonePulseDatabase - "
 cache:
   types:
+    ANIMATION:
+      invalidate_on_reload: true
+      duration: 1
+      time_unit: "MINUTES"
+      size: 10000
     COOLDOWN:
       invalidate_on_reload: false
       duration: 5

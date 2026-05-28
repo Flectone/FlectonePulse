@@ -14,6 +14,7 @@ import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -23,7 +24,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import org.incendo.cloud.type.tuple.Pair;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
@@ -96,6 +96,13 @@ public abstract class PlatformInjector extends AbstractModule {
     }
 
     public abstract void setupPlatform(ReflectionResolver reflectionResolver);
+
+    @Provides
+    @Singleton
+    @Named("animation")
+    public Cache<AnimationModule.AnimationKey, Integer> provideAnimationCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.ANIMATION);
+    }
 
     @Provides
     @Singleton

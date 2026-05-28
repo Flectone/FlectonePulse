@@ -931,6 +931,7 @@ public class FileMigrator {
         }
 
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new EnumMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.ANIMATION, new Config.Cache.CacheSetting(true, 1, TimeUnit.MINUTES, 10000));
         cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 100));
 
         return files

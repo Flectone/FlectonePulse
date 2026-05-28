@@ -1,8 +1,10 @@
 package net.flectone.pulse.module.message.format.animation;
 
+import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -21,15 +23,13 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AnimationModule implements ModuleLocalization<Localization.Message.Format.Animation> {
 
-    private final Map<AnimationKey, Integer> animationMap = new ConcurrentHashMap<>();
+    private final @Named("animation") Cache<AnimationKey, Integer> animationCache;
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -39,11 +39,6 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseAnimationListener.class);
-    }
-
-    @Override
-    public void onDisable() {
-        animationMap.clear();
     }
 
     @Override
@@ -86,8 +81,9 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
             Message.Format.Animation.AnimationConfig animationConfig = config().values().get(animation);
             if (animationConfig == null || animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
 
-            UUID player = messageContext.receiver().uuid();
-            int playerIndex = increment(player, animation, animationConfig.interval(), texts.size());
+            UUID sender = messageContext.sender().uuid();
+            UUID receiver = messageContext.receiver().uuid();
+            int playerIndex = increment(sender, receiver, animation, animationConfig.interval(), texts.size());
 
             try {
                 String text = texts.get(playerIndex);
@@ -100,12 +96,12 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
             } catch (IndexOutOfBoundsException _) { // reload safety
                 return MessagePipeline.ReplacementTag.emptyTag();
             }
-        });
+        }));
     }
 
-    public int increment(UUID player, String animation, int maxInterval, int maxIndex) {
-        AnimationKey animationKey = new AnimationKey(player, animation);
-        Integer encodedIndex = animationMap.get(animationKey);
+    public int increment(UUID sender, UUID receiver, String animation, int maxInterval, int maxIndex) {
+        AnimationKey animationKey = new AnimationKey(sender, receiver, animation);
+        Integer encodedIndex = animationCache.getIfPresent(animationKey);
 
         int currentInterval;
         int currentIndex;
@@ -125,12 +121,11 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
         }
 
         int newEncoded = currentIndex * (maxInterval + 1) + currentInterval;
-        animationMap.put(animationKey, newEncoded);
+        animationCache.put(animationKey, newEncoded);
 
         return currentIndex;
     }
 
-    private record AnimationKey(UUID player, String phase) {
-    }
+    public record AnimationKey(UUID sender, UUID receiver, String animation) {}
 
 }
