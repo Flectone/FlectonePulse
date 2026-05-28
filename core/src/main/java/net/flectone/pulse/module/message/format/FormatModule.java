@@ -164,7 +164,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
 
                     return entry.getValue();
                 })
-                .toList()
+                .toArray(TagResolver[]::new)
         );
     }
 

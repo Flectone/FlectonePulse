@@ -74,7 +74,7 @@ public class MessagePipeline {
             eventContext = eventContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
                     .filter(tag -> !tagResolver.has(tag.getTagName()))
                     .map(ReplacementTag::emptyResolver)
-                    .toList()
+                    .toArray(TagResolver[]::new)
             );
         }
 

@@ -71,17 +71,10 @@ public record MessageContext(
     }
 
     @CheckReturnValue
-    public MessageContext addTagResolvers(@Nullable Collection<TagResolver> tagResolvers) {
-        if (tagResolvers == null || tagResolvers.isEmpty()) return this;
-
-        return withTagResolver(TagResolver.resolver(this.tagResolver, TagResolver.resolver(tagResolvers)));
-    }
-
-    @CheckReturnValue
-    public MessageContext addTagResolvers(@Nullable TagResolver... resolvers) {
+    public MessageContext addTagResolvers(@NonNull TagResolver... resolvers) {
         if (resolvers == null || resolvers.length == 0) return this;
 
-        return addTagResolvers(Arrays.asList(resolvers));
+        return withTagResolver(TagResolver.resolver(this.tagResolver, TagResolver.resolver(resolvers)));
     }
 
     public boolean isFlag(MessageFlag flag) {
