@@ -1,6 +1,5 @@
 package net.flectone.pulse.model.event;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
@@ -99,7 +98,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
     final class Builder<L extends LocalizationSetting> {
 
         private final Map<MessageFlag, Boolean> flags = new EnumMap<>(MessageFlag.class);
-        private final List<FPlayer> receivers = new ObjectArrayList<>();
 
         private UUID uuid = UUID.randomUUID();
         private FEntity sender;
@@ -212,11 +210,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return this;
         }
 
-        public Builder<L> receivers(Collection<FPlayer> receivers) {
-            this.receivers.addAll(receivers);
-            return this;
-        }
-
         public BaseEventMetadata<L> build() {
             Objects.requireNonNull(sender);
             Objects.requireNonNull(format);
@@ -236,7 +229,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     tagResolvers,
                     proxy,
                     integration,
-                    receivers
+                    Collections.emptyList()
             );
         }
     }
