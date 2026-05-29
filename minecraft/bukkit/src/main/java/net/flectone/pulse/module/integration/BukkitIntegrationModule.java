@@ -25,6 +25,7 @@ import net.flectone.pulse.module.integration.triton.BukkitTritonModule;
 import net.flectone.pulse.module.integration.vault.BukkitVaultModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.BukkitDatapackChecker;
 import net.flectone.pulse.util.checker.PaperDatapackChecker;
@@ -54,9 +55,10 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    ReflectionResolver reflectionResolver,
+                                   ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, moduleController, injector);
+        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, listenerRegistry, moduleController, injector);
         
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;

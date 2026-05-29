@@ -11,6 +11,7 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.placeholderapi.HytalePlaceholderAPIModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
@@ -23,9 +24,10 @@ public class HytaleIntegrationModule extends IntegrationModule {
     @Inject
     public HytaleIntegrationModule(FileFacade fileFacade,
                                    PlatformServerAdapter platformServerAdapter,
+                                   ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, platformServerAdapter, moduleController, injector);
+        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController, injector);
 
         this.platformServerAdapter = platformServerAdapter;
     }

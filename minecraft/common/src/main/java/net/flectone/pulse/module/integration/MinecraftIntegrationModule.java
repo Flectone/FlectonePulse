@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceMod
 import net.flectone.pulse.module.integration.skinsrestorer.MinecraftSkinsRestorerModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -31,9 +32,10 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
                                          FLogger fLogger,
                                          PlatformServerAdapter platformServerAdapter,
                                          ReflectionResolver reflectionResolver,
+                                         ListenerRegistry listenerRegistry,
                                          ModuleController moduleController,
                                          Injector injector) {
-        super(fileFacade, platformServerAdapter, moduleController, injector);
+        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController, injector);
 
         this.platformServerAdapter = platformServerAdapter;
         this.reflectionResolver = reflectionResolver;

@@ -14,6 +14,7 @@ import net.flectone.pulse.module.integration.placeholderapi.FabricPlaceholderAPI
 import net.flectone.pulse.module.integration.supervanish.FabricVanishModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
@@ -34,9 +35,10 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
                                    PlatformServerAdapter platformServerAdapter,
                                    Provider<PermissionChecker> permissionCheckerProvider,
                                    ReflectionResolver reflectionResolver,
+                                   ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileManager, fLogger, platformServerAdapter, reflectionResolver, moduleController, injector);
+        super(fileManager, fLogger, platformServerAdapter, reflectionResolver, listenerRegistry, moduleController, injector);
 
         this.permissionCheckerProvider = permissionCheckerProvider;
         this.platformServerAdapter = platformServerAdapter;

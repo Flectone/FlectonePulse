@@ -154,7 +154,7 @@ public class MessageDispatcher {
         MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, rawFormat, eventMetadata));
 
         // if canceled, it means that message was sent to Proxy
-        if (messagePrepareEvent.cancelled()) return eventMetadata;
+        if (messagePrepareEvent.isForProxy() && messagePrepareEvent.cancelled()) return eventMetadata;
 
         EventMetadata<L> newEventMetadata = (EventMetadata<L>) messagePrepareEvent.eventMetadata();
 

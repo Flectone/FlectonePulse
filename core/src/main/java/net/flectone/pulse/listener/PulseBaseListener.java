@@ -8,18 +8,14 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.lifecycle.DisableEvent;
-import net.flectone.pulse.model.event.lifecycle.EnableEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -33,7 +29,6 @@ public class PulseBaseListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ProxySender proxySender;
-    private final IntegrationSender integrationSender;
     private final SoundPlayer soundPlayer;
     private final TaskScheduler taskScheduler;
 
@@ -82,38 +77,13 @@ public class PulseBaseListener implements PulseListener {
         }
     }
 
-    @Pulse
+    @Pulse(priority = Event.Priority.HIGH)
     public Event onMessagePrepareEvent(MessagePrepareEvent event) {
-        ModuleName moduleName = event.moduleName();
-        String rawFormat = event.rawFormat();
-        EventMetadata<?> eventMetadata = event.eventMetadata();
-
-        integrationSender.asyncSend(moduleName, rawFormat, eventMetadata);
-
-        if (proxySender.send(moduleName, eventMetadata)) {
+        if (event.isForProxy() && proxySender.send(event.moduleName(), event.eventMetadata())) {
             return event.withCancelled(true);
         }
 
         return event;
     }
 
-    @Pulse
-    public void onEnableEvent(EnableEvent event) {
-        integrationSender.send(ModuleName.SERVER_ENABLE, "", EventMetadata.builder()
-                .sender(FPlayer.UNKNOWN)
-                .format("")
-                .integration()
-                .build()
-        );
-    }
-
-    @Pulse
-    public void onDisableEvent(DisableEvent event) {
-        integrationSender.send(ModuleName.SERVER_DISABLE, "", EventMetadata.builder()
-                .sender(FPlayer.UNKNOWN)
-                .format("")
-                .integration()
-                .build()
-        );
-    }
 }

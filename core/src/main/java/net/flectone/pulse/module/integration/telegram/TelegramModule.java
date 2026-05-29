@@ -10,14 +10,21 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.telegram.listener.TelegramPulseListener;
 import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.processor.IntegrationMessageProcessor;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -27,6 +34,8 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
+    private final IntegrationMessageProcessor integrationMessageProcessor;
+    private final ListenerRegistry listenerRegistry;
     private final Injector injector;
 
     @Override
@@ -34,6 +43,8 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
         injector.getInstance(TelegramIntegration.class).hook();
+
+        listenerRegistry.register(TelegramPulseListener.class);
     }
 
     @Override
@@ -90,9 +101,28 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
         return fileFacade.localization(sender).integration().telegram();
     }
 
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
+    public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {
+        IntegrationMetadata integrationMetadata = eventMetadata.integrationMeta();
+        if (integrationMetadata == null) return;
+
+        // skip empty message names
+        List<String> messageNames = integrationMessageProcessor.getExistedMessageNames(moduleName, integrationMetadata, config());
+        if (messageNames.isEmpty()) return;
+
+        // skip vanished player
+        if (integrationMessageProcessor.isVanished(eventMetadata)) return;
+
+        FEntity sender = eventMetadata.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
-        injector.getInstance(TelegramSender.class).sendMessage(sender, messageName, telegramString);
+        // create formatter
+        UnaryOperator<String> integrationFormatter = integrationMessageProcessor.createFormatter(eventMetadata, integrationMetadata, format);
+
+        // send to discord
+        TelegramSender telegramSender = injector.getInstance(TelegramSender.class);
+        for (String specificMessageName : messageNames) {
+            telegramSender.sendMessage(sender, specificMessageName, integrationFormatter);
+        }
     }
+
 }

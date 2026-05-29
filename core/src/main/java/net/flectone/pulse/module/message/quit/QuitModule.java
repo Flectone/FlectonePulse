@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -21,7 +23,6 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -44,7 +45,7 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final PlatformServerAdapter platformServerAdapter;
-    private final IntegrationSender integrationSender;
+    private final EventDispatcher eventDispatcher;
     private final ProxyRegistry proxyRegistry;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
@@ -148,7 +149,7 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
 
     private void sendToIntegration(FPlayer fPlayer) {
         EventMetadata<Localization.Message.Quit> eventMetadata = buildEventMetadata(fPlayer, config().range(),true, false);
-        integrationSender.send(name(), eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization()), eventMetadata);
+        eventDispatcher.dispatch(new MessagePrepareEvent(MessagePrepareEvent.Type.INTEGRATION, name(), eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization()), eventMetadata));
     }
 
     private EventMetadata<Localization.Message.Quit> buildEventMetadata(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {
