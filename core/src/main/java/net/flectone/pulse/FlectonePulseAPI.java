@@ -80,9 +80,12 @@ public class FlectonePulseAPI {
     public void onEnable() {
         if (!instance.isReady()) return;
 
-        // call enable event
-        EnableEvent enableEvent = instance.get(EventDispatcher.class).dispatch(new EnableEvent(instance));
-        if (enableEvent.cancelled()) return;
+        // get event dispatcher
+        EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
+
+        // call enable init event
+        EnableEvent enableInitEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.INIT, instance));
+        if (enableInitEvent.cancelled()) return;
 
         // get configs
         FileFacade fileFacade = instance.get(FileFacade.class);
@@ -124,6 +127,10 @@ public class FlectonePulseAPI {
         if (fileFacade.config().metrics().enable()) {
             instance.get(MetricsService.class).start();
         }
+
+        // call enable ready event
+        EnableEvent enableReadyEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.READY, instance));
+        if (enableReadyEvent.cancelled()) return;
 
         // log plugin enabled
         fLogger.logEnabled();
