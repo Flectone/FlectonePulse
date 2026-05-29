@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -33,6 +34,7 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -291,7 +293,10 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
                         .sound(soundOrThrow())
                         .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                         .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + String.valueOf(isAfk).toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .newStatus(isAfk)

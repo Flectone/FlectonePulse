@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.PulseMaintenanceListener;
@@ -32,6 +33,7 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 
 @Singleton
 public class MaintenanceModule implements ModuleCommand<Localization.Command.Maintenance> {
@@ -137,6 +139,10 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                         .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .turned(turned)

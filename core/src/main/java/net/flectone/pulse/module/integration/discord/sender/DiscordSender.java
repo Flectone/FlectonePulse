@@ -20,6 +20,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -169,7 +170,8 @@ public class DiscordSender {
                 .subscribe();
     }
 
-    public void sendMessage(@Nullable Member member,
+    public void sendMessage(@NonNull String channelId,
+                            @Nullable Member member,
                             @Nullable Webhook webhook,
                             @NonNull String message,
                             @Nullable Pair<String, String> reply) {
@@ -214,11 +216,15 @@ public class DiscordSender {
 
                             return Tag.inserting(messagePipeline.build(tagContext));
                         })})
-                        .integration(string -> StringUtils.replaceEach(
-                                string,
-                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                new String[]{globalName, globalName, nickname, displayName, userName}
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> StringUtils.replaceEach(
+                                        string,
+                                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                        new String[]{globalName, globalName, nickname, displayName, userName}
+                                ))
+                                .messageNames(List.of(discordModule.name().name() + "_" + channelId))
+                                .build()
+                        )
                         .build()
                 )
                 .globalName(globalName)

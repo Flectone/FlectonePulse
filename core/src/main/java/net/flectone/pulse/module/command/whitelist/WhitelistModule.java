@@ -14,6 +14,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -49,6 +50,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -210,7 +212,10 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                         .sound(soundOrThrow())
                         .range(config().range())
                         .proxy(dataOutputStream -> dataOutputStream.writeInt(turnedOn ? Action.ON.ordinal() : Action.OFF.ordinal()))
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + String.valueOf(turnedOn).toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .turnedOn(turnedOn)
@@ -255,8 +260,10 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                     dataOutputStream.writeInt(Action.ADD.ordinal());
                     dataOutputStream.writeAsJson(whitelist);
                 })
-                .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist)
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist))
+                        .messageNames(List.of(name().name() + "_ADD"))
+                        .build()
                 )
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag("moderator", fResolver, fPlayer)
@@ -341,8 +348,10 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                     dataOutputStream.writeInt(Action.REMOVE.ordinal());
                     dataOutputStream.writeAsJson(unwhitelist);
                 })
-                .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist)
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist))
+                        .messageNames(List.of(name().name() + "_REMOVE"))
+                        .build()
                 )
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag("moderator", fResolver, fPlayer)

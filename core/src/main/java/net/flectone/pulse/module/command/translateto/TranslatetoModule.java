@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -111,7 +113,11 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
                             dataOutputStream.writeString(message);
                             dataOutputStream.writeString(finalMessageToTranslate);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> Strings.CS.replace(string, "<language>", targetLang))
+                                .messageNames(List.of(name().name() + "_" + targetLang.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .targetLanguage(targetLang)

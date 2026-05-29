@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -21,6 +22,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -71,7 +73,9 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
                             dataOutputStream.writeInt(random);
                             dataOutputStream.writeString(message);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<percent>", String.valueOf(random)))
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + String.valueOf(isGood(random)).toUpperCase()))
+                                .build())
                         .build()
                 )
                 .percent(random)
@@ -101,9 +105,13 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
 
     public Function<Localization.Command.CommandTry, String> replacePercent(int value) {
         return message -> Strings.CS.replace(
-                value >= config().good() ? message.formatTrue() : message.formatFalse(),
+                isGood(value) ? message.formatTrue() : message.formatFalse(),
                 "<percent>",
                 String.valueOf(value)
         );
+    }
+
+    private boolean isGood(int value) {
+        return value >= config().good();
     }
 }

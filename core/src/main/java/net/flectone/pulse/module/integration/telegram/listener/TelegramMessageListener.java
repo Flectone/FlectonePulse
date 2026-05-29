@@ -84,10 +84,11 @@ public class TelegramMessageListener implements TelegramEventListener {
             }
         }
 
+        String chatId = telegramChatIdExtractor.extract(message);
         List<String> chats = telegramModule.config().messageChannel().get(telegramModule.name().name());
-        if (chats == null || !chats.contains(telegramChatIdExtractor.extract(message))) return;
+        if (chats == null || !chats.contains(chatId)) return;
 
-        telegramSender.sendMessage(author, chat, text, reply);
+        telegramSender.sendMessage(author, chat, chatId, text, reply);
     }
 
     private boolean isRealReply(@NonNull Message message) {

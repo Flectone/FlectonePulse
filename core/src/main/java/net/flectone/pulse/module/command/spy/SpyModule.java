@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -122,7 +123,10 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
                         .tagResolvers(fReceiver -> new TagResolver[]{
                                 Placeholder.parsed("action", localization(fReceiver).actions().getOrDefault(action, action))
                         })
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + action.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .turned(true)

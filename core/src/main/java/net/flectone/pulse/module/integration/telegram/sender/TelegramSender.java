@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
@@ -111,6 +112,7 @@ public class TelegramSender {
 
     public void sendMessage(@NonNull User user,
                             @NonNull String chat,
+                            @NonNull String chatId,
                             @NonNull String message,
                             @Nullable Pair<String, String> reply) {
         TelegramClient telegramClient = telegramClientProvider.get();
@@ -148,11 +150,15 @@ public class TelegramSender {
 
                             return Tag.inserting(messagePipeline.build(tagContext));
                         })})
-                        .integration(string -> StringUtils.replaceEach(
-                                string,
-                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                                new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> StringUtils.replaceEach(
+                                        string,
+                                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
+                                ))
+                                .messageNames(List.of(telegramModule.name().name() + "_" + chatId, telegramModule.name().name() + "_" + chat.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .userName(userName)

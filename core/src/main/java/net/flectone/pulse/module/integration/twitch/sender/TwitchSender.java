@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -69,11 +70,15 @@ public class TwitchSender {
 
                             return Tag.inserting(messagePipeline.build(tagContext));
                         })})
-                        .integration(string -> StringUtils.replaceEach(
-                                string,
-                                new String[]{"<name>", "<channel>"},
-                                new String[]{nickname, channel}
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> StringUtils.replaceEach(
+                                        string,
+                                        new String[]{"<name>", "<channel>"},
+                                        new String[]{nickname, channel}
+                                ))
+                                .messageNames(List.of(twitchModule.name().name() + "_" + channel.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .nickname(nickname)

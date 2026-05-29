@@ -52,7 +52,9 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
                               @Nullable Member member) {
         List<String> channel = discordModule.config().messageChannel().get(discordModule.name().name());
         if (channel == null) return;
-        if (!channel.contains(message.getChannelId().asString())) return;
+
+        String channelId = message.getChannelId().asString();
+        if (!channel.contains(channelId)) return;
 
         DiscordClient discordClient = discordClientProvider.get();
         if (discordClient == null) return;
@@ -78,6 +80,7 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
         String content = getMessageContent(message);
         discordSender.sendMessage(
+                channelId,
                 member,
                 webhook,
                 content,

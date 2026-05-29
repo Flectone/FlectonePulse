@@ -121,7 +121,7 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
         // send to discord
         TelegramSender telegramSender = injector.getInstance(TelegramSender.class);
         for (String specificMessageName : messageNames) {
-            telegramSender.sendMessage(sender, specificMessageName, integrationFormatter);
+            telegramSender.sendMessage(sender, specificMessageName.toUpperCase(), integrationFormatter);
         }
     }
 

@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -20,6 +21,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -53,11 +55,15 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .proxy(output -> output.writeInt(percent))
-                        .integration(string -> Strings.CS.replace(
-                                string,
-                                "<result>",
-                                percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> Strings.CS.replace(
+                                        string,
+                                        "<result>",
+                                        percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
+                                ))
+                                .messageNames(List.of(name().name() + "_" + (percent == 0 ? "DRAW" : percent > 50 ? "HEAD" : "TAIL")))
+                                .build()
+                        )
                         .build()
                 )
                 .percent(percent)
