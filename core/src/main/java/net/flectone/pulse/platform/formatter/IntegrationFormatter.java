@@ -1,4 +1,4 @@
-package net.flectone.pulse.processing.processor;
+package net.flectone.pulse.platform.formatter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,20 +29,40 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * Create format for external integrations (Discord, Telegram, Twitch, etc.)
+ *
+ * @author TheFaser
+ * @since 1.10.0
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IntegrationMessageProcessor {
+public class IntegrationFormatter {
 
     private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
 
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
 
+    /**
+     * Checks if the event sender is in vanish
+     *
+     * @param eventMetadata The event metadata containing sender information and optional vanish metadata
+     * @return true if the sender is vanished and vanish should not be ignored, false otherwise
+     */
     public boolean isVanished(EventMetadata<?> eventMetadata) {
         FEntity sender = eventMetadata.sender();
         return eventMetadata instanceof VanishMetadata<?> vanishMetadata && !vanishMetadata.ignoreVanish() && integrationModule.isVanished(sender);
     }
 
+    /**
+     * Retrieves a list of message names that have corresponding non-empty channel configurations.
+     *
+     * @param moduleName The module name to check for existence in message channels
+     * @param integrationMetadata Metadata containing the collection of message names to validate
+     * @param messageChannelSetting Configuration providing the mapping of channel names to message lists
+     * @return A list of message names that have non-empty channel configurations, including the module name if applicable
+     */
     @NonNull
     public List<String> getExistedMessageNames(@NonNull ModuleName moduleName, @NonNull IntegrationMetadata integrationMetadata, MessageChannelSetting messageChannelSetting) {
         Predicate<String> existChannelPredicate = string -> !messageChannelSetting.messageChannel().getOrDefault(string, List.of()).isEmpty();
@@ -57,10 +77,18 @@ public class IntegrationMessageProcessor {
         return Stream.concat(existedStream, moduleStream).toList();
     }
 
+    /**
+     * Creates a format function that processes and replaces placeholders in message templates.
+     *
+     * @param eventMetadata The event metadata containing sender information, message content, and flags
+     * @param integrationMetadata Metadata providing integration-specific format transformations
+     * @param format The format template string containing placeholders to be replaced
+     * @return A unary operator that takes an input string and returns the formatted message with all placeholders resolved
+     */
     @NonNull
-    public UnaryOperator<String> createFormatter(@NonNull EventMetadata<?> eventMetadata, @NonNull IntegrationMetadata integrationMetadata, @NonNull String format) {
-        String plainFormat = plainSerialize(createFormat(format, eventMetadata));
-        String plainMessage = plainSerialize(createMessage(eventMetadata));
+    public UnaryOperator<String> createFormat(@NonNull EventMetadata<?> eventMetadata, @NonNull IntegrationMetadata integrationMetadata, @NonNull String format) {
+        String plainFormat = plainSerialize(buildFormatComponent(format, eventMetadata));
+        String plainMessage = plainSerialize(buildMessageComponent(eventMetadata));
 
         String finalMessage = Strings.CS.replace(
                 plainFormat,
@@ -73,14 +101,14 @@ public class IntegrationMessageProcessor {
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
             return StringUtils.replaceEach(
-                    plainSerialize(createFormat(input, eventMetadata)),
+                    plainSerialize(buildFormatComponent(input, eventMetadata)),
                     new String[]{"<player>", "<message>", "<final_message>", "<final_clear_message>"},
                     new String[]{eventMetadata.sender().name(), plainMessage, finalMessage, clearMessage(finalMessage)}
             );
         };
     }
 
-    private Component createFormat(String text, EventMetadata<?> eventMetadata) {
+    private Component buildFormatComponent(String text, EventMetadata<?> eventMetadata) {
         FEntity sender = eventMetadata.sender();
         MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
                 .withFlags(eventMetadata.flags())
@@ -93,7 +121,7 @@ public class IntegrationMessageProcessor {
         return messagePipeline.build(context);
     }
 
-    private Component createMessage(EventMetadata<?> eventMetadata) {
+    private Component buildMessageComponent(EventMetadata<?> eventMetadata) {
         String message = eventMetadata.message();
         if (StringUtils.isEmpty(message)) return Component.empty();
 

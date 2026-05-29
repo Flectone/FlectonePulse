@@ -18,7 +18,7 @@ import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.module.integration.twitch.listener.TwitchPulseListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.processor.IntegrationMessageProcessor;
+import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -35,7 +35,7 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
-    private final IntegrationMessageProcessor integrationMessageProcessor;
+    private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
     private final Injector injector;
 
@@ -78,22 +78,22 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
         if (integrationMetadata == null) return;
 
         // skip empty message names
-        List<String> messageNames = integrationMessageProcessor.getExistedMessageNames(moduleName, integrationMetadata, config());
+        List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMetadata, config());
         if (messageNames.isEmpty()) return;
 
         // skip vanished player
-        if (integrationMessageProcessor.isVanished(eventMetadata)) return;
+        if (integrationFormatter.isVanished(eventMetadata)) return;
 
         FEntity sender = eventMetadata.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
         // create formatter
-        UnaryOperator<String> integrationFormatter = integrationMessageProcessor.createFormatter(eventMetadata, integrationMetadata, format);
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
 
         // send to discord
         TelegramSender telegramSender = injector.getInstance(TelegramSender.class);
         for (String specificMessageName : messageNames) {
-            telegramSender.sendMessage(sender, specificMessageName, integrationFormatter);
+            telegramSender.sendMessage(sender, specificMessageName, integrationFormat);
         }
     }
 

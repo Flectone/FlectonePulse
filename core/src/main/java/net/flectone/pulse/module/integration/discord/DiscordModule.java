@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.processing.processor.IntegrationMessageProcessor;
+import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.module.integration.discord.listener.DiscordPulseListener;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -36,7 +36,7 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
-    private final IntegrationMessageProcessor integrationMessageProcessor;
+    private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
     private final Injector injector;
     private final FLogger fLogger;
@@ -105,22 +105,22 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
         if (integrationMetadata == null) return;
 
         // skip empty message names
-        List<String> messageNames = integrationMessageProcessor.getExistedMessageNames(moduleName, integrationMetadata, config());
+        List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMetadata, config());
         if (messageNames.isEmpty()) return;
 
         // skip vanished player
-        if (integrationMessageProcessor.isVanished(eventMetadata)) return;
+        if (integrationFormatter.isVanished(eventMetadata)) return;
 
         FEntity sender = eventMetadata.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
         // create formatter
-        UnaryOperator<String> integrationFormatter = integrationMessageProcessor.createFormatter(eventMetadata, integrationMetadata, format);
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
 
         // send to discord
         DiscordSender discordSender = injector.getInstance(DiscordSender.class);
         for (String specificMessageName : messageNames) {
-            discordSender.sendMessage(sender, specificMessageName, integrationFormatter);
+            discordSender.sendMessage(sender, specificMessageName, integrationFormat);
         }
     }
 
