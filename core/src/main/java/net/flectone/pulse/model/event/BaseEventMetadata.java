@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 @With
 @Builder
@@ -41,7 +40,7 @@ public record BaseEventMetadata<L extends LocalizationSetting>(
         @Nullable String message,
         @Nullable Function<FPlayer, TagResolver[]> tagResolvers,
         @Nullable ProxyDataConsumer<SafeDataOutputStream> proxy,
-        @Nullable UnaryOperator<String> integration,
+        @Nullable IntegrationMetadata integrationMetadata,
         @NonNull List<FPlayer> receivers
 ) implements EventMetadata<L> {
 

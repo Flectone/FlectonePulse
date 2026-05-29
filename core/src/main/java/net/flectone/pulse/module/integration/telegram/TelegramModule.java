@@ -102,7 +102,7 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
     }
 
     public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {
-        IntegrationMetadata integrationMetadata = eventMetadata.integrationMeta();
+        IntegrationMetadata integrationMetadata = eventMetadata.integrationMetadata();
         if (integrationMetadata == null) return;
 
         // skip empty message names

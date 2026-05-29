@@ -16,10 +16,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public interface EventMetadata<L extends LocalizationSetting> {
 
@@ -79,8 +76,8 @@ public interface EventMetadata<L extends LocalizationSetting> {
         return base().proxy();
     }
 
-    default @Nullable UnaryOperator<String> integration() {
-        return base().integration();
+    default @Nullable IntegrationMetadata integrationMetadata() {
+        return base().integrationMetadata();
     }
 
     default @Nullable TagResolver[] resolveTags(FPlayer player) {
@@ -110,7 +107,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
         private String message;
         private Function<FPlayer, TagResolver[]> tagResolvers;
         private ProxyDataConsumer<SafeDataOutputStream> proxy;
-        private UnaryOperator<String> integration;
+        private IntegrationMetadata integrationMetadata;
 
         private Builder() {
         }
@@ -200,13 +197,23 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return this;
         }
 
-        public Builder<L> integration(UnaryOperator<String> integration) {
-            this.integration = integration;
+        public Builder<L> integration(IntegrationMetadata integrationMetadata) {
+            this.integrationMetadata = integrationMetadata;
+            return this;
+        }
+
+        public Builder<L> integration(@NonNull UnaryOperator<String> format) {
+            if (integrationMetadata == null) {
+                integrationMetadata = IntegrationMetadata.EMPTY.withFormat(format);
+            } else {
+                integrationMetadata = integrationMetadata.withFormat(format);
+            }
+
             return this;
         }
 
         public Builder<L> integration() {
-            this.integration = s -> s;
+            this.integrationMetadata = IntegrationMetadata.EMPTY;
             return this;
         }
 
@@ -228,7 +235,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     message,
                     tagResolvers,
                     proxy,
-                    integration,
+                    integrationMetadata,
                     Collections.emptyList()
             );
         }

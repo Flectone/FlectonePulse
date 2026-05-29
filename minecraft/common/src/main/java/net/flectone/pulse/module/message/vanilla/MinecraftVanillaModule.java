@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -35,6 +36,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -125,7 +127,13 @@ public class MinecraftVanillaModule extends VanillaModule {
                                 && (vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                         )
                         .destination(parsedComponent.vanillaMessage().destination())
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
+                                        ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
+                                        : Collections.emptyList()
+                                )
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(parsedComponent.translationKey());
                             dataOutputStream.writeAsJson(parsedComponent.arguments());

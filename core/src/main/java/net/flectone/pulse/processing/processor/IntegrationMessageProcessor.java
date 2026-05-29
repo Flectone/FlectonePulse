@@ -1,18 +1,17 @@
-package net.flectone.pulse.platform.sender;
+package net.flectone.pulse.processing.processor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.chat.model.ChatMetadata;
-import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
@@ -21,64 +20,45 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.NonNull;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-/**
- * Sends formatted messages to external integrations (Discord, Telegram, Twitch, etc.)
- *
- * <p><b>Usage example:</b>
- * <pre>{@code
- * IntegrationSender integrationSender = flectonePulse.get(IntegrationSender.class);
- *
- * // Send chat message to external integrations
- * integrationSender.asyncSend(MessageType.CHAT, "<final_message>", eventMetadata);
- * }</pre>
- *
- * @author TheFaser
- * @since 1.5.0
- */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IntegrationSender {
+public class IntegrationMessageProcessor {
 
     private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
 
-    private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
-    private final TaskScheduler taskScheduler;
+    private final IntegrationModule integrationModule;
 
-    /**
-     * Sends a message to integrations asynchronously.
-     *
-     * @param moduleName the type of message being sent
-     * @param format the message format string
-     * @param eventMetadata the event metadata containing sender and message
-     */
-    public void asyncSend(ModuleName moduleName, String format, EventMetadata<?> eventMetadata) {
-        taskScheduler.runAsync(() -> send(moduleName, format, eventMetadata), true);
+    public boolean isVanished(EventMetadata<?> eventMetadata) {
+        FEntity sender = eventMetadata.sender();
+        return eventMetadata instanceof VanishMetadata<?> vanishMetadata && !vanishMetadata.ignoreVanish() && integrationModule.isVanished(sender);
     }
 
-    /**
-     * Sends a message to integrations
-     *
-     * @param moduleName the type of message being sent
-     * @param format the message format string
-     * @param eventMetadata the event metadata containing sender and message
-     */
-    public void send(ModuleName moduleName, String format, EventMetadata<?> eventMetadata) {
-        UnaryOperator<String> integrationOperator = eventMetadata.integration();
-        if (integrationOperator == null) return;
-        if (!integrationModule.hasMessenger()) return;
+    @NonNull
+    public List<String> getExistedMessageNames(@NonNull ModuleName moduleName, @NonNull IntegrationMetadata integrationMetadata, MessageChannelSetting messageChannelSetting) {
+        Predicate<String> existChannelPredicate = string -> !messageChannelSetting.messageChannel().getOrDefault(string, List.of()).isEmpty();
 
-        FEntity sender = eventMetadata.sender();
-        if (eventMetadata instanceof VanishMetadata<?> vanishMetadata && !vanishMetadata.ignoreVanish() && integrationModule.isVanished(sender)) return;
+        Stream<String> existedStream = integrationMetadata.messageNames().stream()
+                .filter(existChannelPredicate);
 
+        Stream<String> moduleStream = existChannelPredicate.test(moduleName.name())
+                ? Stream.of(moduleName.name())
+                : Stream.empty();
+
+        return Stream.concat(existedStream, moduleStream).toList();
+    }
+
+    @NonNull
+    public UnaryOperator<String> createFormatter(@NonNull EventMetadata<?> eventMetadata, @NonNull IntegrationMetadata integrationMetadata, @NonNull String format) {
         String plainFormat = plainSerialize(createFormat(format, eventMetadata));
         String plainMessage = plainSerialize(createMessage(eventMetadata));
 
@@ -88,22 +68,16 @@ public class IntegrationSender {
                 plainMessage
         );
 
-        UnaryOperator<String> interfaceReplaceString = s -> {
-            String input = integrationOperator.apply(s);
+        return string -> {
+            String input = integrationMetadata.format().apply(string);
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
             return StringUtils.replaceEach(
                     plainSerialize(createFormat(input, eventMetadata)),
                     new String[]{"<player>", "<message>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.name(), plainMessage, finalMessage, clearMessage(finalMessage)}
+                    new String[]{eventMetadata.sender().name(), plainMessage, finalMessage, clearMessage(finalMessage)}
             );
         };
-
-        for (String specificMessageName : createSpecificMessageNames(moduleName, eventMetadata)) {
-            integrationModule.sendMessage(sender, specificMessageName, interfaceReplaceString);
-        }
-
-        integrationModule.sendMessage(sender, moduleName.name(), interfaceReplaceString);
     }
 
     private Component createFormat(String text, EventMetadata<?> eventMetadata) {
@@ -143,23 +117,6 @@ public class IntegrationSender {
 
     private String plainSerialize(Component component) {
         return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
-    }
-
-    protected Collection<String> createSpecificMessageNames(ModuleName moduleName, EventMetadata<?> eventMetadata) {
-        if (moduleName == ModuleName.MESSAGE_CHAT
-                && eventMetadata instanceof ChatMetadata<?> chatMetadata
-                && chatMetadata.chat().name() != null) {
-            return List.of((moduleName.name() + "_" + chatMetadata.chat().name()).toUpperCase());
-        } else if (moduleName == ModuleName.MESSAGE_VANILLA) {
-            if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) return Collections.emptyList();
-
-            String vanillaMessageName = vanillaMetadata.parsedComponent().vanillaMessage().name();
-            if (vanillaMessageName.isEmpty()) return Collections.emptyList();
-
-            return List.of(vanillaMessageName.toUpperCase(), vanillaMetadata.parsedComponent().translationKey());
-        }
-
-        return Collections.emptyList();
     }
 
 }

@@ -14,6 +14,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -137,6 +138,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     public void sendMessage(FPlayer fPlayer, String rawString, String playerMessage, Chat playerChat) {
         String chatName = playerChat.name();
+        if (chatName == null) return;
 
         ChatMetadata<Localization.Message.Chat> chatMetadata = messageDispatcher.dispatch(this, ChatMetadata.<Localization.Message.Chat>builder()
                 .base(EventMetadata.<Localization.Message.Chat>builder()
@@ -151,7 +153,10 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
                             dataOutputStream.writeString(chatName);
                             dataOutputStream.writeString(playerMessage);
                         })
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name() + "_" + chatName.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .chat(playerChat)
