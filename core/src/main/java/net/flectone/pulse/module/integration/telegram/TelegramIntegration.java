@@ -25,10 +25,13 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTit
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramIntegration implements FIntegration {
+
+    private final AtomicLong taskGeneration = new AtomicLong(0);
 
     private final FileFacade fileFacade;
     private final TelegramClientProvider telegramClientProvider;
@@ -49,8 +52,19 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        long taskId = taskGeneration.incrementAndGet();
+
         TelegramClient telegramClient = telegramClientProvider.create();
         if (telegramClient == null) return;
+
+        if (taskGeneration.get() != taskId) {
+            try {
+                telegramClient.application().close();
+            } catch (Exception _) {
+                // just ignore
+            }
+            return;
+        }
 
         try {
             // register listener

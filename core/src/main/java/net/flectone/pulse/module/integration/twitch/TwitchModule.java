@@ -10,6 +10,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -37,13 +38,14 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
     private final ModuleController moduleController;
     private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
     private final Injector injector;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
-        injector.getInstance(TwitchIntegration.class).hook();
+        taskScheduler.runAsync(() -> injector.getInstance(TwitchIntegration.class).hook(), true);
 
         listenerRegistry.register(TwitchPulseListener.class);
     }

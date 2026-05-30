@@ -22,10 +22,13 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiscordIntegration implements FIntegration {
+
+    private final AtomicLong taskGeneration = new AtomicLong(0);
 
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -43,8 +46,15 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        long taskId = taskGeneration.incrementAndGet();
+
         DiscordClient discordClient = discordClientProvider.create();
         if (discordClient == null) return;
+
+        if (taskGeneration.get() != taskId) {
+            discordClient.gateway().logout().block();
+            return;
+        }
 
         Integration.ChannelInfo channelInfo = discordModule.config().channelInfo();
 

@@ -17,10 +17,13 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TwitchIntegration implements FIntegration {
+
+    private final AtomicLong taskGeneration = new AtomicLong(0);
 
     private final TwitchModule twitchModule;
     private final TwitchClientProvider twitchClientProvider;
@@ -37,8 +40,15 @@ public class TwitchIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        long taskId = taskGeneration.incrementAndGet();
+
         TwitchClient twitchClient = twitchClientProvider.create();
         if (twitchClient == null) return;
+
+        if (taskGeneration.get() != taskId) {
+            twitchClient.client().close();
+            return;
+        }
 
         Integration.Twitch integration = twitchModule.config();
         for (List<String> channels : integration.messageChannel().values()) {

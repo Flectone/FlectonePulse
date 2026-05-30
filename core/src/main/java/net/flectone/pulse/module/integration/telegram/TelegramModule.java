@@ -9,6 +9,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -36,13 +37,14 @@ public class TelegramModule implements ModuleLocalization<Localization.Integrati
     private final ModuleController moduleController;
     private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
     private final Injector injector;
 
     @Override
     public void onEnable() {
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
-        injector.getInstance(TelegramIntegration.class).hook();
+        taskScheduler.runAsync(() -> injector.getInstance(TelegramIntegration.class).hook(), true);
 
         listenerRegistry.register(TelegramPulseListener.class);
     }

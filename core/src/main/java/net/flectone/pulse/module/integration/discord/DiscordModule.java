@@ -10,14 +10,15 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.module.integration.discord.listener.DiscordPulseListener;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -38,6 +39,7 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     private final ModuleController moduleController;
     private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
     private final Injector injector;
     private final FLogger fLogger;
 
@@ -45,11 +47,13 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     public void onEnable() {
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
-        try {
-            injector.getInstance(DiscordIntegration.class).hook();
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
+        taskScheduler.runAsync(() -> {
+            try {
+                injector.getInstance(DiscordIntegration.class).hook();
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+        }, true);
 
         listenerRegistry.register(DiscordPulseListener.class);
     }
