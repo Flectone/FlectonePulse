@@ -10,7 +10,6 @@ import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 
 @Singleton
 public class BukkitMessageSender extends MinecraftMessageSender {
@@ -41,20 +40,12 @@ public class BukkitMessageSender extends MinecraftMessageSender {
 
         // replace item mark
         if (fPlayer.isConsole() || silent) {
-            super.sendMessage(fPlayer, replaceItemMarkToEmpty(component), silent);
+            super.sendMessage(fPlayer, component, silent);
             return;
         }
 
         if (!paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
-            super.sendMessage(fPlayer, replaceItemMarkToEmpty(component), true);
+            super.sendMessage(fPlayer, component, true);
         }
-    }
-
-    private Component replaceItemMarkToEmpty(Component component) {
-        return component.replaceText(TextReplacementConfig.builder()
-                .match(PaperItemStackUtil.FLECTONEPULSE_ITEM_MARK_PATTERN)
-                .replacement((_, _) -> Component.text(""))
-                .build()
-        );
     }
 }

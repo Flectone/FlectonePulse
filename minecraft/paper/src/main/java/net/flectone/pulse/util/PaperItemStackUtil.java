@@ -1,49 +1,20 @@
 package net.flectone.pulse.util;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperItemStackUtil {
 
-    public static final Pattern FLECTONEPULSE_ITEM_MARK_PATTERN = Pattern.compile("<flectonepulse_item_mark:([a-fA-F0-9\\-]{36})>");
-
-    private final Cache<UUID, ItemStack> uuidItemStackCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(5, TimeUnit.SECONDS)
-            .maximumSize(100)
-            .build();
-
     private final FLogger fLogger;
-
-    public String saveItem(UUID key, ItemStack itemStack) {
-        ItemStack cachedItemStack = getItem(key);
-        if (cachedItemStack == null) {
-            uuidItemStackCache.put(key, itemStack);
-        }
-
-        return "<flectonepulse_item_mark:" + key + ">";
-    }
-
-    public ItemStack getItem(UUID key) {
-        return uuidItemStackCache.getIfPresent(key);
-    }
 
     public boolean sendMessage(FPlayer fPlayer, String serialized) {
         Player player = Bukkit.getPlayer(fPlayer.uuid());
@@ -51,27 +22,13 @@ public class PaperItemStackUtil {
 
         try {
             Component component = GsonComponentSerializer.gson().deserialize(serialized);
-            player.sendMessage(replaceItemMark(component));
+            player.sendMessage(component);
         } catch (Exception e) {
             fLogger.warning(e, "Failed to deserialize message %s", serialized);
             return false;
         }
 
         return true;
-    }
-
-    private Component replaceItemMark(Component component) {
-        return component.replaceText(TextReplacementConfig.builder()
-                .match(FLECTONEPULSE_ITEM_MARK_PATTERN)
-                .replacement((matchResult, _) -> {
-                    String foundUuid = matchResult.group(1);
-                    ItemStack itemStack = uuidItemStackCache.getIfPresent(UUID.fromString(foundUuid));
-                    if (itemStack == null) return Component.empty();
-
-                    return Component.text("").color(NamedTextColor.GRAY).hoverEvent(itemStack);
-                })
-                .build()
-        );
     }
 
 }

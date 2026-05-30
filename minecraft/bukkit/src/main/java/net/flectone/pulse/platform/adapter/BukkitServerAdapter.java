@@ -19,16 +19,12 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -62,9 +58,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
     private final MinecraftPacketProvider packetProvider;
+    private final AdventureHoverConvertor adventureHoverConvertor;
     private final ReflectionResolver reflectionResolver;
-    private final Provider<FileFacade> fileFacadeProvider;
-    private final PaperItemStackUtil paperItemStackUtil;
     private final TaskScheduler taskScheduler;
     private final IconConvertor iconUtil;
 
@@ -333,22 +328,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
-        if (itemStack.getType() == Material.AIR) return component;
-
-        Key key = Key.key(itemStack.getType().name().toLowerCase());
-        int amount = itemStack.getAmount();
-
-        // This is a shitty Paper-only hack. No idea when it'll break. Admins can enable it, but it is disabled by default
-        // Pray PacketEvents merges https://github.com/retrooper/packetevents/pull/1277
-        if (reflectionResolver.isPaper() && fileFacadeProvider.get().config().module().usePaperMessageSender() && translatable) {
-            String itemMark = paperItemStackUtil.saveItem(messageUUID, itemStack);
-
-            return Component.text(itemMark)
-                    .color(NamedTextColor.WHITE)
-                    .append(component);
+        if (itemStack.getType() != Material.AIR) {
+            ItemStack packetItemStack = SpigotConversionUtil.fromBukkitItemStack(itemStack);
+            return component.hoverEvent(adventureHoverConvertor.convert(packetItemStack));
         }
 
-        return component.hoverEvent(HoverEvent.showItem(key, amount));
+        return component;
     }
 
     private Component createItemMetaName(org.bukkit.inventory.ItemStack itemStack) {

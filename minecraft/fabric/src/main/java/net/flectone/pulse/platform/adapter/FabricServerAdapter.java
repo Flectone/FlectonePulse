@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLor
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -12,6 +13,8 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
@@ -22,6 +25,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -33,6 +37,8 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -58,6 +64,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
     private final MinecraftPacketProvider packetProvider;
+    private final AdventureHoverConvertor adventureHoverConvertor;
     private final @Named("projectPath") Path projectPath;
     private final FabricTpsTracker tpsTracker;
     private final FLogger fLogger;
@@ -254,10 +261,27 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer != null) {
+            ItemStack packetItemStack = fromMinecraftStack(itemStack, minecraftServer.registryAccess());
+            return component.hoverEvent(adventureHoverConvertor.convert(packetItemStack));
+        }
+
         Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
     }
 
+    // https://github.com/retrooper/packetevents/pull/1147/changes#diff-9647df572bdd365fa3ce0333c7491ea491ee6b602bfadcb0f46d8660b580f419R142
+    private ItemStack fromMinecraftStack(net.minecraft.world.item.ItemStack stack, RegistryAccess registries) {
+        ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
+        try {
+            net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode(
+                    new RegistryFriendlyByteBuf(buf, registries), stack);
+            return PacketWrapper.createUniversalPacketWrapper(buf).readItemStack();
+        } finally {
+            buf.release();
+        }
+    }
 
     private Component createItemMetaName(net.minecraft.world.item.ItemStack itemStack) {
         net.minecraft.network.chat.Component customName = itemStack.getCustomName();
