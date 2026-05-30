@@ -116,7 +116,7 @@ public class MessagePipeline {
     }
 
     public String buildJsonString(MessageContext context) {
-        return gson.toJson(buildJson(context));
+        return gson.toJson(build(context));
     }
 
     public Optional<String> legacyFormat(@NonNull FPlayer fPlayer, @NonNull String message) {
