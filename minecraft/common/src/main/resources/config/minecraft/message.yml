@@ -68,8 +68,8 @@ bubble:
     height: 0.4
   modern:
     enable: true
-    has_shadow: false
-    see_through: true
+    has_shadow: true
+    see_through: false
     animation_time: 5
     scale: 1.0
     background: "#00000040"

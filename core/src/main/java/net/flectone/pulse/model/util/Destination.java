@@ -21,7 +21,7 @@ public record Destination(
     public static final BossBar DEFAULT_BOSS_BAR = new BossBar(100, 1f, net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS, net.kyori.adventure.bossbar.BossBar.Color.BLUE);
     public static final Times DEFAULT_TIMES = new Times(20, 60, 20);
     public static final Toast DEFAULT_TOAST = new Toast("minecraft:diamond", Toast.Type.TASK);
-    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", false, true, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
+    public static final TextScreen DEFAULT_TEXT_SCREEN = new TextScreen("#00000040", true, false, 2, 10, 100000, 0.5f, 0f, -0.3f, -0.8f);
 
     public static final Destination EMPTY_ACTION_BAR = new Destination(Type.ACTION_BAR, DEFAULT_TIMES);
     public static final Destination EMPTY_BOSS_BAR = new Destination(Type.BOSS_BAR, DEFAULT_BOSS_BAR);
