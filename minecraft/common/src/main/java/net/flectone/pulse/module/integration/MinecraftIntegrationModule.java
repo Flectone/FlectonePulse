@@ -86,6 +86,10 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     public boolean isBedrockPlayer(FEntity fPlayer) {
         if (!moduleController.isEnable(this)) return false;
 
+        // bedrock players use a nil uuid bit masked with their xbox user id (xuid). The version is always zero.
+        // https://github.com/ocelotpotpie/FreedomChat/blob/main/paper/src/main/java/ru/bk/oharass/freedomchat/FreedomHandler.java#L111
+        if (fPlayer.uuid().version() == 0) return true;
+
         if (containsEnabledChild(MinecraftFloodgateModule.class)) {
             return injector.getInstance(MinecraftFloodgateModule.class).isBedrockPlayer(fPlayer);
         }
