@@ -71,8 +71,7 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
             // always ignore ourselves
             Optional<User> creator = webhook.getCreator();
-            if (creator.isPresent()
-                    && creator.get().getId().equals(discordClient.id())) return;
+            if (creator.isPresent() && creator.get().getId().asLong() == discordClient.id()) return;
         }
 
         // check command in message
