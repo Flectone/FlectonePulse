@@ -33,6 +33,7 @@ import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -263,12 +264,38 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer != null) {
+            // convert fabric itemStack to packetevents
             ItemStack packetItemStack = fromMinecraftStack(itemStack, minecraftServer.registryAccess());
+
+            // translation for checking component
+            String translationKey = getTranslationKey(itemStack);
+
+            // first try custom name
+            Optional<Component> itemName = packetItemStack.getComponent(ComponentTypes.CUSTOM_NAME);
+            if (itemName.isPresent() && !isTranslatableItemComponent(itemName.get(), translationKey)) {
+                component = itemName.get();
+            } else {
+                // else try item name
+                itemName = packetItemStack.getComponent(ComponentTypes.ITEM_NAME);
+                if (itemName.isPresent() && !isTranslatableItemComponent(itemName.get(), translationKey)) {
+                    component = itemName.get();
+                }
+            }
+
+            // final translatable component
+            if (!isTranslatableItemComponent(component, translationKey)) {
+                component = applyItalicToAllChildren(component);
+            }
+
             return component.hoverEvent(adventureHoverConvertor.convert(packetItemStack));
         }
 
         Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
+    }
+
+    private boolean isTranslatableItemComponent(Component component, String translationKey) {
+        return component instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals(translationKey);
     }
 
     // https://github.com/retrooper/packetevents/pull/1147/changes#diff-9647df572bdd365fa3ce0333c7491ea491ee6b602bfadcb0f46d8660b580f419R142
@@ -295,11 +322,15 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     private Component createTranslatableItemName(net.minecraft.world.item.ItemStack itemStack, boolean translatable) {
-        Component itemComponent = Component.translatable(itemStack.getItem().getDescriptionId());
+        Component itemComponent = Component.translatable(getTranslationKey(itemStack));
 
         return translatable
                 ? itemComponent
                 : GlobalTranslator.render(itemComponent, Locale.ROOT);
+    }
+
+    private String getTranslationKey(net.minecraft.world.item.ItemStack itemStack) {
+        return itemStack.getItem().getDescriptionId();
     }
 
     @Override
