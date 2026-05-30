@@ -103,9 +103,8 @@ public class BukkitInjector extends MinecraftPlatformInjector {
             bind(MinecraftSimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
         }
 
-        if (reflectionResolver.isPaper()) {
-            bind(MinecraftMessageSender.class).to(BukkitMessageSender.class);
-        }
+        // sender
+        bind(MinecraftMessageSender.class).to(BukkitMessageSender.class);
 
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
         bind(BookModule.class).to(BukkitBookModule.class);

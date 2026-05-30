@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -16,6 +17,7 @@ public class BukkitMessageSender extends MinecraftMessageSender {
 
     private final FileFacade fileFacade;
     private final PaperItemStackUtil paperItemStackUtil;
+    private final ReflectionResolver reflectionResolver;
 
     @Inject
     public BukkitMessageSender(MinecraftPacketSender packetSender,
@@ -23,29 +25,22 @@ public class BukkitMessageSender extends MinecraftMessageSender {
                                IntegrationModule integrationModule,
                                FileFacade fileFacade,
                                PaperItemStackUtil paperItemStackUtil,
+                               ReflectionResolver reflectionResolver,
                                FLogger fLogger) {
         super(packetSender, packetProvider, integrationModule, fLogger);
 
         this.fileFacade = fileFacade;
         this.paperItemStackUtil = paperItemStackUtil;
+        this.reflectionResolver = reflectionResolver;
     }
 
     @Override
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
-        // use default sendMessage
-        if (!fileFacade.config().module().usePaperMessageSender()) {
+        if (fPlayer.isConsole() || silent
+                || !fileFacade.config().module().usePaperMessageSender()
+                || !reflectionResolver.isPaper()
+                || !paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
             super.sendMessage(fPlayer, component, silent);
-            return;
-        }
-
-        // replace item mark
-        if (fPlayer.isConsole() || silent) {
-            super.sendMessage(fPlayer, component, silent);
-            return;
-        }
-
-        if (!paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
-            super.sendMessage(fPlayer, component, true);
         }
     }
 }
