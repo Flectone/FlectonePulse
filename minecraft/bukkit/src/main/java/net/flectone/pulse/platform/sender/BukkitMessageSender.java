@@ -7,7 +7,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -16,7 +15,7 @@ import net.kyori.adventure.text.Component;
 public class BukkitMessageSender extends MinecraftMessageSender {
 
     private final FileFacade fileFacade;
-    private final PaperItemStackUtil paperItemStackUtil;
+    private final PaperMessageSender paperMessageSender;
     private final ReflectionResolver reflectionResolver;
 
     @Inject
@@ -24,13 +23,13 @@ public class BukkitMessageSender extends MinecraftMessageSender {
                                MinecraftPacketProvider packetProvider,
                                IntegrationModule integrationModule,
                                FileFacade fileFacade,
-                               PaperItemStackUtil paperItemStackUtil,
+                               PaperMessageSender paperMessageSender,
                                ReflectionResolver reflectionResolver,
                                FLogger fLogger) {
         super(packetSender, packetProvider, integrationModule, fLogger);
 
         this.fileFacade = fileFacade;
-        this.paperItemStackUtil = paperItemStackUtil;
+        this.paperMessageSender = paperMessageSender;
         this.reflectionResolver = reflectionResolver;
     }
 
@@ -39,7 +38,7 @@ public class BukkitMessageSender extends MinecraftMessageSender {
         if (fPlayer.isConsole() || silent
                 || !fileFacade.config().module().usePaperMessageSender()
                 || !reflectionResolver.isPaper()
-                || !paperItemStackUtil.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
+                || !paperMessageSender.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
             super.sendMessage(fPlayer, component, silent);
         }
     }

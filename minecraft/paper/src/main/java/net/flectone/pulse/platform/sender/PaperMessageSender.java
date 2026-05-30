@@ -1,4 +1,4 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PaperItemStackUtil {
+public class PaperMessageSender {
 
     private final FLogger fLogger;
 
