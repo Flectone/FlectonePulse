@@ -110,9 +110,12 @@ public record Config(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Module(Boolean enable,
-                         Boolean usePaperMessageSender,
-                         Boolean useBukkitPreLoginListener) implements EnableSetting {
+    public record Module(
+            Boolean enable,
+            Boolean alwaysSendSilentPacket,
+            Boolean usePaperMessageSender,
+            Boolean useBukkitPreLoginListener
+    ) implements EnableSetting {
     }
 
     @With

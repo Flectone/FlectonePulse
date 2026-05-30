@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.util.file.FileFacade;
 
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftPacketSender {
 
+    private final FileFacade fileFacade;
     private final MinecraftPacketProvider packetProvider;
 
     /**
@@ -42,7 +44,7 @@ public class MinecraftPacketSender {
      */
     public void send(Object channel, PacketWrapper<?> packetWrapper, boolean silent) {
         ProtocolManager protocolManager = packetProvider.getApi().getProtocolManager();
-        if (silent) {
+        if (silent || fileFacade.config().module().alwaysSendSilentPacket()) {
             protocolManager.sendPacketSilently(channel, packetWrapper);
         } else {
             protocolManager.sendPacket(channel, packetWrapper);
@@ -102,6 +104,12 @@ public class MinecraftPacketSender {
     public void send(PacketWrapper<?> packetWrapper) {
         packetProvider.getApi().getProtocolManager()
                 .getUsers()
-                .forEach(user -> user.sendPacket(packetWrapper));
+                .forEach(user -> {
+                    if (fileFacade.config().module().alwaysSendSilentPacket()) {
+                        user.sendPacketSilently(packetWrapper);
+                    } else {
+                        user.sendPacket(packetWrapper);
+                    }
+                });
     }
 }

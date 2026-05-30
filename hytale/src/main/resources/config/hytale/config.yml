@@ -38,6 +38,7 @@ command:
   - "ban"
 module:
   enable: true
+  always_send_silent_packet: false
   use_paper_message_sender: false
   use_bukkit_pre_login_listener: false
 editor:
