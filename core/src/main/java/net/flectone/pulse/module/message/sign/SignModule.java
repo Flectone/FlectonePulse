@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -38,10 +39,26 @@ public class SignModule implements ModuleSimple {
         return fileFacade.permission().message().sign();
     }
 
-    public Optional<String> format(FPlayer fPlayer, String string) {
+    public Optional<String> legacyFormat(FPlayer fPlayer, String string) {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
         return messagePipeline.legacyFormat(fPlayer, string);
     }
+
+    public Optional<String> paperFormat(FPlayer fPlayer, String string) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
+        if (StringUtils.isEmpty(string)) return Optional.empty();
+
+        // disable Object for sign because they don't work correctly
+        String jsonComponentConverted = messagePipeline.buildJsonString(messagePipeline.createContext(fPlayer, string)
+                    .addFlags(
+                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
+                            new boolean[]{true, true}
+                    )
+        );
+
+        return Optional.of(jsonComponentConverted);
+    }
+
 }

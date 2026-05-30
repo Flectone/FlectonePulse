@@ -28,7 +28,7 @@ public class BukkitSignListener implements Listener {
         for (int x = 0; x < event.getLines().length; x++) {
             String string = event.getLine(x);
 
-            Optional<String> formattedString = signModule.format(fPlayer, string);
+            Optional<String> formattedString = signModule.legacyFormat(fPlayer, string);
             if (formattedString.isPresent()) {
                 event.setLine(x, formattedString.get());
             }
