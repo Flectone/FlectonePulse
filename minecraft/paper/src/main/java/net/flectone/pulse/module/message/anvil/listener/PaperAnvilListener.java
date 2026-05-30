@@ -1,0 +1,75 @@
+package net.flectone.pulse.module.message.anvil.listener;
+
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.anvil.AnvilModule;
+import net.flectone.pulse.service.FPlayerService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.AnvilInventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Optional;
+
+public class PaperAnvilListener implements Listener {
+
+    private final FPlayerService fPlayerService;
+    private final AnvilModule anvilModule;
+
+    public PaperAnvilListener(FPlayerService fPlayerService, AnvilModule anvilModule) {
+        this.fPlayerService = fPlayerService;
+        this.anvilModule = anvilModule;
+    }
+
+    @EventHandler
+    public void inventoryClickEvent(InventoryClickEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
+        if (event.getSlot() != 2) return;
+
+        ItemStack itemStack = event.getCurrentItem();
+        if (itemStack == null) return;
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasDisplayName()) return;
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
+
+        try {
+            // try use paper format
+            Component componentDisplayName = itemMeta.displayName();
+            if (componentDisplayName == null) return;
+
+            String displayName;
+            try {
+                displayName = PlainTextComponentSerializer.plainText().serialize(componentDisplayName);
+            } catch (Exception _) {
+                displayName = itemMeta.getDisplayName();
+            }
+
+            // skip empty string
+            if (StringUtils.isEmpty(displayName)) return;
+
+            Optional<String> formatted = anvilModule.paperFormat(fPlayer, displayName);
+            if (formatted.isEmpty()) return;
+
+            itemMeta.displayName(GsonComponentSerializer.gson().deserialize(formatted.get()));
+            itemStack.setItemMeta(itemMeta);
+        } catch (Exception _) {
+            // use deprecated format
+            Optional<String> formatted = anvilModule.legacyFormat(fPlayer, itemMeta.getDisplayName());
+            if (formatted.isEmpty()) return;
+
+            itemMeta.setDisplayName(formatted.get());
+            itemStack.setItemMeta(itemMeta);
+        }
+
+    }
+}

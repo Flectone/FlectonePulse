@@ -37,7 +37,7 @@ public class BukkitAnvilListener implements Listener {
         ItemStack itemStack = event.getCurrentItem();
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        Optional<String> displayName = anvilModule.format(fPlayer, itemMeta.getDisplayName());
+        Optional<String> displayName = anvilModule.legacyFormat(fPlayer, itemMeta.getDisplayName());
         if (displayName.isPresent()) {
             itemMeta.setDisplayName(displayName.get());
             itemStack.setItemMeta(itemMeta);
