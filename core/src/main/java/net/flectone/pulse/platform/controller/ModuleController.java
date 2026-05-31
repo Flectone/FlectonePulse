@@ -99,14 +99,14 @@ public class ModuleController {
         return isDisabledFor(clazz, entity, false);
     }
 
-    public boolean isDisabledFor(ModuleSimple abstractModule, FEntity entity, boolean isMessage) {
-        return isDisabledFor(abstractModule.getClass(), entity, isMessage);
+    public boolean isDisabledFor(ModuleSimple abstractModule, FEntity entity, boolean isPlayerMessage) {
+        return isDisabledFor(abstractModule.getClass(), entity, isPlayerMessage);
     }
 
-    public boolean isDisabledFor(Class<? extends ModuleSimple> clazz, FEntity entity, boolean isMessage) {
+    public boolean isDisabledFor(Class<? extends ModuleSimple> clazz, FEntity entity, boolean isPlayerMessage) {
         Class<? extends ModuleSimple> root = getRoot(clazz);
         BiPredicate<FEntity, Boolean> disablePredicate = modulePredicateMap.get(root);
-        return disablePredicate != null && disablePredicate.test(entity, isMessage);
+        return disablePredicate != null && disablePredicate.test(entity, isPlayerMessage);
     }
 
     public Set<Class<? extends ModuleSimple>> getChildren(Class<? extends ModuleSimple> clazz) {
@@ -179,9 +179,9 @@ public class ModuleController {
 
         if (module instanceof ModuleLocalization<?> localizationModule) {
             return disablePredicate
-                    .or((fPlayer, needBoolean) -> needBoolean && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
-                    .or((fPlayer, needBoolean) -> needBoolean && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
-                    .or((fPlayer, needBoolean) -> needBoolean && muteSenderProvider.get().sendIfMuted(fPlayer));
+                    .or((fPlayer, isPlayerMessage) -> isPlayerMessage && disableSenderProvider.get().sendIfDisabled(fPlayer, fPlayer, localizationModule.name()))
+                    .or((fPlayer, isPlayerMessage) -> isPlayerMessage && cooldownSenderProvider.get().sendIfCooldown(fPlayer, localizationModule.cooldown(), module.getClass().getName()))
+                    .or((fPlayer, isPlayerMessage) -> isPlayerMessage && muteSenderProvider.get().sendIfMuted(fPlayer));
         }
 
         return disablePredicate;
