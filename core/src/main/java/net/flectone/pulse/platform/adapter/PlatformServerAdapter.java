@@ -4,12 +4,10 @@ import com.google.gson.JsonElement;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -200,18 +198,5 @@ public interface PlatformServerAdapter {
             @NonNull String title,
             @NonNull String[] lore
     );
-
-    /**
-     * Recursively applies italic text decoration to all children of a component.
-     */
-    default Component applyItalicToAllChildren(Component component) {
-        Component result = component.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.TRUE);
-
-        List<Component> newChildren = result.children().stream()
-                .map(this::applyItalicToAllChildren)
-                .toList();
-
-        return result.children(newChildren);
-    }
 
 }

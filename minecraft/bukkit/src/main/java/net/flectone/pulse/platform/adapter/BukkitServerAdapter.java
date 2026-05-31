@@ -25,6 +25,7 @@ import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -64,7 +65,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final ReflectionResolver reflectionResolver;
     private final PaperItemNameProvider paperItemNameProvider;
     private final TaskScheduler taskScheduler;
-    private final IconConvertor iconUtil;
+    private final ComponentDecorator componentDecorator;
+    private final IconConvertor iconConvertor;
 
     private String serverIcon;
     private Pair<MethodHandle, Object> getTPSMethodPair;
@@ -142,7 +144,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         File iconFile = new File(Bukkit.getWorldContainer(), "server-icon.png");
         if (!iconFile.exists()) return Optional.empty();
 
-        return Optional.ofNullable(iconUtil.convert(iconFile));
+        return Optional.ofNullable(iconConvertor.convert(iconFile));
     }
 
     @Override
@@ -317,7 +319,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         if (itemStack.getType() != Material.AIR) {
             ItemStack packetItemStack = SpigotConversionUtil.fromBukkitItemStack(itemStack);
-            return component.hoverEvent(adventureHoverConvertor.convert(packetItemStack));
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
         }
 
         return component;
@@ -332,7 +334,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         if (isModernItemStack) {
             String jsonDisplayName = paperItemNameProvider.get(itemStack);
             if (jsonDisplayName != null) {
-                return applyItalicToAllChildren(GsonComponentSerializer.gson().deserialize(jsonDisplayName));
+                return componentDecorator.decorateIfAbsent(GsonComponentSerializer.gson().deserialize(jsonDisplayName), TextDecoration.ITALIC, TextDecoration.State.TRUE);
             }
         }
 

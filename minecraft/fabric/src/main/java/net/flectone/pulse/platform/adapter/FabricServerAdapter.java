@@ -29,6 +29,7 @@ import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
@@ -69,8 +70,9 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final @Named("projectPath") Path projectPath;
     private final FabricTpsTracker tpsTracker;
     private final FLogger fLogger;
-    private final RandomGenerator randomUtil;
-    private final IconConvertor iconUtil;
+    private final ComponentDecorator componentDecorator;
+    private final RandomGenerator randomGenerator;
+    private final IconConvertor iconConvertor;
 
     private String serverIcon;
 
@@ -122,7 +124,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
     @Override
     public int generateEntityId() {
-        return randomUtil.nextInt(Integer.MAX_VALUE);
+        return randomGenerator.nextInt(Integer.MAX_VALUE);
     }
 
     @Override
@@ -174,7 +176,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
             File iconFile = minecraftServer.getFile("server-icon.png").toFile();
 
             if (iconFile.exists()) {
-                serverIcon = iconUtil.convert(iconFile);
+                serverIcon = iconConvertor.convert(iconFile);
             }
 
             // empty string is an indicator that it is already initialized
@@ -284,14 +286,14 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
             // final translatable component
             if (!isTranslatableItemComponent(component, translationKey)) {
-                component = applyItalicToAllChildren(component);
+                component = componentDecorator.decorateIfAbsent(component, TextDecoration.ITALIC, TextDecoration.State.TRUE);
             }
 
-            return component.hoverEvent(adventureHoverConvertor.convert(packetItemStack));
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
         }
 
         Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
-        return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
+        return componentDecorator.hoverIfAbsent(component, HoverEvent.showItem(key, itemStack.getCount()));
     }
 
     private boolean isTranslatableItemComponent(Component component, String translationKey) {
