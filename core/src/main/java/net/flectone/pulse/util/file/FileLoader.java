@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FileLoader {
 
-    private static final boolean LOAD_ASM_JAR = Boolean.parseBoolean(System.getProperty("load.asm.jar", "true"));
+    private static final boolean LOAD_ASM_JAR = Boolean.parseBoolean(System.getProperty("flectonepulse.load-asm-jar", "true"));
 
     public static final Predicate<Path> ADD_FILE_TO_CLASSPATH_PREDICATE = path -> {
         if (LOAD_ASM_JAR) return true;
