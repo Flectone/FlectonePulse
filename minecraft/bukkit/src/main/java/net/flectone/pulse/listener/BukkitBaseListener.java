@@ -12,15 +12,11 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
 import java.util.Set;
 import java.util.UUID;
@@ -36,26 +32,7 @@ public class BukkitBaseListener implements Listener {
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final MinecraftPacketProvider packetProvider;
-    private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TaskScheduler taskScheduler;
-
-    @EventHandler
-    public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-        // in older versions (1.20.1 and older), there is no configuration stage
-        // so we use Bukkit API
-        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)
-                || fileFacade.config().module().useBukkitPreLoginListener()) {
-            UUID uuid = event.getUniqueId();
-            String name = event.getName();
-
-            playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
-                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-
-                Component reason = loginEvent.kickReason();
-                event.setKickMessage(LegacyComponentSerializer.legacySection().serialize(reason));
-            });
-        }
-    }
 
     @EventHandler
     public void onPlayerJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {

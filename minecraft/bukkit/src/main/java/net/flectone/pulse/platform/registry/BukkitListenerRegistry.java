@@ -5,9 +5,13 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.BukkitBaseListener;
+import net.flectone.pulse.listener.BukkitPreLoginListener;
+import net.flectone.pulse.listener.PaperPreLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -20,18 +24,22 @@ import java.util.List;
 public class BukkitListenerRegistry extends MinecraftListenerRegistry {
 
     private final List<Listener> listeners = new ObjectArrayList<>();
+
     private final Plugin plugin;
     private final Injector injector;
+    private final ReflectionResolver reflectionResolver;
 
     @Inject
     public BukkitListenerRegistry(Plugin plugin,
                                   FLogger fLogger,
                                   Injector injector,
-                                  MinecraftPacketProvider packetProvider) {
+                                  MinecraftPacketProvider packetProvider,
+                                  ReflectionResolver reflectionResolver) {
         super(fLogger, injector, packetProvider);
 
         this.plugin = plugin;
         this.injector = injector;
+        this.reflectionResolver = reflectionResolver;
     }
 
     @Override
@@ -92,6 +100,12 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
     @Override
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
+
+        if (reflectionResolver.hasMethod(AsyncPlayerPreLoginEvent.class, "kickMessage")) {
+            register(PaperPreLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        } else {
+            register(BukkitPreLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        }
 
         register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
     }
