@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerSetupConnectEvent;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -19,6 +18,8 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -37,12 +38,13 @@ public class HytaleBaseListener implements HytaleListener {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
+    private final HytaleComponentSerializer componentSerializer;
 
     public void onPlayerSetupConnectEvent(PlayerSetupConnectEvent event) {
         UUID uuid = event.getUuid();
         String playerName = event.getUsername();
         playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent -> {
-            event.setReason(HytaleComponentSerializer.get().serialize(loginEvent.kickReason()));
+            event.setReason(componentSerializer.toHytale(loginEvent.kickReason()));
             event.setCancelled(true);
         });
     }

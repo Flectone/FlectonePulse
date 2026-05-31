@@ -43,7 +43,6 @@ public class ComponentSerializer {
         return gson.toJson(playerPreLoginEventWithKickReason.kickReason());
     }
 
-
     @NonNull
     public JsonElement toJsonTree(@NonNull Component component) {
         return gson.toJsonTree(component);

@@ -14,6 +14,7 @@ import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -31,6 +32,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
 
     @Inject
     public HytaleScoreboardModule(FileFacade fileFacade,
@@ -38,13 +40,15 @@ public class HytaleScoreboardModule extends ScoreboardModule {
                                   TaskScheduler taskScheduler,
                                   MessagePipeline messagePipeline,
                                   PlatformPlayerAdapter platformPlayerAdapter,
-                                  ModuleController moduleController) {
+                                  ModuleController moduleController,
+                                  ComponentSerializer componentSerializer) {
         super(fileFacade, listenerRegistry, platformPlayerAdapter);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.moduleController = moduleController;
+        this.componentSerializer = componentSerializer;
     }
 
     @Override
@@ -133,7 +137,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
             suffix = messagePipeline.build(suffixContext);
         }
 
-        return new CustomName(fPlayer.name(), PlainTextComponentSerializer.plainText().serialize(prefix.append(displayName).append(suffix)));
+        return new CustomName(fPlayer.name(), componentSerializer.toPlain(prefix.append(displayName).append(suffix)));
     }
 
     private record CustomName(String original, String value) {

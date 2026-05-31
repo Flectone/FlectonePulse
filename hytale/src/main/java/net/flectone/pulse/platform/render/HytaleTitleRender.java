@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Times;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -16,6 +16,7 @@ import net.kyori.adventure.text.Component;
 public class HytaleTitleRender implements TitleRender {
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final HytaleComponentSerializer componentSerializer;
 
     @Override
     public void render(FPlayer fPlayer, Component title, Component subTitle, Times times) {
@@ -23,8 +24,8 @@ public class HytaleTitleRender implements TitleRender {
         if (!(object instanceof PlayerRef playerRef)) return;
 
         EventTitleUtil.showEventTitleToPlayer(playerRef,
-                HytaleComponentSerializer.get().serialize(title),
-                HytaleComponentSerializer.get().serialize(subTitle),
+                componentSerializer.toHytale(title),
+                componentSerializer.toHytale(subTitle),
                 true,
                 null,
                 (float) times.stayTicks() / 20,

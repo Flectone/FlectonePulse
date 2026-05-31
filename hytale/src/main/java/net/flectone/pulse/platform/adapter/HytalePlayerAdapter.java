@@ -22,11 +22,11 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.joml.Vector3d;
@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePlayerAdapter implements PlatformPlayerAdapter {
+
+    private final HytaleComponentSerializer componentSerializer;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -418,7 +420,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef playerRef = getPlayer(fPlayer.uuid());
         if (playerRef == null) return;
 
-        playerRef.getPacketHandler().disconnect(HytaleComponentSerializer.get().serialize(reason));
+        playerRef.getPacketHandler().disconnect(componentSerializer.toHytale(reason));
     }
 
     @Nullable

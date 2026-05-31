@@ -26,6 +26,7 @@ import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameM
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -73,6 +74,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final ComponentDecorator componentDecorator;
     private final RandomGenerator randomGenerator;
     private final IconConvertor iconConvertor;
+    private final ComponentSerializer componentSerializer;
 
     private String serverIcon;
 
@@ -318,7 +320,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         MessageContext messageContext = messagePipelineProvider.get().createContext(customName.getString());
         Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
+        String clearedDisplayName = componentSerializer.toPlain(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }

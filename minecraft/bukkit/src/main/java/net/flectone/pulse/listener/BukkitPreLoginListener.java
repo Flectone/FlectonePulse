@@ -6,9 +6,9 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -22,6 +22,7 @@ public class BukkitPreLoginListener implements Listener {
     private final FileFacade fileFacade;
     private final MinecraftPacketProvider packetProvider;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
+    private final ComponentSerializer componentSerializer;
 
     @EventHandler
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
@@ -36,7 +37,7 @@ public class BukkitPreLoginListener implements Listener {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
 
                 Component reason = loginEvent.kickReason();
-                event.setKickMessage(LegacyComponentSerializer.legacySection().serialize(reason));
+                event.setKickMessage(componentSerializer.toLegacy(reason));
             });
         }
     }

@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -29,7 +30,7 @@ public class MinecraftServerStatusFormatter {
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
-    private final Gson gson;
+    private final ComponentSerializer componentSerializer;
 
     @NonNull
     public JsonElement formatDescription(FPlayer fPlayer, User user, String message) {
@@ -55,9 +56,9 @@ public class MinecraftServerStatusFormatter {
         if (motd == null) return platformServerAdapter.getMOTD();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            return gson.toJsonTree(motd);
+            return componentSerializer.toJsonTree(motd);
         } else {
-            String serializedText =  LegacyComponentSerializer.legacySection().serialize(motd);
+            String serializedText =  componentSerializer.toLegacy(motd);
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("text", serializedText);
             return jsonObject;

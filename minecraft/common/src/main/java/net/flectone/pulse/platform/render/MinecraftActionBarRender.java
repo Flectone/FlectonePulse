@@ -14,6 +14,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -24,6 +25,7 @@ public class MinecraftActionBarRender implements ActionBarRender {
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
     private final TaskScheduler taskScheduler;
+    private final ComponentSerializer componentSerializer;
 
     @Override
     public void render(FPlayer fPlayer, Component component) {
@@ -41,7 +43,7 @@ public class MinecraftActionBarRender implements ActionBarRender {
         } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_8_8)) {
             packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(component, ChatTypes.GAME_INFO)));
         } else { // PacketEvents issue https://github.com/retrooper/packetevents/issues/1241
-            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(Component.text(LegacyComponentSerializer.legacySection().serialize(component)), ChatTypes.GAME_INFO)));
+            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(Component.text(componentSerializer.toLegacy(component)), ChatTypes.GAME_INFO)));
         }
 
         // cannot set stay ticks for action bar, so

@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
@@ -43,6 +44,7 @@ public class IntegrationFormatter {
 
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
+    private final ComponentSerializer componentSerializer;
 
     /**
      * Checks if the event sender is in vanish
@@ -144,7 +146,7 @@ public class IntegrationFormatter {
     }
 
     private String plainSerialize(Component component) {
-        return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
+        return componentSerializer.toPlain(GlobalTranslator.render(component, Locale.ROOT));
     }
 
 }

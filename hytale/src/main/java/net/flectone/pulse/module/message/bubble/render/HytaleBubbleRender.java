@@ -34,7 +34,6 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.joml.Vector3d;
 
 import java.time.Instant;
@@ -85,7 +84,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         String playerKey = sender.uuid().toString();
 
-        String bubbleText = PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer));
+        String bubbleText = createFormattedMessage(bubble, viewer);
 
         Transform playerTransform = playerRef.getTransform();
         world.execute(() -> {
@@ -190,7 +189,7 @@ public class HytaleBubbleRender implements BubbleRender {
         }
     }
 
-    private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
+    private String createFormattedMessage(Bubble bubble, FPlayer viewer) {
         Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
 
         MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
@@ -201,7 +200,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         Component message = messagePipeline.build(messageContext);
 
-        return messagePipeline.build(messageContext
+        return messagePipeline.buildPlain(messageContext
                 .withMessage(localization.format())
                 .addFlag(MessageFlag.PLAYER_MESSAGE, false)
                 .addTagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))

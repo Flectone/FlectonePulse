@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -30,9 +31,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
@@ -50,7 +49,6 @@ import java.util.regex.Pattern;
 public class ReplacementModule implements ModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new ConcurrentHashMap<>();
-    private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
 
     private final @Named("replacementMessage") Cache<String, String> messageCache;
     private final @Named("replacementImage") Cache<String, Component> imageCache;
@@ -63,6 +61,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
     private final UrlFormatter urlFormatter;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
 
     @Override
@@ -257,7 +256,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
         Component spoilerComponent = messagePipeline.build(spoilerContext);
 
-        int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
+        int length = componentSerializer.toPlain(spoilerComponent).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
         Localization.Message.Format.Replacement replacement = localization(messageContext.receiver());
@@ -506,7 +505,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                 for (int i = 0; i < pixels.size(); i++) {
                     component = component
                             .append(Component.newline())
-                            .append(defaultMiniMessage.deserialize(pixels.get(i)));
+                            .append(componentSerializer.fromStandard(pixels.get(i)));
 
                     if (i == pixels.size() - 1) {
                         component = component

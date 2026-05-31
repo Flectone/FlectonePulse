@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.serializer.BrandPacketSerializer;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -18,10 +19,11 @@ public class MinecraftBrandRender implements BrandRender {
 
     private final MinecraftPacketSender packetSender;
     private final BrandPacketSerializer brandPacketSerializer;
+    private final ComponentSerializer componentSerializer;
 
     @Override
     public void render(FPlayer fPlayer, Component component) {
-        String message = LegacyComponentSerializer.legacySection().serialize(component) + RESET_STYLE;
+        String message = componentSerializer.toLegacy(component) + RESET_STYLE;
 
         packetSender.send(fPlayer, new WrapperPlayServerPluginMessage(BrandPacketSerializer.MINECRAFT_BRAND, brandPacketSerializer.serialize(message)));
     }

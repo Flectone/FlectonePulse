@@ -12,7 +12,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -24,9 +23,9 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
@@ -46,6 +45,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private final ChatsettingHandler chatsettingHandler;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
+    private final HytaleComponentSerializer componentSerializer;
 
     @Override
     public void open(FPlayer fPlayer, UUID fTargetUUID) {
@@ -119,8 +119,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
             Component componentInvertLore = messagePipeline.build(invertLoreContext);
 
             uiContext.getById(id, ButtonBuilder.class).ifPresent(buttonBuilder -> buttonBuilder
-                    .withText(PlainTextComponentSerializer.plainText().serialize(componentInvertTitle))
-                    .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentInvertLore))
+                    .withText(componentSerializer.toPlain(componentInvertTitle))
+                    .withTooltipTextSpan(componentSerializer.toHytale(componentInvertLore))
             );
 
             uiContext.updatePage(true);
@@ -246,8 +246,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private ButtonBuilder createButton(String id, Component componentTitle, Component componentLore, BiConsumer<Void, UIContext> callback) {
         return ButtonBuilder.textButton()
                 .withId(id)
-                .withText(PlainTextComponentSerializer.plainText().serialize(componentTitle))
-                .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentLore))
+                .withText(componentSerializer.toPlain(componentTitle))
+                .withTooltipTextSpan(componentSerializer.toHytale(componentLore))
                 .withAnchor(new HyUIAnchor()
                         .setWidth(config().buttonWidth())
                         .setHeight(config().buttonHeight())
@@ -261,7 +261,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
                 .withLifetime(CustomPageLifetime.CanDismissOrCloseThroughInteraction)
                 .addElement(PageOverlayBuilder.pageOverlay()
                         .addChild(ContainerBuilder.container()
-                                .withTitleText(PlainTextComponentSerializer.plainText().serialize(title))
+                                .withTitleText(componentSerializer.toPlain(title))
                                 .withAnchor(new HyUIAnchor()
                                         .setWidth(config().panelWidth())
                                         .setHeight(config().panelHeight())

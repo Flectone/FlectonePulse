@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -62,6 +63,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
 
     @Override
@@ -349,7 +351,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
                         new String[]{
                                 String.valueOf(poll.getId()),
                                 String.valueOf(k),
-                                PlainTextComponentSerializer.plainText().serialize(answerComponent),
+                                componentSerializer.toPlain(answerComponent),
                                 String.valueOf(poll.getCountAnswers()[k])
                         }
                 ));

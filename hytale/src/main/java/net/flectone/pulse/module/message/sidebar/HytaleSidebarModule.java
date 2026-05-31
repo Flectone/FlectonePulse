@@ -14,6 +14,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -36,6 +37,7 @@ public class HytaleSidebarModule extends SidebarModule {
     private final MessagePipeline messagePipeline;
     private final HytaleMessageUtil hytaleMessageUtil;
     private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
 
     @Inject
     public HytaleSidebarModule(FileFacade fileFacade,
@@ -47,7 +49,8 @@ public class HytaleSidebarModule extends SidebarModule {
                                MessagePipeline messagePipeline,
                                HytaleMessageUtil hytaleMessageUtil,
                                ModuleController moduleController,
-                               RandomGenerator randomUtil) {
+                               RandomGenerator randomUtil,
+                               ComponentSerializer componentSerializer) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
@@ -55,6 +58,7 @@ public class HytaleSidebarModule extends SidebarModule {
         this.messagePipeline = messagePipeline;
         this.hytaleMessageUtil = hytaleMessageUtil;
         this.moduleController = moduleController;
+        this.componentSerializer = componentSerializer;
     }
 
     @Override
@@ -128,7 +132,7 @@ public class HytaleSidebarModule extends SidebarModule {
 
             lineBuilder.addChild(LabelBuilder.label()
                     .withId(lineId)
-                    .withText(PlainTextComponentSerializer.plainText().serialize(line))
+                    .withText(componentSerializer.toPlain(line))
                     .withStyle(new HyUIStyle().setTextColor(hytaleMessageUtil.findFirstColor(line)))
                     .withPadding(new HyUIPadding(config().labelLeft(), config().labelTop(), 0, 0))
             );

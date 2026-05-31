@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.BukkitPassengersProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -51,6 +52,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final ReflectionResolver reflectionResolver;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -267,7 +269,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         header = player.getPlayerListHeader();
         if (header == null) return Component.empty();
 
-        return LegacyComponentSerializer.legacySection().deserialize(header);
+        return componentSerializer.fromLegacy(header);
     }
 
     @Override
@@ -289,7 +291,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         footer = player.getPlayerListFooter();
         if (footer == null) return Component.empty();
 
-        return LegacyComponentSerializer.legacySection().deserialize(footer);
+        return componentSerializer.fromLegacy(footer);
     }
 
     @Override

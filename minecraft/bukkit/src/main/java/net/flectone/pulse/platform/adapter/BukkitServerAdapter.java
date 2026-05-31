@@ -23,14 +23,12 @@ import net.flectone.pulse.platform.provider.PaperItemNameProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -66,6 +64,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final PaperItemNameProvider paperItemNameProvider;
     private final TaskScheduler taskScheduler;
     private final ComponentDecorator componentDecorator;
+    private final ComponentSerializer componentSerializer;
     private final IconConvertor iconConvertor;
 
     private String serverIcon;
@@ -270,11 +269,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
-        LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
-
-        meta.setDisplayName(legacyComponentSerializer.serialize(name));
+        meta.setDisplayName(componentSerializer.toLegacy(name));
         meta.setLore(lore.stream()
-                .map(legacyComponentSerializer::serialize)
+                .map(componentSerializer::toLegacy)
                 .toList()
         );
 
@@ -334,7 +331,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         if (isModernItemStack) {
             String jsonDisplayName = paperItemNameProvider.get(itemStack);
             if (jsonDisplayName != null) {
-                return componentDecorator.decorateIfAbsent(GsonComponentSerializer.gson().deserialize(jsonDisplayName), TextDecoration.ITALIC, TextDecoration.State.TRUE);
+                return componentDecorator.decorateIfAbsent(componentSerializer.fromJson(jsonDisplayName), TextDecoration.ITALIC, TextDecoration.State.TRUE);
             }
         }
 
@@ -343,7 +340,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         MessageContext messageContext = messagePipelineProvider.get().createContext(displayName);
         Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
+        String clearedDisplayName = componentSerializer.toPlain(componentName);
 
         return Component.text(clearedDisplayName).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.TRUE);
     }
