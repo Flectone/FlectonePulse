@@ -142,8 +142,8 @@ public class MinecraftBasePacketListener implements PacketListener {
 
         if (!usePacketPreLoginListener) return;
 
-        WrapperLoginServerLoginSuccess wrapperLoginServerLoginSuccess = new WrapperLoginServerLoginSuccess(event);
-        UserProfile userProfile = wrapperLoginServerLoginSuccess.getUserProfile();
+        WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
+        UserProfile userProfile = wrapper.getUserProfile();
 
         UUID uuid = userProfile.getUUID();
         if (uuid == null) return;
@@ -151,9 +151,11 @@ public class MinecraftBasePacketListener implements PacketListener {
         String playerName = userProfile.getName();
         if (playerName == null) return;
 
-        playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent ->
-                packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()))
-        );
+        playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent -> {
+            event.setCancelled(true);
+
+            packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()));
+        });
     }
 
     private void handleSetPassengers(PacketSendEvent event) {
