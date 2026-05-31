@@ -1,16 +1,17 @@
 package net.flectone.pulse.execution.pipeline;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 import java.util.Map;
@@ -25,15 +26,15 @@ public class HytaleMessagePipeline extends MessagePipeline {
     public HytaleMessagePipeline(FLogger fLogger,
                                  MiniMessage miniMessage,
                                  EventDispatcher eventDispatcher,
-                                 Gson gson) {
-        super(fLogger, miniMessage, eventDispatcher, gson);
+                                 ComponentSerializer componentSerializer) {
+        super(fLogger, miniMessage, eventDispatcher, componentSerializer);
     }
 
     @Override
-    public Component build(MessageContext context) {
-        Component component = super.build(context);
+    public @NonNull Component build(MessageContext messageContext) {
+        Component component = super.build(messageContext);
         if (Component.IS_NOT_EMPTY.test(component)) {
-            return GlobalTranslator.render(component, getLocale(context.receiver()));
+            return GlobalTranslator.render(component, getLocale(messageContext.receiver()));
         }
 
         return component;

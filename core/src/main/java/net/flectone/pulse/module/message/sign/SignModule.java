@@ -43,7 +43,7 @@ public class SignModule implements ModuleSimple {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
-        return messagePipeline.legacyFormat(fPlayer, string);
+        return messagePipeline.buildLegacy(fPlayer, string);
     }
 
     public Optional<String> paperFormat(FPlayer fPlayer, String string) {
@@ -51,7 +51,7 @@ public class SignModule implements ModuleSimple {
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
         // disable Object for sign because they don't work correctly
-        String jsonComponentConverted = messagePipeline.buildJsonString(messagePipeline.createContext(fPlayer, string)
+        String jsonComponentConverted = messagePipeline.buildJson(messagePipeline.createContext(fPlayer, string)
                     .addFlags(
                             new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
                             new boolean[]{true, true}

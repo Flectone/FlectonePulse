@@ -42,7 +42,7 @@ public class BookModule implements ModuleSimple {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
-        return messagePipeline.legacyFormat(fPlayer, string);
+        return messagePipeline.buildLegacy(fPlayer, string);
     }
 }
 

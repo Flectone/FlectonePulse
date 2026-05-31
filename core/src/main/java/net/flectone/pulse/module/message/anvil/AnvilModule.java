@@ -43,14 +43,14 @@ public class AnvilModule implements ModuleSimple {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
-        return messagePipeline.legacyFormat(fPlayer, string);
+        return messagePipeline.buildLegacy(fPlayer, string);
     }
 
     public Optional<String> paperFormat(FPlayer fPlayer, String string) {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
-        String jsonComponentConverted = messagePipeline.buildJsonString(messagePipeline.createContext(fPlayer, string)
+        String jsonComponentConverted = messagePipeline.buildJson(messagePipeline.createContext(fPlayer, string)
                 .addFlag(MessageFlag.PLAYER_MESSAGE, true)
         );
 

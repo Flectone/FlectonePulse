@@ -60,6 +60,8 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.MinecraftProfileResolver;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.processing.serializer.MinecraftComponentSerializer;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.SkinService;
@@ -133,6 +135,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(SoundPlayer.class).to(MinecraftSoundPlayer.class);
 
         // others
+        bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);

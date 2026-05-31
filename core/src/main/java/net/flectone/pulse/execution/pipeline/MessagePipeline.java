@@ -1,6 +1,5 @@
 package net.flectone.pulse.execution.pipeline;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,6 +9,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -20,8 +20,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
@@ -40,7 +38,7 @@ public class MessagePipeline {
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
-    private final Gson gson;
+    private final ComponentSerializer componentSerializer;
 
     public MessageContext createContext(@NonNull String message) {
         return createContext(FPlayer.UNKNOWN, message);
@@ -62,11 +60,68 @@ public class MessagePipeline {
         return new MessageContext(messageUUID, sender, receiver, message);
     }
 
-    public Component build(MessageContext context) {
-        // no need to build empty message
-        if (StringUtils.isEmpty(context.message())) return Component.empty();
+    @NonNull
+    public String buildStandard(MessageContext messageContext) {
+        // add a space so that MiniMessage correctly deserializes closed tags
+        // https://github.com/Flectone/FlectonePulse/issues/243
+        messageContext = messageContext.withMessage(messageContext.message() + " ");
 
-        MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(context));
+        // build and serialize component
+        String serializedComponent = componentSerializer.toStandard(build(messageContext));
+
+        // remove last space
+        return Strings.CS.removeEnd(serializedComponent, " ");
+    }
+
+    @NonNull
+    public String buildPlain(MessageContext messageContext) {
+        return componentSerializer.toPlain(build(messageContext));
+    }
+
+    @NonNull
+    public String buildLegacy(MessageContext messageContext) {
+        return componentSerializer.toLegacy(build(messageContext));
+    }
+
+    public Optional<String> buildLegacy(@NonNull FPlayer fPlayer, @NonNull String message) {
+        try {
+            Component deserialized = componentSerializer.fromLegacy(message);
+
+            MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
+                    .addFlag(MessageFlag.PLAYER_MESSAGE, true);
+
+            Component component = build(context)
+                    .applyFallbackStyle(deserialized.style())
+                    .mergeStyle(deserialized);
+
+            String formattedMessage = componentSerializer.toLegacy(component);
+            if (!message.equalsIgnoreCase(formattedMessage)) {
+                return Optional.of(formattedMessage);
+            }
+
+        } catch (Exception _) {
+            // ignore problem
+        }
+
+        return Optional.empty();
+    }
+
+    @NonNull
+    public String buildJson(MessageContext messageContext) {
+        return componentSerializer.toJson(build(messageContext));
+    }
+
+    @NonNull
+    public JsonElement buildJsonTree(MessageContext messageContext) {
+        return componentSerializer.toJsonTree(build(messageContext));
+    }
+
+    @NonNull
+    public Component build(MessageContext messageContext) {
+        // no need to build empty message
+        if (StringUtils.isEmpty(messageContext.message())) return Component.empty();
+
+        MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(messageContext));
         MessageContext eventContext = event.context();
 
         if (eventContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
@@ -89,59 +144,6 @@ public class MessagePipeline {
         }
 
         return Component.empty();
-    }
-
-    public String buildDefault(MessageContext context) {
-        // add a space so that MiniMessage correctly deserializes closed tags
-        // https://github.com/Flectone/FlectonePulse/issues/243
-        context = context.withMessage(context.message() + " ");
-
-        // build and serialize component
-        String serializedComponent = MiniMessage.miniMessage().serialize(build(context));
-
-        // remove last space
-        return Strings.CS.removeEnd(serializedComponent, " ");
-    }
-
-    public String buildPlain(MessageContext context) {
-        return PlainTextComponentSerializer.plainText().serialize(build(context));
-    }
-
-    public String buildLegacy(MessageContext context) {
-        return LegacyComponentSerializer.legacySection().serialize(build(context));
-    }
-
-    public JsonElement buildJson(MessageContext context) {
-        return gson.toJsonTree(build(context));
-    }
-
-    public String buildJsonString(MessageContext context) {
-        return gson.toJson(build(context));
-    }
-
-    public Optional<String> legacyFormat(@NonNull FPlayer fPlayer, @NonNull String message) {
-        LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
-
-        try {
-            Component deserialized = legacyComponentSerializer.deserialize(message);
-
-            MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-            Component component = build(context)
-                    .applyFallbackStyle(deserialized.style())
-                    .mergeStyle(deserialized);
-
-            String formattedMessage = LegacyComponentSerializer.legacySection().serialize(component);
-            if (!message.equalsIgnoreCase(formattedMessage)) {
-                return Optional.of(formattedMessage);
-            }
-
-        } catch (Exception _) {
-            // ignore problem
-        }
-
-        return Optional.empty();
     }
 
     public TagResolver messageTag(Component message) {

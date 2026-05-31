@@ -232,7 +232,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
             return Tag.selfClosingInserting(messagePipeline.build(tagContext));
         }
 
-        return Tag.preProcessParsed(messagePipeline.buildDefault(tagContext));
+        return Tag.preProcessParsed(messagePipeline.buildStandard(tagContext));
     }
 
 }
