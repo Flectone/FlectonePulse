@@ -14,4 +14,7 @@ dependencies {
     compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
     compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly "org.mineskin:java-client-jsoup:$mineskin_api_version"
+
+    // only for no compile errors
+    compileOnly "io.netty:netty-buffer:4.2.14.Final"
 }

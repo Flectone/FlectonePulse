@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PacketSerializer {
+public class BrandPacketSerializer {
 
     public static final String MINECRAFT_BRAND = "minecraft:brand";
 
