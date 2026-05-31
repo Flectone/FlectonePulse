@@ -7,11 +7,21 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.processing.resolver.libby.BukkitLibbyResolver;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+
 @Singleton
 public class BukkitLibraryResolver extends LibraryResolver {
 
     public BukkitLibraryResolver(Plugin plugin) {
         super(new BukkitLibbyResolver(plugin, "libraries"));
+    }
+
+    public List<String> getPacketEventsArtifactIds() {
+        return List.of(
+                "packetevents-spigot",
+                "packetevents-api",
+                "packetevents-netty-common"
+        );
     }
 
     @Override
@@ -24,6 +34,35 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .version(BuildConfig.ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN)
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("com{}google{}gson")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".gson")
+                        .build()
+                )
+                .build()
+        ));
+
+        getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
+                .groupId("com{}github{}retrooper")
+                .artifactId(artifactId)
+                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
+                .repository(BuildConfig.CODEMC_REPOSITORY)
+                .fallbackRepository("https://repo.codemc.io/repository/maven-snapshots/")
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN)
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern(BuildConfig.RELOCATED_PATTERN + ".packetevents.impl")
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN)

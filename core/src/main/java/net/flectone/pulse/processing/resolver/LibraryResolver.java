@@ -61,6 +61,7 @@ public class LibraryResolver {
 
     public void resolveRepositories() {
         libraryManager.addRepository(BuildConfig.MAVEN_REPOSITORY);
+        libraryManager.addRepository(BuildConfig.CODEMC_REPOSITORY);
         libraryManager.addRepository(BuildConfig.JITPACK_REPOSITORY);
 
         libraryManager.addSonatype();
