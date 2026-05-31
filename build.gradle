@@ -134,12 +134,12 @@ subprojects {
         }
 
         if (project.name != "fabric") {
+            relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
+            relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
             relocate("org.incendo", "${relocated_pattern}.cloud")
         }
 
         if (project.name != "paper" && project.name != "fabric") {
-            relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
-            relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
