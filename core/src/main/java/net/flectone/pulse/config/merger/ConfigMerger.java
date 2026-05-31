@@ -23,7 +23,6 @@ public interface ConfigMerger {
     @Mapping(target = "proxy", expression = "java(mergeProxy(target.build().proxy().toBuilder(), source.proxy()))")
     @Mapping(target = "command", expression = "java(mergeCommand(target.build().command().toBuilder(), source.command()))")
     @Mapping(target = "module", expression = "java(mergeModule(target.build().module().toBuilder(), source.module()))")
-    @Mapping(target = "editor", expression = "java(mergeEditor(target.build().editor().toBuilder(), source.editor()))")
     @Mapping(target = "logger", expression = "java(mergeLogger(target.build().logger().toBuilder(), source.logger()))")
     @Mapping(target = "cache", expression = "java(mergeCache(target.build().cache().toBuilder(), source.cache()))")
     @Mapping(target = "metrics", expression = "java(mergeMetrics(target.build().metrics().toBuilder(), source.metrics()))")
@@ -41,8 +40,6 @@ public interface ConfigMerger {
     Config.Command mergeCommand(@MappingTarget Config.Command.CommandBuilder target, Config.Command source);
 
     Config.Module mergeModule(@MappingTarget Config.Module.ModuleBuilder target, Config.Module source);
-
-    Config.Editor mergeEditor(@MappingTarget Config.Editor.EditorBuilder target, Config.Editor source);
 
     Config.Logger mergeLogger(@MappingTarget Config.Logger.LoggerBuilder target, Config.Logger source);
 

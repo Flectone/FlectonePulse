@@ -248,7 +248,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     }
 
     private boolean commandEditor(FPlayer fPlayer, Operation operation) {
-        if (fileFacade.config().editor().host().isEmpty()) {
+        if (config().editor().host().isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::nullHostEditor)
@@ -265,7 +265,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
 
         reflectionResolver.hasClassOrElse(SPARK_CLASS, this::loadSparkLibrary);
 
-        int port = fileFacade.config().editor().port();
+        int port = config().editor().port();
         if (!isPortAvailable(port)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Flectonepulse>builder()
                     .sender(fPlayer)

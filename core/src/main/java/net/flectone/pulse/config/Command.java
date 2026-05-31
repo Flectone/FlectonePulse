@@ -455,10 +455,22 @@ public record Command(
             Boolean enable,
             Boolean executeInMainThread,
             List<String> aliases,
+            Editor editor,
             Destination destination,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Editor(
+                String host,
+                Boolean https,
+                Integer port
+        ) {
+        }
+
     }
 
     @With

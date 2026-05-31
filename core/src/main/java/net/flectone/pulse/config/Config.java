@@ -43,9 +43,6 @@ public record Config(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
         Module module,
 
-        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/editor")
-        Editor editor,
-
         @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger")
         Logger logger,
 
@@ -116,14 +113,6 @@ public record Config(
             Boolean usePaperMessageSender,
             Boolean useBukkitPreLoginListener
     ) implements EnableSetting {
-    }
-
-    @With
-    @Builder(toBuilder = true)
-    @Jacksonized
-    public record Editor(String host,
-                         Boolean https,
-                         Integer port) {
     }
 
     @With

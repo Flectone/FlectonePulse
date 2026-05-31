@@ -460,6 +460,10 @@ flectonepulse:
   aliases:
   - "flectonepulse"
   - "fp"
+  editor:
+    host: ""
+    https: false
+    port: 25566
   destination:
     type: "CHAT"
   cooldown:

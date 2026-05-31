@@ -41,10 +41,6 @@ module:
   always_send_silent_packet: false
   use_paper_message_sender: false
   use_bukkit_pre_login_listener: false
-editor:
-  host: ""
-  https: false
-  port: 25566
 logger:
   console: "Console"
   prefix: "\e[38;2;77;166;255m(FlectonePulse) \e[0m"

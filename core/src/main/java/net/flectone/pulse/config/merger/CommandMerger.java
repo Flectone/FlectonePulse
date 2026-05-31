@@ -113,7 +113,10 @@ public interface CommandMerger {
 
     Command.Emit mergeEmit(@MappingTarget Command.Emit.EmitBuilder target, Command.Emit source);
 
+    @Mapping(target = "editor", expression = "java(mergeFlectonepulseEditor(target.build().editor().toBuilder(), source.editor()))")
     Command.Flectonepulse mergeFlectonepulse(@MappingTarget Command.Flectonepulse.FlectonepulseBuilder target, Command.Flectonepulse source);
+
+    Command.Flectonepulse.Editor mergeFlectonepulseEditor(@MappingTarget Command.Flectonepulse.Editor.EditorBuilder target, Command.Flectonepulse.Editor source);
 
     Command.Geolocate mergeGeolocate(@MappingTarget Command.Geolocate.GeolocateBuilder target, Command.Geolocate source);
 
