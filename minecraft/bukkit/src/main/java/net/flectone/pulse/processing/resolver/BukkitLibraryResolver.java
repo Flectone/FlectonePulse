@@ -48,11 +48,11 @@ public class BukkitLibraryResolver extends LibraryResolver {
         ));
 
         getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
-                .groupId("com{}github{}retrooper")
+                .groupId("net{}flectone")
                 .artifactId(artifactId)
-                .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
-                .repository(BuildConfig.CODEMC_REPOSITORY)
-                .fallbackRepository("https://repo.codemc.io/repository/maven-snapshots/")
+                .version("2.12.2-07135e3")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
                         .relocatedPattern(BuildConfig.RELOCATED_PATTERN)
