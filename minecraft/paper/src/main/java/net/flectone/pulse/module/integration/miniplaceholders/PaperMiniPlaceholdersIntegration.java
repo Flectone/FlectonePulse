@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseListener {
 
     private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -172,6 +171,8 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             String content = matcher.group(1);
+
+            MiniMessage miniMessage = MiniMessage.miniMessage();
 
             Component parsedMessage = sender == null || receiver == null
                     ? miniMessage.deserialize(content, resolvers)

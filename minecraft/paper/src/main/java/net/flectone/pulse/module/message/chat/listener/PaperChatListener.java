@@ -17,7 +17,6 @@ public class PaperChatListener implements Listener {
     private final FPlayerService fPlayerService;
     private final ChatModule chatModule;
     private final ModuleController moduleController;
-    private final PlainTextComponentSerializer plainSerializer = PlainTextComponentSerializer.plainText();
 
     public PaperChatListener(FPlayerService fPlayerService,
                              ModuleController moduleController,
@@ -35,7 +34,7 @@ public class PaperChatListener implements Listener {
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
 
-        String format = plainSerializer.serialize(event.message());
+        String format = PlainTextComponentSerializer.plainText().serialize(event.message());
 
         Runnable cancelRunnable = () -> {
             event.setCancelled(true);

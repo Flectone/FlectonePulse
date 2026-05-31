@@ -32,7 +32,6 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
 
     private static final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
 
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     @Getter private final FLogger fLogger;
@@ -77,6 +76,8 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             String content = matcher.group(1);
+
+            MiniMessage miniMessage = MiniMessage.miniMessage();
 
             Component parsedMessage = sender == null || receiver == null
                     ? miniMessage.deserialize(content, resolvers)
