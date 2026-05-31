@@ -124,7 +124,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
             CommandNode<CommandSourceStack> root = dispatcher.getRoot();
 
-            for (String command : injector.getInstance(FileFacade.class).config().command().disabledFabric()) {
+            for (String command : injector.getInstance(FileFacade.class).config().internal().vanillaCommandsToRemove()) {
                 root.getChildren().removeIf(node -> node.getName().equals(command));
             }
         });

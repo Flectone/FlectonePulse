@@ -138,7 +138,7 @@ public class MinecraftBasePacketListener implements PacketListener {
                 // because there is a configuration stage and there are no problems
                 event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)
                 // and not Bukkit AsyncPlayerPreLoginEvent
-                && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().module().useBukkitPreLoginListener());
+                && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().internal().useBukkitPreLoginListener());
 
         if (!usePacketPreLoginListener) return;
 

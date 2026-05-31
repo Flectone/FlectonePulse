@@ -44,7 +44,7 @@ public class MinecraftPacketSender {
      */
     public void send(Object channel, PacketWrapper<?> packetWrapper, boolean silent) {
         ProtocolManager protocolManager = packetProvider.getApi().getProtocolManager();
-        if (silent || fileFacade.config().module().alwaysSendSilentPacket()) {
+        if (silent || fileFacade.config().internal().alwaysSendSilentPacket()) {
             protocolManager.sendPacketSilently(channel, packetWrapper);
         } else {
             protocolManager.sendPacket(channel, packetWrapper);
@@ -105,7 +105,7 @@ public class MinecraftPacketSender {
         packetProvider.getApi().getProtocolManager()
                 .getUsers()
                 .forEach(user -> {
-                    if (fileFacade.config().module().alwaysSendSilentPacket()) {
+                    if (fileFacade.config().internal().alwaysSendSilentPacket()) {
                         user.sendPacketSilently(packetWrapper);
                     } else {
                         user.sendPacket(packetWrapper);

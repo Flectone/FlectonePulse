@@ -892,6 +892,27 @@ public class FileMigrator {
                     ));
         }
 
+        Config.DeprecatedModule deprecatedModule = files.config().module();
+        if (deprecatedModule != null) {
+            files = files.withConfig(files.config()
+                    .withInternal(files.config().internal()
+                            .withEnable(deprecatedModule.enable())
+                            .withUsePaperMessageSender(deprecatedModule.usePaperMessageSender())
+                            .withUseBukkitPreLoginListener(true)
+                    )
+            );
+        }
+
+        Config.DeprecatedCommand deprecatedCommand = files.config().command();
+        if (deprecatedCommand != null) {
+            files = files.withConfig(files.config()
+                    .withInternal(files.config().internal()
+                            .withUnregisterCommandOnReload(deprecatedCommand.unregisterOnReload())
+                            .withVanillaCommandsToRemove(deprecatedCommand.disabledFabric())
+                    )
+            );
+        }
+
         boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
         if (isNotHytale) {
             List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();

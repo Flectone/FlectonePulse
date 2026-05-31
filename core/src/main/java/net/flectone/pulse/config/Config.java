@@ -37,11 +37,14 @@ public record Config(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy")
         Proxy proxy,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/command")
-        Command command,
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/internal")
+        Internal internal,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
-        Module module,
+        @Deprecated(forRemoval = true)
+        DeprecatedCommand command,
+
+        @Deprecated(forRemoval = true)
+        DeprecatedModule module,
 
         @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger")
         Logger logger,
@@ -79,35 +82,56 @@ public record Config(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Proxy(Set<String> clusters,
-                        Boolean bungeecord,
-                        Boolean velocity,
-                        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy#redis")
-                        Redis redis) {
+    public record Internal(
+            Boolean enable,
+            Boolean alwaysSendSilentPacket,
+            Boolean usePaperMessageSender,
+            Boolean useBukkitPreLoginListener,
+            Boolean unregisterCommandOnReload,
+            Set<String> vanillaCommandsToRemove
+    ) implements EnableSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Proxy(
+            Set<String> clusters,
+            Boolean bungeecord,
+            Boolean velocity,
+            Redis redis
+    ) {
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Redis(Boolean enable,
-                            String host,
-                            Integer port,
-                            Boolean ssl,
-                            String user,
-                            String password) implements EnableSetting {
+        public record Redis(
+                Boolean enable,
+                String host,
+                Integer port,
+                Boolean ssl,
+                String user,
+                String password
+        ) implements EnableSetting {
         }
+
     }
 
+    @Deprecated(forRemoval = true)
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Command(Boolean unregisterOnReload,
-                          Set<String> disabledFabric) {
+    public record DeprecatedCommand(
+            Boolean unregisterOnReload,
+            Set<String> disabledFabric
+    ) {
     }
 
+    @Deprecated(forRemoval = true)
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Module(
+    public record DeprecatedModule(
             Boolean enable,
             Boolean alwaysSendSilentPacket,
             Boolean usePaperMessageSender,
@@ -118,12 +142,14 @@ public record Config(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Logger(String console,
-                         String prefix,
-                         List<String> description,
-                         String warn,
-                         String info,
-                         List<String> filter) {
+    public record Logger(
+            String console,
+            String prefix,
+            List<String> description,
+            String warn,
+            String info,
+            List<String> filter
+    ) {
     }
 
     @With

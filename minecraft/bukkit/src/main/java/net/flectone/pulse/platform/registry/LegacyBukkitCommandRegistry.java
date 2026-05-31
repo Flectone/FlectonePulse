@@ -71,7 +71,7 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
                 .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
 
         boolean needUnregister = plugin.getServer().getPluginCommand(commandName) != null
-                || fileFacade.config().command().unregisterOnReload() && isCloudCommand;
+                || fileFacade.config().internal().unregisterCommandOnReload() && isCloudCommand;
 
         if (needUnregister) {
             unregisterCommand(commandName);
@@ -98,7 +98,7 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
 
     @Override
     public void onDisable() {
-        if (!fileFacade.config().command().unregisterOnReload()) return;
+        if (!fileFacade.config().internal().unregisterCommandOnReload()) return;
 
         if (reflectionResolver.isPaper()) {
             unregisterCommands();

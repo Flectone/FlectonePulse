@@ -25,22 +25,22 @@ proxy:
     ssl: false
     user: ""
     password: ""
-command:
-  unregister_on_reload: false
-  disabled_fabric:
-  - "msg"
-  - "banlist"
-  - "kick"
-  - "w"
-  - "tell"
-  - "me"
-  - "pardon"
-  - "ban"
-module:
+internal:
   enable: true
   always_send_silent_packet: false
   use_paper_message_sender: false
-  use_bukkit_pre_login_listener: false
+  use_bukkit_pre_login_listener: true
+  unregister_command_on_reload: false
+  vanilla_commands_to_remove:
+    - "msg"
+    - "banlist"
+    - "kick"
+    - "w"
+    - "tell"
+    - "me"
+    - "pardon"
+    - "ban"
+    - "whitelist"
 logger:
   console: "Console"
   prefix: "\e[38;2;77;166;255m(FlectonePulse) \e[0m"

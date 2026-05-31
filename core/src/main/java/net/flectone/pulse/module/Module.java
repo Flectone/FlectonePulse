@@ -34,8 +34,8 @@ public class Module implements ModuleSimple {
     }
 
     @Override
-    public Config.Module config() {
-        return fileFacade.config().module();
+    public Config.Internal config() {
+        return fileFacade.config().internal();
     }
 
     @Override

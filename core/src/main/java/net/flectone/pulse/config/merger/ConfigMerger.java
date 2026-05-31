@@ -21,8 +21,7 @@ public interface ConfigMerger {
     @Mapping(target = "language", expression = "java(mergeLanguage(target.build().language().toBuilder(), source.language()))")
     @Mapping(target = "database", expression = "java(mergeDatabase(target.build().database().toBuilder(), source.database()))")
     @Mapping(target = "proxy", expression = "java(mergeProxy(target.build().proxy().toBuilder(), source.proxy()))")
-    @Mapping(target = "command", expression = "java(mergeCommand(target.build().command().toBuilder(), source.command()))")
-    @Mapping(target = "module", expression = "java(mergeModule(target.build().module().toBuilder(), source.module()))")
+    @Mapping(target = "internal", expression = "java(mergeInternal(target.build().internal().toBuilder(), source.internal()))")
     @Mapping(target = "logger", expression = "java(mergeLogger(target.build().logger().toBuilder(), source.logger()))")
     @Mapping(target = "cache", expression = "java(mergeCache(target.build().cache().toBuilder(), source.cache()))")
     @Mapping(target = "metrics", expression = "java(mergeMetrics(target.build().metrics().toBuilder(), source.metrics()))")
@@ -37,9 +36,7 @@ public interface ConfigMerger {
 
     Config.Proxy.Redis mergeProxyRedis(@MappingTarget Config.Proxy.Redis.RedisBuilder target, Config.Proxy.Redis source);
 
-    Config.Command mergeCommand(@MappingTarget Config.Command.CommandBuilder target, Config.Command source);
-
-    Config.Module mergeModule(@MappingTarget Config.Module.ModuleBuilder target, Config.Module source);
+    Config.Internal mergeInternal(@MappingTarget Config.Internal.InternalBuilder target, Config.Internal source);
 
     Config.Logger mergeLogger(@MappingTarget Config.Logger.LoggerBuilder target, Config.Logger source);
 

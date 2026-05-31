@@ -51,7 +51,7 @@ public class ModuleCommandController {
     // all prompt methods for solving the problems of a non-existent argument
     // when changing the plugin language at runtime
     public void clearPrompts(ModuleCommand<?> abstractModuleCommand) {
-        if (fileFacade.config().command().unregisterOnReload()) {
+        if (fileFacade.config().internal().unregisterCommandOnReload()) {
             commandPromptsMap.remove(abstractModuleCommand.getClass());
         }
     }
