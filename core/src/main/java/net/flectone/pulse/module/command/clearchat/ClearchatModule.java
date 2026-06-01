@@ -12,10 +12,12 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -39,6 +41,7 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final RangeFilter rangeFilter;
 
     @Override
     public void onEnable() {
@@ -71,8 +74,14 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
 
         if (optionalPlayer.isPresent() && permissionChecker.check(fPlayer, permission().other())) {
             String player = optionalPlayer.get();
-            if (player.equals("all")) {
-                fPlayerService.findOnlineFPlayers().forEach(this::clearChat);
+
+            Range range = player.equalsIgnoreCase("all")
+                    ? Range.get(Range.Type.PROXY)
+                    : Range.fromString(player).orElse(null);
+            if (range != null) {
+                fPlayerService.findOnlineFPlayers().stream()
+                        .filter(rangeFilter.createFilter(fPlayer, range))
+                        .forEach(this::clearChat);
                 return;
             }
 
