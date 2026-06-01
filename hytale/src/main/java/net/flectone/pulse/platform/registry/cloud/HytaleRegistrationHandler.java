@@ -5,12 +5,10 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.incendo.cloud.Command;
-import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.internal.CommandRegistrationHandler;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class HytaleRegistrationHandler implements CommandRegistrationHandler<FPlayer> {
@@ -40,10 +38,12 @@ public class HytaleRegistrationHandler implements CommandRegistrationHandler<FPl
 
             this.manager = manager;
 
-            CommandComponent<FPlayer> component = command.rootComponent();
-            Collection<String> aliases = component.alternativeAliases();
+            String commandName = command.rootComponent().name();
+            addAliases(command.rootComponent().alternativeAliases().stream()
+                    .filter(string -> !string.equalsIgnoreCase(commandName))
+                    .toArray(String[]::new)
+            );
 
-            addAliases(aliases.toArray(new String[0]));
             setAllowsExtraArguments(true);
         }
 
