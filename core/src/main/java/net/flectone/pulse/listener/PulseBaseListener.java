@@ -50,9 +50,8 @@ public class PulseBaseListener implements PulseListener {
 
         FPlayer finalFPlayer = fPlayer;
         taskScheduler.runAsync(() -> {
-            if (anotherIp) {
-                fPlayerService.saveFPlayerData(finalFPlayer);
-            }
+            // always save player after join event so that player ip is real
+            fPlayerService.saveFPlayerData(finalFPlayer);
 
             if (anotherServer) {
                 fPlayerService.saveOrUpdateSetting(finalFPlayer, SettingText.SERVER);
