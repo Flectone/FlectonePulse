@@ -133,14 +133,12 @@ public class MinecraftBasePacketListener implements PacketListener {
     }
 
     private void handleLoginSuccess(PacketSendEvent event) {
-        boolean usePacketPreLoginListener =
-                // only for 1.20.2 and newer versions
-                // because there is a configuration stage and there are no problems
-                event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)
-                // and not Bukkit AsyncPlayerPreLoginEvent
-                && !(platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().internal().useBukkitPreLoginListener());
+        // only for 1.20.2 and newer versions
+        // because there is a configuration stage and there are no problems
+        if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS || !packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
 
-        if (!usePacketPreLoginListener) return;
+        // and not Bukkit AsyncPlayerPreLoginEvent
+        if (platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().internal().useBukkitPreLoginListener()) return;
 
         WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
         UserProfile userProfile = wrapper.getUserProfile();
