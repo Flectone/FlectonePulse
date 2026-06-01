@@ -74,11 +74,14 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
         Destination destination = parseDestination(typeWithMessage);
         String message = parseMessage(destination, typeWithMessage);
 
-        if (targetName.equalsIgnoreCase("all")) {
+        try {
+            Range range = targetName.equalsIgnoreCase("all")
+                    ? Range.get(Range.Type.PROXY)
+                    : Range.fromJson(targetName);
             messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
                     .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                    .range(Range.get(Range.Type.PROXY))
+                    .range(range)
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
@@ -92,8 +95,9 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                     .integration()
                     .build()
             );
-
             return;
+        } catch (IllegalArgumentException _) {
+            // just ignore incorrect range
         }
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
