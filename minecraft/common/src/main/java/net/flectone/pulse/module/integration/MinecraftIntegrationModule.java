@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -52,7 +53,9 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
             builder.add(MinecraftSkinsRestorerModule.class);
         }
 
-        if (platformServerAdapter.hasProject("MiniMOTD")) {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
+                ? platformServerAdapter.hasProject("minimotd-fabric")
+                : platformServerAdapter.hasProject("MiniMOTD")) {
             builder.add(MinecraftMiniMOTDModule.class);
         }
 
@@ -72,7 +75,9 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
             builder.add(MinecraftFloodgateModule.class);
         }
 
-        if (platformServerAdapter.hasProject("Geyser-Spigot") || platformServerAdapter.hasProject("geyser-fabric")) {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
+                ? platformServerAdapter.hasProject("geyser-fabric")
+                : platformServerAdapter.hasProject("Geyser-Spigot")) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
                 builder.add(MinecraftGeyserModule.class);
             } else {
