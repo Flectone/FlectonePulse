@@ -463,6 +463,7 @@ command:
     connection_attempt: "<color:#ff7171>☰ Player <display_name>, who is not on the whitelist, attempted to connect"
     reasons:
       default: "You have been added to the server whitelist"
+      removed: "You have been removed from the server whitelist"
     global:
       header: "<fcolor:2>▋ Whitelisted players: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Remove from whitelist <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
