@@ -556,7 +556,8 @@ public record Command(
     @Jacksonized
     public record Maintenance(
             Boolean enable,
-            Boolean turnedOn,
+            Boolean filterByServer,
+            Range range,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,

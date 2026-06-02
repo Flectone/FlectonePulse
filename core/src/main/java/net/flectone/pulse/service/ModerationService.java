@@ -60,6 +60,11 @@ public class ModerationService {
     }
 
     @Nullable
+    public Moderation maintenance(FPlayer fPlayer, long time, String reason, int moderator) {
+        return add(fPlayer, time, reason, moderator, Moderation.Type.MAINTENANCE);
+    }
+
+    @Nullable
     public Moderation warn(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WARN);
     }
@@ -74,14 +79,16 @@ public class ModerationService {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WHITELIST);
     }
 
+    public boolean hasValid(FPlayer fTarget, Moderation.Type type) {
+        return !getValid(fTarget, type, 1, 0).isEmpty();
+    }
+
     public boolean hasValid(FPlayer fTarget, Moderation.Type type, int id) {
-        String server = getServer(type);
+        return id == -1 ? hasValid(fTarget, type) : getValid(type, id).isPresent();
+    }
 
-        if (id == -1) {
-            return !getValid(fTarget, type, 1, 0).isEmpty();
-        }
-
-        return getValid(server, id).isPresent();
+    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
+        return getValid(fPlayer, type, 1, 0);
     }
 
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, int limit, int offset) {
@@ -92,8 +99,8 @@ public class ModerationService {
         return moderationRepository.getValid(type, getServer(type), limit, offset);
     }
 
-    public Optional<Moderation> getValid(@Nullable String server, int id) {
-        return moderationRepository.getValid(server, id);
+    public Optional<Moderation> getValid(Moderation.Type type, int id) {
+        return moderationRepository.getValid(getServer(type), id);
     }
 
     public List<String> getValidNames(Moderation.Type type) {
@@ -189,6 +196,7 @@ public class ModerationService {
         return moderationRepository.save(fTarget, System.currentTimeMillis(), -1, reason, fModerator.id(), switch (type) {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
+            case MAINTENANCE -> Moderation.Type.UNMAINTENANCE;
             case WARN -> Moderation.Type.UNWARN;
             case WHITELIST -> Moderation.Type.UNWHITELIST;
             default -> throw new IllegalArgumentException("Unknown un-moderation type: " + type);
@@ -219,6 +227,7 @@ public class ModerationService {
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
                 || type == Moderation.Type.WHITELIST && fileFacade.command().whitelist().filterByServer()
+                || type == Moderation.Type.MAINTENANCE && fileFacade.command().maintenance().filterByServer()
                 ? fileFacade.config().server()
                 : null;
     }

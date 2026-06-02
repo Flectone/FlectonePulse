@@ -18,6 +18,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Destination;
@@ -38,6 +39,8 @@ import net.flectone.pulse.module.command.do_.DoModule;
 import net.flectone.pulse.module.command.emit.EmitModule;
 import net.flectone.pulse.module.command.helper.HelperModule;
 import net.flectone.pulse.module.command.kick.KickModule;
+import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
+import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.module.command.me.MeModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.poll.PollModule;
@@ -187,6 +190,7 @@ public class ProxyMessageHandler {
             case COMMAND_EMIT -> handleEmitCommand(input, fEntity, metadataUUID);
             case COMMAND_HELPER -> handleHelperCommand(input, fEntity, metadataUUID);
             case COMMAND_MUTE -> handleMuteCommand(input, fEntity, metadataUUID);
+            case COMMAND_MAINTENANCE -> handleMaintenanceCommand(input, fEntity, metadataUUID);
             case COMMAND_NICKNAME -> handleNicknameCommand(fEntity);
             case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
             case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity, metadataUUID);
@@ -222,6 +226,12 @@ public class ProxyMessageHandler {
             case SYSTEM_MUTE -> {
                 if (!injector.getInstance(MuteModule.class).config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MUTE);
+                }
+                yield true;
+            }
+            case SYSTEM_MAINTENANCE -> {
+                if (!injector.getInstance(MaintenanceModule.class).config().filterByServer()) {
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.MAINTENANCE);
                 }
                 yield true;
             }
@@ -540,6 +550,51 @@ public class ProxyMessageHandler {
         );
 
         module.sendForTarget(fModerator, (FPlayer) fEntity, mute);
+    }
+
+    private void handleMaintenanceCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        MaintenanceModule module = injector.getInstance(MaintenanceModule.class);
+        if (module.config().filterByServer()) return;
+
+        Moderation maintenance = gson.fromJson(input.readUTF(), Moderation.class);
+
+        FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
+        if (moduleController.isDisabledFor(module, fModerator)) return;
+
+        boolean turned = input.readBoolean();
+
+        ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
+
+        messageDispatcher.dispatch(module, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
+                .base(EventMetadata.<Localization.Command.Maintenance>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format((fReceiver, localization) ->
+                                moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, maintenance)
+                        )
+                        .destination(module.config().destination())
+                        .sound(module.soundOrThrow())
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeAsJson(maintenance);
+                            dataOutputStream.writeBoolean(turned);
+                        })
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(module.name().name() + "_" + String.valueOf(turned).toUpperCase()))
+                                .build()
+                        )
+                        .tagResolvers(fResolver -> new TagResolver[]{
+                                messagePipeline.targetTag("moderator", fResolver, fModerator)
+                        })
+                        .build()
+                )
+                .moderation(maintenance)
+                .turned(turned)
+                .build()
+        );
+
+        if (turned) {
+            module.kickOnlinePlayers(fModerator, maintenance);
+        }
     }
 
     private void handleNicknameCommand(FEntity fEntity) {

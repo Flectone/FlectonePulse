@@ -499,11 +499,14 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Maintenance(
+                String alreadyTrue,
+                String alreadyFalse,
                 String serverDescription,
                 String serverVersion,
-                String kick,
+                ReasonMap reasons,
                 String formatTrue,
-                String formatFalse
+                String formatFalse,
+                String person
         ) implements LocalizationSetting {
         }
 

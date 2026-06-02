@@ -58,11 +58,13 @@ public record Moderation(
 
     public enum Type {
         MUTE,
+        MAINTENANCE,
         BAN,
         WARN,
         WHITELIST,
         KICK,
         UNMUTE,
+        UNMAINTENANCE,
         UNBAN,
         UNWARN,
         UNWHITELIST

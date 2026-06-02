@@ -126,6 +126,7 @@ public class ModerationMessageFormatter {
             case UNWARN -> localization.command().unwarn().reasons();
             case KICK -> localization.command().kick().reasons();
             case WHITELIST, UNWHITELIST -> localization.command().whitelist().reasons();
+            case MAINTENANCE, UNMAINTENANCE -> localization.command().maintenance().reasons();
         };
 
         String reason = constantReasons.getConstant(moderation.reason());

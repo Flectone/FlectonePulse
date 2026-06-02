@@ -241,11 +241,15 @@ command:
     sender: "<fcolor:2>✉ Mail #<id> for <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>"
   maintenance:
-    server_description: "<color:#ff7171>The server is under maintenance"
+    already_true: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Server maintenance is already enabled"
+    already_false: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Server maintenance is already disabled"
+    server_description: "<color:#ff7171>Server maintenance is currently underway"
     server_version: "Maintenance"
-    kick: "<color:#ff7171>★ The server is under maintenance"
-    format_true: "<fcolor:1>★ You have <fcolor:2>enabled <fcolor:1>maintenance on the server"
-    format_false: "<fcolor:1>★ You have <fcolor:2>disabled <fcolor:1>maintenance on the server"
+    reasons:
+      default: "Server maintenance is in progress"
+    format_true: "<fcolor:1>★ <fcolor:2>Enabled <fcolor:1>server maintenance <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
+    format_false: "<fcolor:1>★ <fcolor:2>Disabled <fcolor:1>server maintenance <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
+    person: "<color:#ff7171>★ <reason>, <time_left> remaining"
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:

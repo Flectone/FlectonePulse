@@ -537,7 +537,8 @@ mail:
     enable: false
 maintenance:
   enable: true
-  turned_on: false
+  filter_by_server: true
+  range: "SERVER"
   aliases:
   - "maintenance"
   destination:

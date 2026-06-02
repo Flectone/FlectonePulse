@@ -4,17 +4,21 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.PulseMaintenanceListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
@@ -22,26 +26,38 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.type.tuple.Pair;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceModule implements ModuleCommand<Localization.Command.Maintenance> {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
-    private final Path iconPath;
+    private final @Named("imagePath") Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
@@ -50,38 +66,13 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final IconConvertor iconUtil;
-    private final FLogger fLogger;
+    private final CommandParserProvider commandParserProvider;
+    private final TaskScheduler taskScheduler;
+    private final ModerationService moderationService;
+    private final ProxySender proxySender;
+    private final ModerationMessageFormatter moderationMessageFormatter;
 
     protected String icon;
-
-    @Inject
-    public MaintenanceModule(FileFacade fileFacade,
-                             PermissionChecker permissionChecker,
-                             ListenerRegistry listenerRegistry,
-                             @Named("imagePath") Path iconPath,
-                             PlatformServerAdapter platformServerAdapter,
-                             PlatformPlayerAdapter platformPlayerAdapter,
-                             FPlayerService fPlayerService,
-                             MessagePipeline messagePipeline,
-                             MessageDispatcher messageDispatcher,
-                             ModuleController moduleController,
-                             ModuleCommandController commandModuleController,
-                             IconConvertor iconUtil,
-                             FLogger fLogger) {
-        this.fileFacade = fileFacade;
-        this.permissionChecker = permissionChecker;
-        this.listenerRegistry = listenerRegistry;
-        this.iconPath = iconPath;
-        this.platformServerAdapter = platformServerAdapter;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.fPlayerService = fPlayerService;
-        this.messagePipeline = messagePipeline;
-        this.messageDispatcher = messageDispatcher;
-        this.moduleController = moduleController;
-        this.commandModuleController = commandModuleController;
-        this.iconUtil = iconUtil;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onEnable() {
@@ -95,12 +86,19 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
         icon = iconUtil.convert(file);
 
-        if (config().turnedOn()) {
-            kickOnlinePlayers(FPlayer.UNKNOWN);
+        List<Moderation> moderations = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
+        if (!moderations.isEmpty()) {
+            Moderation maintenance = moderations.getFirst();
+            kickOnlinePlayers(fPlayerService.getFPlayer(maintenance.moderator()), maintenance);
         }
 
+        String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
+        String promptReason = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::reason);
+        String promptTime = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::time);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
+                .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
     }
 
@@ -118,39 +116,48 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        boolean turned = !config().turnedOn();
+        String promptType = commandModuleController.getPrompt(this, 0);
+        Optional<String> optionalType = commandContext.optional(promptType);
 
-        fileFacade.updateFilePack(filePack -> filePack.withCommand(
-                filePack.command().withMaintenance(
-                        filePack.command().maintenance().withTurnedOn(turned)
-                )
-        ));
+        // get current state
+        boolean isAlreadyTurned = isTurnedOn();
 
-        try {
-            fileFacade.saveFiles();
-        } catch (Exception e) {
-            fLogger.warning(e);
+        // command can be used without arguments
+        boolean turned = optionalType
+                .map(string -> !string.equalsIgnoreCase("end"))
+                .orElseGet(() -> !isAlreadyTurned);
+
+        if (turned && isAlreadyTurned || !turned && !isAlreadyTurned) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Maintenance>builder()
+                    .sender(fPlayer)
+                    .format(localization -> turned ? localization.alreadyTrue() : localization.alreadyFalse())
+                    .build()
+            );
+
             return;
         }
 
-        messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
-                .base(EventMetadata.<Localization.Command.Maintenance>builder()
-                        .sender(fPlayer)
-                        .format(maintenance -> turned ? maintenance.formatTrue() : maintenance.formatFalse())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
-                                .build()
-                        )
-                        .build()
-                )
-                .turned(turned)
-                .build()
-        );
+        String promptReason = commandModuleController.getPrompt(this, 1);
+        String promptTime = commandModuleController.getPrompt(this, 2);
+        Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
+        Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
 
-        if (turned) {
-            kickOnlinePlayers(fPlayer);
+        long time = timeReasonPair.first() == -1 ? -1 : timeReasonPair.first();
+        String reason = timeReasonPair.second();
+
+        Moderation maintenance = turn(fPlayer, reason, time, turned);
+
+        if (maintenance != null && time != -1) {
+            taskScheduler.runAsyncLater(() -> {
+                List<Moderation> moderations = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
+                if (moderations.isEmpty()) return;
+
+                Moderation currentMaintenance = moderations.getFirst();
+                if (!currentMaintenance.equals(maintenance)) return;
+
+                turn(fPlayerService.getConsole(), null, time, !turned);
+
+            }, (time / TimeFormatter.MULTIPLIER) - 10L); // we need to check this before it is invalid in database
         }
     }
 
@@ -176,19 +183,94 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
     public boolean isAllowed(FPlayer fPlayer) {
         if (!moduleController.isEnable(this)) return true;
-        if (!config().turnedOn()) return true;
+        if (!isTurnedOn()) return true;
 
         return permissionChecker.check(fPlayer, permission().join());
     }
 
-    public void kickOnlinePlayers(FPlayer fSender) {
+    public boolean isTurnedOn() {
+        return moduleController.isEnable(this) && moderationService.hasValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
+    }
+
+    public void kickOnlinePlayers(@NonNull FPlayer fSender, @NonNull Moderation maintenance) {
         fPlayerService.getOnlineFPlayers()
                 .stream()
                 .filter(filter -> !permissionChecker.check(filter, permission().join()))
                 .forEach(fReceiver -> {
-                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, localization(fReceiver).kick());
+                    Localization.Command.Maintenance localization = localization(fReceiver);
+                    String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
+
+                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, formatPlayer)
+                            .addTagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender));
+
                     platformPlayerAdapter.kick(fReceiver, messagePipeline.build(messageContext));
                 });
+    }
+
+    @Nullable
+    public Moderation turn(FPlayer fPlayer, @Nullable String reason, long time, boolean turned) {
+        FPlayer fTarget = fPlayerService.getConsole();
+
+        Moderation maintenance;
+        if (turned) {
+            long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
+
+            // save maintenance for server target (console)
+            maintenance = moderationService.maintenance(fTarget, databaseTime, reason, fPlayer.id());
+        } else {
+            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, -1, reason);
+        }
+
+        // skip error
+        if (maintenance == null) return null;
+
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE);
+        }
+
+        EventMetadata.Builder<Localization.Command.Maintenance> baseMetadataBuilder = EventMetadata.<Localization.Command.Maintenance>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, maintenance)
+                )
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeAsJson(maintenance);
+                    dataOutputStream.writeBoolean(turned);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
+                        .build()
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
+        }
+
+        messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
+                .base(baseMetadataBuilder.build())
+                .moderation(maintenance)
+                .turned(turned)
+                .build()
+        );
+
+        if (turned) {
+            kickOnlinePlayers(fPlayer, maintenance);
+        }
+
+        return maintenance;
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (_, _) -> List.of(
+                Suggestion.suggestion("start"),
+                Suggestion.suggestion("end")
+        );
     }
 
 }

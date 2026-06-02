@@ -241,11 +241,15 @@ command:
     sender: "<fcolor:2>✉ Письмо #<id> для <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>"
   maintenance:
+    already_true: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервере уже включены технические работы"
+    already_false: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервере уже выключены технические работы"
     server_description: "<color:#ff7171>В настоящее время проводятся технические работы"
     server_version: "Технические работы"
-    kick: "<color:#ff7171>★ На сервере ведутся технические работы"
-    format_true: "<fcolor:1>★ Ты <fcolor:2>включил <fcolor:1>технические работы на сервере"
-    format_false: "<fcolor:1>★ Ты <fcolor:2>выключил <fcolor:1>технические работы на сервере"
+    reasons:
+      default: "На сервере ведутся технические работы"
+    format_true: "<fcolor:1>★ <fcolor:2>Включены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    format_false: "<fcolor:1>★ <fcolor:2>Выключены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    person: "<color:#ff7171>★ <reason>, осталось <time_left>"
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:
