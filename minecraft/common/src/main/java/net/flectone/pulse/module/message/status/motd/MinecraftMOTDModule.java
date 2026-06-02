@@ -99,8 +99,14 @@ public class MinecraftMOTDModule implements ModuleListLocalization<Localization.
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
+        // load custom player colors
         if (fPlayer.fColors().isEmpty()) {
             fPlayer = fPlayerService.loadColors(fPlayer);
+        }
+
+        // load settings (localization)
+        if (fPlayer.settingsText().isEmpty()) {
+            fPlayer = fPlayerService.loadSettings(fPlayer);
         }
 
         event.markForReEncode(true);

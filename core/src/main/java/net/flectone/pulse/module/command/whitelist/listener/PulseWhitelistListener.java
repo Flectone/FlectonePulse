@@ -55,6 +55,11 @@ public class PulseWhitelistListener implements PulseListener {
             fPlayer = fPlayerService.loadColors(fPlayer);
         }
 
+        // load settings (localization)
+        if (fPlayer.settingsText().isEmpty()) {
+            fPlayer = fPlayerService.loadSettings(fPlayer);
+        }
+
         // build message
         MessageContext messageContext = messagePipeline.createContext(fPlayer, whitelistModule.localization(fPlayer).person());
         Component reason = messagePipeline.build(messageContext);

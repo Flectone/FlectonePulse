@@ -59,6 +59,11 @@ public class PulseBanListener implements PulseListener {
             fPlayer = fPlayerService.loadColors(fPlayer);
         }
 
+        // load settings (localization)
+        if (fPlayer.settingsText().isEmpty()) {
+            fPlayer = fPlayerService.loadSettings(fPlayer);
+        }
+
         // replace string moderation placeholders
         Localization.Command.Ban localization = banModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
