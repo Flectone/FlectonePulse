@@ -164,9 +164,14 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             }
 
                             Localization.Message.Format.Names localization = localization(fReceiver);
-                            String displayName = fPlayer.isUnknown() || localization.display().isEmpty()
-                                    ? Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer))
-                                    : localization.display().get(displayNameIndex);
+                            String displayName;
+                            if (fPlayer.isUnknown() || localization.display().isEmpty()) {
+                                displayName = Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer));
+                            } else if (fPlayer.isConsole()) {
+                                displayName = Strings.CS.replace(localization.console(), "<name>", profileResolver.resolveName(fPlayer));
+                            } else {
+                                displayName = localization.display().get(displayNameIndex);
+                            }
 
                             MessageContext displayContext = messagePipeline.createContext(sender, fReceiver, displayName)
                                     .withFlags(messageContext.flags())

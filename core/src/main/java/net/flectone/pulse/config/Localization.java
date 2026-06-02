@@ -1228,6 +1228,7 @@ public record Localization(
                     List<String> display,
                     String entity,
                     String unknown,
+                    String console,
                     String invisible
             ) implements LocalizationSetting {
             }
