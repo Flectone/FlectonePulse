@@ -50,7 +50,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
         getPacketEventsArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}flectone")
                 .artifactId(artifactId)
-                .version("2.12.2-07135e3")
+                .version("2.12.2-release") // TODO always upload PacketEvents to net.flectone maven repository
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .fallbackRepository(BuildConfig.CODEMC_REPOSITORY)
                 .relocate(Relocation.builder()
