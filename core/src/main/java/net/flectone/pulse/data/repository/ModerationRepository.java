@@ -110,18 +110,6 @@ public class ModerationRepository {
     }
 
     /**
-     * Gets all moderation's for a player (including invalid ones).
-     *
-     * @param fPlayer the player
-     * @param type the moderation type
-     * @param server the server ID
-     * @return list of all moderation's
-     */
-    public List<Moderation> get(@NonNull FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
-        return moderationDAO.get(fPlayer, type, server);
-    }
-
-    /**
      * Saves a new moderation.
      *
      * @param fTarget the target player

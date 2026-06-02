@@ -20,17 +20,6 @@ import java.util.Optional;
 public interface ModerationSQL extends SQL {
 
     /**
-     * Finds moderation's for a player by type.
-     *
-     * @param playerId the player ID
-     * @param type the moderation type
-     * @param server the server ID
-     * @return list of moderation's
-     */
-    @SqlQuery("SELECT * FROM `fp_moderation` WHERE `player` = :player AND `type` = :type AND (:server IS NULL OR `server` = :server)")
-    List<Moderation> findByPlayerAndType(@Bind("player") int playerId, @Bind("type") String type, @Bind("server") String server);
-
-    /**
      * Finds valid (non-expired) moderations for a specific player and type with pagination support.
      * Results are ordered by ID in descending order.
      *

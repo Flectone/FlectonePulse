@@ -38,19 +38,6 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
     }
 
     /**
-     * Gets all moderation actions for a player.
-     *
-     * @param player the player
-     * @param type the moderation type
-     * @param server the server ID
-     * @return list of moderation actions, empty list if player is unknown
-     */
-    public List<Moderation> get(@NonNull FPlayer player, Moderation.Type type, @Nullable String server) {
-        if (player.isUnknown()) return Collections.emptyList();
-        return withHandle(sql -> sql.findByPlayerAndType(player.id(), type.name(), server));
-    }
-
-    /**
      * Retrieves valid (non-expired) moderation actions for a specific player and type with pagination.
      * Returns an empty list if the player is unknown.
      *
