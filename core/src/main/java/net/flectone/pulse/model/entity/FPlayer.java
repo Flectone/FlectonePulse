@@ -114,7 +114,7 @@ public interface FPlayer extends FEntity {
 
     @Override
     default boolean isUnknown() {
-        return id() == -1;
+        return id() == -1 && !isConsole();
     }
 
     @Builder(toBuilder = true)

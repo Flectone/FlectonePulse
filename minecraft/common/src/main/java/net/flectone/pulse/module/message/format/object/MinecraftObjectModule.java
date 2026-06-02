@@ -299,7 +299,7 @@ public class MinecraftObjectModule extends ObjectModule {
         FPlayer fReceiver = messageContext.receiver();
 
         // return default formatting
-        if (fReceiver.isUnknown()) {
+        if (fReceiver.isUnknown() || fReceiver.isConsole()) {
             return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 

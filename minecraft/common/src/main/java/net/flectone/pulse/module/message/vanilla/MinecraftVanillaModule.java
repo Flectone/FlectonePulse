@@ -240,7 +240,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                 }
 
                 // fix serialization issue [%s] for console and integration
-                if (fResolver.isUnknown() && component instanceof TranslatableComponent translatableComponent
+                if ((fResolver.isUnknown() || fResolver.isConsole()) && component instanceof TranslatableComponent translatableComponent
                         && translatableComponent.key().equals("chat.square_brackets")) {
                     yield Tag.selfClosingInserting(
                             Component.text("[").color(color)

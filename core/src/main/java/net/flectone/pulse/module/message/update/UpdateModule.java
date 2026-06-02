@@ -84,7 +84,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
                     .base(EventMetadata.<Localization.Message.Update>builder()
                             .sender(fPlayer)
                             .format((fResolver, s) -> StringUtils.replaceEach(
-                                    fResolver.isUnknown() ? s.formatConsole() : s.formatPlayer(),
+                                    fResolver.isUnknown() || fResolver.isConsole() ? s.formatConsole() : s.formatPlayer(),
                                     new String[]{"<current_version>", "<latest_version>"},
                                     new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
                             ))

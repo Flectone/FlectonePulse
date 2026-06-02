@@ -110,7 +110,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     }
 
     public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
-        // skip console
+        // skip unknown
         if (receiver.isUnknown()) return;
         // skip offline history
         if (!receiver.isOnline()) return;

@@ -190,7 +190,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     private FPlayer convertUnknownFPlayer(FPlayer fPlayer) {
-        return fPlayer.isUnknown() ? fPlayerServiceProvider.get().getRandomFPlayer() : fPlayer;
+        return fPlayer.isUnknown() || fPlayer.isConsole() ? fPlayerServiceProvider.get().getRandomFPlayer() : fPlayer;
     }
 
     private boolean isAsyncThread() {
