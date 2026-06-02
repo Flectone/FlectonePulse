@@ -118,6 +118,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                     .append(messagePipeline.build(MessageContext.builder()
                             .sender(fPlayer)
                             .message(line)
+                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
                             .build()
                     ))
                     .append(Component.newline());

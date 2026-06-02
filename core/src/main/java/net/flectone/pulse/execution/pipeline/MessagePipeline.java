@@ -70,7 +70,7 @@ public class MessagePipeline {
             MessageContext messageContext = MessageContext.builder()
                     .sender(fPlayer)
                     .message(Strings.CS.replace(message, "§", "&"))
-                    .flags(Map.of(MessageFlag.PLAYER_MESSAGE, true))
+                    .flag(MessageFlag.PLAYER_MESSAGE, true)
                     .build();
 
             Component component = build(messageContext)

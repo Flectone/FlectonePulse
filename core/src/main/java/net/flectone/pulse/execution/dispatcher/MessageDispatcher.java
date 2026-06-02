@@ -230,6 +230,7 @@ public class MessageDispatcher {
                 .sender(eventMetadata.sender())
                 .receiver(receiver)
                 .message(message)
+                .flags(eventMetadata.flags())
                 .flag(MessageFlag.PLAYER_MESSAGE, true)
                 .build()
         );
@@ -248,7 +249,8 @@ public class MessageDispatcher {
                 .receiver(receiver)
                 .message(formatContent)
                 .userMessage(eventMetadata.message())
-                .tagResolver(messagePipeline.messageTag(message));
+                .tagResolver(messagePipeline.messageTag(message))
+                .flags(eventMetadata.flags());
 
         TagResolver[] tagResolvers = eventMetadata.resolveTags(receiver);
         if (tagResolvers != null) {

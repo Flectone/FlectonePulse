@@ -215,8 +215,8 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
                     String json = messagePipeline.buildJson(MessageContext.builder()
                             .sender(fTarget.get())
-                            .receiver(fPlayer
-                            ).message("<display_name>")
+                            .receiver(fPlayer)
+                            .message("<display_name>")
                             .build()
                     );
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));

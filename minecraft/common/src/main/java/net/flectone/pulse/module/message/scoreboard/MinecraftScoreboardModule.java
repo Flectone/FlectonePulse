@@ -147,7 +147,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
             prefix = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
                     .message(localization().prefix())
-                    .flag(MessageFlag.ITEM_DETECTION, false)
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
                     .build()
             );
         }
