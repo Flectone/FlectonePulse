@@ -17,7 +17,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.Component;
 
-import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -34,11 +34,11 @@ public class PulseMaintenanceListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (maintenanceModule.isAllowed(fPlayer)) return event;
 
-        List<Moderation> moderations = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
-        if (moderations.isEmpty()) return event;
+        Optional<Moderation> currentModeration = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
+        if (currentModeration.isEmpty()) return event;
 
         // get moderator
-        Moderation maintenance = moderations.getFirst();
+        Moderation maintenance = currentModeration.get();
         FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
 
         // load custom player colors

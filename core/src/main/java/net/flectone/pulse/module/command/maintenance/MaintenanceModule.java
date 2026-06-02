@@ -86,10 +86,14 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
         icon = iconUtil.convert(file);
 
-        List<Moderation> moderations = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
-        if (!moderations.isEmpty()) {
-            Moderation maintenance = moderations.getFirst();
+        Optional<Moderation> optionalMaintenace = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
+        if (optionalMaintenace.isPresent()) {
+            Moderation maintenance = optionalMaintenace.get();
             kickOnlinePlayers(fPlayerService.getFPlayer(maintenance.moderator()), maintenance);
+
+            unturnLater(maintenance);
+        } else {
+            moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.UNMAINTENANCE).ifPresent(this::unturnLater);
         }
 
         String promptType = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::type);
@@ -145,20 +149,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         long time = timeReasonPair.first() == -1 ? -1 : timeReasonPair.first();
         String reason = timeReasonPair.second();
 
-        Moderation maintenance = turn(fPlayer, reason, time, turned);
-
-        if (maintenance != null && time != -1) {
-            taskScheduler.runAsyncLater(() -> {
-                List<Moderation> moderations = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
-                if (moderations.isEmpty()) return;
-
-                Moderation currentMaintenance = moderations.getFirst();
-                if (!currentMaintenance.equals(maintenance)) return;
-
-                turn(fPlayerService.getConsole(), null, time, !turned);
-
-            }, (time / TimeFormatter.MULTIPLIER) - 10L); // we need to check this before it is invalid in database
-        }
+        turn(fPlayer, reason, time, turned).ifPresent(this::unturnLater);
     }
 
     @Override
@@ -192,40 +183,24 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         return moduleController.isEnable(this) && moderationService.hasValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
     }
 
-    public void kickOnlinePlayers(@NonNull FPlayer fSender, @NonNull Moderation maintenance) {
-        fPlayerService.getOnlineFPlayers()
-                .stream()
-                .filter(filter -> !permissionChecker.check(filter, permission().join()))
-                .forEach(fReceiver -> {
-                    Localization.Command.Maintenance localization = localization(fReceiver);
-                    String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
-
-                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(MessageContext.builder()
-                            .sender(fSender)
-                            .receiver(fReceiver)
-                            .message(formatPlayer)
-                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender))
-                            .build()
-                    ));
-                });
-    }
-
-    @Nullable
-    public Moderation turn(FPlayer fPlayer, @Nullable String reason, long time, boolean turned) {
+    public Optional<Moderation> turn(FPlayer fPlayer, @Nullable String reason, long time, boolean turned) {
         FPlayer fTarget = fPlayerService.getConsole();
+
+        long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
         Moderation maintenance;
         if (turned) {
-            long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
+            // invalidate all unmaintenance
+            moderationService.invalidate(fTarget, Moderation.Type.UNMAINTENANCE, -1);
 
             // save maintenance for server target (console)
             maintenance = moderationService.maintenance(fTarget, databaseTime, reason, fPlayer.id());
         } else {
-            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, -1, reason);
+            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, databaseTime,-1, reason);
         }
 
         // skip error
-        if (maintenance == null) return null;
+        if (maintenance == null) return Optional.empty();
 
         if (!config().filterByServer()) {
             proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE);
@@ -266,7 +241,44 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             kickOnlinePlayers(fPlayer, maintenance);
         }
 
-        return maintenance;
+        return Optional.of(maintenance);
+    }
+
+    public void kickOnlinePlayers(@NonNull FPlayer fSender, @NonNull Moderation maintenance) {
+        fPlayerService.getOnlineFPlayers()
+                .stream()
+                .filter(filter -> !permissionChecker.check(filter, permission().join()))
+                .forEach(fReceiver -> {
+                    Localization.Command.Maintenance localization = localization(fReceiver);
+                    String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
+
+                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(MessageContext.builder()
+                            .sender(fSender)
+                            .receiver(fReceiver)
+                            .message(formatPlayer)
+                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender))
+                            .build()
+                    ));
+                });
+    }
+
+    private void unturnLater(Moderation maintenance) {
+        long time = maintenance.time();
+        if (time == -1) return;
+
+        // we need to check this before it is invalid in database
+        long delay = (time - System.currentTimeMillis()) / TimeFormatter.MULTIPLIER - 10L;
+        if (delay < 0) return;
+
+        taskScheduler.runAsyncLater(() -> {
+            Optional<Moderation> currentModeration = moderationService.getValid(fPlayerService.getConsole(), maintenance.type());
+            if (currentModeration.isEmpty()) return;
+
+            Moderation currentMaintenance = currentModeration.get();
+            if (!currentMaintenance.equals(maintenance)) return;
+
+            turn(fPlayerService.getConsole(), null, time,maintenance.type() != Moderation.Type.MAINTENANCE);
+        }, delay);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
