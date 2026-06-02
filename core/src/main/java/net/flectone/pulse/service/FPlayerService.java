@@ -68,8 +68,6 @@ public class FPlayerService {
     }
 
     public void initialize(boolean reload) {
-        addConsole();
-
         // more like a migration for older versions below 1.9.0,
         // because this information was not in the database before.
         // and also we cannot add information about all players,

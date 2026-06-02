@@ -114,11 +114,17 @@ public class FlectonePulseAPI {
         // initialize packetevents
         instance.initPacketAdapter();
 
+        // get fplayer service
+        FPlayerService fPlayerService = instance.get(FPlayerService.class);
+
+        // add console to database and cache
+        fPlayerService.addConsole();
+
         // init modules and their children
         instance.get(ModuleController.class).initialize();
 
         // reload fplayer service
-        instance.get(FPlayerService.class).initialize(false);
+        fPlayerService.initialize(false);
 
         // enable proxy registry
         instance.get(ProxyRegistry.class).onEnable();
@@ -321,6 +327,9 @@ public class FlectonePulseAPI {
 
         // init proxies
         proxyRegistry.onEnable();
+
+        // add console to database and cache
+        fPlayerService.addConsole();
 
         // init modules
         moduleController.initialize();
