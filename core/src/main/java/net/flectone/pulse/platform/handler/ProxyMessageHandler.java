@@ -594,7 +594,8 @@ public class ProxyMessageHandler {
         );
 
         if (turned) {
-            module.kickOnlinePlayers(fModerator, maintenance);
+            // give some time for players to reconnect
+            taskScheduler.runAsyncLater(() -> module.kickOnlinePlayers(fModerator, maintenance));
         }
     }
 
@@ -952,7 +953,8 @@ public class ProxyMessageHandler {
 
         ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
 
-        module.kick(fModerator, (FPlayer) fEntity, kick);
+        // give some time for players to reconnect
+        taskScheduler.runAsyncLater(() -> module.kick(fModerator, (FPlayer) fEntity, kick));
 
         messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()
