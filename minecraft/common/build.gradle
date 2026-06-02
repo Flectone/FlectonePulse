@@ -16,5 +16,5 @@ dependencies {
     compileOnly "org.mineskin:java-client-jsoup:$mineskin_api_version"
 
     // only for no compile errors
-    compileOnly "io.netty:netty-buffer:4.2.14.Final"
+    compileOnly "io.netty:netty-buffer:4.2.15.Final"
 }
