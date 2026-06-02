@@ -45,6 +45,20 @@ public class ModerationService {
                 .forEach(playerViolations::remove);
     }
 
+    public void invalidate(FPlayer fTarget, Moderation.Type type, int id) {
+        invalidate(fTarget, type, id, getServer(type));
+    }
+
+    public void invalidate(FPlayer fTarget, Moderation.Type type, int id, @Nullable String server) {
+        invalidate(fTarget.uuid(), type);
+
+        if (id == -1) {
+            moderationRepository.updateValid(fTarget.id(), type, server);
+        } else {
+            moderationRepository.updateValid(id, server);
+        }
+    }
+
     public void invalidate(UUID uuid, Moderation.Type type) {
         moderationRepository.invalidate(uuid, type, getServer(type));
     }
@@ -87,8 +101,8 @@ public class ModerationService {
         return id == -1 ? hasValid(fTarget, type) : getValid(type, id).isPresent();
     }
 
-    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
-        return getValid(fPlayer, type, 1, 0);
+    public Optional<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
+        return getValid(fPlayer, type, 1, 0).stream().findAny();
     }
 
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, int limit, int offset) {
@@ -184,16 +198,20 @@ public class ModerationService {
 
     @Nullable
     public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @Nullable String reason, @Nullable String server) {
-        invalidate(fTarget.uuid(), type);
+        return remove(fModerator, fTarget, type, -1, id, reason, server);
+    }
 
-        if (id == -1) {
-            moderationRepository.updateValid(fTarget.id(), type, server);
-        } else {
-            moderationRepository.updateValid(id, server);
-        }
+    @Nullable
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, long time, int id, @Nullable String reason) {
+        return remove(fModerator, fTarget, type, time, id, reason, getServer(type));
+    }
+
+    @Nullable
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, long time, int id, @Nullable String reason, @Nullable String server) {
+        invalidate(fTarget, type, id, server);
 
         // save to un-moderation database
-        return moderationRepository.save(fTarget, System.currentTimeMillis(), -1, reason, fModerator.id(), switch (type) {
+        return moderationRepository.save(fTarget, System.currentTimeMillis(), time, reason, fModerator.id(), switch (type) {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
             case MAINTENANCE -> Moderation.Type.UNMAINTENANCE;
