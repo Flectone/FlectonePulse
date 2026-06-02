@@ -232,6 +232,7 @@ public class ProxyMessageHandler {
             case SYSTEM_MAINTENANCE -> {
                 if (!injector.getInstance(MaintenanceModule.class).config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MAINTENANCE);
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMAINTENANCE);
                 }
                 yield true;
             }
