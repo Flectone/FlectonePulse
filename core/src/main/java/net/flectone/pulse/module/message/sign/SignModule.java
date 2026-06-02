@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -51,14 +52,15 @@ public class SignModule implements ModuleSimple {
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
         // disable Object for sign because they don't work correctly
-        String jsonComponentConverted = messagePipeline.buildJson(messagePipeline.createContext(fPlayer, string)
-                    .addFlags(
-                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
-                            new boolean[]{true, true}
-                    )
-        );
-
-        return Optional.of(jsonComponentConverted);
+        return Optional.of(messagePipeline.buildJson(MessageContext.builder()
+                .sender(fPlayer)
+                .message(string)
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
+                        new boolean[]{true, true}
+                )
+                .build()
+        ));
     }
 
 }

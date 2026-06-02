@@ -137,18 +137,20 @@ public class TelegramSender {
                         .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            MessageContext tagContext = messagePipeline.createContext(telegramModule.localization(fResolver).formatReply())
-                                    .addTagResolvers(
+                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .message(telegramModule.localization(fResolver).formatReply())
+                                    .tagResolvers(
                                             messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            messagePipeline.resolver("reply_message", (_, _) -> {
-                                                MessageContext replyContext = messagePipeline.createContext(telegramClient.sender(), fResolver, reply.second())
-                                                        .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-                                                return Tag.selfClosingInserting(messagePipeline.build(replyContext));
-                                            })
-                                    );
-
-                            return Tag.inserting(messagePipeline.build(tagContext));
+                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                    .sender(telegramClient.sender())
+                                                    .receiver(fResolver)
+                                                    .message(reply.second())
+                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                    .build()
+                                            )))
+                                    )
+                                    .build()
+                            ));
                         })})
                         .integration(IntegrationMetadata.builder()
                                 .format(string -> StringUtils.replaceEach(

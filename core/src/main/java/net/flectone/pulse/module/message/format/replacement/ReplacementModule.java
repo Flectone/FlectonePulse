@@ -177,18 +177,17 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                         replacementList[i] = values.get(i);
                     }
 
-                    replacement = StringUtils.replaceEach(replacement, searchList, replacementList);
-
-                    MessageContext componentContext = messagePipeline.createContext(sender, receiver, replacement)
-                            .withFlags(messageContext.flags())
-                            .addFlags(
+                    yield Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                            .sender(sender)
+                            .receiver(receiver)
+                            .message(StringUtils.replaceEach(replacement, searchList, replacementList))
+                            .flags(messageContext.flags())
+                            .flags(
                                     new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                                     new boolean[]{false, false}
-                            );
-
-                    Component component = messagePipeline.build(componentContext);
-
-                    yield Tag.selfClosingInserting(component);
+                            )
+                            .build()
+                    ));
                 }
             };
         }));
@@ -247,16 +246,17 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         if (spoilerText.equals("\\")) return MessagePipeline.ReplacementTag.emptyTag();
 
         // "." to have the original context like ||%stats%||
-        MessageContext spoilerContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), "." + spoilerText)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        int length = componentSerializer.toPlain(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message("." + spoilerText)
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.ITEM_DETECTION},
                         new boolean[]{false, false} // we don't need to double format "|| %item% ||"
-                );
-
-        Component spoilerComponent = messagePipeline.build(spoilerContext);
-
-        int length = componentSerializer.toPlain(spoilerComponent).length();
+                )
+                .build()
+        )).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
         Localization.Message.Format.Replacement replacement = localization(messageContext.receiver());
@@ -266,130 +266,122 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                 new String[]{spoilerText, StringUtils.repeat(replacement.spoilerSymbol(), length)}
         );
 
-        MessageContext formatContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false); // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
-
-        Component component = messagePipeline.build(formatContext);
-
-        return Tag.selfClosingInserting(component);
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(format)
+                .flags(messageContext.flags())
+                .flag(MessageFlag.PLAYER_MESSAGE, false) // don't set .withFlag(MessageFlag.REPLACEMENT, false) to format "|| %item% ||"
+                .build()
+        ));
     }
 
     private Tag pingTag(MessageContext messageContext) {
         if (!(messageContext.sender() instanceof FPlayer fPlayer)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        int ping = platformPlayerAdapter.getPing(fPlayer);
-
-        String format = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("ping", ""),
-                "<value>",
-                String.valueOf(ping)
-        );
-
-        MessageContext newContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("ping", ""),
+                        "<value>",
+                        String.valueOf(platformPlayerAdapter.getPing(fPlayer))
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
-                );
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                )
+                .build()
+        ));
     }
 
     private Tag tpsTag(MessageContext messageContext) {
-        String format = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("tps", ""),
-                "<value>",
-                platformServerAdapter.getTPS()
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("tps", ""),
+                        "<value>",
+                        platformServerAdapter.getTPS()
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
-                );
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                )
+                .build()
+        ));
     }
 
     private Tag onlineTag(MessageContext messageContext) {
-        String format = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("online", ""),
-                "<value>",
-                String.valueOf(platformServerAdapter.getOnlinePlayerCount())
-        );
-
-        MessageContext context = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("online", ""),
+                        "<value>",
+                        String.valueOf(platformServerAdapter.getOnlinePlayerCount())
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
-                );
-
-        Component component = messagePipeline.build(context);
-
-        return Tag.selfClosingInserting(component);
+                )
+                .build()
+        ));
     }
 
     private Tag coordsTag(MessageContext messageContext) {
-        Component component = Component.empty();
-
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(messageContext.sender());
-        if (coordinates != null) {
-            String format = StringUtils.replaceEach(
-                    localization(messageContext.receiver()).values().getOrDefault("coords", ""),
-                    new String[]{"<x>", "<y>", "<z>"},
-                    new String[]{
-                            String.valueOf(coordinates.x()),
-                            String.valueOf(coordinates.y()),
-                            String.valueOf(coordinates.z())
-                    }
-            );
+        if (coordinates == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-            MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
-                            new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
-                            new boolean[]{false, false}
-                    );
-
-            component = messagePipeline.build(newContext);
-        }
-
-        return Tag.selfClosingInserting(component);
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(StringUtils.replaceEach(
+                        localization(messageContext.receiver()).values().getOrDefault("coords", ""),
+                        new String[]{"<x>", "<y>", "<z>"},
+                        new String[]{
+                                String.valueOf(coordinates.x()),
+                                String.valueOf(coordinates.y()),
+                                String.valueOf(coordinates.z())
+                        }
+                ))
+                .flags(messageContext.flags())
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
+                        new boolean[]{false, false}
+                )
+                .build()
+        ));
     }
 
     private Tag statsTag(MessageContext messageContext) {
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(messageContext.sender());
         if (statistics == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-        String format = StringUtils.replaceEach(
-                localization(messageContext.receiver()).values().getOrDefault("stats", ""),
-                new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
-                new String[]{
-                        String.valueOf(statistics.health()),
-                        String.valueOf(statistics.armor()),
-                        String.valueOf(statistics.level()),
-                        String.valueOf(statistics.food()),
-                        String.valueOf(statistics.damage())
-                }
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(StringUtils.replaceEach(
+                        localization(messageContext.receiver()).values().getOrDefault("stats", ""),
+                        new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
+                        new String[]{
+                                String.valueOf(statistics.health()),
+                                String.valueOf(statistics.armor()),
+                                String.valueOf(statistics.level()),
+                                String.valueOf(statistics.food()),
+                                String.valueOf(statistics.damage())
+                        }
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
-                );
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                )
+                .build()
+        ));
     }
 
     private Tag skinTag(MessageContext messageContext) {
@@ -402,41 +394,40 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
-        String format = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("skin", ""),
-                "<message_1>",
-                url
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("skin", ""),
+                        "<message_1>",
+                        url
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                .build()
+        ));
     }
 
     private Tag itemTag(MessageContext messageContext) {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
-        String format = localization(messageContext.receiver()).values().getOrDefault("item", "");
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(localization(messageContext.receiver()).values().getOrDefault("item", ""))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
                         new boolean[]{false, false}
                 )
-                .addTagResolver(messagePipeline.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)));
-
-        Component componentFormat = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(componentFormat);
+                .tagResolver(messagePipeline.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)))
+                .build()
+        ));
     }
 
     private Tag urlTag(MessageContext messageContext, String url) {
@@ -444,22 +435,21 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
         if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
-        String string = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("url", ""),
-                "<message_1>",
-                url
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("url", ""),
+                        "<message_1>",
+                        url
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
-                );
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                )
+                .build()
+        ));
     }
 
     private Tag imageTag(MessageContext messageContext, String url) {
@@ -474,23 +464,22 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
-        String string = Strings.CS.replace(
-                localization(messageContext.receiver()).values().getOrDefault("image", ""),
-                "<message_1>",
-                url
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), string)
-                .withFlags(messageContext.flags())
-                .addFlags(
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(Strings.CS.replace(
+                        localization(messageContext.receiver()).values().getOrDefault("image", ""),
+                        "<message_1>",
+                        url
+                ))
+                .flags(messageContext.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
                         new boolean[]{false, false, false}
                 )
-                .addTagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)));
-
-        Component component = messagePipeline.build(newContext);
-
-        return Tag.selfClosingInserting(component);
+                .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                .build()
+        ));
     }
 
     public Component createImageComponent(String link) throws ExecutionException {

@@ -78,10 +78,13 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
             String conditionValue = getConditionValue(conditionName, messageContext.sender(), messageContext.receiver(), messageContext.flags());
             if (StringUtils.isEmpty(conditionValue)) return MessagePipeline.ReplacementTag.emptyTag();
 
-            MessageContext conditionValueContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), conditionValue)
-                    .withFlags(messageContext.flags());
-
-            return Tag.inserting(messagePipeline.build(conditionValueContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(messageContext.sender())
+                    .receiver(messageContext.receiver())
+                    .message(conditionValue)
+                    .flags(messageContext.flags())
+                    .build()
+            ));
         }));
     }
 
@@ -139,10 +142,13 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     }
 
     private String buildCriteriaString(FEntity fPlayer, FPlayer fReceiver, String value, Map<MessageFlag, Boolean> flags) {
-        MessageContext conditionNameContext = messagePipeline.createContext(fPlayer, fReceiver, value)
-                .withFlags(flags);
-
-        return messagePipeline.buildPlain(conditionNameContext).trim();
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(value)
+                .flags(flags)
+                .build()
+        ).trim();
     }
 
 }

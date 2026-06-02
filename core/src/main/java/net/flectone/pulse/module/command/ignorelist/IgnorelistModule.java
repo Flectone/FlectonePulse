@@ -104,8 +104,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                 .toList();
 
         String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build()).append(Component.newline());
 
         for (Ignore ignore : finalIgnoreList) {
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
@@ -115,11 +114,12 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                     new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date())}
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolver(messagePipeline.targetTag(fPlayer, fTarget));
-
             component = component
-                    .append(messagePipeline.build(lineContext))
+                    .append(messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(line)
+                            .build()
+                    ))
                     .append(Component.newline());
         }
 
@@ -129,8 +129,11 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                 new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.COMMAND_IGNORELIST, fPlayer, component));
 

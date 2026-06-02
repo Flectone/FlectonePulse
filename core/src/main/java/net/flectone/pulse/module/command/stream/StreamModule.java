@@ -198,11 +198,14 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), streamPrefix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.inserting(messagePipeline.build(prefixContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(streamPrefix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 

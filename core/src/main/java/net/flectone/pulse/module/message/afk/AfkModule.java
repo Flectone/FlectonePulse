@@ -105,11 +105,14 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             afkSuffix = Strings.CS.replace(afkSuffix, "<time>", getAfkDurationFormatted(fPlayer, messageContext.receiver()));
             if (!afkSuffix.contains("%")) return Tag.preProcessParsed(afkSuffix);
 
-            MessageContext afkContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), afkSuffix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.inserting(messagePipeline.build(afkContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(afkSuffix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 

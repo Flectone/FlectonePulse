@@ -56,9 +56,13 @@ public class PulseMaintenanceListener implements PulseListener {
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, maintenance);
 
         // build message
-        MessageContext messageContext = messagePipeline.createContext(fModerator, fPlayer, formatPlayer)
-                .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator));
-        Component reason = messagePipeline.build(messageContext);
+        Component reason = messagePipeline.build(MessageContext.builder()
+                .sender(fModerator)
+                .receiver(fPlayer)
+                .message(formatPlayer)
+                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                .build()
+        );
 
         return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }

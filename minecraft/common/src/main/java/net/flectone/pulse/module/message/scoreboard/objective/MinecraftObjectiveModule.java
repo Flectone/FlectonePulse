@@ -87,11 +87,18 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format) {
-        MessageContext tabNameContext = messagePipeline.createContext(fPlayer, fReceiver, format)
-                .addTagResolvers(messagePipeline.resolver("score", (_, _) ->
-                        Tag.inserting(messagePipeline.build(messagePipeline.createContext(fPlayer, score)))
-                ));
-
-        return messagePipeline.build(tabNameContext);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(format)
+                .tagResolver(messagePipeline.resolver("score", (_, _) ->
+                        Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(score)
+                                .build())
+                        )
+                ))
+                .build()
+        );
     }
 }

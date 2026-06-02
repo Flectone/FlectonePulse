@@ -20,14 +20,13 @@ import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.BukkitAttributesProvider;
-import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.BukkitPassengersProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
@@ -258,8 +257,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(header)
+                        .build()
+                );
             }
         }
 
@@ -280,8 +282,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(footer)
+                        .build()
+                );
             }
         }
 

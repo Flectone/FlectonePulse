@@ -31,7 +31,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -210,22 +209,21 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
                 value = defaultNickname;
             }
 
-            String displayFormat = Strings.CS.replace(
-                    permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
-                    "<value>",
-                    value
-            );
-
-            MessageContext nickContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), displayFormat)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(messageContext.sender())
+                    .receiver(messageContext.receiver())
+                    .message(Strings.CS.replace(
+                            permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
+                            "<value>",
+                            value
+                    ))
+                    .flags(messageContext.flags())
+                    .flags(
                             new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.NICKNAME_MODULE, MessageFlag.ICU_MODULE},
                             new boolean[]{false, false, true}
-                    );
-
-            Component nickComponent = messagePipeline.build(nickContext);
-
-            return Tag.inserting(nickComponent);
+                    )
+                    .build()
+            ));
         }));
     }
 

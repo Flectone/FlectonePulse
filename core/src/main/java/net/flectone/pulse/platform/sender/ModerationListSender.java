@@ -100,8 +100,8 @@ public class ModerationListSender {
         }
 
         String header = Strings.CS.replace(localizationType.header(), "<count>", String.valueOf(size));
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build())
+                .append(Component.newline());
 
         for (Moderation moderation : moderations) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
@@ -112,14 +112,16 @@ public class ModerationListSender {
                     moderation
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolvers(
-                            messagePipeline.targetTag(fPlayer, fTarget),
-                            messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
-                    );
-
             component = component
-                    .append(messagePipeline.build(lineContext))
+                    .append(messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(line)
+                            .tagResolvers(
+                                    messagePipeline.targetTag(fPlayer, fTarget),
+                                    messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
+                            )
+                            .build()
+                    ))
                     .append(Component.newline());
         }
 
@@ -129,8 +131,11 @@ public class ModerationListSender {
                 new String[]{nextPageCommand, String.valueOf(listArgument.page() - 1), String.valueOf(listArgument.page() + 1), String.valueOf(listArgument.page()), String.valueOf(countPage)}
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         MessageSendEvent messageSendEvent = eventDispatcher.dispatch(new MessageSendEvent(module.name(), fPlayer, component));
         if (!messageSendEvent.cancelled()) {

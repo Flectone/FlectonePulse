@@ -181,8 +181,11 @@ public class MinecraftStatusModule extends StatusModule {
 
             JsonObject playerObject = new JsonObject();
 
-            MessageContext sampleContext = messagePipeline.createContext(fPlayer, sample.name());
-            playerObject.addProperty("name", messagePipeline.buildLegacy(sampleContext));
+            playerObject.addProperty("name", messagePipeline.buildLegacy(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(sample.name())
+                    .build()
+            ));
             playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).uuid().toString() : sample.id());
 
             jsonArray.add(playerObject);

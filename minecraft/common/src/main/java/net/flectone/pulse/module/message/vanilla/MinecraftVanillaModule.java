@@ -101,11 +101,12 @@ public class MinecraftVanillaModule extends VanillaModule {
                 if (!target.equals(fPlayer)) {
                     if (parsedComponent.vanillaMessage().multiMessage()) return;
                 } else {
-                    String format = StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey()));
-                    MessageContext messageContext = messagePipeline.createContext(fPlayer, format)
-                            .addTagResolver(argumentTag(fPlayer, parsedComponent));
-
-                    sendPersonalDeath(fPlayer, messagePipeline.build(messageContext));
+                    sendPersonalDeath(fPlayer, messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
+                            .tagResolver(argumentTag(fPlayer, parsedComponent))
+                            .build()
+                    ));
                 }
             } else {
                 range = Range.get(Range.Type.PLAYER);
@@ -257,12 +258,15 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
-        String formatTarget = fTarget.type().equals(FPlayer.PLAYER_TYPE)
-                ? localization.formatPlayer()
-                : localization.formatEntity();
-
-        MessageContext context = messagePipeline.createContext(fTarget, fResolver, formatTarget);
-        return messagePipeline.build(context);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .receiver(fResolver)
+                .message(fTarget.type().equals(FPlayer.PLAYER_TYPE)
+                        ? localization.formatPlayer()
+                        : localization.formatEntity()
+                )
+                .build()
+        );
     }
 
     private Component extractInnerText(Component component) {

@@ -148,9 +148,11 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
         String format = moderationMessageFormatter.replacePlaceholders(localization(fTarget).person(), fTarget, kick);
-        MessageContext messageContext = messagePipeline.createContext(fTarget, format)
-                .addTagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator));
-
-        platformPlayerAdapter.kick(fTarget, messagePipeline.build(messageContext));
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(format)
+                .tagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator))
+                .build()
+        ));
     }
 }

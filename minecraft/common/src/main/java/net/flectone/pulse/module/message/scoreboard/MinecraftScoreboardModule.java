@@ -144,16 +144,22 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
         Component prefix = Component.empty();
         if (!localization().prefix().isEmpty()) {
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, localization().prefix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            prefix = messagePipeline.build(prefixContext);
+            prefix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().prefix())
+                    .flag(MessageFlag.ITEM_DETECTION, false)
+                    .build()
+            );
         }
 
         Component suffix = Component.empty();
         if (!localization().suffix().isEmpty()) {
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, localization().suffix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            suffix = messagePipeline.build(suffixContext);
+            suffix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().suffix())
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
+                    .build()
+            );
         }
 
         WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = isInvisibleNameFor(fPlayer)
@@ -161,9 +167,11 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 : WrapperPlayServerTeams.NameTagVisibility.ALWAYS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
 
-        MessageContext colorContext = messagePipeline.createContext(fPlayer, config().color());
-        Component colorComponent = messagePipeline.build(colorContext);
-        TextColor color = colorComponent.color();
+        TextColor color = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(config().color())
+                .build()
+        ).color();
 
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 

@@ -92,8 +92,11 @@ public class MinecraftPlayersModule implements ModuleLocalization<Localization.M
             // ignore exception
         }
 
-        MessageContext onlineContext = messagePipeline.createContext(fPlayer, config().online());
-        online = messagePipeline.buildPlain(onlineContext);
+        online = messagePipeline.buildPlain(MessageContext.builder()
+                .sender(fPlayer)
+                .message(config().online())
+                .build()
+        );
         try {
             return Integer.parseInt(online);
         } catch (NumberFormatException _) {

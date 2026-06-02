@@ -40,26 +40,6 @@ public class MessagePipeline {
     private final EventDispatcher eventDispatcher;
     private final ComponentSerializer componentSerializer;
 
-    public MessageContext createContext(@NonNull String message) {
-        return createContext(FPlayer.UNKNOWN, message);
-    }
-
-    public MessageContext createContext(@NonNull FPlayer sender, @NonNull String message) {
-        return createContext(sender, sender, message);
-    }
-
-    public MessageContext createContext(@NonNull FEntity sender, @NonNull FPlayer receiver) {
-        return new MessageContext(UUID.randomUUID(), sender, receiver, null);
-    }
-
-    public MessageContext createContext(@NonNull FEntity sender, @NonNull FPlayer receiver, @NonNull String message) {
-        return new MessageContext(UUID.randomUUID(), sender, receiver, message);
-    }
-
-    public MessageContext createContext(UUID messageUUID, @NonNull FEntity sender, @NonNull FPlayer receiver, @NonNull String message) {
-        return new MessageContext(messageUUID, sender, receiver, message);
-    }
-
     @NonNull
     public String buildStandard(MessageContext messageContext) {
         // add a space so that MiniMessage correctly deserializes closed tags
@@ -87,10 +67,13 @@ public class MessagePipeline {
         try {
             Component deserialized = componentSerializer.fromLegacy(message);
 
-            MessageContext context = createContext(fPlayer, Strings.CS.replace(message, "§", "&"))
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, true);
+            MessageContext messageContext = MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(Strings.CS.replace(message, "§", "&"))
+                    .flags(Map.of(MessageFlag.PLAYER_MESSAGE, true))
+                    .build();
 
-            Component component = build(context)
+            Component component = build(messageContext)
                     .applyFallbackStyle(deserialized.style())
                     .mergeStyle(deserialized);
 
@@ -159,9 +142,11 @@ public class MessagePipeline {
                 targetIndex = argumentQueue.pop().asInt().orElse(0);
             }
 
-            MessageContext messageContext = createContext(target, receiver,
-                    Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex))
-            );
+            MessageContext messageContext = MessageContext.builder()
+                    .sender(target)
+                    .receiver(receiver)
+                    .message(Strings.CS.replace(formatTarget, "<index>", String.valueOf(targetIndex)))
+                    .build();
 
             return Tag.selfClosingInserting(build(messageContext));
         });

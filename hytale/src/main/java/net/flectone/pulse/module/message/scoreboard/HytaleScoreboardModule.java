@@ -18,7 +18,6 @@ import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.Map;
 import java.util.UUID;
@@ -125,16 +124,22 @@ public class HytaleScoreboardModule extends ScoreboardModule {
 
         Component prefix = Component.empty();
         if (!localization().prefix().isEmpty()) {
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, localization().prefix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            prefix = messagePipeline.build(prefixContext);
+            prefix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().prefix())
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
+                    .build()
+            );
         }
 
         Component suffix = Component.empty();
         if (!localization().suffix().isEmpty()) {
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, localization().suffix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            suffix = messagePipeline.build(suffixContext);
+            suffix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().suffix())
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
+                    .build()
+            );
         }
 
         return new CustomName(fPlayer.name(), componentSerializer.toPlain(prefix.append(displayName).append(suffix)));

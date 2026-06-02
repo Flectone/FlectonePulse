@@ -224,13 +224,15 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
-        // 3 - offline client, 4 - official client
-        boolean offlineClient = fReceiver.uuid().version() == 3;
-
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
-                .addFlag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, offlineClient); // disable player_head for official client
-
-        return messagePipeline.build(messageContext);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(localization(fReceiver).format())
+                // 3 - offline client, 4 - official client, 0 - bedrock client
+                // disable for offline and bedrock client
+                .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3 || fReceiver.uuid().version() == 0)
+                .build()
+        );
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {

@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.List;
@@ -68,11 +67,6 @@ public class PulseBanListener implements PulseListener {
         Localization.Command.Ban localization = banModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
 
-        // build message
-        MessageContext messageContext = messagePipeline.createContext(fModerator, fPlayer, formatPlayer)
-                .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator));
-        Component reason = messagePipeline.build(messageContext);
-
         // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
             messageDispatcher.dispatch(banModule, ModerationMetadata.<Localization.Command.Ban>builder()
@@ -92,7 +86,16 @@ public class PulseBanListener implements PulseListener {
             );
         }
 
-        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
+        return event
+                .withPlayer(fPlayer)
+                .withAllowed(false)
+                .withKickReason(messagePipeline.build(MessageContext.builder()
+                        .sender(fModerator)
+                        .receiver(fPlayer)
+                        .message(formatPlayer)
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                        .build()
+                ));
     }
 
 }

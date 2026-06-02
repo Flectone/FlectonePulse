@@ -129,13 +129,17 @@ public class DiscordSender {
                 discordWebhookService.saveWebhook(channelID, webhookData);
             }
 
-            String username = StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
-                    ? sender.name()
-                    : messagePipeline.buildPlain(messagePipeline.createContext(sender, FPlayer.UNKNOWN, channelEmbed.webhookName()));
-
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
                     .allowedMentions(AllowedMentionsData.builder().build())
-                    .username(username)
+                    .username(StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
+                            ? sender.name()
+                            : messagePipeline.buildPlain(MessageContext.builder()
+                                                         .sender(sender)
+                                                         .receiver(FPlayer.UNKNOWN)
+                                                         .message(channelEmbed.webhookName())
+                                                         .build()
+                            )
+                    )
                     .avatarUrl(replaceSkin.apply(webhookAvatar))
                     .content(replaceString.apply(channelEmbed.content()));
 
@@ -203,18 +207,20 @@ public class DiscordSender {
                         .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            MessageContext tagContext = messagePipeline.createContext(discordModule.localization(fResolver).formatReply())
-                                    .addTagResolvers(
+                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .message(discordModule.localization(fResolver).formatReply())
+                                    .tagResolvers(
                                             messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            messagePipeline.resolver("reply_message", (_, _) -> {
-                                                MessageContext replyContext = messagePipeline.createContext(discordClient.sender(), fResolver, reply.second())
-                                                        .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-                                                return Tag.selfClosingInserting(messagePipeline.build(replyContext));
-                                            })
-                                    );
-
-                            return Tag.inserting(messagePipeline.build(tagContext));
+                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                    .sender(discordClient.sender())
+                                                    .receiver(fResolver)
+                                                    .message(reply.second())
+                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                    .build()
+                                            )))
+                                    )
+                                    .build()
+                            ));
                         })})
                         .integration(IntegrationMetadata.builder()
                                 .format(string -> StringUtils.replaceEach(

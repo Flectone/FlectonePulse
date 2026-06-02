@@ -23,7 +23,6 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
@@ -60,10 +59,6 @@ public class PulseWhitelistListener implements PulseListener {
             fPlayer = fPlayerService.loadSettings(fPlayer);
         }
 
-        // build message
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, whitelistModule.localization(fPlayer).person());
-        Component reason = messagePipeline.build(messageContext);
-
         // show player connection for moderators
         if (whitelistModule.config().showConnectionAttempts()) {
             messageDispatcher.dispatch(whitelistModule, ModerationMetadata.<Localization.Command.Whitelist>builder()
@@ -78,7 +73,14 @@ public class PulseWhitelistListener implements PulseListener {
             );
         }
 
-        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
+        return event
+                .withPlayer(fPlayer)
+                .withAllowed(false)
+                .withKickReason(messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(whitelistModule.localization(fPlayer).person())
+                        .build()
+                ));
     }
 
     @Pulse

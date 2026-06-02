@@ -32,7 +32,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -342,8 +341,12 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
             int k = 0;
             for (String answer : poll.getAnswers()) {
 
-                MessageContext answerContext = messagePipeline.createContext(fPlayer, FPlayer.UNKNOWN, answer);
-                Component answerComponent = messagePipeline.build(answerContext);
+                Component answerComponent = messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(FPlayer.UNKNOWN)
+                        .message(answer)
+                        .build()
+                );
 
                 answersBuilder.append(StringUtils.replaceEach(
                         message.answerTemplate(),

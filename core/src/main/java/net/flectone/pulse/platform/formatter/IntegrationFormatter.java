@@ -16,7 +16,7 @@ import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -111,30 +111,39 @@ public class IntegrationFormatter {
     }
 
     private Component buildFormatComponent(String text, EventMetadata<?> eventMetadata) {
-        FEntity sender = eventMetadata.sender();
-        MessageContext context = messagePipeline.createContext(sender, FPlayer.UNKNOWN, text)
-                .withFlags(eventMetadata.flags())
-                .addFlags(
+        MessageContext.MessageContextBuilder messageContextBuilder = MessageContext.builder()
+                .sender(eventMetadata.sender())
+                .receiver(FPlayer.UNKNOWN)
+                .message(text)
+                .flags(eventMetadata.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING},
                         new boolean[]{false, false, false}
-                )
-                .addTagResolvers(eventMetadata.resolveTags(FPlayer.UNKNOWN));
+                );
 
-        return messagePipeline.build(context);
+        TagResolver[] tagResolvers = eventMetadata.resolveTags(FPlayer.UNKNOWN);
+        if (tagResolvers != null) {
+            messageContextBuilder = messageContextBuilder.tagResolvers(tagResolvers);
+        }
+
+        return messagePipeline.build(messageContextBuilder.build());
     }
 
     private Component buildMessageComponent(EventMetadata<?> eventMetadata) {
         String message = eventMetadata.message();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), FPlayer.UNKNOWN, message)
-                .withFlags(eventMetadata.flags())
-                .addFlags(
+        return messagePipeline.build(MessageContext.builder()
+                .sender(eventMetadata.sender())
+                .receiver(FPlayer.UNKNOWN)
+                .message(message)
+                .flags(eventMetadata.flags())
+                .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.TRANSLATE_MODULE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.URL_PROCESSING},
                         new boolean[]{true, false, false, false, false, false}
-                );
-
-        return messagePipeline.build(context);
+                )
+                .build()
+        );
     }
 
     private String clearMessage(String finalMessage) {

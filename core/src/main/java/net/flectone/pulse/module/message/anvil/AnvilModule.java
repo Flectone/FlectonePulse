@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -50,11 +51,12 @@ public class AnvilModule implements ModuleSimple {
         if (moduleController.isDisabledFor(this, fPlayer)) return Optional.empty();
         if (StringUtils.isEmpty(string)) return Optional.empty();
 
-        String jsonComponentConverted = messagePipeline.buildJson(messagePipeline.createContext(fPlayer, string)
-                .addFlag(MessageFlag.PLAYER_MESSAGE, true)
-        );
-
-        return Optional.of(jsonComponentConverted);
+        return Optional.of(messagePipeline.buildJson(MessageContext.builder()
+                .sender(fPlayer)
+                .message(string)
+                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .build()
+        ));
     }
 
 }

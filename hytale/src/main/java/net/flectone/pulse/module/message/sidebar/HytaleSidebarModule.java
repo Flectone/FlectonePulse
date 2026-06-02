@@ -17,11 +17,10 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.HytaleMessageUtil;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.Map;
 import java.util.UUID;
@@ -127,8 +126,11 @@ public class HytaleSidebarModule extends SidebarModule {
 
         for (int i = 0; i < lines.length; i++) {
             String lineId = getLineId(i, fPlayer);
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            Component line = messagePipeline.build(lineContext);
+            Component line = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             lineBuilder.addChild(LabelBuilder.label()
                     .withId(lineId)

@@ -37,9 +37,11 @@ public class MinecraftPulsePlayersListener implements PulseListener {
             fPlayer = fPlayerService.loadSettings(fPlayer);
         }
 
-        String reasonMessage = playersModule.localization(fPlayer).full();
-        MessageContext reasonContext = messagePipeline.createContext(fPlayer, reasonMessage);
-        Component reason = messagePipeline.build(reasonContext);
+        Component reason = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message( playersModule.localization(fPlayer).full())
+                .build()
+        );
 
         return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }

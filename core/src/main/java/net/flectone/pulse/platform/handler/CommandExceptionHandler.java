@@ -59,32 +59,37 @@ public class CommandExceptionHandler {
             );
         };
 
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
-        send(fPlayer, messagePipeline.build(messageContext));
+        send(fPlayer, messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(message)
+                .build()
+        ));
     }
 
     public void handleInvalidSyntaxException(ExceptionContext<FPlayer, InvalidSyntaxException> context) {
         FPlayer fPlayer = context.context().sender();
 
         String correctSyntax = context.exception().correctSyntax();
-        String message = StringUtils.replaceEach(
-                fileFacade.localization(fPlayer).command().exception().syntax(),
-                new String[]{"<correct_syntax>", "<command>"},
-                new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
-        );
 
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
-        send(fPlayer, messagePipeline.build(messageContext));
+        send(fPlayer, messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(StringUtils.replaceEach(
+                        fileFacade.localization(fPlayer).command().exception().syntax(),
+                        new String[]{"<correct_syntax>", "<command>"},
+                        new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
+                ))
+                .build()
+        ));
     }
 
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        String message = fileFacade.localization(fPlayer)
-                .command().exception().permission();
-
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
-        send(fPlayer, messagePipeline.build(messageContext));
+        send(fPlayer, messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(fileFacade.localization(fPlayer).command().exception().permission())
+                .build()
+        ));
     }
 
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
@@ -93,14 +98,15 @@ public class CommandExceptionHandler {
 
         FPlayer fPlayer = context.context().sender();
 
-        String message = Strings.CS.replace(
-                fileFacade.localization(fPlayer).command().exception().execution(),
-                "<exception>",
-                context.exception().getMessage()
-        );
-
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, message);
-        send(fPlayer, messagePipeline.build(messageContext));
+        send(fPlayer, messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(Strings.CS.replace(
+                        fileFacade.localization(fPlayer).command().exception().execution(),
+                        "<exception>",
+                        context.exception().getMessage()
+                ))
+                .build()
+        ));
     }
 
     private void send(FPlayer fPlayer, Component component) {

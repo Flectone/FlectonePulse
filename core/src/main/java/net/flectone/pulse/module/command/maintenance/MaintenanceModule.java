@@ -200,10 +200,13 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                     Localization.Command.Maintenance localization = localization(fReceiver);
                     String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
 
-                    MessageContext messageContext = messagePipeline.createContext(fSender, fReceiver, formatPlayer)
-                            .addTagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender));
-
-                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(messageContext));
+                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(MessageContext.builder()
+                            .sender(fSender)
+                            .receiver(fReceiver)
+                            .message(formatPlayer)
+                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender))
+                            .build()
+                    ));
                 });
     }
 

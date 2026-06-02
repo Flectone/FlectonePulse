@@ -180,11 +180,14 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
 
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), suffix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.inserting(messagePipeline.build(suffixContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(suffix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 

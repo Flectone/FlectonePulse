@@ -197,18 +197,21 @@ public class MinecraftBubbleRender implements BubbleRender {
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
         Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
 
-        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
-                .addFlags(
+        MessageContext messageContext = MessageContext.builder()
+                .sender(bubble.getSender())
+                .receiver(viewer)
+                .message(bubble.getRawMessage())
+                .flags(
                         new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE},
                         new boolean[]{false, false, false, true}
-                );
+                )
+                .build();
 
-        Component message = messagePipeline.build(messageContext);
-
-        return messagePipeline.build(messageContext
-                .withMessage(localization.format())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
+        return messagePipeline.build(messageContext.toBuilder()
+                .message(localization.format())
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))
+                .build()
         );
     }
 

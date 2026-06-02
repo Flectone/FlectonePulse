@@ -27,7 +27,6 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -149,17 +148,17 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     private Tag mentionTag(MessageContext messageContext, String mention) {
-        String format = StringUtils.replaceEach(localization(messageContext.receiver()).format(),
-                new String[]{"<player>", "<target>"},
-                new String[]{mention, mention}
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-        Component component = messagePipeline.build(newContext);
-        return Tag.selfClosingInserting(component);
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(StringUtils.replaceEach(localization(messageContext.receiver()).format(),
+                        new String[]{"<player>", "<target>"},
+                        new String[]{mention, mention}
+                ))
+                .flags(messageContext.flags())
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .build()
+        ));
     }
 
     private String replace(String message) {

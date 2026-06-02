@@ -213,7 +213,12 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     Optional<FPlayer> fTarget = toponlineModule.getPlayerByPosition(queue.pop().value());
                     if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-                    String json = messagePipeline.buildJson(messagePipeline.createContext(fTarget.get(), fPlayer, "<display_name>"));
+                    String json = messagePipeline.buildJson(MessageContext.builder()
+                            .sender(fTarget.get())
+                            .receiver(fPlayer
+                            ).message("<display_name>")
+                            .build()
+                    );
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
                 })
                 .audiencePlaceholder(Player.class, "online", (player, queue, _) -> {
@@ -291,10 +296,11 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                 .audiencePlaceholder(Player.class, "format", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
-                    FPlayer fPlayer = fPlayerService.getFPlayer(player);
-                    String message = queue.pop().value();
-                    String json = messagePipeline.buildJson(messagePipeline.createContext(fPlayer, message));
-
+                    String json = messagePipeline.buildJson(MessageContext.builder()
+                            .sender(fPlayerService.getFPlayer(player))
+                            .message(queue.pop().value())
+                            .build()
+                    );
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
                 })
                 .globalPlaceholder("online", (_, _) ->

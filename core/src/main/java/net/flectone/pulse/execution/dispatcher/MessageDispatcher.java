@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
@@ -19,6 +18,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -211,11 +211,14 @@ public class MessageDispatcher {
         Destination destination = eventMetadata.destination();
         if (destination.subtext().isEmpty()) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, destination.subtext())
-                .withFlags(eventMetadata.flags())
-                .addTagResolver(messagePipeline.messageTag(message));
-
-        return messagePipeline.build(context);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(eventMetadata.sender())
+                .receiver(receiver)
+                .message(destination.subtext())
+                .flags(eventMetadata.flags())
+                .tagResolver(messagePipeline.messageTag(message))
+                .build()
+        );
     }
 
     private <L extends LocalizationSetting> Component buildMessageComponent(FPlayer receiver,
@@ -223,11 +226,13 @@ public class MessageDispatcher {
         String message = eventMetadata.message();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
-        MessageContext context = messagePipeline.createContext(eventMetadata.sender(), receiver, message)
-                .withFlags(eventMetadata.flags())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-        return messagePipeline.build(context);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(eventMetadata.sender())
+                .receiver(receiver)
+                .message(message)
+                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .build()
+        );
     }
 
     private <L extends LocalizationSetting> Component buildFormatComponent(FPlayer receiver,
@@ -237,19 +242,20 @@ public class MessageDispatcher {
         String formatContent = eventMetadata.resolveFormat(receiver, module.localization(receiver));
         if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
-        FEntity sender = eventMetadata.sender();
+        MessageContext.MessageContextBuilder messageContextBuilder = MessageContext.builder()
+                .messageUUID(eventMetadata.uuid())
+                .sender(eventMetadata.sender())
+                .receiver(receiver)
+                .message(formatContent)
+                .userMessage(eventMetadata.message())
+                .tagResolver(messagePipeline.messageTag(message));
 
-        MessageContext messageContext = messagePipeline.createContext(eventMetadata.uuid(), sender, receiver, formatContent)
-                .withFlags(eventMetadata.flags())
-                .addTagResolvers(eventMetadata.resolveTags(receiver))
-                .addTagResolver(messagePipeline.messageTag(message));
-
-        if (!receiver.isUnknown()) {
-            messageContext = messageContext
-                    .withUserMessage(eventMetadata.message());
+        TagResolver[] tagResolvers = eventMetadata.resolveTags(receiver);
+        if (tagResolvers != null) {
+            messageContextBuilder = messageContextBuilder.tagResolvers(tagResolvers);
         }
 
-        return messagePipeline.build(messageContext);
+        return messagePipeline.build(messageContextBuilder.build());
     }
 
 }

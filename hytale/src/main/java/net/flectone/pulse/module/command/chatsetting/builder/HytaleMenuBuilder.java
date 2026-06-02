@@ -67,8 +67,12 @@ public class HytaleMenuBuilder implements MenuBuilder {
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(localization.inventory().trim())
+                .build()
+        );
 
         GridGroup gridGroup = new GridGroup(config().columns());
 
@@ -93,13 +97,19 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         boolean enabled = fTarget.isSetting(messageType);
 
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
-        MessageContext titleContext = messagePipeline.createContext(fPlayer, fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
+                .build()
+        );
 
-        String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
-        MessageContext loreContext = messagePipeline.createContext(fPlayer, fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
+                .build()
+        );
 
         String id = "fp_" + UUID.randomUUID();
 
@@ -110,13 +120,19 @@ public class HytaleMenuBuilder implements MenuBuilder {
             FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
             boolean currentEnabled = status.toBoolean();
 
-            String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-            MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, finalFTarget, invertTitle);
-            Component componentInvertTitle = messagePipeline.build(invertTitleContext);
+            Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(finalFTarget)
+                    .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
+                    .build()
+            );
 
-            String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-            MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, finalFTarget, invertLore);
-            Component componentInvertLore = messagePipeline.build(invertLoreContext);
+            Component componentInvertLore = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(finalFTarget)
+                    .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
+                    .build()
+            );
 
             uiContext.getById(id, ButtonBuilder.class).ifPresent(buttonBuilder -> buttonBuilder
                     .withText(componentSerializer.toPlain(componentInvertTitle))
@@ -143,14 +159,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
                 "<chat>", localization.menu().chat().types().getOrDefault(currentChat, currentChat)
         ).split("<br>");
 
-        String title = messages.length > 0 ? messages[0] : "";
-        String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 0 ? messages[0] : "")
+                .build()
+        );
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
-
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                .build()
+        );
 
         String id = "fp_chat";
 
@@ -170,14 +189,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         String[] messages = subMenu.item().split("<br>");
 
-        String title = messages.length > 0 ? messages[0] : "";
-        String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 0 ? messages[0] : "")
+                .build()
+        );
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
-
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                .build()
+        );
 
         String id = "fp_fcolor_" + type.ordinal();
 
@@ -219,14 +241,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
             String message = getItemMessage.apply(item);
             String[] messages = message.split("<br>");
 
-            String title = messages.length > 0 ? messages[0] : "";
-            String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+            Component componentTitle = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(messages.length > 0 ? messages[0] : "")
+                    .build()
+            );
 
-            MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-            Component componentTitle = messagePipeline.build(titleContext);
-
-            MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-            Component componentLore = messagePipeline.build(loreContext);
+            Component componentLore = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                    .build()
+            );
 
             String subId = id + "_" + i;
 

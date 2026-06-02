@@ -134,15 +134,23 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
 
             Component component;
             if (permissionChecker.check(receiver, permission().see())) {
-                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, localization.formatSee())
-                        .withFlags(messageContext.flags())
-                        .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                        .addTagResolvers(Placeholder.unparsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(localization.formatSee())
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .tagResolvers(Placeholder.unparsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                        .build()
                 );
             } else {
-                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, symbols)
-                        .withFlags(messageContext.flags())
-                        .addFlag(MessageFlag.PLAYER_MESSAGE, false)
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(symbols)
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .build()
                 );
             }
 

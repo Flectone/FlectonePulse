@@ -86,10 +86,12 @@ public class MinecraftBossbarModule extends BossbarModule {
                 message = message + RAIDERS_PLACEHOLDER;
             }
 
-            MessageContext messageContext = messagePipeline.createContext(fPlayer, message)
-                    .addTagResolver(raidersTag(fPlayer, raiders));
-
-            Component title = messagePipeline.build(messageContext);
+            Component title = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(message)
+                    .tagResolver(raidersTag(fPlayer, raiders))
+                    .build()
+            );
             if (title.equals(oldTitle)) return;
 
             WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(bossbarUUID, WrapperPlayServerBossBar.Action.UPDATE_TITLE);
@@ -122,9 +124,11 @@ public class MinecraftBossbarModule extends BossbarModule {
             String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
             if (StringUtils.isEmpty(raidersRemaining)) return MessagePipeline.ReplacementTag.emptyTag();
 
-            String replaced = Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders);
-            MessageContext tagContext = messagePipeline.createContext(fPlayer, replaced);
-            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders))
+                    .build()
+            ));
         });
     }
 

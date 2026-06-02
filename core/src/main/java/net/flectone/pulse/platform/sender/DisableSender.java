@@ -60,7 +60,12 @@ public class DisableSender {
                 ? localization.disabledSelf()
                 : localization.disabledOther();
 
-        MessageContext messageContext = messagePipeline.createContext(receiver, fPlayer, disableMessage);
+        MessageContext messageContext = MessageContext.builder()
+                .sender(receiver)
+                .receiver(fPlayer)
+                .message(disableMessage)
+                .build();
+
         Component component = messagePipeline.build(messageContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));

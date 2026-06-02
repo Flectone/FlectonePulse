@@ -89,10 +89,13 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
                 String text = texts.get(playerIndex);
                 if (Boolean.TRUE.equals(animationConfig.raw())) return Tag.preProcessParsed(text);
 
-                MessageContext textContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), text)
-                        .withFlags(messageContext.flags());
-
-                return Tag.inserting(messagePipeline.build(textContext));
+                return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                        .sender(messageContext.sender())
+                        .receiver(messageContext.receiver())
+                        .message(text)
+                        .flags(messageContext.flags())
+                        .build()
+                ));
             } catch (IndexOutOfBoundsException _) { // reload safety
                 return MessagePipeline.ReplacementTag.emptyTag();
             }

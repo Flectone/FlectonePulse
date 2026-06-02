@@ -87,7 +87,12 @@ public class CooldownSender {
 
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
-        MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
+
+        MessageContext cooldownContext = MessageContext.builder()
+                .sender(fPlayer)
+                .message(cooldownMessage)
+                .build();
+
         Component component = messagePipeline.build(cooldownContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));

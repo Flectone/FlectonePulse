@@ -111,14 +111,17 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
             action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
 
-            MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .message(action)
+                    .flags(messageContext.flags())
+                    .flags(
                             new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.TRANSLATE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
-                    );
-
-            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
+                    )
+                    .build()
+            ));
         }));
     }
 

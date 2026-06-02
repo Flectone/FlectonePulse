@@ -462,8 +462,12 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (permissionChecker.check(fTarget, permission().bypass())) return;
         if (isWhitelisted(fTarget)) return;
 
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, fTarget, localization(fTarget).person());
-        platformPlayerAdapter.kick(fTarget, messagePipeline.build(messageContext));
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(localization(fTarget).person())
+                .build()
+        ));
     }
 
     public enum Action {

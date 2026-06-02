@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
@@ -100,7 +101,11 @@ public class ProxySender {
             List<String> constant = fileFacade.localization(sender).message().format().names().constant();
             if (!constant.isEmpty()) {
                 sender = fPlayer.withConstants(constant.stream()
-                        .map(string -> messagePipeline.build(messagePipeline.createContext(fPlayer, string)))
+                        .map(string -> messagePipeline.build(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(string)
+                                .build()
+                        ))
                         .toList()
                 );
             }

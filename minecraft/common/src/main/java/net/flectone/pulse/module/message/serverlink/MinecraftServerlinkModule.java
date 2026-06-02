@@ -75,10 +75,11 @@ public class MinecraftServerlinkModule implements ModuleLocalization<Localizatio
                 .map(entry -> {
                     String link = entry.getValue();
 
-                    String linkMessage = linksMessages.getOrDefault(entry.getKey(), link);
-
-                    MessageContext linkContext = messagePipeline.createContext(fPlayer, linkMessage);
-                    Component linkComponent = messagePipeline.build(linkContext);
+                    Component linkComponent = messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(linksMessages.getOrDefault(entry.getKey(), link))
+                            .build()
+                    );
 
                     return new WrapperCommonServerServerLinks.ServerLink(linkComponent, link);
                 }).toList();

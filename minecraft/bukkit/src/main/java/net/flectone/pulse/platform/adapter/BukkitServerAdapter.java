@@ -237,11 +237,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         List<Component> componentLore = lore.length == 0
                 ? Collections.emptyList()
                 : Arrays.stream(lore)
-                .map(message -> {
-                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
-                    Component component = messagePipelineProvider.get().build(messageContext);
-                    return component.decoration(TextDecoration.ITALIC, false);
-                })
+                .map(message -> messagePipelineProvider.get()
+                                .build(MessageContext.builder()
+                                       .sender(fPlayer)
+                                       .message(message)
+                                       .build()
+                                )
+                                .decoration(TextDecoration.ITALIC, false)
+                )
                 .toList();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
@@ -252,9 +255,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
-        return title.isEmpty()
-                ? Component.empty()
-                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
+        if (title.isEmpty()) return Component.empty();
+
+        return messagePipelineProvider.get().build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(title)
+                .build()
+        );
     }
 
     private @NonNull ItemStack buildModernItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
@@ -338,9 +345,10 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         String displayName = itemStack.getItemMeta().getDisplayName();
         if (displayName == null) return Component.empty();
 
-        MessageContext messageContext = messagePipelineProvider.get().createContext(displayName);
-        Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = componentSerializer.toPlain(componentName);
+        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+                .message(displayName)
+                .build()
+        );
 
         return Component.text(clearedDisplayName).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.TRUE);
     }

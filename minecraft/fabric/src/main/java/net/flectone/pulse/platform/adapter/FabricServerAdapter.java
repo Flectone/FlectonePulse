@@ -38,7 +38,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -318,9 +317,10 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         net.minecraft.network.chat.Component customName = itemStack.getCustomName();
         if (customName == null) return Component.empty();
 
-        MessageContext messageContext = messagePipelineProvider.get().createContext(customName.getString());
-        Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = componentSerializer.toPlain(componentName);
+        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+                .message(customName.getString())
+                .build()
+        );
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }
@@ -356,11 +356,14 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         List<Component> componentLore = lore.length == 0
                 ? Collections.emptyList()
                 : Arrays.stream(lore)
-                .map(message -> {
-                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
-                    Component component = messagePipelineProvider.get().build(messageContext);
-                    return component.decoration(TextDecoration.ITALIC, false);
-                })
+                .map(message -> messagePipelineProvider.get()
+                                .build(MessageContext.builder()
+                                       .sender(fPlayer)
+                                       .message(message)
+                                       .build()
+                                )
+                                .decoration(TextDecoration.ITALIC, false)
+                )
                 .toList();
 
         return new ItemStack.Builder()
@@ -371,8 +374,12 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
-        return title.isEmpty()
-                ? Component.empty()
-                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
+        if (title.isEmpty()) return Component.empty();
+
+        return messagePipelineProvider.get().build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(title)
+                .build()
+        );
     }
 }

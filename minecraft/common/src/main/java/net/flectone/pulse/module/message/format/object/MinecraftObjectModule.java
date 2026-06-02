@@ -349,9 +349,12 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     private Component buildArgument(MessageContext messageContext, String argument) {
-        MessageContext argumentContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), argument)
-                .withFlags(messageContext.flags());
-
-        return messagePipeline.build(argumentContext);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(argument)
+                .flags(messageContext.flags())
+                .build()
+        );
     }
 }

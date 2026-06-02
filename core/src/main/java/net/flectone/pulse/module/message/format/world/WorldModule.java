@@ -68,9 +68,13 @@ public class WorldModule implements ModuleSimple {
             if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
-            MessageContext worldContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
+            MessageContext worldContext = MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(worldPrefix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build();
 
             return Tag.inserting(messagePipeline.build(worldContext));
         }));

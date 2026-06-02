@@ -202,8 +202,11 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(header)
+                        .build()
+                );
             }
         }
 
@@ -217,8 +220,11 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(footer)
+                        .build()
+                );
             }
         }
 

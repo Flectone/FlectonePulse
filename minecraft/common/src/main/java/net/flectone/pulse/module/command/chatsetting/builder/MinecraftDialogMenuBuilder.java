@@ -49,8 +49,12 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(localization.inventory().trim())
+                .build()
+        );
 
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
@@ -85,13 +89,19 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
 
         boolean enabled = fTarget.isSetting(messageType);
 
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
-        MessageContext titleContext = messagePipeline.createContext(fPlayer, fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
+                .build()
+        );
 
-        String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
-        MessageContext loreContext = messagePipeline.createContext(fPlayer, fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
+                .build()
+        );
 
         String id = "fp_" + UUID.randomUUID();
 
@@ -109,13 +119,19 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                     FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
                     boolean currentEnabled = status.toBoolean();
 
-                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-                    MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, finalFTarget, invertTitle);
-                    Component componentInvertTitle = messagePipeline.build(invertTitleContext);
+                    Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(finalFTarget)
+                            .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
+                            .build()
+                    );
 
-                    String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-                    MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, finalFTarget, invertLore);
-                    Component componentInvertLore = messagePipeline.build(invertLoreContext);
+                    Component componentInvertLore = messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(finalFTarget)
+                            .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
+                            .build()
+                    );
 
                     ActionButton invertButton = new ActionButton(
                             new CommonButtonData(componentInvertTitle, componentInvertLore, chatsettingModule.config().modern().buttonWidth()),
@@ -142,11 +158,17 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         String title = messages.length > 0 ? messages[0] : "";
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(title)
+                .build()
+        );
 
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(lore)
+                .build()
+        );
 
         String id = "fp_chat";
 
@@ -176,11 +198,17 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         String title = messages.length > 0 ? messages[0] : "";
         String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(title)
+                .build()
+        );
 
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(lore)
+                .build()
+        );
 
         String id = "fp_fcolor_" + type.ordinal();
 
@@ -229,11 +257,17 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
             String title = messages.length > 0 ? messages[0] : "";
             String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
 
-            MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-            Component componentTitle = messagePipeline.build(titleContext);
+            Component componentTitle = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(title)
+                    .build()
+            );
 
-            MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-            Component componentLore = messagePipeline.build(loreContext);
+            Component componentLore = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(lore)
+                    .build()
+            );
 
             String subId = id + "_" + i;
 

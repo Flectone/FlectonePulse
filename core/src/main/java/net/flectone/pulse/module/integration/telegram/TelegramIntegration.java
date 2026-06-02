@@ -137,8 +137,10 @@ public class TelegramIntegration implements FIntegration {
 
     @NonNull
     private String getNewChatName(@NonNull String value) {
-        MessageContext messageContext = messagePipeline.createContext(value);
-        return messagePipeline.buildPlain(messageContext);
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .message(value)
+                .build()
+        );
     }
 
 }

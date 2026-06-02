@@ -28,7 +28,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
@@ -188,11 +187,12 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
         Localization.Command.Ban localization = localization(fTarget);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, ban);
 
-        MessageContext messageContext = messagePipeline.createContext(fModerator, fTarget, formatPlayer)
-                .addTagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator));
-
-        Component kickMessage = messagePipeline.build(messageContext);
-
-        platformPlayerAdapter.kick(fTarget, kickMessage);
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
+                .sender(fModerator)
+                .receiver(fTarget)
+                .message(formatPlayer)
+                .tagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator))
+                .build())
+        );
     }
 }

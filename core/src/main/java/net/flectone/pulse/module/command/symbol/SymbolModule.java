@@ -117,8 +117,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
                 new String[]{category, String.valueOf(size)}
         );
 
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(header)
+                .build()
+        ).append(Component.newline());
 
         StringBuilder symbolLine = new StringBuilder();
         for (String symbol : finalSymbols) {
@@ -126,8 +129,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
             symbolLine.append(line);
         }
 
-        MessageContext lineContext = messagePipeline.createContext(fPlayer, symbolLine.toString());
-        component = component.append(messagePipeline.build(lineContext)).append(Component.newline());
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(symbolLine.toString())
+                .build()
+        )).append(Component.newline());
 
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + category;
         String footer = StringUtils.replaceEach(
@@ -142,8 +148,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
                 }
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 

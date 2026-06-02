@@ -96,14 +96,16 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
                     messageUUID.toString()
             );
 
-            MessageContext newContext = messagePipeline.createContext(sender, receiver, placeholder)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            Component componentPlaceholder = messagePipeline.build(MessageContext.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .message(placeholder)
+                    .flags(
                             new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.DELETE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
-                    );
-
-            Component componentPlaceholder = messagePipeline.build(newContext);
+                    )
+                    .build()
+            );
 
             return Tag.selfClosingInserting(componentPlaceholder);
         }));
@@ -166,8 +168,12 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
                 for (int i = 0; i < history.size(); i++) {
                     HistoryMessage historyMessage = history.get(i);
                     if (messageUUID.equals(historyMessage.uuid())) {
-                        MessageContext messageContext = messagePipeline.createContext(sender, fReceiver, format);
-                        Component removedComponent = messagePipeline.build(messageContext);
+                        Component removedComponent = messagePipeline.build(MessageContext.builder()
+                                .sender(sender)
+                                .receiver(fReceiver)
+                                .message(format)
+                                .build()
+                        );
                         history.set(i, new HistoryMessage(messageUUID, removedComponent));
                     }
                 }

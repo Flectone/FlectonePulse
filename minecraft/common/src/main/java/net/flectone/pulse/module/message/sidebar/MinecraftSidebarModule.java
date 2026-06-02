@@ -109,8 +109,11 @@ public class MinecraftSidebarModule extends SidebarModule {
             if (lines.length == 0) return;
 
             String objectiveName = getObjectiveName(fPlayer);
-            MessageContext titleContext = messagePipeline.createContext(fPlayer, lines[0]);
-            Component title = messagePipeline.build(titleContext);
+            Component title = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[0])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                     objectiveName,
@@ -138,8 +141,11 @@ public class MinecraftSidebarModule extends SidebarModule {
             int lineIndex = i - 1;
 
             String lineId = getLineId(lineIndex, fPlayer);
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            Component line = messagePipeline.build(lineContext);
+            Component line = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     lineId,
@@ -170,8 +176,11 @@ public class MinecraftSidebarModule extends SidebarModule {
         for (int i = 1; i < lines.length; i++) {
             int lineIndex = i - 1;
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            String line = messagePipeline.buildLegacy(lineContext);
+            String line = messagePipeline.buildLegacy(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     line,

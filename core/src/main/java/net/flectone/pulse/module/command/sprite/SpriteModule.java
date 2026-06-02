@@ -174,8 +174,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 new String[]{atlas, String.valueOf(size)}
         );
 
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(header)
+                .build()
+        ).append(Component.newline());
 
         StringBuilder spriteLine = new StringBuilder();
         for (String sprite : finalSprites) {
@@ -190,8 +193,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
             spriteLine.append(line);
         }
 
-        MessageContext lineContext = messagePipeline.createContext(fPlayer, spriteLine.toString());
-        component = component.append(messagePipeline.build(lineContext)).append(Component.newline());
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(spriteLine.toString())
+                .build()
+        ).append(Component.newline()));
 
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + atlas;
         String footer = StringUtils.replaceEach(
@@ -206,8 +212,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 }
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 

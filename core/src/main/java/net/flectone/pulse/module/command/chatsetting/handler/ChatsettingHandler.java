@@ -76,9 +76,12 @@ public class ChatsettingHandler {
             fPlayerService.updateCache(syncFPlayer(fTarget).withSetting(SettingText.CHAT_NAME, chatName));
         };
 
-        String headerStr = localization.menu().chat().inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(syncFPlayer(fTarget))
+                .message(localization.menu().chat().inventory())
+                .build()
+        );
 
         Runnable closeConsumer = () -> chatsettingModule.saveSetting(syncFPlayer(fTarget), SettingText.CHAT_NAME);
 
@@ -142,9 +145,12 @@ public class ChatsettingHandler {
             fPlayerService.updateCache(syncFPlayer(fTarget).withFColors(type, fColors));
         };
 
-        String headerStr = subMenu.inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(syncFPlayer(fTarget))
+                .message(subMenu.inventory())
+                .build()
+        );
 
         Runnable closeConsumer = () -> fPlayerService.saveColors(syncFPlayer(fTarget));
 

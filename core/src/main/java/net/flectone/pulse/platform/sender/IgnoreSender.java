@@ -61,8 +61,12 @@ public class IgnoreSender {
     }
 
     private void sendMessage(FPlayer sender, FPlayer receiver, String ignoreMessage) {
-        MessageContext messageContext = messagePipeline.createContext(receiver, sender, ignoreMessage);
-        Component component = messagePipeline.build(messageContext);
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(receiver)
+                .receiver(sender)
+                .message(ignoreMessage)
+                .build()
+        );
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, sender, component));
     }
