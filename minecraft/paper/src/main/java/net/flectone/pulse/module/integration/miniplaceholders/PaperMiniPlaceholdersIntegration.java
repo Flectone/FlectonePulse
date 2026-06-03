@@ -41,7 +41,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.Set;
@@ -69,7 +68,6 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
     @Getter private final FLogger fLogger;
 
     private Expansion expansion;
-
 
     @Override
     public String getIntegrationName() {
@@ -128,19 +126,6 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
         return event.withContext(messageContext.withMessage(message));
     }
 
-    private Tag fColorPlaceholder(FPlayer fPlayer, String argument, FColor.Type... types) {
-        if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
-        if (!StringUtils.isNumeric(argument)) return MessagePipeline.ReplacementTag.emptyTag();
-
-        Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
-        for (FColor.Type type : types) {
-            colorsMap.putAll(fPlayer.getFColors(type));
-        }
-
-        int colorNumber = Integer.parseInt(argument);
-        return Tag.preProcessParsed(StringUtils.defaultString(colorsMap.get(colorNumber)));
-    }
-
     private Audience getAudienceOrDefault(UUID uuid, Audience defaultAudience) {
         Audience audience = Bukkit.getPlayer(uuid);
         return audience == null ? defaultAudience : audience;
@@ -172,19 +157,19 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                 .version(BuildConfig.PROJECT_VERSION)
                 .author(BuildConfig.PROJECT_AUTHOR)
                 // ignore required type error
-                .audiencePlaceholder(Player.class, "mute_suffix", (player, _, _) -> {
+                .audiencePlaceholder("mute_suffix", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(muteModuleProvider.get().getMuteSuffix(fPlayer, fPlayer));
                 })
-                .audiencePlaceholder(Player.class, "afk_duration", (player, _, _) -> {
+                .audiencePlaceholder("afk_duration", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(String.valueOf(afkModuleProvider.get().getAfkDuration(fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "afk_duration_formatted", (player, _, _) -> {
+                .audiencePlaceholder("afk_duration_formatted", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(afkModuleProvider.get().getAfkDurationFormatted(fPlayer, fPlayer));
                 })
-                .audiencePlaceholder(Player.class, "toponline", (player, queue, _) -> {
+                .audiencePlaceholder("toponline", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -201,7 +186,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     );
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
                 })
-                .audiencePlaceholder(Player.class, "online", (player, queue, _) -> {
+                .audiencePlaceholder("online", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -212,31 +197,31 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
                     return Tag.preProcessParsed(timeValue);
                 })
-                .audiencePlaceholder(Player.class, "condition", (player, queue, _) -> {
+                .audiencePlaceholder("condition", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return Tag.preProcessParsed(StringUtils.defaultString(conditionModuleProvider.get().getConditionValue(queue.pop().value(), fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "fcolor", (player, queue, _) -> {
+                .audiencePlaceholder("fcolor", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.SEE, FColor.Type.OUT);
                 })
-                .audiencePlaceholder(Player.class, "fcolor_out", (player, queue, _) -> {
+                .audiencePlaceholder("fcolor_out", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.OUT);
                 })
-                .audiencePlaceholder(Player.class, "fcolor_see", (player, queue, _) -> {
+                .audiencePlaceholder("fcolor_see", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
                     return fColorPlaceholder(fPlayer, queue.pop().value(), FColor.Type.SEE);
                 })
-                .audiencePlaceholder(Player.class, "setting", (player, queue, _) -> {
+                .audiencePlaceholder("setting", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -252,28 +237,22 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
                     return Tag.preProcessParsed(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
                 })
-                .audiencePlaceholder(Player.class, "player", (player, queue, _) -> {
-                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
-
+                .audiencePlaceholder("player", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(fPlayer.name());
                 })
-                .audiencePlaceholder(Player.class, "ip", (player, queue, _) -> {
-                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
-
+                .audiencePlaceholder("ip", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(StringUtils.defaultString(fPlayer.ip()));
                 })
-                .audiencePlaceholder(Player.class, "ping", (player, queue, _) -> {
-                    if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
-
+                .audiencePlaceholder("ping", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
                     return Tag.preProcessParsed(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
                 })
-                .audiencePlaceholder(Player.class, "format", (player, queue, _) -> {
+                .audiencePlaceholder("format", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
                     String json = messagePipeline.buildJson(MessageContext.builder()
@@ -290,6 +269,19 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                         Tag.preProcessParsed(platformServerAdapter.getTPS())
                 )
                 .build();
+    }
+
+    private Tag fColorPlaceholder(FPlayer fPlayer, String argument, FColor.Type... types) {
+        if (argument == null) return MessagePipeline.ReplacementTag.emptyTag();
+        if (!StringUtils.isNumeric(argument)) return MessagePipeline.ReplacementTag.emptyTag();
+
+        Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
+        for (FColor.Type type : types) {
+            colorsMap.putAll(fPlayer.getFColors(type));
+        }
+
+        int colorNumber = Integer.parseInt(argument);
+        return Tag.preProcessParsed(StringUtils.defaultString(colorsMap.get(colorNumber)));
     }
 
 }
