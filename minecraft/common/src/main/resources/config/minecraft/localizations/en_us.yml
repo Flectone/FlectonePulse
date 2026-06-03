@@ -247,6 +247,7 @@ command:
     server_version: "Maintenance"
     reasons:
       default: "Server maintenance is in progress"
+      disabled: "Server maintenance is finished"
     format_true: "<fcolor:1>★ <fcolor:2>Enabled <fcolor:1>server maintenance <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
     format_false: "<fcolor:1>★ <fcolor:2>Disabled <fcolor:1>server maintenance <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
     person: "<color:#ff7171>★ <reason>, <time_left> remaining"

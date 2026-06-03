@@ -38,6 +38,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -196,7 +197,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             // save maintenance for server target (console)
             maintenance = moderationService.maintenance(fTarget, databaseTime, reason, fPlayer.id());
         } else {
-            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, databaseTime,-1, reason);
+            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, databaseTime,-1, StringUtils.isEmpty(reason) ? "disabled" : reason);
         }
 
         // skip error

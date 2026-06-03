@@ -247,6 +247,7 @@ command:
     server_version: "Технические работы"
     reasons:
       default: "На сервере ведутся технические работы"
+      disabled: "На сервере закончены технические работы"
     format_true: "<fcolor:1>[*] <fcolor:2>Включены <fcolor:1>технические работы на сервере <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     format_false: "<fcolor:1>[*] <fcolor:2>Выключены <fcolor:1>технические работы на сервере <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     person: "<color:#ff7171>[*] <reason>, осталось <time_left>"
