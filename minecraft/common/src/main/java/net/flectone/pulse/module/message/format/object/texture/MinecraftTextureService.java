@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.message.format.object.texture.mineskin.MineskinIntegration;
 import net.flectone.pulse.module.message.format.object.texture.model.Frame;
 import net.flectone.pulse.module.message.format.object.texture.model.Texture;
@@ -36,8 +37,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -54,6 +58,7 @@ public class MinecraftTextureService {
     private final FLogger fLogger;
     private final Injector injector;
     private final LibraryResolver libraryResolver;
+    private final TaskScheduler taskScheduler;
 
     private MineskinIntegration mineskinIntegration;
 
@@ -96,6 +101,10 @@ public class MinecraftTextureService {
                 })
                 .forEach(textureMap::remove);
 
+        taskScheduler.runAsync(this::loadTextures, true);
+    }
+
+    public void loadTextures() {
         config().values().forEach((key, value) -> {
             // skip empty image
             if (StringUtils.isEmpty(value)) return;
@@ -106,6 +115,7 @@ public class MinecraftTextureService {
             try {
                 // load texture
                 List<Frame> frames = loadTexture(value);
+                if (frames.isEmpty()) return;
 
                 // build component
                 Component textureComponent = Component.empty();
@@ -194,13 +204,17 @@ public class MinecraftTextureService {
         // read image
         BufferedImage original = ImageIO.read(textureFileImage);
 
+        // get texture name
+        String textureName = textureFileImage.getName();
+
         // check dimensions
         if (original.getWidth() % HEAD_SIZE != 0 || original.getHeight() % HEAD_SIZE != 0) {
-            throw new IllegalArgumentException(textureFileImage.getName() + " image dimensions must be multiples of 8");
+            throw new IllegalArgumentException(textureName + " image dimensions must be multiples of 8");
         }
 
         int framesX = original.getWidth() / HEAD_SIZE;
         int framesY = original.getHeight() / HEAD_SIZE;
+        int totalFrames = framesX * framesY;
 
         List<CompletableFuture<Frame>> futures = new ObjectArrayList<>(framesX * framesY);
 
@@ -209,13 +223,35 @@ public class MinecraftTextureService {
                 BufferedImage headPart = createHead(original, x, y);
                 BufferedImage skinImage = createSkin(headPart);
 
-                futures.add(mineskinIntegration.loadTexture(x, y, skinImage));
+                futures.add(mineskinIntegration.loadTexture(x, y, skinImage, textureName));
             }
         }
 
-        return futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+
+        List<Frame> frames;
+        try {
+            frames = futures.stream()
+                    .map(completableFuture -> {
+                        Frame frame = completableFuture.join();
+
+                        fLogger.info("Texture %s | Frame %d/%d uploaded", textureName, atomicInteger.getAndIncrement(), totalFrames);
+
+                        return frame;
+                    })
+                    .toList();
+        } catch (CancellationException | CompletionException e) {
+            if (!(e instanceof CancellationException)) {
+                fLogger.warning(e);
+            }
+
+            futures.forEach(completableFuture -> completableFuture.cancel(true));
+            return List.of();
+        }
+
+        fLogger.info("Texture %s | Uploaded (%d frames)", textureName, totalFrames);
+
+        return frames;
     }
 
 
