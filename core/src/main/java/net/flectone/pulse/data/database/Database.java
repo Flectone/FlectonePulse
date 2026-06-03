@@ -63,7 +63,7 @@ public class Database {
     private final Provider<VersionDAO> versionDAOProvider;
     private final BackupCreator backupCreator;
 
-    @Nullable private HikariDataSource dataSource;
+    @Nullable private volatile HikariDataSource dataSource;
     @Nullable private Jdbi jdbi;
 
     /**
@@ -85,11 +85,13 @@ public class Database {
 
         HikariConfig hikariConfig = createHikariConfig();
 
-        dataSource = new HikariDataSource(hikariConfig);
-        jdbi = Jdbi.create(dataSource);
+        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+        this.dataSource = hikariDataSource;
+
+        jdbi = Jdbi.create(hikariDataSource);
         jdbi.installPlugin(new SqlObjectPlugin());
 
-        setupTemplateEngine();
+        setupTemplateEngine(jdbi);
 
         jdbi.registerRowMapper(ConstructorMapper.factory(FColorDao.FColorInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
@@ -128,14 +130,16 @@ public class Database {
      * Disconnects from the database.
      */
     public void disconnect() {
-        if (dataSource != null) {
-            dataSource.close();
+        HikariDataSource hikariDataSource = dataSource;
+        if (hikariDataSource != null) {
+            hikariDataSource.close();
+            this.dataSource = null;
 
             fLogger.info("[-] Database disconnected");
         }
     }
 
-    private void setupTemplateEngine() {
+    private void setupTemplateEngine(Jdbi jdbi) {
         BiFunction<String, StatementContext, String> template = null;
         if (StringUtils.isNotEmpty(config().prefix())) {
             template = (sql, _) -> Strings.CS.replace(sql, "fp_", config().prefix());
@@ -152,6 +156,11 @@ public class Database {
         if (template != null) {
             jdbi.getConfig(SqlStatements.class).setTemplateEngine(template::apply);
         }
+    }
+
+    public boolean isClosed() {
+        HikariDataSource hikariDataSource = dataSource;
+        return hikariDataSource == null || hikariDataSource.isClosed();
     }
 
     private HikariConfig createHikariConfig() {

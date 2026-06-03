@@ -10,7 +10,6 @@ import net.flectone.pulse.model.util.Moderation;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +48,9 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return list of valid moderation actions matching the criteria
      */
     public List<Moderation> getValid(@NonNull FPlayer player, Moderation.Type type, @Nullable String server, int limit, int offset) {
-        if (player.isUnknown()) return Collections.emptyList();
+        if (database.isClosed()) return List.of();
+        if (player.isUnknown()) return List.of();
+
         return withHandle(sql -> sql.findValidByPlayerAndType(
                 player.id(),
                 type.name(),
@@ -70,6 +71,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return list of valid moderation actions matching the criteria
      */
     public List<Moderation> getValid(Moderation.Type type, @Nullable String server, int limit, int offset) {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> sql.findValidByType(
                 type.name(),
                 System.currentTimeMillis(),
@@ -88,6 +91,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return an Optional containing the moderation if found and valid, or empty otherwise
      */
     public Optional<Moderation> getValidById(@Nullable String server, int id) {
+        if (database.isClosed()) return Optional.empty();
+
         return withHandle(sql -> sql.findValidById(
                 System.currentTimeMillis(),
                 server,
@@ -103,6 +108,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return list of player names
      */
     public List<String> getValidPlayersNames(Moderation.Type type, @Nullable String server) {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> sql.findValidPlayerNamesByType(
                 type.name(),
                 System.currentTimeMillis(),
@@ -120,6 +127,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return the count of valid moderations matching the criteria
      */
     public int getTotalValidCount(FPlayer fPlayer, Moderation.Type type, @Nullable String server) {
+        if (database.isClosed()) return 0;
+
         return withHandle(sql -> sql.getTotalValidCountByPlayerAndType(
                 fPlayer.id(),
                 type.name(),
@@ -137,6 +146,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return the count of valid moderations matching the criteria
      */
     public int getTotalValidCount(Moderation.Type type, @Nullable String server) {
+        if (database.isClosed()) return 0;
+
         return withHandle(sql -> sql.getTotalValidCountByType(
                 type.name(),
                 System.currentTimeMillis(),
@@ -157,6 +168,7 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @return the created moderation action, or null if player is unknown
      */
     public @Nullable Moderation insert(@NonNull FPlayer target, long date, long time, String reason, int moderatorId, Moderation.Type type, String server) {
+        if (database.isClosed()) return null;
         if (target.isUnknown()) return null;
 
         int id = withHandle(sql -> sql.insert(target.id(), date, time, reason, moderatorId, type.name(), server));
@@ -182,6 +194,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @param server the server ID (can be null for global invalidation)
      */
     public void updateValid(int id, @Nullable String server) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.invalidate(id, server));
     }
 
@@ -194,6 +208,8 @@ public class ModerationDAO implements BaseDAO<ModerationSQL> {
      * @param server the server ID (can be null for global invalidation)
      */
     public void updateValid(int playerId, Moderation.@NonNull Type type, @Nullable String server) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.invalidate(playerId, type.name(), server));
     }
 

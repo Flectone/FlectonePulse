@@ -294,7 +294,7 @@ public interface FPlayer extends FEntity {
 
         @Override
         public int hashCode() {
-            return uuid.hashCode();
+            return Objects.hashCode(id);
         }
 
         @Override

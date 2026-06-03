@@ -49,6 +49,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
      * @param fPlayer the player whose colors to save
      */
     public void save(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
         if (fPlayer.fColors().isEmpty()) {
             delete(fPlayer);
             return;
@@ -78,6 +79,8 @@ public class FColorDao implements BaseDAO<FColorSQL> {
      * @param fPlayer the player whose colors to delete
      */
     public void delete(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.deleteFColors(fPlayer.id()));
     }
 
@@ -88,6 +91,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
      * @return new FPlayer with colors
      */
     public FPlayer load(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return fPlayer;
         if (fPlayer.isUnknown()) return fPlayer;
 
         return withHandle(sql -> fPlayer.withFColors(findFColors(sql, fPlayer)));

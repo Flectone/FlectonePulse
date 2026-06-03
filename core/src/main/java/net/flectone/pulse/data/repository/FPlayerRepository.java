@@ -359,6 +359,12 @@ public class FPlayerRepository {
         if (fPlayer.isOnline() || fPlayer.isConsole()) {
             saveToCacheOnline(fPlayer);
         } else {
+            if (fPlayer.id().equals(FPlayer.UNKNOWN.id())
+                    && fPlayer.uuid().equals(FPlayer.UNKNOWN.uuid())
+                    && fPlayer.name().equals(FPlayer.UNKNOWN.name())
+                    && fPlayer.ip() == null) return;
+
+            // save only changed player
             saveToCacheOffline(fPlayer);
         }
     }

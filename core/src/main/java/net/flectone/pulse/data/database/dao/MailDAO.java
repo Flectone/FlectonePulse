@@ -10,7 +10,6 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,6 +44,7 @@ public class MailDAO implements BaseDAO<MailSQL> {
      * @return the created mail record, or null if players are unknown
      */
     public @Nullable Mail insert(@NonNull FPlayer sender, @NonNull FPlayer receiver, @NonNull String message) {
+        if (database.isClosed()) return null;
         if (sender.isUnknown() || receiver.isUnknown()) return null;
 
         long date = System.currentTimeMillis();
@@ -59,6 +59,8 @@ public class MailDAO implements BaseDAO<MailSQL> {
      * @param mail the mail record to delete
      */
     public void delete(@NonNull Mail mail) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.invalidate(mail.id()));
     }
 
@@ -69,7 +71,8 @@ public class MailDAO implements BaseDAO<MailSQL> {
      * @return list of received mail messages, empty list if player is unknown
      */
     public List<Mail> getReceiver(FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return Collections.emptyList();
+        if (database.isClosed()) return List.of();
+        if (fPlayer.isUnknown()) return List.of();
 
         return withHandle(sql -> sql.findByReceiver(fPlayer.id()));
     }
@@ -81,7 +84,8 @@ public class MailDAO implements BaseDAO<MailSQL> {
      * @return list of sent mail messages, empty list if player is unknown
      */
     public List<Mail> getSender(FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return Collections.emptyList();
+        if (database.isClosed()) return List.of();
+        if (fPlayer.isUnknown()) return List.of();
 
         return withHandle(sql -> sql.findBySender(fPlayer.id()));
     }

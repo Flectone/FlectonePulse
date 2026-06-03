@@ -56,6 +56,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return true if a new player was inserted, false if an existing player was updated
      */
     public boolean insert(@NonNull UUID uuid, @NonNull String name) {
+        if (database.isClosed()) return false;
+
         return inTransaction(sql -> {
             Optional<PlayerInfo> existingByUUID = sql.findByUUID(uuid.toString());
             if (existingByUUID.isPresent()) {
@@ -97,6 +99,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @param fPlayer the player to insert
      */
     public void insertOrIgnore(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.insertOrIgnore(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name()));
     }
 
@@ -106,6 +110,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @param fPlayer the player to update
      */
     public void update(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
 
         useHandle(sql -> sql.update(
@@ -123,6 +128,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return list of online players
      */
     public List<FPlayer> getOnlineFPlayers() {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> convertToFPlayers(sql.getOnlinePlayers()));
     }
 
@@ -132,6 +139,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return list of all players
      */
     public List<FPlayer> getFPlayers() {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> convertToFPlayers(sql.getAllPlayers()));
     }
 
@@ -142,6 +151,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull String name) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByNameWithSettings(name)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
@@ -155,6 +166,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull InetAddress inetAddress) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByIpWithSettings(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
@@ -168,6 +181,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull UUID uuid) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByUUIDWithSettings(uuid.toString())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.withUuid(uuid))
@@ -181,6 +196,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(int id) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByIdWithSettings(id)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())

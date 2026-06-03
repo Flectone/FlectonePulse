@@ -44,6 +44,8 @@ public class VersionDAO implements BaseDAO<VersionSQL> {
      * @return optional containing the version name if found
      */
     public Optional<String> find() {
+        if (database.isClosed()) return Optional.empty();
+
         return withHandle(VersionSQL::find);
     }
 
@@ -53,6 +55,8 @@ public class VersionDAO implements BaseDAO<VersionSQL> {
      * @param name the version name
      */
     public void insertOrUpdate(@NonNull String name) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.upsert(name));
     }
 

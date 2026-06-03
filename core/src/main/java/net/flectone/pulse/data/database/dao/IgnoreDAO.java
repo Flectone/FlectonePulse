@@ -49,6 +49,7 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * @return the ignore record, or null if players are unknown
      */
     public @Nullable Ignore insert(@NonNull FPlayer fSender, @NonNull FPlayer fIgnored) {
+        if (database.isClosed()) return null;
         if (fSender.isUnknown() || fIgnored.isUnknown()) return null;
 
         return inTransaction(sql -> {
@@ -66,6 +67,8 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * @param ignore the ignore record to invalidate
      */
     public void invalidate(@NonNull Ignore ignore) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.invalidate(ignore.id()));
     }
 
@@ -76,6 +79,7 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * @return new FPlayer with ignores
      */
     public FPlayer load(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return fPlayer;
         if (fPlayer.isUnknown()) return fPlayer;
 
         List<Ignore> ignores = withHandle(sql ->

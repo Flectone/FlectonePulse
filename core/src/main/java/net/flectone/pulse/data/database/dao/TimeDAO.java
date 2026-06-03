@@ -49,6 +49,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @param fPlayer the player who joined
      */
     public void saveJoin(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
 
         saveSession(new PlayTime(-1, fPlayer.id(), System.currentTimeMillis(), System.currentTimeMillis(), 0, 1));
@@ -62,6 +63,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @param playTime the playtime data to save
      */
     public void saveSession(@NonNull PlayTime playTime) {
+        if (database.isClosed()) return;
         if (playTime.id() != -1) return;
 
         useHandle(sql -> sql.upsert(
@@ -82,6 +84,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @param afk true if the player is going AFK, false if returning
      */
     public void saveAfk(@NonNull FPlayer fPlayer, boolean afk, PlayTime playTime) {
+        if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
 
         long currentTime = System.currentTimeMillis();
@@ -100,6 +103,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @param fPlayer the player who quit
      */
     public void saveQuit(@NonNull FPlayer fPlayer, PlayTime playTime) {
+        if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
         if (playTime.last() < 0) return;
 
@@ -115,6 +119,7 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @return optional containing the playtime record
      */
     public @NonNull Optional<PlayTime> getByPlayer(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return Optional.empty();
         if (fPlayer.isUnknown()) return Optional.empty();
 
         return withHandle(sql -> sql.findByPlayer(fPlayer.id()));
@@ -126,6 +131,8 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @return total count
      */
     public int getTotalCount() {
+        if (database.isClosed()) return 0;
+
         return withHandle(TimeSQL::getTotalCount);
     }
 
@@ -135,6 +142,8 @@ public class TimeDAO implements BaseDAO<TimeSQL> {
      * @return list of playtime records
      */
     public @NonNull List<PlayTime> getAllPlayTimes(int limit, int offset) {
+        if (database.isClosed()) return List.of();
+
         return withHandle(timeSQL -> timeSQL.getAllPlayTimes(limit, offset));
     }
 

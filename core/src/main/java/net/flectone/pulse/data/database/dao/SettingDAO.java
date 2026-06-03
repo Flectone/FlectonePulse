@@ -48,6 +48,8 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * @param player the player to save settings for
      */
     public void save(@NonNull FPlayer player) {
+        if (database.isClosed()) return;
+
         useTransaction(sql -> {
             player.settingsBoolean().forEach((messageType, _) ->
                     insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
@@ -70,6 +72,8 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * @return new FPlayer with settings
      */
     public FPlayer load(@NonNull FPlayer player) {
+        if (database.isClosed()) return player;
+
         int id = player.id();
 
         Map<String, Boolean> settingsBoolean = new Object2BooleanOpenHashMap<>();
@@ -100,6 +104,8 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * @param setting the setting name
      */
     public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> insertOrUpdate(sql, player, setting, player.getSetting(setting)));
     }
 
@@ -110,6 +116,8 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * @param settingText the setting text type
      */
     public void insertOrUpdate(@NonNull FPlayer player, SettingText settingText) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> insertOrUpdate(sql, player, settingText.name(), player.getSetting(settingText)));
     }
 
