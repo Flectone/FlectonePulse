@@ -228,9 +228,9 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(localization(fReceiver).format())
-                // 3 - offline client, 4 - official client, 0 - bedrock client
-                // disable for offline and bedrock client
-                .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3 || fReceiver.uuid().version() == 0)
+                // 3 - offline client, 4 - official client
+                // disable for offline client
+                .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
                 .build()
         );
     }
