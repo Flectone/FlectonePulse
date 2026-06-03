@@ -719,7 +719,7 @@ message:
         - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><white><player_head></white></!shadow><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
+      format: "<white><player_head></white><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"
