@@ -28,17 +28,17 @@ public class BukkitBookListener implements Listener {
 
         BookMeta bookMeta = event.getNewBookMeta();
 
-        for (int x = 1; x <= event.getNewBookMeta().getPages().size(); x++) {
-            String string = bookMeta.getPage(x);
+        for (int i = 1; i <= event.getNewBookMeta().getPages().size(); i++) {
+            String string = bookMeta.getPage(i);
 
-            Optional<String> formattedString = bookModule.format(fPlayer, string);
+            Optional<String> formattedString = bookModule.legacyFormat(fPlayer, string);
             if (formattedString.isPresent()) {
-                bookMeta.setPage(x, formattedString.get());
+                bookMeta.setPage(i, formattedString.get());
             }
         }
 
         if (event.isSigning()) {
-            Optional<String> formattedTitle = bookModule.format(fPlayer, bookMeta.getTitle());
+            Optional<String> formattedTitle = bookModule.legacyFormat(fPlayer, bookMeta.getTitle());
             formattedTitle.ifPresent(bookMeta::setTitle);
         }
 
