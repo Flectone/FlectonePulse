@@ -11,8 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.meta.BookMeta;
 
-import java.util.Optional;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitBookListener implements Listener {
@@ -21,7 +19,7 @@ public class BukkitBookListener implements Listener {
     private final BukkitBookModule bookModule;
 
     @EventHandler
-    public void playerEditBookEvent(PlayerEditBookEvent event) {
+    public void onPlayerEditBookEvent(PlayerEditBookEvent event) {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
@@ -29,17 +27,14 @@ public class BukkitBookListener implements Listener {
         BookMeta bookMeta = event.getNewBookMeta();
 
         for (int i = 1; i <= event.getNewBookMeta().getPages().size(); i++) {
-            String string = bookMeta.getPage(i);
+            String page = bookMeta.getPage(i);
 
-            Optional<String> formattedString = bookModule.legacyFormat(fPlayer, string);
-            if (formattedString.isPresent()) {
-                bookMeta.setPage(i, formattedString.get());
-            }
+            int pageIndex = i;
+            bookModule.legacyFormat(fPlayer, page).ifPresent(string -> bookMeta.setPage(pageIndex, string));
         }
 
         if (event.isSigning()) {
-            Optional<String> formattedTitle = bookModule.legacyFormat(fPlayer, bookMeta.getTitle());
-            formattedTitle.ifPresent(bookMeta::setTitle);
+            bookModule.legacyFormat(fPlayer, bookMeta.getTitle()).ifPresent(bookMeta::setTitle);
         }
 
         event.setNewBookMeta(bookMeta);

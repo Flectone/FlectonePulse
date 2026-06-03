@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.processing.PaperComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -22,16 +22,17 @@ public class PaperChatListener implements Listener {
     private final FPlayerService fPlayerService;
     private final ChatModule chatModule;
     private final ModuleController moduleController;
+    private final PaperComponentSerializer paperComponentSerializer;
 
     @EventHandler
-    public void asyncPlayerChatEvent(AsyncChatEvent event) {
+    public void onAsyncChatEvent(AsyncChatEvent event) {
         if (event.isCancelled()) return;
         if (!moduleController.isEnable(chatModule)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         if (moduleController.isDisabledFor(chatModule, fPlayer)) return;
 
-        String format = PlainTextComponentSerializer.plainText().serialize(event.message());
+        String format = paperComponentSerializer.toPlain(event.message()).orElse("");
 
         Runnable cancelRunnable = () -> {
             event.setCancelled(true);

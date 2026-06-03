@@ -5,10 +5,9 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
+import net.flectone.pulse.processing.PaperComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,17 +17,16 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Optional;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperAnvilListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final AnvilModule anvilModule;
+    private final PaperComponentSerializer paperComponentSerializer;
 
     @EventHandler
-    public void inventoryClickEvent(InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
         if (event.getSlot() != 2) return;
@@ -43,33 +41,24 @@ public class PaperAnvilListener implements Listener {
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
         try {
-            // try use paper format
+            // try paper format
             Component componentDisplayName = itemMeta.displayName();
             if (componentDisplayName == null) return;
 
-            String displayName;
-            try {
-                displayName = PlainTextComponentSerializer.plainText().serialize(componentDisplayName);
-            } catch (Exception _) {
-                displayName = itemMeta.getDisplayName();
-            }
+            String displayName = paperComponentSerializer.toPlain(componentDisplayName).orElse(itemMeta.getDisplayName());
 
             // skip empty string
             if (StringUtils.isEmpty(displayName)) return;
 
-            Optional<String> formatted = anvilModule.paperFormat(fPlayer, displayName);
-            if (formatted.isEmpty()) return;
-
-            itemMeta.displayName(GsonComponentSerializer.gson().deserialize(formatted.get()));
-            itemStack.setItemMeta(itemMeta);
+            anvilModule.paperFormat(fPlayer, displayName)
+                    .flatMap(paperComponentSerializer::fromJson)
+                    .ifPresent(itemMeta::displayName);
         } catch (Exception _) {
             // use deprecated format
-            Optional<String> formatted = anvilModule.legacyFormat(fPlayer, itemMeta.getDisplayName());
-            if (formatted.isEmpty()) return;
-
-            itemMeta.setDisplayName(formatted.get());
-            itemStack.setItemMeta(itemMeta);
+            anvilModule.legacyFormat(fPlayer, itemMeta.getDisplayName())
+                    .ifPresent(itemMeta::setDisplayName);
         }
 
+        itemStack.setItemMeta(itemMeta);
     }
 }

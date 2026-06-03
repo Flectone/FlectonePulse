@@ -5,17 +5,14 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.book.BookModule;
+import net.flectone.pulse.processing.PaperComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.meta.BookMeta;
-
-import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -23,9 +20,10 @@ public class PaperBookListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final BookModule bookModule;
+    private final PaperComponentSerializer paperComponentSerializer;
 
     @EventHandler
-    public void playerEditBookEvent(PlayerEditBookEvent event) {
+    public void onPlayerEditBookEvent(PlayerEditBookEvent event) {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
@@ -34,33 +32,28 @@ public class PaperBookListener implements Listener {
 
         // pages
         try {
+            // try paper format
             for (int i = 1; i <= bookMeta.pages().size(); i++) {
                 Component componentPage = bookMeta.page(i);
 
-                String page;
-                try {
-                    page = PlainTextComponentSerializer.plainText().serialize(componentPage);
-                } catch (Exception _) {
-                    page = bookMeta.getPage(i);
-                }
+                String page = paperComponentSerializer.toPlain(componentPage).orElse(bookMeta.getPage(i));
 
                 // skip empty string
                 if (StringUtils.isEmpty(page)) continue;
 
-                Optional<String> formatted = bookModule.paperFormat(fPlayer, page);
-                if (formatted.isEmpty()) continue;
-
-                bookMeta.page(i, GsonComponentSerializer.gson().deserialize(formatted.get()));
+                int pageIndex = i;
+                bookModule.paperFormat(fPlayer, page)
+                        .flatMap(paperComponentSerializer::fromJson)
+                        .ifPresent(component -> bookMeta.page(pageIndex, component));
             }
 
         } catch (Exception _) {
+            // use legacy format
             for (int i = 1; i <= bookMeta.getPages().size(); i++) {
-                String string = bookMeta.getPage(i);
+                String page = bookMeta.getPage(i);
 
-                Optional<String> formattedString = bookModule.legacyFormat(fPlayer, string);
-                if (formattedString.isPresent()) {
-                    bookMeta.setPage(i, formattedString.get());
-                }
+                int pageIndex = i;
+                bookModule.legacyFormat(fPlayer, page).ifPresent(string -> bookMeta.setPage(pageIndex, string));
             }
         }
 
@@ -74,26 +67,21 @@ public class PaperBookListener implements Listener {
 
     private void sign(FPlayer fPlayer, BookMeta bookMeta) {
         try {
+            // try paper format
             Component componentTitle = bookMeta.title();
             if (componentTitle == null) return;
 
-            String title;
-            try {
-                title = PlainTextComponentSerializer.plainText().serialize(componentTitle);
-            } catch (Exception _) {
-                title = bookMeta.getTitle();
-            }
+            String title = paperComponentSerializer.toPlain(componentTitle).orElse(bookMeta.getTitle());
 
             // skip empty string
             if (StringUtils.isEmpty(title)) return;
 
-            Optional<String> formatted = bookModule.paperFormat(fPlayer, title);
-            if (formatted.isEmpty()) return;
-
-            bookMeta.title(GsonComponentSerializer.gson().deserialize(formatted.get()));
+            bookModule.paperFormat(fPlayer, title)
+                    .flatMap(paperComponentSerializer::fromJson)
+                    .ifPresent(bookMeta::title);
         } catch (Exception _) {
-            Optional<String> formattedTitle = bookModule.legacyFormat(fPlayer, bookMeta.getTitle());
-            formattedTitle.ifPresent(bookMeta::setTitle);
+            // use legacy format
+            bookModule.legacyFormat(fPlayer, bookMeta.getTitle()).ifPresent(bookMeta::setTitle);
         }
     }
 }

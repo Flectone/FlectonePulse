@@ -5,16 +5,13 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.sign.SignModule;
+import net.flectone.pulse.processing.PaperComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-
-import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,6 +19,7 @@ public class PaperSignListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final SignModule signModule;
+    private final PaperComponentSerializer paperComponentSerializer;
 
     @EventHandler
     public void signChangeEvent(SignChangeEvent event) {
@@ -30,35 +28,29 @@ public class PaperSignListener implements Listener {
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
         try {
-            // try use paper methods
+            // try paper format
             for (int i = 0; i < event.lines().size(); i++) {
                 Component componentLine = event.line(i);
                 if (componentLine == null) continue;
 
-                String line;
-                try {
-                    line = PlainTextComponentSerializer.plainText().serialize(componentLine);
-                } catch (Exception _) {
-                    line = event.getLine(i);
-                }
+                String line = paperComponentSerializer.toPlain(componentLine).orElse(event.getLine(i));
 
                 // skip empty string
                 if (StringUtils.isEmpty(line)) continue;
 
-                Optional<String> formatted = signModule.paperFormat(fPlayer, line);
-                if (formatted.isEmpty()) continue;
-
-                event.line(i, GsonComponentSerializer.gson().deserialize(formatted.get()));
+                int lineIndex = i;
+                signModule.paperFormat(fPlayer, line)
+                        .flatMap(paperComponentSerializer::fromJson)
+                        .ifPresent(component -> event.line(lineIndex, component));
             }
         } catch (Exception _) {
-            // use deprecated methods
+            // use legacy format
             for (int i = 0; i < event.getLines().length; i++) {
-                String string = event.getLine(i);
+                String line = event.getLine(i);
 
-                Optional<String> formattedString = signModule.legacyFormat(fPlayer, string);
-                if (formattedString.isPresent()) {
-                    event.setLine(i, formattedString.get());
-                }
+                int lineIndex = i;
+                signModule.legacyFormat(fPlayer, line)
+                        .ifPresent(string -> event.setLine(lineIndex, string));
             }
         }
 

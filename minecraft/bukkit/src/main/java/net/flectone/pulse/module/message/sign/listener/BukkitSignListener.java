@@ -10,8 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
-import java.util.Optional;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitSignListener implements Listener {
@@ -20,18 +18,16 @@ public class BukkitSignListener implements Listener {
     private final BukkitSignModule signModule;
 
     @EventHandler
-    public void signChangeEvent(SignChangeEvent event) {
+    public void onSignChangeEvent(SignChangeEvent event) {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
-        for (int x = 0; x < event.getLines().length; x++) {
-            String string = event.getLine(x);
+        for (int i = 0; i < event.getLines().length; i++) {
+            String line = event.getLine(i);
 
-            Optional<String> formattedString = signModule.legacyFormat(fPlayer, string);
-            if (formattedString.isPresent()) {
-                event.setLine(x, formattedString.get());
-            }
+            int lineIndex = i;
+            signModule.legacyFormat(fPlayer, line).ifPresent(string -> event.setLine(lineIndex, string));
         }
     }
 }
