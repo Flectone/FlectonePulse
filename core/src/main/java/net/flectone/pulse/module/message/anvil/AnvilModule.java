@@ -54,7 +54,10 @@ public class AnvilModule implements ModuleSimple {
         return Optional.of(messagePipeline.buildJson(MessageContext.builder()
                 .sender(fPlayer)
                 .message(string)
-                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
+                        new boolean[]{true, !config().allowObject()}
+                )
                 .build()
         ));
     }

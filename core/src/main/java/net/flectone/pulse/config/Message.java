@@ -121,7 +121,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Anvil(Boolean enable) implements EnableSetting {
+    public record Anvil(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With
@@ -147,7 +150,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Book(Boolean enable) implements EnableSetting {
+    public record Book(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With
@@ -752,7 +758,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Sign(Boolean enable) implements EnableSetting {
+    public record Sign(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With

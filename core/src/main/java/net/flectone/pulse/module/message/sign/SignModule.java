@@ -57,7 +57,7 @@ public class SignModule implements ModuleSimple {
                 .message(string)
                 .flags(
                         new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.OBJECT_DEFAULT_VALUE},
-                        new boolean[]{true, true}
+                        new boolean[]{true, !config().allowObject()}
                 )
                 .build()
         ));

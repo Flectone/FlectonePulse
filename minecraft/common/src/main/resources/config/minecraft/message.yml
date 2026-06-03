@@ -16,6 +16,7 @@ afk:
     enable: false
 anvil:
   enable: false
+  allow_object: false
 auto:
   enable: false
   types:
@@ -30,6 +31,7 @@ auto:
         enable: false
 book:
   enable: false
+  allow_object: false
 bossbar:
   enable: true
   announce:
@@ -391,6 +393,7 @@ sidebar:
     period: 100
 sign:
   enable: false
+  allow_object: false
 status:
   enable: true
   icon:
