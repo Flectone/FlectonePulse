@@ -1,6 +1,9 @@
 package net.flectone.pulse.module.message.chat.listener;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -12,19 +15,13 @@ import org.bukkit.event.Listener;
 
 import java.util.function.BiConsumer;
 
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperChatListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final ChatModule chatModule;
     private final ModuleController moduleController;
-
-    public PaperChatListener(FPlayerService fPlayerService,
-                             ModuleController moduleController,
-                             ChatModule chatModule) {
-        this.fPlayerService = fPlayerService;
-        this.chatModule = chatModule;
-        this.moduleController = moduleController;
-    }
 
     @EventHandler
     public void asyncPlayerChatEvent(AsyncChatEvent event) {

@@ -1,5 +1,8 @@
 package net.flectone.pulse.module.message.sign.listener;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -13,15 +16,12 @@ import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.Optional;
 
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperSignListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final SignModule signModule;
-
-    public PaperSignListener(FPlayerService fPlayerService, SignModule signModule) {
-        this.fPlayerService = fPlayerService;
-        this.signModule = signModule;
-    }
 
     @EventHandler
     public void signChangeEvent(SignChangeEvent event) {

@@ -1,5 +1,8 @@
 package net.flectone.pulse.module.message.anvil.listener;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -17,15 +20,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Optional;
 
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperAnvilListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final AnvilModule anvilModule;
-
-    public PaperAnvilListener(FPlayerService fPlayerService, AnvilModule anvilModule) {
-        this.fPlayerService = fPlayerService;
-        this.anvilModule = anvilModule;
-    }
 
     @EventHandler
     public void inventoryClickEvent(InventoryClickEvent event) {

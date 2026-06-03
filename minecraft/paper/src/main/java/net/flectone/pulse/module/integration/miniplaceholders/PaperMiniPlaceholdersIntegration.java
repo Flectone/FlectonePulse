@@ -1,12 +1,15 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.Expansion;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -46,7 +49,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// only for modern paper based servers
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseListener {
 
     private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
@@ -65,30 +69,6 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
     @Getter private final FLogger fLogger;
 
     private Expansion expansion;
-
-    public PaperMiniPlaceholdersIntegration(FileFacade fileFacade,
-                                            FPlayerService fPlayerService,
-                                            PlatformPlayerAdapter platformPlayerAdapter,
-                                            PlatformServerAdapter platformServerAdapter,
-                                            Provider<MuteModule> muteModuleProvider,
-                                            Provider<ConditionModule> conditionModuleProvider,
-                                            Provider<AfkModule> afkModuleProvider,
-                                            Provider<OnlineModule> onlineModuleProvider,
-                                            Provider<ToponlineModule> toponlineModuleProvider,
-                                            MessagePipeline messagePipeline,
-                                            FLogger fLogger) {
-        this.fileFacade = fileFacade;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.platformServerAdapter = platformServerAdapter;
-        this.muteModuleProvider = muteModuleProvider;
-        this.conditionModuleProvider = conditionModuleProvider;
-        this.afkModuleProvider = afkModuleProvider;
-        this.onlineModuleProvider = onlineModuleProvider;
-        this.toponlineModuleProvider = toponlineModuleProvider;
-        this.messagePipeline = messagePipeline;
-        this.fLogger = fLogger;
-    }
 
 
     @Override
