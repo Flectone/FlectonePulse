@@ -169,8 +169,11 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         Matcher matcher = combinedPattern.matcher(string);
         while (matcher.find()) {
             String word = matcher.group(0);
+            if (isIgnored(word)) continue;
+
             int start = matcher.start();
-            if (isIgnored(word) || isIgnored(getFullWord(string, start))) continue;
+            String fullWord = getFullWord(string, start);
+            if (!StringUtils.isEmpty(fullWord) && isIgnored(fullWord)) continue;
 
             matcher.appendReplacement(result, "<swear:'" + word + "'>");
         }
