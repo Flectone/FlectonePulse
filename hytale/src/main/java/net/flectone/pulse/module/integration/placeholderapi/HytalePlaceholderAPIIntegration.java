@@ -39,6 +39,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -79,6 +80,27 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     @Override
     public String getIntegrationName() {
         return "PlaceholderAPI";
+    }
+
+    @Override
+    public @NonNull List<String> getPlaceholders() {
+        return List.of(
+                "%flectonepulse_mute_suffix%",
+                "%flectonepulse_afk_duration%",
+                "%flectonepulse_afk_duration_formatted%",
+                "%flectonepulse_toponline_<position>%",
+                "%flectonepulse_online_<time>%",
+                "%flectonepulse_condition_<name>%",
+                "%flectonepulse_fcolor_<number>%",
+                "%flectonepulse_fcolor_out_<number>%",
+                "%flectonepulse_fcolor_see_<number>%",
+                "%flectonepulse_setting_<name>%",
+                "%flectonepulse_player%",
+                "%flectonepulse_ip%",
+                "%flectonepulse_ping%",
+                "%flectonepulse_online%",
+                "%flectonepulse_tps%"
+        );
     }
 
     @Override
