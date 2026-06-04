@@ -38,7 +38,6 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.Permissible;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.Set;
 
 @Singleton
@@ -202,7 +201,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
             return getInstance(BukkitVaultModule.class).getGroups();
         }
 
-        return Collections.emptySet();
+        return Set.of();
     }
 
     @Override

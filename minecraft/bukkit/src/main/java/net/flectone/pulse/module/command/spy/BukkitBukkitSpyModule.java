@@ -74,7 +74,7 @@ public class BukkitBukkitSpyModule extends SpyModule {
             FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
             FPlayer fReceiver = arguments.length > 1 ? fPlayerService.getFPlayer(arguments[1]) : FPlayer.UNKNOWN;
 
-            spy(fPlayer, commandName, event.getMessage(), fReceiver.isUnknown() ? Collections.emptyList() : List.of(fReceiver));
+            spy(fPlayer, commandName, event.getMessage(), fReceiver.isUnknown() ? List.of() : List.of(fReceiver));
         });
     }
 

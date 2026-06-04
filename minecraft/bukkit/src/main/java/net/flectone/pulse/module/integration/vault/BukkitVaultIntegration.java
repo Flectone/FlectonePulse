@@ -85,7 +85,7 @@ public class BukkitVaultIntegration implements FIntegration {
     }
 
     public Set<String> getGroups() {
-        if (chat == null) return Collections.emptySet();
+        if (chat == null) return Set.of();
 
         return Set.of(chat.getGroups());
     }

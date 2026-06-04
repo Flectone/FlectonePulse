@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton
@@ -14,7 +13,7 @@ public class BukkitLegacyPassengersProvider implements BukkitPassengersProvider 
 
     @Override
     public List<Integer> getPassengers(Player player) {
-        return Collections.emptyList();
+        return List.of();
     }
 
 }

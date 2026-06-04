@@ -92,7 +92,7 @@ public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, 
         }
 
         if (Character.isLetter(input.lastRemainingCharacter())) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         String string = input.readString();

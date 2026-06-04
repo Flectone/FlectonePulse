@@ -122,12 +122,12 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
         String promptColor = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalClear = commandContext.optional(promptColor + " 1");
         if (optionalClear.isPresent() && optionalClear.get().equalsIgnoreCase("clear")) {
-            setColors(fTarget, fColorType.get(), Collections.emptySet());
+            setColors(fTarget, fColorType.get(), Set.of());
             return;
         }
 
         Int2ObjectArrayMap<FColor> newFColors = new Int2ObjectArrayMap<>();
-        fTarget.fColors().getOrDefault(fColorType.get(), Collections.emptySet())
+        fTarget.fColors().getOrDefault(fColorType.get(), Set.of())
                 .forEach(fColor -> newFColors.put(fColor.number(), fColor));
 
         for (int i = 0; i < fColorConfig().defaultColors().size(); i++) {
@@ -184,7 +184,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
 
     private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
         Map<FColor.Type, Set<FColor>> fColors = fPlayer.fColors();
-        Set<FColor> oldFColors = fColors.getOrDefault(type, Collections.emptySet());
+        Set<FColor> oldFColors = fColors.getOrDefault(type, Set.of());
 
         UUID metadataUUID = UUID.randomUUID();
 

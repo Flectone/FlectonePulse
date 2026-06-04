@@ -427,7 +427,7 @@ public class FPlayerService {
     }
 
     public List<PlayTime> getAllPlayTimes(int limit, int offset) {
-        return isPlaytimeTracking() ? socialRepository.getAllPlayTimes(limit, offset) : Collections.emptyList();
+        return isPlaytimeTracking() ? socialRepository.getAllPlayTimes(limit, offset) : List.of();
     }
 
     private boolean isPlaytimeTracking() {

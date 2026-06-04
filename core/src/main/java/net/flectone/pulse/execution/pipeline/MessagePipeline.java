@@ -164,7 +164,7 @@ public class MessagePipeline {
     }
 
     public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull BiFunction<ArgumentQueue, Context, Tag> handler) {
-        return resolver(Collections.singleton(name), handler);
+        return resolver(Set.of(name), handler);
     }
 
     public @NonNull TagResolver resolver(@TagPattern @NonNull String name, @NonNull Tag tag) {

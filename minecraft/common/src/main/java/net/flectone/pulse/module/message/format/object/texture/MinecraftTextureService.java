@@ -195,8 +195,8 @@ public class MinecraftTextureService {
     }
 
     private List<Frame> loadImageTexture(File textureFileImage) throws IOException {
-        if (!isMineSkinHooked()) return Collections.emptyList();
-        if (!textureFileImage.exists()) return Collections.emptyList();
+        if (!isMineSkinHooked()) return List.of();
+        if (!textureFileImage.exists()) return List.of();
 
         // update last modified time image
         setLastModified(textureFileImage);

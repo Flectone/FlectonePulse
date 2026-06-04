@@ -75,7 +75,7 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public Set<String> getGroups() {
-        if (luckPerms == null) return Collections.emptySet();
+        if (luckPerms == null) return Set.of();
 
         return luckPerms.getGroupManager().getLoadedGroups().stream()
                 .map(Group::getName)

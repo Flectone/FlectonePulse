@@ -198,7 +198,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         int firstAnswerIndex = hasTitle ? 1 : 0;
         List<String> answers = parts.length > firstAnswerIndex
                 ? List.of(Arrays.copyOfRange(parts, firstAnswerIndex, parts.length))
-                : Collections.emptyList();
+                : List.of();
 
         createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
     }

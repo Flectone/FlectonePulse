@@ -29,6 +29,7 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -126,7 +127,7 @@ public class CommandParserProvider {
 
     public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(boolean offlinePlayers, PermissionSetting permission) {
         return (context, input) -> {
-            if (!permissionChecker.check(context.sender(), permission)) return Collections.emptyList();
+            if (!permissionChecker.check(context.sender(), permission)) return List.of();
 
             return playerParser(offlinePlayers).parser().suggestionProvider().suggestionsFuture(context, input).join();
         };

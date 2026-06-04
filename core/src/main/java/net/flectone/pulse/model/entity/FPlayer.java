@@ -141,11 +141,11 @@ public interface FPlayer extends FEntity {
             if (uuid == null) uuid = FEntity.UNKNOWN_UUID;
             if (type == null) type = PLAYER_TYPE;
             if (id == null) id = -1;
-            if (fColors == null) fColors = Collections.emptyMap();
-            if (settingsBoolean == null) settingsBoolean = Collections.emptyMap();
-            if (settingsText == null) settingsText = Collections.emptyMap();
-            if (ignores == null) ignores = Collections.emptyList();
-            if (constants == null) constants = Collections.emptyList();
+            if (fColors == null) fColors = Map.of();
+            if (settingsBoolean == null) settingsBoolean = Map.of();
+            if (settingsText == null) settingsText = Map.of();
+            if (ignores == null) ignores = List.of();
+            if (constants == null) constants = List.of();
 
             console = console || type.equalsIgnoreCase(CONSOLE_TYPE);
             if (console) type = CONSOLE_TYPE;
@@ -300,7 +300,7 @@ public interface FPlayer extends FEntity {
         @Override
         public Map<Integer, String> getFColors(FColor.@NonNull Type type) {
             Set<FColor> colors = fColors.get(type);
-            if (colors == null || colors.isEmpty()) return Collections.emptyMap();
+            if (colors == null || colors.isEmpty()) return Map.of();
 
             Map<Integer, String> result = colors.stream()
                     .collect(Collectors.toMap(
@@ -319,7 +319,7 @@ public interface FPlayer extends FEntity {
             boolean oldFColorsEmpty = this.fColors.isEmpty();
             if (newFColorsEmpty && oldFColorsEmpty) {
                 return toBuilder()
-                        .fColors(Map.of(type, Collections.emptySet()))
+                        .fColors(Map.of(type, Set.of()))
                         .build();
             }
 
@@ -328,7 +328,7 @@ public interface FPlayer extends FEntity {
                     : new EnumMap<>(this.fColors);
 
             if (newFColorsEmpty) {
-                fColorMap.put(type, Collections.emptySet());
+                fColorMap.put(type, Set.of());
             } else {
                 fColorMap.put(type, Set.copyOf(fColors));
             }
@@ -344,7 +344,7 @@ public interface FPlayer extends FEntity {
                 if (this.ignores.isEmpty()) return this;
 
                 return toBuilder()
-                        .ignores(Collections.emptyList())
+                        .ignores(List.of())
                         .build();
             }
 
@@ -359,7 +359,7 @@ public interface FPlayer extends FEntity {
                 if (this.constants.isEmpty()) return this;
 
                 return toBuilder()
-                        .constants(Collections.emptyList())
+                        .constants(List.of())
                         .build();
             }
 

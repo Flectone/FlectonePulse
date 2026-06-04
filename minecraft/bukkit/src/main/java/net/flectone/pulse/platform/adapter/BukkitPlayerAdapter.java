@@ -375,7 +375,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return Collections.emptySet();
+        if (player == null) return Set.of();
 
         World world = player.getWorld();
         Location location = player.getLocation();
@@ -392,7 +392,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return Collections.emptyList();
+        if (player == null) return List.of();
 
         return passengersProvider.getPassengers(player);
     }

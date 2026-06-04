@@ -131,7 +131,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
                                         ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
-                                        : Collections.emptyList()
+                                        : List.of()
                                 )
                                 .build()
                         )
@@ -283,7 +283,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private Component clearComponent(Component component) {
-        return component.style(Style.empty()).children(Collections.emptyList());
+        return component.style(Style.empty()).children(List.of());
     }
 
     private HoverEvent<?> findFirstHoverEvent(Component component) {

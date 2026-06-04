@@ -48,7 +48,7 @@ public class MinecraftDialogPollBuilder {
 
     public void openDialog(FPlayer fPlayer) {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
-        openDialog(fPlayer, poll.inputInitial(), false, 5.0f, 1.0f, Collections.emptyList());
+        openDialog(fPlayer, poll.inputInitial(), false, 5.0f, 1.0f, List.of());
     }
 
     public void openDialog(FPlayer fPlayer, String inputValue, boolean multipleValue, float endTimeValue, float repeatTimeValue, List<String> answers) {

@@ -24,7 +24,6 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.Set;
 
 public abstract class IntegrationModule implements ModuleSimple {
@@ -152,13 +151,13 @@ public abstract class IntegrationModule implements ModuleSimple {
     }
 
     public Set<String> getGroups() {
-        if (!moduleController.isEnable(this)) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Set.of();
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getGroups();
         }
 
-        return Collections.emptySet();
+        return Set.of();
     }
 
     public int getGroupWeight(FPlayer fPlayer) {

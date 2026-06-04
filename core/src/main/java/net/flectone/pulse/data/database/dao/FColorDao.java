@@ -68,7 +68,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
             }
 
             Arrays.stream(FColor.Type.values()).forEach(type ->
-                    saveType(handle, sql, fPlayer, type, newFColors.getOrDefault(type, Collections.emptySet()), oldFColors.getOrDefault(type, Collections.emptySet()))
+                    saveType(handle, sql, fPlayer, type, newFColors.getOrDefault(type, Set.of()), oldFColors.getOrDefault(type, Set.of()))
             );
         });
     }

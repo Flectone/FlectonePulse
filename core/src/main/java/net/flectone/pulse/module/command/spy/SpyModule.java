@@ -102,7 +102,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     }
 
     public void spy(FPlayer fPlayer, String action, String message) {
-        spy(fPlayer, action, message, Collections.emptyList());
+        spy(fPlayer, action, message, List.of());
     }
 
     public void spy(FPlayer fPlayer, String action, String message, List<FPlayer> receivers) {

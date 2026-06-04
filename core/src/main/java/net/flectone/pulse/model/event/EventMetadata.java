@@ -236,7 +236,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     tagResolvers,
                     proxy,
                     integrationMetadata,
-                    Collections.emptyList()
+                    List.of()
             );
         }
     }

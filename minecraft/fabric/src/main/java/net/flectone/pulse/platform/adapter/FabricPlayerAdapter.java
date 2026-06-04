@@ -333,7 +333,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<UUID> getOnlinePlayers() {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
-        if (minecraftServer == null) return Collections.emptyList();
+        if (minecraftServer == null) return List.of();
 
         return minecraftServer.getPlayerList().getPlayers()
                 .stream()
@@ -344,7 +344,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
         ServerPlayer player = getPlayer(uuid);
-        if (player == null) return Collections.emptySet();
+        if (player == null) return Set.of();
 
         Vec3 position = player.position();
         AABB searchBox = new AABB(
@@ -377,7 +377,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
         ServerPlayer player = getPlayer(uuid);
-        if (player == null) return Collections.emptyList();
+        if (player == null) return List.of();
 
         return player.getPassengers()
                 .stream()

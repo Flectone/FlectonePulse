@@ -90,7 +90,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
 
     @Nullable
     public String getConditionValue(String conditionName, FPlayer fPlayer) {
-        return getConditionValue(conditionName, fPlayer, fPlayer, Collections.emptyMap());
+        return getConditionValue(conditionName, fPlayer, fPlayer, Map.of());
     }
 
     @Nullable

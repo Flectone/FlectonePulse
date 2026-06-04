@@ -30,7 +30,6 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -111,7 +110,7 @@ public class ModuleController {
 
     public Set<Class<? extends ModuleSimple>> getChildren(Class<? extends ModuleSimple> clazz) {
         Class<? extends ModuleSimple> root = getRoot(clazz);
-        return moduleChildrenMap.getOrDefault(root, Collections.emptySet());
+        return moduleChildrenMap.getOrDefault(root, Set.of());
     }
 
     private void configureHierarchy(Class<? extends ModuleSimple> clazz) {

@@ -30,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class ChatsettingModule implements ModuleCommand<Localization.Command.Chatsetting> {
@@ -94,7 +95,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, _) -> {
-            if (!permissionChecker.check(context.sender(), permission().other())) return Collections.emptyList();
+            if (!permissionChecker.check(context.sender(), permission().other())) return List.of();
 
             return Arrays.stream(ModuleName.values())
                     .map(setting -> Suggestion.suggestion(setting.name()))

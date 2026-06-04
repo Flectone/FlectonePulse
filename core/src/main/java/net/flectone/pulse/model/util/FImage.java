@@ -24,12 +24,12 @@ public record FImage(String link) {
         connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
 
         BufferedImage bufferedImage = ImageIO.read(connection.getInputStream());
-        if (bufferedImage == null) return Collections.emptyList();
+        if (bufferedImage == null) return List.of();
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
 
-        if (height * width >= 8 * 1024 * 1024) return Collections.emptyList();
+        if (height * width >= 8 * 1024 * 1024) return List.of();
 
         int stepSize = Math.max((int) Math.ceil(bufferedImage.getWidth() / 48.0), 1);
         int stepSquared = stepSize * stepSize;

@@ -91,7 +91,7 @@ public class ModuleCommandController {
     }
 
     public List<String> getPrompts(ModuleCommand<?> command) {
-        return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), Collections.emptyList());
+        return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), List.of());
     }
 
     public <V extends @NonNull Object> V getArgument(ModuleCommand<?> command,

@@ -30,7 +30,7 @@ public class HytaleTextScreenRender implements TextScreenRender {
 
     @Override
     public List<Integer> getPassengers(UUID uuid) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

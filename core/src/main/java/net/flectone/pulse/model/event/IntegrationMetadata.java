@@ -20,7 +20,7 @@ public record IntegrationMetadata(
 
     @SuppressWarnings("DataFlowIssue")
     public IntegrationMetadata {
-        messageNames = Objects.requireNonNullElse(messageNames, Collections.emptyList());
+        messageNames = Objects.requireNonNullElse(messageNames, List.of());
         format = Objects.requireNonNullElse(format, string -> string);
     }
 

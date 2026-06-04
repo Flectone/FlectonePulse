@@ -35,7 +35,7 @@ public interface FColorSQL extends SQL {
     // Map<String, Integer> findFColorIdsByNames(@BindList("names") List<String> names);
     default Map<String, Integer> findFColorIdsByNames(Handle handle, List<String> names) {
         if (names == null || names.isEmpty()) {
-            return Collections.emptyMap();
+            return Map.of();
         }
 
         String placeholders = names.stream()

@@ -16,10 +16,7 @@ import net.flectone.pulse.model.util.Toast;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.kyori.adventure.text.Component;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -50,8 +47,8 @@ public class MinecraftToastRender implements ToastRender {
         );
 
         String criterionName = "trigger";
-        List<String> criteria = Collections.singletonList(criterionName);
-        List<List<String>> requirements = Collections.singletonList(criteria);
+        List<String> criteria = List.of(criterionName);
+        List<List<String>> requirements = List.of(criteria);
 
         ResourceLocation advancementId = ResourceLocation.minecraft(UUID.randomUUID().toString());
         Advancement advancement = new Advancement(
@@ -62,7 +59,7 @@ public class MinecraftToastRender implements ToastRender {
                 false
         );
 
-        List<AdvancementHolder> advancementHolders = Collections.singletonList(
+        List<AdvancementHolder> advancementHolders = List.of(
                 new AdvancementHolder(advancementId, advancement)
         );
 
@@ -74,8 +71,8 @@ public class MinecraftToastRender implements ToastRender {
         WrapperPlayServerUpdateAdvancements showPacket = new WrapperPlayServerUpdateAdvancements(
                 false,
                 advancementHolders,
-                Collections.emptySet(),
-                Collections.singletonMap(advancementId, progress),
+                Set.of(),
+                Map.of(advancementId, progress),
                 true
         );
 
@@ -83,9 +80,9 @@ public class MinecraftToastRender implements ToastRender {
 
         WrapperPlayServerUpdateAdvancements removePacket = new WrapperPlayServerUpdateAdvancements(
                 false,
-                Collections.emptyList(),
-                Collections.singleton(advancementId),
-                Collections.emptyMap(),
+                List.of(),
+                Set.of(advancementId),
+                Map.of(),
                 false
         );
 

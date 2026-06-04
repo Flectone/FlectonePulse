@@ -235,7 +235,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         Component componentName = buildItemNameComponent(fPlayer, title);
 
         List<Component> componentLore = lore.length == 0
-                ? Collections.emptyList()
+                ? List.of()
                 : Arrays.stream(lore)
                 .map(message -> messagePipelineProvider.get()
                                 .build(MessageContext.builder()

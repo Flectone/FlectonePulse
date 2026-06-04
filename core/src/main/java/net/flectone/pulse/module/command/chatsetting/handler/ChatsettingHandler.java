@@ -125,7 +125,7 @@ public class ChatsettingHandler {
         };
 
         Consumer<SubMenuItem> onSelect = item -> {
-            Set<FColor> fColors = new ObjectOpenHashSet<>(syncFPlayer(fTarget).fColors().getOrDefault(type, Collections.emptySet()));
+            Set<FColor> fColors = new ObjectOpenHashSet<>(syncFPlayer(fTarget).fColors().getOrDefault(type, Set.of()));
 
             // skip "null" colors replace
             item.colors().entrySet().stream()

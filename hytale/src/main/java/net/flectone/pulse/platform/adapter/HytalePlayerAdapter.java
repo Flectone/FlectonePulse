@@ -344,7 +344,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<UUID> getOnlinePlayers() {
         Universe universe = Universe.get();
-        if (universe == null) return Collections.emptyList();
+        if (universe == null) return List.of();
 
         return universe.getPlayers().stream()
                 .map(PlayerRef::getUuid)
@@ -354,16 +354,16 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(UUID senderUuid, double viewDistanceX, double viewDistanceY, double viewDistanceZ) {
         PlayerRef senderRef = getPlayer(senderUuid);
-        if (senderRef == null) return Collections.emptySet();
+        if (senderRef == null) return Set.of();
 
         Universe universe = Universe.get();
-        if (universe == null) return Collections.emptySet();
+        if (universe == null) return Set.of();
 
         UUID worldUUID = senderRef.getWorldUuid();
-        if (worldUUID == null) return Collections.emptySet();
+        if (worldUUID == null) return Set.of();
 
         World world = universe.getWorld(worldUUID);
-        if (world == null) return Collections.emptySet();
+        if (world == null) return Set.of();
 
         Vector3d senderPos = senderRef.getTransform().getPosition();
 
@@ -407,7 +407,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

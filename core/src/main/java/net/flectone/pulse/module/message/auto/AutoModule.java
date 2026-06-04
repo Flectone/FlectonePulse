@@ -84,7 +84,7 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

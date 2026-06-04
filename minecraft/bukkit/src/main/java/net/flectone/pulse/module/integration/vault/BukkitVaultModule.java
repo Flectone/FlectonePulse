@@ -66,7 +66,7 @@ public class BukkitVaultModule implements ModuleSimple {
     }
 
     public Set<String> getGroups() {
-        if (!moduleController.isEnable(this)) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Set.of();
 
         return vaultIntegration.getGroups();
     }

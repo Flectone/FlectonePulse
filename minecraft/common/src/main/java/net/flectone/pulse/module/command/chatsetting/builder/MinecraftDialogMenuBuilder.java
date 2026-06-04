@@ -65,7 +65,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                 false,
                 DialogAction.CLOSE,
                 List.of(dialogBody),
-                Collections.emptyList()
+                List.of()
         );
 
         MinecraftDialog.Builder dialogBuilder = new MinecraftDialog.Builder(commonDialogData, chatsettingModule.config().modern().columns());
@@ -241,7 +241,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
                 false,
                 DialogAction.CLOSE,
                 List.of(dialogBody),
-                Collections.emptyList()
+                List.of()
         );
 
         MinecraftDialog.Builder dialogBuilder = new MinecraftDialog.Builder(commonDialogData, chatsettingModule.config().modern().columns())

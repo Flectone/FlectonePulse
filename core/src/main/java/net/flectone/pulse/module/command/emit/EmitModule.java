@@ -164,7 +164,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                         .toList();
             }
 
-            return Collections.emptyList();
+            return List.of();
         };
     }
 

@@ -16,7 +16,7 @@ public class BukkitModernPassengersProvider implements BukkitPassengersProvider 
     @Override
     public List<Integer> getPassengers(Player player) {
         List<Entity> passengers = player.getPassengers();
-        if (passengers.isEmpty()) return Collections.emptyList();
+        if (passengers.isEmpty()) return List.of();
 
         return passengers.stream()
                 .map(Entity::getEntityId)

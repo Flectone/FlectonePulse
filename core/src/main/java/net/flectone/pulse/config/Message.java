@@ -935,7 +935,7 @@ public record Message(
 
             @Override
             public List<String> translationKeys() {
-                return translationKeys != null ? new ObjectImmutableList<>(translationKeys) : Collections.emptyList();
+                return translationKeys != null ? List.copyOf(translationKeys) : List.of();
             }
 
             @JsonValue
