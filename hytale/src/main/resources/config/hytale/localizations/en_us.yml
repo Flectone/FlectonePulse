@@ -59,8 +59,8 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot ban a player with equal or higher permissions"
     reasons:
       default: "You have been banned from this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has banned <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    person: "<color:#ff7171>[!] BAN< fcolor:1><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has banned <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    person: "<color:#ff7171>[!] BAN< fcolor:1><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     connection_attempt: "<color:#ff7171>[!] <fcolor:1>Banned <display_name> tried to log in, remaining time: <time_left>"
   banlist:
     empty: "<color:#98FB98>No bans found"
@@ -248,8 +248,8 @@ command:
     reasons:
       default: "Server maintenance is in progress"
       disabled: "Server maintenance is finished"
-    format_true: "<fcolor:1>[*] <fcolor:2>Enabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    format_false: "<fcolor:1>[*] <fcolor:2>Disabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_true: "<fcolor:1>[*] <fcolor:2>Enabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_false: "<fcolor:1>[*] <fcolor:2>Disabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[*] <reason>, <time_left> remaining"
   me:
     format: "<fcolor:1>> <display_name> <fcolor:1><message>"
@@ -260,7 +260,7 @@ command:
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "You have been muted on this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has muted <display_name> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has muted <display_name> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are muted, <time_left> left"
   mutelist:
     empty: "<color:#98FB98>No mutes found"
@@ -437,7 +437,7 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot warn a player with equal or higher permissions"
     reasons:
       default: "You have been warned on this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>gave a warning to <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>gave a warning to <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are warned a <time>"
   warnlist:
     empty: "<color:#98FB98>No warns found"
@@ -461,8 +461,8 @@ command:
     already_on: "<color:#ff7171>Whitelist is already enabled"
     already_off: "<color:#ff7171>Whitelist is already disabled"
     format_add: "<fcolor:1>[=] Player <display_name> has been added to the whitelist <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    format_off: "<fcolor:1>[=] Whitelist <fcolor:2>disabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    format_on: "<fcolor:1>[=] Whitelist <fcolor:2>enabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_off: "<fcolor:1>[=] Whitelist <fcolor:2>disabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_on: "<fcolor:1>[=] Whitelist <fcolor:2>enabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     format_remove: "<fcolor:1>[=] Player <display_name> has been removed from the whitelist <br><fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[=] You are not on the server whitelist"
     connection_attempt: "<color:#ff7171>[=] Player <display_name>, who is not on the whitelist, attempted to connect"
