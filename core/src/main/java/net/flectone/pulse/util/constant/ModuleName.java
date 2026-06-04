@@ -153,6 +153,7 @@ public enum ModuleName {
     SYSTEM_WARN,
     SYSTEM_WHITELIST,
     SYSTEM_SKIN,
+    SYSTEM_KICK,
     SYSTEM_VIOLATION;
 
     private static final Map<String, ModuleName> ENUM_BY_PROXY_KEY = Arrays.stream(ModuleName.values())

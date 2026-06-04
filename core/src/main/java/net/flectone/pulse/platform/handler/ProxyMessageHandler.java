@@ -258,6 +258,16 @@ public class ProxyMessageHandler {
                 handleSystemSkin(fEntity.uuid());
                 yield true;
             }
+            case SYSTEM_KICK -> {
+                KickModule module = injector.getInstance(KickModule.class);
+                if (!module.config().filterByServer()) {
+                    Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
+
+                    // give some time
+                    taskScheduler.runAsyncLater(() -> module.kick(moderation));
+                }
+                yield true;
+            }
             default -> false;
         };
     }
@@ -953,9 +963,6 @@ public class ProxyMessageHandler {
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
         ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
-
-        // give some time for players to reconnect
-        taskScheduler.runAsyncLater(() -> module.kick(fModerator, (FPlayer) fEntity, kick));
 
         messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(EventMetadata.<Localization.Command.Kick>builder()

@@ -530,6 +530,7 @@ public record Command(
     @Jacksonized
     public record Kick(
             Boolean enable,
+            Boolean filterByServer,
             Boolean checkGroupWeight,
             Range range,
             List<String> aliases,

@@ -21,6 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -44,6 +45,7 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxySender proxySender;
 
     @Override
     public void onEnable() {
@@ -51,7 +53,7 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         String promptMessage = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::message);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
-                .required(promptPlayer, commandParserProvider.playerParser())
+                .required(promptPlayer, config().filterByServer() ? commandParserProvider.platformPlayerParser() : commandParserProvider.playerParser())
                 .optional(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -90,22 +92,24 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         Optional<String> optionalReason = commandContext.optional(promptMessage);
         String reason = optionalReason.orElse(null);
 
-        Moderation kick = moderationService.kick(fTarget, reason, fPlayer.id());
-        if (kick == null) return;
+        Moderation moderation = moderationService.kick(fTarget, reason, fPlayer.id());
+        if (moderation == null) return;
 
-        kick(fPlayer, fTarget, kick);
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_KICK, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+        }
 
         EventMetadata.Builder<Localization.Command.Kick> baseMetadataBuilder = EventMetadata.<Localization.Command.Kick>builder()
                 .sender(fTarget)
                 .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, kick)
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, moderation)
                 )
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(moderation))
                 .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick)
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation)
                 )
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag("moderator", fResolver, fPlayer)
@@ -117,10 +121,11 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()
                 .base(baseMetadataBuilder.build())
-                .moderation(kick)
+                .moderation(moderation)
                 .build()
         );
 
+        kick(moderation);
     }
 
     @Override
@@ -143,9 +148,12 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         return fileFacade.localization(sender).command().kick();
     }
 
-    public void kick(FEntity fModerator, FPlayer fTarget, Moderation kick) {
-        if (fModerator == null) return;
+    public void kick(Moderation kick) {
+        FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
         if (moduleController.isDisabledFor(this, fModerator)) return;
+
+        FPlayer fTarget = fPlayerService.getFPlayer(kick.player());
+        if (!platformPlayerAdapter.isOnline(fTarget)) return;
 
         String format = moderationMessageFormatter.replacePlaceholders(localization(fTarget).person(), fTarget, kick);
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
