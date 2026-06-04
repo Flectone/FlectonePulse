@@ -519,10 +519,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> is now afk"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> is now afk"
       local: "<gradient:#ffd500:#FFFF00>⌚ Now you're afk"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> isn't afk now"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> isn't afk now"
       local: "<gradient:#ffd500:#FFFF00>⌚ Now you're not afk"
   auto:
     types:

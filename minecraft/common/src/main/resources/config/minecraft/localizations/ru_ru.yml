@@ -519,10 +519,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> отошёл"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> отошёл"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> вернулся"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> вернулся"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру"
   auto:
     types:
