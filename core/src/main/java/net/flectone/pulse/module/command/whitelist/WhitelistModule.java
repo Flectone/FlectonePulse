@@ -285,7 +285,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             Moderation currentMaintenance = currentModeration.get();
             if (!currentMaintenance.equals(whitelist)) return;
 
-            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, time,whitelist.type() != Moderation.Type.WHITELIST);
+            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, -1, whitelist.type() != Moderation.Type.WHITELIST);
         }, delay);
     }
 

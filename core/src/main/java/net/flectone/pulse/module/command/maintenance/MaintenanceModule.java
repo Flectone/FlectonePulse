@@ -280,7 +280,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             Moderation currentMaintenance = currentModeration.get();
             if (!currentMaintenance.equals(maintenance)) return;
 
-            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, time,maintenance.type() != Moderation.Type.MAINTENANCE);
+            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, -1, maintenance.type() != Moderation.Type.MAINTENANCE);
         }, delay);
     }
 
