@@ -250,7 +250,7 @@ command:
       disabled: "Server maintenance is finished"
     format_true: "<fcolor:1>[*] <fcolor:2>Enabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     format_false: "<fcolor:1>[*] <fcolor:2>Disabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    person: "<color:#ff7171>[*] <reason>, <time_left> remaining"
+    person: "<color:#ff7171>[*] <reason> (<time_left>)"
   me:
     format: "<fcolor:1>> <display_name> <fcolor:1><message>"
   mute:

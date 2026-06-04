@@ -250,7 +250,7 @@ command:
       disabled: "На сервере закончены технические работы"
     format_true: "<fcolor:1>★ <fcolor:2>Включены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     format_false: "<fcolor:1>★ <fcolor:2>Выключены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
-    person: "<color:#ff7171>★ <reason>, осталось <time_left>"
+    person: "<color:#ff7171>★ <reason> (<time_left>)"
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:
