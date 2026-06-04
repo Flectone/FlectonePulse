@@ -871,7 +871,11 @@ public class FileMigrator {
                             .withHideNameWhenSneaking(deprecatedScoreboard.hideNameWhenSneaking())
                             .withColor(deprecatedScoreboard.color())
                             .withTicker(deprecatedScoreboard.ticker())
-            ));
+                    )
+                    .withFormat(files.message().format()
+                            .withScoreboard(null)
+                    )
+            );
         }
 
         Message.DeprecatedObjective deprecatedObjective = files.message().objective();
@@ -889,7 +893,9 @@ public class FileMigrator {
                                             .withTicker(deprecatedObjective.tabname().ticker())
                                     )
                             )
-                    ));
+                    )
+                    .withObjective(null)
+            );
         }
 
         Config.DeprecatedModule deprecatedModule = files.config().module();
@@ -900,6 +906,7 @@ public class FileMigrator {
                             .withUsePaperMessageSender(deprecatedModule.usePaperMessageSender())
                             .withUseBukkitPreLoginListener(true)
                     )
+                    .withModule(null)
             );
         }
 
@@ -913,6 +920,7 @@ public class FileMigrator {
                             .withUnregisterCommandOnReload(deprecatedCommand.unregisterOnReload())
                             .withVanillaCommandsToRemove(vanillaCommandsToRemove)
                     )
+                    .withCommand(null)
             );
         }
 
@@ -977,6 +985,7 @@ public class FileMigrator {
                                                 )
                                         )
                                 )
+                                .withObjective(null)
                         );
             }
 
