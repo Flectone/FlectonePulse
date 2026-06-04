@@ -431,6 +431,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }
 
         FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
+        if (fTarget.isConsole()) return null;
+
         if (fTarget.isUnknown()) {
             if (isUuid) {
                 // just save empty string for update in feature
