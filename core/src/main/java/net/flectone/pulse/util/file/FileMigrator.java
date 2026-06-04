@@ -87,7 +87,7 @@ public class FileMigrator {
         }
 
         Map<String, Integer> types = files.command().chatsetting().checkbox().types();
-        Map<String, Integer> oldTypes = new HashMap<>(types);
+        Map<String, Integer> oldTypes = new LinkedHashMap<>(types);
         types.clear();
 
         if (oldTypes.containsKey("AFK")) {
@@ -306,7 +306,7 @@ public class FileMigrator {
 
         Map<String, String> triggers = files.message().format().replacement().triggers();
 
-        Map<String, String> updates = new HashMap<>();
+        Map<String, String> updates = new LinkedHashMap<>();
         updates.put("smile", ":-?\\)");
         updates.put("big_smile", ":-?D");
         updates.put("sad", ":-?\\(");
@@ -435,7 +435,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_1(FilePack files) {
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();
+        List<Message.Vanilla.VanillaMessage> vanillaMessages = new LinkedList<>();
 
         for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
             if (!vanillaMessage.name().equals("DEATH")) {
@@ -443,7 +443,7 @@ public class FileMigrator {
                 continue;
             }
 
-            List<String> translationKeys = new ArrayList<>(vanillaMessage.translationKeys());
+            List<String> translationKeys = new LinkedList<>(vanillaMessage.translationKeys());
             if (!translationKeys.contains("death.attack.spear")) {
                 translationKeys.add("death.attack.spear");
             }
@@ -455,7 +455,7 @@ public class FileMigrator {
             vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
         }
 
-        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
         types.put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
 
         return files
@@ -580,12 +580,12 @@ public class FileMigrator {
 
         for (Localization localization : files.localizations().values()) {
 
-            Map<String, String> newChats = new HashMap<>(localization.message().chat().types());
+            Map<String, String> newChats = new LinkedHashMap<>(localization.message().chat().types());
             newChats.forEach((key, value) ->
                     newChats.put(key, replaceOldTags.apply(value))
             );
 
-            List<String> newDisplays = new ArrayList<>(localization.message().format().names().display());
+            List<String> newDisplays = new LinkedList<>(localization.message().format().names().display());
             newDisplays.replaceAll(replaceOldTags);
 
             String newPlayerListname = replaceOldTags.apply(localization.message().tab().playerlistname().format());
@@ -639,7 +639,7 @@ public class FileMigrator {
                     );
 
             if (isHytale) {
-                Map<String, String> types = new HashMap<>(localization.message().vanilla().types());
+                Map<String, String> types = new LinkedHashMap<>(localization.message().vanilla().types());
                 types.put("server.assetModule.outOfDatePacks", "");
                 types.put("server.pluginManager.outOfDatePlugins", "");
 
@@ -706,7 +706,7 @@ public class FileMigrator {
     }
 
     private <T> Map<String, T> replaceOldMessageName(Map<String, T> oldMap) {
-        Map<String, T> newMap = new HashMap<>(oldMap);
+        Map<String, T> newMap = new LinkedHashMap<>(oldMap);
 
         oldMap.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith("CHAT_"))
@@ -848,7 +848,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_9_1(FilePack files) {
-        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
         types.put(CacheName.ICU_MESSAGE, new Config.Cache.CacheSetting(false, 10, TimeUnit.MINUTES, 100000));
 
         return files.withConfig(files.config().withCache(files.config().cache().withTypes(types)));
@@ -912,7 +912,7 @@ public class FileMigrator {
 
         Config.DeprecatedCommand deprecatedCommand = files.config().command();
         if (deprecatedCommand != null) {
-            Set<String> vanillaCommandsToRemove = new HashSet<>(deprecatedCommand.disabledFabric());
+            Set<String> vanillaCommandsToRemove = new LinkedHashSet<>(deprecatedCommand.disabledFabric());
             vanillaCommandsToRemove.add("whitelist");
 
             files = files.withConfig(files.config()
@@ -926,7 +926,7 @@ public class FileMigrator {
 
         boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
         if (isNotHytale) {
-            List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();
+            List<Message.Vanilla.VanillaMessage> vanillaMessages = new LinkedList<>();
 
             for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
                 if (!vanillaMessage.name().equals("DEATH")) {
@@ -934,7 +934,7 @@ public class FileMigrator {
                     continue;
                 }
 
-                List<String> translationKeys = new ArrayList<>(vanillaMessage.translationKeys());
+                List<String> translationKeys = new LinkedList<>(vanillaMessage.translationKeys());
                 if (!translationKeys.contains("death.attack.sulfurCubeHot")) {
                     translationKeys.add("death.attack.sulfurCubeHot");
                 }
@@ -990,7 +990,7 @@ public class FileMigrator {
             }
 
             if (isNotHytale) {
-                Map<String, String> newVanillaTypes = new HashMap<>(localization.message().vanilla().types());
+                Map<String, String> newVanillaTypes = new LinkedHashMap<>(localization.message().vanilla().types());
 
                 boolean isRussian = localization.language().toLowerCase().contains("ru");
                 if (isRussian) {
@@ -1012,7 +1012,7 @@ public class FileMigrator {
             newLocalizations.put(localization.language(), localization);
         }
 
-        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
         cacheTypes.put(CacheName.ANIMATION, new Config.Cache.CacheSetting(true, 1, TimeUnit.MINUTES, 10000));
         cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 100));
 
