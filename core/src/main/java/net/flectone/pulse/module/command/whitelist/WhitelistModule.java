@@ -52,10 +52,13 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WhitelistModule implements ModuleCommand<Localization.Command.Whitelist> {
+
+    private final AtomicBoolean tickerStarted = new AtomicBoolean(false);
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
@@ -103,6 +106,11 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (isTurnedOn()) {
             startKickTicker();
         }
+    }
+
+    @Override
+    public void onDisable() {
+        tickerStarted.set(false);
     }
 
     @Override
@@ -195,6 +203,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     }
 
     private void startKickTicker() {
+        if (!tickerStarted.compareAndSet(false, true)) return;
+
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
             if (!isTurnedOn()) return;
             if (permissionChecker.check(fPlayer, permission().bypass())) return;
