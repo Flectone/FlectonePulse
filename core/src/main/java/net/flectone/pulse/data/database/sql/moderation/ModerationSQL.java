@@ -45,7 +45,7 @@ public interface ModerationSQL extends SQL {
      * @param offset number of results to skip for pagination
      * @return list of valid moderations matching the criteria
      */
-    @SqlQuery("SELECT * FROM `fp_moderation` WHERE `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` = :server) ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
+    @SqlQuery("SELECT * FROM `fp_moderation` WHERE `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` = :server) AND NOT `player` = -1 ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
     List<Moderation> findValidByType(@Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server, @Bind("limit") int limit, @Bind("offset") int offset);
 
     /**
@@ -68,7 +68,7 @@ public interface ModerationSQL extends SQL {
      * @param server the server ID
      * @return list of player names
      */
-    @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime) AND (:server IS NULL OR `m`.`server` = :server)")
+    @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime) AND (:server IS NULL OR `m`.`server` = :server) AND NOT `player` = -1")
     List<String> findValidPlayerNamesByType(@Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server);
 
     /**
@@ -93,7 +93,7 @@ public interface ModerationSQL extends SQL {
      * @param server the server ID (can be null for global count)
      * @return the count of valid moderations matching the criteria
      */
-    @SqlQuery("SELECT COUNT(id) FROM `fp_moderation` WHERE `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` = :server)")
+    @SqlQuery("SELECT COUNT(id) FROM `fp_moderation` WHERE `type` = :type AND `valid` = true AND (`time` = -1 OR `time` > :currentTime) AND (:server IS NULL OR `server` = :server) AND NOT `player` = -1")
     int getTotalValidCountByType(@Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server);
 
     /**
