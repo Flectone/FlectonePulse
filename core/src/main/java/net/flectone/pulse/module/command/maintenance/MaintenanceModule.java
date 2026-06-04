@@ -90,8 +90,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         Optional<Moderation> optionalMaintenace = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
         if (optionalMaintenace.isPresent()) {
             Moderation maintenance = optionalMaintenace.get();
-            kickOnlinePlayers(fPlayerService.getFPlayer(maintenance.moderator()), maintenance);
-
+            kickOnlinePlayers(maintenance);
             unturnLater(maintenance);
         } else {
             moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.UNMAINTENANCE).ifPresent(this::unturnLater);
@@ -150,7 +149,10 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         long time = timeReasonPair.first() == -1 ? -1 : timeReasonPair.first();
         String reason = timeReasonPair.second();
 
-        turn(fPlayer, reason, time, turned).ifPresent(this::unturnLater);
+        turn(fPlayer, reason, time, turned).ifPresent(moderation -> {
+            kickOnlinePlayersIfTurned(moderation);
+            unturnLater(moderation);
+        });
     }
 
     @Override
@@ -204,7 +206,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         if (maintenance == null) return Optional.empty();
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE);
+            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(maintenance));
         }
 
         EventMetadata.Builder<Localization.Command.Maintenance> baseMetadataBuilder = EventMetadata.<Localization.Command.Maintenance>builder()
@@ -238,26 +240,30 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                 .build()
         );
 
-        if (turned) {
-            kickOnlinePlayers(fPlayer, maintenance);
-        }
-
         return Optional.of(maintenance);
     }
 
-    public void kickOnlinePlayers(@NonNull FPlayer fSender, @NonNull Moderation maintenance) {
-        fPlayerService.getOnlineFPlayers()
-                .stream()
+    public void kickOnlinePlayersIfTurned(@Nullable Moderation maintenance) {
+        if (maintenance != null && maintenance.type() == Moderation.Type.MAINTENANCE) {
+            kickOnlinePlayers(maintenance);
+        }
+    }
+
+    private void kickOnlinePlayers(@NonNull Moderation maintenance) {
+        FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
+        if (moduleController.isDisabledFor(this, fModerator)) return;
+
+        fPlayerService.getOnlineFPlayers().stream()
                 .filter(filter -> !permissionChecker.check(filter, permission().join()))
                 .forEach(fReceiver -> {
                     Localization.Command.Maintenance localization = localization(fReceiver);
                     String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
 
                     platformPlayerAdapter.kick(fReceiver, messagePipeline.build(MessageContext.builder()
-                            .sender(fSender)
+                            .sender(fModerator)
                             .receiver(fReceiver)
                             .message(formatPlayer)
-                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fSender))
+                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fModerator))
                             .build()
                     ));
                 });

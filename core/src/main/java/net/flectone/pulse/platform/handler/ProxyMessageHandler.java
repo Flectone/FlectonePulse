@@ -162,7 +162,7 @@ public class ProxyMessageHandler {
         if (handleSystemViolation(tag, input)) return;
 
         FEntity fEntity = optionalFEntity.get();
-        if (handleEntityInvalidation(tag, fEntity)) {
+        if (handleEntityInvalidation(input, tag, fEntity)) {
             return;
         }
 
@@ -215,7 +215,7 @@ public class ProxyMessageHandler {
         }
     }
 
-    private boolean handleEntityInvalidation(ModuleName tag, FEntity fEntity) {
+    private boolean handleEntityInvalidation(DataInputStream input, ModuleName tag, FEntity fEntity) throws IOException {
         return switch (tag) {
             case SYSTEM_BAN -> {
                 if (!injector.getInstance(BanModule.class).config().filterByServer()) {
@@ -230,9 +230,15 @@ public class ProxyMessageHandler {
                 yield true;
             }
             case SYSTEM_MAINTENANCE -> {
-                if (!injector.getInstance(MaintenanceModule.class).config().filterByServer()) {
+                MaintenanceModule module = injector.getInstance(MaintenanceModule.class);
+                if (!module.config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MAINTENANCE);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMAINTENANCE);
+
+                    Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
+
+                    // give some time
+                    taskScheduler.runAsyncLater(() -> module.kickOnlinePlayersIfTurned(moderation));
                 }
                 yield true;
             }
@@ -592,11 +598,6 @@ public class ProxyMessageHandler {
                 .turned(turned)
                 .build()
         );
-
-        if (turned) {
-            // give some time for players to reconnect
-            taskScheduler.runAsyncLater(() -> module.kickOnlinePlayers(fModerator, maintenance));
-        }
     }
 
     private void handleNicknameCommand(FEntity fEntity) {
