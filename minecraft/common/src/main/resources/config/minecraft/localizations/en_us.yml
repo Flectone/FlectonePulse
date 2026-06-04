@@ -196,8 +196,8 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     dump_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>An error occurred while uploading the dump: <error>"
-    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Host parameter must be configured in config.yml"
-    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Port <port> is unavailable, choose another one in config.yml"
+    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Host parameter must be configured in command.yml, field port"
+    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Port <port> is unavailable, choose another one in command.yml, field port"
     null_file: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>File <file> does not exist"
     file_exist: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>File <file> already exists"
     format_starting: "<fcolor:1>★ Starting <fcolor:2><type><fcolor:1>, please wait..."
