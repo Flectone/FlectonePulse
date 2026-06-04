@@ -135,26 +135,26 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
             return;
         }
 
-        Moderation unwarn = moderationService.remove(fPlayer, fTarget, Moderation.Type.WARN, id, reason);
-        if (unwarn == null) return;
+        Moderation moderation = moderationService.remove(fPlayer, fTarget, Moderation.Type.WARN, id, reason);
+        if (moderation == null) return;
 
         if (!fileFacade.command().warn().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+            proxySender.send(fTarget, ModuleName.SYSTEM_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Unwarn> baseMetadataBuilder = EventMetadata.<Localization.Command.Unwarn>builder()
                 .sender(fTarget)
                 .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unwarn)
+                        moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, moderation)
                 )
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
                 .proxy(dataOutputStream ->
-                        dataOutputStream.writeAsJson(unwarn)
+                        dataOutputStream.writeAsJson(moderation)
                 )
                 .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwarn)
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation)
                 )
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag("moderator", fResolver, fPlayer)
@@ -166,7 +166,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .base(baseMetadataBuilder.build())
-                .unmoderation(unwarn)
+                .unmoderation(moderation)
                 .build()
         );
     }

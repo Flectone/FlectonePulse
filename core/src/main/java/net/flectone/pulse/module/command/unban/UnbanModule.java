@@ -136,7 +136,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
         if (unban == null) return;
 
         if (!fileFacade.command().ban().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_BAN);
+            proxySender.send(fTarget, ModuleName.SYSTEM_BAN, dataOutputStream -> dataOutputStream.writeAsJson(unban));
         }
 
         EventMetadata.Builder<Localization.Command.Unban> baseMetadataBuilder = EventMetadata.<Localization.Command.Unban>builder()

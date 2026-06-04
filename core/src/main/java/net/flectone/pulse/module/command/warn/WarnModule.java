@@ -113,24 +113,24 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         long databaseTime = time + System.currentTimeMillis();
         String reason = timeReasonPair.second();
 
-        Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
-        if (warn == null) return;
+        Moderation moderation = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
+        if (moderation == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WARN);
+            proxySender.send(fTarget, ModuleName.SYSTEM_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Warn> baseMetadataBuilder = EventMetadata.<Localization.Command.Warn>builder()
                 .sender(fTarget)
                 .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
+                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, moderation)
                 )
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(moderation))
                 .integration(string ->
-                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn)
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation)
                 )
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag("moderator", fResolver, fPlayer)
@@ -142,18 +142,11 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
                 .base(baseMetadataBuilder.build())
-                .moderation(warn)
+                .moderation(moderation)
                 .build()
         );
 
-        sendForTarget(fPlayer, fTarget, warn);
-
-        int countWarns = moderationService.getTotalValidCount(fTarget, Moderation.Type.WARN, moderationService.getServer(Moderation.Type.WARN));
-
-        String action = config().actions().get(countWarns);
-        if (StringUtils.isEmpty(action)) return;
-
-        platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.name()));
+        sendForTarget(moderation);
     }
 
     @Override
@@ -176,9 +169,11 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         return fileFacade.localization(sender).command().warn();
     }
 
-    public void sendForTarget(FEntity fModerator, FPlayer fTarget, Moderation warn) {
+    public void sendForTarget(Moderation warn) {
+        FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
+        FPlayer fTarget = fPlayerService.getFPlayer(warn.player());
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Warn>builder()
                 .sender(fTarget)
                 .format(localization -> moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, warn))
@@ -187,5 +182,12 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
                 })
                 .build()
         );
+
+        int countWarns = moderationService.getTotalValidCount(fTarget, Moderation.Type.WARN, moderationService.getServer(Moderation.Type.WARN));
+
+        String action = config().actions().get(countWarns);
+        if (StringUtils.isEmpty(action)) return;
+
+        platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.name()));
     }
 }

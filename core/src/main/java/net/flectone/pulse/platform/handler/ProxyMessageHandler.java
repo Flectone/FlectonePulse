@@ -221,17 +221,20 @@ public class ProxyMessageHandler {
                 BanModule module = injector.getInstance(BanModule.class);
                 if (!module.config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.BAN);
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNBAN);
 
                     Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
-
-                    // give some time
-                    taskScheduler.runAsyncLater(() -> module.kick(moderation));
+                    if (moderation.type() == Moderation.Type.BAN) {
+                        // give some time
+                        taskScheduler.runAsyncLater(() -> module.kick(moderation));
+                    }
                 }
                 yield true;
             }
             case SYSTEM_MUTE -> {
                 if (!injector.getInstance(MuteModule.class).config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MUTE);
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMUTE);
                 }
                 yield true;
             }
@@ -250,8 +253,15 @@ public class ProxyMessageHandler {
                 yield true;
             }
             case SYSTEM_WARN -> {
-                if (!injector.getInstance(WarnModule.class).config().filterByServer()) {
+                WarnModule module = injector.getInstance(WarnModule.class);
+                if (!module.config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.WARN);
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNWARN);
+
+                    Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
+                    if (moderation.type() == Moderation.Type.WARN) {
+                        taskScheduler.runAsyncLater(() ->  module.sendForTarget(moderation));
+                    }
                 }
                 yield true;
             }
@@ -890,8 +900,6 @@ public class ProxyMessageHandler {
                 .moderation(warn)
                 .build()
         );
-
-        module.sendForTarget(fModerator, (FPlayer) fEntity, warn);
     }
 
     private void handleWhitelistCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
