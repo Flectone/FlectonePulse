@@ -326,7 +326,7 @@ scoreboard:
   ticker:
     enable: false
   objective:
-    enable: true
+    enable: false
     belowname:
       enable: false
       ticker:
