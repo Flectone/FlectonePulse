@@ -28,6 +28,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -161,7 +162,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unmute>builder()

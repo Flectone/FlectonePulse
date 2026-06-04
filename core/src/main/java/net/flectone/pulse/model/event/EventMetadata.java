@@ -124,7 +124,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return filter(fReceiver::equals);
         }
 
-        public Builder<L> receivers(Set<FPlayer> fReceivers) {
+        public Builder<L> receivers(Collection<FPlayer> fReceivers) {
             return filter(fReceivers::contains);
         }
 

@@ -32,8 +32,8 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -138,7 +138,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()

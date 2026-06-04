@@ -34,6 +34,7 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -139,7 +140,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()

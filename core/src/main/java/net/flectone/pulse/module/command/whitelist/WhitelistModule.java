@@ -260,7 +260,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
@@ -346,7 +346,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
@@ -434,7 +434,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()
