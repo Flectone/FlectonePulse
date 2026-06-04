@@ -242,9 +242,10 @@ public class ProxyMessageHandler {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMAINTENANCE);
 
                     Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
-
-                    // give some time
-                    taskScheduler.runAsyncLater(() -> module.kickOnlinePlayersIfTurned(moderation));
+                    if (moderation.type() == Moderation.Type.MAINTENANCE) {
+                        // give some time
+                        taskScheduler.runAsyncLater(() -> module.kickOnlinePlayers(moderation));
+                    }
                 }
                 yield true;
             }

@@ -149,10 +149,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         long time = timeReasonPair.first() == -1 ? -1 : timeReasonPair.first();
         String reason = timeReasonPair.second();
 
-        turn(fPlayer, reason, time, turned).ifPresent(moderation -> {
-            kickOnlinePlayersIfTurned(moderation);
-            unturnLater(moderation);
-        });
+        turn(fPlayer, reason, time, turned).ifPresent(this::unturnLater);
     }
 
     @Override
@@ -191,34 +188,34 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation maintenance;
+        Moderation moderation;
         if (turned) {
             // invalidate all unmaintenance
             moderationService.invalidate(fTarget, Moderation.Type.UNMAINTENANCE, -1);
 
             // save maintenance for server target (console)
-            maintenance = moderationService.maintenance(fTarget, databaseTime, reason, fPlayer.id());
+            moderation = moderationService.maintenance(fTarget, databaseTime, reason, fPlayer.id());
         } else {
-            maintenance = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, databaseTime,-1, StringUtils.isEmpty(reason) ? "disabled" : reason);
+            moderation = moderationService.remove(fPlayer, fTarget, Moderation.Type.MAINTENANCE, databaseTime,-1, StringUtils.isEmpty(reason) ? "disabled" : reason);
         }
 
         // skip error
-        if (maintenance == null) return Optional.empty();
+        if (moderation == null) return Optional.empty();
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(maintenance));
+            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Maintenance> baseMetadataBuilder = EventMetadata.<Localization.Command.Maintenance>builder()
                 .sender(fTarget)
                 .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, maintenance)
+                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, moderation)
                 )
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(maintenance);
+                    dataOutputStream.writeAsJson(moderation);
                     dataOutputStream.writeBoolean(turned);
                 })
                 .integration(IntegrationMetadata.builder()
@@ -235,21 +232,19 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
 
         messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
                 .base(baseMetadataBuilder.build())
-                .moderation(maintenance)
+                .moderation(moderation)
                 .turned(turned)
                 .build()
         );
 
-        return Optional.of(maintenance);
-    }
-
-    public void kickOnlinePlayersIfTurned(@Nullable Moderation maintenance) {
-        if (maintenance != null && maintenance.type() == Moderation.Type.MAINTENANCE) {
-            kickOnlinePlayers(maintenance);
+        if (moderation.type() == Moderation.Type.MAINTENANCE) {
+            kickOnlinePlayers(moderation);
         }
+
+        return Optional.of(moderation);
     }
 
-    private void kickOnlinePlayers(@NonNull Moderation maintenance) {
+    public void kickOnlinePlayers(@NonNull Moderation maintenance) {
         FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
@@ -284,7 +279,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             Moderation currentMaintenance = currentModeration.get();
             if (!currentMaintenance.equals(maintenance)) return;
 
-            turn(fPlayerService.getConsole(), null, time,maintenance.type() != Moderation.Type.MAINTENANCE);
+            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, time,maintenance.type() != Moderation.Type.MAINTENANCE);
         }, delay);
     }
 
