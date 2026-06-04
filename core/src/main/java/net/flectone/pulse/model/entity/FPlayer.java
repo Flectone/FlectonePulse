@@ -288,13 +288,16 @@ public interface FPlayer extends FEntity {
         public boolean equals(Object object) {
             if (this == object) return true;
             if (!(object instanceof FPlayer fPlayer)) return false;
+            if (this.console != fPlayer.isConsole()) return false;
+            if (this.integration != fPlayer.isIntegration()) return false;
+            if (!Objects.equals(this.uuid, fPlayer.uuid())) return false;
 
             return Objects.equals(this.id, fPlayer.id());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(id);
+            return Objects.hash(uuid, id, console, integration);
         }
 
         @Override
