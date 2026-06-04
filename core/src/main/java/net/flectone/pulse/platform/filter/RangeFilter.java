@@ -3,7 +3,9 @@ package net.flectone.pulse.platform.filter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -17,7 +19,18 @@ public class RangeFilter {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
 
-    public Predicate<FPlayer> createFilter(FPlayer filterPlayer, Range range) {
+    public Predicate<FPlayer> createFilter(EventMetadata<?> eventMetadata) {
+        Predicate<FPlayer> filter = eventMetadata.filter();
+
+        boolean hasCustomFilter = !filter.test(FPlayer.UNKNOWN);
+        if (eventMetadata.range().is(Range.Type.PLAYER) && hasCustomFilter) {
+            return filter;
+        }
+
+        return filter.and(createFilter(eventMetadata.sender(), eventMetadata.range()));
+    }
+
+    public Predicate<FPlayer> createFilter(FEntity filterPlayer, Range range) {
         if (range.is(Range.Type.PLAYER)) {
             return filterPlayer::equals;
         }

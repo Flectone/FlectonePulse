@@ -34,6 +34,7 @@ import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -169,7 +170,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Ban>builder()

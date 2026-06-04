@@ -139,7 +139,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()

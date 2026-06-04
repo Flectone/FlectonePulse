@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -176,7 +177,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(message -> String.format(message.receiver(), ticTacToe.getId()))
                         .sound(soundOrThrow())
                         .build()
@@ -212,7 +214,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag(fResolver, fReceiver)

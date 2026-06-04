@@ -110,7 +110,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                 .sender(fPlayer)
-                .filterPlayer(fTarget)
+                .receiver(fTarget)
                 .format(Localization.Command.Emit::format)
                 .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
                 .message(message)

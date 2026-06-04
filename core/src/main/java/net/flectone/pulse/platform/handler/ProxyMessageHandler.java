@@ -539,7 +539,7 @@ public class ProxyMessageHandler {
             messageDispatcher.dispatch(module, EventMetadata.<Localization.Command.Emit>builder()
                     .uuid(metadataUUID)
                     .sender(fEntity)
-                    .filterPlayer(fTarget)
+                    .receiver(fTarget)
                     .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
                     .format(Localization.Command.Emit::format)
                     .message(message)

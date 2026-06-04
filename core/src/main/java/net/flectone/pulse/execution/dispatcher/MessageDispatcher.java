@@ -159,8 +159,7 @@ public class MessageDispatcher {
         EventMetadata<L> newEventMetadata = (EventMetadata<L>) messagePrepareEvent.eventMetadata();
 
         return (E) newEventMetadata.withBase(newEventMetadata.base().withReceivers(fPlayerService.getFPlayersWithConsole().stream()
-                        .filter(newEventMetadata.filter())
-                        .filter(rangeFilter.createFilter(newEventMetadata.filterPlayer(), newEventMetadata.range()))
+                        .filter(rangeFilter.createFilter(newEventMetadata))
                         .filter(fReceiver -> fReceiver.isSetting(moduleName))
                         .toList()
                 )

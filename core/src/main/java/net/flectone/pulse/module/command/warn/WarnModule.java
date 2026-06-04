@@ -33,6 +33,7 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -137,7 +138,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()

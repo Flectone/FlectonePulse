@@ -161,7 +161,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .base(EventMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                         .sender(sender)
-                        .filterPlayer(fReceiver)
+                        .receiver(fReceiver)
                         .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
                         .destination(questionMessage.destination())
                         .sound(sound)

@@ -170,7 +170,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Tell>builder()
                 .uuid(metadataUUID)
                 .sender(sender)
-                .filterPlayer(fReceiver)
+                .receiver(fReceiver)
                 .format(format)
                 .destination(config().destination())
                 .message(string)

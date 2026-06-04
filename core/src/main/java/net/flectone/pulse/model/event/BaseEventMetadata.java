@@ -30,7 +30,6 @@ import java.util.function.Predicate;
 public record BaseEventMetadata<L extends LocalizationSetting>(
         @NonNull UUID uuid,
         @NonNull FEntity sender,
-        @Nullable FPlayer filterPlayer,
         @NonNull Predicate<FPlayer> filter,
         @NonNull Map<MessageFlag, Boolean> flags,
         @NonNull BiFunction<FPlayer, L, String> format,

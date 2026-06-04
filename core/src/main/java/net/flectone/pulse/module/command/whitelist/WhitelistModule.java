@@ -51,10 +51,7 @@ import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -248,7 +245,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
@@ -334,7 +331,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
@@ -422,7 +419,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()

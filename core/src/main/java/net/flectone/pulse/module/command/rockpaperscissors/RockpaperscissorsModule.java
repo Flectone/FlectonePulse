@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -285,7 +286,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
-                        .filterPlayer(fPlayer)
+                        .receiver(fPlayer)
                         .format(message)
                         .build()
                 )
@@ -298,7 +299,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
-                        .filterPlayer(fReceiver)
+                        .receiver(fReceiver)
                         .format(message)
                         .build()
                 )
@@ -321,7 +322,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
         messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(Localization.Command.Rockpaperscissors::receiver)
                         .build()
                 )
@@ -334,7 +336,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(s -> StringUtils.replaceEach(
                                 s.formatMove(),
                                 new String[]{"<target>", "<uuid>"},

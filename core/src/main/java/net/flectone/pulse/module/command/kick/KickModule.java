@@ -30,6 +30,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -116,7 +117,7 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()

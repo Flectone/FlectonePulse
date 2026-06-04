@@ -50,6 +50,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -227,7 +228,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()

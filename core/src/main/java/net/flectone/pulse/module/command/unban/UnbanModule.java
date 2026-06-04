@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -158,7 +159,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(Set.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()

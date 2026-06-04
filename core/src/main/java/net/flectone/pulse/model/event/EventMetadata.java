@@ -39,10 +39,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
         return base().sender();
     }
 
-    default @Nullable FPlayer filterPlayer() {
-        return base().filterPlayer();
-    }
-
     default @NonNull Predicate<FPlayer> filter() {
         return base().filter();
     }
@@ -101,7 +97,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
         private UUID uuid = UUID.randomUUID();
         private FEntity sender;
-        private FPlayer filterPlayer;
         private Predicate<FPlayer> filter = _ -> true;
         private BiFunction<FPlayer, L, String> format;
         private Destination destination = Destination.EMPTY_CHAT;
@@ -122,26 +117,19 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
         public Builder<L> sender(FEntity sender) {
             this.sender = sender;
-            return filterPlayer(sender);
+            return range(Range.Type.PLAYER);
         }
 
-        public Builder<L> filterPlayer(FEntity entity) {
-            this.range = Range.get(Range.Type.PLAYER);
-            this.filterPlayer = (entity instanceof FPlayer fp) ? fp : FPlayer.UNKNOWN;
-            return this;
+        public Builder<L> receiver(FPlayer fReceiver) {
+            return filter(fReceiver::equals);
         }
 
-        public Builder<L> filterPlayer(FPlayer player) {
-            this.filterPlayer = player;
-            return this;
-        }
-
-        public Builder<L> filterPlayer(FPlayer player, boolean senderColorOut) {
-            return filterPlayer(player).flag(MessageFlag.COLOR_CONTEXT_SENDER, senderColorOut);
+        public Builder<L> receivers(Set<FPlayer> fReceivers) {
+            return filter(fReceivers::contains);
         }
 
         public Builder<L> filter(Predicate<FPlayer> filter) {
-            this.filter = filter;
+            this.filter = this.filter.and(filter);
             return this;
         }
 
@@ -167,6 +155,11 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
         public Builder<L> destination(Destination destination) {
             this.destination = destination;
+            return this;
+        }
+
+        public Builder<L> range(Range.Type type) {
+            this.range = Range.get(type);
             return this;
         }
 
@@ -228,7 +221,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return new BaseEventMetadata<>(
                     uuid,
                     sender,
-                    filterPlayer,
                     filter,
                     Map.copyOf(flags),
                     format,

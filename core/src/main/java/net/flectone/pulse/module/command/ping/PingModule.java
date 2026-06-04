@@ -71,7 +71,7 @@ public class PingModule implements ModuleCommand<Localization.Command.Ping> {
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Ping>builder()
                 .sender(fTarget)
-                .filterPlayer(fPlayer)
+                .receiver(fPlayer)
                 .format(Localization.Command.Ping::format)
                 .destination(config().destination())
                 .sound(soundOrThrow())
