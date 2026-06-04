@@ -905,10 +905,13 @@ public class FileMigrator {
 
         Config.DeprecatedCommand deprecatedCommand = files.config().command();
         if (deprecatedCommand != null) {
+            Set<String> vanillaCommandsToRemove = new HashSet<>(deprecatedCommand.disabledFabric());
+            vanillaCommandsToRemove.add("whitelist");
+
             files = files.withConfig(files.config()
                     .withInternal(files.config().internal()
                             .withUnregisterCommandOnReload(deprecatedCommand.unregisterOnReload())
-                            .withVanillaCommandsToRemove(deprecatedCommand.disabledFabric())
+                            .withVanillaCommandsToRemove(vanillaCommandsToRemove)
                     )
             );
         }
