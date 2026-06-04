@@ -148,7 +148,12 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 .filter(actionType -> actionType.name().equalsIgnoreCase(type))
                 .findAny()
                 .orElse(null);
-        if (action == null) {
+
+        boolean isPlayerCommand = commandContext.command().rootComponent().name().endsWith("player");
+
+        if (action == null
+                || (action == Action.ON || action == Action.OFF) && isPlayerCommand
+                || (action == Action.ADD || action == Action.REMOVE || action == Action.LIST) && !isPlayerCommand) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Whitelist::nullType)
@@ -449,8 +454,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 Moderation.Type.WHITELIST,
                 1,
                 config().perPage(),
-                "/" + commandModuleController.getCommandName(this) + " list",
-                fTarget -> "/" + commandModuleController.getCommandName(this) + " remove " + fTarget.uuid() + " <id>"
+                "/" + commandModuleController.getCommandName(this) + "player list",
+                fTarget -> "/" + commandModuleController.getCommandName(this) + "player remove " + fTarget.uuid() + " <id>"
         );
     }
 
