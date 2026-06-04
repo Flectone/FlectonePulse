@@ -881,9 +881,8 @@ whitelist:
   auto_add: false
   auto_add_duration: -1
   check_duplicate: true
-  filter_by_server: false
+  filter_by_server: true
   show_connection_attempts: true
-  turned_on: false
   per_page: 4
   range: "PLAYER"
   aliases:

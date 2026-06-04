@@ -40,9 +40,7 @@ public class PulseWhitelistListener implements PulseListener {
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
-        // check module state
-        if (!moduleController.isEnable(whitelistModule)) return event;
-        if (!whitelistModule.config().turnedOn()) return event;
+        if (!whitelistModule.isTurnedOn()) return event;
 
         // get player whitelist
         FPlayer fPlayer = event.player();
@@ -87,7 +85,7 @@ public class PulseWhitelistListener implements PulseListener {
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         if (!moduleController.isEnable(whitelistModule)) return;
         if (!whitelistModule.config().autoAdd()) return;
-        if (whitelistModule.config().turnedOn()) return;
+        if (whitelistModule.isTurnedOn()) return;
 
         long time = whitelistModule.config().autoAddDuration() * TimeFormatter.MULTIPLIER;
 

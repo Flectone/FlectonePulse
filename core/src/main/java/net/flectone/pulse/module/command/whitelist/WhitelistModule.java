@@ -93,7 +93,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         listenerRegistry.register(PulseWhitelistListener.class);
 
-        if (config().turnedOn()) {
+        if (isTurnedOn()) {
             startKickTicker();
         }
     }
@@ -155,13 +155,17 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         return moderationService.whitelist(fTarget, time != -1 ? time + System.currentTimeMillis() : -1, reason, fModerator.id());
     }
 
+    public boolean isTurnedOn() {
+        return moduleController.isEnable(this) && moderationService.hasValid(fPlayerService.getConsole(), Moderation.Type.WHITELIST);
+    }
+
     public boolean isWhitelisted(FPlayer fPlayer) {
         return moderationService.hasValid(fPlayer, Moderation.Type.WHITELIST);
     }
 
     private void startKickTicker() {
         taskScheduler.runPlayerRegionTimer(fPlayer -> {
-            if (!config().turnedOn()) return;
+            if (!isTurnedOn()) return;
             if (permissionChecker.check(fPlayer, permission().bypass())) return;
             if (isWhitelisted(fPlayer)) return;
 
@@ -169,8 +173,9 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }, 20L);
     }
 
-    private void actionOnOff(FPlayer fPlayer, boolean turnedOn) {
-        if (turnedOn && config().turnedOn()) {
+    private void actionOnOff(FPlayer fPlayer, boolean turned) {
+        boolean isAlreadyTurned = isTurnedOn();
+        if (turned && isAlreadyTurned) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Whitelist::alreadyOn)
@@ -179,7 +184,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             return;
         }
 
-        if (!turnedOn && !config().turnedOn()) {
+        if (!turned && !isAlreadyTurned) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Whitelist::alreadyOff)
@@ -188,41 +193,46 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             return;
         }
 
-        // save state to file
-        fileFacade.updateFilePack(filePack -> filePack
-                .withCommand(filePack.command()
-                        .withWhitelist(
-                                filePack.command().whitelist().withTurnedOn(turnedOn)
-                        )
-                )
-        );
+        FPlayer fTarget = fPlayerService.getConsole();
 
-        try {
-            fileFacade.saveFiles();
-        } catch (Exception e) {
-            fLogger.warning(e);
-            return;
+        Moderation whitelist;
+        if (turned) {
+            // invalidate all unwhitelist for server target (console)
+            moderationService.invalidate(fTarget, Moderation.Type.UNWHITELIST, -1);
+
+            // save whitelist for server target (console)
+            whitelist = moderationService.whitelist(fTarget, -1, null, fPlayer.id());
+        } else {
+            whitelist = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, -1, -1, "disabled");
+        }
+
+        // skip error
+        if (whitelist == null) return;
+
+        if (!config().filterByServer()) {
+            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
         }
 
         messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
                 .base(EventMetadata.<Localization.Command.Whitelist>builder()
                         .sender(fPlayer)
-                        .format(localization -> turnedOn ? localization.formatOn() : localization.formatOff())
+                        .format(localization -> turned ? localization.formatOn() : localization.formatOff())
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .range(config().range())
-                        .proxy(dataOutputStream -> dataOutputStream.writeInt(turnedOn ? Action.ON.ordinal() : Action.OFF.ordinal()))
+                        .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
                         .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_" + String.valueOf(turnedOn).toUpperCase()))
+                                .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
                                 .build()
                         )
                         .build()
                 )
-                .turnedOn(turnedOn)
+                .moderation(whitelist)
+                .turnedOn(turned)
                 .build()
         );
 
-        if (turnedOn) {
+        if (turned) {
             fPlayerService.getOnlineFPlayers().forEach(fReceiver -> kickPlayer(fPlayer, fReceiver));
             startKickTicker();
         }

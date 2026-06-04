@@ -893,7 +893,6 @@ public record Command(
             Boolean checkDuplicate,
             Boolean filterByServer,
             Boolean showConnectionAttempts,
-            Boolean turnedOn,
             Integer perPage,
             Range range,
             List<String> aliases,
