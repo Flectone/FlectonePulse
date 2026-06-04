@@ -83,6 +83,18 @@ public class ProxySender {
     }
 
     /**
+     * Sends a simple message to proxy network.
+     *
+     * @param sender the entity sending the message
+     * @param tag the message type tag
+     * @param outputConsumer consumer to write custom data to output stream
+     * @return true if message was sent to at least one proxy, false otherwise
+     */
+    public boolean send(@NonNull FEntity sender, @NonNull ModuleName tag, @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer) {
+        return send(sender, tag, outputConsumer, UUID.randomUUID());
+    }
+
+    /**
      * Sends custom data to proxy network.
      *
      * @param sender the entity sending the data
