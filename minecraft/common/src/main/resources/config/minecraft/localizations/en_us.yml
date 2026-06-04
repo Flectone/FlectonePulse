@@ -461,14 +461,16 @@ command:
     already_on: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Whitelist is already enabled"
     already_off: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Whitelist is already disabled"
     format_add: "<fcolor:1>☰ Player <display_name> has been added to the whitelist <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
-    format_off: "<fcolor:1>☰ Whitelist <fcolor:2>disabled"
-    format_on: "<fcolor:1>☰ Whitelist <fcolor:2>enabled"
+    format_off: "<fcolor:1>☰ Whitelist <fcolor:2>disabled <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
+    format_on: "<fcolor:1>☰ Whitelist <fcolor:2>enabled <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[DETAILS]</hover>"
     format_remove: "<fcolor:1>☰ Player <display_name> has been removed from the whitelist <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
     person: "<color:#ff7171>☰ You are not on the server whitelist"
     connection_attempt: "<color:#ff7171>☰ Player <display_name>, who is not on the whitelist, attempted to connect"
     reasons:
       default: "You have been added to the server whitelist"
       removed: "You have been removed from the server whitelist"
+      enabled: "Whitelist is enabled on the server"
+      disabled: "Whitelist is disabled on the server"
     global:
       header: "<fcolor:2>▋ Whitelisted players: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Remove from whitelist <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"

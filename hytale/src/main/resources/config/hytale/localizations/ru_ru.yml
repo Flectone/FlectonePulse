@@ -461,14 +461,16 @@ command:
     already_on: "<color:#ff7171>Белый список уже включен"
     already_off: "<color:#ff7171>Белый список уже выключен"
     format_add: "<fcolor:1>[=] Игрок <display_name> добавлен в белый список <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
-    format_off: "<fcolor:1>[=] Белый список <fcolor:2>выключен"
-    format_on: "<fcolor:1>[=] Белый список <fcolor:2>включен"
+    format_off: "<fcolor:1>[=] Белый список <fcolor:2>выключен <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
+    format_on: "<fcolor:1>[=] Белый список <fcolor:2>включен <br><fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
     format_remove: "<fcolor:1>[=] Игрок <display_name> удалён из белого списка <br><fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>"
     person: "<color:#ff7171>[=] Тебя нет в белом списке сервера"
     connection_attempt: "<color:#ff7171>[=] Игрок <display_name>, которого нет в белом списке, попытался подключиться"
     reasons:
       default: "Ты добавлен в белый список сервера"
       removed: "Ты был удалён из белого списка сервера"
+      enabled: "На сервере включен белый список"
+      disabled: "На сервере выключен белый список"
     global:
       header: "<fcolor:2>| Игроки в белом списке: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Причина: <reason>"

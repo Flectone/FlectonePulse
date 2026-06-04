@@ -28,6 +28,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.ModerationListSender;
@@ -39,12 +40,13 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -76,7 +78,6 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private final MessagePipeline messagePipeline;
     private final ProxySender proxySender;
     private final UUIDParser uuidParser;
-    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
@@ -84,11 +85,20 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
         String promptReason = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::reason);
         String promptTime = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::time);
+
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
-                .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
-                .optional(promptPlayer, commandParserProvider.whitelistedParser())
+                .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("on", "off")))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
+        );
+
+        commandModuleController.registerCustomCommand(manager ->
+                manager.commandBuilder(commandModuleController.getCommandName(this) + "player", CommandMeta.empty())
+                        .permission(permission().name())
+                        .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("add", "remove", "list")))
+                        .optional(promptPlayer, commandParserProvider.whitelistedParser())
+                        .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
+                        .handler(this)
         );
 
         listenerRegistry.register(PulseWhitelistListener.class);
@@ -143,7 +153,31 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }
 
         switch (action) {
-            case ON, OFF -> actionOnOff(fPlayer, action == Action.ON);
+            case ON, OFF -> {
+                boolean turned = action == Action.ON;
+                boolean isAlreadyTurned = isTurnedOn();
+                if (turned && isAlreadyTurned) {
+                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                            .sender(fPlayer)
+                            .format(Localization.Command.Whitelist::alreadyOn)
+                            .build()
+                    );
+                    return;
+                }
+
+                if (!turned && !isAlreadyTurned) {
+                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                            .sender(fPlayer)
+                            .format(Localization.Command.Whitelist::alreadyOff)
+                            .build()
+                    );
+                    return;
+                }
+
+                Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
+
+                turn(fPlayer, timeReasonPair.second(), timeReasonPair.first(), turned).ifPresent(this::unturnLater);
+            }
             case ADD -> actionAdd(fPlayer, commandContext);
             case REMOVE -> actionRemove(fPlayer, commandContext);
             case LIST -> actionList(fPlayer, commandContext);
@@ -173,69 +207,89 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }, 20L);
     }
 
-    private void actionOnOff(FPlayer fPlayer, boolean turned) {
-        boolean isAlreadyTurned = isTurnedOn();
-        if (turned && isAlreadyTurned) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::alreadyOn)
-                    .build()
-            );
-            return;
-        }
-
-        if (!turned && !isAlreadyTurned) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::alreadyOff)
-                    .build()
-            );
-            return;
-        }
+    private Optional<Moderation> turn(FPlayer fPlayer, @Nullable String reason, long time, boolean turned) {
+        long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
         FPlayer fTarget = fPlayerService.getConsole();
 
-        Moderation whitelist;
+        Moderation moderation;
         if (turned) {
             // invalidate all unwhitelist for server target (console)
             moderationService.invalidate(fTarget, Moderation.Type.UNWHITELIST, -1);
 
             // save whitelist for server target (console)
-            whitelist = moderationService.whitelist(fTarget, -1, null, fPlayer.id());
+            moderation = moderationService.whitelist(fTarget, databaseTime, StringUtils.isEmpty(reason) ? "enabled" : reason, fPlayer.id());
         } else {
-            whitelist = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, -1, -1, "disabled");
+            moderation = moderationService.remove(fPlayer, fTarget, Moderation.Type.WHITELIST, databaseTime, -1,  StringUtils.isEmpty(reason) ? "disabled" : reason);
         }
 
         // skip error
-        if (whitelist == null) return;
+        if (moderation == null) return Optional.empty();
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
+            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+        }
+
+        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
+                .sender(fTarget)
+                .format((fReceiver, localization) ->
+                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatOn() : localization.formatOff(), fReceiver, moderation)
+                )
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .range(config().range())
+                .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
+                        .build()
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
+                });
+
+        if (config().range().is(Range.Type.PLAYER)) {
+            baseMetadataBuilder.filterPlayer(fPlayer);
         }
 
         messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
-                .base(EventMetadata.<Localization.Command.Whitelist>builder()
-                        .sender(fPlayer)
-                        .format(localization -> turned ? localization.formatOn() : localization.formatOff())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .range(config().range())
-                        .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
-                                .build()
-                        )
-                        .build()
-                )
-                .moderation(whitelist)
+                .base(baseMetadataBuilder.build())
+                .moderation(moderation)
                 .turnedOn(turned)
                 .build()
         );
 
-        if (turned) {
-            fPlayerService.getOnlineFPlayers().forEach(fReceiver -> kickPlayer(fPlayer, fReceiver));
-            startKickTicker();
+        if (moderation.type() == Moderation.Type.WHITELIST) {
+            kickOnlinePlayers(moderation);
         }
+
+        return Optional.of(moderation);
+    }
+
+    public void kickOnlinePlayers(@NonNull Moderation moderation) {
+        fPlayerService.getOnlineFPlayers().forEach(fReceiver -> {
+            FPlayer fPlayer = fPlayerService.getFPlayer(moderation.moderator());
+
+            kickPlayer(fPlayer, fReceiver);
+        });
+    }
+
+    private void unturnLater(Moderation whitelist) {
+        long time = whitelist.time();
+        if (time == -1) return;
+
+        // we need to check this before it is invalid in database
+        long delay = (time - System.currentTimeMillis()) / TimeFormatter.MULTIPLIER - 10L;
+        if (delay < 0) return;
+
+        taskScheduler.runAsyncLater(() -> {
+            Optional<Moderation> currentModeration = moderationService.getValid(fPlayerService.getConsole(), whitelist.type());
+            if (currentModeration.isEmpty()) return;
+
+            Moderation currentMaintenance = currentModeration.get();
+            if (!currentMaintenance.equals(whitelist)) return;
+
+            turn(fPlayerService.getFPlayer(currentMaintenance.moderator()), null, time,whitelist.type() != Moderation.Type.WHITELIST);
+        }, delay);
     }
 
     private void actionAdd(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
@@ -469,13 +523,14 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         return fTarget;
     }
 
-    private void kickPlayer(FPlayer fPlayer, FPlayer fTarget) {
+    public void kickPlayer(FEntity fModerator, FPlayer fTarget) {
         if (!platformPlayerAdapter.isOnline(fTarget)) return;
+        if (moduleController.isDisabledFor(this, fModerator)) return;
         if (permissionChecker.check(fTarget, permission().bypass())) return;
         if (isWhitelisted(fTarget)) return;
 
         platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
+                .sender(fModerator)
                 .receiver(fTarget)
                 .message(localization(fTarget).person())
                 .build()

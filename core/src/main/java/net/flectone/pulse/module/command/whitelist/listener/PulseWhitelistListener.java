@@ -19,12 +19,15 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.whitelist.WhitelistModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.kyori.adventure.text.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -37,6 +40,7 @@ public class PulseWhitelistListener implements PulseListener {
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
     private final ModerationService moderationService;
+    private final ModerationMessageFormatter moderationMessageFormatter;
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
@@ -46,6 +50,13 @@ public class PulseWhitelistListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (permissionChecker.check(fPlayer, whitelistModule.permission().bypass())) return event;
         if (whitelistModule.isWhitelisted(fPlayer)) return event;
+
+        Optional<Moderation> currentModeration = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.WHITELIST);
+        if (currentModeration.isEmpty()) return event;
+
+        // get moderator
+        Moderation maintenance = currentModeration.get();
+        FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
 
         // load custom player colors
         if (fPlayer.fColors().isEmpty()) {
@@ -71,14 +82,23 @@ public class PulseWhitelistListener implements PulseListener {
             );
         }
 
+        // replace string moderation placeholders
+        Localization.Command.Whitelist localization = whitelistModule.localization(fPlayer);
+        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, maintenance);
+
+        // build message
+        Component reason = messagePipeline.build(MessageContext.builder()
+                .sender(fModerator)
+                .receiver(fPlayer)
+                .message(formatPlayer)
+                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                .build()
+        );
+
         return event
                 .withPlayer(fPlayer)
                 .withAllowed(false)
-                .withKickReason(messagePipeline.build(MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(whitelistModule.localization(fPlayer).person())
-                        .build()
-                ));
+                .withKickReason(reason);
     }
 
     @Pulse

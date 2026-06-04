@@ -461,14 +461,16 @@ command:
     already_on: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Белый список уже включен"
     already_off: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Белый список уже выключен"
     format_add: "<fcolor:1>☰ Игрок <display_name> добавлен в белый список <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
-    format_off: "<fcolor:1>☰ Белый список <fcolor:2>выключен"
-    format_on: "<fcolor:1>☰ Белый список <fcolor:2>включен"
+    format_off: "<fcolor:1>☰ Белый список <fcolor:2>выключен <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    format_on: "<fcolor:1>☰ Белый список <fcolor:2>включен <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     format_remove: "<fcolor:1>☰ Игрок <display_name> удалён из белого списка <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     person: "<color:#ff7171>☰ Тебя нет в белом списке сервера"
     connection_attempt: "<color:#ff7171>☰ Игрок <display_name>, которого нет в белом списке, попытался подключиться"
     reasons:
       default: "Ты добавлен в белый список сервера"
       removed: "Ты был удалён из белого списка сервера"
+      enabled: "На сервере включен белый список"
+      disabled: "На сервере выключен белый список"
     global:
       header: "<fcolor:2>▋ Игроки в белом списке: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Удалить из белого списка <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"

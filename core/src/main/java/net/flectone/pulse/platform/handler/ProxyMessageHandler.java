@@ -255,8 +255,24 @@ public class ProxyMessageHandler {
                 yield true;
             }
             case SYSTEM_WHITELIST -> {
-                if (!injector.getInstance(WhitelistModule.class).config().filterByServer()) {
+                WhitelistModule module = injector.getInstance(WhitelistModule.class);
+                if (!module.config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.WHITELIST);
+                    moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNWHITELIST);
+
+                    Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
+                    FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
+
+                    if (fTarget.isConsole()) {
+                        if (moderation.type() == Moderation.Type.WHITELIST) {
+                            taskScheduler.runAsyncLater(() -> module.kickOnlinePlayers(moderation));
+                        }
+
+                    } else if (moderation.type() == Moderation.Type.UNWHITELIST && module.isTurnedOn()) {
+                        FPlayer fModerator = fPlayerService.getFPlayer(moderation.moderator());
+                        taskScheduler.runAsyncLater(() -> module.kickPlayer(fModerator, fTarget));
+                    }
+
                 }
                 yield true;
             }
