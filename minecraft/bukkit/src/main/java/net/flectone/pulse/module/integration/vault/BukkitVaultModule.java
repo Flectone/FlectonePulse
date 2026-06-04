@@ -11,7 +11,6 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
-import java.util.Collections;
 import java.util.Set;
 
 @Singleton

@@ -17,7 +17,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 

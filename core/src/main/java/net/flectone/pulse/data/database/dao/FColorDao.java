@@ -11,7 +11,10 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.mapper.Nested;
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -135,7 +138,7 @@ public class FColorDao implements BaseDAO<FColorSQL> {
 
             sql.insertFColorsIfAbsent(names);
 
-            Map<String, Integer> nameToId  = sql.findFColorIdsByNames(handle, names);
+            Map<String, Integer> nameToId = sql.findFColorIdsByNames(handle, names);
 
             sql.batchUpsertPlayerFColors(
                     fPlayer.id(),
@@ -161,8 +164,8 @@ public class FColorDao implements BaseDAO<FColorSQL> {
             @NonNull
             @Nested
             FColor fColor,
-
             FColor.@NonNull Type type
-    ){}
+    ) {
+    }
 
 }

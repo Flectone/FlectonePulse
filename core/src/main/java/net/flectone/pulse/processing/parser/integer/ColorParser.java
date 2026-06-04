@@ -16,7 +16,6 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton

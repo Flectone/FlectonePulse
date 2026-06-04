@@ -13,7 +13,6 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 

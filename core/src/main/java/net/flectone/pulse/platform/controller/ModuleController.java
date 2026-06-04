@@ -65,7 +65,7 @@ public class ModuleController {
         Class<? extends ModuleSimple> root = getRoot(clazz);
 
         Map<String, String> modules = new Object2ObjectArrayMap<>();
-        modules.put(root.getSimpleName(), isEnable(root) ? "true" : "false");
+        modules.put(root.getSimpleName(), Boolean.toString(isEnable(root)));
 
         getChildren(root)
                 .forEach(subModule -> modules.putAll(collectModuleStatuses(subModule)));

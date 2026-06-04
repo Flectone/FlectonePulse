@@ -14,7 +14,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.concurrent.TimeUnit;
 

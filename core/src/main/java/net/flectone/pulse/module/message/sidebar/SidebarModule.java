@@ -11,9 +11,9 @@ import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.PulseSidebarListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 
 import java.util.List;
 import java.util.Map;

@@ -18,9 +18,9 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;

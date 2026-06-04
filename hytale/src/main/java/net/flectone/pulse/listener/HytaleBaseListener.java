@@ -18,7 +18,6 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
-import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import org.apache.commons.lang3.StringUtils;

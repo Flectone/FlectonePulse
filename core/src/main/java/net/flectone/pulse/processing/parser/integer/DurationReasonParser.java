@@ -13,7 +13,6 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;

@@ -12,8 +12,8 @@ import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.HytaleBaseListener;
-import net.flectone.pulse.listener.HytalePulseBaseListener;
 import net.flectone.pulse.listener.HytaleListener;
+import net.flectone.pulse.listener.HytalePulseBaseListener;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.lang.reflect.InvocationTargetException;

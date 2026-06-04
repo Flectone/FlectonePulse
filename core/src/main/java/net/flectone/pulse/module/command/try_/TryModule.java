@@ -16,9 +16,9 @@ import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 

@@ -24,7 +24,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Singleton

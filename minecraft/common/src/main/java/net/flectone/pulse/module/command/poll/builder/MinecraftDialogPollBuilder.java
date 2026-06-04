@@ -20,16 +20,15 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.NBTPoll;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton

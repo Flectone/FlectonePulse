@@ -10,7 +10,6 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton

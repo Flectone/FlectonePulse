@@ -16,7 +16,10 @@ import net.flectone.pulse.model.util.Toast;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.kyori.adventure.text.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))

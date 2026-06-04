@@ -15,9 +15,9 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 

@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
-import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedHashMap;

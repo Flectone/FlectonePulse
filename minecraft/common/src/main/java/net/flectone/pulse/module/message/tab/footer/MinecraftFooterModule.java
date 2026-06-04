@@ -19,9 +19,9 @@ import net.flectone.pulse.module.message.tab.footer.listener.MinecraftPulseFoote
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 

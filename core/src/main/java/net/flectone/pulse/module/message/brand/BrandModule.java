@@ -16,9 +16,9 @@ import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.PulseBrandListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
