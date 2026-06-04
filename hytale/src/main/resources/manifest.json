@@ -11,7 +11,7 @@
     }
   ],
   "Website": "https://flectone.net/pulse/",
-  "ServerVersion": "0.5.3",
+  "ServerVersion": ">0.5.3",
   "Dependencies": {},
   "OptionalDependencies": {
     "LuckPerms:LuckPerms": "*",
