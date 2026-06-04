@@ -156,7 +156,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     }
 
     public boolean isWhitelisted(FPlayer fPlayer) {
-        return moderationService.hasValid(fPlayer, Moderation.Type.WHITELIST, -1);
+        return moderationService.hasValid(fPlayer, Moderation.Type.WHITELIST);
     }
 
     private void startKickTicker() {
