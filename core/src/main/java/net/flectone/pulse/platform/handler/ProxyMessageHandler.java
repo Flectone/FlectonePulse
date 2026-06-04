@@ -218,8 +218,14 @@ public class ProxyMessageHandler {
     private boolean handleEntityInvalidation(DataInputStream input, ModuleName tag, FEntity fEntity) throws IOException {
         return switch (tag) {
             case SYSTEM_BAN -> {
-                if (!injector.getInstance(BanModule.class).config().filterByServer()) {
+                BanModule module = injector.getInstance(BanModule.class);
+                if (!module.config().filterByServer()) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.BAN);
+
+                    Moderation moderation = gson.fromJson(input.readUTF(), Moderation.class);
+
+                    // give some time
+                    taskScheduler.runAsyncLater(() -> module.kick(moderation));
                 }
                 yield true;
             }
@@ -362,8 +368,6 @@ public class ProxyMessageHandler {
         if (moduleController.isDisabledFor(module, fModerator)) return;
 
         ModerationMessageFormatter moderationMessageFormatter = injector.getInstance(ModerationMessageFormatter.class);
-
-        module.kick(fModerator, (FPlayer) fEntity, ban);
 
         messageDispatcher.dispatch(module, ModerationMetadata.<Localization.Command.Ban>builder()
                 .base(EventMetadata.<Localization.Command.Ban>builder()
