@@ -145,7 +145,7 @@ public class ProxyMessageHandler {
     }
 
     public void handleSystemOffline(UUID uuid, boolean connected) throws IOException {
-        fPlayerService.invalidateOnline(uuid);
+        taskScheduler.runAsyncLater(() -> fPlayerService.invalidateOnline(uuid), 5L);
 
         if (connected) {
             injector.getInstance(QuitModule.class).proxySend(uuid);
