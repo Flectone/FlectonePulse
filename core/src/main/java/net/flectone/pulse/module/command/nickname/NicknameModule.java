@@ -34,7 +34,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -78,12 +77,11 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
         );
 
         String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "other", CommandMeta.empty())
-                        .permission(permission().other().name())
-                        .required(promptPlayer, commandParserProvider.playerParser())
-                        .required(promptMessage, commandParserProvider.nativeMessageParser())
-                        .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandOther(), commandBuilder -> commandBuilder
+                .permission(permission().other().name())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
         );
 
         listenerRegistry.register(PulseNicknameListener.class);

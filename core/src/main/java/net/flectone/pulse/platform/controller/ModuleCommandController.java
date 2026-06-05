@@ -12,7 +12,6 @@ import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.Command;
-import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -43,8 +42,13 @@ public class ModuleCommandController {
         );
     }
 
-    public void registerCustomCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        commandRegistryProvider.get().registerCommand(builder);
+    public void registerSubCommand(ModuleCommand<?> command, String subName, UnaryOperator<Command.Builder<FPlayer>> builder) {
+        List<String> aliases = command.config().aliases().stream().map(alias -> alias + subName).toList();
+        String commandName = getCommandName(command) + subName;
+
+        commandRegistryProvider.get().registerCommand(manager ->
+                builder.apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty()))
+        );
     }
 
     // all prompt methods for solving the problems of a non-existent argument

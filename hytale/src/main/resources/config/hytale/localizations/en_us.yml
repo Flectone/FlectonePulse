@@ -297,7 +297,7 @@ command:
     vote_true: "<color:#4eff52>[+] You voted for option <answer_id> in poll #<id>. There are <count> of you"
     vote_false: "<color:#ff4e4e>[-] You rejected option <answer_id> in poll #<id>. There are <count> without you"
     format: "<br><color:#fce303>| <status> <br>| <message><reset> <color:#fce303><br>├─────────────<br><answers>"
-    answer_template: "<color:#fce303>| <count> -> <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [+]<br>"
+    answer_template: "<color:#fce303>| <count> -> <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"<command> <id> <number>\"><answer> [+]<br>"
     status:
       start: "New poll #<b><id></b> has been created"
       run: "Poll #<b><id></b> is in progress"
@@ -381,7 +381,7 @@ command:
     wrong_move: "<color:#ff7171>This step is not possible"
     wrong_by_player: "<color:#ff7171>This game ended because player quit"
     symbol:
-      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">[ ]</click></hover>"
+      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"<command> %d <move>\">[ ]</click></hover>"
       first: "<fcolor:2>[X]"
       first_remove: "<color:#ff7171>[X]</color:#ff7171>"
       first_win: "<color:#98FB98>[X]</color:#98FB98>"
@@ -395,7 +395,7 @@ command:
     format_win: "<color:#98FB98><target> won this game</color:#98FB98>"
     format_draw: "<color:#98FB98>The game ended in a draw [H]</color:#98FB98>"
     sender: "<fcolor:1>[ ] An offer to play was sent to <target>"
-    receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>[ ] Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
+    receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>[ ] Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
   toponline:
     null_page: "<color:#ff7171>This page doesn't exist"
     header: "<fcolor:2>| Players: <count> <br>"

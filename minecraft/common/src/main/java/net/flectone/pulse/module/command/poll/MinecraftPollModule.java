@@ -17,7 +17,6 @@ import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.incendo.cloud.meta.CommandMeta;
 
 @Singleton
 public class MinecraftPollModule extends PollModule {
@@ -52,10 +51,9 @@ public class MinecraftPollModule extends PollModule {
         super.onEnable();
 
         if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
-            commandModuleController.registerCustomCommand(manager ->
-                    manager.commandBuilder(commandModuleController.getCommandName(this) + "gui", CommandMeta.empty())
-                            .permission(permission().create().name())
-                            .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
+            commandModuleController.registerSubCommand(this, config().subCommandGui(), commandBuilder -> commandBuilder
+                    .permission(permission().create().name())
+                    .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
             );
         }
 

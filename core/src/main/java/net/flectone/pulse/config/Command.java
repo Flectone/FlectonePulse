@@ -614,6 +614,7 @@ public record Command(
     public record Nickname(
             Boolean enable,
             String allowedInput,
+            String subCommandOther,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -655,6 +656,8 @@ public record Command(
             Boolean enableGui,
             Integer lastId,
             Range range,
+            String subCommandVote,
+            String subCommandGui,
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
@@ -757,6 +760,7 @@ public record Command(
     @Jacksonized
     public record Tictactoe(
             Boolean enable,
+            String subCommandMove,
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
@@ -896,6 +900,7 @@ public record Command(
             Boolean showConnectionAttempts,
             Integer perPage,
             Range range,
+            String subCommandPlayer,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,

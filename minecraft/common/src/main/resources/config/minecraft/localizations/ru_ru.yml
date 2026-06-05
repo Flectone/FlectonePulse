@@ -297,7 +297,7 @@ command:
     vote_true: "<color:#4eff52>👍 Ты выбрал <answer_id> вариант в голосовании #<id>. Всего таких голосов <count>"
     vote_false: "<color:#ff4e4e>🖓 Ты передумал об <answer_id> варианте в голосовании #<id>. Всего таких голосов <count> без тебя"
     format: "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>"
-    answer_template: "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>"
+    answer_template: "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"<command> <id> <number>\"><answer> [👍]<br>"
     status:
       start: "Создано новое голосование #<b><id></b>"
       run: "Идёт голосование #<b><id></b>"
@@ -381,7 +381,7 @@ command:
     wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Такой ход невозможен"
     wrong_by_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игра закончена, потому что один из игроков не в сети"
     symbol:
-      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>"
+      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"<command> %d <move>\">☐</click></hover>"
       first: "<fcolor:2>☑"
       first_remove: "<color:#ff7171>☑</color:#ff7171>"
       first_win: "<color:#98FB98>☑</color:#98FB98>"
@@ -395,7 +395,7 @@ command:
     format_win: "<color:#98FB98><target> выиграл</color:#98FB98>"
     format_draw: "<color:#98FB98>Ничья 👬</color:#98FB98>"
     sender: "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <target>"
-    receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
+    receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
   toponline:
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игроков: <count> <br>"

@@ -29,6 +29,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -57,7 +58,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     public void onEnable() {
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptHard = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::hard);
-        commandModuleController.registerCommand(this, manager -> manager
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptHard, commandParserProvider.booleanParser())
                 .permission(permission().name())
@@ -65,12 +66,11 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
 
         String promptId = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::id);
         String promptMove = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::move);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "move")
-                        .required(promptId, commandParserProvider.integerParser())
-                        .required(promptMove, commandParserProvider.singleMessageParser())
-                        .permission(permission().name())
-                        .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandMove(), commandBuilder -> commandBuilder
+                .required(promptId, commandParserProvider.integerParser())
+                .required(promptMove, commandParserProvider.singleMessageParser())
+                .permission(permission().name())
+                .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
     }
 
@@ -179,7 +179,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                         .sender(fPlayer)
                         .receiver(fReceiver)
                         .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
-                        .format(message -> String.format(message.receiver(), ticTacToe.getId()))
+                        .format(message -> Strings.CS.replace(String.format(message.receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
                         .sound(soundOrThrow())
                         .build()
                 )
@@ -336,7 +336,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                     }
             );
 
-            String symbolEmpty = messageSymbol.blank();
+            String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove());
             String symbolFirstRemove = messageSymbol.firstRemove();
             String symbolFirstWin = messageSymbol.firstWin();
             String symbolSecondRemove = messageSymbol.secondRemove();
@@ -350,7 +350,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                     symbolSecond,
                     symbolSecondRemove,
                     symbolSecondWin,
-                    String.format(symbolEmpty, ticTacToe.getId())
+                    symbolEmpty
             );
         };
     }

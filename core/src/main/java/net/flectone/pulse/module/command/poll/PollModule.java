@@ -35,7 +35,6 @@ import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
@@ -70,7 +69,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         String promptRepeatTime = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::repeatTime);
         String promptMultipleVote = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::multipleVote);
         String promptMessage = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::message);
-        commandModuleController.registerCommand(this, manager -> manager
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().create().name())
                 .required(promptTime, commandParserProvider.durationParser())
                 .required(promptRepeatTime, commandParserProvider.durationParser())
@@ -80,12 +79,11 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
         String promptId = commandModuleController.addPrompt(this, 4, Localization.Command.Prompt::id);
         String promptNumber = commandModuleController.addPrompt(this, 5, Localization.Command.Prompt::number);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "vote", CommandMeta.empty())
-                        .permission(permission().name())
-                        .required(promptId, commandParserProvider.integerParser())
-                        .required(promptNumber, commandParserProvider.integerParser())
-                        .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandVote(), commandBuilder -> commandBuilder
+                .permission(permission().name())
+                .required(promptId, commandParserProvider.integerParser())
+                .required(promptNumber, commandParserProvider.integerParser())
+                .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
         );
 
         taskScheduler.runAsyncTimer(() -> {
@@ -349,13 +347,8 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
                 answersBuilder.append(StringUtils.replaceEach(
                         message.answerTemplate(),
-                        new String[]{"<id>", "<number>", "<answer>", "<count>"},
-                        new String[]{
-                                String.valueOf(poll.getId()),
-                                String.valueOf(k),
-                                componentSerializer.toPlain(answerComponent),
-                                String.valueOf(poll.getCountAnswers()[k])
-                        }
+                        new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
+                        new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(poll.getCountAnswers()[k])}
                 ));
 
                 k++;

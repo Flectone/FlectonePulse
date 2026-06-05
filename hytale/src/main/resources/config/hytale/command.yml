@@ -587,6 +587,7 @@ mutelist:
 nickname:
   enable: true
   allowed_input: ""
+  sub_command_other: "other"
   aliases:
     - "nickname"
   destination:
@@ -622,6 +623,8 @@ poll:
   enable_gui: true
   last_id: 1
   range: "PROXY"
+  sub_command_vote: "vote"
+  sub_command_gui: "gui"
   aliases:
   - "poll"
   cooldown:
@@ -766,6 +769,7 @@ tell:
     enable: false
 tictactoe:
   enable: false
+  sub_command_move: "move"
   aliases:
   - "tictactoe"
   - "ttt"
@@ -886,6 +890,7 @@ whitelist:
   show_connection_attempts: true
   per_page: 4
   range: "PLAYER"
+  sub_command_player: "player"
   aliases:
     - "whitelist"
   destination:

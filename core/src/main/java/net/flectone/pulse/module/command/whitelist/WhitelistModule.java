@@ -43,7 +43,6 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -51,7 +50,10 @@ import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
@@ -86,19 +88,18 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         String promptReason = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::reason);
         String promptTime = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::time);
 
-        commandModuleController.registerCommand(this, manager -> manager
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("on", "off")))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
 
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "player", CommandMeta.empty())
-                        .permission(permission().name())
-                        .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("add", "remove", "list")))
-                        .optional(promptPlayer, commandParserProvider.whitelistedParser())
-                        .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
-                        .handler(this)
+        commandModuleController.registerSubCommand(this, config().subCommandPlayer(), commandBuilder -> commandBuilder
+                .permission(permission().name())
+                .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("add", "remove", "list")))
+                .optional(promptPlayer, commandParserProvider.whitelistedParser())
+                .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
+                .handler(this)
         );
 
         listenerRegistry.register(PulseWhitelistListener.class);
@@ -454,8 +455,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 Moderation.Type.WHITELIST,
                 1,
                 config().perPage(),
-                "/" + commandModuleController.getCommandName(this) + "player list",
-                fTarget -> "/" + commandModuleController.getCommandName(this) + "player remove " + fTarget.uuid() + " <id>"
+                "/" + commandModuleController.getCommandName(this) + config().subCommandPlayer() + " list",
+                fTarget -> "/" + commandModuleController.getCommandName(this) + config().subCommandPlayer() + " remove " + fTarget.uuid() + " <id>"
         );
     }
 
