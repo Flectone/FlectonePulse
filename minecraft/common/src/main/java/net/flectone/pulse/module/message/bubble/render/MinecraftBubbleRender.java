@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
@@ -31,6 +32,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -66,6 +68,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     private final MinecraftEntityUtil entityUtil;
     private final MinecraftPacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
+    private final ReflectionResolver reflectionResolver;
 
     @Override
     public void renderBubble(Bubble bubble) {
@@ -77,10 +80,16 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         CompletableFuture<Set<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
 
-        taskScheduler.runRegion(sender, () -> {
+        SchedulerRunnable runnable = () -> {
             Set<UUID> nearbyEntities = platformPlayerAdapter.findPlayersWhoCanSee(sender, viewDistance, viewDistance, viewDistance);
             nearbyEntitiesFuture.complete(nearbyEntities);
-        }, true);
+        };
+
+        if (reflectionResolver.isFolia()) {
+            taskScheduler.runRegion(sender, runnable);
+        } else {
+            taskScheduler.runSync(runnable);
+        }
 
         nearbyEntitiesFuture.thenAcceptAsync(nearbyEntities -> nearbyEntities
                 .stream()

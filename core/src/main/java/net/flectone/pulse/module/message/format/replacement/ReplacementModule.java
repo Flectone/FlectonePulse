@@ -303,7 +303,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
                 .message(Strings.CS.replace(
                         localization(messageContext.receiver()).values().getOrDefault("tps", ""),
                         "<value>",
-                        platformServerAdapter.getTPS()
+                        platformServerAdapter.getTPS(messageContext.sender())
                 ))
                 .flags(messageContext.flags())
                 .flags(

@@ -56,7 +56,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(fPlayer -> {
+            taskScheduler.runPlayerAsyncTimer(fPlayer -> {
                 if (!uuidTeamMap.containsKey(fPlayer.uuid())) return;
 
                 CustomName customName = createNameplate(fPlayer);
@@ -78,7 +78,7 @@ public class HytaleScoreboardModule extends ScoreboardModule {
 
     @Override
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             CustomName customName = createNameplate(fPlayer);

@@ -38,7 +38,7 @@ public class HytaleWorldModule extends WorldModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(WorldHytaleListener.class);

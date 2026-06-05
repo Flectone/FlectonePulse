@@ -80,42 +80,16 @@ public interface TaskScheduler {
      *
      * @param fPlayer the player whose region to use
      * @param runnable the task to run
-     * @param sync otherwise executes sync or async
      */
-    void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync);
+    void runRegion(FPlayer fPlayer, SchedulerRunnable runnable);
 
     /**
-     * Runs a task in the player's region after a delay.
-     * On Folia: executes in the player's region thread.
-     * Otherwise: executes asynchronously.
-     *
-     * @param fPlayer the player whose region to use
-     * @param runnable the task to run
-     * @param delay the delay in ticks
-     */
-    void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay);
-
-    /**
-     * Runs a repeating task in the player's region.
-     * On Folia: executes in the player's region thread.
-     * Otherwise: executes asynchronously.
-     *
-     * @param fPlayer the player whose region to use
-     * @param runnable the task to run
-     * @param delay the initial delay in ticks
-     * @param period the period between executions in ticks
-     */
-    void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period);
-
-    /**
-     * Runs a repeating task for all players in their respective regions.
-     * On Folia: executes in each player's region thread.
-     * Otherwise: executes asynchronously.
+     * Runs a repeating task for all platform players, executes asynchronously.
      *
      * @param fPlayerConsumer the consumer to apply to each player
      * @param delay the period between executions in ticks
      */
-    void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay);
+    void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay);
 
     /**
      * Checks if the scheduler is currently in a disabled state.
@@ -149,18 +123,6 @@ public interface TaskScheduler {
      * @return wrapped runnable with exception handling
      */
     Runnable wrapExceptionRunnable(SchedulerRunnable runnable);
-
-    /**
-     * Runs a repeating task in the player's region.
-     * On Folia: executes in the player's region thread.
-     * Otherwise: executes asynchronously.
-     *
-     * @param fPlayer the player whose region to use
-     * @param runnable the task to run
-     */
-    default void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
-        runRegion(fPlayer, runnable, false);
-    }
 
     /**
      * Runs a task asynchronously with default independent flag (false).
@@ -198,17 +160,6 @@ public interface TaskScheduler {
      */
     default void runSyncTimer(SchedulerRunnable runnable, long period) {
         runSyncTimer(runnable, 5L, period);
-    }
-
-    /**
-     * Runs a repeating task in the player's region with period.
-     *
-     * @param fPlayer the player whose region to use
-     * @param runnable the task to run
-     * @param period period in ticks
-     */
-    default void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long period) {
-        runRegionTimer(fPlayer, runnable, 5L, period);
     }
 
     /**

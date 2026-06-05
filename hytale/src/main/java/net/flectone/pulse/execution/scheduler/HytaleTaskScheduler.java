@@ -129,27 +129,13 @@ public class HytaleTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable, boolean sync) {
+    public void runRegion(FPlayer fPlayer, SchedulerRunnable runnable) {
         runAsync(runnable);
     }
 
     @Override
-    public void runRegionLater(FPlayer fPlayer, SchedulerRunnable runnable, long delay) {
-        runAsyncLater(runnable, delay);
-    }
-
-    @Override
-    public void runRegionTimer(FPlayer fPlayer, SchedulerRunnable runnable, long delay, long period) {
-        runAsyncTimer(runnable, delay, period);
-    }
-
-    @Override
-    public void runPlayerRegionTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
-        runAsyncTimer(() -> {
-            for (FPlayer fPlayer : fPlayerServiceProvider.get().getOnlineFPlayers()) {
-                runAsync(() -> fPlayerConsumer.accept(fPlayer));
-            }
-        }, delay);
+    public void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
+        runAsyncTimer(() -> fPlayerServiceProvider.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay);
     }
 
     @Override

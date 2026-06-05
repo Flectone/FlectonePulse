@@ -1,6 +1,7 @@
 package net.flectone.pulse.platform.adapter;
 
 import com.google.gson.JsonElement;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.Component;
@@ -27,11 +28,12 @@ public interface PlatformServerAdapter {
     void dispatchCommand(@NonNull String command);
 
     /**
-     * Gets the current server TPS (ticks per second).
+     * Gets the current server TPS (ticks per second) for a specific entity.
      *
+     * @param entity the entity for which to retrieve TPS information
      * @return formatted TPS string or empty string if unavailable
      */
-    @NonNull String getTPS();
+    @NonNull String getTPS(FEntity entity);
 
     /**
      * Gets the maximum player count for the server.

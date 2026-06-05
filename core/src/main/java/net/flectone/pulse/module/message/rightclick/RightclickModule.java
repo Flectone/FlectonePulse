@@ -59,7 +59,7 @@ public class RightclickModule implements ModuleLocalization<Localization.Message
     public void send(UUID uuid, int targetId) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             UUID targetUUID = platformPlayerAdapter.getPlayerByEntityId(targetId);

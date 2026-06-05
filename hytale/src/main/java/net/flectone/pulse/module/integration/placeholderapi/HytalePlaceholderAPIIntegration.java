@@ -198,7 +198,7 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
             case "ip" -> fPlayer.ip();
             case "ping" -> String.valueOf(platformPlayerAdapter.getPing(fPlayer));
             case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
-            case "tps" -> platformServerAdapter.getTPS();
+            case "tps" -> platformServerAdapter.getTPS(fPlayer);
             default -> null;
         };
     }

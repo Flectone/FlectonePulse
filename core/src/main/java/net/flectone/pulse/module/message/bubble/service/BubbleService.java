@@ -39,7 +39,7 @@ public class BubbleService {
     private final MessagePipeline messagePipeline;
 
     public void startTicker() {
-        taskScheduler.runPlayerRegionTimer(fPlayer -> {
+        taskScheduler.runPlayerAsyncTimer(fPlayer -> {
             PlayerBubbleState state = playerBubbleStates.get(fPlayer.uuid());
             if (state == null) return;
 

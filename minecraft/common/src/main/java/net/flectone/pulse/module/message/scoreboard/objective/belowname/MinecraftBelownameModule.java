@@ -36,7 +36,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::updateScore, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulseBelownameListener.class);

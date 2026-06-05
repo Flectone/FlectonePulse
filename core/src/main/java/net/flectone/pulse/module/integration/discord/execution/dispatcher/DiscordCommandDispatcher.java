@@ -52,7 +52,7 @@ public class DiscordCommandDispatcher {
             Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization().customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
-            taskScheduler.runRegion(fPlayer, () -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
+            taskScheduler.runAsync(() -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
             return true;
         }
 

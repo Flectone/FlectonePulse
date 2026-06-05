@@ -16,6 +16,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -48,7 +49,7 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String getTPS() {
+    public @NonNull String getTPS(FEntity entity) {
         Universe universe = Universe.get();
         if (universe == null) return "";
 

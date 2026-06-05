@@ -95,12 +95,7 @@ public class MessageDispatcher {
                                                                                               ModuleLocalization<L> module,
                                                                                               E eventMetadata) {
         if (!eventMetadata.receivers().isEmpty()) {
-            // fix Folia issue
-            FPlayer regionPlayer = eventMetadata.sender() instanceof FPlayer fPlayer
-                    ? fPlayer
-                    : fPlayerService.getRandomFPlayer();
-
-            taskScheduler.runRegion(regionPlayer, () -> eventMetadata.receivers().forEach(fReceiver ->
+            taskScheduler.runAsync(() -> eventMetadata.receivers().forEach(fReceiver ->
                     dispatch(createMessageEvent(fReceiver, moduleName, module, eventMetadata)))
             );
         }

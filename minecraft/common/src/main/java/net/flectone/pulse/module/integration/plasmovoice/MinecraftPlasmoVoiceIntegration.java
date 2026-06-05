@@ -91,7 +91,7 @@ public class MinecraftPlasmoVoiceIntegration implements FIntegration, AddonIniti
 
         event.setCancelled(true);
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             Optional<MessageContext> messageContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
             if (messageContext.isEmpty()) return;
 

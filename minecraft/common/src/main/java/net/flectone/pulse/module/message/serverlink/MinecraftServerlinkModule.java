@@ -41,7 +41,7 @@ public class MinecraftServerlinkModule implements ModuleLocalization<Localizatio
         listenerRegistry.register(MinecraftPulseServerlinkListener.class);
 
         if (config().ticker().enable()) {
-            taskScheduler.runPlayerRegionTimer(this::sendLinks, config().ticker().period());
+            taskScheduler.runPlayerAsyncTimer(this::sendLinks, config().ticker().period());
         }
     }
 

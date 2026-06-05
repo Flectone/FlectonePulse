@@ -60,7 +60,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     @Override
     public void onEnable() {
         if (config().ticker().enable()) {
-            taskScheduler.runPlayerRegionTimer(this::updateCoordinates, config().ticker().period());
+            taskScheduler.runPlayerAsyncTimer(this::updateCoordinates, config().ticker().period());
         }
 
         listenerRegistry.register(PulseAfkListener.class);
@@ -117,7 +117,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     }
 
     public void asyncRemoveAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             // sync fPlayer
             FPlayer syncFPlayer = fPlayerService.getFPlayer(fPlayer);
             removeAfk(action, syncFPlayer);

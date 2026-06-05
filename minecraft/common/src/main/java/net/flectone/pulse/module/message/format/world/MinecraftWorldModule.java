@@ -43,7 +43,7 @@ public class MinecraftWorldModule extends WorldModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPacketWorldListener.class);

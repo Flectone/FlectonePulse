@@ -262,11 +262,13 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     );
                     return Tag.selfClosingInserting(GsonComponentSerializer.gson().deserialize(json));
                 })
+                .audiencePlaceholder("tps", (player, _, _) -> {
+                    FPlayer fPlayer = fPlayerService.getFPlayer(player);
+
+                    return Tag.preProcessParsed(platformServerAdapter.getTPS(fPlayer));
+                })
                 .globalPlaceholder("online", (_, _) ->
                         Tag.preProcessParsed(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
-                )
-                .globalPlaceholder("tps", (_, _) ->
-                        Tag.preProcessParsed(platformServerAdapter.getTPS())
                 )
                 .build();
     }

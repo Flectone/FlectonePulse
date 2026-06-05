@@ -101,7 +101,7 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
 
         event.cancel();
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             Optional<MessageContext> messageContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
             if (messageContext.isEmpty()) return;
 

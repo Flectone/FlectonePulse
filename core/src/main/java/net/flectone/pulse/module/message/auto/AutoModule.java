@@ -46,7 +46,7 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
 
             Ticker ticker = value.ticker();
             if (ticker.enable()) {
-                taskScheduler.runPlayerRegionTimer(fPlayer -> send(fPlayer, key, value, sound), ticker.period());
+                taskScheduler.runPlayerAsyncTimer(fPlayer -> send(fPlayer, key, value, sound), ticker.period());
             }
         });
     }

@@ -51,7 +51,7 @@ public class TwitchCommandDispatcher {
             String localizationString = twitchModule.localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            taskScheduler.runRegion(fPlayer, () -> twitchSender.sendMessage(channel, buildMessage(fPlayer, localizationString)));
+            taskScheduler.runAsync(() -> twitchSender.sendMessage(channel, buildMessage(fPlayer, localizationString)));
             return true;
         }
 

@@ -42,7 +42,7 @@ public class BrandModule implements ModuleListLocalization<Localization.Message.
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(PulseBrandListener.class);

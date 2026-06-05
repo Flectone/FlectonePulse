@@ -46,7 +46,7 @@ public abstract class SidebarModule implements ModuleListLocalization<Localizati
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(PulseSidebarListener.class);

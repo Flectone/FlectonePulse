@@ -71,7 +71,7 @@ public class MinecraftBossbarModule extends BossbarModule {
 
     public void send(UUID playerUUID, UUID bossbarUUID, String translationKey, boolean announce, Component oldTitle) {
         FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
             if (!fPlayer.isSetting(ModuleName.MESSAGE_BOSSBAR)) return;
 

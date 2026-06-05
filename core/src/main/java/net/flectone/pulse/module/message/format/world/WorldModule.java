@@ -81,7 +81,7 @@ public class WorldModule implements ModuleSimple {
     }
 
     public void update(FPlayer fPlayer) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             String newWorldPrefix = config().mode() == Mode.TYPE

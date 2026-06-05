@@ -47,7 +47,7 @@ public class MinecraftFooterModule implements ModuleListLocalization<Localizatio
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulseFooterListener.class);

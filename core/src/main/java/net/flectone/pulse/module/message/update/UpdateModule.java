@@ -73,7 +73,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
     }
 
     public void send(FPlayer fPlayer) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
             if (latestVersion == null) return;
 

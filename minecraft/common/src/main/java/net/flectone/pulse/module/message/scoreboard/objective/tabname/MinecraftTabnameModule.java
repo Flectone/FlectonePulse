@@ -36,7 +36,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::updateScore, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulseTabnameListener.class);

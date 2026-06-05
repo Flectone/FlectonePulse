@@ -14,6 +14,7 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -48,6 +49,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -77,7 +79,23 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String getTPS() {
+    public @NonNull String getTPS(FEntity entity) {
+        if (reflectionResolver.isFolia()) {
+            FPlayer regionFPlayer = entity instanceof FPlayer fPlayer && Bukkit.getPlayer(entity.uuid()) != null
+                    ? fPlayer
+                    : fPlayerServiceProvider.get().getRandomFPlayer();
+
+            CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+            taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(getTPS()));
+
+            return completableFuture.join();
+        }
+
+        return getTPS();
+    }
+
+    private String getTPS() {
         if (getTPSMethodPair == null) {
             getTPSMethodPair = findGetTPSMethod();
         }
@@ -91,7 +109,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
     }
 
-    public Pair<MethodHandle, Object> findGetTPSMethod() {
+    private Pair<MethodHandle, Object> findGetTPSMethod() {
         Object minecraftServer = Bukkit.getServer();
         MethodHandle getTPS = reflectionResolver.unreflectMethod(Server.class, "getTPS");
         if (getTPS == null) {

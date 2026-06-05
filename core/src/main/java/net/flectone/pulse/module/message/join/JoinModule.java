@@ -91,7 +91,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
             return;
         }
 
-        taskScheduler.runRegionLater(fPlayer, () -> privateSend(fPlayer, config().range(), true, false), 5L);
+        taskScheduler.runAsyncLater(() -> privateSend(fPlayer, config().range(), true, false), 5L);
     }
 
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
@@ -105,7 +105,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
             return;
         }
 
-        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, config().range(), !ignoreVanish, ignoreVanish));
+        taskScheduler.runAsync(() -> privateSend(fPlayer, config().range(), !ignoreVanish, ignoreVanish));
     }
 
     private void privateSend(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {

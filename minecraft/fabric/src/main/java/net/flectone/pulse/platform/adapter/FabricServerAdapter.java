@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -90,7 +91,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String getTPS() {
+    public @NonNull String getTPS(FEntity entity) {
         return String.format("%.2f", tpsTracker.getTPS());
     }
 

@@ -212,9 +212,12 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (_, _) ->
-                PlaceholderResult.value(platformServerAdapter.getTPS())
-        );
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, _) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
+            return PlaceholderResult.value(platformServerAdapter.getTPS(fPlayer));
+        });
 
         logHook();
     }

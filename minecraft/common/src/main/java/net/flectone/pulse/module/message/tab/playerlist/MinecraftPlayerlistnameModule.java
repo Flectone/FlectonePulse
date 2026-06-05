@@ -86,7 +86,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulsePlayerlistnameListener.class);
@@ -121,7 +121,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     public void update() {
         if (!moduleController.isEnable(this)) return;
 
-        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> taskScheduler.runRegion(fPlayer, () -> send(fPlayer)));
+        taskScheduler.runAsync(() -> fPlayerService.getPlatformFPlayers().forEach(this::send));
     }
 
     public void send(FPlayer fPlayer) {

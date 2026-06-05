@@ -244,6 +244,11 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
 
                     return Tag.preProcessParsed(String.valueOf(platformPlayerAdapter.getPing(fPlayer)));
                 })
+                .audiencePlaceholder("tps", (player, _, _) -> {
+                    FPlayer fPlayer = fPlayerService.getFPlayer(player);
+
+                    return Tag.preProcessParsed(platformServerAdapter.getTPS(fPlayer));
+                })
                 .audiencePlaceholder("format", (player, queue, _) -> {
                     if (!queue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
@@ -256,9 +261,6 @@ public class FabricMiniPlaceholdersIntegration implements FIntegration, PulseLis
                 })
                 .globalPlaceholder("online", (_, _) ->
                         Tag.preProcessParsed(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
-                )
-                .globalPlaceholder("tps", (_, _) ->
-                        Tag.preProcessParsed(platformServerAdapter.getTPS())
                 )
                 .build();
     }

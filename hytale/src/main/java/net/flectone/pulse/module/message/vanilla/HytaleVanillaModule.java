@@ -87,7 +87,7 @@ public class HytaleVanillaModule extends VanillaModule {
     }
 
     public void send(FPlayer fPlayer, ParsedComponent parsedComponent) {
-        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, parsedComponent));
+        taskScheduler.runAsync(() -> privateSend(fPlayer, parsedComponent));
     }
 
     private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {

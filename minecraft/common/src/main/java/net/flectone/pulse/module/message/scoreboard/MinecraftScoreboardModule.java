@@ -66,7 +66,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(fPlayer -> {
+            taskScheduler.runPlayerAsyncTimer(fPlayer -> {
                 Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
                 if (oldTeam == null) return;
 
@@ -86,7 +86,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     @Override
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             if (!skipCacheTeam) {

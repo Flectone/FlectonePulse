@@ -28,6 +28,7 @@ import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -43,6 +44,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -61,6 +63,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final Provider<AfkModule> afkModuleProvider;
     private final Provider<OnlineModule> onlineModuleProvider;
     private final Provider<ToponlineModule> toponlineModuleProvider;
+    private final ReflectionResolver reflectionResolver;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -199,7 +202,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
             case "ip" -> fPlayer.ip();
             case "ping" -> String.valueOf(platformPlayerAdapter.getPing(fPlayer));
             case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
-            case "tps" -> platformServerAdapter.getTPS();
+            case "tps" -> platformServerAdapter.getTPS(fPlayer);
             default -> null;
         };
     }
@@ -224,6 +227,10 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
             fReceiver = tempFPlayer;
         }
 
+        return event.withContext(messageContext.withMessage(setPlaceholders(fPlayer, fReceiver, message, true)));
+    }
+
+    private String setPlaceholders(FPlayer fPlayer, FPlayer fReceiver, String message, boolean firstTry) {
         try {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
@@ -237,10 +244,19 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
                 message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
             }
 
-        } catch (Exception _) {
-            // ignore placeholderapi exceptions
+        } catch (Exception e) {
+            if (firstTry && e.getMessage().contains("any region")  && reflectionResolver.isFolia()) {
+                FPlayer regionFPlayer = platformPlayerAdapter.isOnline(fPlayer) ? fPlayer : fPlayerService.getRandomFPlayer();
+
+                CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+                String finalMessage = message;
+                taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(setPlaceholders(fPlayer, fReceiver, finalMessage, false)));
+
+                return completableFuture.join();
+            }
         }
 
-        return event.withContext(messageContext.withMessage(message));
+        return message;
     }
 }

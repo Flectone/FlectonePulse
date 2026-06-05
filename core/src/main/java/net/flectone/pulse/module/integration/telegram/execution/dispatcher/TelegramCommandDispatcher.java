@@ -49,7 +49,7 @@ public class TelegramCommandDispatcher {
             String localizationString = telegramModule.localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            taskScheduler.runRegion(fPlayer, () -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
+            taskScheduler.runAsync(() -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
             return true;
         }
 
