@@ -104,6 +104,11 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
     }
 
     @Override
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
     public void hook() {
         taskScheduler.runSync(this::register);
         logHook();
