@@ -273,6 +273,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         if (moderation.type() == Moderation.Type.WHITELIST) {
             kickOnlinePlayers(moderation);
+            startKickTicker();
         }
 
         return Optional.of(moderation);
