@@ -52,10 +52,12 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
     }
 
     @Override
-    public void handleSystemOffline(UUID uuid) throws IOException {
-        super.handleSystemOffline(uuid);
+    public void handleSystemOffline(UUID uuid, boolean connected) throws IOException {
+        super.handleSystemOffline(uuid, connected);
 
-        injector.getInstance(MinecraftPlayerlistnameModule.class).remove(uuid);
+        if (connected) {
+            injector.getInstance(MinecraftPlayerlistnameModule.class).remove(uuid);
+        }
     }
 
     @Override

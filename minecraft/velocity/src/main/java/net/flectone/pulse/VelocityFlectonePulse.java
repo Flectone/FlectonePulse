@@ -18,7 +18,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -66,12 +65,7 @@ public class VelocityFlectonePulse {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
-        Optional<byte[]> data = ProxyMessageProcessor.validate(event.getData());
-        if (data.isEmpty()) return;
-
-        proxyServer.getAllServers().stream()
-                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data.get()));
+        ProxyMessageProcessor.validate(event.getData()).ifPresent(this::sendData);
     }
 
     @Subscribe
@@ -105,30 +99,24 @@ public class VelocityFlectonePulse {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
 
-        byte[] dataOnline = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID);
-
-        proxyServer.getAllServers().stream()
-                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, dataOnline));
+        sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID));
 
         if (firstJoinPlayers.remove(playerUUID)) {
-            byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID);
-
-            proxyServer.getAllServers().stream()
-                    .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                    .forEach(serverInfo -> {
-                        serverInfo.sendPluginMessage(IDENTIFIER, data);
-                    });
+            sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID));
         }
     }
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
         UUID playerUUID = event.getPlayer().getUniqueId();
-        if (velocityLoginStateListener.getLoginStatus(playerUUID) != LoginStatus.CONNECTED) return;
 
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
+        boolean connected = velocityLoginStateListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED;
+        sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID, dataOutputStream ->
+                dataOutputStream.writeBoolean(connected))
+        );
+    }
 
+    private void sendData(byte[] data) {
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
                 .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));

@@ -116,7 +116,14 @@ public class MinecraftBasePacketListener implements PacketListener {
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
         UUID uuid = event.getUser().getUUID();
-        if (uuid == null) return;
+        if (uuid == null) {
+            // yes, this is very bad, but there are no other options
+            // UUID == null and name == null, and we need to remove players who have failed to log in
+            if (!FlectonePulseAPI.isDisabling()) {
+                taskScheduler.runAsyncLater(() -> fPlayerService.getLoginFPlayers().forEach(this::persistAndDisposePlayer), 5L);
+            }
+            return;
+        }
 
         if (FlectonePulseAPI.isDisabling()) {
             persistAndDisposePlayer(uuid);

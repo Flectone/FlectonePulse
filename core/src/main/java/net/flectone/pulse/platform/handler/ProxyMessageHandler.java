@@ -126,7 +126,7 @@ public class ProxyMessageHandler {
                 switch (moduleName) {
                     case SYSTEM_ONLINE -> handleSystemOnline(messageUUID);
                     case SYSTEM_CONNECTED -> handleSystemConnected(messageUUID);
-                    case SYSTEM_OFFLINE -> handleSystemOffline(messageUUID);
+                    case SYSTEM_OFFLINE -> handleSystemOffline(messageUUID, input.readBoolean());
                     default -> handleProxyMessage(input, messageUUID, moduleName);
                 }
             } catch (IOException e) {
@@ -144,9 +144,12 @@ public class ProxyMessageHandler {
         injector.getInstance(JoinModule.class).proxySend(uuid);
     }
 
-    public void handleSystemOffline(UUID uuid) throws IOException {
+    public void handleSystemOffline(UUID uuid, boolean connected) throws IOException {
         fPlayerService.invalidateOnline(uuid);
-        injector.getInstance(QuitModule.class).proxySend(uuid);
+
+        if (connected) {
+            injector.getInstance(QuitModule.class).proxySend(uuid);
+        }
     }
 
     public void handleSystemSkin(UUID uuid) {

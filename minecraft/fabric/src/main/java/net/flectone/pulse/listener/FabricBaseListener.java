@@ -13,31 +13,25 @@ import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.service.FPlayerService;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricBaseListener {
-
-    private final Set<UUID> joinedPlayers = new CopyOnWriteArraySet<>();
 
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
 
     public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
-        ServerPlayer player = handler.getPlayer();
-        UUID playerUUID = player.getUUID();
+        UUID uuid = handler.getPlayer().getUUID();
 
         taskScheduler.runAsyncLater(() -> {
-            joinedPlayers.add(playerUUID);
+            if (!fPlayerService.invalidateLoginSession(uuid)) return;
 
-            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
             PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
             if (playerLoadEvent.cancelled()) return;
@@ -50,13 +44,11 @@ public class FabricBaseListener {
     }
 
     public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
-        ServerPlayer player = handler.getPlayer();
-        UUID playerUUID = player.getUUID();
+        UUID uuid = handler.getPlayer().getUUID();
 
         taskScheduler.runAsync(() -> {
-            if (!joinedPlayers.remove(playerUUID)) return;
-
-            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
+            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            if (!fPlayer.isOnline()) return;
 
             PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
             if (playerQuitEvent.cancelled()) return;

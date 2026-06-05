@@ -2,6 +2,7 @@ package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
@@ -23,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * This service manages player storage across the plugin. You can use <code>getFPlayer()</code> to grab players from this service.
@@ -44,6 +47,9 @@ import java.util.UUID;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerService {
+
+    @Getter
+    private final Set<UUID> loginFPlayers = new CopyOnWriteArraySet<>();
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -189,6 +195,9 @@ public class FPlayerService {
     public void invalidateOnline(UUID uuid) {
         fPlayerRepository.removeOnline(uuid);
         socialRepository.invalidatePlaytime(uuid);
+
+        // most likely it is not there, but just in case
+        invalidateLoginSession(uuid); 
     }
 
     public FPlayer clearAndSave(FPlayer fPlayer) {
@@ -209,11 +218,17 @@ public class FPlayerService {
         return fPlayer;
     }
 
-    public void saveJoinSession(FPlayer fPlayer) {
+    public void saveLoginSession(FPlayer fPlayer) {
+        loginFPlayers.add(fPlayer.uuid());
+
         if (isPlaytimeTracking()) {
             socialRepository.saveJoinSession(fPlayer);
             socialRepository.invalidatePlaytime(fPlayer.uuid());
         }
+    }
+
+    public boolean invalidateLoginSession(UUID uuid) {
+        return loginFPlayers.remove(uuid);
     }
 
     public void updateFPlayer(FPlayer fPlayer) {

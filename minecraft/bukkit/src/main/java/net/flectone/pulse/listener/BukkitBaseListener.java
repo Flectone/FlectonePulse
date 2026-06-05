@@ -19,15 +19,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitBaseListener implements Listener {
-
-    private final Set<UUID> joinedPlayers = new CopyOnWriteArraySet<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -41,7 +37,7 @@ public class BukkitBaseListener implements Listener {
         UUID uuid = player.getUniqueId();
 
         taskScheduler.runAsync(() -> {
-            joinedPlayers.add(uuid);
+            if (!fPlayerService.invalidateLoginSession(uuid)) return;
 
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
             if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
@@ -64,9 +60,8 @@ public class BukkitBaseListener implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
 
         taskScheduler.runAsync(() -> {
-            if (!joinedPlayers.remove(uuid)) return;
-
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            if (!fPlayer.isOnline()) return;
 
             PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
             if (playerQuitEvent.cancelled()) return;
