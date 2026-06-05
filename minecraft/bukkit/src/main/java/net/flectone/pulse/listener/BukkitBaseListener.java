@@ -16,6 +16,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Set;
@@ -34,13 +35,14 @@ public class BukkitBaseListener implements Listener {
     private final MinecraftPacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        joinedPlayers.add(uuid);
 
         taskScheduler.runAsync(() -> {
+            joinedPlayers.add(uuid);
+
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
             if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
                 String locale = getPlayerLocale(player);
@@ -57,12 +59,13 @@ public class BukkitBaseListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuitEvent(org.bukkit.event.player.PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
-        if (!joinedPlayers.remove(uuid)) return;
 
         taskScheduler.runAsync(() -> {
+            if (!joinedPlayers.remove(uuid)) return;
+
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
             PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));

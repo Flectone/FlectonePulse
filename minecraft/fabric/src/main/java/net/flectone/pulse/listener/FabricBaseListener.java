@@ -33,9 +33,10 @@ public class FabricBaseListener {
     public void asyncProcessJoinEvent(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer minecraftServer) {
         ServerPlayer player = handler.getPlayer();
         UUID playerUUID = player.getUUID();
-        joinedPlayers.add(playerUUID);
 
         taskScheduler.runAsyncLater(() -> {
+            joinedPlayers.add(playerUUID);
+
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
             PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
@@ -51,9 +52,10 @@ public class FabricBaseListener {
     public void asyncProcessQuitEvent(ServerGamePacketListenerImpl handler, MinecraftServer minecraftServer) {
         ServerPlayer player = handler.getPlayer();
         UUID playerUUID = player.getUUID();
-        if (!joinedPlayers.remove(playerUUID)) return;
 
         taskScheduler.runAsync(() -> {
+            if (!joinedPlayers.remove(playerUUID)) return;
+
             FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
 
             PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
