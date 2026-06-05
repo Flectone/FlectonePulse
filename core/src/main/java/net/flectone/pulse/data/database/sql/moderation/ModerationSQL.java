@@ -68,7 +68,7 @@ public interface ModerationSQL extends SQL {
      * @param server the server ID
      * @return list of player names
      */
-    @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime) AND (:server IS NULL OR `m``server` IS NULL OR `m`.`server` = :server) AND NOT `player` = -1")
+    @SqlQuery("SELECT `p`.`name` FROM `fp_moderation` `m` JOIN `fp_player` `p` ON `p`.`id` = `m`.`player` WHERE `m`.`type` = :type AND `m`.`valid` = true AND (`m`.`time` = -1 OR `m`.`time` > :currentTime) AND (:server IS NULL OR `m`.`server` IS NULL OR `m`.`server` = :server) AND NOT `player` = -1")
     List<String> findValidPlayerNamesByType(@Bind("type") String type, @Bind("currentTime") long currentTime, @Bind("server") String server);
 
     /**
