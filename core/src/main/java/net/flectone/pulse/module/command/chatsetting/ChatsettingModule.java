@@ -159,12 +159,12 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
             String promptValue = commandModuleController.getPrompt(this, 2);
             Optional<String> optionalValue = commandContext.optional(promptValue);
 
-            saveSetting(fTarget.withSetting(settingText, optionalValue.orElse(null)), settingText);
+            saveSetting(fTarget, settingText, optionalValue.orElse(null));
             return;
         }
 
         String messageType = optionalType.get().toUpperCase();
-        saveSetting(fTarget.withSetting(messageType, !fTarget.isSetting(messageType)), messageType);
+        saveSetting(fTarget, messageType, !fTarget.isSetting(messageType));
     }
 
     protected abstract MenuBuilder getMenuBuilder();
@@ -173,22 +173,22 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         getMenuBuilder().open(fPlayer, fTarget.uuid());
     }
 
-    public void saveSetting(FPlayer fPlayer, String messageType) {
+    public void saveSetting(FPlayer fPlayer, String messageType, boolean value) {
         taskScheduler.runAsync(() -> {
-            fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
+            FPlayer newFPlayer = fPlayerService.saveSetting(fPlayer, messageType, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
+                proxySender.send(newFPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }
 
-    public void saveSetting(FPlayer fPlayer, SettingText settingText) {
+    public void saveSetting(FPlayer fPlayer, SettingText settingText, String value) {
         taskScheduler.runAsync(() -> {
-            fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
+            FPlayer newFPlayer = fPlayerService.saveSetting(fPlayer, settingText, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
+                proxySender.send(newFPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }

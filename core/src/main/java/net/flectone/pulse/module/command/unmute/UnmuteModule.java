@@ -30,7 +30,6 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -117,7 +116,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::lowerWeightGroup)

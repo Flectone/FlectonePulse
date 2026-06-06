@@ -91,7 +91,7 @@ public class WorldModule implements ModuleSimple {
             SettingText setting = SettingText.WORLD_PREFIX;
             if (Objects.equals(fPlayer.getSetting(setting), newWorldPrefix)) return;
 
-            fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(setting, newWorldPrefix), setting);
+            fPlayerService.saveSetting(fPlayer, setting, newWorldPrefix);
         });
     }
 

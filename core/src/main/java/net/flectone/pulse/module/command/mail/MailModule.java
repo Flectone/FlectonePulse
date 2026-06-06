@@ -30,6 +30,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.Optional;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MailModule implements ModuleCommand<Localization.Command.Mail> {
@@ -96,21 +98,23 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
+        FPlayer finalFReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String message = commandModuleController.getArgument(this, commandContext, 1);
 
-        Mail mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
-        if (mail == null) return;
+        Optional<Mail> mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
+        if (mail.isEmpty()) return;
+
+        int mailId = mail.get().id();
 
         messageDispatcher.dispatch(this, MailMetadata.<Localization.Command.Mail>builder()
                 .base(EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
-                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))
+                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mailId)))
                         .message(message)
                         .destination(config().destination())
                         .sound(soundOrThrow())
@@ -119,7 +123,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
                         })
                         .build()
                 )
-                .mail(mail)
+                .mail(mail.get())
                 .target(fReceiver)
                 .build()
         );

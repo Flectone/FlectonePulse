@@ -92,12 +92,6 @@ public interface FPlayer extends FEntity {
 
     boolean isSetting(String moduleName);
 
-    FPlayer withoutSetting(SettingText settingText);
-
-    FPlayer withoutSetting(String moduleName);
-
-    FPlayer withoutSetting(ModuleName moduleName);
-
     FPlayer withoutIgnore(Ignore ignore);
 
     Map<Integer, String> getFColors(FColor.Type type);
@@ -240,36 +234,6 @@ public interface FPlayer extends FEntity {
         public boolean isSetting(@Nullable String moduleName) {
             Boolean value = this.settingsBoolean.get(moduleName);
             return value == null || value;
-        }
-
-        @Override
-        public FPlayer withoutSetting(@Nullable SettingText settingText) {
-            if (!this.settingsText.containsKey(settingText)) return this;
-
-            Map<SettingText, String> newSettings = new EnumMap<>(this.settingsText);
-            newSettings.remove(settingText);
-
-            return toBuilder()
-                    .settingsText(Map.copyOf(newSettings))
-                    .build();
-        }
-
-        @Override
-        public FPlayer withoutSetting(@Nullable String moduleName) {
-            if (!this.settingsBoolean.containsKey(moduleName)) return this;
-
-            Map<String, Boolean> newSettings = new Object2BooleanArrayMap<>(this.settingsBoolean);
-
-            newSettings.remove(moduleName);
-
-            return toBuilder()
-                    .settingsBoolean(Map.copyOf(newSettings))
-                    .build();
-        }
-
-        @Override
-        public FPlayer withoutSetting(@NonNull ModuleName moduleName) {
-            return withoutSetting(moduleName.name());
         }
 
         @Override

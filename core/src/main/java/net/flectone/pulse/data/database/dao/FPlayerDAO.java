@@ -48,48 +48,63 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     /**
-     * Inserts a new player into the database.
-     * Handles UUID and name conflicts by updating existing records.
+     * Inserts a new player into the database or updates an existing player.
+     * Handles conflicts by checking for existing records with the same UUID or name.
      *
      * @param uuid the player's UUID
      * @param name the player's name
-     * @return true if a new player was inserted, false if an existing player was updated
+     * @param ip the player's IP address, can be null
+     * @param online whether the player is currently online
+     * @return the created or updated FPlayer object with assigned database ID
      */
-    public boolean insert(@NonNull UUID uuid, @NonNull String name) {
-        if (database.isClosed()) return false;
+    public FPlayer insertOrUpdate(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
 
         return inTransaction(sql -> {
+            int id;
+
             Optional<PlayerInfo> existingByUUID = sql.findByUUID(uuid.toString());
             if (existingByUUID.isPresent()) {
                 PlayerInfo playerInfo = existingByUUID.get();
 
+                // get current id
+                id = playerInfo.id();
+
+                // update old record
                 String existingName = playerInfo.name();
                 if (!name.equalsIgnoreCase(existingName)) {
                     logger.warning("Player with UUID '%s' changed name: '%s' -> '%s'", uuid, existingName, name);
-
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
                 }
 
-                return false;
-            }
+                sql.update(playerInfo.id(), online, uuid.toString(), name, ip);
+            } else {
+                Optional<PlayerInfo> existingByName = sql.findByName(name);
+                if (existingByName.isPresent()) {
+                    PlayerInfo playerInfo = existingByName.get();
 
-            Optional<PlayerInfo> existingByName = sql.findByName(name);
-            if (existingByName.isPresent()) {
-                PlayerInfo playerInfo = existingByName.get();
+                    // get current id
+                    id = playerInfo.id();
 
-                UUID existingUuid = UUID.fromString(playerInfo.uuid());
-                if (!uuid.equals(existingUuid)) {
-                    logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
+                    // update old record
+                    UUID existingUuid = UUID.fromString(playerInfo.uuid());
+                    if (!uuid.equals(existingUuid)) {
+                        logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
+                    }
 
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
+                    sql.update(playerInfo.id(), online, uuid.toString(), name, ip);
+                } else {
+                    // insert new record
+                    id = sql.insert(online, uuid.toString(), name, ip);
                 }
-
-                return false;
             }
 
-            sql.insert(uuid.toString(), name);
-
-            return true;
+            return FPlayer.builder()
+                    .id(id)
+                    .uuid(uuid)
+                    .name(name)
+                    .ip(ip)
+                    .online(online)
+                    .build();
         });
     }
 

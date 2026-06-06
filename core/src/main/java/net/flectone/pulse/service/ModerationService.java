@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -32,6 +33,7 @@ public class ModerationService {
     private final IntegrationModule integrationModule;
     private final FileFacade fileFacade;
     private final ProxySender proxySender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
@@ -238,6 +240,17 @@ public class ModerationService {
         }
 
         return time != -1 && timeLimit != -1 && timeLimit >= time;
+    }
+
+    public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
+        if (source.isConsole()) return true;
+
+        boolean sourceIsOperator = platformPlayerAdapter.isOperator(source);
+        boolean targetIsOperator = platformPlayerAdapter.isOperator(target);
+        if (!sourceIsOperator && targetIsOperator) return false;
+
+        return sourceIsOperator && !targetIsOperator
+                || integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
     }
 
     public String getServer(Moderation.Type type) {

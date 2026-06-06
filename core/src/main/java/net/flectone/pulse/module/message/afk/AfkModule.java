@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -56,6 +57,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final TimeFormatter timeFormatter;
+    private final PlaytimeService playtimeService;
 
     @Override
     public void onEnable() {
@@ -180,27 +182,24 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     }
 
     private FPlayer removeAfkSetting(FPlayer fPlayer) {
-        fPlayer = fPlayer.withoutSetting(SettingText.AFK_SUFFIX);
+        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, null);
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
         playersCoordinates.remove(fPlayer.uuid());
 
         if (!config().trackPlaytime()) {
-            fPlayerService.saveAfkSession(fPlayer, false);
+            playtimeService.saveAfkSession(fPlayer, false);
         }
 
         return fPlayer;
     }
 
     private FPlayer addAfkSetting(FPlayer fPlayer) {
-        fPlayer = fPlayer.withSetting(SettingText.AFK_SUFFIX, localization().suffix());
+        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, localization().suffix());
 
         playersCoordinates.put(fPlayer.uuid(), Pair.of(System.currentTimeMillis(), platformPlayerAdapter.getCoordinates(fPlayer)));
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
-
         if (!config().trackPlaytime()) {
-            fPlayerService.saveAfkSession(fPlayer, true);
+            playtimeService.saveAfkSession(fPlayer, true);
         }
 
         return fPlayer;

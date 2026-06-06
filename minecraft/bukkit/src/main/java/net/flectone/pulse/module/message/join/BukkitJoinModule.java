@@ -12,6 +12,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -28,9 +29,10 @@ public class BukkitJoinModule extends MinecraftJoinModule {
                             MessageDispatcher messageDispatcher,
                             ModuleController moduleController,
                             FPlayerService fPlayerService,
+                            PlaytimeService playtimeService,
                             EventDispatcher eventDispatcher,
                             ProxyRegistry proxyRegistry) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, listenerRegistry, taskScheduler, messageDispatcher, moduleController, fPlayerService, eventDispatcher, proxyRegistry);
+        super(fileFacade, platformPlayerAdapter, integrationModule, listenerRegistry, taskScheduler, messageDispatcher, moduleController, fPlayerService, playtimeService, eventDispatcher, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

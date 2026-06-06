@@ -165,7 +165,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     public void setStreamPrefix(FPlayer fPlayer, String prefix) {
         if (Objects.equals(prefix, fPlayer.getSetting(SettingText.STREAM_PREFIX))) return;
 
-        fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.STREAM_PREFIX, prefix), SettingText.STREAM_PREFIX);
+        fPlayerService.saveSetting(fPlayer, SettingText.STREAM_PREFIX, prefix);
     }
 
     @Override

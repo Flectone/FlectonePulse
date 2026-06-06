@@ -84,6 +84,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -104,6 +105,7 @@ public class ProxyMessageHandler {
     private final Injector injector;
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final FLogger fLogger;
     private final ModerationService moderationService;
     private final Gson gson;
@@ -137,7 +139,10 @@ public class ProxyMessageHandler {
 
     public void handleSystemOnline(UUID uuid) throws IOException {
         // delay is needed for proper sync Proxy
-        taskScheduler.runAsyncLater(() -> fPlayerService.invalidateOffline(uuid, true), 5L);
+        taskScheduler.runAsyncLater(() -> {
+            fPlayerService.invalidateOfflineCache(uuid, true);
+            playtimeService.invalidate(uuid);
+        }, 5L);
     }
 
     public void handleSystemConnected(UUID uuid) {
@@ -145,7 +150,10 @@ public class ProxyMessageHandler {
     }
 
     public void handleSystemOffline(UUID uuid, boolean connected) throws IOException {
-        taskScheduler.runAsyncLater(() -> fPlayerService.invalidateOnline(uuid), 5L);
+        taskScheduler.runAsyncLater(() -> {
+            fPlayerService.invalidateOnlineCache(uuid);
+            playtimeService.invalidate(uuid);
+        }, 5L);
 
         if (connected) {
             injector.getInstance(QuitModule.class).proxySend(uuid);
@@ -436,7 +444,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
-        FPlayer fPlayer = fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity));
+        FPlayer fPlayer = fPlayerService.updateCache(fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity), false));
 
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!moduleController.isEnable(module)) return;
@@ -445,7 +453,9 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {
-        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity)));
+        fPlayerService.updateCache(
+                fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity), false)
+        );
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -645,7 +655,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleNicknameCommand(FEntity fEntity) {
-        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity)));
+        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity), false));
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

@@ -72,7 +72,7 @@ public class ChatsettingHandler {
 
         Consumer<SubMenuItem> onSelect = item -> {
             String chatName = "default".equalsIgnoreCase(item.name()) ? null : item.name();
-            fPlayerService.updateCache(syncFPlayer(fTarget).withSetting(SettingText.CHAT_NAME, chatName));
+            fPlayerService.saveSetting(fTarget, SettingText.CHAT_NAME, chatName);
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
@@ -82,7 +82,7 @@ public class ChatsettingHandler {
                 .build()
         );
 
-        Runnable closeConsumer = () -> chatsettingModule.saveSetting(syncFPlayer(fTarget), SettingText.CHAT_NAME);
+        Runnable closeConsumer = () -> {};
 
         menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
@@ -141,7 +141,7 @@ public class ChatsettingHandler {
 
                     });
 
-            fPlayerService.updateCache(syncFPlayer(fTarget).withFColors(type, fColors));
+            fPlayerService.saveColors(syncFPlayer(fTarget).withFColors(type, fColors));
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
@@ -151,7 +151,7 @@ public class ChatsettingHandler {
                 .build()
         );
 
-        Runnable closeConsumer = () -> fPlayerService.saveColors(syncFPlayer(fTarget));
+        Runnable closeConsumer = () -> {};
 
         menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
@@ -183,8 +183,7 @@ public class ChatsettingHandler {
         fTarget = syncFPlayer(fTarget);
         boolean currentEnabled = fTarget.isSetting(messageType);
 
-        fTarget = fPlayerService.updateCache(fTarget.withSetting(messageType, !currentEnabled));
-        chatsettingModule.saveSetting(fTarget, messageType);
+        chatsettingModule.saveSetting(fTarget, messageType, !currentEnabled);
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
     }

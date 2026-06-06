@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.bukkit.*;
@@ -36,16 +37,14 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
+    private final FileFacade fileFacade;
     private final Injector injector;
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
@@ -142,6 +141,18 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull String getWorldEnvironment(@NonNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         return player != null ? player.getWorld().getEnvironment().toString().toLowerCase() : "";
+    }
+
+    @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        try {
+            return player.getLocale();
+        } catch (NoSuchMethodError _) {
+            return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+        }
     }
 
     @Override

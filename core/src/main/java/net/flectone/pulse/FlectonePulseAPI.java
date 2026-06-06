@@ -19,10 +19,7 @@ import net.flectone.pulse.model.event.lifecycle.StartReloadEvent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.MetricsService;
-import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.service.TranslationService;
+import net.flectone.pulse.service.*;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.util.logging.filter.LogFilter;
@@ -177,9 +174,13 @@ public class FlectonePulseAPI {
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
+        PlaytimeService playtimeService = instance.get(PlaytimeService.class);
 
         // update and clear all fplayers
-        fPlayerService.getPlatformFPlayers().forEach(fPlayerService::clearAndSave);
+        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> {
+            fPlayerService.clearAndSave(fPlayer);
+            playtimeService.updateLastSession(fPlayer);
+        });
         fPlayerService.invalidate();
 
         // terminate packetevents

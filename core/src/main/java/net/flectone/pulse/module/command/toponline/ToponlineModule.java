@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -49,6 +50,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
@@ -77,7 +79,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
-        int size = fPlayerService.getPlayTimesCount();
+        int size = playtimeService.getPlayTimesCount();
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
@@ -91,7 +93,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
             return;
         }
 
-        List<PlayTime> finalPlayedTimePlayers = fPlayerService.getAllPlayTimes(perPage, (page - 1) * perPage);
+        List<PlayTime> finalPlayedTimePlayers = playtimeService.getAllPlayTimes(perPage, (page - 1) * perPage);
 
         Localization.Command.Toponline localization = localization(fPlayer);
 
@@ -197,7 +199,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     public Optional<FPlayer> getPlayerByPosition(int position) {
         if (position < 1) return Optional.empty();
 
-        List<PlayTime> playTimeList = fPlayerService.getAllPlayTimes(1, position - 1);
+        List<PlayTime> playTimeList = playtimeService.getAllPlayTimes(1, position - 1);
         if (playTimeList.isEmpty()) return Optional.empty();
 
         return Optional.of(fPlayerService.getFPlayer(playTimeList.getFirst().playerId()));

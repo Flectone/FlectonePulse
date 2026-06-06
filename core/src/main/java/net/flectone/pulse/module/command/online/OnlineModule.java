@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -45,6 +46,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
@@ -87,7 +89,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         String target = commandModuleController.getArgument(this, commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
-        PlayTime playTime = fPlayerService.getPlayTime(targetFPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(targetFPlayer);
         if (playTime == null) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Online>builder()
                     .sender(fPlayer)
@@ -184,7 +186,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     public int getTime(FPlayer fPlayer, TimeType type) {
         if (moduleController.isDisabledFor(this, fPlayer)) return 0;
 
-        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         if (playTime == null) return 0;
 
         return (int) type.getTime(fPlayer, playTime) / 1000;

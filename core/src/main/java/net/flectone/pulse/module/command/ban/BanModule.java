@@ -133,7 +133,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::lowerWeightGroup)

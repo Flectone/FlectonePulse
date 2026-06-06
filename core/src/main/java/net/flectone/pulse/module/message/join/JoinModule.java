@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -43,6 +44,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final EventDispatcher eventDispatcher;
     private final ProxyRegistry proxyRegistry;
 
@@ -120,7 +122,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     }
 
     private EventMetadata<Localization.Message.Join> buildEventMetadata(FPlayer fPlayer, Range range, boolean toIntegration, boolean ignoreVanish) {
-        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer) || (playTime != null && playTime.sessions() > 1);
 
         EventMetadata.Builder<Localization.Message.Join> eventMetadata = EventMetadata.<Localization.Message.Join>builder()

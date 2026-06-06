@@ -117,16 +117,17 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
         // check after a while that the player has definitely left
         taskScheduler.runAsyncLater(() -> {
             // if player is online, then he just switched between servers
-            if (fPlayerService.getFPlayerFromDatabase(fPlayer.uuid()).isOnline()) return;
+            FPlayer newFPlayer = fPlayerService.getFPlayer(fPlayer.uuid());
+            if (newFPlayer.isOnline()) return;
 
             // message has already been sent from the proxy
-            if (proxyDisconnectMessagePlayers.contains(fPlayer.uuid())) {
-                sendToIntegration(fPlayer);
+            if (proxyDisconnectMessagePlayers.contains(newFPlayer.uuid())) {
+                sendToIntegration(newFPlayer);
                 return;
             }
 
             // send server message
-            privateSend(fPlayer, config().range(), true, false, 0L);
+            privateSend(newFPlayer, config().range(), true, false, 0L);
         });
     }
 

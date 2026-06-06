@@ -11,9 +11,12 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.SneakyThrows;
 import net.flectone.pulse.data.repository.CooldownRepository;
+import net.flectone.pulse.data.repository.SocialRepository;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -193,6 +196,27 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("translateMessage")
     public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.TRANSLATE_MESSAGE);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerColor")
+    public Cache<UUID, Map<FColor.Type, Set<FColor>>> providePlayerColorCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_COLOR);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerSetting")
+    public Cache<UUID, SocialRepository.Settings> providePlayerSettingCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_SETTING);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerIgnore")
+    public Cache<UUID, List<Ignore>> providePlayerIgnoreCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_IGNORE);
     }
 
     private ObjectMapper createMapper() {

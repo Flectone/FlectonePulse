@@ -101,10 +101,10 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
+        FPlayer finalFReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String promptMove = commandModuleController.getPrompt(this, 1);

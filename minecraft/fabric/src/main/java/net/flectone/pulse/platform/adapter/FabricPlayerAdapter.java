@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
+    private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
@@ -143,6 +145,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull String getWorldEnvironment(@NonNull UUID uuid) {
         return getWorldName(uuid);
+    }
+
+    @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return player.clientInformation().language();
     }
 
     @Override

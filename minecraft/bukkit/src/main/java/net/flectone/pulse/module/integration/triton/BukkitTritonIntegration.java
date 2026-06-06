@@ -40,7 +40,7 @@ public class BukkitTritonIntegration implements Listener, FIntegration {
         SettingText setting = SettingText.LOCALE;
         if (Objects.equals(fPlayer.getSetting(setting), newLanguage)) return;
 
-        fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(setting, newLanguage), setting);
+        fPlayerService.saveSetting(fPlayer, setting, newLanguage);
     }
 
     public @Nullable String getLocale(FPlayer fPlayer) {

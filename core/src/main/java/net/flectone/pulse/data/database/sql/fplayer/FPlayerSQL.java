@@ -5,6 +5,7 @@ import net.flectone.pulse.data.database.reducer.PlayerInfoReducer;
 import net.flectone.pulse.data.database.sql.SQL;
 import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.statement.UseRowReducer;
@@ -111,9 +112,11 @@ public interface FPlayerSQL extends SQL {
      *
      * @param uuid the player UUID
      * @param name the player name
+     * @return the player database ID
      */
-    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`) VALUES (:uuid, :name)")
-    void insert(@Bind("uuid") String uuid, @Bind("name") String name);
+    @GetGeneratedKeys("id")
+    @SqlUpdate("INSERT INTO `fp_player` (`online`, `uuid`, `name`, `ip`) VALUES (:online, :uuid, :name, :ip)")
+    int insert(@Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip);
 
     /**
      * Updates player information.

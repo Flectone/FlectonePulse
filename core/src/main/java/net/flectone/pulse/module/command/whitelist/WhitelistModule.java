@@ -504,7 +504,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (fTarget.isUnknown()) {
             if (isUuid) {
                 // just save empty string for update in feature
-                fPlayerService.save(uuid, platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : "");
+                fPlayerService.saveOrUpdate(uuid, platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : "", platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
             } else {
                 uuid = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineUUID(playerName) : profileResolver.resolveOfflineUUID(playerName);
                 if (uuid == null) {
@@ -516,11 +516,11 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                     return null;
                 }
 
-                fPlayerService.save(uuid, playerName);
+                fPlayerService.saveOrUpdate(uuid, playerName, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
             }
 
             // invalidate cached unknown player
-            fPlayerService.invalidateOffline(uuid, false);
+            fPlayerService.invalidateOfflineCache(uuid, false);
 
             fTarget = fPlayerService.getFPlayer(uuid);
         } else {

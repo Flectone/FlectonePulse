@@ -104,7 +104,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::lowerWeightGroup)

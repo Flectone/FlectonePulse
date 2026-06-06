@@ -248,7 +248,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         }
 
         if (updateCache) {
-            fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer));
+            fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer, false));
         }
 
         if (userProfile == null) {

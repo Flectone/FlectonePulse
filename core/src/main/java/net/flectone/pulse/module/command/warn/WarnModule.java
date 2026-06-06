@@ -102,7 +102,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::lowerWeightGroup)

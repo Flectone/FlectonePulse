@@ -5,11 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
-import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.SettingText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -38,8 +35,6 @@ public class FPlayerRepository {
 
     private final @Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache;
     private final FPlayerDAO fPlayerDAO;
-    private final SettingDAO settingDAO;
-    private final FColorDao FColorDao;
 
     /**
      * Invalidates a player from all caches.
@@ -228,14 +223,16 @@ public class FPlayerRepository {
     }
 
     /**
-     * Saves a new player to the database.
+     * Saves or updates a player in the database.
      *
-     * @param uuid the player UUID
-     * @param name the player name
-     * @return true if a new player was inserted, false if existing player was updated
+     * @param uuid the player's UUID
+     * @param name the player's name
+     * @param ip the player's IP address, can be null
+     * @param online whether the player is currently online
+     * @return the created or updated FPlayer object with assigned database ID
      */
-    public boolean save(@NonNull UUID uuid, @NonNull String name) {
-        return fPlayerDAO.insert(uuid, name);
+    public FPlayer saveOrUpdate(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
+        return fPlayerDAO.insertOrUpdate(uuid, name, ip, online);
     }
 
     /**
@@ -296,63 +293,6 @@ public class FPlayerRepository {
         return onlinePlayers.values().stream()
                 .filter(fPlayer -> fPlayer.isOnline() || fPlayer.isConsole())
                 .toList();
-    }
-
-    /**
-     * Loads color settings for a player.
-     *
-     * @param fPlayer the player to load colors for
-     * @return new FPlayer with colors
-     */
-    public FPlayer loadColors(@NonNull FPlayer fPlayer) {
-        return FColorDao.load(fPlayer);
-    }
-
-    /**
-     * Saves color settings for a player.
-     *
-     * @param fPlayer the player to save colors for
-     */
-    public void saveColors(@NonNull FPlayer fPlayer) {
-        FColorDao.save(fPlayer);
-    }
-
-    /**
-     * Saves all settings for a player.
-     *
-     * @param fPlayer the player to save settings for
-     */
-    public void saveSettings(@NonNull FPlayer fPlayer) {
-        settingDAO.save(fPlayer);
-    }
-
-    /**
-     * Loads all settings for a player.
-     *
-     * @param fPlayer the player to load settings for
-     */
-    public FPlayer loadSettings(@NonNull FPlayer fPlayer) {
-        return settingDAO.load(fPlayer);
-    }
-
-    /**
-     * Saves or updates a specific setting for a player.
-     *
-     * @param fPlayer the player
-     * @param setting the setting name
-     */
-    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting) {
-        settingDAO.insertOrUpdate(fPlayer, setting);
-    }
-
-    /**
-     * Saves or updates a specific setting for a player.
-     *
-     * @param fPlayer the player
-     * @param setting the setting text
-     */
-    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting) {
-        settingDAO.insertOrUpdate(fPlayer, setting);
     }
 
     private void saveToCache(FPlayer fPlayer) {

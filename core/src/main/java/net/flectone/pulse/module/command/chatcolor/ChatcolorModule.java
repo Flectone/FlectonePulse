@@ -189,8 +189,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
         UUID metadataUUID = UUID.randomUUID();
 
         if (!oldFColors.equals(newFColors)) {
-            fPlayer = fPlayer.withFColors(type, newFColors);
-            fPlayerService.saveColors(fPlayer);
+            fPlayer = fPlayerService.saveColors(fPlayer.withFColors(type, newFColors));
 
             // update proxy players
             proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, _ -> {}, metadataUUID);

@@ -30,7 +30,6 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -116,7 +115,7 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::lowerWeightGroup)

@@ -8,9 +8,9 @@ import net.flectone.pulse.data.database.sql.mail.MailSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data Access Object for mail data in FlectonePulse.
@@ -41,16 +41,17 @@ public class MailDAO implements BaseDAO<MailSQL> {
      * @param sender the player who sent the mail
      * @param receiver the player who received the mail
      * @param message the mail message content
-     * @return the created mail record, or null if players are unknown
+     * @return the created mail record, or empty if players are unknown
      */
-    public @Nullable Mail insert(@NonNull FPlayer sender, @NonNull FPlayer receiver, @NonNull String message) {
-        if (database.isClosed()) return null;
-        if (sender.isUnknown() || receiver.isUnknown()) return null;
+    @NonNull
+    public Optional<Mail> insert(@NonNull FPlayer sender, @NonNull FPlayer receiver, @NonNull String message) {
+        if (database.isClosed()) return Optional.empty();
+        if (sender.isUnknown() || receiver.isUnknown()) return Optional.empty();
 
         long date = System.currentTimeMillis();
         int id = withHandle(sql -> sql.insert(date, sender.id(), receiver.id(), message));
 
-        return new Mail(id, date, sender.id(), receiver.id(), message);
+        return Optional.of(new Mail(id, date, sender.id(), receiver.id(), message));
     }
 
     /**

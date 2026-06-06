@@ -27,8 +27,10 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import org.apache.commons.lang3.Strings;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 import org.jspecify.annotations.NonNull;
@@ -36,10 +38,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -47,6 +46,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
+    private final FileFacade fileFacade;
     private final HytaleComponentSerializer componentSerializer;
 
     @Override
@@ -128,6 +128,14 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull String getWorldEnvironment(@NonNull UUID uuid) {
         return getWorldName(uuid);
+    }
+
+    @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        PlayerRef player = getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return Strings.CS.replace(player.getLanguage().toLowerCase(Locale.ROOT), "-", "_");
     }
 
     @Override

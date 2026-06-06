@@ -131,10 +131,10 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        fReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
+        fReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         // save for sender

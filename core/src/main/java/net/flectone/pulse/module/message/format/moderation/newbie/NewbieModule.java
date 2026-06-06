@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.TimeType;
@@ -28,7 +28,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
-    private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
@@ -59,7 +59,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         if (moduleController.isDisabledFor(this, fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission().bypass())) return false;
 
-        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         if (playTime == null) return false;
 
         long timeToCheck = switch (config().mode()) {
@@ -75,7 +75,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     public ExternalModeration getModeration(FPlayer fPlayer) {
         if (!isNewBie(fPlayer)) return null;
 
-        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         if (playTime == null) return null;
 
         long timeout = config().timeout() * TimeFormatter.MULTIPLIER;
@@ -87,7 +87,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
         };
 
         return new ExternalModeration(fPlayer.name(),
-                fPlayerService.getConsole().name(),
+                fileFacade.config().logger().console(),
                 localization().formatRestrict(),
                 1,
                 firstPlayed,

@@ -51,13 +51,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
         boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
-        if (turnedBefore) {
-            fPlayer = fPlayer.withoutSetting(SettingText.SPY_STATUS);
-        } else {
-            fPlayer = fPlayer.withSetting(SettingText.SPY_STATUS, "1");
-        }
-
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);
+        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
 
         messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()

@@ -8,6 +8,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -19,6 +20,7 @@ public class PlayerPreLoginProcessor {
     private final FPlayerService fPlayerService;
     private final ProxyRegistry proxyRegistry;
     private final EventDispatcher eventDispatcher;
+    private final PlaytimeService playtimeService;
 
     public void processLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> kickConsumer) {
         // if no one was on the server, the cache may be invalid for other servers
@@ -29,13 +31,11 @@ public class PlayerPreLoginProcessor {
             fPlayerService.addConsole();
         }
 
-        FPlayer fPlayer = fPlayerService.addFPlayer(uuid, name);
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
-        if (event.allowed()) {
-            fPlayerService.saveLoginSession(event.player());
-            fPlayerService.updateCache(fPlayerService.loadData(event.player()));
-        } else {
-            fPlayerService.invalidateOnline(fPlayer.uuid());
+        if (!event.allowed()) {
+            fPlayerService.invalidateOnlineCache(fPlayer.uuid());
+            playtimeService.invalidate(fPlayer.uuid());
             kickConsumer.accept(event);
         }
     }
