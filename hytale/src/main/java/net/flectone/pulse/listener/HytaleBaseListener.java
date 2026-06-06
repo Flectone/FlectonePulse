@@ -40,6 +40,8 @@ public class HytaleBaseListener implements HytaleListener {
     private final HytaleComponentSerializer componentSerializer;
 
     public void onPlayerSetupConnectEvent(PlayerSetupConnectEvent event) {
+        if (event.isCancelled()) return;
+
         UUID uuid = event.getUuid();
         String playerName = event.getUsername();
         playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent -> {
@@ -52,7 +54,6 @@ public class HytaleBaseListener implements HytaleListener {
     // then use PlayerConnectEvent
     public void onPlayerConnectEvent(PlayerConnectEvent event) {
         PlayerRef playerRef = event.getPlayerRef();
-        if (!fPlayerService.invalidateLoginSession(playerRef.getUuid())) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(playerRef.getUuid());
 

@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.listener.BukkitBaseListener;
 import net.flectone.pulse.listener.BukkitPreLoginListener;
+import net.flectone.pulse.listener.BukkitConnectionListener;
 import net.flectone.pulse.listener.PaperPreLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -108,5 +109,6 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
         }
 
         register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        register(BukkitConnectionListener.class, net.flectone.pulse.model.event.Event.Priority.MONITOR);
     }
 }

@@ -29,8 +29,6 @@ public class FabricBaseListener {
         UUID uuid = handler.getPlayer().getUUID();
 
         taskScheduler.runAsyncLater(() -> {
-            if (!fPlayerService.invalidateLoginSession(uuid)) return;
-
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
             PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));

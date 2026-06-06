@@ -37,9 +37,9 @@ public class BukkitBaseListener implements Listener {
         UUID uuid = player.getUniqueId();
 
         taskScheduler.runAsync(() -> {
-            if (!fPlayerService.invalidateLoginSession(uuid)) return;
-
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            if (!fPlayer.isOnline()) return;
+
             if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
                 String locale = getPlayerLocale(player);
                 fPlayerService.updateLocale(fPlayer, locale);

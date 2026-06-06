@@ -26,6 +26,8 @@ public class PaperPreLoginListener implements Listener {
 
     @EventHandler
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
+        if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) return;
+
         // in older versions (1.20.1 and older), there is no configuration stage
         // so we use Bukkit API
         if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)
