@@ -1,14 +1,12 @@
 package net.flectone.pulse.data.database.sql.fplayer;
 
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
-import net.flectone.pulse.data.database.reducer.PlayerInfoReducer;
 import net.flectone.pulse.data.database.sql.SQL;
 import net.flectone.pulse.exception.UnsupportedDatabaseOperationException;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,22 +30,6 @@ public interface FPlayerSQL extends SQL {
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 
     /**
-     * Finds a player by name (case-insensitive) and load settings.
-     *
-     * @param name the player name
-     * @return optional containing player info if found
-     */
-    @SqlQuery(
-            """
-            SELECT p.*, s.`type`, s.`value`
-            FROM (SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name) LIMIT 1) p
-            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
-            """
-    )
-    @UseRowReducer(PlayerInfoReducer.class)
-    Optional<FPlayerDAO.PlayerInfo> findByNameWithSettings(@Bind("name") String name);
-
-    /**
      * Finds a player by UUID.
      *
      * @param uuid the player UUID
@@ -57,38 +39,13 @@ public interface FPlayerSQL extends SQL {
     Optional<FPlayerDAO.PlayerInfo> findByUUID(@Bind("uuid") String uuid);
 
     /**
-     * Finds a player by UUID and load settings.
-     *
-     * @param uuid the player UUID
-     * @return optional containing player info if found
-     */
-    @SqlQuery(
-            """
-            SELECT p.*, s.`type`, s.`value`
-            FROM `fp_player` p
-            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
-            WHERE p.`uuid` = :uuid
-            """
-    )
-    @UseRowReducer(PlayerInfoReducer.class)
-    Optional<FPlayerDAO.PlayerInfo> findByUUIDWithSettings(@Bind("uuid") String uuid);
-
-    /**
      * Finds a player by IP address and load settings.
      *
      * @param ip the IP address
      * @return optional containing player info if found
      */
-    @SqlQuery(
-            """
-            SELECT p.*, s.`type`, s.`value`
-            FROM (SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1) p
-            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
-            """
-    )
-    @UseRowReducer(PlayerInfoReducer.class)
-    Optional<FPlayerDAO.PlayerInfo> findByIpWithSettings(@Bind("ip") String ip);
-
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1")
+    Optional<FPlayerDAO.PlayerInfo> findByIp(@Bind("ip") String ip);
 
     /**
      * Finds a player by database ID and load settings.
@@ -96,16 +53,8 @@ public interface FPlayerSQL extends SQL {
      * @param id the player database ID
      * @return optional containing player info if found
      */
-    @SqlQuery(
-            """
-            SELECT p.*, s.`type`, s.`value`
-            FROM `fp_player` p
-            LEFT JOIN `fp_setting` s ON s.`player` = p.`id`
-            WHERE p.`id` = :id
-            """
-    )
-    @UseRowReducer(PlayerInfoReducer.class)
-    Optional<FPlayerDAO.PlayerInfo> findByIdWithSettings(@Bind("id") int id);
+    @SqlQuery("SELECT p.*, s.`type`, s.`value` FROM `fp_player` p WHERE p.`id` = :id")
+    Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
 
     /**
      * Inserts a new player.

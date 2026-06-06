@@ -168,7 +168,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull String name) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
-        return withHandle(sql -> sql.findByNameWithSettings(name)
+        return withHandle(sql -> sql.findByName(name)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
         );
@@ -183,7 +183,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull InetAddress inetAddress) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
-        return withHandle(sql -> sql.findByIpWithSettings(inetAddress.getHostAddress())
+        return withHandle(sql -> sql.findByIp(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
         );
@@ -198,7 +198,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(@NonNull UUID uuid) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
-        return withHandle(sql -> sql.findByUUIDWithSettings(uuid.toString())
+        return withHandle(sql -> sql.findByUUID(uuid.toString())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.withUuid(uuid))
         );
@@ -213,42 +213,25 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer getFPlayer(int id) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
-        return withHandle(sql -> sql.findByIdWithSettings(id)
+        return withHandle(sql -> sql.findById(id)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
     }
 
-    private FPlayer convertToFPlayer(PlayerInfo entity) {
-        return convertToFPlayer(entity, true);
-    }
-
-    private FPlayer convertToFPlayer(PlayerInfo info, boolean loadSetting) {
-        FPlayer.FPlayerImpl.FPlayerImplBuilder fPlayer = FPlayer.builder()
+    private FPlayer convertToFPlayer(PlayerInfo info) {
+        return FPlayer.builder()
                 .id(info.id())
                 .name(info.name())
                 .uuid(UUID.fromString(info.uuid()))
                 .online(info.online())
-                .ip(info.ip());
-
-        if (loadSetting) {
-            Map<String, Boolean> settingsBoolean = info.settingsBoolean();
-            if (settingsBoolean != null && !settingsBoolean.isEmpty()) {
-                fPlayer = fPlayer.settingsBoolean(Map.copyOf(settingsBoolean));
-            }
-
-            Map<SettingText, String> settingsText = info.settingsText();
-            if (settingsText != null && !settingsText.isEmpty()) {
-                fPlayer = fPlayer.settingsText(Map.copyOf(settingsText));
-            }
-        }
-
-        return fPlayer.build();
+                .ip(info.ip())
+                .build();
     }
 
     private List<FPlayer> convertToFPlayers(List<PlayerInfo> entities) {
         return entities.stream()
-                .map(playerInfo -> convertToFPlayer(playerInfo, false))
+                .map(this::convertToFPlayer)
                 .toList();
     }
 
