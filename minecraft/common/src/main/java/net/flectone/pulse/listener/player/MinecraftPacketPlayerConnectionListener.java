@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.player;
 
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
@@ -24,13 +24,11 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -43,7 +41,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftBasePacketListener implements PacketListener {
+public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -52,7 +50,6 @@ public class MinecraftBasePacketListener implements PacketListener {
     private final MinecraftPacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final TextScreenRender textScreenRender;
-    private final PlatformServerAdapter platformServerAdapter;
     private final TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
@@ -75,7 +72,9 @@ public class MinecraftBasePacketListener implements PacketListener {
         if (fPlayerService.updateLocale(fPlayer, wrapperLocale)) return;
 
         // first time player joined, wait for it to be added
-        fPlayerService.updateLocaleLater(uuid, wrapperLocale);
+        taskScheduler.runAsyncLater(() ->
+                fPlayerService.updateLocale(fPlayerService.getFPlayer(uuid), wrapperLocale)
+        );
     }
 
     @Override
@@ -136,12 +135,11 @@ public class MinecraftBasePacketListener implements PacketListener {
     }
 
     private void handleLoginSuccess(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
+
         // only for 1.20.2 and newer versions
         // because there is a configuration stage and there are no problems
-        if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS || !packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
-
-        // and not Bukkit AsyncPlayerPreLoginEvent
-        if (platformServerAdapter.getPlatformType() == PlatformType.BUKKIT && fileFacade.config().internal().useBukkitPreLoginListener()) return;
+        if (!fileFacade.config().internal().usePacketLoginListener() && !packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) return;
 
         WrapperLoginServerLoginSuccess wrapper = new WrapperLoginServerLoginSuccess(event);
         UserProfile userProfile = wrapper.getUserProfile();

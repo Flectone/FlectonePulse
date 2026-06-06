@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.flectone.pulse.listener.BukkitBaseListener;
-import net.flectone.pulse.listener.BukkitPreLoginListener;
-import net.flectone.pulse.listener.BukkitConnectionListener;
-import net.flectone.pulse.listener.PaperPreLoginListener;
+import net.flectone.pulse.listener.player.BukkitPlayerConnectionValidListener;
+import net.flectone.pulse.listener.player.PaperPlayerLoginListener;
+import net.flectone.pulse.listener.player.BukkitPlayerConnectionListener;
+import net.flectone.pulse.listener.player.BukkitPlayerLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -103,12 +103,12 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
         super.registerDefaultListeners();
 
         if (reflectionResolver.hasMethod(AsyncPlayerPreLoginEvent.class, "kickMessage")) {
-            register(PaperPreLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+            register(PaperPlayerLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
         } else {
-            register(BukkitPreLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+            register(BukkitPlayerLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
         }
 
-        register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
-        register(BukkitConnectionListener.class, net.flectone.pulse.model.event.Event.Priority.MONITOR);
+        register(BukkitPlayerConnectionListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        register(BukkitPlayerConnectionValidListener.class, net.flectone.pulse.model.event.Event.Priority.MONITOR);
     }
 }

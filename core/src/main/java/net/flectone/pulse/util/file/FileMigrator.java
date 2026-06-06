@@ -904,7 +904,6 @@ public class FileMigrator {
                     .withInternal(files.config().internal()
                             .withEnable(deprecatedModule.enable())
                             .withUsePaperMessageSender(deprecatedModule.usePaperMessageSender())
-                            .withUseBukkitPreLoginListener(true)
                     )
                     .withModule(null)
             );
@@ -1038,6 +1037,20 @@ public class FileMigrator {
                                 .withTypes(cacheTypes)
                         )
                 );
+    }
+
+    public FilePack migration_1_10_1(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.PLAYER_COLOR, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+
+        return files
+                .withConfig(files.config()
+                .withCache(files.config().cache()
+                        .withTypes(cacheTypes)
+                )
+        );
     }
 
 }

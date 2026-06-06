@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.dialog;
 
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;

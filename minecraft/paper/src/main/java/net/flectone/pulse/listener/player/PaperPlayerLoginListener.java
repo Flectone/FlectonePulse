@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.player;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PaperPreLoginListener implements Listener {
+public class PaperPlayerLoginListener implements Listener {
 
     private final FileFacade fileFacade;
     private final MinecraftPacketProvider packetProvider;
@@ -28,10 +28,8 @@ public class PaperPreLoginListener implements Listener {
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) return;
 
-        // in older versions (1.20.1 and older), there is no configuration stage
-        // so we use Bukkit API
-        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)
-                || fileFacade.config().internal().useBukkitPreLoginListener()) {
+        // in older versions (1.20.1 and older), there is no configuration stage, so we use Bukkit API
+        if (!fileFacade.config().internal().usePacketLoginListener() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
             UUID uuid = event.getUniqueId();
             String name = event.getName();
 

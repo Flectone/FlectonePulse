@@ -1,9 +1,10 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.module;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
@@ -27,7 +28,7 @@ import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HytalePulseBaseListener implements PulseListener {
+public class HytalePulseModuleEnableListener implements PulseListener {
 
     private static final List<Class<? extends ModuleSimple>> NOT_SUPPORTED_MODULES = List.of(
             AnvilModule.class,

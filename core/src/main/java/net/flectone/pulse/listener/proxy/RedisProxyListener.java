@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.proxy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,7 +9,7 @@ import net.flectone.pulse.platform.proxy.RedisProxy;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RedisListener implements RedisPubSubListener<byte[], byte[]> {
+public class RedisProxyListener implements RedisPubSubListener<byte[], byte[]> {
 
     private final RedisProxy redisProxySender;
     private final ProxyMessageHandler proxyMessageHandler;

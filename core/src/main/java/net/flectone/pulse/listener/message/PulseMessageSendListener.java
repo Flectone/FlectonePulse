@@ -1,22 +1,26 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.message;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.render.*;
 import net.flectone.pulse.platform.sender.MessageSender;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PulseMessageListener implements PulseListener {
+public class PulseMessageSendListener implements PulseListener {
 
+    private final SoundPlayer soundPlayer;
     private final MessageSender messageSender;
     private final ActionBarRender actionBarRender;
     private final BossBarRender bossBarRender;
@@ -27,8 +31,13 @@ public class PulseMessageListener implements PulseListener {
     private final ToastRender toastRender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
-    @Pulse(priority = Event.Priority.HIGHEST)
-    public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
+    @Pulse(priority = Event.Priority.MONITOR)
+    public void onMessageSendEvent(MessageSendEvent event) {
+        EventMetadata<?> eventMetadata = event.eventMetadata();
+        if (eventMetadata.sound() != null) {
+            soundPlayer.play(eventMetadata.sound(), eventMetadata.sender(), event.receiver());
+        }
+
         Component message = event.message();
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
@@ -54,4 +63,5 @@ public class PulseMessageListener implements PulseListener {
             default -> messageSender.sendMessage(fReceiver, message, false);
         }
     }
+
 }

@@ -1,49 +1,41 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.player;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.listener.HytaleListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
-import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.file.FileFacade;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BukkitBaseListener implements Listener {
+public class HytalePlayerConnectionListener implements HytaleListener {
 
-    private final FileFacade fileFacade;
+    private final Set<UUID> disconnectPlayers = new CopyOnWriteArraySet<>();
+
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
-    private final MinecraftPacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoinEvent(org.bukkit.event.player.PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
+    // PlayerReadyEvent is called every time you move from portal to portal, this causes duplication
+    // then use PlayerConnectEvent
+    public void onPlayerConnectEvent(PlayerConnectEvent event) {
+        UUID uuid = event.getPlayerRef().getUuid();
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-            if (!fPlayer.isOnline()) return;
-
-            if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_20_2)) {
-                String locale = getPlayerLocale(player);
-                fPlayerService.updateLocale(fPlayer, locale);
-            }
 
             PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
             if (playerLoadEvent.cancelled()) return;
@@ -55,12 +47,16 @@ public class BukkitBaseListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuitEvent(org.bukkit.event.player.PlayerQuitEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
+    // PlayerDisconnectEvent can be called multiple times, so we need to keep first disconnect and remove it later
+    public void onPlayerDisconnectEvent(PlayerDisconnectEvent event) {
+        UUID playerUUID = event.getPlayerRef().getUuid();
+
+        if (!disconnectPlayers.add(playerUUID)) {
+            return;
+        }
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
             if (!fPlayer.isOnline()) return;
 
             PlayerQuitEvent playerQuitEvent = eventDispatcher.dispatch(new PlayerQuitEvent(fPlayer));
@@ -71,13 +67,8 @@ public class BukkitBaseListener implements Listener {
                 // nothing
             }
         });
+
+        taskScheduler.runAsyncLater(() -> disconnectPlayers.remove(playerUUID));
     }
 
-    private String getPlayerLocale(Player player) {
-        try {
-            return player.getLocale();
-        } catch (NoSuchMethodError _) {
-            return fileFacade.config().language().type();
-        }
-    }
 }

@@ -86,7 +86,7 @@ public record Config(
             Boolean enable,
             Boolean alwaysSendSilentPacket,
             Boolean usePaperMessageSender,
-            Boolean useBukkitPreLoginListener,
+            Boolean usePacketLoginListener,
             Boolean unregisterCommandOnReload,
             Set<String> vanillaCommandsToRemove
     ) implements EnableSetting {

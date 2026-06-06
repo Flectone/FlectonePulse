@@ -1,10 +1,11 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.module;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
@@ -17,7 +18,7 @@ import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftPulseBaseListener implements PulseListener {
+public class MinecraftPulseModuleEnableListener implements PulseListener {
 
     private final MinecraftPacketProvider packetProvider;
     private final FLogger fLogger;
