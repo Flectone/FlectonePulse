@@ -25,6 +25,9 @@
 			"net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceIntegration"
         ]
 	},
+	"mixins": [
+		"flectonepulse.mixins.json"
+	],
 	"depends": {
       "fabricloader": "*",
       "fabric-api-base": "*",

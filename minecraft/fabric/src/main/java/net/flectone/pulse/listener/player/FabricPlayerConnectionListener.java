@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.listener.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FabricBaseListener {
+public class FabricPlayerConnectionListener {
 
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
