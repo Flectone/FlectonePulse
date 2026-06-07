@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -16,6 +17,7 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -25,6 +27,8 @@ import net.flectone.pulse.util.constant.SettingText;
 public class PulseAfkListener implements PulseListener {
 
     private final AfkModule afkModule;
+    private final SocialService socialService;
+    private final TaskScheduler taskScheduler;
 
     @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
@@ -35,17 +39,19 @@ public class PulseAfkListener implements PulseListener {
 
         EventMetadata<?> eventMetadata = event.eventMetadata();
         if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;
-        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) == null) return;
+        if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) == null) return;
 
         int commandIndex = messageType.indexOf('_');
         String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();
-        afkModule.asyncRemoveAfk(action, fPlayer);
+
+        taskScheduler.runAsync(() -> afkModule.removeAfk(action, fPlayer));
     }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.player();
-        afkModule.asyncRemoveAfk("", fPlayer);
+
+        afkModule.removeAfk("", fPlayer);
     }
 
     @Pulse
@@ -53,14 +59,14 @@ public class PulseAfkListener implements PulseListener {
         if (!event.reload()) return;
 
         FPlayer fPlayer = event.player();
-        afkModule.asyncRemoveAfk("", fPlayer);
+        afkModule.removeAfk("", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public PlayerQuitEvent onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         FPlayer fPlayer = event.player();
 
-        return event.withPlayer(afkModule.removeAfk("quit", fPlayer));
+        afkModule.removeAfk("quit", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)

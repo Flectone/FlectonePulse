@@ -12,6 +12,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -26,6 +27,7 @@ public class PulsePlayerLoadListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
 
     @Pulse(priority = Event.Priority.LOW)
     public PlayerLoadEvent onPlayerLoadEvent(PlayerLoadEvent event) {
@@ -53,18 +55,26 @@ public class PulsePlayerLoadListener implements PulseListener {
             return event.withPlayer(fPlayer).withCancelled(true);
         }
 
-        // always load new data for new player
-        boolean loadCache = false;
-        fPlayer = fPlayerService.loadSettings(fPlayerService.loadColors(fPlayerService.loadIgnores(fPlayer, loadCache), loadCache), loadCache);
+        // save to cache
+        fPlayer = fPlayerService.addCache(fPlayer);
+
+        // update settings cache
+        socialService.loadSettings(fPlayer, false);
+
+        // update colors cache
+        socialService.loadColors(fPlayer, false);
+
+        // update ignore cache
+        socialService.loadIgnores(fPlayer, false);
 
         // update player locale
         String currentPlayerLocale = platformPlayerAdapter.getLocale(currentPlayerUUID);
-        fPlayerService.updateLocale(fPlayer, currentPlayerLocale);
+        socialService.updateLocale(fPlayer, currentPlayerLocale);
 
         // update player server
         String currentServer = fileFacade.config().server();
-        if (!currentServer.equals(fPlayer.getSetting(SettingText.SERVER))) {
-            fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.SERVER, currentServer);
+        if (!currentServer.equals(socialService.getSetting(fPlayer, SettingText.SERVER))) {
+            socialService.saveSetting(fPlayer, SettingText.SERVER, currentServer);
         }
 
         // update play time in database
@@ -73,9 +83,6 @@ public class PulsePlayerLoadListener implements PulseListener {
         } else {
             playtimeService.updateJoinSession(fPlayer);
         }
-
-        // save to cache
-        fPlayer = fPlayerService.addCache(fPlayer);
 
         return event.withPlayer(fPlayer);
     }

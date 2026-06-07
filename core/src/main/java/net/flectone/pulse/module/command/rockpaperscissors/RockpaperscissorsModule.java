@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -47,6 +48,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
     private final FileFacade fileFacade;
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final IgnoreSender ignoreSender;
@@ -101,10 +103,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String promptMove = commandModuleController.getPrompt(this, 1);
@@ -116,7 +115,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
         UUID uuid = optionalUUID.orElse(null);
 
         if (move != null && uuid != null) {
-            finalMove(fPlayer, finalFReceiver, move, uuid);
+            finalMove(fPlayer, fReceiver, move, uuid);
             return;
         }
 
@@ -135,7 +134,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                         .sender(fPlayer)
                         .format(s -> StringUtils.replaceEach(s.formatMove(),
                                 new String[]{"<target>", "<uuid>"},
-                                new String[]{finalFReceiver.name(), rockPaperScissors.getId().toString()}
+                                new String[]{fReceiver.name(), rockPaperScissors.getId().toString()}
                         ))
                         .sound(soundOrThrow())
                         .build()

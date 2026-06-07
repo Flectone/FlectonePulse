@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ public class PulseStreamListener implements PulseListener {
 
     private final StreamModule streamModule;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
@@ -29,7 +31,7 @@ public class PulseStreamListener implements PulseListener {
 
         boolean hasStreamPermission = !moduleController.isDisabledFor(streamModule, fPlayer);
 
-        if (fPlayer.getSetting(SettingText.STREAM_PREFIX) != null) {
+        if (socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX) != null) {
             // remove prefix for non-streamers
             if (!hasStreamPermission) {
                 streamModule.setStreamPrefix(fPlayer, null);

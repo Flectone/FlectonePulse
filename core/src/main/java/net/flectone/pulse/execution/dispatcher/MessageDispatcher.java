@@ -15,6 +15,7 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
@@ -34,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 public class MessageDispatcher {
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final RangeFilter rangeFilter;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
@@ -155,7 +157,7 @@ public class MessageDispatcher {
 
         return (E) newEventMetadata.withBase(newEventMetadata.base().withReceivers(fPlayerService.getFPlayersWithConsole().stream()
                         .filter(rangeFilter.createFilter(newEventMetadata))
-                        .filter(fReceiver -> fReceiver.isSetting(moduleName))
+                        .filter(fReceiver -> socialService.isSetting(fReceiver, moduleName))
                         .toList()
                 )
         );

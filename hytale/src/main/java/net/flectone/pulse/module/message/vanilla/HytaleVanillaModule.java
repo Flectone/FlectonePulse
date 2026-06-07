@@ -21,6 +21,7 @@ import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.HytaleListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -41,6 +42,7 @@ public class HytaleVanillaModule extends VanillaModule {
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Inject
     public HytaleVanillaModule(FileFacade fileFacade,
@@ -52,7 +54,8 @@ public class HytaleVanillaModule extends VanillaModule {
                                HytaleListenerRegistry hytaleListenerRegistry,
                                HytaleDeathListener deathListener,
                                IntegrationModule integrationModule,
-                               ModuleController moduleController) {
+                               ModuleController moduleController,
+                               SocialService socialService) {
         super(fileFacade);
 
         this.extractor = extractor;
@@ -61,6 +64,7 @@ public class HytaleVanillaModule extends VanillaModule {
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
         this.moduleController = moduleController;
+        this.socialService = socialService;
 
         hytaleListenerRegistry.register(javaPlugin -> javaPlugin.getEntityStoreRegistry().registerSystem(deathListener));
 
@@ -103,7 +107,7 @@ public class HytaleVanillaModule extends VanillaModule {
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
                         .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver)
-                                && (vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                                && (vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                         )
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration(IntegrationMetadata.builder()

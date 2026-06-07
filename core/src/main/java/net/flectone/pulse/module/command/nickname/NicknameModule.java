@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -45,6 +46,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
@@ -116,8 +118,6 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             return;
         }
 
-        fTarget = fPlayerService.loadSettings(fTarget);
-
         String nick = commandModuleController.getArgument(this, commandContext, 0);
 
         changeName(fPlayer, fTarget, nick);
@@ -162,11 +162,11 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
         }
 
         if (needClear) {
-            if (fTarget.getSetting(SettingText.NICKNAME) != null) {
-                fTarget = fPlayerService.saveSetting(fTarget, SettingText.NICKNAME, null);
+            if (socialService.getSetting(fTarget, SettingText.NICKNAME) != null) {
+                socialService.saveSetting(fTarget, SettingText.NICKNAME, null);
             }
         } else {
-            fTarget = fPlayerService.saveSetting(fTarget, SettingText.NICKNAME, nickname);
+            socialService.saveSetting(fTarget, SettingText.NICKNAME, nickname);
         }
 
         messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
@@ -189,7 +189,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     public MessageContext addTag(MessageContext messageContext) {
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.NICKNAME.getTagName(), (_, _) -> {
             // get nickname value
-            String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
+            String value = socialService.getSetting(fPlayerService.getFPlayer(messageContext.sender()), SettingText.NICKNAME);
 
             // resolve receiver localization
             Localization.Command.Nickname localization = localization(messageContext.receiver());

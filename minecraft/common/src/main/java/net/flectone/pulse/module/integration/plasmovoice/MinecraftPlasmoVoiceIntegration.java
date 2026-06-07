@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.render.ActionBarRender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
 import su.plo.voice.api.addon.AddonInitializer;
@@ -34,6 +35,7 @@ import java.util.UUID;
 public class MinecraftPlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
     private final ActionBarRender actionBarRender;
@@ -74,7 +76,7 @@ public class MinecraftPlasmoVoiceIntegration implements FIntegration, AddonIniti
             UUID receiverUUID = voicePlayer.getInstance().getUuid();
             FPlayer fReceiver = fPlayerService.getFPlayer(receiverUUID);
 
-            return !fReceiver.isIgnored(fSender);
+            return !socialService.isIgnored(fReceiver, fSender);
         });
     }
 

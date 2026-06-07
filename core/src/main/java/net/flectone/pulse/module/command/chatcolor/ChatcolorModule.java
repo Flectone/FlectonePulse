@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -40,6 +41,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
     private final ColorConverter colorConverter;
@@ -127,7 +129,7 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
         }
 
         Int2ObjectArrayMap<FColor> newFColors = new Int2ObjectArrayMap<>();
-        fTarget.fColors().getOrDefault(fColorType.get(), Set.of())
+        socialService.loadColors(fTarget).getOrDefault(fColorType.get(), Set.of())
                 .forEach(fColor -> newFColors.put(fColor.number(), fColor));
 
         for (int i = 0; i < fColorConfig().defaultColors().size(); i++) {
@@ -183,13 +185,13 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
     }
 
     private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
-        Map<FColor.Type, Set<FColor>> fColors = fPlayer.fColors();
+        Map<FColor.Type, Set<FColor>> fColors = socialService.loadColors(fPlayer);
         Set<FColor> oldFColors = fColors.getOrDefault(type, Set.of());
 
         UUID metadataUUID = UUID.randomUUID();
 
         if (!oldFColors.equals(newFColors)) {
-            fPlayer = fPlayerService.saveColors(fPlayer.withFColors(type, newFColors));
+            socialService.saveColors(fPlayer, type, newFColors);
 
             // update proxy players
             proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, _ -> {}, metadataUUID);

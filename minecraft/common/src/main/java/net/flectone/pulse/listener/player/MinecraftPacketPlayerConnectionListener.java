@@ -29,6 +29,7 @@ import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
@@ -45,6 +46,7 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final EventDispatcher eventDispatcher;
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
@@ -68,12 +70,12 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
         WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
         String wrapperLocale = wrapperPlayClientSettings.getLocale();
 
-        if (wrapperLocale.equals(fPlayer.getSetting(SettingText.LOCALE))) return;
-        if (fPlayerService.updateLocale(fPlayer, wrapperLocale)) return;
+        if (wrapperLocale.equals(socialService.getSetting(fPlayer, SettingText.LOCALE))) return;
+        if (socialService.updateLocale(fPlayer, wrapperLocale)) return;
 
         // first time player joined, wait for it to be added
         taskScheduler.runAsyncLater(() ->
-                fPlayerService.updateLocale(fPlayerService.getFPlayer(uuid), wrapperLocale)
+                socialService.updateLocale(fPlayerService.getFPlayer(uuid), wrapperLocale)
         );
     }
 

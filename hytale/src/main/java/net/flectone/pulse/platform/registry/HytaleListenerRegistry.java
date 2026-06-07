@@ -19,6 +19,7 @@ import net.flectone.pulse.listener.module.HytalePulseModuleEnableListener;
 import net.flectone.pulse.listener.player.HytalePlayerLoginListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
     private final EventRegistry eventRegistry;
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     @Inject
     public HytaleListenerRegistry(FileFacade fileFacade,
@@ -52,7 +54,8 @@ public class HytaleListenerRegistry extends ListenerRegistry {
                                   Injector injector,
                                   JavaPlugin javaPlugin,
                                   TaskScheduler taskScheduler,
-                                  FPlayerService fPlayerService) {
+                                  FPlayerService fPlayerService,
+                                  SocialService socialService) {
         super(fLogger, injector);
 
         this.fileFacade = fileFacade;
@@ -62,6 +65,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
         this.eventRegistry = javaPlugin.getEventRegistry();
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class HytaleListenerRegistry extends ListenerRegistry {
                     taskScheduler.runAsync(() -> {
                         FPlayer fPlayer = fPlayerService.getFPlayer(playerRef.getUuid());
 
-                        fPlayerService.updateLocale(fPlayer, language);
+                        socialService.updateLocale(fPlayer, language);
                     });
                 }
             });

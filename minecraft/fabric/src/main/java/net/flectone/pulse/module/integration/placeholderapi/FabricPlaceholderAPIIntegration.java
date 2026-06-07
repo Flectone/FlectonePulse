@@ -31,6 +31,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -48,6 +49,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -178,13 +180,13 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             SettingText settingText = SettingText.fromString(argument);
             if (settingText != null) {
-                String value = fPlayer.getSetting(settingText);
+                String value = socialService.getSetting(fPlayer, settingText);
                 if (settingText == SettingText.CHAT_NAME && value == null) return PlaceholderResult.value("default");
 
                 return PlaceholderResult.value(StringUtils.defaultString(value));
             }
 
-            return PlaceholderResult.value(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
+            return PlaceholderResult.value(socialService.isSetting(fPlayer, argument.toUpperCase()) ? "yes" : "no");
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, _) -> {
@@ -231,7 +233,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
         Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
-            colorsMap.putAll(fPlayer.getFColors(type));
+            colorsMap.putAll(socialService.loadColors(fPlayer, type));
         }
 
         int colorNumber = Integer.parseInt(argument);

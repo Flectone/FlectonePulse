@@ -41,16 +41,6 @@ public class PulseMaintenanceListener implements PulseListener {
         Moderation maintenance = currentModeration.get();
         FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
 
-        // load custom player colors
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
-
-        // load settings (localization)
-        if (fPlayer.settingsText().isEmpty()) {
-            fPlayer = fPlayerService.loadSettings(fPlayer);
-        }
-
         // replace string moderation placeholders
         Localization.Command.Maintenance localization = maintenanceModule.localization(fPlayer);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, maintenance);

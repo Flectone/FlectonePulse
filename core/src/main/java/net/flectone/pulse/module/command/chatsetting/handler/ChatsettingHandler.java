@@ -17,6 +17,7 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -41,6 +42,7 @@ public class ChatsettingHandler {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     public Permission.Message.Chat chatPermission() {
         return fileFacade.permission().message().chat();
@@ -72,12 +74,12 @@ public class ChatsettingHandler {
 
         Consumer<SubMenuItem> onSelect = item -> {
             String chatName = "default".equalsIgnoreCase(item.name()) ? null : item.name();
-            fPlayerService.saveSetting(fTarget, SettingText.CHAT_NAME, chatName);
+            socialService.saveSetting(fTarget, SettingText.CHAT_NAME, chatName);
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
-                .receiver(syncFPlayer(fTarget))
+                .receiver(fTarget)
                 .message(localization.menu().chat().inventory())
                 .build()
         );
@@ -124,7 +126,7 @@ public class ChatsettingHandler {
         };
 
         Consumer<SubMenuItem> onSelect = item -> {
-            Set<FColor> fColors = new ObjectOpenHashSet<>(syncFPlayer(fTarget).fColors().getOrDefault(type, Set.of()));
+            Set<FColor> fColors = new ObjectOpenHashSet<>(socialService.loadColors(fTarget).getOrDefault(type, Set.of()));
 
             // skip "null" colors replace
             item.colors().entrySet().stream()
@@ -141,12 +143,12 @@ public class ChatsettingHandler {
 
                     });
 
-            fPlayerService.saveColors(syncFPlayer(fTarget).withFColors(type, fColors));
+            socialService.saveColors(fTarget, type, fColors);
         };
 
         Component header = messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
-                .receiver(syncFPlayer(fTarget))
+                .receiver(fTarget)
                 .message(subMenu.inventory())
                 .build()
         );
@@ -180,16 +182,11 @@ public class ChatsettingHandler {
             return Status.DENIED;
         }
 
-        fTarget = syncFPlayer(fTarget);
-        boolean currentEnabled = fTarget.isSetting(messageType);
+        boolean currentEnabled = socialService.isSetting(fTarget, messageType);
 
         chatsettingModule.saveSetting(fTarget, messageType, !currentEnabled);
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
-    }
-
-    private FPlayer syncFPlayer(FPlayer fPlayer) {
-        return fPlayerService.getFPlayer(fPlayer);
     }
 
     public enum Status {

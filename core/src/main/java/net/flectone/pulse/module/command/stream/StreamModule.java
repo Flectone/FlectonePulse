@@ -21,6 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -44,6 +45,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
@@ -89,7 +91,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
         if (needStart == null) return;
 
-        boolean isStream = localization().prefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
+        boolean isStream = localization().prefixTrue().equals(socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
@@ -163,9 +165,9 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     public void setStreamPrefix(FPlayer fPlayer, String prefix) {
-        if (Objects.equals(prefix, fPlayer.getSetting(SettingText.STREAM_PREFIX))) return;
+        if (Objects.equals(prefix, socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX))) return;
 
-        fPlayerService.saveSetting(fPlayer, SettingText.STREAM_PREFIX, prefix);
+        socialService.saveSetting(fPlayer, SettingText.STREAM_PREFIX, prefix);
     }
 
     @Override
@@ -194,7 +196,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         if (moduleController.isDisabledFor(this, fPlayer)) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (_, _) -> {
-            String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
+            String streamPrefix = socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 

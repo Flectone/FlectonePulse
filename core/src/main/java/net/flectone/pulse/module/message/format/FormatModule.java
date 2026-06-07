@@ -31,6 +31,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -59,6 +60,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
@@ -147,7 +149,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
 
         if (sender instanceof FPlayer fPlayer && !isUserMessage) {
             messageContext = messageContext.addTagResolver(
-                    Placeholder.unparsed("server", StringUtils.defaultString(fPlayer.getSetting(SettingText.SERVER)))
+                    Placeholder.unparsed("server", StringUtils.defaultString(socialService.getSetting(fPlayer, SettingText.SERVER)))
             );
         }
 

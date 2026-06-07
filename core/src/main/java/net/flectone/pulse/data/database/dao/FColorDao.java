@@ -46,14 +46,9 @@ public class FColorDao implements BaseDAO<FColorSQL> {
         };
     }
 
-    /**
-     * Saves the player's color preferences to the database.
-     *
-     * @param fPlayer the player whose colors to save
-     */
-    public void save(@NonNull FPlayer fPlayer) {
+    public void save(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
         if (database.isClosed()) return;
-        if (fPlayer.fColors().isEmpty()) {
+        if (colors.isEmpty()) {
             delete(fPlayer);
             return;
         }
@@ -61,17 +56,16 @@ public class FColorDao implements BaseDAO<FColorSQL> {
         useCustomTransaction(handle -> {
             FColorSQL sql = getSQL(handle);
 
-            Map<FColor.Type, Set<FColor>> newFColors = fPlayer.fColors();
             Map<FColor.Type, Set<FColor>> oldFColors = findFColors(sql, fPlayer);
-            if (newFColors.equals(oldFColors) || newFColors.isEmpty() && oldFColors.isEmpty()) return;
+            if (colors.equals(oldFColors)) return;
 
-            if (newFColors.isEmpty()) {
+            if (colors.isEmpty()) {
                 sql.deleteFColors(fPlayer.id());
                 return;
             }
 
             Arrays.stream(FColor.Type.values()).forEach(type ->
-                    saveType(handle, sql, fPlayer, type, newFColors.getOrDefault(type, Set.of()), oldFColors.getOrDefault(type, Set.of()))
+                    saveType(handle, sql, fPlayer, type, colors.getOrDefault(type, Set.of()), oldFColors.getOrDefault(type, Set.of()))
             );
         });
     }
@@ -93,11 +87,11 @@ public class FColorDao implements BaseDAO<FColorSQL> {
      * @param fPlayer the player whose colors to load
      * @return new FPlayer with colors
      */
-    public FPlayer load(@NonNull FPlayer fPlayer) {
-        if (database.isClosed()) return fPlayer;
-        if (fPlayer.isUnknown()) return fPlayer;
+    public Map<FColor.Type, Set<FColor>> load(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return Map.of();
+        if (fPlayer.isUnknown()) return Map.of();
 
-        return withHandle(sql -> fPlayer.withFColors(findFColors(sql, fPlayer)));
+        return withHandle(sql -> findFColors(sql, fPlayer));
     }
 
     private Map<FColor.Type, Set<FColor>> findFColors(FColorSQL sql, FPlayer fPlayer) {

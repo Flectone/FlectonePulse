@@ -18,6 +18,7 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -39,6 +40,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     private final MinecraftPacketProvider packetProvider;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftSidebarModule(FileFacade fileFacade,
@@ -50,7 +52,8 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   MinecraftPacketProvider packetProvider,
                                   PermissionChecker permissionChecker,
                                   ModuleController moduleController,
-                                  RandomGenerator randomUtil) {
+                                  RandomGenerator randomUtil,
+                                  SocialService socialService) {
         super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
 
         this.taskScheduler = taskScheduler;
@@ -59,6 +62,7 @@ public class MinecraftSidebarModule extends SidebarModule {
         this.packetProvider = packetProvider;
         this.permissionChecker = permissionChecker;
         this.moduleController = moduleController;
+        this.socialService = socialService;
     }
 
     @Override
@@ -95,7 +99,7 @@ public class MinecraftSidebarModule extends SidebarModule {
 
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
         taskScheduler.runAsync(() -> {
-            if (!permissionChecker.check(fPlayer, permission()) || !fPlayer.isSetting(name())) {
+            if (!permissionChecker.check(fPlayer, permission()) || !socialService.isSetting(fPlayer, name())) {
                 remove(fPlayer);
                 return;
             }

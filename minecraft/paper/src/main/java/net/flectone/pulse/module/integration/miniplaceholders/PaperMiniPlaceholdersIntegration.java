@@ -29,6 +29,7 @@ import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -56,6 +57,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final Provider<MuteModule> muteModuleProvider;
@@ -229,13 +231,13 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
                     String argument = queue.pop().value();
                     SettingText settingText = SettingText.fromString(argument);
                     if (settingText != null) {
-                        String value = fPlayer.getSetting(settingText);
+                        String value = socialService.getSetting(fPlayer, settingText);
                         if (settingText == SettingText.CHAT_NAME && value == null) return Tag.preProcessParsed("default");
 
                         return Tag.preProcessParsed(StringUtils.defaultString(value));
                     }
 
-                    return Tag.preProcessParsed(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
+                    return Tag.preProcessParsed(socialService.isSetting(fPlayer, argument.toUpperCase()) ? "yes" : "no");
                 })
                 .audiencePlaceholder("player", (player, _, _) -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(player);
@@ -279,7 +281,7 @@ public class PaperMiniPlaceholdersIntegration implements FIntegration, PulseList
 
         Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
-            colorsMap.putAll(fPlayer.getFColors(type));
+            colorsMap.putAll(socialService.loadColors(fPlayer, type));
         }
 
         int colorNumber = Integer.parseInt(argument);

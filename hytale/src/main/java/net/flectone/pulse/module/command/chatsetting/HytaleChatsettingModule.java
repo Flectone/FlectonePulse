@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -24,6 +25,7 @@ public class HytaleChatsettingModule extends ChatsettingModule {
     @Inject
     public HytaleChatsettingModule(FileFacade fileFacade,
                                    FPlayerService fPlayerService,
+                                   SocialService socialService,
                                    PermissionChecker permissionChecker,
                                    CommandParserProvider commandParserProvider,
                                    ProxySender proxySender,
@@ -33,7 +35,7 @@ public class HytaleChatsettingModule extends ChatsettingModule {
                                    ModuleController moduleController,
                                    ModuleCommandController commandModuleController,
                                    Provider<HytaleMenuBuilder> hytaleMenuBuilderProvider) {
-        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
 
         this.hytaleMenuBuilderProvider = hytaleMenuBuilderProvider;
     }

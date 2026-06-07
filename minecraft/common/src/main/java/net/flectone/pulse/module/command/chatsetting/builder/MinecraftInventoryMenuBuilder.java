@@ -18,6 +18,7 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -38,6 +39,7 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
     private final MinecraftInventoryController inventoryController;
     private final ChatsettingHandler chatsettingHandler;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final @Named("isNewerThanOrEqualsV_1_14") boolean isNewerThanOrEqualsV_1_14;
 
     @Override
@@ -73,7 +75,7 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
         int slot = checkbox.types().get(messageType);
         if (slot == -1) return inventoryBuilder;
 
-        boolean enabled = fTarget.isSetting(messageType);
+        boolean enabled = socialService.isSetting(fTarget, messageType);
 
         String material = chatsettingModule.getCheckboxMaterial(enabled);
         String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
@@ -85,14 +87,13 @@ public class MinecraftInventoryMenuBuilder implements MenuBuilder {
                     ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
                     if (status == ChatsettingHandler.Status.DENIED) return;
 
-                    FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
                     boolean currentEnabled = status.toBoolean();
 
                     String invertMaterial = chatsettingModule.getCheckboxMaterial(!currentEnabled);
                     String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
 
-                    ItemStack newItemStack = (ItemStack) platformServerAdapter.buildItemStack(finalFTarget, invertMaterial, invertTitle, invertLore);
+                    ItemStack newItemStack = (ItemStack) platformServerAdapter.buildItemStack(fTarget, invertMaterial, invertTitle, invertLore);
                     inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
                 });
     }

@@ -9,11 +9,8 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
@@ -21,7 +18,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -53,7 +49,6 @@ public class FPlayerService {
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerRepository fPlayerRepository;
-    private final SocialRepository socialRepository;
     private final IntegrationModule integrationModule;
     private final RandomGenerator randomUtil;
     private final EventDispatcher eventDispatcher;
@@ -113,90 +108,6 @@ public class FPlayerService {
     }
 
     /**
-     * Loads player settings with cache enabled by default.
-     *
-     * @param fPlayer the player to load settings for
-     * @return the player with updated settings
-     */
-    @NonNull
-    public FPlayer loadSettings(FPlayer fPlayer) {
-        return loadSettings(fPlayer, true);
-    }
-
-    /**
-     * Loads player settings with optional cache control.
-     * Invalidates cached settings if cache parameter is false before loading.
-     *
-     * @param fPlayer the player to load settings for
-     * @param cache whether to use cached settings or force reload from database
-     * @return the player with updated settings
-     */
-    @NonNull
-    public FPlayer loadSettings(FPlayer fPlayer, boolean cache) {
-        if (!cache) {
-            socialRepository.invalidateSettings(fPlayer.uuid());
-        }
-
-        return socialRepository.loadSettings(fPlayer);
-    }
-
-    /**
-     * Loads player colors with cache enabled by default.
-     *
-     * @param fPlayer the player to load colors for
-     * @return the player with updated colors
-     */
-    @NonNull
-    public FPlayer loadColors(FPlayer fPlayer) {
-        return loadColors(fPlayer, true);
-    }
-
-    /**
-     * Loads player colors with optional cache control.
-     * Invalidates cached colors if cache parameter is false before loading.
-     *
-     * @param fPlayer the player to load colors for
-     * @param cache whether to use cached colors or force reload from database
-     * @return the player with updated colors
-     */
-    @NonNull
-    public FPlayer loadColors(FPlayer fPlayer, boolean cache) {
-        if (!cache) {
-            socialRepository.invalidateColors(fPlayer.uuid());
-        }
-
-        return socialRepository.loadColors(fPlayer);
-    }
-
-    /**
-     * Loads player ignore list with cache enabled by default.
-     *
-     * @param fPlayer the player to load ignores for
-     * @return the player with updated ignore list
-     */
-    @NonNull
-    public FPlayer loadIgnores(FPlayer fPlayer) {
-        return loadIgnores(fPlayer, true);
-    }
-
-    /**
-     * Loads player ignore list with optional cache control.
-     * Invalidates cached ignores if cache parameter is false before loading.
-     *
-     * @param fPlayer the player to load ignores for
-     * @param cache whether to use cached ignores or force reload from database
-     * @return the player with updated ignore list
-     */
-    @NonNull
-    public FPlayer loadIgnores(FPlayer fPlayer, boolean cache) {
-        if (!cache) {
-            socialRepository.invalidateIgnores(fPlayer.uuid());
-        }
-
-        return socialRepository.loadIgnores(fPlayer);
-    }
-
-    /**
      * Adds a player to the online cache.
      *
      * @param fPlayer the player to add to cache
@@ -236,36 +147,6 @@ public class FPlayerService {
                 invalidate(uuid);
             }
         });
-    }
-
-    /**
-     * Saves a text setting for a player and updates the cache.
-     *
-     * @param fPlayer the player to save the setting for
-     * @param setting the setting type to save
-     * @param value the text value to set, can be null
-     * @return the updated player with the new setting
-     */
-    @NonNull
-    public FPlayer saveSetting(@NonNull FPlayer fPlayer, SettingText setting, @Nullable String value) {
-        fPlayer = fPlayer.withSetting(setting, value);
-        socialRepository.saveOrUpdateSetting(fPlayer, setting);
-        return updateCache(fPlayer);
-    }
-
-    /**
-     * Saves a boolean setting for a player and updates the cache.
-     *
-     * @param fPlayer the player to save the setting for
-     * @param setting the setting name to save
-     * @param value the boolean value to set
-     * @return the updated player with the new setting
-     */
-    @NonNull
-    public FPlayer saveSetting(@NonNull FPlayer fPlayer, String setting, boolean value) {
-        fPlayer = fPlayer.withSetting(setting, value);
-        socialRepository.saveOrUpdateSetting(fPlayer, setting);
-        return updateCache(fPlayer);
     }
 
     /**
@@ -505,112 +386,6 @@ public class FPlayerService {
     @NonNull
     public List<FPlayer> getFPlayersWithConsole() {
         return fPlayerRepository.getOnlineFPlayersWithConsole();
-    }
-
-    /**
-     * Saves player colors and updates the cache.
-     *
-     * @param fPlayer the player with colors to save
-     * @return the updated player from cache
-     */
-    @NonNull
-    public FPlayer saveColors(@NonNull FPlayer fPlayer) {
-        socialRepository.saveColors(fPlayer);
-        return updateCache(fPlayer);
-    }
-
-    /**
-     * Gets all mail messages received by a player.
-     *
-     * @param fPlayer the player to get mails for
-     * @return list of mail messages received by the player
-     */
-    @NonNull
-    public List<Mail> getReceiverMails(FPlayer fPlayer) {
-        return socialRepository.getReceiverMails(fPlayer);
-    }
-
-    /**
-     * Gets all mail messages sent by a player.
-     *
-     * @param fPlayer the player to get sent mails for
-     * @return list of mail messages sent by the player
-     */
-    @NonNull
-    public List<Mail> getSenderMails(FPlayer fPlayer) {
-        return socialRepository.getSenderMails(fPlayer);
-    }
-
-    /**
-     * Saves an ignore relationship between two players and updates the cache.
-     *
-     * @param fPlayer the player who is ignoring
-     * @param fTarget the player being ignored
-     * @return the updated player with the new ignore, or original player if ignore was null
-     */
-    @NonNull
-    public FPlayer saveIgnore(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
-        Ignore ignore = socialRepository.saveAndGetIgnore(fPlayer, fTarget);
-        if (ignore == null) return fPlayer;
-
-        return updateCache(fPlayer.withIgnore(ignore));
-    }
-
-    /**
-     * Saves a mail message from one player to another.
-     *
-     * @param fPlayer the sender of the mail
-     * @param fTarget the recipient of the mail
-     * @param message the mail message content
-     * @return Optional containing the saved mail, or empty if save failed
-     */
-    @NonNull
-    public Optional<Mail> saveMail(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget, @NonNull String message) {
-        return socialRepository.saveAndGetMail(fPlayer, fTarget, message);
-    }
-
-    /**
-     * Deletes an ignore relationship and updates the cache.
-     *
-     * @param fPlayer the player who was ignoring
-     * @param ignore the ignore relationship to delete
-     * @return the updated player without the ignore
-     */
-    @NonNull
-    public FPlayer deleteIgnore(@NonNull FPlayer fPlayer, @NonNull Ignore ignore) {
-        socialRepository.deleteIgnore(fPlayer, ignore);
-        return updateCache(fPlayer.withoutIgnore(ignore));
-    }
-
-    /**
-     * Deletes a mail message.
-     *
-     * @param mail the mail message to delete
-     */
-    public void deleteMail(@NonNull Mail mail) {
-        socialRepository.deleteMail(mail);
-    }
-
-    /**
-     * Updates a player's locale setting based on integration or provided locale.
-     * Checks if the new locale differs from current setting before saving.
-     *
-     * @param fPlayer the player to update locale for
-     * @param newLocale the new locale to set
-     * @return true if locale was updated, false if unchanged or player is unknown
-     */
-    public boolean updateLocale(@NonNull FPlayer fPlayer, @NonNull String newLocale) {
-        String locale = integrationModule.getTritonLocale(fPlayer);
-        if (locale == null) {
-            locale = newLocale;
-        }
-
-        SettingText settingName = SettingText.LOCALE;
-        if (locale.equals(fPlayer.getSetting(settingName))) return false;
-        if (fPlayer.isUnknown()) return false;
-
-        saveSetting(fPlayer, settingName, locale);
-        return true;
     }
 
 }

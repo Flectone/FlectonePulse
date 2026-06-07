@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -58,6 +59,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private final ModuleController moduleController;
     private final TimeFormatter timeFormatter;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -101,7 +103,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.AFK.getTagName(), "afk_suffix"), (_, _) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(sender.uuid());
 
-            String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
+            String afkSuffix = socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return MessagePipeline.ReplacementTag.emptyTag();
 
             afkSuffix = Strings.CS.replace(afkSuffix, "<time>", getAfkDurationFormatted(fPlayer, messageContext.receiver()));
@@ -118,56 +120,44 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         }));
     }
 
-    public void asyncRemoveAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
-        taskScheduler.runAsync(() -> {
-            // sync fPlayer
-            FPlayer syncFPlayer = fPlayerService.getFPlayer(fPlayer);
-            removeAfk(action, syncFPlayer);
-        });
-    }
-
     public void removeAllAfkPlayers(String action) {
         playersCoordinates.keySet().forEach(uuid -> removeAfk(action, fPlayerService.getFPlayer(uuid)));
     }
 
-    public FPlayer removeAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
+    public void removeAfk(@NonNull String action, @NonNull FPlayer fPlayer) {
         // skip empty afk suffix
-        if (StringUtils.isEmpty(fPlayer.getSetting(SettingText.AFK_SUFFIX))) {
+        if (StringUtils.isEmpty(socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX))) {
             playersCoordinates.remove(fPlayer.uuid());
-            return fPlayer;
+            return;
         }
 
         // always delete afk suffix if action is empty
         if (action.isEmpty()) {
-            return removeAfkSetting(fPlayer);
+            removeAfkSetting(fPlayer);
+            return;
         }
 
         // base module checks
-        if (moduleController.isDisabledFor(this, fPlayer)) return fPlayer;
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         // skip ignored action
-        if (config().ignore().contains(action)) return fPlayer;
+        if (config().ignore().contains(action)) return;
 
         // just remove afk suffix
-        fPlayer = removeAfkSetting(fPlayer);
+        removeAfkSetting(fPlayer);
 
         // send message
         sendAfkMessage(fPlayer, false);
-
-        return fPlayer;
     }
 
-    public FPlayer addAfk(FPlayer fPlayer) {
-        fPlayer = addAfkSetting(fPlayer);
-
+    public void addAfk(FPlayer fPlayer) {
+        addAfkSetting(fPlayer);
         sendAfkMessage(fPlayer, true);
-
-        return fPlayer;
     }
 
     public int getAfkDuration(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return 0;
-        if (StringUtils.isEmpty(fPlayer.getSetting(SettingText.AFK_SUFFIX))) return 0;
+        if (StringUtils.isEmpty(socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX))) return 0;
 
         Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
         return timeCoordinates != null ? (int) (System.currentTimeMillis() - timeCoordinates.first()) / 1000 : 0;
@@ -181,28 +171,24 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         return timeFormatter.format(fReceiver, afkDuration * 1000L);
     }
 
-    private FPlayer removeAfkSetting(FPlayer fPlayer) {
-        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, null);
+    private void removeAfkSetting(FPlayer fPlayer) {
+        socialService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, null);
 
         playersCoordinates.remove(fPlayer.uuid());
 
         if (!config().trackPlaytime()) {
             playtimeService.saveAfkSession(fPlayer, false);
         }
-
-        return fPlayer;
     }
 
-    private FPlayer addAfkSetting(FPlayer fPlayer) {
-        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, localization().suffix());
+    private void addAfkSetting(FPlayer fPlayer) {
+        socialService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, localization().suffix());
 
         playersCoordinates.put(fPlayer.uuid(), Pair.of(System.currentTimeMillis(), platformPlayerAdapter.getCoordinates(fPlayer)));
 
         if (!config().trackPlaytime()) {
             playtimeService.saveAfkSession(fPlayer, true);
         }
-
-        return fPlayer;
     }
 
     private void updateCoordinates(@NonNull FPlayer fPlayer) {
@@ -229,8 +215,9 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
         if (timeCoordinates == null || !isSameCoordinates(timeCoordinates.second(), coordinates)) {
             // remove afk suffix if present
-            if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
-                sendAfkMessage(removeAfkSetting(fPlayer), false);
+            if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) {
+                removeAfkSetting(fPlayer);
+                sendAfkMessage(fPlayer, false);
                 return;
             }
 
@@ -244,13 +231,14 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         }
 
         // skip afk players
-        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
+        if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) return;
 
         // skip not full afk players
         if (currentTime - timeCoordinates.first() < config().delay() * TimeFormatter.MULTIPLIER) return;
 
         // update afk suffix
-        sendAfkMessage(addAfkSetting(fPlayer), true);
+        addAfkSetting(fPlayer);
+        sendAfkMessage(fPlayer, true);
     }
 
     private boolean isSameCoordinates(PlatformPlayerAdapter.Coordinates first, PlatformPlayerAdapter.Coordinates second) {
@@ -260,8 +248,9 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private void sendAfkMessage(FPlayer fPlayer, boolean isAfk) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        if (isAfk && fPlayer.getSetting(SettingText.AFK_SUFFIX) == null
-                || !isAfk && fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
+        boolean afkSuffixEmpty = socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) == null;
+        if (isAfk && afkSuffixEmpty) return;
+        if (!isAfk && !afkSuffixEmpty) return;
 
         Range range = config().range();
         if (range.is(Range.Type.PLAYER)) {

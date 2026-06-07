@@ -85,6 +85,7 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -106,6 +107,7 @@ public class ProxyMessageHandler {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
     private final FLogger fLogger;
     private final ModerationService moderationService;
     private final Gson gson;
@@ -444,7 +446,9 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
-        FPlayer fPlayer = fPlayerService.updateCache(fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity), false));
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
+
+        socialService.loadColors(fPlayer, false);
 
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!moduleController.isEnable(module)) return;
@@ -453,9 +457,9 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {
-        fPlayerService.updateCache(
-                fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity), false)
-        );
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
+
+        socialService.loadSettings(fPlayer, false);
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -655,7 +659,9 @@ public class ProxyMessageHandler {
     }
 
     private void handleNicknameCommand(FEntity fEntity) {
-        fPlayerService.updateCache(fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity), false));
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
+
+        socialService.loadSettings(fPlayer, false);
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -1214,7 +1220,7 @@ public class ProxyMessageHandler {
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                         .tagResolvers(fResolver -> new TagResolver[]{module.argumentTag(fResolver, parsedComponent)})
                         .range(Range.get(Range.Type.SERVER))
-                        .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                         .destination(parsedComponent.vanillaMessage().destination())
                         .build()
                 )

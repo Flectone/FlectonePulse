@@ -6,12 +6,15 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.setting.*;
+import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Data Access Object for player settings in FlectonePulse.
@@ -43,36 +46,13 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
     }
 
     /**
-     * Saves all settings for a player.
-     *
-     * @param player the player to save settings for
-     */
-    public void save(@NonNull FPlayer player) {
-        if (database.isClosed()) return;
-
-        useTransaction(sql -> {
-            player.settingsBoolean().forEach((messageType, _) ->
-                    insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
-            );
-
-            player.settingsText().forEach((settingText, string) ->
-                    insertOrUpdate(sql, player, settingText.name(), string)
-            );
-        });
-    }
-
-    private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
-        sql.upsert(player.id(), type, value);
-    }
-
-    /**
      * Loads all settings for a player.
      *
      * @param player the player to load settings for
      * @return new FPlayer with settings
      */
-    public FPlayer load(@NonNull FPlayer player) {
-        if (database.isClosed()) return player;
+    public Optional<SocialRepository.Settings> load(@NonNull FPlayer player) {
+        if (database.isClosed()) return Optional.empty();
 
         int id = player.id();
 
@@ -91,10 +71,7 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
             settingsBoolean.put(key.toUpperCase(), "1".equals(value));
         });
 
-        return player.toBuilder()
-                .settingsText(Map.copyOf(settingsText))
-                .settingsBoolean(Map.copyOf(settingsBoolean))
-                .build();
+        return Optional.of(new SocialRepository.Settings(Map.copyOf(settingsBoolean), Map.copyOf(settingsText)));
     }
 
     /**
@@ -103,22 +80,14 @@ public class SettingDAO implements BaseDAO<SettingSQL> {
      * @param player the player
      * @param setting the setting name
      */
-    public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting) {
+    public void insertOrUpdate(@NonNull FPlayer player, @NonNull String setting, @Nullable String value) {
         if (database.isClosed()) return;
 
-        useHandle(sql -> insertOrUpdate(sql, player, setting, player.getSetting(setting)));
+        useHandle(sql -> insertOrUpdate(sql, player, setting, value));
     }
 
-    /**
-     * Inserts or updates a specific text setting for a player.
-     *
-     * @param player the player
-     * @param settingText the setting text type
-     */
-    public void insertOrUpdate(@NonNull FPlayer player, SettingText settingText) {
-        if (database.isClosed()) return;
-
-        useHandle(sql -> insertOrUpdate(sql, player, settingText.name(), player.getSetting(settingText)));
+    private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
+        sql.upsert(player.id(), type, value);
     }
 
 }

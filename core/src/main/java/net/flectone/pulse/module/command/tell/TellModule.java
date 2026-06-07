@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -43,6 +44,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
@@ -131,10 +133,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        fReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         // save for sender

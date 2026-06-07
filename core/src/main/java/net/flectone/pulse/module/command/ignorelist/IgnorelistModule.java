@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -38,6 +39,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -65,7 +67,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        List<Ignore> ignoreList = fPlayer.ignores();
+        List<Ignore> ignoreList = socialService.loadIgnores(fPlayer);
         if (ignoreList.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
                     .sender(fPlayer)

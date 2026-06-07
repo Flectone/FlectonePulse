@@ -30,6 +30,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -52,6 +53,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -176,12 +178,12 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
             Map<Integer, String> colorsMap = new Object2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.SEE));
             } else {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.SEE));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.OUT));
             }
 
             return colorsMap.get(Integer.parseInt(number));
@@ -193,13 +195,13 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
             SettingText settingText = SettingText.fromString(conditionName);
             if (settingText != null) {
-                String value = fPlayer.getSetting(settingText);
+                String value = socialService.getSetting(fPlayer, settingText);
                 if (settingText == SettingText.CHAT_NAME && value == null) return "default";
 
                 return StringUtils.defaultString(value);
             }
 
-            return fPlayer.isSetting(params.toUpperCase()) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            return socialService.isSetting(fPlayer, params.toUpperCase()) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
         }
 
         return switch (params) {

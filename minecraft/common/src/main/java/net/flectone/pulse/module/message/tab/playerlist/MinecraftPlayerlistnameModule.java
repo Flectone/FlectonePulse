@@ -36,6 +36,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -68,6 +69,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final MinecraftPacketSender packetSender;
@@ -236,19 +238,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
-        boolean updateCache = !platformPlayerAdapter.isOnline(fPlayer);
-
-        // check new settings data
-        if (!updateCache && fPlayer.settingsText().isEmpty()) {
-            // get fplayer from cache
-            fPlayer = fPlayerService.getFPlayer(fPlayer);
-
-            // check new settings data
-            updateCache = fPlayer.settingsText().isEmpty();
-        }
-
-        if (updateCache) {
-            fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer, false));
+        if (!platformPlayerAdapter.isOnline(fPlayer)) {
+            socialService.loadSettings(fPlayer, false);
         }
 
         if (userProfile == null) {

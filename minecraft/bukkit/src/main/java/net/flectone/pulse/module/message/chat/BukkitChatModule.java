@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -31,6 +32,7 @@ public class BukkitChatModule extends MinecraftChatModule {
     @Inject
     protected BukkitChatModule(FileFacade fileFacade,
                                FPlayerService fPlayerService,
+                               SocialService socialService,
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
@@ -44,7 +46,7 @@ public class BukkitChatModule extends MinecraftChatModule {
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, platformServerAdapter, permissionChecker,
+        super(fileFacade, fPlayerService, socialService, platformServerAdapter, permissionChecker,
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry,
                 taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
 

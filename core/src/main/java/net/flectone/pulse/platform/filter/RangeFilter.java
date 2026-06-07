@@ -8,6 +8,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.function.Predicate;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RangeFilter {
 
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
 
@@ -41,7 +43,7 @@ public class RangeFilter {
 
         return fReceiver -> {
             if (fReceiver.isUnknown()) return true;
-            if (fReceiver.isIgnored(fPlayer)) return false;
+            if (socialService.isIgnored(fReceiver, fPlayer)) return false;
 
             return switch (range.type()) {
                 case BLOCKS -> checkDistance(fPlayer, fReceiver, range.value());

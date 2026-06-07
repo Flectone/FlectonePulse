@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -51,6 +52,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final MinecraftPacketSender packetSender;
     private final ModuleController moduleController;
     private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
@@ -62,7 +64,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   TaskScheduler taskScheduler,
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
-                                  IntegrationModule integrationModule) {
+                                  IntegrationModule integrationModule,
+                                  SocialService socialService) {
         super(fileFacade);
 
         this.extractor = extractor;
@@ -74,6 +77,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.packetSender = packetSender;
         this.moduleController = moduleController;
         this.integrationModule = integrationModule;
+        this.socialService = socialService;
     }
 
     @Override
@@ -124,7 +128,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
                         .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver)
-                                && (vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                                && (vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                         )
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration(IntegrationMetadata.builder()

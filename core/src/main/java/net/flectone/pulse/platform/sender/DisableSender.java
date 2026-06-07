@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -34,9 +35,10 @@ import net.kyori.adventure.text.Component;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DisableSender {
 
+    private final FileFacade fileFacade;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
-    private final FileFacade fileFacade;
+    private final SocialService socialService;
 
     /**
      * Checks if a message type is disabled for a receiver and sends appropriate message.
@@ -49,7 +51,7 @@ public class DisableSender {
     public boolean sendIfDisabled(FEntity entity, FEntity receiver, ModuleName moduleName) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (fReceiver.isUnknown()) return false;
-        if (fReceiver.isSetting(moduleName)) return false;
+        if (socialService.isSetting(fReceiver, moduleName)) return false;
 
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return true;

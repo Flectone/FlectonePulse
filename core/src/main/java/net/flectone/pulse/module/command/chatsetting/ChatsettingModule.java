@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -36,6 +37,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
@@ -47,6 +49,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
+                                SocialService socialService,
                                 PermissionChecker permissionChecker,
                                 CommandParserProvider commandParserProvider,
                                 ProxySender proxySender,
@@ -57,6 +60,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                                 ModuleCommandController commandModuleController) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
         this.permissionChecker = permissionChecker;
         this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
@@ -144,8 +148,6 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
-        fTarget = fPlayerService.loadSettings(fTarget);
-
         String promptType = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalType = commandContext.optional(promptType);
 
@@ -164,7 +166,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         }
 
         String messageType = optionalType.get().toUpperCase();
-        saveSetting(fTarget, messageType, !fTarget.isSetting(messageType));
+        saveSetting(fTarget, messageType, !socialService.isSetting(fTarget, messageType));
     }
 
     protected abstract MenuBuilder getMenuBuilder();
@@ -175,27 +177,27 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
     public void saveSetting(FPlayer fPlayer, String messageType, boolean value) {
         taskScheduler.runAsync(() -> {
-            FPlayer newFPlayer = fPlayerService.saveSetting(fPlayer, messageType, value);
+            socialService.saveSetting(fPlayer, messageType, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(newFPlayer, ModuleName.COMMAND_CHATSETTING);
+                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }
 
     public void saveSetting(FPlayer fPlayer, SettingText settingText, String value) {
         taskScheduler.runAsync(() -> {
-            FPlayer newFPlayer = fPlayerService.saveSetting(fPlayer, settingText, value);
+            socialService.saveSetting(fPlayer, settingText, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(newFPlayer, ModuleName.COMMAND_CHATSETTING);
+                proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
             }
         }, true);
     }
 
 
     public String getPlayerChat(FPlayer fTarget) {
-        String currentChat = fTarget.getSetting(SettingText.CHAT_NAME);
+        String currentChat = socialService.getSetting(fTarget, SettingText.CHAT_NAME);
         if (StringUtils.isEmpty(currentChat)) return "default";
 
         return currentChat;

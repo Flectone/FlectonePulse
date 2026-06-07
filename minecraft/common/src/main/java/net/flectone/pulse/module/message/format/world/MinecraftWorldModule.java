@@ -12,6 +12,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -24,13 +25,14 @@ public class MinecraftWorldModule extends WorldModule {
     @Inject
     public MinecraftWorldModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
+                                SocialService socialService,
                                 PlatformPlayerAdapter platformPlayerAdapter,
                                 ListenerRegistry listenerRegistry,
                                 TaskScheduler taskScheduler,
                                 MinecraftPacketProvider packetProvider,
                                 MessagePipeline messagePipeline,
                                 ModuleController moduleController) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline, moduleController);
+        super(fileFacade, fPlayerService, socialService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline, moduleController);
 
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;

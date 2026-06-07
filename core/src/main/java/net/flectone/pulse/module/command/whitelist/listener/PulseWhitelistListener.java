@@ -58,16 +58,6 @@ public class PulseWhitelistListener implements PulseListener {
         Moderation maintenance = currentModeration.get();
         FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
 
-        // load custom player colors
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
-
-        // load settings (localization)
-        if (fPlayer.settingsText().isEmpty()) {
-            fPlayer = fPlayerService.loadSettings(fPlayer);
-        }
-
         // show player connection for moderators
         if (whitelistModule.config().showConnectionAttempts()) {
             messageDispatcher.dispatch(whitelistModule, ModerationMetadata.<Localization.Command.Whitelist>builder()

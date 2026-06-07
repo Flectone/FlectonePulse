@@ -34,6 +34,7 @@ import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -59,6 +60,7 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MinecraftPacketSender packetSender;
@@ -97,7 +99,7 @@ public class MinecraftBubbleRender implements BubbleRender {
                 .filter(fViewer -> config.visibleToSelf() || !fViewer.equals(sender))
                 .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))
                 .filter(fViewer -> !fViewer.isUnknown())
-                .filter(fViewer -> !fViewer.isIgnored(sender))
+                .filter(fViewer -> !socialService.isIgnored(fViewer, sender))
                 .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
                 .forEach(fViewer -> renderBubble(fViewer, bubble))
         );

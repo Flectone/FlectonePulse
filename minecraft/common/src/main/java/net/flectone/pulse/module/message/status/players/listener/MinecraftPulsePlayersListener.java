@@ -11,7 +11,6 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.message.status.players.MinecraftPlayersModule;
-import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -19,23 +18,12 @@ import net.kyori.adventure.text.Component;
 public class MinecraftPulsePlayersListener implements PulseListener {
 
     private final MinecraftPlayersModule playersModule;
-    private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onPlayerPreLoginEvent(PlayerPreLoginEvent event) {
         FPlayer fPlayer = event.player();
         if (playersModule.isAllowed(fPlayer)) return event;
-
-        // load custom player colors
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
-
-        // load settings (localization)
-        if (fPlayer.settingsText().isEmpty()) {
-            fPlayer = fPlayerService.loadSettings(fPlayer);
-        }
 
         Component reason = messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)

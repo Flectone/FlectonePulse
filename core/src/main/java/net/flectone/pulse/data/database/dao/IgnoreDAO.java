@@ -72,20 +72,10 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
         useHandle(sql -> sql.invalidate(ignore.id()));
     }
 
-    /**
-     * Loads ignore relationships for a player.
-     *
-     * @param fPlayer the player to load ignores for
-     * @return new FPlayer with ignores
-     */
-    public FPlayer load(@NonNull FPlayer fPlayer) {
-        if (database.isClosed()) return fPlayer;
-        if (fPlayer.isUnknown()) return fPlayer;
+    public List<Ignore> load(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return List.of();
+        if (fPlayer.isUnknown()) return List.of();
 
-        List<Ignore> ignores = withHandle(sql ->
-                sql.findByInitiator(fPlayer.id())
-        );
-
-        return fPlayer.withIgnores(List.copyOf(ignores));
+        return withHandle(sql -> sql.findByInitiator(fPlayer.id()));
     }
 }

@@ -18,6 +18,7 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -31,6 +32,7 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -78,19 +80,24 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
             return;
         }
 
-        Optional<Ignore> optionalIgnore = fPlayer.ignores()
+
+        Optional<Ignore> optionalIgnore = socialService.loadIgnores(fPlayer)
                 .stream()
                 .filter(i -> i.target() == fTarget.id())
                 .findAny();
 
-        Ignore metadataIgnore = optionalIgnore.orElse(null);
+        Ignore metadataIgnore;
         if (optionalIgnore.isPresent()) {
-            fPlayer = fPlayerService.deleteIgnore(fPlayer, optionalIgnore.get());
-        } else {
-            fPlayer = fPlayerService.saveIgnore(fPlayer, fTarget);
+            Ignore ignore = optionalIgnore.get();
 
-            if (fPlayer.ignores().isEmpty()) return;
-            metadataIgnore = fPlayer.ignores().getLast();
+            socialService.deleteIgnore(fPlayer, ignore);
+
+            metadataIgnore = ignore;
+        } else {
+            Optional<Ignore> ignore = socialService.saveIgnore(fPlayer, fTarget);
+            if (ignore.isEmpty()) return;
+
+            metadataIgnore = ignore.get();
         }
 
         messageDispatcher.dispatch(this, IgnoreMetadata.<Localization.Command.Ignore>builder()

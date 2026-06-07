@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -35,6 +36,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     private static final String RAIDERS_PLACEHOLDER = "<raiders>";
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -45,6 +47,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     @Inject
     public MinecraftBossbarModule(FileFacade fileFacade,
                                   FPlayerService fPlayerService,
+                                  SocialService socialService,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
                                   MessageDispatcher messageDispatcher,
@@ -54,6 +57,7 @@ public class MinecraftBossbarModule extends BossbarModule {
         super(fileFacade);
 
         this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
@@ -73,7 +77,7 @@ public class MinecraftBossbarModule extends BossbarModule {
         FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
-            if (!fPlayer.isSetting(ModuleName.MESSAGE_BOSSBAR)) return;
+            if (!socialService.isSetting(fPlayer, ModuleName.MESSAGE_BOSSBAR)) return;
 
             String message = localization(fPlayer).types().get(translationKey);
             if (StringUtils.isEmpty(message)) return;

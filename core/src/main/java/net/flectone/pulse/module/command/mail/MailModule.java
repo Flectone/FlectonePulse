@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -40,6 +41,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
     private final IgnoreSender ignoreSender;
@@ -98,15 +100,12 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String message = commandModuleController.getArgument(this, commandContext, 1);
 
-        Optional<Mail> mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
+        Optional<Mail> mail = socialService.saveMail(fPlayer, fReceiver, message);
         if (mail.isEmpty()) return;
 
         int mailId = mail.get().id();
@@ -119,7 +118,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                                messagePipeline.targetTag(fResolver, fReceiver)
                         })
                         .build()
                 )

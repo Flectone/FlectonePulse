@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 import net.flectone.pulse.data.database.dao.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -46,14 +47,14 @@ public class SocialRepository {
      * @param fPlayer the player to load ignores for
      * @return new FPlayer with ignores loaded
      */
-    public FPlayer loadIgnores(FPlayer fPlayer) {
+    public List<Ignore> loadIgnores(FPlayer fPlayer) {
         List<Ignore> cache = playerIgnoreCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) return fPlayer.withIgnores(cache);
+        if (cache != null) return cache;
 
-        fPlayer = ignoreDAO.load(fPlayer);
-        playerIgnoreCache.put(fPlayer.uuid(), fPlayer.ignores());
+        List<Ignore> ignores = ignoreDAO.load(fPlayer);
+        playerIgnoreCache.put(fPlayer.uuid(), ignores);
 
-        return fPlayer;
+        return ignores;
     }
 
     /**
@@ -73,24 +74,27 @@ public class SocialRepository {
      * @param fTarget the player being ignored
      * @return the created ignore record, or null if players are unknown
      */
-    public @Nullable Ignore saveAndGetIgnore(FPlayer fPlayer, FPlayer fTarget) {
-        invalidateIgnores(fPlayer.uuid());
+    public Optional<Ignore> saveIgnore(FPlayer fPlayer, FPlayer fTarget) {
+        Ignore ignore = ignoreDAO.insert(fPlayer, fTarget);
+        if (ignore == null) return Optional.empty();
 
-        // return new ignore
-        return ignoreDAO.insert(fPlayer, fTarget);
+        List<Ignore> ignores = new ArrayList<>(loadIgnores(fPlayer));
+        ignores.add(ignore);
+
+        playerIgnoreCache.put(fPlayer.uuid(), List.copyOf(ignores));
+
+        return Optional.of(ignore);
     }
 
-    /**
-     * Deletes an ignore relationship and invalidates the cache.
-     *
-     * @param fPlayer the player who was ignoring
-     * @param ignore the ignore record to delete
-     */
     public void deleteIgnore(FPlayer fPlayer, Ignore ignore) {
-        invalidateIgnores(fPlayer.uuid());
-
         // invalidate record in database
         ignoreDAO.invalidate(ignore);
+
+        // update cache
+        List<Ignore> ignores = new ArrayList<>(loadIgnores(fPlayer));
+        ignores.remove(ignore);
+
+        playerIgnoreCache.put(fPlayer.uuid(), List.copyOf(ignores));
     }
 
     /**
@@ -122,7 +126,7 @@ public class SocialRepository {
      * @return Optional containing the created mail record, or empty if creation failed
      */
     @NonNull
-    public Optional<Mail> saveAndGetMail(FPlayer fPlayer, FPlayer fTarget, String message) {
+    public Optional<Mail> saveMail(FPlayer fPlayer, FPlayer fTarget, String message) {
         return mailDAO.insert(fPlayer, fTarget, message);
     }
 
@@ -218,21 +222,15 @@ public class SocialRepository {
         playTimeCache.invalidate(uuid);
     }
 
-    /**
-     * Loads color settings for a player with cache support.
-     * Returns cached colors if available, otherwise loads from database and caches the result.
-     *
-     * @param fPlayer the player to load colors for
-     * @return new FPlayer with colors loaded
-     */
-    public FPlayer loadColors(@NonNull FPlayer fPlayer) {
+    @NonNull
+    public Map<FColor.Type, Set<FColor>> loadColors(@NonNull FPlayer fPlayer) {
         Map<FColor.Type, Set<FColor>> cache = playerColorCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) return fPlayer.withFColors(cache);
+        if (cache != null) return cache;
 
-        fPlayer = fColorDao.load(fPlayer);
-        playerColorCache.put(fPlayer.uuid(), fPlayer.fColors());
+        Map<FColor.Type, Set<FColor>> colors = fColorDao.load(fPlayer);
+        playerColorCache.put(fPlayer.uuid(), colors);
 
-        return fPlayer;
+        return colors;
     }
 
     /**
@@ -250,11 +248,12 @@ public class SocialRepository {
      *
      * @param fPlayer the player whose colors are being saved
      */
-    public void saveColors(@NonNull FPlayer fPlayer) {
-        invalidateColors(fPlayer.uuid());
-
+    public void saveColors(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
         // save colors to database
-        fColorDao.save(fPlayer);
+        fColorDao.save(fPlayer, colors);
+
+        // update cache
+        playerColorCache.put(fPlayer.uuid(), colors);
     }
 
     /**
@@ -264,19 +263,14 @@ public class SocialRepository {
      * @param fPlayer the player to load settings for
      * @return new FPlayer with settings loaded
      */
-    public FPlayer loadSettings(@NonNull FPlayer fPlayer) {
+    public Settings loadSettings(@NonNull FPlayer fPlayer) {
         Settings cache = playerSettingCache.getIfPresent(fPlayer.uuid());
-        if (cache != null) {
-            return fPlayer.toBuilder()
-                    .settingsBoolean(cache.booleans())
-                    .settingsText(cache.texts())
-                    .build();
-        }
+        if (cache != null) return cache;
 
-        fPlayer = settingDAO.load(fPlayer);
-        playerSettingCache.put(fPlayer.uuid(), new Settings(fPlayer.settingsBoolean(), fPlayer.settingsText()));
+        Settings settings = settingDAO.load(fPlayer).orElse(Settings.EMPTY);
+        playerSettingCache.put(fPlayer.uuid(), settings);
 
-        return fPlayer;
+        return settings;
     }
 
     /**
@@ -289,30 +283,25 @@ public class SocialRepository {
     }
 
     /**
-     * Saves all settings for a player to the database.
-     * Invalidates the settings cache before saving to ensure fresh data on next load.
-     *
-     * @param fPlayer the player whose settings are being saved
-     */
-    public void saveSettings(@NonNull FPlayer fPlayer) {
-        invalidateSettings(fPlayer.uuid());
-
-        // save settings to database
-        settingDAO.save(fPlayer);
-    }
-
-    /**
      * Saves or updates a specific boolean setting for a player.
      * Invalidates the settings cache before saving to ensure fresh data on next load.
      *
      * @param fPlayer the player whose setting is being saved
      * @param setting the name of the boolean setting
      */
-    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting) {
-        invalidateSettings(fPlayer.uuid());
-
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
         // save setting to database
-        settingDAO.insertOrUpdate(fPlayer, setting);
+        settingDAO.insertOrUpdate(fPlayer, setting, value ? "1" : "0");
+
+        Settings settings = loadSettings(fPlayer);
+
+        Map<String, Boolean> newBooleans = new HashMap<>(settings.booleans());
+
+        newBooleans.put(setting, value);
+
+        settings = settings.withBooleans(Map.copyOf(newBooleans));
+
+        playerSettingCache.put(fPlayer.uuid(), settings);
     }
 
     /**
@@ -322,16 +311,35 @@ public class SocialRepository {
      * @param fPlayer the player whose setting is being saved
      * @param setting the SettingText enum representing the text setting type
      */
-    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting) {
-        invalidateSettings(fPlayer.uuid());
-
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
         // save setting to database
-        settingDAO.insertOrUpdate(fPlayer, setting);
+        settingDAO.insertOrUpdate(fPlayer, setting.name(), value);
+
+        Settings settings = loadSettings(fPlayer);
+
+        Map<SettingText, String> newTexts = settings.texts().isEmpty()
+                ? new EnumMap<>(SettingText.class)
+                : new EnumMap<>(settings.texts());
+
+        if (value == null) {
+            newTexts.remove(setting);
+        } else {
+            newTexts.put(setting, value);
+        }
+
+        settings = settings.withTexts(Map.copyOf(newTexts));
+
+        playerSettingCache.put(fPlayer.uuid(), settings);
     }
 
+    @With
     public record Settings(
             Map<String, Boolean> booleans,
             Map<SettingText, String> texts
-    ){}
+    ){
+
+        public static final Settings EMPTY = new Settings(Map.of(), Map.of());
+
+    }
 
 }

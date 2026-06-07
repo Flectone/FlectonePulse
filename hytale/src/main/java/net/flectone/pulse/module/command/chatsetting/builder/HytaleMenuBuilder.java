@@ -25,6 +25,7 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -46,6 +47,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
     private final HytaleComponentSerializer componentSerializer;
+    private final SocialService socialService;
 
     @Override
     public void open(FPlayer fPlayer, UUID fTargetUUID) {
@@ -95,7 +97,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
         int slot = checkbox.types().get(messageType);
         if (slot == -1) return gridGroup;
 
-        boolean enabled = fTarget.isSetting(messageType);
+        boolean enabled = socialService.isSetting(fTarget, messageType);
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
@@ -117,19 +119,18 @@ public class HytaleMenuBuilder implements MenuBuilder {
             ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
             if (status == ChatsettingHandler.Status.DENIED) return;
 
-            FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
             boolean currentEnabled = status.toBoolean();
 
             Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .receiver(finalFTarget)
+                    .receiver(fTarget)
                     .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
                     .build()
             );
 
             Component componentInvertLore = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .receiver(finalFTarget)
+                    .receiver(fTarget)
                     .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
                     .build()
             );

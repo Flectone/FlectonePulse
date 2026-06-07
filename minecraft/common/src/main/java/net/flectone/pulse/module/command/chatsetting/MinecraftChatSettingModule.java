@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -28,6 +29,7 @@ public class MinecraftChatSettingModule extends ChatsettingModule {
     @Inject
     public MinecraftChatSettingModule(FileFacade fileFacade,
                                       FPlayerService fPlayerService,
+                                      SocialService socialService,
                                       PermissionChecker permissionChecker,
                                       CommandParserProvider commandParserProvider,
                                       ProxySender proxySender,
@@ -39,7 +41,7 @@ public class MinecraftChatSettingModule extends ChatsettingModule {
                                       Provider<MinecraftDialogMenuBuilder> dialogMenuBuilderProvider,
                                       Provider<MinecraftInventoryMenuBuilder> inventoryMenuBuilderProvider,
                                       @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6) {
-        super(fileFacade, fPlayerService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
 
         this.isNewerThanOrEqualsV_1_21_6 = isNewerThanOrEqualsV_1_21_6;
         this.dialogMenuBuilderProvider = dialogMenuBuilderProvider;

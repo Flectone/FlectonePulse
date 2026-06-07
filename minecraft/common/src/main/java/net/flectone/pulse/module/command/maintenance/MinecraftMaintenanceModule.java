@@ -104,16 +104,6 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
 
-        // load custom player colors
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
-
-        // load settings (localization)
-        if (fPlayer.settingsText().isEmpty()) {
-            fPlayer = fPlayerService.loadSettings(fPlayer);
-        }
-
         JsonObject responseJson = new JsonObject();
 
         Localization.Command.Maintenance localizationMaintenance = localization(fPlayer);

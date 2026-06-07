@@ -15,7 +15,7 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
@@ -50,8 +50,9 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
-        fPlayer = fPlayerService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
+        boolean turnedBefore = socialService.getSetting(fPlayer, SettingText.SPY_STATUS) != null;
+
+        socialService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
 
         messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
@@ -132,7 +133,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
         return fReceiver -> !fPlayer.equals(fReceiver)
                 && !receivers.contains(fReceiver)
                 && permissionChecker.check(fReceiver, permission())
-                && fReceiver.getSetting(SettingText.SPY_STATUS) != null
+                && socialService.getSetting(fReceiver, SettingText.SPY_STATUS) != null
                 && fReceiver.isOnline();
     }
 

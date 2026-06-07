@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -33,6 +34,7 @@ import net.kyori.adventure.text.Component;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreSender {
 
+    private final SocialService socialService;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
@@ -47,12 +49,12 @@ public class IgnoreSender {
     public boolean sendIfIgnored(FPlayer sender, FPlayer receiver) {
         Localization.Command.Ignore localization = fileFacade.localization(sender).command().ignore();
 
-        if (sender.isIgnored(receiver)) {
+        if (socialService.isIgnored(sender, receiver)) {
             sendMessage(sender, receiver, localization.you());
             return true;
         }
 
-        if (receiver.isIgnored(sender)) {
+        if (socialService.isIgnored(receiver, sender)) {
             sendMessage(sender, receiver, localization.he());
             return true;
         }

@@ -24,6 +24,7 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
@@ -42,6 +43,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
     private final MinecraftDialogController dialogController;
     private final ChatsettingHandler chatsettingHandler;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     @Override
     public void open(FPlayer fPlayer, UUID fTargetUUID) {
@@ -86,7 +88,7 @@ public class MinecraftDialogMenuBuilder implements MenuBuilder {
         int slot = checkbox.types().get(messageType);
         if (slot == -1) return dialogBuilder;
 
-        boolean enabled = fTarget.isSetting(messageType);
+        boolean enabled = socialService.isSetting(fTarget, messageType);
 
         Component componentTitle = messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)

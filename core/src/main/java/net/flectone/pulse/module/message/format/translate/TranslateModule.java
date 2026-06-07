@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.format.translate.listener.PulseTranslat
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -38,6 +39,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final UUIDParser uuidParser;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -87,7 +89,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TRANSLATION.getTagName(), (argumentQueue, _) -> {
             String firstLang = "auto";
-            String secondLang = receiver.getSetting(SettingText.LOCALE);
+            String secondLang = socialService.getSetting(receiver, SettingText.LOCALE);
 
             if (argumentQueue.hasNext()) {
                 Tag.Argument first = argumentQueue.pop();

@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -31,8 +32,9 @@ public class BukkitAfkModule extends AfkModule {
                            MessageDispatcher messageDispatcher,
                            ModuleController moduleController,
                            TimeFormatter timeFormatter,
-                           PlaytimeService playtimeService) {
-        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService);
+                           PlaytimeService playtimeService,
+                           SocialService socialService) {
+        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService, socialService);
 
         this.listenerRegistry = listenerRegistry;
     }

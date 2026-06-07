@@ -11,10 +11,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.MinecraftSkinService;
-import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.*;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -32,6 +29,7 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
                                         FileFacade fileFacade,
                                         FPlayerService fPlayerService,
                                         PlaytimeService playtimeService,
+                                        SocialService socialService,
                                         FLogger fLogger,
                                         ModerationService moderationService,
                                         Gson gson,
@@ -40,7 +38,7 @@ public class MinecraftProxyMessageHandler extends ProxyMessageHandler {
                                         MessagePipeline messagePipeline,
                                         MessageDispatcher messageDispatcher,
                                         ModuleController moduleController) {
-        super(injector, fileFacade, fPlayerService, playtimeService, fLogger, moderationService, gson, taskScheduler, cooldownRepository, messagePipeline, messageDispatcher, moduleController);
+        super(injector, fileFacade, fPlayerService, playtimeService, socialService, fLogger, moderationService, gson, taskScheduler, cooldownRepository, messagePipeline, messageDispatcher, moduleController);
 
         this.fPlayerService = fPlayerService;
         this.injector = injector;

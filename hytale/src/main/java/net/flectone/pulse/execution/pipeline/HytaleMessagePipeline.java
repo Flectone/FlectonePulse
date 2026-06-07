@@ -6,6 +6,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -22,12 +23,17 @@ public class HytaleMessagePipeline extends MessagePipeline {
 
     private static final Map<String, Locale> LOCALE_CACHE = new ConcurrentHashMap<>();
 
+    private final SocialService socialService;
+
     @Inject
     public HytaleMessagePipeline(FLogger fLogger,
                                  MiniMessage miniMessage,
                                  EventDispatcher eventDispatcher,
-                                 ComponentSerializer componentSerializer) {
+                                 ComponentSerializer componentSerializer,
+                                 SocialService socialService) {
         super(fLogger, miniMessage, eventDispatcher, componentSerializer);
+
+        this.socialService = socialService;
     }
 
     @Override
@@ -41,7 +47,7 @@ public class HytaleMessagePipeline extends MessagePipeline {
     }
 
     public Locale getLocale(FPlayer fPlayer) {
-        String locale = fPlayer.getSetting(SettingText.LOCALE);
+        String locale = socialService.getSetting(fPlayer, SettingText.LOCALE);
         if (locale == null) return Locale.ENGLISH;
 
         return LOCALE_CACHE.computeIfAbsent(locale, string -> Locale.forLanguageTag(string.replace('_', '-')));

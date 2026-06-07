@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -32,6 +33,7 @@ public class WorldModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
@@ -64,7 +66,7 @@ public class WorldModule implements ModuleSimple {
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.WORLD.getTagName(), "world_prefix"), (_, _) -> {
-            String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
+            String worldPrefix = socialService.getSetting(fPlayer, SettingText.WORLD_PREFIX);
             if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
@@ -89,9 +91,9 @@ public class WorldModule implements ModuleSimple {
                     : config().values().get(platformPlayerAdapter.getWorldName(fPlayer));
 
             SettingText setting = SettingText.WORLD_PREFIX;
-            if (Objects.equals(fPlayer.getSetting(setting), newWorldPrefix)) return;
+            if (Objects.equals(socialService.getSetting(fPlayer, setting), newWorldPrefix)) return;
 
-            fPlayerService.saveSetting(fPlayer, setting, newWorldPrefix);
+            socialService.saveSetting(fPlayer, setting, newWorldPrefix);
         });
     }
 

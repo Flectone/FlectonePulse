@@ -10,6 +10,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -21,12 +22,13 @@ public class HytaleWorldModule extends WorldModule {
     @Inject
     public HytaleWorldModule(FileFacade fileFacade,
                              FPlayerService fPlayerService,
+                             SocialService socialService,
                              PlatformPlayerAdapter platformPlayerAdapter,
                              ListenerRegistry listenerRegistry,
                              TaskScheduler taskScheduler,
                              MessagePipeline messagePipeline,
                              ModuleController moduleController) {
-        super(fileFacade, fPlayerService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline, moduleController);
+        super(fileFacade, fPlayerService, socialService, platformPlayerAdapter, listenerRegistry, taskScheduler, messagePipeline, moduleController);
 
         this.listenerRegistry = listenerRegistry;
         this.taskScheduler = taskScheduler;

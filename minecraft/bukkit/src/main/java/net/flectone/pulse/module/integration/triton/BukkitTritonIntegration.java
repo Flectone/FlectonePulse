@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
@@ -23,6 +24,7 @@ import java.util.Objects;
 public class BukkitTritonIntegration implements Listener, FIntegration {
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -38,9 +40,9 @@ public class BukkitTritonIntegration implements Listener, FIntegration {
         String newLanguage = event.getNewLanguage().getLanguageId();
 
         SettingText setting = SettingText.LOCALE;
-        if (Objects.equals(fPlayer.getSetting(setting), newLanguage)) return;
+        if (Objects.equals(socialService.getSetting(fPlayer, setting), newLanguage)) return;
 
-        fPlayerService.saveSetting(fPlayer, setting, newLanguage);
+        socialService.saveSetting(fPlayer, setting, newLanguage);
     }
 
     public @Nullable String getLocale(FPlayer fPlayer) {

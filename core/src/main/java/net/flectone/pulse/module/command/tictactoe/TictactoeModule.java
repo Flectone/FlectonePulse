@@ -111,10 +111,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnores(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettings(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
@@ -125,7 +122,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                         .format(Localization.Command.Tictactoe::sender)
                         .sound(soundOrThrow())
                         .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                                messagePipeline.targetTag(fResolver, fReceiver)
                         })
                         .build()
                 )
@@ -137,7 +134,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.CREATE.name());
-            dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
+            dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
         }, metadataUUID);
