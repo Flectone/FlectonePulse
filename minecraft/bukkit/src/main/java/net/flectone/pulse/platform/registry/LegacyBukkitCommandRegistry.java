@@ -8,6 +8,9 @@ import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.BukkitFPlayerMapper;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
+import org.bukkit.Bukkit;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -19,6 +22,8 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import org.incendo.cloud.setting.ManagerSetting;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.function.Function;
 
 @Singleton
@@ -30,6 +35,7 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
     private final TaskScheduler taskScheduler;
     private final BukkitFPlayerMapper fPlayerMapper;
     private final CommandExceptionHandler commandExceptionHandler;
+    private final FLogger fLogger;
 
     protected LegacyPaperCommandManager<FPlayer> manager;
 
@@ -39,13 +45,15 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
                                        Plugin plugin,
                                        ReflectionResolver reflectionResolver,
                                        TaskScheduler taskScheduler,
-                                       BukkitFPlayerMapper fPlayerMapper) {
+                                       BukkitFPlayerMapper fPlayerMapper,
+                                       FLogger fLogger) {
         this.fileFacade = fileFacade;
         this.plugin = plugin;
         this.fPlayerMapper = fPlayerMapper;
         this.taskScheduler = taskScheduler;
         this.reflectionResolver = reflectionResolver;
         this.commandExceptionHandler = commandExceptionHandler;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -58,6 +66,8 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
         manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
         manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
         manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
+
+        unregisterVanillaCommands();
     }
 
     @Override
@@ -120,6 +130,29 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
                 .map(command -> command.rootComponent().name())
                 .toList() // fix concurrent modification
                 .forEach(this::unregisterCommand);
+    }
+
+    public void unregisterVanillaCommands() {
+        try {
+            Field declaredField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            declaredField.setAccessible(true);
+            SimpleCommandMap commandMap = (SimpleCommandMap) declaredField.get(Bukkit.getServer());
+
+            Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+            knownCommandsField.setAccessible(true);
+            Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) knownCommandsField.get(commandMap);
+
+            fileFacade.config().internal().vanillaCommandsToRemove().forEach(commandName -> {
+                org.bukkit.command.Command bukkitCommand = knownCommands.remove(commandName);
+                if (bukkitCommand != null) {
+                    bukkitCommand.unregister(commandMap);
+                }
+
+                knownCommands.remove(commandName);
+            });
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fLogger.warning("Failed to remove vanilla commands: %s", e.getMessage());
+        }
     }
 
 }

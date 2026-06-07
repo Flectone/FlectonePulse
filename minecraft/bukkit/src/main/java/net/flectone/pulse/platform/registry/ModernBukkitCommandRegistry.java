@@ -7,6 +7,7 @@ import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.BukkitFPlayerMapper;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities;
 
@@ -19,8 +20,9 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry imp
                                        CommandExceptionHandler commandExceptionHandler,
                                        Plugin plugin,
                                        TaskScheduler taskScheduler,
-                                       BukkitFPlayerMapper fPlayerMapper) {
-        super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, taskScheduler, fPlayerMapper);
+                                       BukkitFPlayerMapper fPlayerMapper,
+                                       FLogger fLogger) {
+        super(fileFacade, commandExceptionHandler, plugin, reflectionResolver, taskScheduler, fPlayerMapper, fLogger);
     }
 
     @Override
