@@ -192,6 +192,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public @NonNull File getWhitelistFile() {
+        return FabricLoader.getInstance().getConfigDir().getParent().resolve("whitelist.json").toFile();
+    }
+
+    @Override
     public boolean hasProject(@NonNull String projectName) {
         return FabricLoader.getInstance().isModLoaded(projectName.toLowerCase());
     }

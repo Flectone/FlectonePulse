@@ -154,6 +154,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
     }
 
+    @Override
+    public @NonNull File getWhitelistFile() {
+        return new File(Bukkit.getWorldContainer(), "whitelist.json");
+    }
+
     private Optional<String> getServerIcon() {
         CachedServerIcon cachedServerIcon = Bukkit.getServerIcon();
         if (cachedServerIcon == null) return Optional.empty();

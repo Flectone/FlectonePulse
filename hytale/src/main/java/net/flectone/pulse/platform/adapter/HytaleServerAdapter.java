@@ -9,6 +9,7 @@ import com.hypixel.hytale.common.plugin.PluginIdentifier;
 import com.hypixel.hytale.common.semver.SemverRange;
 import com.hypixel.hytale.common.util.java.ManifestUtil;
 import com.hypixel.hytale.server.core.HytaleServer;
+import com.hypixel.hytale.server.core.HytaleServerConfig;
 import com.hypixel.hytale.server.core.auth.ServerAuthManager;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -25,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -129,6 +131,11 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
     @Override
     public @Nullable String getIcon() {
         return null;
+    }
+
+    @Override
+    public @NonNull File getWhitelistFile() {
+        return HytaleServerConfig.PATH.toAbsolutePath().getParent().resolve("whitelist.json").toFile();
     }
 
     @Override

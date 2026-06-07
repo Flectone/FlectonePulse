@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -104,6 +105,13 @@ public interface PlatformServerAdapter {
      * @return the server icon as a string, or null if unavailable
      */
     @Nullable String getIcon();
+
+    /**
+     * Gets the server's whitelist file.
+     *
+     * @return the whitelist File object, never null
+     */
+    @NonNull File getWhitelistFile();
 
     /**
      * Checks if a project/resource is available on the server.
