@@ -28,6 +28,8 @@ import net.flectone.pulse.module.message.sidebar.HytaleSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.vanilla.HytaleVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
 import net.flectone.pulse.platform.adapter.HytalePlayerAdapter;
 import net.flectone.pulse.platform.adapter.HytaleServerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -127,6 +129,7 @@ public class HytaleInjector extends PlatformInjector {
 
         // others
         bind(ComponentSerializer.class).to(HytaleComponentSerializer.class);
+        bind(ComponentExtractor.class).to(HytaleComponentExtractor.class);
         bind(SkinService.class).to(HytaleSkinService.class);
         bind(ProfileResolver.class).to(HytaleProfileResolver.class);
         bind(TranslationService.class).to(HytaleTranslationService.class);

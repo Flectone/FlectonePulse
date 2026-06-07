@@ -47,6 +47,8 @@ import net.flectone.pulse.module.message.tab.MinecraftTabModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.platform.handler.MinecraftProxyMessageHandler;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -136,6 +138,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
         // others
         bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
+        bind(ComponentExtractor.class).to(MinecraftComponentExtractor.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);
