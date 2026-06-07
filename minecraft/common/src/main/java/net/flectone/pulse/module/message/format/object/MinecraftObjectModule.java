@@ -36,6 +36,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 @Singleton
 public class MinecraftObjectModule extends ObjectModule {
@@ -155,24 +156,37 @@ public class MinecraftObjectModule extends ObjectModule {
 
         playerHeadBuilder.hat(!argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value()));
 
-        if (playerHead.length() > 16) {
-            playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
+        // first check valid player name
+        if (isValidName(playerHead)) {
+            // try load this player
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
+
+            // apply custom property
+            applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
         } else {
+            // second check player uuid
             UUID playerHeadUUID = uuidParser.parse(playerHead);
             if (playerHeadUUID != null) {
+                // try load this player
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
 
+                // apply custom property
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
             } else {
-                FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
-
-                applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+                // or insert value to textures
+                playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
             }
         }
 
         Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
 
         return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
+    }
+
+    // https://github.com/PaperMC/adventure/blob/main/5/api/src/main/java/net/kyori/adventure/text/object/PlayerHeadObjectContentsImpl.java
+    private boolean isValidName(final String name) {
+        if (name.length() > 16) return false;
+        return name.chars().filter(c -> c <= 32 || c >= 126).findAny().isEmpty();
     }
 
     private void applyFPlayerProfileProperty(FEntity fEntity,
