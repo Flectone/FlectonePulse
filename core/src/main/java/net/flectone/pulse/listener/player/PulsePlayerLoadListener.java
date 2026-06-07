@@ -58,14 +58,8 @@ public class PulsePlayerLoadListener implements PulseListener {
         // save to cache
         fPlayer = fPlayerService.addCache(fPlayer);
 
-        // update settings cache
-        socialService.loadSettings(fPlayer, false);
-
-        // update colors cache
-        socialService.loadColors(fPlayer, false);
-
-        // update ignore cache
-        socialService.loadIgnores(fPlayer, false);
+        // update settings, colors, ignores cache
+        socialService.invalidate(currentPlayerUUID);
 
         // update player locale
         String currentPlayerLocale = platformPlayerAdapter.getLocale(currentPlayerUUID);

@@ -41,6 +41,17 @@ public class SocialService {
     private final ProxySender proxySender;
 
     /**
+     * Invalidates all cached social data for a player including colors, settings, and ignores.
+     *
+     * @param uuid the UUID of the player whose social data cache should be cleared
+     */
+    public void invalidate(UUID uuid) {
+        socialRepository.invalidateColors(uuid);
+        socialRepository.invalidateSettings(uuid);
+        socialRepository.invalidateIgnores(uuid);
+    }
+
+    /**
      * Gets a player's setting value as a string by module name.
      *
      * @param fPlayer the player to get the setting for

@@ -144,6 +144,7 @@ public class ProxyMessageHandler {
         taskScheduler.runAsyncLater(() -> {
             fPlayerService.invalidateOfflineCache(uuid, true);
             playtimeService.invalidate(uuid);
+            socialService.invalidate(uuid);
         }, 5L);
     }
 
@@ -155,6 +156,7 @@ public class ProxyMessageHandler {
         taskScheduler.runAsyncLater(() -> {
             fPlayerService.invalidateOnlineCache(uuid);
             playtimeService.invalidate(uuid);
+            socialService.invalidate(uuid);
         }, 5L);
 
         if (connected) {
