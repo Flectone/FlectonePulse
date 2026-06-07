@@ -149,10 +149,7 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
         UUID uuid = userProfile.getUUID();
         if (uuid == null) return;
 
-        String playerName = userProfile.getName();
-        if (playerName == null) return;
-
-        playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent -> {
+        playerPreLoginProcessor.process(uuid, loginEvent -> {
             event.setCancelled(true);
 
             packetSender.send(uuid, new WrapperLoginServerDisconnect(loginEvent.kickReason()));
