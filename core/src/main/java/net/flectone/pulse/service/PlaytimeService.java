@@ -3,7 +3,7 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.data.repository.SocialRepository;
+import net.flectone.pulse.data.repository.PlaytimeRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -20,7 +20,7 @@ import java.util.UUID;
  * Playtime tracking can be enabled or disabled via configuration.
  *
  * @see PlayTime
- * @see SocialRepository
+ * @see PlaytimeRepository
  *
  * @author TheFaser
  * @since 1.10.1
@@ -30,7 +30,7 @@ import java.util.UUID;
 public class PlaytimeService {
 
     private final FileFacade fileFacade;
-    private final SocialRepository socialRepository;
+    private final PlaytimeRepository playtimeRepository;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
@@ -54,7 +54,7 @@ public class PlaytimeService {
                 PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
                 if (platformPlayTime == null) return;
 
-                socialRepository.saveJoinSession(platformPlayTime);
+                playtimeRepository.saveJoinSession(platformPlayTime);
             });
         }
     }
@@ -67,7 +67,7 @@ public class PlaytimeService {
      */
     public void invalidate(@NonNull UUID uuid) {
         if (isPlaytimeTracking()) {
-            socialRepository.invalidatePlaytime(uuid);
+            playtimeRepository.invalidate(uuid);
         }
     }
 
@@ -80,8 +80,8 @@ public class PlaytimeService {
      */
     public void saveAfkSession(FPlayer fPlayer, boolean afk) {
         if (isPlaytimeTracking()) {
-            socialRepository.saveAfkSession(fPlayer, afk);
-            socialRepository.invalidatePlaytime(fPlayer.uuid());
+            playtimeRepository.saveAfkSession(fPlayer, afk);
+            playtimeRepository.invalidate(fPlayer.uuid());
         }
     }
 
@@ -94,8 +94,8 @@ public class PlaytimeService {
      */
     public void updateJoinSession(@NonNull FPlayer fPlayer) {
         if (isPlaytimeTracking()) {
-            socialRepository.saveJoinSession(fPlayer);
-            socialRepository.invalidatePlaytime(fPlayer.uuid());
+            playtimeRepository.saveJoinSession(fPlayer);
+            playtimeRepository.invalidate(fPlayer.uuid());
         }
     }
 
@@ -108,8 +108,8 @@ public class PlaytimeService {
      */
     public void updateLastSession(@NonNull FPlayer fPlayer) {
         if (isPlaytimeTracking()) {
-            socialRepository.saveLastSeen(fPlayer);
-            socialRepository.invalidatePlaytime(fPlayer.uuid());
+            playtimeRepository.saveLastSeen(fPlayer);
+            playtimeRepository.invalidate(fPlayer.uuid());
         }
     }
 
@@ -121,7 +121,7 @@ public class PlaytimeService {
      * @return the player's playtime statistics, or null if tracking is disabled or not found
      */
     public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        return isPlaytimeTracking() ? socialRepository.getPlayTime(fPlayer) : null;
+        return isPlaytimeTracking() ? playtimeRepository.getPlayTime(fPlayer) : null;
     }
 
     /**
@@ -131,7 +131,7 @@ public class PlaytimeService {
      * @return the total number of playtime records, or -1 if tracking is disabled
      */
     public int getPlayTimesCount() {
-        return isPlaytimeTracking() ? socialRepository.getPlayTimesCount() : -1;
+        return isPlaytimeTracking() ? playtimeRepository.getPlayTimesCount() : -1;
     }
 
     /**
@@ -144,7 +144,7 @@ public class PlaytimeService {
      */
     @NonNull
     public List<PlayTime> getAllPlayTimes(int limit, int offset) {
-        return isPlaytimeTracking() ? socialRepository.getAllPlayTimes(limit, offset) : List.of();
+        return isPlaytimeTracking() ? playtimeRepository.getAllPlayTimes(limit, offset) : List.of();
     }
 
     private boolean isPlaytimeTracking() {
