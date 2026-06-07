@@ -256,8 +256,11 @@ public class Database {
                 try {
                     handle.execute(finalStatement);
                 } catch (Exception e) {
-                    // skip MySQL "index already exists"
-                    if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists") && !e.getMessage().contains("Incorrect prefix key")) {
+                    // skip migration errors
+                    if (!e.getMessage().contains("Duplicate key")
+                            && !e.getMessage().contains("already exists")
+                            && !e.getMessage().contains("Incorrect prefix key")
+                            && !e.getMessage().contains("key was too long")) {
                         throw e;
                     }
                 }
