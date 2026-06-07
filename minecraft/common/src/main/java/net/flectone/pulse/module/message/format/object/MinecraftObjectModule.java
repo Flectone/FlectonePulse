@@ -156,22 +156,25 @@ public class MinecraftObjectModule extends ObjectModule {
 
         playerHeadBuilder.hat(!argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value()));
 
+        // first check valid player name
         if (isValidName(playerHead)) {
-            playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
-        } else {
-            if (playerHead.length() < 16) {
-                return MessagePipeline.ReplacementTag.emptyTag();
-            }
+            // try load this player
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
 
+            // apply custom property
+            applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+        } else {
+            // second check player uuid
             UUID playerHeadUUID = uuidParser.parse(playerHead);
             if (playerHeadUUID != null) {
+                // try load this player
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
 
+                // apply custom property
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
             } else {
-                FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
-
-                applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+                // or insert value to textures
+                playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
             }
         }
 
