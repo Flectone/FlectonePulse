@@ -19,11 +19,17 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 /**
- * Repository for managing social interactions in FlectonePulse.
- * Handles ignore relationships and mail messages between players.
+ * Repository for managing social interactions and player data in FlectonePulse.
+ * Handles ignore relationships, mail messages, playtime tracking, color settings,
+ * and player preferences with caching support.
  *
  * @author TheFaser
  * @since 0.8.1
+ * @see IgnoreDAO
+ * @see MailDAO
+ * @see TimeDAO
+ * @see SettingDAO
+ * @see FColorDao
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -45,7 +51,7 @@ public class SocialRepository {
      * Returns cached ignores if available, otherwise loads from database and caches the result.
      *
      * @param fPlayer the player to load ignores for
-     * @return new FPlayer with ignores loaded
+     * @return list of ignore relationships for the player
      */
     public List<Ignore> loadIgnores(FPlayer fPlayer) {
         List<Ignore> cache = playerIgnoreCache.getIfPresent(fPlayer.uuid());
@@ -67,12 +73,11 @@ public class SocialRepository {
     }
 
     /**
-     * Saves an ignore relationship between two players and returns the created record.
-     * Invalidates the ignore cache before saving to ensure fresh data on next load.
+     * Saves an ignore relationship between two players and updates the cache.
      *
      * @param fPlayer the player who is ignoring
      * @param fTarget the player being ignored
-     * @return the created ignore record, or null if players are unknown
+     * @return Optional containing the created ignore record, or empty if creation failed
      */
     public Optional<Ignore> saveIgnore(FPlayer fPlayer, FPlayer fTarget) {
         Ignore ignore = ignoreDAO.insert(fPlayer, fTarget);
@@ -86,6 +91,12 @@ public class SocialRepository {
         return Optional.of(ignore);
     }
 
+    /**
+     * Deletes an ignore relationship and updates the cache.
+     *
+     * @param fPlayer the player who was ignoring
+     * @param ignore the ignore record to delete
+     */
     public void deleteIgnore(FPlayer fPlayer, Ignore ignore) {
         // invalidate record in database
         ignoreDAO.invalidate(ignore);
@@ -118,7 +129,7 @@ public class SocialRepository {
     }
 
     /**
-     * Saves a mail message from one player to another and returns the created record.
+     * Saves a mail message from one player to another.
      *
      * @param fPlayer the sender of the mail message
      * @param fTarget the recipient of the mail message
@@ -222,6 +233,13 @@ public class SocialRepository {
         playTimeCache.invalidate(uuid);
     }
 
+    /**
+     * Loads color settings for a player with cache support.
+     * Returns cached colors if available, otherwise loads from database and caches the result.
+     *
+     * @param fPlayer the player to load colors for
+     * @return map of color types to sets of FColor objects
+     */
     @NonNull
     public Map<FColor.Type, Set<FColor>> loadColors(@NonNull FPlayer fPlayer) {
         Map<FColor.Type, Set<FColor>> cache = playerColorCache.getIfPresent(fPlayer.uuid());
@@ -243,10 +261,10 @@ public class SocialRepository {
     }
 
     /**
-     * Saves color settings for a player to the database.
-     * Invalidates the color cache before saving to ensure fresh data on next load.
+     * Saves color settings for a player to the database and updates the cache.
      *
      * @param fPlayer the player whose colors are being saved
+     * @param colors map of color types to sets of FColor objects to save
      */
     public void saveColors(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
         // save colors to database
@@ -261,7 +279,7 @@ public class SocialRepository {
      * Returns cached settings if available, otherwise loads from database and caches the result.
      *
      * @param fPlayer the player to load settings for
-     * @return new FPlayer with settings loaded
+     * @return Settings object containing boolean and text settings
      */
     public Settings loadSettings(@NonNull FPlayer fPlayer) {
         Settings cache = playerSettingCache.getIfPresent(fPlayer.uuid());
@@ -283,11 +301,11 @@ public class SocialRepository {
     }
 
     /**
-     * Saves or updates a specific boolean setting for a player.
-     * Invalidates the settings cache before saving to ensure fresh data on next load.
+     * Saves or updates a specific boolean setting for a player and updates the cache.
      *
      * @param fPlayer the player whose setting is being saved
      * @param setting the name of the boolean setting
+     * @param value the boolean value to set
      */
     public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
         // save setting to database
@@ -305,11 +323,11 @@ public class SocialRepository {
     }
 
     /**
-     * Saves or updates a specific text setting for a player.
-     * Invalidates the settings cache before saving to ensure fresh data on next load.
+     * Saves or updates a specific text setting for a player and updates the cache.
      *
      * @param fPlayer the player whose setting is being saved
      * @param setting the SettingText enum representing the text setting type
+     * @param value the text value to set, can be null to remove the setting
      */
     public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
         // save setting to database

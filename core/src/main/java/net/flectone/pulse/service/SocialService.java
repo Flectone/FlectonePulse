@@ -20,6 +20,17 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service for managing social interactions and player settings in FlectonePulse.
+ * Handles player preferences including settings, colors, ignore lists, and mail messages.
+ * Integrates with proxy systems to synchronize social data across servers.
+ *
+ * @see SocialRepository
+ * @see FPlayer
+ *
+ * @author TheFaser
+ * @since 1.10.1
+ */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SocialService {
@@ -29,27 +40,69 @@ public class SocialService {
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
 
+    /**
+     * Gets a player's setting value as a string by module name.
+     *
+     * @param fPlayer the player to get the setting for
+     * @param moduleName the module name to retrieve the setting for
+     * @return the setting value as a string
+     */
     public @NonNull String getSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName moduleName) {
         return getSetting(fPlayer, moduleName.name());
     }
 
+    /**
+     * Gets a player's text setting value by SettingText enum.
+     *
+     * @param fPlayer the player to get the setting for
+     * @param settingText the SettingText enum representing the setting type
+     * @return the text setting value, or null if not set
+     */
     public @Nullable String getSetting(@NonNull FPlayer fPlayer, @Nullable SettingText settingText) {
         return loadSettings(fPlayer).texts().get(settingText);
     }
 
+    /**
+     * Gets a player's boolean setting value as a string ("1" or "0").
+     *
+     * @param fPlayer the player to get the setting for
+     * @param moduleName the setting name to retrieve
+     * @return "1" if the setting is true or not set, "0" if false
+     */
     public @NonNull String getSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName) {
         return isSetting(fPlayer, moduleName) ? "1" : "0";
     }
 
+    /**
+     * Checks if a player has a boolean setting enabled by module name.
+     *
+     * @param fPlayer the player to check the setting for
+     * @param messageType the module name to check
+     * @return true if the setting is enabled or not set, false if disabled
+     */
     public boolean isSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName messageType) {
         return isSetting(fPlayer, messageType.name());
     }
 
+    /**
+     * Checks if a player has a boolean setting enabled by name.
+     *
+     * @param fPlayer the player to check the setting for
+     * @param moduleName the setting name to check
+     * @return true if the setting is enabled or not set, false if disabled
+     */
     public boolean isSetting(@NonNull FPlayer fPlayer, @Nullable String moduleName) {
         Boolean value = loadSettings(fPlayer).booleans().get(moduleName);
         return value == null || value;
     }
 
+    /**
+     * Saves a text setting for a player and notifies proxy if enabled.
+     *
+     * @param fPlayer the player to save the setting for
+     * @param setting the SettingText enum representing the setting type
+     * @param value the text value to set, can be null
+     */
     public void saveSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
 
@@ -58,6 +111,13 @@ public class SocialService {
         }
     }
 
+    /**
+     * Saves a boolean setting for a player and notifies proxy if enabled.
+     *
+     * @param fPlayer the player to save the setting for
+     * @param setting the setting name to save
+     * @param value the boolean value to set
+     */
     public void saveSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
 
@@ -66,10 +126,23 @@ public class SocialService {
         }
     }
 
+    /**
+     * Loads all settings for a player with caching enabled.
+     *
+     * @param fPlayer the player to load settings for
+     * @return Settings object containing boolean and text settings
+     */
     public SocialRepository.@NonNull Settings loadSettings(FPlayer fPlayer) {
         return loadSettings(fPlayer, true);
     }
 
+    /**
+     * Loads all settings for a player with optional cache control.
+     *
+     * @param fPlayer the player to load settings for
+     * @param cache if true, use cached settings; if false, invalidate cache and reload from database
+     * @return Settings object containing boolean and text settings
+     */
     public SocialRepository.@NonNull Settings loadSettings(FPlayer fPlayer, boolean cache) {
         if (!cache) {
             socialRepository.invalidateSettings(fPlayer.uuid());
@@ -78,6 +151,13 @@ public class SocialService {
         return socialRepository.loadSettings(fPlayer);
     }
 
+    /**
+     * Loads colors of a specific type for a player and converts them to a number-to-name map.
+     *
+     * @param fPlayer the player to load colors for
+     * @param type the color type to load
+     * @return map of color numbers to color names, empty if no colors found
+     */
     @NonNull
     public Map<Integer, String> loadColors(@NonNull FPlayer fPlayer, FColor.@NonNull Type type) {
         Set<FColor> colors = loadColors(fPlayer).get(type);
@@ -87,18 +167,31 @@ public class SocialService {
                 .collect(Collectors.toMap(
                         FColor::number,
                         FColor::name,
-                        (v1, v2) -> v1,
+                        (v1, _) -> v1,
                         Int2ObjectArrayMap::new
                 ));
 
         return Map.copyOf(result);
     }
 
+    /**
+     * Loads all colors for a player with caching enabled.
+     *
+     * @param fPlayer the player to load colors for
+     * @return map of color types to sets of FColor objects
+     */
     @NonNull
     public Map<FColor.Type, Set<FColor>> loadColors(FPlayer fPlayer) {
         return loadColors(fPlayer, true);
     }
 
+    /**
+     * Loads all colors for a player with optional cache control.
+     *
+     * @param fPlayer the player to load colors for
+     * @param cache if true, use cached colors; if false, invalidate cache and reload from database
+     * @return map of color types to sets of FColor objects
+     */
     @NonNull
     public Map<FColor.Type, Set<FColor>> loadColors(FPlayer fPlayer, boolean cache) {
         if (!cache) {
@@ -108,6 +201,13 @@ public class SocialService {
         return socialRepository.loadColors(fPlayer);
     }
 
+    /**
+     * Saves colors of a specific type for a player, merging with existing colors.
+     *
+     * @param fPlayer the player to save colors for
+     * @param type the color type to save
+     * @param newColors the set of new colors to save, can be null or empty to clear
+     */
     public void saveColors(@NonNull FPlayer fPlayer, FColor.@NonNull Type type, @Nullable Set<FColor> newColors) {
         Map<FColor.Type, Set<FColor>> fColors = loadColors(fPlayer);
 
@@ -131,6 +231,12 @@ public class SocialService {
         saveColors(fPlayer, Map.copyOf(fColorMap));
     }
 
+    /**
+     * Saves all colors for a player and notifies proxy if enabled.
+     *
+     * @param fPlayer the player to save colors for
+     * @param colors map of color types to sets of FColor objects to save
+     */
     public void saveColors(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
         socialRepository.saveColors(fPlayer, colors);
 
@@ -139,15 +245,35 @@ public class SocialService {
         }
     }
 
+    /**
+     * Checks if a player is ignoring another player.
+     *
+     * @param fPlayer the player who might be ignoring
+     * @param fTarget the potential target being ignored
+     * @return true if fPlayer is ignoring fTarget, false otherwise
+     */
     public boolean isIgnored(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
         return loadIgnores(fPlayer).stream().anyMatch(ignore -> ignore.target() == fTarget.id());
     }
 
+    /**
+     * Loads all ignore relationships for a player with caching enabled.
+     *
+     * @param fPlayer the player to load ignores for
+     * @return list of ignore relationships
+     */
     @NonNull
     public List<Ignore> loadIgnores(FPlayer fPlayer) {
         return loadIgnores(fPlayer, true);
     }
 
+    /**
+     * Loads all ignore relationships for a player with optional cache control.
+     *
+     * @param fPlayer the player to load ignores for
+     * @param cache if true, use cached ignores; if false, invalidate cache and reload from database
+     * @return list of ignore relationships
+     */
     @NonNull
     public List<Ignore> loadIgnores(FPlayer fPlayer, boolean cache) {
         if (!cache) {
@@ -157,16 +283,35 @@ public class SocialService {
         return socialRepository.loadIgnores(fPlayer);
     }
 
+    /**
+     * Gets all mail messages received by a player.
+     *
+     * @param fPlayer the player who received the mail messages
+     * @return list of received mail messages
+     */
     @NonNull
     public List<Mail> getReceiverMails(FPlayer fPlayer) {
         return socialRepository.getReceiverMails(fPlayer);
     }
 
+    /**
+     * Gets all mail messages sent by a player.
+     *
+     * @param fPlayer the player who sent the mail messages
+     * @return list of sent mail messages
+     */
     @NonNull
     public List<Mail> getSenderMails(FPlayer fPlayer) {
         return socialRepository.getSenderMails(fPlayer);
     }
 
+    /**
+     * Saves an ignore relationship between two players and notifies proxy if enabled.
+     *
+     * @param fPlayer the player who is ignoring
+     * @param fTarget the player being ignored
+     * @return Optional containing the created ignore record, or empty if creation failed
+     */
     @NonNull
     public Optional<Ignore> saveIgnore(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
         Optional<Ignore> ignore = socialRepository.saveIgnore(fPlayer, fTarget);
@@ -179,11 +324,25 @@ public class SocialService {
         return ignore;
     }
 
+    /**
+     * Saves a mail message from one player to another.
+     *
+     * @param fPlayer the sender of the mail message
+     * @param fTarget the recipient of the mail message
+     * @param message the content of the mail message
+     * @return Optional containing the created mail record, or empty if creation failed
+     */
     @NonNull
     public Optional<Mail> saveMail(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget, @NonNull String message) {
         return socialRepository.saveMail(fPlayer, fTarget, message);
     }
 
+    /**
+     * Deletes an ignore relationship and notifies proxy if enabled.
+     *
+     * @param fPlayer the player who was ignoring
+     * @param ignore the ignore record to delete
+     */
     public void deleteIgnore(@NonNull FPlayer fPlayer, @NonNull Ignore ignore) {
         socialRepository.deleteIgnore(fPlayer, ignore);
 
@@ -192,10 +351,23 @@ public class SocialService {
         }
     }
 
+    /**
+     * Deletes a mail message from the database.
+     *
+     * @param mail the mail record to delete
+     */
     public void deleteMail(@NonNull Mail mail) {
         socialRepository.deleteMail(mail);
     }
 
+    /**
+     * Updates a player's locale setting based on Triton integration or provided value.
+     * Only updates if the locale has changed and the player is not unknown.
+     *
+     * @param fPlayer the player whose locale is being updated
+     * @param newLocale the new locale to set if Triton locale is unavailable
+     * @return true if the locale was updated, false if unchanged or player is unknown
+     */
     public boolean updateLocale(@NonNull FPlayer fPlayer, @NonNull String newLocale) {
         String locale = integrationModule.getTritonLocale(fPlayer);
         if (locale == null) {

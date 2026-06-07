@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
-import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,15 +19,11 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 
-
 /**
  * Central service for managing player data across the FlectonePulse plugin.
- * Provides methods for retrieving, caching, and updating player information including
- * settings, colors, ignore lists, and mail messages.
- * <p>
- * This service acts as a facade layer between the platform-specific player adapters
- * and the data repositories, handling cache management and data synchronization.
- * </p>
+ * Provides methods for retrieving, caching, and updating player information.
+ * Acts as a facade layer between platform-specific player adapters and data repositories,
+ * handling cache management and data synchronization.
  * <p>
  * Players can be retrieved using various identifiers such as UUID, name, IP address,
  * database ID, or platform-specific player objects. The service maintains separate
@@ -37,7 +32,6 @@ import java.util.UUID;
  *
  * @see FPlayer
  * @see FPlayerRepository
- * @see SocialRepository
  *
  * @author TheFaser
  * @since 0.0.1
