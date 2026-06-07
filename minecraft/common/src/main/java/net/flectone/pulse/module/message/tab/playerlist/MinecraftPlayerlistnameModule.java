@@ -238,10 +238,6 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
-        if (!platformPlayerAdapter.isOnline(fPlayer)) {
-            socialService.loadSettings(fPlayer, false);
-        }
-
         if (userProfile == null) {
             userProfile = createUserProfile(fPlayer);
         }

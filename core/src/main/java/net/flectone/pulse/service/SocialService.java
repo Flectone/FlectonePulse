@@ -10,6 +10,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import org.jspecify.annotations.NonNull;
@@ -24,6 +26,8 @@ public class SocialService {
 
     private final IntegrationModule integrationModule;
     private final SocialRepository socialRepository;
+    private final ProxyRegistry proxyRegistry;
+    private final ProxySender proxySender;
 
     public @NonNull String getSetting(@NonNull FPlayer fPlayer, @NonNull ModuleName moduleName) {
         return getSetting(fPlayer, moduleName.name());
@@ -48,10 +52,18 @@ public class SocialService {
 
     public void saveSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, ModuleName.SYSTEM_SETTING);
+        }
     }
 
     public void saveSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, ModuleName.SYSTEM_SETTING);
+        }
     }
 
     public SocialRepository.@NonNull Settings loadSettings(FPlayer fPlayer) {
@@ -121,6 +133,10 @@ public class SocialService {
 
     public void saveColors(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
         socialRepository.saveColors(fPlayer, colors);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, ModuleName.SYSTEM_COLOR);
+        }
     }
 
     public boolean isIgnored(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
@@ -153,7 +169,14 @@ public class SocialService {
 
     @NonNull
     public Optional<Ignore> saveIgnore(@NonNull FPlayer fPlayer, @NonNull FPlayer fTarget) {
-        return socialRepository.saveIgnore(fPlayer, fTarget);
+        Optional<Ignore> ignore = socialRepository.saveIgnore(fPlayer, fTarget);
+        if (ignore.isEmpty()) return Optional.empty();
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, ModuleName.SYSTEM_IGNORE);
+        }
+
+        return ignore;
     }
 
     @NonNull
@@ -163,6 +186,10 @@ public class SocialService {
 
     public void deleteIgnore(@NonNull FPlayer fPlayer, @NonNull Ignore ignore) {
         socialRepository.deleteIgnore(fPlayer, ignore);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, ModuleName.SYSTEM_IGNORE);
+        }
     }
 
     public void deleteMail(@NonNull Mail mail) {

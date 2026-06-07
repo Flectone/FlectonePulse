@@ -232,8 +232,6 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
             // check proxy players only if no online server receivers found
             for (FPlayer fReceiver : proxyReceivers) {
-                socialService.loadIgnores(fReceiver, false);
-                socialService.loadSettings(fReceiver, false);
                 if (!socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT)) {
                     return false;
                 }

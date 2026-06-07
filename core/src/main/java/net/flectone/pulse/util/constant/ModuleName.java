@@ -154,7 +154,10 @@ public enum ModuleName {
     SYSTEM_WHITELIST,
     SYSTEM_SKIN,
     SYSTEM_KICK,
-    SYSTEM_VIOLATION;
+    SYSTEM_VIOLATION,
+    SYSTEM_SETTING,
+    SYSTEM_COLOR,
+    SYSTEM_IGNORE;
 
     private static final Map<String, ModuleName> ENUM_BY_PROXY_KEY = Arrays.stream(ModuleName.values())
             .collect(Collectors.toUnmodifiableMap(

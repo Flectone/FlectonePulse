@@ -171,8 +171,6 @@ public class ProxyMessageHandler {
 
         Optional<FEntity> optionalFEntity = parseFEntity(readAsJsonObject(input));
         if (optionalFEntity.isEmpty()) return;
-        if (handleSystemCooldown(tag, input)) return;
-        if (handleSystemViolation(tag, input)) return;
 
         FEntity fEntity = optionalFEntity.get();
         if (handleEntityInvalidation(input, tag, fEntity)) {
@@ -230,6 +228,21 @@ public class ProxyMessageHandler {
 
     private boolean handleEntityInvalidation(DataInputStream input, ModuleName tag, FEntity fEntity) throws IOException {
         return switch (tag) {
+            case SYSTEM_COOLDOWN -> {
+                UUID uuid = UUID.fromString(input.readUTF());
+                String cooldownClass = input.readUTF();
+                long newExpireTime = input.readLong();
+
+                cooldownRepository.updateCache(uuid, cooldownClass, newExpireTime);
+                yield true;
+            }
+            case SYSTEM_VIOLATION -> {
+                ModerationService.ViolationKey violationKey = gson.fromJson(input.readUTF(), ModerationService.ViolationKey.class);
+                long violationValue = input.readLong();
+
+                moderationService.addViolation(violationKey, violationValue);
+                yield true;
+            }
             case SYSTEM_BAN -> {
                 BanModule module = injector.getInstance(BanModule.class);
                 if (!module.config().filterByServer()) {
@@ -314,29 +327,26 @@ public class ProxyMessageHandler {
                 }
                 yield true;
             }
+            case SYSTEM_COLOR -> {
+                if (fEntity instanceof FPlayer fPlayer) {
+                    socialService.loadColors(fPlayer, false);
+                }
+                yield true;
+            }
+            case SYSTEM_SETTING -> {
+                if (fEntity instanceof FPlayer fPlayer) {
+                    socialService.loadSettings(fPlayer, false);
+                }
+                yield true;
+            }
+            case SYSTEM_IGNORE -> {
+                if (fEntity instanceof FPlayer fPlayer) {
+                    socialService.loadIgnores(fPlayer, false);
+                }
+                yield true;
+            }
             default -> false;
         };
-    }
-
-    private boolean handleSystemCooldown(ModuleName tag, DataInputStream input) throws IOException {
-        if (tag != ModuleName.SYSTEM_COOLDOWN) return false;
-
-        UUID uuid = UUID.fromString(input.readUTF());
-        String cooldownClass = input.readUTF();
-        long newExpireTime = input.readLong();
-
-        cooldownRepository.updateCache(uuid, cooldownClass, newExpireTime);
-        return true;
-    }
-
-    private boolean handleSystemViolation(ModuleName tag, DataInputStream input) throws IOException {
-        if (tag != ModuleName.SYSTEM_VIOLATION) return false;
-
-        ModerationService.ViolationKey violationKey = gson.fromJson(input.readUTF(), ModerationService.ViolationKey.class);
-        long violationValue = input.readLong();
-
-        moderationService.addViolation(violationKey, violationValue);
-        return true;
     }
 
     private void handleAnonCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -446,20 +456,15 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
-
-        socialService.loadColors(fPlayer, false);
-
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!moduleController.isEnable(module)) return;
 
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
         module.sendMessageWithUpdatedColors(fPlayer, metadataUUID);
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
-
-        socialService.loadSettings(fPlayer, false);
+        // nothing
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
@@ -659,9 +664,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleNicknameCommand(FEntity fEntity) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity);
-
-        socialService.loadSettings(fPlayer, false);
+        // nothing
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
