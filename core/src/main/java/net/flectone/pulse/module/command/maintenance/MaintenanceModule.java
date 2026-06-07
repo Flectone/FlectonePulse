@@ -20,6 +20,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.maintenance.listener.MaintenanceProxyMessageListener;
 import net.flectone.pulse.module.command.maintenance.listener.PulseMaintenanceListener;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -30,6 +31,7 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.service.FPlayerService;
@@ -72,12 +74,17 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     private final ModerationService moderationService;
     private final ProxySender proxySender;
     private final ModerationMessageFormatter moderationMessageFormatter;
+    private final ProxyRegistry proxyRegistry;
 
     protected String icon;
 
     @Override
     public void onEnable() {
         listenerRegistry.register(PulseMaintenanceListener.class);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(MaintenanceProxyMessageListener.class);
+        }
 
         File file = iconPath.resolve("maintenance.png").toFile();
 

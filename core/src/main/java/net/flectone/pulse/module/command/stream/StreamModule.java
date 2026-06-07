@@ -15,12 +15,13 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.PulseStreamListener;
+import net.flectone.pulse.module.command.stream.listener.StreamProxyMessageListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
 public class StreamModule implements ModuleCommand<Localization.Command.Stream> {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
     private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
@@ -52,6 +52,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -62,6 +63,10 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(StreamProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseStreamListener.class);
     }

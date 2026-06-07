@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.tictactoe.listener.TictactoeProxyMessageListener;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
@@ -20,6 +21,8 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -53,6 +56,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -72,6 +77,10 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 .permission(permission().name())
                 .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(TictactoeProxyMessageListener.class);
+        }
     }
 
     @Override

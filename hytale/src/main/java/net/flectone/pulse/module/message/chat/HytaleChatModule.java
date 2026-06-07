@@ -39,7 +39,7 @@ public class HytaleChatModule extends ChatModule {
                             MessageDispatcher messageDispatcher,
                             ProxyRegistry proxyRegistry,
                             ListenerRegistry listenerRegistry) {
-        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

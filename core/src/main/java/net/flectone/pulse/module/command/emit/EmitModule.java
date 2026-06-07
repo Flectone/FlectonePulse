@@ -16,9 +16,12 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.emit.listener.EmitProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -44,6 +47,8 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -56,6 +61,10 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                 .required(promptType, commandParserProvider.messageParser(), typeWithMessageSuggestion())
                 .optional(promptMessage, commandParserProvider.messageParser()) // not used, only for better message help
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(EmitProxyMessageListener.class);
+        }
     }
 
     @Override

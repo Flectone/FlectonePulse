@@ -15,17 +15,18 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
+import net.flectone.pulse.module.command.tell.listener.TellProxyMessageListener;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -44,7 +45,6 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
-    private final SocialService socialService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
@@ -56,6 +56,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -66,6 +67,10 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(TellProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseTellListener.class);
     }

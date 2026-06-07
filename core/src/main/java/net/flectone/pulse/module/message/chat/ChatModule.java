@@ -21,8 +21,10 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.chat.listener.ChatProxyMessageListener;
 import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
@@ -58,6 +60,14 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     private final CooldownSender cooldownSender;
     private final MessageDispatcher messageDispatcher;
     private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
+
+    @Override
+    public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(ChatProxyMessageListener.class);
+        }
+    }
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {

@@ -20,11 +20,14 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.poll.listener.PollProxyMessageListener;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
@@ -62,6 +65,8 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     private final ModuleCommandController commandModuleController;
     private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -125,6 +130,10 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
             toRemove.forEach(pollMap::remove);
         }, 20L);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(PollProxyMessageListener.class);
+        }
     }
 
     @Override

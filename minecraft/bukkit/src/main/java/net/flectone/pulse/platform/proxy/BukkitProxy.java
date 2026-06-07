@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.platform.handler.ProxyMessageHandler;
+import net.flectone.pulse.listener.message.ProxyMessageListener;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ public class BukkitProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final Plugin plugin;
-    private final ProxyMessageHandler proxyMessageHandler;
+    private final ProxyMessageListener proxyMessageListener;
 
     private String channel;
 
@@ -41,7 +41,7 @@ public class BukkitProxy implements Proxy {
                 return;
             }
 
-            proxyMessageHandler.handleProxyMessage(message);
+            proxyMessageListener.handleProxyMessage(message);
         });
     }
 

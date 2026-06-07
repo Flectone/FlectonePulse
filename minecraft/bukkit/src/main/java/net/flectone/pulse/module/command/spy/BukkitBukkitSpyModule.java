@@ -10,6 +10,8 @@ import net.flectone.pulse.module.command.spy.listener.BukkitSpyListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -46,8 +48,10 @@ public class BukkitBukkitSpyModule extends SpyModule {
                                  TaskScheduler taskScheduler,
                                  MessageDispatcher messageDispatcher,
                                  ModuleController moduleController,
-                                 ModuleCommandController commandModuleController) {
-        super(fileFacade, socialService, permissionChecker, messageDispatcher, moduleController, commandModuleController);
+                                 ModuleCommandController commandModuleController,
+                                 ProxyRegistry proxyRegistry,
+                                 ListenerRegistry listenerRegistry) {
+        super(fileFacade, socialService, permissionChecker, messageDispatcher, moduleController, commandModuleController, proxyRegistry, listenerRegistry);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;

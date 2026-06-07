@@ -10,9 +10,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
+import net.flectone.pulse.module.command.chatsetting.listener.ChatsettingProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -46,6 +48,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
@@ -57,7 +60,8 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                                 SoundPlayer soundPlayer,
                                 TaskScheduler taskScheduler,
                                 ModuleController moduleController,
-                                ModuleCommandController commandModuleController) {
+                                ModuleCommandController commandModuleController,
+                                ListenerRegistry listenerRegistry) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
         this.socialService = socialService;
@@ -69,6 +73,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         this.taskScheduler = taskScheduler;
         this.moduleController = moduleController;
         this.commandModuleController = commandModuleController;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -82,6 +87,10 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(ChatsettingProxyMessageListener.class);
+        }
     }
 
     @Override

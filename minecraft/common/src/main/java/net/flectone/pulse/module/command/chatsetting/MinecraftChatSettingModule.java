@@ -11,6 +11,7 @@ import net.flectone.pulse.module.command.chatsetting.builder.MinecraftInventoryM
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -40,8 +41,9 @@ public class MinecraftChatSettingModule extends ChatsettingModule {
                                       ModuleCommandController commandModuleController,
                                       Provider<MinecraftDialogMenuBuilder> dialogMenuBuilderProvider,
                                       Provider<MinecraftInventoryMenuBuilder> inventoryMenuBuilderProvider,
-                                      @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6) {
-        super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController);
+                                      @Named("isNewerThanOrEqualsV_1_21_6") boolean isNewerThanOrEqualsV_1_21_6,
+                                      ListenerRegistry listenerRegistry) {
+        super(fileFacade, fPlayerService, socialService, permissionChecker, commandParserProvider, proxySender, proxyRegistry, soundPlayer, taskScheduler, moduleController, commandModuleController, listenerRegistry);
 
         this.isNewerThanOrEqualsV_1_21_6 = isNewerThanOrEqualsV_1_21_6;
         this.dialogMenuBuilderProvider = dialogMenuBuilderProvider;

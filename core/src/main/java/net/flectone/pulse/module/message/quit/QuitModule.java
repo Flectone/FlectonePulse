@@ -18,6 +18,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.PulseQuitListener;
+import net.flectone.pulse.module.message.quit.listener.QuitProxyMessageListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -52,6 +53,10 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
 
     @Override
     public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(QuitProxyMessageListener.class);
+        }
+
         listenerRegistry.register(PulseQuitListener.class);
     }
 

@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.service.FPlayerService;
@@ -60,8 +61,11 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ModerationService moderationService,
                                       ProxySender proxySender,
                                       ModerationMessageFormatter moderationMessageFormatter,
-                                      MinecraftServerStatusFormatter serverStatusFormatter) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil, commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter);
+                                      MinecraftServerStatusFormatter serverStatusFormatter,
+                                      ProxyRegistry proxyRegistry) {
+        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter,
+                fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil,
+                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry);
 
         this.fPlayerService = fPlayerService;
         this.moduleController = moduleController;

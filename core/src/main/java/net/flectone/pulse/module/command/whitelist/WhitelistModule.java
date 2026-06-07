@@ -23,6 +23,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.whitelist.listener.PulseWhitelistListener;
+import net.flectone.pulse.module.command.whitelist.listener.WhitelistProxyMessageListener;
 import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -32,6 +33,7 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ModerationListSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
@@ -86,6 +88,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private final UUIDParser uuidParser;
     private final Gson gson;
     private final FLogger fLogger;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -107,6 +110,10 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
                 .handler(this)
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(WhitelistProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseWhitelistListener.class);
 

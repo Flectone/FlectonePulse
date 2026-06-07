@@ -12,6 +12,8 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
@@ -38,8 +40,10 @@ public class MinecraftPollModule extends PollModule {
                                FLogger fLogger,
                                ComponentSerializer componentSerializer,
                                MinecraftPacketProvider packetProvider,
-                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, componentSerializer, fLogger);
+                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider,
+                               ListenerRegistry listenerRegistry,
+                               ProxyRegistry proxyRegistry) {
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, componentSerializer, fLogger, proxyRegistry, listenerRegistry);
 
         this.commandModuleController = commandModuleController;
         this.packetProvider = packetProvider;

@@ -14,11 +14,14 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.clearchat.listener.ClearchatProxyMessageListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -42,6 +45,8 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final RangeFilter rangeFilter;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -50,6 +55,10 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
                 .permission(permission().name())
                 .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission().other()))
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(ClearchatProxyMessageListener.class);
+        }
     }
 
     @Override

@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.nickname.listener.NicknameProxyMessageListener;
 import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -85,6 +86,10 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(NicknameProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseNicknameListener.class);
     }

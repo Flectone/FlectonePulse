@@ -11,6 +11,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
@@ -33,8 +34,9 @@ public class BukkitAfkModule extends AfkModule {
                            ModuleController moduleController,
                            TimeFormatter timeFormatter,
                            PlaytimeService playtimeService,
-                           SocialService socialService) {
-        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService, socialService);
+                           SocialService socialService,
+                           ProxyRegistry proxyRegistry) {
+        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService, socialService, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

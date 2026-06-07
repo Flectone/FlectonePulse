@@ -17,9 +17,11 @@ import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.join.listener.JoinProxyMessageListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
@@ -47,6 +49,14 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     private final PlaytimeService playtimeService;
     private final EventDispatcher eventDispatcher;
     private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
+
+    @Override
+    public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(JoinProxyMessageListener.class);
+        }
+    }
 
     @Override
     public ModuleName name() {

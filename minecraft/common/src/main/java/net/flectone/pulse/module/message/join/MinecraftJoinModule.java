@@ -32,7 +32,7 @@ public class MinecraftJoinModule extends JoinModule {
                                PlaytimeService playtimeService,
                                EventDispatcher eventDispatcher,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService, playtimeService, eventDispatcher, proxyRegistry);
+        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService, playtimeService, eventDispatcher, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

@@ -44,7 +44,7 @@ public class MinecraftChatModule extends ChatModule {
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
         this.platformServerAdapter = platformServerAdapter;
@@ -52,6 +52,8 @@ public class MinecraftChatModule extends ChatModule {
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             listenerRegistry.register(MinecraftPacketChatListener.class);
         }

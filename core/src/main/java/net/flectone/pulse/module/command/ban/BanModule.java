@@ -16,6 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.ban.listener.BanProxyMessageListener;
 import net.flectone.pulse.module.command.ban.listener.PulseBanListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -23,6 +24,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -47,6 +49,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MessagePipeline messagePipeline;
     private final ProxySender proxySender;
+    private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
@@ -63,6 +66,10 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(BanProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseBanListener.class);
     }
