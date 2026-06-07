@@ -42,7 +42,7 @@ public class MaintenanceProxyMessageListener implements PulseListener {
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
-        if (event.name() != ModuleName.COMMAND_HELPER) return event;
+        if (event.name() != ModuleName.COMMAND_MAINTENANCE) return event;
         if (maintenanceModule.config().filterByServer()) return event.withProcessed(true);
         if (!moduleController.isEnable(maintenanceModule)) return event.withProcessed(true);
 
