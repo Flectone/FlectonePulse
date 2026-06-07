@@ -9,10 +9,12 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -24,6 +26,7 @@ public class PulsePlayerLoadListener implements PulseListener {
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final PlaytimeService playtimeService;
@@ -61,9 +64,11 @@ public class PulsePlayerLoadListener implements PulseListener {
         // update settings, colors, ignores cache
         socialService.invalidate(currentPlayerUUID);
 
-        // update player locale
-        String currentPlayerLocale = platformPlayerAdapter.getLocale(currentPlayerUUID);
-        socialService.updateLocale(fPlayer, currentPlayerLocale);
+        // minecraft locale will update via PacketEvents
+        if (platformServerAdapter.getPlatformType() == PlatformType.HYTALE) {
+            String currentPlayerLocale = platformPlayerAdapter.getLocale(currentPlayerUUID);
+            socialService.updateLocale(fPlayer, currentPlayerLocale);
+        }
 
         // update player server
         String currentServer = fileFacade.config().server();
