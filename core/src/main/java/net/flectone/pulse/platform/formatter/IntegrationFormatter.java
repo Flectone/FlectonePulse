@@ -117,8 +117,8 @@ public class IntegrationFormatter {
                 .message(text)
                 .flags(eventMetadata.flags())
                 .flags(
-                        new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING},
-                        new boolean[]{false, false, false}
+                        new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.INTERACTIVE_CHAT_COMPAT},
+                        new boolean[]{false, false, false, false}
                 );
 
         TagResolver[] tagResolvers = eventMetadata.resolveTags(FPlayer.UNKNOWN);
