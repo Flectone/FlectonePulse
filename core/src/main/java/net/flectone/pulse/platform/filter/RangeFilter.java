@@ -42,7 +42,7 @@ public class RangeFilter {
         }
 
         return fReceiver -> {
-            if (fReceiver.isUnknown()) return true;
+            if (fReceiver.isUnknown() || fReceiver.isConsole()) return true;
             if (socialService.isIgnored(fReceiver, fPlayer)) return false;
 
             return switch (range.type()) {
