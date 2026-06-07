@@ -117,14 +117,14 @@ public class FlectonePulseAPI {
         // add console to database and cache
         fPlayerService.addConsole();
 
+        // enable proxy registry
+        instance.get(ProxyRegistry.class).onEnable();
+
         // init modules and their children
         instance.get(ModuleController.class).initialize();
 
         // reload fplayer service
         fPlayerService.initialize(false);
-
-        // enable proxy registry
-        instance.get(ProxyRegistry.class).onEnable();
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
