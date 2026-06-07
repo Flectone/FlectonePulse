@@ -87,9 +87,20 @@ public interface TaskScheduler {
      * Runs a repeating task for all platform players, executes asynchronously.
      *
      * @param fPlayerConsumer the consumer to apply to each player
-     * @param delay the period between executions in ticks
+     * @param delay the initial delay in ticks
+     * @param period period in ticks
      */
-    void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay);
+    void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay, long period);
+
+    /**
+     * Runs a repeating task for all platform players, executes asynchronously.
+     *
+     * @param fPlayerConsumer the consumer to apply to each player
+     * @param period period in ticks
+     */
+    default void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long period) {
+        runPlayerAsyncTimer(fPlayerConsumer, 5L, period);
+    }
 
     /**
      * Checks if the scheduler is currently in a disabled state.

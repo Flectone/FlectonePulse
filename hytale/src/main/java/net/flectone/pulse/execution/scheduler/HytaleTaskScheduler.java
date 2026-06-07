@@ -134,8 +134,8 @@ public class HytaleTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay) {
-        runAsyncTimer(() -> fPlayerServiceProvider.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay);
+    public void runPlayerAsyncTimer(Consumer<FPlayer> fPlayerConsumer, long delay, long period) {
+        runAsyncTimer(() -> fPlayerServiceProvider.get().getPlatformFPlayers().forEach(fPlayerConsumer), delay, period);
     }
 
     @Override
