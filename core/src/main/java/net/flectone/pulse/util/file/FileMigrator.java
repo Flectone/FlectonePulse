@@ -1043,7 +1043,7 @@ public class FileMigrator {
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
         cacheTypes.put(CacheName.PLAYER_COLOR, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
         cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
-        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 1, TimeUnit.HOURS, 1000));
 
         return files
                 .withConfig(files.config()

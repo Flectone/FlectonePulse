@@ -147,8 +147,8 @@ cache:
       size: 1000
     PLAYER_IGNORE:
       invalidate_on_reload: true
-      duration: 10
-      time_unit: "MINUTES"
+      duration: 1
+      time_unit: "HOURS"
       size: 1000
 metrics:
   enable: true
