@@ -17,9 +17,11 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 
 @Singleton
@@ -29,22 +31,32 @@ public class PulseAfkListener implements PulseListener {
     private final AfkModule afkModule;
     private final SocialService socialService;
     private final TaskScheduler taskScheduler;
+    private final PlatformServerAdapter platformServerAdapter;
 
     @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
         String messageType = event.moduleName().name();
 
-        // check only sender-based message types
+        // for bukkit, we check this manually
+        if (platformServerAdapter.getPlatformType() == PlatformType.BUKKIT) return;
+
+        // check only chat and command messages
         if (event.moduleName() != ModuleName.MESSAGE_CHAT && !messageType.startsWith("COMMAND_")) return;
+
+        // skip afk messages
+        if (event.moduleName() == ModuleName.MESSAGE_AFK || event.moduleName() == ModuleName.COMMAND_AFK) return;
 
         EventMetadata<?> eventMetadata = event.eventMetadata();
         if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;
-        if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) == null) return;
 
         int commandIndex = messageType.indexOf('_');
         String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();
 
-        taskScheduler.runAsync(() -> afkModule.removeAfk(action, fPlayer));
+        taskScheduler.runAsync(() -> {
+            if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) {
+                afkModule.removeAfk(action, fPlayer);
+            }
+        });
     }
 
     @Pulse
