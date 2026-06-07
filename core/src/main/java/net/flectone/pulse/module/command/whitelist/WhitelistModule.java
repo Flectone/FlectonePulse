@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.whitelist;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -39,17 +40,20 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
-import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +84,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private final MessagePipeline messagePipeline;
     private final ProxySender proxySender;
     private final UUIDParser uuidParser;
+    private final Gson gson;
+    private final FLogger fLogger;
 
     @Override
     public void onEnable() {
@@ -90,7 +96,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
-                .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("on", "off")))
+                .required(promptType, commandParserProvider.singleMessageParser(), SuggestionProvider.blockingStrings((_, _) -> List.of("on", "off", "import")))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
 
@@ -153,7 +159,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         boolean isPlayerCommand = commandContext.command().rootComponent().name().endsWith("player");
 
         if (action == null
-                || (action == Action.ON || action == Action.OFF) && isPlayerCommand
+                || (action == Action.ON || action == Action.OFF || action == Action.IMPORT) && isPlayerCommand
                 || (action == Action.ADD || action == Action.REMOVE || action == Action.LIST) && !isPlayerCommand) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                     .sender(fPlayer)
@@ -189,7 +195,17 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
                 turn(fPlayer, timeReasonPair.second(), timeReasonPair.first(), turned).ifPresent(this::unturnLater);
             }
-            case ADD -> actionAdd(fPlayer, commandContext);
+            case IMPORT -> actionImport(fPlayer, commandContext);
+            case ADD -> {
+                Optional<String> optionalPlayer = getPlayerNameArgument(fPlayer, commandContext);
+                if (optionalPlayer.isPresent()) {
+                    String playerName = optionalPlayer.get();
+
+                    Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
+
+                    actionAdd(fPlayer, timeReasonPair, playerName, null);
+                }
+            }
             case REMOVE -> actionRemove(fPlayer, commandContext);
             case LIST -> actionList(fPlayer, commandContext);
         }
@@ -306,17 +322,37 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }, delay);
     }
 
-    private void actionAdd(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        Optional<String> optionalPlayer = getPlayerNameArgument(fPlayer, commandContext);
-        if (optionalPlayer.isEmpty()) return;
-
-        String playerName = optionalPlayer.get();
-
-        // save new FPlayer
-        FPlayer fTarget = parseFPlayerAndSaveNew(fPlayer, playerName);
-        if (fTarget == null) return;
+    private void actionImport(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        File whitelistFile = platformServerAdapter.getWhitelistFile();
+        if (!whitelistFile.exists()) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::empty)
+                    .build()
+            );
+            return;
+        }
 
         Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
+
+        try {
+            String json = Files.readString(whitelistFile.toPath());
+            if (platformServerAdapter.getPlatformType() == PlatformType.HYTALE) {
+                gson.fromJson(json, HytaleWhitelist.class).list()
+                        .forEach(uuid -> actionAdd(fPlayer, timeReasonPair, uuid, null));
+            } else {
+                Arrays.stream(gson.fromJson(json, MinecraftWhitelistEntry[].class))
+                        .forEach(entry -> actionAdd(fPlayer, timeReasonPair, entry.uuid().toString(), entry.name()));
+            }
+        } catch (IOException e) {
+            fLogger.warning(e);
+        }
+    }
+
+    private void actionAdd(FPlayer fPlayer, Pair<Long, String> timeReasonPair, String argument, @Nullable String existingName) {
+        // save new FPlayer
+        FPlayer fTarget = parseFPlayerAndSaveNew(fPlayer, argument, existingName);
+        if (fTarget == null) return;
 
         // save whitelist moderation
         Moderation whitelist = add(fPlayer, fTarget, timeReasonPair.first(), timeReasonPair.second());
@@ -483,30 +519,25 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         return optionalTime.orElse(Pair.of(-1L, null));
     }
 
-    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
-        return (_, _) -> Arrays.stream(Action.values())
-                .map(type -> Suggestion.suggestion(type.name().toLowerCase()))
-                .toList();
-    }
-
     @Nullable
-    private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String playerName) {
-        UUID uuid = uuidParser.parse(playerName);
+    private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String argument, @Nullable String existingName) {
+        UUID uuid = uuidParser.parse(argument);
 
         boolean isUuid = uuid != null;
         if (!isUuid) {
-            playerName = StringUtils.left(playerName, 16);
+            argument = StringUtils.left(argument, 16);
         }
 
-        FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
+        FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(argument);
         if (fTarget.isConsole()) return null;
 
         if (fTarget.isUnknown()) {
             if (isUuid) {
-                // just save empty string for update in feature
-                fPlayerService.saveOrUpdate(uuid, platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : "", platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
+                // just save random string for update in feature
+                existingName = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : existingName == null ? uuid.toString() : existingName;
+                fPlayerService.saveOrUpdate(uuid, existingName, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
             } else {
-                uuid = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineUUID(playerName) : profileResolver.resolveOfflineUUID(playerName);
+                uuid = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineUUID(argument) : profileResolver.resolveOfflineUUID(argument);
                 if (uuid == null) {
                     messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
                             .sender(fPlayer)
@@ -516,7 +547,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                     return null;
                 }
 
-                fPlayerService.saveOrUpdate(uuid, playerName, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
+                fPlayerService.saveOrUpdate(uuid, argument, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
             }
 
             // invalidate cached unknown player
@@ -556,7 +587,18 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         LIST,
         OFF,
         ON,
+        IMPORT,
         REMOVE
     }
+
+    private record MinecraftWhitelistEntry(
+            UUID uuid,
+            String name
+    ){}
+
+    private record HytaleWhitelist(
+            boolean enabled,
+            List<String> list
+    ){}
 
 }
