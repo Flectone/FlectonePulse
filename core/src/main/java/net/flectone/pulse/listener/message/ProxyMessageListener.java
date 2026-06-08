@@ -90,7 +90,7 @@ public class ProxyMessageListener {
 
                         byte[] payload = proxyPayload.readAllBytes();
                         ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(name, fEntity, uuid, payload));
-                        if (!proxyMessageEvent.processed()) {
+                        if (!proxyMessageEvent.cancelled() && !proxyMessageEvent.processed()) {
                             fLogger.warning("Proxy message '%s' with UUID '%s' sent by '%s' was not processed", name, uuid.toString(), fEntity.name());
                         }
                     }
