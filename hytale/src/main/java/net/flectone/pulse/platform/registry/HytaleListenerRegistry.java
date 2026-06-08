@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.EventRegistry;
@@ -45,8 +46,8 @@ public class HytaleListenerRegistry extends ListenerRegistry {
     private final JavaPlugin javaPlugin;
     private final EventRegistry eventRegistry;
     private final TaskScheduler taskScheduler;
-    private final FPlayerService fPlayerService;
-    private final SocialService socialService;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
+    private final Provider<SocialService> socialServiceProvider;
 
     @Inject
     public HytaleListenerRegistry(FileFacade fileFacade,
@@ -54,8 +55,8 @@ public class HytaleListenerRegistry extends ListenerRegistry {
                                   Injector injector,
                                   JavaPlugin javaPlugin,
                                   TaskScheduler taskScheduler,
-                                  FPlayerService fPlayerService,
-                                  SocialService socialService) {
+                                  Provider<FPlayerService> fPlayerServiceProvider,
+                                  Provider<SocialService> socialServiceProvider) {
         super(fLogger, injector);
 
         this.fileFacade = fileFacade;
@@ -64,8 +65,8 @@ public class HytaleListenerRegistry extends ListenerRegistry {
         this.javaPlugin = javaPlugin;
         this.eventRegistry = javaPlugin.getEventRegistry();
         this.taskScheduler = taskScheduler;
-        this.fPlayerService = fPlayerService;
-        this.socialService = socialService;
+        this.fPlayerServiceProvider = fPlayerServiceProvider;
+        this.socialServiceProvider = socialServiceProvider;
     }
 
     @Override
@@ -84,9 +85,9 @@ public class HytaleListenerRegistry extends ListenerRegistry {
                             ? fileFacade.config().language().type().toLowerCase(Locale.ROOT)
                             : Strings.CS.replace(updateLanguage.language.toLowerCase(Locale.ROOT), "-", "_");
                     taskScheduler.runAsync(() -> {
-                        FPlayer fPlayer = fPlayerService.getFPlayer(playerRef.getUuid());
+                        FPlayer fPlayer = fPlayerServiceProvider.get().getFPlayer(playerRef.getUuid());
 
-                        socialService.updateLocale(fPlayer, language);
+                        socialServiceProvider.get().updateLocale(fPlayer, language);
                     });
                 }
             });

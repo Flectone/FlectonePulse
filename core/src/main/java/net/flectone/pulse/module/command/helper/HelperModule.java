@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -38,6 +39,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final IntegrationModule integrationModule;
 
     @Override
     public void onEnable() {
@@ -62,9 +64,12 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        Predicate<FPlayer> filter = getFilterSee();
+        List<FPlayer> recipients = fPlayerService.getOnlineFPlayers()
+                .stream()
+                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .filter(getFilterSee())
+                .toList();
 
-        List<FPlayer> recipients = fPlayerService.getVisibleFPlayersFor(fPlayer).stream().filter(filter).toList();
         if (recipients.isEmpty() && config().nullHelper()) {
             boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
                     .noneMatch(online -> permissionChecker.check(online, permission().see()));
@@ -95,7 +100,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
                 .destination(config().destination())
                 .range(config().range())
                 .message(message)
-                .filter(filter)
+                .filter(getFilterSee())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .sound(soundOrThrow())

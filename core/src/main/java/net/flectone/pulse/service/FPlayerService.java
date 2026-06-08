@@ -8,7 +8,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
@@ -43,7 +42,6 @@ public class FPlayerService {
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerRepository fPlayerRepository;
-    private final IntegrationModule integrationModule;
     private final RandomGenerator randomUtil;
     private final EventDispatcher eventDispatcher;
 
@@ -343,20 +341,6 @@ public class FPlayerService {
     @NonNull
     public List<FPlayer> getOnlineFPlayers() {
         return fPlayerRepository.getOnlinePlayers();
-    }
-
-    /**
-     * Gets all online players visible to a specific viewer, filtering out vanished players.
-     *
-     * @param fViewer the player who is viewing
-     * @return list of online players that the viewer can see
-     */
-    @NonNull
-    public List<FPlayer> getVisibleFPlayersFor(FPlayer fViewer) {
-        return getOnlineFPlayers()
-                .stream()
-                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fViewer))
-                .toList();
     }
 
     /**

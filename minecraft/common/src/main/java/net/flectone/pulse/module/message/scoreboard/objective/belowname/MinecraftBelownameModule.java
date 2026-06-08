@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.scoreboard.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPulseBelownameListener;
@@ -31,6 +32,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     private final MinecraftObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
+    private final IntegrationModule integrationModule;
 
     @Override
     public void onEnable() {
@@ -81,12 +83,14 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     public void updateScore(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
-            Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
-            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
+        fPlayerService.getOnlineFPlayers().stream()
+                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .forEach(fObjective -> {
+                    Localization.Message.Scoreboard.Objective.Belowname localization = localization(fPlayer);
+                    Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
 
-            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
-        });
+                    objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.BELOWNAME);
+                });
     }
 
     public void remove(FPlayer fPlayer) {

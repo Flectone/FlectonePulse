@@ -16,6 +16,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.status.icon.MinecraftIconModule;
 import net.flectone.pulse.module.message.status.listener.MinecraftPacketStatusListener;
 import net.flectone.pulse.module.message.status.motd.MinecraftMOTDModule;
@@ -46,6 +47,7 @@ public class MinecraftStatusModule extends StatusModule {
     private final EventDispatcher eventDispatcher;
     private final ModuleController moduleController;
     private final MinecraftServerStatusFormatter statusUtil;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
@@ -59,7 +61,8 @@ public class MinecraftStatusModule extends StatusModule {
                                  MinecraftPacketProvider packetProvider,
                                  EventDispatcher eventDispatcher,
                                  ModuleController moduleController,
-                                 MinecraftServerStatusFormatter statusUtil) {
+                                 MinecraftServerStatusFormatter statusUtil,
+                                 IntegrationModule integrationModule) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -73,6 +76,7 @@ public class MinecraftStatusModule extends StatusModule {
         this.eventDispatcher = eventDispatcher;
         this.moduleController = moduleController;
         this.statusUtil = statusUtil;
+        this.integrationModule = integrationModule;
     }
 
     @Override
@@ -156,7 +160,10 @@ public class MinecraftStatusModule extends StatusModule {
         List<Localization.Message.Status.Players.Sample> samples = playersModule.getSamples(fPlayer);
         samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample("<players>", null)) : samples;
 
-        Collection<FPlayer> onlineFPlayers = fPlayerService.getVisibleFPlayersFor(fPlayer);
+        Collection<FPlayer> onlineFPlayers = fPlayerService.getOnlineFPlayers().stream()
+                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .toList();
+
         samples.forEach(sample -> {
             if ("<players>".equalsIgnoreCase(sample.name())) {
                 onlineFPlayers.forEach(player -> {
