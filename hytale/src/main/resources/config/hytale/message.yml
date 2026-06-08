@@ -5,8 +5,7 @@ afk:
   range: "SERVER"
   delay: 36000
   radius: 1.0
-  ignore:
-  - "afk"
+  ignore: []
   destination:
     type: "CHAT"
   ticker:

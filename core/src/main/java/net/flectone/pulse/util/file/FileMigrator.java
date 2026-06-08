@@ -1045,12 +1045,20 @@ public class FileMigrator {
         cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
         cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 1, TimeUnit.HOURS, 1000));
 
+        List<String> ignore = new LinkedList<>(files.message().afk().ignore());
+        ignore.remove("afk");
+
         return files
                 .withConfig(files.config()
-                .withCache(files.config().cache()
-                        .withTypes(cacheTypes)
+                        .withCache(files.config().cache()
+                                .withTypes(cacheTypes)
+                        )
                 )
-        );
+                .withMessage(files.message()
+                        .withAfk(files.message().afk()
+                                .withIgnore(ignore)
+                        )
+                );
     }
 
 }
