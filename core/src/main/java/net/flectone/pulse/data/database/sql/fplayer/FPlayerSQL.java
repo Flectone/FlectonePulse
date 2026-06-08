@@ -53,7 +53,7 @@ public interface FPlayerSQL extends SQL {
      * @param id the player database ID
      * @return optional containing player info if found
      */
-    @SqlQuery("SELECT p.*, s.`type`, s.`value` FROM `fp_player` p WHERE p.`id` = :id")
+    @SqlQuery("SELECT * FROM `fp_player` p WHERE p.`id` = :id")
     Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
 
     /**
