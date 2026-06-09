@@ -39,7 +39,7 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
         if (!fileFacade.integration().supervanish().showFakeQuit()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
-        quitModule.send(fPlayer, false);
+        quitModule.send(fPlayer, true);
 
         event.setSilent(true);
     }
@@ -50,7 +50,7 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
         if (!fileFacade.integration().supervanish().showFakeJoin()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
-        joinModule.send(fPlayer, false);
+        joinModule.send(fPlayer, true);
 
         event.setSilent(true);
     }

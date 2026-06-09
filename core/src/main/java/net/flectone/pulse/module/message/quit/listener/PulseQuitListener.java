@@ -21,7 +21,7 @@ public class PulseQuitListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.LOW)
     public void onDisableEvent(DisableEvent event) {
-        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> quitModule.send(fPlayer, true));
+        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> quitModule.send(fPlayer, false));
     }
 
     @Pulse
