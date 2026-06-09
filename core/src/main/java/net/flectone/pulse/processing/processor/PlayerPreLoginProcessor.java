@@ -32,6 +32,13 @@ public class PlayerPreLoginProcessor {
         }
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+
+        // if player is unknown, then he is not in database and has never been on the server before this moment,
+        // then need to update his name to display messages correctly
+        if (fPlayer.isUnknown()) {
+            fPlayer = fPlayerService.updateCache(fPlayer.withName(name));
+        }
+
         PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
         if (!event.allowed()) {
             fPlayerService.invalidateOnlineCache(fPlayer.uuid());
