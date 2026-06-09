@@ -17,6 +17,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -43,6 +44,7 @@ public class VanillaProxyMessageListener implements PulseListener {
     private final Gson gson;
     private final ComponentExtractor<?> componentExtractor;
     private final SocialService socialService;
+    private final IntegrationModule integrationModule;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -59,6 +61,7 @@ public class VanillaProxyMessageListener implements PulseListener {
             ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
 
             String vanillaMessageName = vanillaMessage.name();
+            boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(vanillaModule, VanillaMetadata.<Localization.Message.Vanilla>builder()
                     .base(EventMetadata.<Localization.Message.Vanilla>builder()
@@ -68,10 +71,13 @@ public class VanillaProxyMessageListener implements PulseListener {
                             .tagResolvers(fResolver -> new TagResolver[]{vanillaModule.argumentTag(fResolver, parsedComponent)})
                             .range(Range.get(Range.Type.SERVER))
                             .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
+                            .filter(fResolver -> integrationModule.canSeeVanished(event.sender(), fResolver, vanished))
                             .destination(parsedComponent.vanillaMessage().destination())
                             .build()
                     )
                     .parsedComponent(parsedComponent)
+                    .fakeMessage(false)
+                    .vanished(vanished)
                     .build()
             );
         }

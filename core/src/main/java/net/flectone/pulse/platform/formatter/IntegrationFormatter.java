@@ -5,13 +5,11 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -43,7 +41,6 @@ public class IntegrationFormatter {
     private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
 
     private final MessagePipeline messagePipeline;
-    private final IntegrationModule integrationModule;
     private final ComponentSerializer componentSerializer;
 
     /**
@@ -53,8 +50,7 @@ public class IntegrationFormatter {
      * @return true if the sender is vanished and vanish should not be ignored, false otherwise
      */
     public boolean isVanished(EventMetadata<?> eventMetadata) {
-        FEntity sender = eventMetadata.sender();
-        return eventMetadata instanceof VanishMetadata<?> vanishMetadata && !vanishMetadata.ignoreVanish() && integrationModule.isVanished(sender);
+        return eventMetadata instanceof VanishMetadata<?> vanishMetadata && vanishMetadata.fakeMessage() && vanishMetadata.vanished();
     }
 
     /**

@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 public record JoinMetadata<L extends LocalizationSetting>(
         @NonNull BaseEventMetadata<L> base,
         boolean playedBefore,
-        boolean ignoreVanish
+        boolean fakeMessage,
+        boolean vanished
 ) implements VanishMetadata<L> {
 }

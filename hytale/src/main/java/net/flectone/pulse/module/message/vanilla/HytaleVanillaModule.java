@@ -100,15 +100,15 @@ public class HytaleVanillaModule extends VanillaModule {
         Range range = parsedComponent.vanillaMessage().range();
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
+        boolean vanished = integrationModule.isVanished(fPlayer);
         messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
                         .sender(fPlayer)
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
-                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver)
-                                && (vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                        )
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
+                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver, vanished))
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
@@ -120,11 +120,13 @@ public class HytaleVanillaModule extends VanillaModule {
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(parsedComponent.translationKey());
                             dataOutputStream.writeAsJson(parsedComponent.arguments());
+                            dataOutputStream.writeBoolean(vanished);
                         })
                         .build()
                 )
                 .parsedComponent(parsedComponent)
-                .ignoreVanish(false)
+                .fakeMessage(false)
+                .vanished(vanished)
                 .build()
         );
     }

@@ -302,7 +302,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
                         .build()
                 )
                 .newStatus(isAfk)
-                .checkVanish(true)
+                .fakeMessage(false)
                 .vanished(vanished)
                 .build()
         );

@@ -4,6 +4,8 @@ import net.flectone.pulse.config.setting.LocalizationSetting;
 
 public interface VanishMetadata<L extends LocalizationSetting> extends EventMetadata<L> {
 
-    boolean ignoreVanish();
+    boolean fakeMessage();
+
+    boolean vanished();
 
 }

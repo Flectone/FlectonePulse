@@ -168,10 +168,13 @@ public abstract class IntegrationModule implements ModuleSimple {
     }
 
     public boolean canSeeVanished(FEntity fTarget, FEntity fViewer) {
+        return canSeeVanished(fTarget, fViewer, isVanished(fTarget));
+    }
+
+    public boolean canSeeVanished(FEntity fTarget, FEntity fViewer, boolean targetVanished) {
         if (fTarget.equals(fViewer)) return true;
 
-        boolean isVanished = isVanished(fTarget);
-        return !isVanished || hasSeeVanishPermission(fViewer);
+        return !targetVanished || hasSeeVanishPermission(fViewer);
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {

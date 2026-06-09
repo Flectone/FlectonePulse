@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -26,6 +27,7 @@ public class QuitProxyMessageListener implements PulseListener {
     private final QuitModule quitModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final IntegrationModule integrationModule;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -34,7 +36,8 @@ public class QuitProxyMessageListener implements PulseListener {
         if (moduleController.isDisabledFor(quitModule, event.sender())) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
-            boolean ignoreVanish = proxyPayload.readBoolean();
+            boolean fakeMessage = proxyPayload.readBoolean();
+            boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(quitModule, QuitMetadata.<Localization.Message.Quit>builder()
                     .base(EventMetadata.<Localization.Message.Quit>builder()
@@ -44,9 +47,11 @@ public class QuitProxyMessageListener implements PulseListener {
                             .destination(quitModule.config().destination())
                             .range(Range.get(Range.Type.SERVER))
                             .sound(quitModule.soundOrThrow())
+                            .filter(fReceiver -> fakeMessage || integrationModule.canSeeVanished(event.sender(), fReceiver, vanished))
                             .build()
                     )
-                    .ignoreVanish(ignoreVanish)
+                    .fakeMessage(fakeMessage)
+                    .vanished(vanished)
                     .build()
             );
         }

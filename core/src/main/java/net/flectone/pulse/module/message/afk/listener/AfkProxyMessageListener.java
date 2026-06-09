@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -26,6 +27,7 @@ public class AfkProxyMessageListener implements PulseListener {
     private final AfkModule afkModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final IntegrationModule integrationModule;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -35,6 +37,7 @@ public class AfkProxyMessageListener implements PulseListener {
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
             boolean isAfk = proxyPayload.readBoolean();
+            boolean vanished = proxyPayload.readBoolean();
 
             messageDispatcher.dispatch(afkModule, AFKMetadata.<Localization.Message.Afk>builder()
                     .base(EventMetadata.<Localization.Message.Afk>builder()
@@ -47,9 +50,12 @@ public class AfkProxyMessageListener implements PulseListener {
                             .range(Range.get(Range.Type.SERVER))
                             .destination(afkModule.config().destination())
                             .sound(afkModule.soundOrThrow())
+                            .filter(fReceiver -> integrationModule.canSeeVanished(event.sender(), fReceiver, vanished))
                             .build()
                     )
                     .newStatus(isAfk)
+                    .fakeMessage(false)
+                    .vanished(vanished)
                     .build()
             );
         }
