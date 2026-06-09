@@ -33,8 +33,8 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.List;
@@ -92,7 +92,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
-        long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
+        long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
@@ -123,13 +123,13 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
         }
 
         long databaseTime = time + System.currentTimeMillis();
-        String reason = timeReasonPair.second();
+        String reason = timeReasonPair.getRight();
 
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.id());
         if (mute == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MUTE);
         }
 
         EventMetadata.Builder<Localization.Command.Mute> baseMetadataBuilder = EventMetadata.<Localization.Command.Mute>builder()

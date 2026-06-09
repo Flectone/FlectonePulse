@@ -6,7 +6,7 @@ import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.Strings;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -168,8 +168,8 @@ public class TicTacToe {
         Pair<Integer, Integer> rowColumn = parseMove(move);
         if (rowColumn == null) return false;
 
-        int row = rowColumn.first();
-        int column = rowColumn.second();
+        int row = rowColumn.getLeft();
+        int column = rowColumn.getRight();
 
         if (field[row][column] != 0) {
             return false;
@@ -201,7 +201,7 @@ public class TicTacToe {
             Pair<Integer, Integer> rowColumn = parseMove(move);
             if (rowColumn == null) return;
 
-            field[rowColumn.first()][rowColumn.second()] = 0;
+            field[rowColumn.getLeft()][rowColumn.getRight()] = 0;
         }
 
         String nextRemove = moves.peek();
@@ -210,7 +210,7 @@ public class TicTacToe {
         Pair<Integer, Integer> rowColumn = parseMove(nextRemove);
         if (rowColumn == null) return;
 
-        field[rowColumn.first()][rowColumn.second()] = REMOVE_MULTIPLIER * currentPlayerValue;
+        field[rowColumn.getLeft()][rowColumn.getRight()] = REMOVE_MULTIPLIER * currentPlayerValue;
     }
 
     private @Nullable Pair<Integer, Integer> parseMove(String move) {

@@ -32,6 +32,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -39,7 +40,6 @@ import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.CachedServerIcon;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -101,7 +101,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
 
         try {
-            double[] recentTps = (double[]) getTPSMethodPair.first().invoke(getTPSMethodPair.second());
+            double[] recentTps = (double[]) getTPSMethodPair.getLeft().invoke(getTPSMethodPair.getRight());
             double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
             return String.valueOf(tps);
         } catch (Throwable _) {

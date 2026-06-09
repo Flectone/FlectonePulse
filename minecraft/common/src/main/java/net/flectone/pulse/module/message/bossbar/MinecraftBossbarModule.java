@@ -25,7 +25,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.UUID;
 

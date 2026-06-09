@@ -31,8 +31,8 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -90,8 +90,8 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
 
-        long time = timeReasonPair.first();
-        String reason = timeReasonPair.second();
+        long time = timeReasonPair.getLeft();
+        String reason = timeReasonPair.getRight();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
@@ -155,7 +155,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
         if (moderation == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_BAN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_BAN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Ban> baseMetadataBuilder = EventMetadata.<Localization.Command.Ban>builder()

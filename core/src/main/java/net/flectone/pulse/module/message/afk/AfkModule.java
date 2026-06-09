@@ -35,7 +35,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -167,7 +167,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         if (StringUtils.isEmpty(socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX))) return 0;
 
         Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
-        return timeCoordinates != null ? (int) (System.currentTimeMillis() - timeCoordinates.first()) / 1000 : 0;
+        return timeCoordinates != null ? (int) (System.currentTimeMillis() - timeCoordinates.getLeft()) / 1000 : 0;
     }
 
     @NonNull
@@ -220,7 +220,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         // compare last and current coordinates
         Pair<Long, PlatformPlayerAdapter.Coordinates> timeCoordinates = playersCoordinates.get(fPlayer.uuid());
-        if (timeCoordinates == null || !isSameCoordinates(timeCoordinates.second(), coordinates)) {
+        if (timeCoordinates == null || !isSameCoordinates(timeCoordinates.getRight(), coordinates)) {
             // remove afk suffix if present
             if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) {
                 removeAfkSetting(fPlayer);
@@ -233,15 +233,15 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             return;
         }
 
-        if (!timeCoordinates.second().equals(coordinates)) {
-            playersCoordinates.put(fPlayer.uuid(), Pair.of(timeCoordinates.first(), platformPlayerAdapter.getCoordinates(fPlayer)));
+        if (!timeCoordinates.getRight().equals(coordinates)) {
+            playersCoordinates.put(fPlayer.uuid(), Pair.of(timeCoordinates.getLeft(), platformPlayerAdapter.getCoordinates(fPlayer)));
         }
 
         // skip afk players
         if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) return;
 
         // skip not full afk players
-        if (currentTime - timeCoordinates.first() < config().delay() * TimeFormatter.MULTIPLIER) return;
+        if (currentTime - timeCoordinates.getLeft() < config().delay() * TimeFormatter.MULTIPLIER) return;
 
         // update afk suffix
         addAfkSetting(fPlayer);
@@ -279,6 +279,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             return;
         }
 
+        boolean vanished = integrationModule.isVanished(fPlayer);
         messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
                 .base(EventMetadata.<Localization.Message.Afk>builder()
                         .sender(fPlayer)
@@ -290,7 +291,10 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
-                        .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
+                        .proxy(dataOutputStream -> {
+                            dataOutputStream.writeBoolean(isAfk);
+                            dataOutputStream.writeBoolean(vanished);
+                        })
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(List.of(name().name() + "_" + String.valueOf(isAfk).toUpperCase()))
                                 .build()
@@ -298,7 +302,8 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
                         .build()
                 )
                 .newStatus(isAfk)
-                .ignoreVanish(false)
+                .checkVanish(true)
+                .vanished(vanished)
                 .build()
         );
     }

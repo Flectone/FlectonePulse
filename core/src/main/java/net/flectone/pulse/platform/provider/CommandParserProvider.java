@@ -18,6 +18,7 @@ import net.flectone.pulse.processing.parser.player.PlayerParser;
 import net.flectone.pulse.processing.parser.string.MessageParser;
 import net.flectone.pulse.processing.parser.string.SingleMessageParser;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import org.apache.commons.lang3.tuple.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.standard.BooleanParser;
@@ -25,7 +26,6 @@ import org.incendo.cloud.parser.standard.DurationParser;
 import org.incendo.cloud.parser.standard.IntegerParser;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
-import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.List;

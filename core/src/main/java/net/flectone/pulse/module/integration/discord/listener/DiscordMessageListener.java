@@ -16,7 +16,7 @@ import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;

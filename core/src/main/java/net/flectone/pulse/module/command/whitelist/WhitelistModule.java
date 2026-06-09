@@ -47,9 +47,9 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -200,7 +200,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
                 Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
 
-                turn(fPlayer, timeReasonPair.second(), timeReasonPair.first(), turned).ifPresent(this::unturnLater);
+                turn(fPlayer, timeReasonPair.getRight(), timeReasonPair.getLeft(), turned).ifPresent(this::unturnLater);
             }
             case IMPORT -> actionImport(fPlayer, commandContext);
             case ADD -> {
@@ -263,7 +263,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (moderation == null) return Optional.empty();
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
@@ -362,11 +362,11 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (fTarget == null) return;
 
         // save whitelist moderation
-        Moderation whitelist = add(fPlayer, fTarget, timeReasonPair.first(), timeReasonPair.second());
+        Moderation whitelist = add(fPlayer, fTarget, timeReasonPair.getLeft(), timeReasonPair.getRight());
         if (whitelist == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST);
         }
 
         EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
@@ -422,8 +422,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         Pair<Long, String> timeReasonPair = getTimeReasonArgument(commandContext);
 
-        long time = timeReasonPair.first();
-        String reason = timeReasonPair.second();
+        long time = timeReasonPair.getLeft();
+        String reason = timeReasonPair.getRight();
         if (time != -1) {
             reason = reason != null ? time + " " + reason : String.valueOf(time);
         } else if (reason == null) {
@@ -454,7 +454,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (unwhitelist == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WHITELIST);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST);
         }
 
         EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()

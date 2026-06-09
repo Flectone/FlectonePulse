@@ -18,7 +18,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
@@ -76,13 +76,13 @@ public class CooldownSender {
      * @return true if cooldown message was sent, false otherwise
      */
     public boolean sendIfCooldown(FEntity entity, Pair<Cooldown, PermissionSetting> cooldownPermission, String cooldownOwner) {
-        Cooldown cooldown = cooldownPermission.first();
+        Cooldown cooldown = cooldownPermission.getLeft();
         if (cooldown == null || !cooldown.enable()) return false;
 
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return false;
 
-        if (permissionChecker.check(fPlayer, cooldownPermission.second())) return false;
+        if (permissionChecker.check(fPlayer, cooldownPermission.getRight())) return false;
         if (!cooldownChecker.check(fPlayer.uuid(), cooldown, cooldownOwner)) return false;
 
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);

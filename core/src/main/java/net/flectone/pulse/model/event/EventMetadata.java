@@ -11,7 +11,7 @@ import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -41,10 +41,10 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -153,8 +153,8 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
 
-        long time = timeReasonPair.first() == -1 ? -1 : timeReasonPair.first();
-        String reason = timeReasonPair.second();
+        long time = timeReasonPair.getLeft() == -1 ? -1 : timeReasonPair.getLeft();
+        String reason = timeReasonPair.getRight();
 
         turn(fPlayer, reason, time, turned).ifPresent(this::unturnLater);
     }
@@ -210,7 +210,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
         if (moderation == null) return Optional.empty();
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Maintenance> baseMetadataBuilder = EventMetadata.<Localization.Command.Maintenance>builder()

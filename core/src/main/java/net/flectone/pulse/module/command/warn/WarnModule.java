@@ -31,8 +31,8 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.List;
@@ -88,7 +88,7 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
-        long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
+        long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
@@ -121,13 +121,13 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         }
 
         long databaseTime = time + System.currentTimeMillis();
-        String reason = timeReasonPair.second();
+        String reason = timeReasonPair.getRight();
 
         Moderation moderation = moderationService.warn(fTarget, databaseTime, reason, fPlayer.id());
         if (moderation == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Warn> baseMetadataBuilder = EventMetadata.<Localization.Command.Warn>builder()

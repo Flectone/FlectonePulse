@@ -11,7 +11,7 @@ import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
 import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
 import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.util.logging.FLogger;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;

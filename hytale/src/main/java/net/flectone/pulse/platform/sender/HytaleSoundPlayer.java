@@ -18,7 +18,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Vector3d;
 
 import java.util.Arrays;
@@ -34,9 +34,9 @@ public class HytaleSoundPlayer implements SoundPlayer {
     public void play(Pair<Sound, PermissionSetting> soundPermission, FEntity sender, FPlayer receiver) {
         if (soundPermission == null) return;
 
-        Sound sound = soundPermission.first();
+        Sound sound = soundPermission.getLeft();
         if (sound == null || !sound.enable()) return;
-        if (!permissionChecker.check(sender, soundPermission.second())) return;
+        if (!permissionChecker.check(sender, soundPermission.getRight())) return;
 
         Object player = platformPlayerAdapter.convertToPlatformPlayer(receiver);
         if (!(player instanceof PlayerRef playerRef)) return;
