@@ -99,8 +99,11 @@ public class FlectonePulseAPI {
         // init command registry
         instance.get(CommandRegistry.class).init();
 
+        // enable proxy registry
+        instance.get(ProxyRegistry.class).onEnable();
+
         // register default listeners
-        instance.get(ListenerRegistry.class).registerDefaultListeners();
+        instance.get(ListenerRegistry.class).onEnable();
 
         // setup filter
         instance.get(LogFilter.class).setFilters(fileFacade.config().logger().filter());
@@ -116,9 +119,6 @@ public class FlectonePulseAPI {
 
         // add console to database and cache
         fPlayerService.addConsole();
-
-        // enable proxy registry
-        instance.get(ProxyRegistry.class).onEnable();
 
         // init modules and their children
         instance.get(ModuleController.class).initialize();
@@ -323,11 +323,11 @@ public class FlectonePulseAPI {
         // start scheduler
         taskScheduler.start();
 
-        // register default listeners
-        listenerRegistry.onEnable();
-
         // init proxies
         proxyRegistry.onEnable();
+
+        // register default listeners
+        listenerRegistry.onEnable();
 
         // add console to database and cache
         fPlayerService.addConsole();
