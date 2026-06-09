@@ -1,5 +1,6 @@
 package net.flectone.pulse;
 
+import net.flectone.pulse.listener.BungeecordLoginStateListener;
 import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;

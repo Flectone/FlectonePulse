@@ -12,6 +12,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import net.flectone.pulse.listener.VelocityLoginStateListener;
 import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;

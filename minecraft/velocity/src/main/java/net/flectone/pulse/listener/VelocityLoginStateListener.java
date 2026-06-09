@@ -1,4 +1,4 @@
-package net.flectone.pulse;
+package net.flectone.pulse.listener;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;

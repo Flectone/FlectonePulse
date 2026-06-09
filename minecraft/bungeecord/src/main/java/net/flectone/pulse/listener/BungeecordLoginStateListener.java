@@ -1,4 +1,4 @@
-package net.flectone.pulse;
+package net.flectone.pulse.listener;
 
 
 import net.flectone.pulse.util.constant.LoginStatus;
