@@ -33,8 +33,9 @@ public class FabricPlayerLoginListener {
 
         GameProfile profile = ((ServerLoginPacketListenerImplAccessor) netHandler).getAuthenticatedProfile();
         UUID uuid = profile.id();
+        String name = profile.name();
 
-        playerPreLoginProcessor.process(uuid, loginEvent -> {
+        playerPreLoginProcessor.processLogin(uuid, name, loginEvent -> {
             Component reason = loginEvent.kickReason();
             JsonElement jsonElement = componentSerializer.toJsonTree(reason);
 

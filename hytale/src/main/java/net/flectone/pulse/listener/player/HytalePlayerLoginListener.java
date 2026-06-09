@@ -21,7 +21,8 @@ public class HytalePlayerLoginListener implements HytaleListener {
         if (event.isCancelled()) return;
 
         UUID uuid = event.getUuid();
-        playerPreLoginProcessor.process(uuid, loginEvent -> {
+        String playerName = event.getUsername();
+        playerPreLoginProcessor.processLogin(uuid, playerName, loginEvent -> {
             event.setReason(componentSerializer.toHytale(loginEvent.kickReason()));
             event.setCancelled(true);
         });
