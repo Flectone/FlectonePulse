@@ -29,7 +29,7 @@ public class PlayerConnectedProxyMessageListener implements PulseListener {
         if (event.name() != ModuleName.PLAYER_CONNECTED) return event;
 
         if (event.sentByThisServer()) {
-            joinModule.send((FPlayer) event.sender(), true, false);
+            joinModule.send((FPlayer) event.sender(), false, false);
         } else {
             FEntity fEntity = event.sender();
             fPlayerService.invalidate(fEntity.uuid());

@@ -1,28 +1,26 @@
 package net.flectone.pulse;
 
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
-import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import com.velocitypowered.api.event.player.ServerPostConnectEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
-import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 @Plugin(
         id = "flectonepulse",
@@ -36,8 +34,7 @@ public class VelocityFlectonePulse {
 
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
-    private final Set<UUID> firstJoinPlayers = new CopyOnWriteArraySet<>();
-
+    private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
 
     private final ProxyServer proxyServer;
     private final FLogger fLogger;
@@ -63,13 +60,6 @@ public class VelocityFlectonePulse {
     }
 
     @Subscribe
-    public void onPluginMessageEvent(PluginMessageEvent event) {
-        if (!event.getIdentifier().equals(IDENTIFIER)) return;
-
-        ProxyMessageProcessor.validate(event.getData()).ifPresent(this::sendData);
-    }
-
-    @Subscribe
     public void onProxyShutdownEvent(ProxyShutdownEvent event) {
         fLogger.logDisabling();
 
@@ -79,48 +69,72 @@ public class VelocityFlectonePulse {
         fLogger.logDisabled();
     }
 
-    @Subscribe
-    public void onServerConnectedEvent(ServerConnectedEvent event) {
-        Player player = event.getPlayer();
-        UUID playerUUID = player.getUniqueId();
+    @Subscribe(order = PostOrder.LAST)
+    public void onServerPostConnectEvent(ServerPreConnectEvent event) {
+        if (event.getPreviousServer() != null) return;
 
-        if (event.getPreviousServer().isEmpty()) {
-            firstJoinPlayers.add(playerUUID);
-
-            proxyServer.getScheduler().buildTask(this, () -> {
-                if (!player.isActive()) {
-                    firstJoinPlayers.remove(playerUUID);
-                }
-            }).delay(1L, TimeUnit.SECONDS).schedule();
-        }
+        pendingConnections.add(event.getPlayer().getUniqueId());
     }
 
     @Subscribe
-    public void onServerPostConnectEvent(ServerPostConnectEvent event) {
-        Player player = event.getPlayer();
-        UUID playerUUID = player.getUniqueId();
+    public void onPluginMessageEvent(PluginMessageEvent event) {
+        if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
-        sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID));
+        ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(registeredServer -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)),
+                this::onBackendJoinConfirmed
+        );
 
-        if (firstJoinPlayers.remove(playerUUID)) {
-            sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID));
-        }
+        event.setResult(PluginMessageEvent.ForwardResult.handled());
+    }
+
+    private void onBackendJoinConfirmed(UUID playerUUID) {
+        if (!pendingConnections.remove(playerUUID)) return;
+
+        Optional<Player> player = proxyServer.getPlayer(playerUUID);
+        if (player.isEmpty()) return;
+
+        Optional<ServerConnection> serverConnection = player.get().getCurrentServer();
+        if (serverConnection.isEmpty()) return;
+
+        String serverName = serverConnection.get().getServerInfo().getName();
+
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(registeredServer -> ProxySender.send(
+                        ModuleName.PLAYER_CONNECTED,
+                        outputStream -> {
+                            outputStream.writeUTF(playerUUID.toString());
+                            outputStream.writeBoolean(registeredServer.getServerInfo().getName().equals(serverName));
+                        },
+                        bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
+                ));
     }
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
         UUID playerUUID = event.getPlayer().getUniqueId();
 
-        boolean connected = velocityLoginStateListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED;
-        sendData(ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID, dataOutputStream ->
-                dataOutputStream.writeBoolean(connected))
-        );
-    }
+        // clear pending connection
+        pendingConnections.remove(playerUUID);
 
-    private void sendData(byte[] data) {
-        proxyServer.getAllServers().stream()
-                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
+        if (velocityLoginStateListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED) {
+            Optional<ServerConnection> serverConnection = event.getPlayer().getCurrentServer();
+            if (serverConnection.isEmpty()) return;
+
+            String serverName = serverConnection.get().getServerInfo().getName();
+            proxyServer.getAllServers().stream()
+                    .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                    .forEach(registeredServer -> ProxySender.send(
+                            ModuleName.PLAYER_DISCONNECTED,
+                            outputStream -> {
+                                outputStream.writeUTF(playerUUID.toString());
+                                outputStream.writeBoolean(registeredServer.getServerInfo().getName().equals(serverName));
+                            },
+                            bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
+                    ));
+        }
     }
 
 }

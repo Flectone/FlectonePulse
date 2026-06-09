@@ -4,16 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -31,6 +36,9 @@ public class PulsePlayerLoadListener implements PulseListener {
     private final ModerationService moderationService;
     private final PlaytimeService playtimeService;
     private final SocialService socialService;
+    private final ProxySender proxySender;
+    private final ProxyRegistry proxyRegistry;
+    private final TaskScheduler taskScheduler;
 
     @Pulse(priority = Event.Priority.LOW)
     public PlayerLoadEvent onPlayerLoadEvent(PlayerLoadEvent event) {
@@ -81,6 +89,17 @@ public class PulsePlayerLoadListener implements PulseListener {
             playtimeService.updateLastSession(fPlayer);
         } else {
             playtimeService.updateJoinSession(fPlayer);
+        }
+
+        // confirm player connection
+        if (proxyRegistry.hasEnabledProxy()) {
+            // this must be done after 2 tick so that Bukkit has time to register a channel for the player,
+            // otherwise message may not be sent to the proxy
+            taskScheduler.runAsyncLater(() ->
+                            // send player uuid as metadata, and make sender UNKNOWN so as not to send unnecessary information
+                            proxySender.send(FEntity.unknown(), ModuleName.PLAYER_CONNECTED, _ -> {}, currentPlayerUUID),
+                    2L
+            );
         }
 
         return event.withPlayer(fPlayer);

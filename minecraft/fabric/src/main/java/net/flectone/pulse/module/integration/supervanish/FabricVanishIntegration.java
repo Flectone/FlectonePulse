@@ -39,11 +39,11 @@ public class FabricVanishIntegration implements FIntegration {
 
             if (vanish) {
                 if (fileFacade.integration().supervanish().showFakeQuit()) {
-                    quitModule.send(fPlayer, true);
+                    quitModule.send(fPlayer, false);
                 }
             } else {
                 if (fileFacade.integration().supervanish().showFakeJoin()) {
-                    joinModule.send(fPlayer, true);
+                    joinModule.send(fPlayer, false);
                 }
             }
         });
