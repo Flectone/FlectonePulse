@@ -12,14 +12,15 @@ import java.util.UUID;
 public record ProxyMessageEvent(
         boolean cancelled,
         boolean processed,
+        String server,
         ModuleName name,
         FEntity sender,
         UUID uuid,
         byte[] payload
 ) implements Event {
 
-    public ProxyMessageEvent(ModuleName name, FEntity sender, UUID uuid, byte[] payload) {
-        this(false, false, name, sender, uuid, payload);
+    public ProxyMessageEvent(String server, ModuleName name, FEntity sender, UUID uuid, byte[] payload) {
+        this(false, false, server, name, sender, uuid, payload);
     }
 
     public ProxyPayload openPayload() {

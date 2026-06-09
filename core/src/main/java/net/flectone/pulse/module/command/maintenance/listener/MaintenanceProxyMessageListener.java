@@ -21,6 +21,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -31,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceProxyMessageListener implements PulseListener {
 
+    private final FileFacade fileFacade;
     private final MaintenanceModule maintenanceModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
@@ -43,7 +45,7 @@ public class MaintenanceProxyMessageListener implements PulseListener {
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_MAINTENANCE) return event;
-        if (maintenanceModule.config().filterByServer()) return event.withProcessed(true);
+        if (maintenanceModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
         if (!moduleController.isEnable(maintenanceModule)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {

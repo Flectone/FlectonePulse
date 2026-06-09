@@ -73,23 +73,24 @@ public class ProxyMessageListener {
                     case SYSTEM_CONNECTED -> handleSystemConnected(uuid);
                     case SYSTEM_OFFLINE -> handleSystemOffline(uuid, proxyPayload.readBoolean());
                     default -> {
+                        String server = proxyPayload.readString();
+
                         Set<String> proxyClusters = gson.fromJson(proxyPayload.readString(), new TypeToken<Set<String>>() {}.getType());
+                        Set<String> configClusters = fileFacade.config().proxy().clusters();
+                        if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains) && !configClusters.contains(server)) {
+                            return;
+                        }
 
                         Optional<FEntity> optionalFEntity = proxyPayload.parseFEntity(gson, gson.fromJson(proxyPayload.readString(), JsonObject.class));
                         if (optionalFEntity.isEmpty()) return;
 
                         FEntity fEntity = optionalFEntity.get();
-                        if (handleInvalidateCache(proxyPayload, name, fEntity)) {
-                            return;
-                        }
-
-                        Set<String> configClusters = fileFacade.config().proxy().clusters();
-                        if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
+                        if (handleInvalidateCache(proxyPayload, server, name, fEntity)) {
                             return;
                         }
 
                         byte[] payload = proxyPayload.readAllBytes();
-                        ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(name, fEntity, uuid, payload));
+                        ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(server, name, fEntity, uuid, payload));
                         if (!proxyMessageEvent.cancelled() && !proxyMessageEvent.processed()) {
                             fLogger.warning("Proxy message '%s' with UUID '%s' sent by '%s' was not processed", name, uuid.toString(), fEntity.name());
                         }
@@ -131,7 +132,7 @@ public class ProxyMessageListener {
         // nothing
     }
 
-    private boolean handleInvalidateCache(ProxyPayload proxyPayload, ModuleName tag, FEntity fEntity) throws IOException {
+    private boolean handleInvalidateCache(ProxyPayload proxyPayload, String server, ModuleName tag, FEntity fEntity) throws IOException {
         return switch (tag) {
             case SYSTEM_COOLDOWN -> {
                 UUID uuid = UUID.fromString(proxyPayload.readString());
@@ -149,7 +150,7 @@ public class ProxyMessageListener {
                 yield true;
             }
             case SYSTEM_BAN -> {
-                if (!banModule.config().filterByServer()) {
+                if (!banModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.BAN);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNBAN);
 
@@ -162,14 +163,14 @@ public class ProxyMessageListener {
                 yield true;
             }
             case SYSTEM_MUTE -> {
-                if (!muteModule.config().filterByServer()) {
+                if (!muteModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MUTE);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMUTE);
                 }
                 yield true;
             }
             case SYSTEM_MAINTENANCE -> {
-                if (!maintenanceModule.config().filterByServer()) {
+                if (!maintenanceModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.MAINTENANCE);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNMAINTENANCE);
 
@@ -182,7 +183,7 @@ public class ProxyMessageListener {
                 yield true;
             }
             case SYSTEM_WARN -> {
-                if (!warnModule.config().filterByServer()) {
+                if (!warnModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.WARN);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNWARN);
 
@@ -194,7 +195,7 @@ public class ProxyMessageListener {
                 yield true;
             }
             case SYSTEM_WHITELIST -> {
-                if (!whitelistModule.config().filterByServer()) {
+                if (!whitelistModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.WHITELIST);
                     moderationService.invalidate(fEntity.uuid(), Moderation.Type.UNWHITELIST);
 
@@ -219,7 +220,7 @@ public class ProxyMessageListener {
                 yield true;
             }
             case SYSTEM_KICK -> {
-                if (!kickModule.config().filterByServer()) {
+                if (!kickModule.config().filterByServer() || server.equals(fileFacade.config().server())) {
                     Moderation moderation = gson.fromJson(proxyPayload.readString(), Moderation.class);
 
                     // give some time

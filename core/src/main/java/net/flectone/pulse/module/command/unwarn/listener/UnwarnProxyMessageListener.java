@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnwarnProxyMessageListener implements PulseListener {
 
+    private final FileFacade fileFacade;
     private final WarnModule warnModule;
     private final UnwarnModule unwarnModule;
     private final FPlayerService fPlayerService;
@@ -44,7 +46,7 @@ public class UnwarnProxyMessageListener implements PulseListener {
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_UNWARN) return event;
-        if (warnModule.config().filterByServer()) return event.withProcessed(true);
+        if (warnModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation unwarn = gson.fromJson(proxyPayload.readString(), Moderation.class);

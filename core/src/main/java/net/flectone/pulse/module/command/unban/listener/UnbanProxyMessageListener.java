@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnbanProxyMessageListener implements PulseListener {
 
+    private final FileFacade fileFacade;
     private final BanModule banModule;
     private final UnbanModule unbanModule;
     private final FPlayerService fPlayerService;
@@ -44,7 +46,7 @@ public class UnbanProxyMessageListener implements PulseListener {
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_UNBAN) return event;
-        if (banModule.config().filterByServer()) return event.withProcessed(true);
+        if (banModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation unban = gson.fromJson(proxyPayload.readString(), Moderation.class);
