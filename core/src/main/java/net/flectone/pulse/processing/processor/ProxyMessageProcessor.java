@@ -1,49 +1,80 @@
 package net.flectone.pulse.processing.processor;
 
-import lombok.experimental.UtilityClass;
-import net.flectone.pulse.util.ProxyDataConsumer;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import io.leangen.geantyref.TypeToken;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
-import org.jspecify.annotations.NonNull;
+import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.io.ProxyPayload;
+import net.flectone.pulse.util.logging.FLogger;
 
-import java.io.*;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-@UtilityClass
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxyMessageProcessor {
 
-    public byte[] create(@NonNull ModuleName tag, @NonNull UUID uuid) {
-        return create(tag, uuid, _ -> {});
+    private final FileFacade fileFacade;
+    private final FPlayerService fPlayerService;
+    private final FLogger fLogger;
+    private final Gson gson;
+    private final TaskScheduler taskScheduler;
+    private final EventDispatcher eventDispatcher;
+    private final PlatformServerAdapter platformServerAdapter;
+
+    public void process(byte[] bytes) {
+        taskScheduler.runAsync(() -> {
+            try (ProxyPayload proxyPayload = new ProxyPayload(bytes)) {
+
+                ModuleName name = ModuleName.fromProxyString(proxyPayload.readString());
+                if (name == null) return;
+
+                UUID uuid = UUID.fromString(proxyPayload.readString());
+                if (name == ModuleName.PLAYER_CONNECTED || name == ModuleName.PLAYER_DISCONNECTED) {
+                    dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, new byte[]{}));
+                    return;
+                }
+
+                String server = proxyPayload.readString();
+
+                // this parameter is always different from config value, because it is taken relative to worlds.
+                // this is to prevent user from creating two identical server
+                boolean sentByThisServer = platformServerAdapter.getServerUUID().equals(proxyPayload.readString());
+
+                Set<String> proxyClusters = gson.fromJson(proxyPayload.readString(), new TypeToken<Set<String>>() {}.getType());
+                Set<String> configClusters = fileFacade.config().proxy().clusters();
+                if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains) && !configClusters.contains(server)) {
+                    return;
+                }
+
+                Optional<FEntity> optionalFEntity = proxyPayload.parseFEntity(gson, gson.fromJson(proxyPayload.readString(), JsonObject.class));
+                if (optionalFEntity.isEmpty()) return;
+
+                byte[] payload = proxyPayload.readAllBytes();
+                FEntity fEntity = optionalFEntity.get();
+
+                dispatch(new ProxyMessageEvent(sentByThisServer, server, name, fEntity, uuid, payload));
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+        });
     }
 
-    public byte[] create(@NonNull ModuleName tag, @NonNull UUID uuid, @NonNull ProxyDataConsumer<DataOutputStream> outputConsumer) {
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream output = new DataOutputStream(byteStream)) {
-
-            output.writeUTF(tag.toProxyTag());
-            output.writeUTF(uuid.toString());
-
-            outputConsumer.accept(output);
-
-            return byteStream.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create message", e);
-        }
-    }
-
-    public Optional<byte[]> validate(byte @NonNull [] data) {
-        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
-             DataInputStream input = new DataInputStream(byteStream)) {
-
-            String tag = input.readUTF();
-            if (!tag.startsWith("FlectonePulse")) return Optional.empty();
-
-            ModuleName proxyMessageType = ModuleName.fromProxyString(tag);
-            if (proxyMessageType == null) return Optional.empty();
-
-            return Optional.of(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to process message", e);
+    private void dispatch(ProxyMessageEvent proxyMessageEvent) {
+        proxyMessageEvent = eventDispatcher.dispatch(proxyMessageEvent);
+        if (!proxyMessageEvent.cancelled() && !proxyMessageEvent.processed()) {
+            fLogger.warning("Proxy message '%s' with UUID '%s' sent by '%s' was not processed", proxyMessageEvent.name(), proxyMessageEvent.uuid(), proxyMessageEvent.sender().name());
         }
     }
 

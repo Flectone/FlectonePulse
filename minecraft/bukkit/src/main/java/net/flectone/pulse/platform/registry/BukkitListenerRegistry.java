@@ -31,12 +31,13 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
     private final ReflectionResolver reflectionResolver;
 
     @Inject
-    public BukkitListenerRegistry(Plugin plugin,
+    public BukkitListenerRegistry(ProxyRegistry proxyRegistry,
+                                  Plugin plugin,
                                   FLogger fLogger,
                                   Injector injector,
                                   MinecraftPacketProvider packetProvider,
                                   ReflectionResolver reflectionResolver) {
-        super(fLogger, injector, packetProvider);
+        super(proxyRegistry, fLogger, injector, packetProvider);
 
         this.plugin = plugin;
         this.injector = injector;

@@ -149,7 +149,7 @@ public class UnwarnModule implements ModuleCommand<Localization.Command.Unwarn> 
         if (moderation == null) return;
 
         if (!fileFacade.command().warn().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Unwarn> baseMetadataBuilder = EventMetadata.<Localization.Command.Unwarn>builder()

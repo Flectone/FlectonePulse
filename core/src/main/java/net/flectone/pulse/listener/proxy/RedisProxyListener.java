@@ -4,21 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.lettuce.core.pubsub.RedisPubSubListener;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.listener.message.ProxyMessageListener;
 import net.flectone.pulse.platform.proxy.RedisProxy;
+import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RedisProxyListener implements RedisPubSubListener<byte[], byte[]> {
 
     private final RedisProxy redisProxySender;
-    private final ProxyMessageListener proxyMessageListener;
+    private final ProxyMessageProcessor proxyMessageProcessor;
 
     @Override
     public void message(byte[] channel, byte[] message) {
         if (!redisProxySender.isEnable()) return;
 
-        proxyMessageListener.handleProxyMessage(message);
+        proxyMessageProcessor.process(message);
     }
 
     @Override

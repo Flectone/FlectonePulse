@@ -148,7 +148,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
         if (unmute == null) return;
 
         if (!fileFacade.command().mute().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MUTE);
         }
 
         EventMetadata.Builder<Localization.Command.Unmute> baseMetadataBuilder = EventMetadata.<Localization.Command.Unmute>builder()

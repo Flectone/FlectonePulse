@@ -52,7 +52,7 @@ public class CooldownRepository {
     public void syncProxy(UUID playerUUID, String cooldownOwner, long newExpireTime) {
         taskScheduler.runAsync(() -> {
             if (proxyRegistry.hasEnabledProxy()) {
-                proxySender.send(FPlayer.UNKNOWN, ModuleName.SYSTEM_COOLDOWN, dataOutputStream -> {
+                proxySender.send(FPlayer.UNKNOWN, ModuleName.UPDATE_CACHE_COOLDOWN, dataOutputStream -> {
                     dataOutputStream.writeUTF(playerUUID.toString());
                     dataOutputStream.writeUTF(cooldownOwner);
                     dataOutputStream.writeLong(newExpireTime);

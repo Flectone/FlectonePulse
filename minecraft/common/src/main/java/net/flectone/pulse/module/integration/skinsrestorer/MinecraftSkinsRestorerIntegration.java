@@ -60,7 +60,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     if (fPlayer.isUnknown()) return;
 
                     // update proxy cache
-                    if (!proxySender.send(fPlayer, ModuleName.SYSTEM_SKIN)) {
+                    if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
                         skinServiceProvider.get().updateProfilePropertyCache(fPlayer);
                     }
                 });

@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.listener.message.ProxyMessageListener;
+import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,7 +26,7 @@ public class FabricProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final ProxyMessageListener proxyMessageListener;
+    private final ProxyMessageProcessor proxyMessageProcessor;
 
     private CustomPacketPayload.Type<@NonNull ProxyPayload> channel;
     private StreamCodec<@NonNull FriendlyByteBuf, @NonNull ProxyPayload> streamCodec;
@@ -58,7 +58,7 @@ public class FabricProxy implements Proxy {
         }
 
         ServerPlayNetworking.registerGlobalReceiver(channel, (payload, _) ->
-                proxyMessageListener.handleProxyMessage(payload.data())
+                proxyMessageProcessor.process(payload.data())
         );
     }
 

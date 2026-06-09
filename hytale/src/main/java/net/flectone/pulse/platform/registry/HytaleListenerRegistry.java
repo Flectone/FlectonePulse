@@ -50,14 +50,15 @@ public class HytaleListenerRegistry extends ListenerRegistry {
     private final Provider<SocialService> socialServiceProvider;
 
     @Inject
-    public HytaleListenerRegistry(FileFacade fileFacade,
+    public HytaleListenerRegistry(ProxyRegistry proxyRegistry,
+                                  FileFacade fileFacade,
                                   FLogger fLogger,
                                   Injector injector,
                                   JavaPlugin javaPlugin,
                                   TaskScheduler taskScheduler,
                                   Provider<FPlayerService> fPlayerServiceProvider,
                                   Provider<SocialService> socialServiceProvider) {
-        super(fLogger, injector);
+        super(proxyRegistry, fLogger, injector);
 
         this.fileFacade = fileFacade;
         this.fLogger = fLogger;

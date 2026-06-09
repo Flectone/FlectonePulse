@@ -118,7 +118,7 @@ public class SocialService {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, ModuleName.SYSTEM_SETTING);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SETTING);
         }
     }
 
@@ -133,7 +133,7 @@ public class SocialService {
         socialRepository.saveOrUpdateSetting(fPlayer, setting, value);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, ModuleName.SYSTEM_SETTING);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SETTING);
         }
     }
 
@@ -252,7 +252,7 @@ public class SocialService {
         socialRepository.saveColors(fPlayer, colors);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, ModuleName.SYSTEM_COLOR);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_COLOR);
         }
     }
 
@@ -329,7 +329,7 @@ public class SocialService {
         if (ignore.isEmpty()) return Optional.empty();
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, ModuleName.SYSTEM_IGNORE);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_IGNORE);
         }
 
         return ignore;
@@ -358,7 +358,7 @@ public class SocialService {
         socialRepository.deleteIgnore(fPlayer, ignore);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, ModuleName.SYSTEM_IGNORE);
+            proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_IGNORE);
         }
     }
 

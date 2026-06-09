@@ -14,6 +14,7 @@ import net.flectone.pulse.listener.message.PulseMessagePrepareListener;
 import net.flectone.pulse.listener.message.PulseMessageSendListener;
 import net.flectone.pulse.listener.player.PulsePlayerLoadListener;
 import net.flectone.pulse.listener.player.PulsePlayerPersistAndDisposeListener;
+import net.flectone.pulse.listener.proxy.cache.*;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.command.mute.listener.PulseMuteListener;
 import net.flectone.pulse.util.logging.FLogger;
@@ -38,6 +39,7 @@ public class ListenerRegistry implements Registry {
     private final Set<PulseListener> permanentListeners = new ObjectOpenHashSet<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private final ProxyRegistry proxyRegistry;
     private final FLogger fLogger;
     private final Injector injector;
 
@@ -140,11 +142,29 @@ public class ListenerRegistry implements Registry {
     }
 
     public void registerDefaultListeners() {
+        // need register here to format messages with mute from other plugins
         register(PulseMuteListener.class);
 
         register(PulseMessagePrepareListener.class);
         register(PulseMessageSendListener.class);
         register(PulsePlayerLoadListener.class);
         register(PulsePlayerPersistAndDisposeListener.class);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            register(BanCacheProxyMessageListener.class);
+            register(ColorCacheProxyMessageListener.class);
+            register(CooldownCacheProxyMessageListener.class);
+            register(IgnoreCacheProxyMessageListener.class);
+            register(KickCacheProxyMessageListener.class);
+            register(MaintenanceCacheProxyMessageListener.class);
+            register(MuteCacheProxyMessageListener.class);
+            register(PlayerConnectedProxyMessageListener.class);
+            register(PlayerDisconnectedProxyMessageListener.class);
+            register(SettingCacheProxyMessageListener.class);
+            register(SkinprofileCacheProxyMessageListener.class);
+            register(ViolationCacheProxyMessageListener.class);
+            register(WarnCacheProxyMessageListener.class);
+            register(WhitelistCacheProxyMessageListener.class);
+        }
     }
 }

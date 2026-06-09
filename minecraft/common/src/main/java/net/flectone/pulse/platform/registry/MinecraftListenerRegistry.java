@@ -13,6 +13,9 @@ import net.flectone.pulse.listener.player.MinecraftPacketPlayerConnectionListene
 import net.flectone.pulse.listener.dialog.MinecraftPacketDialogListener;
 import net.flectone.pulse.listener.inventory.MinecraftPacketInventoryListener;
 import net.flectone.pulse.listener.module.MinecraftPulseModuleEnableListener;
+import net.flectone.pulse.listener.proxy.cache.MinecraftPlayerConnectedProxyMessageListener;
+import net.flectone.pulse.listener.proxy.cache.MinecraftPlayerDisconnectedProxyMessageListener;
+import net.flectone.pulse.listener.proxy.cache.MinecraftSkinprofileCacheProxyMessageListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
@@ -26,15 +29,18 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
 
     private final Injector injector;
     private final MinecraftPacketProvider packetProvider;
+    private final ProxyRegistry proxyRegistry;
 
     @Inject
-    public MinecraftListenerRegistry(FLogger fLogger,
+    public MinecraftListenerRegistry(ProxyRegistry proxyRegistry,
+                                     FLogger fLogger,
                                      Injector injector,
                                      MinecraftPacketProvider packetProvider) {
-        super(fLogger, injector);
+        super(proxyRegistry, fLogger, injector);
 
         this.injector = injector;
         this.packetProvider = packetProvider;
+        this.proxyRegistry = proxyRegistry;
     }
 
     @Override
@@ -47,6 +53,12 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
             register(MinecraftPacketDialogListener.class);
+        }
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            register(MinecraftPlayerConnectedProxyMessageListener.class);
+            register(MinecraftPlayerDisconnectedProxyMessageListener.class);
+            register(MinecraftSkinprofileCacheProxyMessageListener.class);
         }
     }
 

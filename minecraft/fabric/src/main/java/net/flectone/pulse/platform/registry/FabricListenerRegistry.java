@@ -26,7 +26,8 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
     private final FabricTpsTracker tpsTracker;
 
     @Inject
-    public FabricListenerRegistry(FabricFlectonePulse fabricFlectonePulse,
+    public FabricListenerRegistry(ProxyRegistry proxyRegistry,
+                                  FabricFlectonePulse fabricFlectonePulse,
                                   Provider<FabricPlayerConnectionListener> fabricBaseListenerProvider,
                                   Provider<FabricPlayerLoginListener> fabricPlayerLoginListenerProvider,
                                   FabricTaskScheduler fabricTaskScheduler,
@@ -34,7 +35,7 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
                                   FLogger fLogger,
                                   Injector injector,
                                   MinecraftPacketProvider packetProvider) {
-        super(fLogger, injector, packetProvider);
+        super(proxyRegistry, fLogger, injector, packetProvider);
 
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fabricBaseListenerProvider = fabricBaseListenerProvider;

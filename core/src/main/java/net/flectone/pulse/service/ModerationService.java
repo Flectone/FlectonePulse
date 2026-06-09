@@ -154,7 +154,7 @@ public class ModerationService {
         addViolation(violationKey, violationValue);
 
         // send to proxy
-        proxySender.send(FPlayer.UNKNOWN, ModuleName.SYSTEM_VIOLATION, outputStream -> {
+        proxySender.send(FPlayer.UNKNOWN, ModuleName.UPDATE_CACHE_VIOLATION, outputStream -> {
             outputStream.writeAsJson(violationKey);
             outputStream.writeLong(violationValue);
         }, UUID.randomUUID());

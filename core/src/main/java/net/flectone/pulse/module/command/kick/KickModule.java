@@ -106,7 +106,7 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         if (moderation == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_KICK, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_KICK, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
         EventMetadata.Builder<Localization.Command.Kick> baseMetadataBuilder = EventMetadata.<Localization.Command.Kick>builder()
