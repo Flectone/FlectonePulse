@@ -158,12 +158,8 @@ public class ModerationListSender {
                 page = Integer.parseInt(playerName);
             } else {
                 String promptNumber = moduleCommandController.getPrompt(command, startIndex + 1);
-                Optional<String> optionalPage = commandContext.optional(promptNumber);
-                try {
-                    page = optionalPage.map(Integer::parseInt).orElse(startIndex);
-                } catch (NumberFormatException _) {
-                    // nothing
-                }
+                Optional<Integer> optionalPage = commandContext.optional(promptNumber);
+                page = optionalPage.orElse(page);
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
