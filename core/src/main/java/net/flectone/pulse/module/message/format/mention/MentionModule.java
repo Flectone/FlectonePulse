@@ -26,6 +26,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -82,8 +83,8 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     @Override
-    public Localization.Message.Format.Mention localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().mention();
+    public Localization.Message.Format.Mention localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().mention();
     }
 
     public MessageContext format(MessageContext messageContext) {

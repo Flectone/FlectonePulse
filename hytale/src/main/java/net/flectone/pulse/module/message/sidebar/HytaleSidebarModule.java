@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
@@ -49,8 +50,9 @@ public class HytaleSidebarModule extends SidebarModule {
                                HytaleMessageUtil hytaleMessageUtil,
                                ModuleController moduleController,
                                RandomGenerator randomUtil,
-                               ComponentSerializer componentSerializer) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
+                               ComponentSerializer componentSerializer,
+                               SocialService socialService) {
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;

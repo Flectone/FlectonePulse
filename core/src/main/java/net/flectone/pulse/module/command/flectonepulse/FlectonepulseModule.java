@@ -19,7 +19,6 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -32,8 +31,10 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.MetricsService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -82,6 +83,7 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     private final SimpleDateFormat simpleDateFormat;
     private final MetricsService metricsService;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
     private final Gson gson;
     private final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
     private final HttpClient httpClient;
@@ -195,8 +197,8 @@ public class FlectonepulseModule implements ModuleCommand<Localization.Command.F
     }
 
     @Override
-    public Localization.Command.Flectonepulse localization(FEntity sender) {
-        return fileFacade.localization(sender).command().flectonepulse();
+    public Localization.Command.Flectonepulse localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().flectonepulse();
     }
 
     private boolean commandDump(FPlayer fPlayer, Operation operation) {

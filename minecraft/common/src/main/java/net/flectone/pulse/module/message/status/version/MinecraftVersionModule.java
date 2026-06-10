@@ -6,11 +6,12 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -19,6 +20,7 @@ public class MinecraftVersionModule implements ModuleLocalization<Localization.M
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public ModuleName name() {
@@ -36,8 +38,8 @@ public class MinecraftVersionModule implements ModuleLocalization<Localization.M
     }
 
     @Override
-    public Localization.Message.Status.Version localization(FEntity sender) {
-        return fileFacade.localization(sender).message().status().version();
+    public Localization.Message.Status.Version localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().status().version();
     }
 
     public String get(FPlayer fPlayer) {

@@ -65,7 +65,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
                                   SocialService socialService) {
-        super(fileFacade, proxyRegistry, listenerRegistry);
+        super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
         this.listenerRegistry = listenerRegistry;

@@ -67,8 +67,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public Localization.Message.Format.Translate localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().translate();
+    public Localization.Message.Format.Translate localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().translate();
     }
 
     public UUID saveMessage(String message) {

@@ -96,8 +96,8 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     }
 
     @Override
-    public Localization.Message.Afk localization(FEntity sender) {
-        return fileFacade.localization(sender).message().afk();
+    public Localization.Message.Afk localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().afk();
     }
 
     public MessageContext addTag(MessageContext messageContext) {

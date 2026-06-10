@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -49,8 +50,9 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      ListenerRegistry listenerRegistry,
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,
-                                     Provider<IntegrationModule> integrationModuleProvider) {
-        super(fileFacade, listenerRegistry, platformPlayerAdapter);
+                                     Provider<IntegrationModule> integrationModuleProvider,
+                                     SocialService socialService) {
+        super(fileFacade, listenerRegistry, platformPlayerAdapter, socialService);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;

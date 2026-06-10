@@ -25,8 +25,10 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -54,6 +56,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -156,8 +159,8 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     }
 
     @Override
-    public Localization.Command.Toponline localization(FEntity sender) {
-        return fileFacade.localization(sender).command().toponline();
+    public Localization.Command.Toponline localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().toponline();
     }
 
     public MessageContext addTag(MessageContext messageContext) {

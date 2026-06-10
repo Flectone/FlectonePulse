@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -19,7 +18,9 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.Strings;
@@ -40,6 +41,7 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -108,8 +110,8 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
     }
 
     @Override
-    public Localization.Command.CommandTry localization(FEntity sender) {
-        return fileFacade.localization(sender).command().commandTry();
+    public Localization.Command.CommandTry localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().commandTry();
     }
 
     public Function<Localization.Command.CommandTry, String> replacePercent(int value) {

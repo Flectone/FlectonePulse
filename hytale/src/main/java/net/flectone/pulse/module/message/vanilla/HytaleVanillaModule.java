@@ -57,7 +57,7 @@ public class HytaleVanillaModule extends VanillaModule {
                                HytaleDeathListener deathListener,
                                ModuleController moduleController,
                                SocialService socialService) {
-        super(fileFacade, proxyRegistry, listenerRegistry);
+        super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
         this.messagePipeline = messagePipeline;

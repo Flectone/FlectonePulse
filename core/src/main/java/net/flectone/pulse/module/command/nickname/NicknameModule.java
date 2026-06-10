@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -144,8 +143,8 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     @Override
-    public Localization.Command.Nickname localization(FEntity sender) {
-        return fileFacade.localization(sender).command().nickname();
+    public Localization.Command.Nickname localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().nickname();
     }
 
     @Override

@@ -54,7 +54,7 @@ public class MinecraftBossbarModule extends BossbarModule {
                                   ModuleController moduleController,
                                   MinecraftPacketSender packetSender,
                                   TaskScheduler taskScheduler) {
-        super(fileFacade);
+        super(fileFacade, socialService);
 
         this.fPlayerService = fPlayerService;
         this.socialService = socialService;

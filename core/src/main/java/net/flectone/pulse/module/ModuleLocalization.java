@@ -2,7 +2,6 @@ package net.flectone.pulse.module;
 
 import com.google.common.collect.ImmutableSet;
 import net.flectone.pulse.config.setting.*;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Sound;
@@ -12,7 +11,7 @@ import java.util.Optional;
 
 public interface ModuleLocalization<L extends LocalizationSetting> extends ModuleSimple {
 
-    L localization(FEntity sender);
+    L localization(FPlayer fPlayer);
 
     @Override
     default ImmutableSet.Builder<PermissionSetting> permissionBuilder() {

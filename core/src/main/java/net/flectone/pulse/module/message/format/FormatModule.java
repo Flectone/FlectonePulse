@@ -137,8 +137,8 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public Localization.Message.Format localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format();
+    public Localization.Message.Format localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format();
     }
 
     public MessageContext addTags(MessageContext messageContext) {

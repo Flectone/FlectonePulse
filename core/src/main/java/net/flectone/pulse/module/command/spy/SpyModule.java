@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -93,8 +92,8 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     }
 
     @Override
-    public Localization.Command.Spy localization(FEntity sender) {
-        return fileFacade.localization(sender).command().spy();
+    public Localization.Command.Spy localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().spy();
     }
 
     public void check(FPlayer fPlayer, String chat, String message, List<FPlayer> receivers) {

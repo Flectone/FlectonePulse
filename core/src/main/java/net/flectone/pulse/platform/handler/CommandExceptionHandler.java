@@ -9,7 +9,9 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -32,12 +34,13 @@ public class CommandExceptionHandler {
     private final FileFacade fileFacade;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
     private final FLogger fLogger;
 
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        Localization.Command.Exception localizationException = fileFacade.localization(fPlayer)
+        Localization.Command.Exception localizationException = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE))
                 .command().exception();
 
         Throwable throwable = context.exception().getCause();
@@ -74,7 +77,7 @@ public class CommandExceptionHandler {
         send(fPlayer, messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
                 .message(StringUtils.replaceEach(
-                        fileFacade.localization(fPlayer).command().exception().syntax(),
+                        fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().exception().syntax(),
                         new String[]{"<correct_syntax>", "<command>"},
                         new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
                 ))
@@ -87,7 +90,7 @@ public class CommandExceptionHandler {
 
         send(fPlayer, messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
-                .message(fileFacade.localization(fPlayer).command().exception().permission())
+                .message(fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().exception().permission())
                 .build()
         ));
     }
@@ -101,7 +104,7 @@ public class CommandExceptionHandler {
         send(fPlayer, messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
                 .message(Strings.CS.replace(
-                        fileFacade.localization(fPlayer).command().exception().execution(),
+                        fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().exception().execution(),
                         "<exception>",
                         context.exception().getMessage()
                 ))

@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
@@ -19,7 +18,9 @@ import net.flectone.pulse.module.message.tab.footer.listener.MinecraftPulseFoote
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
@@ -42,6 +43,7 @@ public class MinecraftFooterModule implements ModuleListLocalization<Localizatio
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final RandomGenerator randomUtil;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -80,8 +82,8 @@ public class MinecraftFooterModule implements ModuleListLocalization<Localizatio
     }
 
     @Override
-    public Localization.Message.Tab.Footer localization(FEntity sender) {
-        return fileFacade.localization(sender).message().tab().footer();
+    public Localization.Message.Tab.Footer localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().tab().footer();
     }
 
     @Override

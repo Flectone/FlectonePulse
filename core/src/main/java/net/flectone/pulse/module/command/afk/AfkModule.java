@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -52,8 +51,8 @@ public class AfkModule implements ModuleCommand<Localization.Command> {
     }
 
     @Override
-    public Localization.Command localization(FEntity sender) {
-        return fileFacade.localization(sender).command();
+    public Localization.Command localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command();
     }
 
     @Override

@@ -40,9 +40,11 @@ import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -89,6 +91,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private final Gson gson;
     private final FLogger fLogger;
     private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -128,8 +131,8 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     }
 
     @Override
-    public Localization.Command.Whitelist localization(FEntity sender) {
-        return fileFacade.localization(sender).command().whitelist();
+    public Localization.Command.Whitelist localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().whitelist();
     }
 
     @Override

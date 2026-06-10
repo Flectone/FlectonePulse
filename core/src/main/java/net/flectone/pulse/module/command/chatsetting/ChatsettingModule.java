@@ -6,7 +6,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
@@ -149,8 +148,8 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     }
 
     @Override
-    public Localization.Command.Chatsetting localization(FEntity sender) {
-        return fileFacade.localization(sender).command().chatsetting();
+    public Localization.Command.Chatsetting localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().chatsetting();
     }
 
     private void executeOther(FPlayer fPlayer, String target, CommandContext<FPlayer> commandContext) {

@@ -25,9 +25,11 @@ import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -58,6 +60,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SkinService skinService;
+    private final SocialService socialService;
     private final UrlFormatter urlFormatter;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
@@ -101,8 +104,8 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
     }
 
     @Override
-    public Localization.Message.Format.Replacement localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().replacement();
+    public Localization.Message.Format.Replacement localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().replacement();
     }
 
     public MessageContext format(MessageContext messageContext) {

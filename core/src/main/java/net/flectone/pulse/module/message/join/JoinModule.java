@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.PlayTime;
@@ -23,8 +22,8 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -64,8 +63,8 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     }
 
     @Override
-    public Localization.Message.Join localization(FEntity sender) {
-        return fileFacade.localization(sender).message().join();
+    public Localization.Message.Join localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().join();
     }
 
     public boolean isProxyMode() {

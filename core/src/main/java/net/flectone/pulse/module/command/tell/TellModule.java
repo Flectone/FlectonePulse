@@ -28,6 +28,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -105,8 +106,8 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     }
 
     @Override
-    public Localization.Command.Tell localization(FEntity sender) {
-        return fileFacade.localization(sender).command().tell();
+    public Localization.Command.Tell localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().tell();
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {

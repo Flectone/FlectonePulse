@@ -26,9 +26,11 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -58,6 +60,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -177,8 +180,8 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     }
 
     @Override
-    public Localization.Command.Mute localization(FEntity sender) {
-        return fileFacade.localization(sender).command().mute();
+    public Localization.Command.Mute localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute();
     }
 
     public MessageContext addTag(MessageContext messageContext) {

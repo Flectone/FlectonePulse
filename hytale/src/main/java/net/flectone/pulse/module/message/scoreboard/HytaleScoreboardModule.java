@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -40,8 +41,9 @@ public class HytaleScoreboardModule extends ScoreboardModule {
                                   MessagePipeline messagePipeline,
                                   PlatformPlayerAdapter platformPlayerAdapter,
                                   ModuleController moduleController,
-                                  ComponentSerializer componentSerializer) {
-        super(fileFacade, listenerRegistry, platformPlayerAdapter);
+                                  ComponentSerializer componentSerializer,
+                                  SocialService socialService) {
+        super(fileFacade, listenerRegistry, platformPlayerAdapter, socialService);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;

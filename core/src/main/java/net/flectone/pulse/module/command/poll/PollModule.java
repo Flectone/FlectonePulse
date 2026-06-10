@@ -31,7 +31,9 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -67,6 +69,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     private final FLogger fLogger;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -225,8 +228,8 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     }
 
     @Override
-    public Localization.Command.Poll localization(FEntity sender) {
-        return fileFacade.localization(sender).command().poll();
+    public Localization.Command.Poll localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().poll();
     }
 
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {

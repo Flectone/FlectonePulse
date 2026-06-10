@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -19,6 +18,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -65,8 +65,8 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     }
 
     @Override
-    public Localization.Message.Scoreboard.Objective.Belowname localization(FEntity sender) {
-        return fileFacade.localization(sender).message().scoreboard().objective().belowname();
+    public Localization.Message.Scoreboard.Objective.Belowname localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().scoreboard().objective().belowname();
     }
 
     public void create(FPlayer fPlayer) {

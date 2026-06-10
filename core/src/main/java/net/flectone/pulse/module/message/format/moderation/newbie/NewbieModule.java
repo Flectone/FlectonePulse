@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.PlayTime;
@@ -16,8 +15,10 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -29,6 +30,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
@@ -51,8 +53,8 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Newbie localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().newbie();
+    public Localization.Message.Format.Moderation.Newbie localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().newbie();
     }
 
     public boolean isNewBie(FPlayer fPlayer) {

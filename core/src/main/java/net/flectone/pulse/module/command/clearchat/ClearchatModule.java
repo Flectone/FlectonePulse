@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
@@ -24,8 +23,10 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -47,6 +48,7 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     private final RangeFilter rangeFilter;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -125,8 +127,8 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
     }
 
     @Override
-    public Localization.Command.Clearchat localization(FEntity sender) {
-        return fileFacade.localization(sender).command().clearchat();
+    public Localization.Command.Clearchat localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().clearchat();
     }
 
     public void clearChat(FPlayer fPlayer) {

@@ -26,6 +26,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -150,8 +151,8 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     }
 
     @Override
-    public Localization.Command.Online localization(FEntity sender) {
-        return fileFacade.localization(sender).command().online();
+    public Localization.Command.Online localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().online();
     }
 
     public MessageContext addTag(MessageContext messageContext) {

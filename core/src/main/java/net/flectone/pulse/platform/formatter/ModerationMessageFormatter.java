@@ -17,7 +17,9 @@ import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +40,7 @@ public class ModerationMessageFormatter {
     private final Provider<SwearModule> swearModuleProvider;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
         return switch (status) {
@@ -46,7 +49,7 @@ public class ModerationMessageFormatter {
                 if (mutes.isEmpty()) yield Optional.empty();
 
                 Moderation mute = mutes.getFirst();
-                String format = fileFacade.localization(fPlayer).command().mute().person();
+                String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
                 MessageContext muteContext = MessageContext.builder()
                         .sender(fPlayer)
@@ -60,7 +63,7 @@ public class ModerationMessageFormatter {
                 ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
                 if (mute == null) yield Optional.empty();
 
-                String format = fileFacade.localization(fPlayer).command().mute().person();
+                String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
                 MessageContext muteContext = MessageContext.builder()
                         .sender(fPlayer)
@@ -136,7 +139,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
-        Localization localization = fileFacade.localization(fReceiver);
+        Localization localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE));
 
         Localization.ReasonMap constantReasons = switch (moderation.type()) {
             case BAN -> localization.command().ban().reasons();
@@ -163,7 +166,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, long moderationId, long date, long time, String reason, boolean permanent) {
-        Localization localization = fileFacade.localization(fReceiver);
+        Localization localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE));
 
         String formatDate = timeFormatter.formatDate(date);
         String formatTime = permanent

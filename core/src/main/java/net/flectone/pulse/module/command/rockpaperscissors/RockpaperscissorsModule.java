@@ -28,6 +28,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -168,8 +169,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
     }
 
     @Override
-    public Localization.Command.Rockpaperscissors localization(FEntity sender) {
-        return fileFacade.localization(sender).command().rockpaperscissors();
+    public Localization.Command.Rockpaperscissors localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().rockpaperscissors();
     }
 
     public void finalMove(FPlayer fPlayer, FPlayer fReceiver, String move, UUID uuid) {

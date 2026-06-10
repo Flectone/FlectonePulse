@@ -30,7 +30,9 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -53,16 +55,19 @@ public class HytaleBubbleRender implements BubbleRender {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
+    private final SocialService socialService;
 
     @Inject
     public HytaleBubbleRender(FileFacade fileFacade,
                               PlatformPlayerAdapter platformPlayerAdapter,
                               MessagePipeline messagePipeline,
-                              TaskScheduler taskScheduler) {
+                              TaskScheduler taskScheduler,
+                              SocialService socialService) {
         this.fileFacade = fileFacade;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.messagePipeline = messagePipeline;
         this.taskScheduler = taskScheduler;
+        this.socialService = socialService;
     }
 
     @Override
@@ -190,7 +195,7 @@ public class HytaleBubbleRender implements BubbleRender {
     }
 
     private String createFormattedMessage(Bubble bubble, FPlayer viewer) {
-        Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
+        Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
         MessageContext messageContext = MessageContext.builder()
                 .sender(bubble.getSender())

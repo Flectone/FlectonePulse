@@ -13,9 +13,11 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
@@ -51,6 +53,7 @@ public class CooldownSender {
     private final TimeFormatter timeFormatter;
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
+    private final SocialService socialService;
 
     /**
      * Checks if an entity is on cooldown and sends a cooldown message if applicable.
@@ -86,7 +89,7 @@ public class CooldownSender {
         if (!cooldownChecker.check(fPlayer.uuid(), cooldown, cooldownOwner)) return false;
 
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
-        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
+        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).cooldown());
 
         MessageContext cooldownContext = MessageContext.builder()
                 .sender(fPlayer)

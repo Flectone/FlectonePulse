@@ -12,6 +12,7 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -56,7 +57,7 @@ public class DisableSender {
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return true;
 
-        Localization.Command.Chatsetting localization = fileFacade.localization(fReceiver).command().chatsetting();
+        Localization.Command.Chatsetting localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE)).command().chatsetting();
 
         String disableMessage = fPlayer.equals(fReceiver)
                 ? localization.disabledSelf()

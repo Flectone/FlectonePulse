@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -36,7 +37,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 @Singleton
 public class MinecraftObjectModule extends ObjectModule {
@@ -67,8 +67,9 @@ public class MinecraftObjectModule extends ObjectModule {
                                  ModuleController moduleController,
                                  MessagePipeline messagePipeline,
                                  UUIDParser uuidParser,
-                                 @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
-        super(fileFacade);
+                                 @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219,
+                                 SocialService socialService) {
+        super(fileFacade, socialService);
 
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;

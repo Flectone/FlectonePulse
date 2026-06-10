@@ -12,7 +12,6 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -36,8 +35,10 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -75,6 +76,7 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     private final ProxySender proxySender;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     protected String icon;
 
@@ -175,8 +177,8 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
     }
 
     @Override
-    public Localization.Command.Maintenance localization(FEntity sender) {
-        return fileFacade.localization(sender).command().maintenance();
+    public Localization.Command.Maintenance localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().maintenance();
     }
 
     public boolean isAllowed(FPlayer fPlayer) {

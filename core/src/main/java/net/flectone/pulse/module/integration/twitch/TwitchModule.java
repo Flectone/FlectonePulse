@@ -12,6 +12,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -22,7 +23,9 @@ import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -39,6 +42,7 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
     private final IntegrationFormatter integrationFormatter;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
+    private final SocialService socialService;
     private final Injector injector;
 
     @Override
@@ -71,8 +75,8 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
     }
 
     @Override
-    public Localization.Integration.Twitch localization(FEntity sender) {
-        return fileFacade.localization(sender).integration().twitch();
+    public Localization.Integration.Twitch localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).integration().twitch();
     }
 
     public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {

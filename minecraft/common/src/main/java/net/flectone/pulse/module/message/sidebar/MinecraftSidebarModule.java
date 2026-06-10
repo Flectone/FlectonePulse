@@ -54,7 +54,7 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   ModuleController moduleController,
                                   RandomGenerator randomUtil,
                                   SocialService socialService) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;

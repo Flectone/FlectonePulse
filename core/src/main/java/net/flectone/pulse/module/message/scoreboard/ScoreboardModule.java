@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.ModuleSimple;
@@ -12,7 +11,9 @@ import net.flectone.pulse.module.message.scoreboard.listener.PulseScoreboardList
 import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -21,13 +22,16 @@ public abstract class ScoreboardModule implements ModuleLocalization<Localizatio
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final SocialService socialService;
 
     protected ScoreboardModule(FileFacade fileFacade,
                                ListenerRegistry listenerRegistry,
-                               PlatformPlayerAdapter platformPlayerAdapter) {
+                               PlatformPlayerAdapter platformPlayerAdapter,
+                               SocialService socialService) {
         this.fileFacade = fileFacade;
         this.listenerRegistry = listenerRegistry;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.socialService = socialService;
     }
 
     @Override
@@ -51,8 +55,8 @@ public abstract class ScoreboardModule implements ModuleLocalization<Localizatio
     }
 
     @Override
-    public Localization.Message.Scoreboard localization(FEntity sender) {
-        return fileFacade.localization(sender).message().scoreboard();
+    public Localization.Message.Scoreboard localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().scoreboard();
     }
 
     @Override

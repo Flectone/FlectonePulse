@@ -3,14 +3,15 @@ package net.flectone.pulse.module.message.vanilla;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.vanilla.listener.VanillaProxyMessageListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -21,13 +22,16 @@ public abstract class VanillaModule implements ModuleLocalization<Localization.M
     private final FileFacade fileFacade;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     protected VanillaModule(FileFacade fileFacade,
                             ProxyRegistry proxyRegistry,
-                            ListenerRegistry listenerRegistry) {
+                            ListenerRegistry listenerRegistry,
+                            SocialService socialService) {
         this.fileFacade = fileFacade;
         this.proxyRegistry = proxyRegistry;
         this.listenerRegistry = listenerRegistry;
+        this.socialService = socialService;
     }
 
     @Override
@@ -53,8 +57,8 @@ public abstract class VanillaModule implements ModuleLocalization<Localization.M
     }
 
     @Override
-    public Localization.Message.Vanilla localization(FEntity sender) {
-        return fileFacade.localization(sender).message().vanilla();
+    public Localization.Message.Vanilla localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().vanilla();
     }
 
     public abstract TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent);

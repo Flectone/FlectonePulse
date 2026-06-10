@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -18,7 +17,9 @@ import net.flectone.pulse.module.message.serverlink.listener.MinecraftPulseServe
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -35,6 +36,7 @@ public class MinecraftServerlinkModule implements ModuleLocalization<Localizatio
     private final TaskScheduler taskScheduler;
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -51,8 +53,8 @@ public class MinecraftServerlinkModule implements ModuleLocalization<Localizatio
     }
 
     @Override
-    public Localization.Message.Serverlink localization(FEntity sender) {
-        return fileFacade.localization(sender).message().serverlink();
+    public Localization.Message.Serverlink localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().serverlink();
     }
 
     @Override

@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
@@ -17,7 +16,9 @@ import net.flectone.pulse.module.message.greeting.listener.PulseGreetingListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 
@@ -29,6 +30,7 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
 
     private final FileFacade fileFacade;
     private final SkinService skinService;
+    private final SocialService socialService;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
@@ -55,8 +57,8 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
     }
 
     @Override
-    public Localization.Message.Greeting localization(FEntity sender) {
-        return fileFacade.localization(sender).message().greeting();
+    public Localization.Message.Greeting localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().greeting();
     }
 
     public void send(FPlayer fPlayer) {

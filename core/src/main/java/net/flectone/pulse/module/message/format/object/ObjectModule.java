@@ -8,9 +8,11 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
-import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -18,10 +20,11 @@ import net.flectone.pulse.util.file.FileFacade;
 public class ObjectModule implements ModuleLocalization<Localization.Message.Format.Object> {
 
     private final FileFacade fileFacade;
+    private final SocialService socialService;
 
     @Override
-    public Localization.Message.Format.Object localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().object();
+    public Localization.Message.Format.Object localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().object();
     }
 
     @Override

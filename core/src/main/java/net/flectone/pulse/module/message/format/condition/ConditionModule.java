@@ -16,9 +16,11 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.condition.listener.PulseConditionListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +37,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -47,8 +50,8 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public Localization.Message.Format.Condition localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().condition();
+    public Localization.Message.Format.Condition localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().condition();
     }
 
     @Override

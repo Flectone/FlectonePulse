@@ -11,14 +11,16 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.animation.listener.PulseAnimationListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
@@ -35,6 +37,7 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -42,8 +45,8 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public Localization.Message.Format.Animation localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().animation();
+    public Localization.Message.Format.Animation localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().animation();
     }
 
     @Override

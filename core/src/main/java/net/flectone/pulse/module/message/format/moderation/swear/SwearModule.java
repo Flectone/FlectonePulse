@@ -20,9 +20,11 @@ import net.flectone.pulse.module.message.format.moderation.swear.listener.PulseS
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -49,6 +51,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModerationService moderationService;
+    private final SocialService socialService;
 
     @Getter private Pattern combinedPattern;
 
@@ -89,8 +92,8 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Swear localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().swear();
+    public Localization.Message.Format.Moderation.Swear localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().swear();
     }
 
     public MessageContext format(MessageContext messageContext) {

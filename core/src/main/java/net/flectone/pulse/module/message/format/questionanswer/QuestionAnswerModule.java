@@ -23,9 +23,11 @@ import net.flectone.pulse.module.message.format.questionanswer.listener.PulseQue
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -52,6 +54,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     private final MessageDispatcher messageDispatcher;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -99,8 +102,8 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     }
 
     @Override
-    public Localization.Message.Format.QuestionAnswer localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().questionAnswer();
+    public Localization.Message.Format.QuestionAnswer localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().questionAnswer();
     }
 
     public MessageContext format(MessageContext messageContext) {

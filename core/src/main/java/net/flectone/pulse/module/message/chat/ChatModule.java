@@ -11,7 +11,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
@@ -93,8 +92,8 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     }
 
     @Override
-    public Localization.Message.Chat localization(FEntity sender) {
-        return fileFacade.localization(sender).message().chat();
+    public Localization.Message.Chat localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().chat();
     }
 
     public void handleChatEvent(FPlayer fPlayer, String rawString, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {

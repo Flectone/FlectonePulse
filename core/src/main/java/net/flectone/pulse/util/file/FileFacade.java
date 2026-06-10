@@ -2,19 +2,15 @@ package net.flectone.pulse.util.file;
 
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.file.FilePack;
-import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.comparator.VersionComparator;
-import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.creator.BackupCreator;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,9 +26,6 @@ public class FileFacade {
     private final FilePathProvider filePathProvider;
     private final BackupCreator backupCreator;
     private final VersionComparator versionComparator;
-
-    @Inject
-    private Provider<SocialService> socialServiceProvider;
 
     @Getter
     private String preInitVersion;
@@ -115,14 +108,11 @@ public class FileFacade {
     }
 
     public Localization localization() {
-        return localization(FPlayer.UNKNOWN);
+        return localization(null);
     }
 
-    public Localization localization(FEntity sender) {
+    public Localization localization(@Nullable String locale) {
         if (!config().language().byPlayer()) return defaultLocalization;
-        if (!(sender instanceof FPlayer fPlayer)) return defaultLocalization;
-
-        String locale = socialServiceProvider.get().getSetting(fPlayer, SettingText.LOCALE);
         if (locale == null) return defaultLocalization;
 
         return localizations().getOrDefault(locale, defaultLocalization);

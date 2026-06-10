@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -19,7 +18,9 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -109,8 +111,8 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
     }
 
     @Override
-    public Localization.Command.Dice localization(FEntity sender) {
-        return fileFacade.localization(sender).command().dice();
+    public Localization.Command.Dice localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().dice();
     }
 
     public String replaceResult(List<Integer> cubes, Map<Integer, String> symbols, String format) {

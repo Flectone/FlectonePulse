@@ -18,8 +18,10 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -46,6 +48,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -74,8 +77,8 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Delete localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().delete();
+    public Localization.Message.Format.Moderation.Delete localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().delete();
     }
 
     public void clearHistory(FPlayer fPlayer) {

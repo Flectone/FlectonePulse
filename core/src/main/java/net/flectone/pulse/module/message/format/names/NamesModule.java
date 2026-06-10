@@ -19,10 +19,12 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -44,6 +46,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
     private final ModuleController moduleController;
     private final PermissionChecker permissionChecker;
     private final ProfileResolver profileResolver;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -71,8 +74,8 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
     }
 
     @Override
-    public Localization.Message.Format.Names localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().names();
+    public Localization.Message.Format.Names localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().names();
     }
 
     public MessageContext addTags(MessageContext messageContext) {

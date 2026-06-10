@@ -13,7 +13,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.FColor;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -29,6 +28,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
@@ -185,8 +185,8 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
     }
 
     @Override
-    public Localization.Command.Chatcolor localization(FEntity sender) {
-        return fileFacade.localization(sender).command().chatcolor();
+    public Localization.Command.Chatcolor localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().chatcolor();
     }
 
     public Message.Format.FColor fColorConfig() {

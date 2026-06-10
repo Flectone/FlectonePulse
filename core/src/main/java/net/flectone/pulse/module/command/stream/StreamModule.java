@@ -191,8 +191,8 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     @Override
-    public Localization.Command.Stream localization(FEntity sender) {
-        return fileFacade.localization(sender).command().stream();
+    public Localization.Command.Stream localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().stream();
     }
 
     public MessageContext addTag(MessageContext messageContext) {

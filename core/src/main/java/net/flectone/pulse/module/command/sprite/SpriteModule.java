@@ -11,7 +11,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
@@ -22,8 +21,10 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -70,6 +71,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     private final ModuleCommandController commandModuleController;
     private final WebUtil webUtil;
     private final FLogger fLogger;
+    private final SocialService socialService;
     private final @Named("minecraftPath") Path minecraftPath;
 
     @Override
@@ -239,8 +241,8 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     }
 
     @Override
-    public Localization.Command.Sprite localization(FEntity sender) {
-        return fileFacade.localization(sender).command().sprite();
+    public Localization.Command.Sprite localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().sprite();
     }
 
     private void lazyLoadLocalAtlases() {

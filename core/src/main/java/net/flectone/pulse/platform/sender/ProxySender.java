@@ -147,7 +147,7 @@ public class ProxySender {
         if (!proxyRegistry.hasEnabledProxy()) return false;
 
         if (sender instanceof FPlayer fPlayer) {
-            List<String> constant = fileFacade.localization(sender).message().format().names().constant();
+            List<String> constant = fileFacade.localization().message().format().names().constant();
             if (!constant.isEmpty()) {
                 sender = fPlayer.withConstants(constant.stream()
                         .map(string -> messagePipeline.build(MessageContext.builder()

@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -17,8 +16,10 @@ import net.flectone.pulse.module.message.status.players.listener.MinecraftPulseP
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,6 +35,7 @@ public class MinecraftPlayersModule implements ModuleLocalization<Localization.M
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -61,8 +63,8 @@ public class MinecraftPlayersModule implements ModuleLocalization<Localization.M
     }
 
     @Override
-    public Localization.Message.Status.Players localization(FEntity sender) {
-        return fileFacade.localization(sender).message().status().players();
+    public Localization.Message.Status.Players localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().status().players();
     }
 
     public boolean isAllowed(FPlayer fPlayer) {

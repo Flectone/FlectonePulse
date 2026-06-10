@@ -9,15 +9,18 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.flood.listener.PulseFloodListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +35,7 @@ public class FloodModule implements ModuleLocalization<Localization.Message.Form
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
     private final ModerationService moderationService;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -39,8 +43,8 @@ public class FloodModule implements ModuleLocalization<Localization.Message.Form
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Flood localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().flood();
+    public Localization.Message.Format.Moderation.Flood localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().flood();
     }
 
     @Override

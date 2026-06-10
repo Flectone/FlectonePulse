@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleCommand;
@@ -15,7 +14,9 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ModerationListSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -29,6 +30,7 @@ public class MutelistModule implements ModuleCommand<Localization.Command.Muteli
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ModerationListSender moderationListSender;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -78,7 +80,7 @@ public class MutelistModule implements ModuleCommand<Localization.Command.Muteli
     }
 
     @Override
-    public Localization.Command.Mutelist localization(FEntity sender) {
-        return fileFacade.localization(sender).command().mutelist();
+    public Localization.Command.Mutelist localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mutelist();
     }
 }
