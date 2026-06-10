@@ -31,6 +31,7 @@ public class AnonProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_ANON) return event;
         if (moduleController.isDisabledFor(anonModule, event.sender())) return event.withProcessed(true);
+        if (!anonModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();

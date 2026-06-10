@@ -15,6 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -47,6 +48,7 @@ public class MaintenanceProxyMessageListener implements PulseListener {
         if (event.name() != ModuleName.COMMAND_MAINTENANCE) return event;
         if (maintenanceModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
         if (!moduleController.isEnable(maintenanceModule)) return event.withProcessed(true);
+        if (!maintenanceModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation maintenance = gson.fromJson(proxyPayload.readString(), Moderation.class);

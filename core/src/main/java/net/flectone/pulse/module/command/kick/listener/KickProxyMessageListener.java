@@ -45,6 +45,7 @@ public class KickProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_KICK) return event;
         if (kickModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
+        if (!kickModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation kick = gson.fromJson(proxyPayload.readString(), Moderation.class);

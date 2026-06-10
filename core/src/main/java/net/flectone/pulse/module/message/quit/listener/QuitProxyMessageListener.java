@@ -34,6 +34,7 @@ public class QuitProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.MESSAGE_QUIT) return event;
         if (moduleController.isDisabledFor(quitModule, event.sender())) return event.withProcessed(true);
+        if (!quitModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
             boolean fakeMessage = proxyPayload.readBoolean();

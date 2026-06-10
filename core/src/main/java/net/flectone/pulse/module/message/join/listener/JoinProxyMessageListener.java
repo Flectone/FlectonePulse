@@ -34,6 +34,7 @@ public class JoinProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.MESSAGE_JOIN) return event;
         if (moduleController.isDisabledFor(joinModule, event.sender())) return event.withProcessed(true);
+        if (!joinModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
             boolean hasPlayedBefore = proxyPayload.readBoolean();

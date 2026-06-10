@@ -55,6 +55,7 @@ public class VanillaProxyMessageListener implements PulseListener {
             Map<Integer, Object> arguments = parseVanillaArguments(proxyPayload);
 
             Message.Vanilla.VanillaMessage vanillaMessage = componentExtractor.getVanillaMessage(translationKey);
+            if (!vanillaMessage.range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
             ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
 

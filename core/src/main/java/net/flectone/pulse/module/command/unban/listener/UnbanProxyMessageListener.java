@@ -47,6 +47,7 @@ public class UnbanProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_UNBAN) return event;
         if (banModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
+        if (!banModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation unban = gson.fromJson(proxyPayload.readString(), Moderation.class);

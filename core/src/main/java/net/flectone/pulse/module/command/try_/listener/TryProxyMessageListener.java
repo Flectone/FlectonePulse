@@ -32,6 +32,7 @@ public class TryProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_TRY) return event;
         if (moduleController.isDisabledFor(tryModule, event.sender())) return event.withProcessed(true);
+        if (!tryModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             int value = proxyPayload.readInt();

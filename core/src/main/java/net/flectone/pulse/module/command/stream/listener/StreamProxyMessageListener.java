@@ -32,6 +32,7 @@ public class StreamProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_STREAM) return event;
         if (moduleController.isDisabledFor(streamModule, event.sender())) return event.withProcessed(true);
+        if (!streamModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();

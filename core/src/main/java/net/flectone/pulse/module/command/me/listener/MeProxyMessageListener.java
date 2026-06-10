@@ -31,6 +31,7 @@ public class MeProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_ME) return event;
         if (moduleController.isDisabledFor(meModule, event.sender())) return event.withProcessed(true);
+        if (!meModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();

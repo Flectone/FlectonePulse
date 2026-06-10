@@ -34,6 +34,7 @@ public class SpyProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_SPY) return event;
         if (!moduleController.isEnable(spyModule)) return event.withProcessed(true);
+        if (!spyModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String action = proxyPayload.readString();

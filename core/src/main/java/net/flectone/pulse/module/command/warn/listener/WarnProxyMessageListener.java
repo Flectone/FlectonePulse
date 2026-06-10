@@ -45,6 +45,7 @@ public class WarnProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_WARN) return event;
         if (warnModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
+        if (!warnModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation warn = gson.fromJson(proxyPayload.readString(), Moderation.class);

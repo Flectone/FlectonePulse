@@ -32,6 +32,7 @@ public class BallProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_BALL) return event;
         if (moduleController.isDisabledFor(ballModule, event.sender())) return event.withProcessed(true);
+        if (!ballModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             int answer = proxyPayload.readInt();

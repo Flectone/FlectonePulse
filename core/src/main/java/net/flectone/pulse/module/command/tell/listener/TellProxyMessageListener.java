@@ -9,6 +9,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
@@ -33,6 +34,7 @@ public class TellProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_TELL) return event;
         if (moduleController.isDisabledFor(tellModule, event.sender())) return event.withProcessed(true);
+        if (!tellModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             UUID receiverUUID = UUID.fromString(proxyPayload.readString());

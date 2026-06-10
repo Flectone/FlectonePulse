@@ -34,6 +34,7 @@ public class PollProxyMessageListener implements PulseListener {
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_POLL) return event;
+        if (!pollModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             PollModule.Action action = PollModule.Action.valueOf(proxyPayload.readString());

@@ -34,6 +34,7 @@ public class AfkProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.MESSAGE_AFK) return event;
         if (moduleController.isDisabledFor(afkModule, event.sender())) return event.withProcessed(true);
+        if (!afkModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = new ProxyPayload(event.payload())) {
             boolean isAfk = proxyPayload.readBoolean();

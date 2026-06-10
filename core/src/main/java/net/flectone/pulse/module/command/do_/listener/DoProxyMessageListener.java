@@ -31,6 +31,7 @@ public class DoProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_DO) return event;
         if (moduleController.isDisabledFor(doModule, event.sender())) return event.withProcessed(true);
+        if (!doModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();

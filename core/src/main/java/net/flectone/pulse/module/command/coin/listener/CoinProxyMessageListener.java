@@ -32,6 +32,7 @@ public class CoinProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_COIN) return event;
         if (!moduleController.isEnable(coinModule)) return event.withProcessed(true);
+        if (!coinModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             int percent = proxyPayload.readInt();

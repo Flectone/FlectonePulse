@@ -48,6 +48,7 @@ public class ChatProxyMessageListener implements PulseListener {
                     .findAny()
                     .map(Map.Entry::getValue)
                     .orElse(null);
+            if (chatType != null && !chatType.range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
             Chat playerChat = new Chat(proxyChatName, chatType, chatModule.permission().types().get(proxyChatName));
 

@@ -31,6 +31,7 @@ public class BroadcastProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_BROADCAST) return event;
         if (moduleController.isDisabledFor(broadcastModule, event.sender())) return event.withProcessed(true);
+        if (!broadcastModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();

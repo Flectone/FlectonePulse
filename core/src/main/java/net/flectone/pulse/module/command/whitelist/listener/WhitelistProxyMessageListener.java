@@ -47,6 +47,7 @@ public class WhitelistProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_WHITELIST) return event;
         if (whitelistModule.config().filterByServer()  && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
+        if (!whitelistModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             WhitelistModule.Action action = WhitelistModule.Action.values()[proxyPayload.readInt()];

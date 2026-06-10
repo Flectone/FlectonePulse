@@ -45,6 +45,7 @@ public class MuteProxyMessageListener implements PulseListener {
         if (event.processed()) return event;
         if (event.name() != ModuleName.COMMAND_MUTE) return event;
         if (muteModule.config().filterByServer() && !event.server().equals(fileFacade.config().server())) return event.withProcessed(true);
+        if (!muteModule.config().range().is(Range.Type.PROXY)) return event.withProcessed(true);
 
         try (ProxyPayload proxyPayload = event.openPayload()) {
             Moderation mute = gson.fromJson(proxyPayload.readString(), Moderation.class);
