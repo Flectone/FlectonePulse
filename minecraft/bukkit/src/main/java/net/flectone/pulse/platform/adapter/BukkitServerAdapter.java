@@ -17,7 +17,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.PaperItemNameProvider;
@@ -26,6 +25,7 @@ import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.kyori.adventure.text.Component;
@@ -56,10 +56,10 @@ import java.util.concurrent.CompletableFuture;
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
     private final Plugin plugin;
-    private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
+    private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
     private final AdventureHoverConvertor adventureHoverConvertor;
     private final ReflectionResolver reflectionResolver;
@@ -178,11 +178,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     public int getOnlinePlayerCount() {
         return playerlistnameModuleProvider.get().isProxyMode()
                 ? (int) fPlayerServiceProvider.get().findOnlineFPlayers().stream()
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count()
                 : (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
                     .filter(fPlayer -> !fPlayer.isUnknown())
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count();
     }
 

@@ -14,6 +14,7 @@ public enum SettingText {
     STREAM_PREFIX,
     SERVER,
     SPY_STATUS,
+    VANISH_STATUS,
     AFK_SUFFIX,
     NICKNAME;
 

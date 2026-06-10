@@ -11,10 +11,10 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
 
@@ -27,7 +27,7 @@ public class QuitProxyMessageListener implements PulseListener {
     private final QuitModule quitModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -47,7 +47,7 @@ public class QuitProxyMessageListener implements PulseListener {
                             .destination(quitModule.config().destination())
                             .range(Range.get(Range.Type.SERVER))
                             .sound(quitModule.soundOrThrow())
-                            .filter(fReceiver -> fakeMessage || integrationModule.canSeeVanished(event.sender(), fReceiver, vanished))
+                            .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                             .build()
                     )
                     .fakeMessage(fakeMessage)

@@ -16,7 +16,6 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
 import net.flectone.pulse.module.command.tell.listener.TellProxyMessageListener;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -27,6 +26,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -46,7 +46,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IgnoreSender ignoreSender;
@@ -128,7 +128,8 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
         if (!fReceiver.isConsole()
-                && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
+                && (fReceiver.isUnknown() || !fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)
+                || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::nullPlayer)

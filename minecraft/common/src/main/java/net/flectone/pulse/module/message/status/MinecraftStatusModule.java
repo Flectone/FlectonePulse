@@ -16,7 +16,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.status.icon.MinecraftIconModule;
 import net.flectone.pulse.module.message.status.listener.MinecraftPacketStatusListener;
 import net.flectone.pulse.module.message.status.motd.MinecraftMOTDModule;
@@ -27,6 +26,7 @@ import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -47,7 +47,7 @@ public class MinecraftStatusModule extends StatusModule {
     private final EventDispatcher eventDispatcher;
     private final ModuleController moduleController;
     private final MinecraftServerStatusFormatter statusUtil;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
@@ -62,7 +62,7 @@ public class MinecraftStatusModule extends StatusModule {
                                  EventDispatcher eventDispatcher,
                                  ModuleController moduleController,
                                  MinecraftServerStatusFormatter statusUtil,
-                                 IntegrationModule integrationModule) {
+                                 SocialService socialService) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -76,7 +76,7 @@ public class MinecraftStatusModule extends StatusModule {
         this.eventDispatcher = eventDispatcher;
         this.moduleController = moduleController;
         this.statusUtil = statusUtil;
-        this.integrationModule = integrationModule;
+        this.socialService = socialService;
     }
 
     @Override
@@ -161,7 +161,7 @@ public class MinecraftStatusModule extends StatusModule {
         samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample("<players>", null)) : samples;
 
         Collection<FPlayer> onlineFPlayers = fPlayerService.getOnlineFPlayers().stream()
-                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
                 .toList();
 
         samples.forEach(sample -> {

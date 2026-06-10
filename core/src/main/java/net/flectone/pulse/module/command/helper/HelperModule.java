@@ -13,12 +13,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -39,7 +39,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -66,7 +66,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
 
         List<FPlayer> recipients = fPlayerService.getOnlineFPlayers()
                 .stream()
-                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
                 .filter(getFilterSee())
                 .toList();
 

@@ -13,7 +13,6 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPacketVanillaListener;
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPulseVanillaListener;
@@ -22,6 +21,7 @@ import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -51,11 +51,11 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final TaskScheduler taskScheduler;
     private final MinecraftPacketSender packetSender;
     private final ModuleController moduleController;
-    private final IntegrationModule integrationModule;
     private final SocialService socialService;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
+                                  ProxyRegistry proxyRegistry,
                                   MinecraftComponentExtractor extractor,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
@@ -64,9 +64,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   TaskScheduler taskScheduler,
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
-                                  IntegrationModule integrationModule,
                                   SocialService socialService) {
-        super(fileFacade);
+        super(fileFacade, proxyRegistry, listenerRegistry);
 
         this.extractor = extractor;
         this.listenerRegistry = listenerRegistry;
@@ -76,7 +75,6 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
         this.moduleController = moduleController;
-        this.integrationModule = integrationModule;
         this.socialService = socialService;
     }
 
@@ -120,7 +118,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         }
 
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
-        boolean vanished = integrationModule.isVanished(fPlayer);
+        boolean vanished = socialService.isVanished(fPlayer);
 
         messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
@@ -129,7 +127,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
                         .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver, vanished))
+                        .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(StringUtils.isNotEmpty(vanillaMessageName)

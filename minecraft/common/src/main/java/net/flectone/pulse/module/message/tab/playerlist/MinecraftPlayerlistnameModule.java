@@ -133,7 +133,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fPlayer, config().range());
 
         fPlayerService.getPlatformFPlayers().stream()
-                .filter(viewer -> integrationModule.canSeeVanished(fPlayer, viewer))
+                .filter(viewer -> socialService.canSeeVanished(fPlayer, viewer))
                 .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver, listedFilter));
     }
 
@@ -149,7 +149,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         UserProfile userProfile = createUserProfile(fPlayer);
 
         fPlayerService.getPlatformFPlayers().stream()
-                .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
                 .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, createPlayerInfo(fPlayer, fReceiver, userProfile))));
     }
 
@@ -220,7 +220,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         return fPlayerService.findOnlineFPlayers()
                 .stream()
                 .filter(fPlayer -> !currentServerPlayers.contains(fPlayer.uuid()))
-                .filter(fPlayer -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .filter(fPlayer -> socialService.canSeeVanished(fPlayer, fReceiver))
                 .map(fPlayer -> createPlayerInfo(fPlayer, fReceiver, null))
                 .toList();
     }

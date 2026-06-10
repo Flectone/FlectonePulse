@@ -7,25 +7,24 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinProxyMessageListener;
 import net.flectone.pulse.module.message.join.listener.PulseJoinListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -33,12 +32,10 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PlatformServerAdapter platformServerAdapter;
-    private final IntegrationModule integrationModule;
-    private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
 
@@ -85,14 +82,14 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
 
         PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer) || (playTime != null && playTime.sessions() > 1);
-        boolean vanished = integrationModule.isVanished(fPlayer);
+        boolean vanished = socialService.isVanished(fPlayer);
         EventMetadata.Builder<Localization.Message.Join> eventMetadataBuilder = EventMetadata.<Localization.Message.Join>builder()
                 .sender(fPlayer)
                 .format(localization -> hasPlayedBefore || !config().first() ? localization.format() : localization.formatFirstTime())
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
-                .filter(fReceiver -> fakeMessage || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
                 .integration();
 
         if (isProxyMode()) {

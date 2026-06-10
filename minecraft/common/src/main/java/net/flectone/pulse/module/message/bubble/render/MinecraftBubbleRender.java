@@ -24,7 +24,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -65,7 +64,6 @@ public class MinecraftBubbleRender implements BubbleRender {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
-    private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final MinecraftEntityUtil entityUtil;
     private final MinecraftPacketProvider packetProvider;
@@ -100,7 +98,7 @@ public class MinecraftBubbleRender implements BubbleRender {
                 .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !socialService.isIgnored(fViewer, sender))
-                .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
+                .filter(fViewer -> socialService.canSeeVanished(sender, fViewer))
                 .forEach(fViewer -> renderBubble(fViewer, bubble))
         );
     }
@@ -158,7 +156,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
-        if (!integrationModule.canSeeVanished(sender, viewer)) return;
+        if (!socialService.canSeeVanished(sender, viewer)) return;
 
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;

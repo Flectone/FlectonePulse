@@ -217,7 +217,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         return receivers.stream()
                 .filter(fReceiver -> !fReceiver.isUnknown())
                 .filter(fReceiver -> !fReceiver.equals(fPlayer))
-                .noneMatch(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer));
+                .noneMatch(fReceiver -> socialService.canSeeVanished(fReceiver, fPlayer));
     }
 
     private boolean noGlobalReceiversFor(FPlayer fPlayer, String chatName) {
@@ -255,7 +255,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         return fReceiver -> {
             if (fReceiver.isUnknown()) return false;
             if (fReceiver.equals(fPlayer)) return false;
-            if (!integrationModule.canSeeVanished(fReceiver, fPlayer)) return false;
+            if (!socialService.canSeeVanished(fReceiver, fPlayer)) return false;
 
             return permissionFilter(chatName).test(fReceiver);
         };

@@ -26,22 +26,22 @@ import org.jspecify.annotations.NonNull;
 public class FabricIntegrationModule extends MinecraftIntegrationModule {
 
     private final Provider<PermissionChecker> permissionCheckerProvider;
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final Injector injector;
 
     @Inject
     public FabricIntegrationModule(FileFacade fileManager,
                                    FLogger fLogger,
-                                   PlatformServerAdapter platformServerAdapter,
+                                   Provider<PlatformServerAdapter> platformServerAdapterProvider,
                                    Provider<PermissionChecker> permissionCheckerProvider,
                                    ReflectionResolver reflectionResolver,
                                    ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileManager, fLogger, platformServerAdapter, reflectionResolver, listenerRegistry, moduleController, injector);
+        super(fileManager, fLogger, platformServerAdapterProvider, reflectionResolver, listenerRegistry, moduleController, injector);
 
         this.permissionCheckerProvider = permissionCheckerProvider;
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
         this.injector = injector;
     }
 
@@ -49,6 +49,7 @@ public class FabricIntegrationModule extends MinecraftIntegrationModule {
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
+        PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("melius-vanish")) {
             builder.add(FabricVanishModule.class);
         }

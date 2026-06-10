@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -29,18 +30,18 @@ import java.util.Set;
 public abstract class IntegrationModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
     private final Injector injector;
 
     protected IntegrationModule(FileFacade fileFacade,
-                                PlatformServerAdapter platformServerAdapter,
+                                Provider<PlatformServerAdapter> platformServerAdapterProvider,
                                 ListenerRegistry listenerRegistry,
                                 ModuleController moduleController,
                                 Injector injector) {
         this.fileFacade = fileFacade;
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
         this.listenerRegistry = listenerRegistry;
         this.moduleController = moduleController;
         this.injector = injector;
@@ -55,7 +56,7 @@ public abstract class IntegrationModule implements ModuleSimple {
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = ModuleSimple.super.childrenBuilder();
 
-        if (platformServerAdapter.hasProject("LuckPerms")) {
+        if (platformServerAdapterProvider.get().hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
         }
 
@@ -165,16 +166,6 @@ public abstract class IntegrationModule implements ModuleSimple {
         if (!containsEnabledChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
-    }
-
-    public boolean canSeeVanished(FEntity fTarget, FEntity fViewer) {
-        return canSeeVanished(fTarget, fViewer, isVanished(fTarget));
-    }
-
-    public boolean canSeeVanished(FEntity fTarget, FEntity fViewer, boolean targetVanished) {
-        if (fTarget.equals(fViewer)) return true;
-
-        return !targetVanished || hasSeeVanishPermission(fViewer);
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {

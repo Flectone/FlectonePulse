@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.BukkitAfkListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -26,7 +25,6 @@ public class BukkitAfkModule extends AfkModule {
     public BukkitAfkModule(FileFacade fileFacade,
                            FPlayerService fPlayerService,
                            TaskScheduler taskScheduler,
-                           IntegrationModule integrationModule,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline,
@@ -36,7 +34,7 @@ public class BukkitAfkModule extends AfkModule {
                            PlaytimeService playtimeService,
                            SocialService socialService,
                            ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, taskScheduler, integrationModule, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService, socialService, proxyRegistry);
+        super(fileFacade, fPlayerService, taskScheduler, platformPlayerAdapter, listenerRegistry, messagePipeline, messageDispatcher, moduleController, timeFormatter, playtimeService, socialService, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

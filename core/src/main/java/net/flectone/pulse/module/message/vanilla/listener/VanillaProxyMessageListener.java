@@ -17,7 +17,6 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
@@ -42,9 +41,8 @@ public class VanillaProxyMessageListener implements PulseListener {
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
     private final Gson gson;
-    private final ComponentExtractor<?> componentExtractor;
+    private final ComponentExtractor componentExtractor;
     private final SocialService socialService;
-    private final IntegrationModule integrationModule;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -71,7 +69,7 @@ public class VanillaProxyMessageListener implements PulseListener {
                             .tagResolvers(fResolver -> new TagResolver[]{vanillaModule.argumentTag(fResolver, parsedComponent)})
                             .range(Range.get(Range.Type.SERVER))
                             .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                            .filter(fResolver -> integrationModule.canSeeVanished(event.sender(), fResolver, vanished))
+                            .filter(fResolver -> socialService.canSeeVanished(event.sender(), fResolver, vanished))
                             .destination(parsedComponent.vanillaMessage().destination())
                             .build()
                     )

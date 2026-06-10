@@ -5,15 +5,10 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.MetadataValue;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -22,7 +17,6 @@ public class BukkitSuperVanishModule implements ModuleSimple {
     private final FileFacade fileFacade;
     private final BukkitSuperVanishIntegration superVanishIntegration;
     private final ListenerRegistry listenerRegistry;
-    private final ModuleController moduleController;
 
     @Override
     public void onEnable() {
@@ -51,17 +45,4 @@ public class BukkitSuperVanishModule implements ModuleSimple {
         return fileFacade.permission().integration().supervanish();
     }
 
-    public boolean isVanished(FEntity sender) {
-        if (moduleController.isDisabledFor(this, sender)) return false;
-
-        Player player = Bukkit.getPlayer(sender.uuid());
-        if (player != null) {
-            return player
-                    .getMetadata("vanished").stream()
-                    .anyMatch(MetadataValue::asBoolean);
-        }
-
-        // offline check
-        return superVanishIntegration.isVanished(sender);
-    }
 }

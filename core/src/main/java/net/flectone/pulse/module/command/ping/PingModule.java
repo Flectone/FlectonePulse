@@ -11,12 +11,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
@@ -30,7 +30,7 @@ public class PingModule implements ModuleCommand<Localization.Command.Ping> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
@@ -59,7 +59,7 @@ public class PingModule implements ModuleCommand<Localization.Command.Ping> {
 
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
-                || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
+                || (!socialService.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ping>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ping::nullPlayer)

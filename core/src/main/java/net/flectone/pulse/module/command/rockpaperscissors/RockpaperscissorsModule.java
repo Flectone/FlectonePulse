@@ -16,7 +16,6 @@ import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.listener.RockpaperscissorsProxyMessageListener;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -26,6 +25,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -51,7 +51,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
@@ -90,7 +90,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
 
         String player = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::nullPlayer)

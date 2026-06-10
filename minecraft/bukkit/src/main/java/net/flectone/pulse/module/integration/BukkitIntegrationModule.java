@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -43,7 +44,7 @@ import java.util.Set;
 @Singleton
 public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
     private final Injector injector;
@@ -52,14 +53,14 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     @Inject
     public BukkitIntegrationModule(FileFacade fileFacade,
                                    FLogger fLogger,
-                                   PlatformServerAdapter platformServerAdapter,
+                                   Provider<PlatformServerAdapter> platformServerAdapterProvider,
                                    ReflectionResolver reflectionResolver,
                                    ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, fLogger, platformServerAdapter, reflectionResolver, listenerRegistry, moduleController, injector);
+        super(fileFacade, fLogger, platformServerAdapterProvider, reflectionResolver, listenerRegistry, moduleController, injector);
         
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
         this.reflectionResolver = reflectionResolver;
         this.moduleController = moduleController;
         this.injector = injector;
@@ -70,6 +71,7 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
+        PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("AdvancedBan")) {
             builder.add(BukkitAdvancedBanModule.class);
         }
@@ -206,10 +208,6 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
-        if (containsEnabledChild(BukkitSuperVanishModule.class)) {
-            return getInstance(BukkitSuperVanishModule.class).isVanished(sender);
-        }
-
         Player player = Bukkit.getPlayer(sender.uuid());
         if (player == null) return false;
 

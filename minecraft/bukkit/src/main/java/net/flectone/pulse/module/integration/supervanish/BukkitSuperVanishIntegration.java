@@ -13,6 +13,8 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
@@ -24,6 +26,7 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final QuitModule quitModule;
     private final JoinModule joinModule;
     @Getter private final FLogger fLogger;
@@ -36,10 +39,16 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
     @EventHandler
     public void onHide(PlayerHideEvent event) {
         if (event.isCancelled()) return;
-        if (!fileFacade.integration().supervanish().showFakeQuit()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
-        quitModule.send(fPlayer, true);
+
+        // proxy vanish synchronization
+        if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
+            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
+            if (fileFacade.integration().supervanish().showFakeQuit()) {
+                quitModule.send(fPlayer, true);
+            }
+        }
 
         event.setSilent(true);
     }
@@ -47,10 +56,16 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
     @EventHandler
     public void onShow(PlayerShowEvent event) {
         if (event.isCancelled()) return;
-        if (!fileFacade.integration().supervanish().showFakeJoin()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
-        joinModule.send(fPlayer, true);
+
+        // proxy vanish synchronization
+        if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, null);
+            if (fileFacade.integration().supervanish().showFakeJoin()) {
+                joinModule.send(fPlayer, true, false);
+            }
+        }
 
         event.setSilent(true);
     }

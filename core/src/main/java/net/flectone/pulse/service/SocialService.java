@@ -1,11 +1,13 @@
 package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -35,10 +37,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SocialService {
 
-    private final IntegrationModule integrationModule;
     private final SocialRepository socialRepository;
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
+
+    @Inject
+    private Provider<IntegrationModule> integrationModuleProvider;
 
     /**
      * Invalidates all cached social data for a player including colors, settings, and ignores.
@@ -380,7 +384,7 @@ public class SocialService {
      * @return true if the locale was updated, false if unchanged or player is unknown
      */
     public boolean updateLocale(@NonNull FPlayer fPlayer, @NonNull String newLocale) {
-        String locale = integrationModule.getTritonLocale(fPlayer);
+        String locale = integrationModuleProvider.get().getTritonLocale(fPlayer);
         if (locale == null) {
             locale = newLocale;
         }
@@ -391,6 +395,59 @@ public class SocialService {
 
         saveSetting(fPlayer, settingName, locale);
         return true;
+    }
+
+    /**
+     * Checks whether a given entity is currently in vanish mode (invisible to other players).
+     * <p>
+     * This method first checks if the entity is a player with a configured vanish status setting.
+     * If not found locally, it delegates to the integration module to check external vanish providers.
+     *
+     * @param fEntity the entity to check for vanish status
+     * @return true if the entity is vanished, false otherwise
+     */
+    public boolean isVanished(@NonNull FEntity fEntity) {
+        if (fEntity instanceof FPlayer fPlayer && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+            return true;
+        }
+
+        return integrationModuleProvider.get().isVanished(fEntity);
+    }
+
+    /**
+     * Determines whether a viewer can see a target entity that may be in vanish mode.
+     * <p>
+     * This is a convenience overload that automatically checks if the target is vanished.
+     *
+     * @param fTarget the target entity that might be vanished, must not be null
+     * @param fViewer the viewer entity attempting to see the target, must not be null
+     * @return true if the viewer can see the target, false if the target is vanished and the viewer lacks permission
+     */
+    public boolean canSeeVanished(@NonNull FEntity fTarget, @NonNull FEntity fViewer) {
+        return canSeeVanished(fTarget, fViewer, isVanished(fTarget));
+    }
+
+    /**
+     * Determines whether a viewer can see a target entity with a known vanish status.
+     * <p>
+     * The following rules apply:
+     * <ul>
+     *   <li>An entity can always see itself</li>
+     *   <li>Console entities can always see vanished players</li>
+     *   <li>If the target is not vanished, any viewer can see them</li>
+     *   <li>If the target is vanished, only viewers with the appropriate permission can see them</li>
+     * </ul>
+     *
+     * @param fTarget the target entity that might be vanished, must not be null
+     * @param fViewer the viewer entity attempting to see the target, must not be null
+     * @param targetVanished pre-computed vanish status of the target entity
+     * @return true if the viewer can see the target, false if the target is vanished and the viewer lacks permission
+     */
+    public boolean canSeeVanished(@NonNull FEntity fTarget, @NonNull FEntity fViewer, boolean targetVanished) {
+        if (fTarget.equals(fViewer)) return true;
+        if (fViewer instanceof FPlayer fPlayer && fPlayer.isConsole()) return true;
+
+        return !targetVanished || integrationModuleProvider.get().hasSeeVanishPermission(fViewer);
     }
 
 }

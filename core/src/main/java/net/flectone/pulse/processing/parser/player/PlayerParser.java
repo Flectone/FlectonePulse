@@ -7,9 +7,9 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
@@ -37,7 +37,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
             .build();
 
     private final FPlayerService playerService;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
@@ -54,7 +54,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
 
     public List<String> createSuggestions(FPlayer sender) {
         return playerService.findOnlineFPlayers().stream()
-                .filter(player -> integrationModule.canSeeVanished(player, sender))
+                .filter(player -> socialService.canSeeVanished(player, sender))
                 .filter(fPlayer -> isVisible(sender, fPlayer))
                 .map(FEntity::name)
                 .toList();

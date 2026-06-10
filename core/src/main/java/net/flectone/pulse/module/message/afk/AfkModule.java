@@ -16,7 +16,6 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkProxyMessageListener;
 import net.flectone.pulse.module.message.afk.listener.PulseAfkListener;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
@@ -53,7 +52,6 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
-    private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
@@ -279,7 +277,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
             return;
         }
 
-        boolean vanished = integrationModule.isVanished(fPlayer);
+        boolean vanished = socialService.isVanished(fPlayer);
         messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
                 .base(EventMetadata.<Localization.Message.Afk>builder()
                         .sender(fPlayer)
@@ -290,7 +288,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
                         .range(range)
                         .destination(config().destination())
                         .sound(soundOrThrow())
-                        .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+                        .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeBoolean(isAfk);
                             dataOutputStream.writeBoolean(vanished);

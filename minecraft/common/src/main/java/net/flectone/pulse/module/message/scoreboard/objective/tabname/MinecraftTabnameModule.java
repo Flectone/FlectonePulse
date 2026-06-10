@@ -11,13 +11,13 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.scoreboard.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.scoreboard.objective.tabname.listener.MinecraftPulseTabnameListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -32,7 +32,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
     private final MinecraftObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -84,7 +84,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         fPlayerService.getOnlineFPlayers().stream()
-                .filter(vanishedPlayer -> integrationModule.canSeeVanished(vanishedPlayer, fPlayer))
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
                 .forEach(fObjective -> {
                     Localization.Message.Scoreboard.Objective.Tabname localization = localization(fPlayer);
                     Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());

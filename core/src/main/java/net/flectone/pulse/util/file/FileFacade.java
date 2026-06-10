@@ -30,7 +30,9 @@ public class FileFacade {
     private final FilePathProvider filePathProvider;
     private final BackupCreator backupCreator;
     private final VersionComparator versionComparator;
-    private final Provider<SocialService> socialServiceProvider;
+
+    @Inject
+    private Provider<SocialService> socialServiceProvider;
 
     @Getter
     private String preInitVersion;
@@ -43,15 +45,13 @@ public class FileFacade {
                       FileMigrator fileMigrator,
                       FilePathProvider filePathProvider,
                       BackupCreator backupCreator,
-                      VersionComparator versionComparator,
-                      Provider<SocialService> socialServiceProvider) throws IOException {
+                      VersionComparator versionComparator) throws IOException {
         this.fileLoader = fileLoader;
         this.fileWriter = fileWriter;
         this.fileMigrator = fileMigrator;
         this.filePathProvider = filePathProvider;
         this.backupCreator = backupCreator;
         this.versionComparator = versionComparator;
-        this.socialServiceProvider = socialServiceProvider;
 
         reload();
     }

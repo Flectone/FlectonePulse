@@ -16,7 +16,6 @@ import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.online.listener.PulseOnlineListener;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -25,6 +24,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -49,7 +49,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     private final PlaytimeService playtimeService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final TimeFormatter timeFormatter;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -112,7 +112,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                                     TimeType.FIRST.getTime(fPlayer, playTime),
                                     localization.formatFirst()
                             );
-                            case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
+                            case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && socialService.canSeeVanished(targetFPlayer, fPlayer)
                                     ? localization.formatCurrent()
                                     : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
                             default -> Strings.CS.replace(

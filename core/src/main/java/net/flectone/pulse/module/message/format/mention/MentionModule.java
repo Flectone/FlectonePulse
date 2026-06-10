@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.format.mention.listener.PulseMentionLis
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -42,6 +43,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final IntegrationModule integrationModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
@@ -126,7 +128,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
+                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && socialService.canSeeVanished(mentionFPlayer, sender)) {
                     if (mentionFPlayer.equals(receiver)) {
                         sendMention(mentionFPlayer);
                     }

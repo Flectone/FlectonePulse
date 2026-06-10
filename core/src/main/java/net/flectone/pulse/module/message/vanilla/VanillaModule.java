@@ -6,7 +6,10 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.message.vanilla.listener.VanillaProxyMessageListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -16,9 +19,22 @@ public abstract class VanillaModule implements ModuleLocalization<Localization.M
     public static final String ARGUMENT = "argument";
 
     private final FileFacade fileFacade;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
-    protected VanillaModule(FileFacade fileFacade) {
+    protected VanillaModule(FileFacade fileFacade,
+                            ProxyRegistry proxyRegistry,
+                            ListenerRegistry listenerRegistry) {
         this.fileFacade = fileFacade;
+        this.proxyRegistry = proxyRegistry;
+        this.listenerRegistry = listenerRegistry;
+    }
+
+    @Override
+    public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(VanillaProxyMessageListener.class);
+        }
     }
 
     @Override

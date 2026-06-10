@@ -13,13 +13,14 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.listener.HytaleDeathListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
 import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.HytaleListenerRegistry;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
@@ -40,12 +41,13 @@ public class HytaleVanillaModule extends VanillaModule {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final TaskScheduler taskScheduler;
-    private final IntegrationModule integrationModule;
     private final ModuleController moduleController;
     private final SocialService socialService;
 
     @Inject
     public HytaleVanillaModule(FileFacade fileFacade,
+                               ProxyRegistry proxyRegistry,
+                               ListenerRegistry listenerRegistry,
                                HytaleComponentExtractor extractor,
                                MessagePipeline messagePipeline,
                                MessageDispatcher messageDispatcher,
@@ -53,16 +55,14 @@ public class HytaleVanillaModule extends VanillaModule {
                                TaskScheduler taskScheduler,
                                HytaleListenerRegistry hytaleListenerRegistry,
                                HytaleDeathListener deathListener,
-                               IntegrationModule integrationModule,
                                ModuleController moduleController,
                                SocialService socialService) {
-        super(fileFacade);
+        super(fileFacade, proxyRegistry, listenerRegistry);
 
         this.extractor = extractor;
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
         this.taskScheduler = taskScheduler;
-        this.integrationModule = integrationModule;
         this.moduleController = moduleController;
         this.socialService = socialService;
 
@@ -100,7 +100,7 @@ public class HytaleVanillaModule extends VanillaModule {
         Range range = parsedComponent.vanillaMessage().range();
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
 
-        boolean vanished = integrationModule.isVanished(fPlayer);
+        boolean vanished = socialService.isVanished(fPlayer);
         messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
                         .sender(fPlayer)
@@ -108,7 +108,7 @@ public class HytaleVanillaModule extends VanillaModule {
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
                         .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver, vanished))
+                        .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                         .destination(parsedComponent.vanillaMessage().destination())
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(StringUtils.isNotEmpty(vanillaMessageName)

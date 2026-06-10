@@ -10,9 +10,9 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.module.command.tell.TellModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
 
@@ -26,7 +26,7 @@ public class TellProxyMessageListener implements PulseListener {
     private final TellModule tellModule;
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -40,7 +40,7 @@ public class TellProxyMessageListener implements PulseListener {
 
             FPlayer fReceiver = fPlayerService.getFPlayer(receiverUUID);
             if (fReceiver.isUnknown()) return event.withProcessed(true);
-            if (!integrationModule.canSeeVanished(fReceiver, event.sender())) return event.withProcessed(true);
+            if (!socialService.canSeeVanished(fReceiver, event.sender())) return event.withProcessed(true);
 
             tellModule.send(event.sender(), fReceiver, fReceiver, Localization.Command.Tell::receiver, message, event.uuid());
         }

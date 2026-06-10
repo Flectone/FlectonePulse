@@ -17,7 +17,6 @@ import net.flectone.pulse.module.command.tictactoe.listener.TictactoeProxyMessag
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -27,6 +26,7 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -47,7 +47,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     private final FPlayerService fPlayerService;
     private final TictactoeService tictactoeService;
     private final ProxySender proxySender;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final Gson gson;
     private final IgnoreSender ignoreSender;
@@ -100,7 +100,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         boolean isHard = optionalBoolean.orElse(true);
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::nullPlayer)
@@ -176,8 +176,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     // /tictactoe %d create
     public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, UUID metadataUUID) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-        if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
-                || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
+        if (!socialService.canSeeVanished(fPlayer, fReceiver)
+                || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
         messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
@@ -198,8 +198,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     // /tictactoe %d <move>
     public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move, UUID metadataUUID) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-        if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
-                || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
+        if (!socialService.canSeeVanished(fPlayer, fReceiver)
+                || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
         messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
@@ -260,7 +260,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         }
 
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)

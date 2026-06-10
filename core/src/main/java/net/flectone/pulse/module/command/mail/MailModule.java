@@ -16,7 +16,6 @@ import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -39,7 +38,6 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
-    private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
     private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
@@ -85,7 +83,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
             return;
         }
 
-        if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (fReceiver.isOnline() && socialService.canSeeVanished(fReceiver, fPlayer)) {
             if (!moduleController.isEnable(tellModule)) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)

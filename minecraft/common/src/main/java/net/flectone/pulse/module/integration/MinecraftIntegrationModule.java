@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleSimple;
@@ -23,7 +24,7 @@ import org.jspecify.annotations.NonNull;
 
 public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
     private final FLogger fLogger;
@@ -31,14 +32,14 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
 
     protected MinecraftIntegrationModule(FileFacade fileFacade,
                                          FLogger fLogger,
-                                         PlatformServerAdapter platformServerAdapter,
+                                         Provider<PlatformServerAdapter> platformServerAdapterProvider,
                                          ReflectionResolver reflectionResolver,
                                          ListenerRegistry listenerRegistry,
                                          ModuleController moduleController,
                                          Injector injector) {
-        super(fileFacade, platformServerAdapter, listenerRegistry, moduleController, injector);
+        super(fileFacade, platformServerAdapterProvider, listenerRegistry, moduleController, injector);
 
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
         this.reflectionResolver = reflectionResolver;
         this.moduleController = moduleController;
         this.fLogger = fLogger;
@@ -49,6 +50,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
+        PlatformServerAdapter platformServerAdapter = platformServerAdapterProvider.get();
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
             builder.add(MinecraftSkinsRestorerModule.class);
         }
