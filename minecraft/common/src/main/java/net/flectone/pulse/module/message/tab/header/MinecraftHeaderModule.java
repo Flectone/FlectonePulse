@@ -119,4 +119,9 @@ public class MinecraftHeaderModule implements ModuleListLocalization<Localizatio
                 .build()
         );
     }
+
+    public boolean isDisabledFor(FPlayer fPlayer) {
+        return moduleController.isDisabledFor(this, fPlayer);
+    }
+
 }

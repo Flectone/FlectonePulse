@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -18,7 +18,6 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.BukkitAttributesProvider;
 import net.flectone.pulse.platform.provider.BukkitPassengersProvider;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -45,15 +44,19 @@ import java.util.stream.Collectors;
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final FileFacade fileFacade;
-    private final Injector injector;
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
     private final BukkitAttributesProvider attributesProvider;
     private final BukkitPassengersProvider passengersProvider;
     private final ReflectionResolver reflectionResolver;
     private final MessagePipeline messagePipeline;
-    private final ModuleController moduleController;
     private final ComponentSerializer componentSerializer;
+
+    @Inject
+    private Provider<MinecraftHeaderModule> headerModuleProvider;
+
+    @Inject
+    private Provider<MinecraftFooterModule> footerModuleProvider;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -265,10 +268,10 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
+        MinecraftHeaderModule headerModule = headerModuleProvider.get();
 
         String header;
-        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
+        if (!headerModule.isDisabledFor(fPlayer)) {
             header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
@@ -290,10 +293,10 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = injector.getInstance(MinecraftFooterModule.class);
+        MinecraftFooterModule footerModule = footerModuleProvider.get();
 
         String footer;
-        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
+        if (!footerModule.isDisabledFor(fPlayer)) {
             footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()

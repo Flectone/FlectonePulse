@@ -1,6 +1,7 @@
 package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.ViolationSetting;
@@ -30,10 +31,12 @@ public class ModerationService {
     private final Map<ViolationKey, List<Long>> playerViolations = new ConcurrentHashMap<>();
 
     private final ModerationRepository moderationRepository;
-    private final IntegrationModule integrationModule;
     private final FileFacade fileFacade;
     private final ProxySender proxySender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+
+    @Inject
+    private Provider<IntegrationModule> integrationModuleProvider;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
@@ -227,7 +230,7 @@ public class ModerationService {
         if (time != -1 && time < 1) return false;
         if (timeLimits.isEmpty()) return true;
 
-        int groupWeight = integrationModule.getGroupWeight(fPlayer);
+        int groupWeight = integrationModuleProvider.get().getGroupWeight(fPlayer);
 
         long timeLimit = -1;
         for (Map.Entry<Integer, Long> timeEntry : timeLimits.entrySet()) {
@@ -248,9 +251,10 @@ public class ModerationService {
         boolean sourceIsOperator = platformPlayerAdapter.isOperator(source);
         boolean targetIsOperator = platformPlayerAdapter.isOperator(target);
         if (!sourceIsOperator && targetIsOperator) return false;
+        if (sourceIsOperator && !targetIsOperator) return true;
 
-        return sourceIsOperator && !targetIsOperator
-                || integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
+        IntegrationModule integrationModule = integrationModuleProvider.get();
+        return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
     }
 
     public String getServer(Moderation.Type type) {

@@ -53,6 +53,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
+    private final FabricPlaceholderAPIModule fabricPlaceholderAPIModule;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
@@ -83,7 +84,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         FEntity sender = messageContext.sender();
-        if (moduleController.isDisabledFor(FabricPlaceholderAPIModule.class, sender)) return event;
+        if (moduleController.isDisabledFor(fabricPlaceholderAPIModule, sender)) return event;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
         if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;

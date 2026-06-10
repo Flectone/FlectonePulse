@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -57,7 +57,12 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
-    private final Injector injector;
+
+    @Inject
+    private Provider<MinecraftHeaderModule> headerModuleProvider;
+
+    @Inject
+    private Provider<MinecraftFooterModule> footerModuleProvider;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -207,7 +212,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
+        MinecraftHeaderModule headerModule = headerModuleProvider.get();
 
         if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
@@ -225,7 +230,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = injector.getInstance(MinecraftFooterModule.class);
+        MinecraftFooterModule footerModule = footerModuleProvider.get();
 
         if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
