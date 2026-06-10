@@ -42,7 +42,10 @@ public class ProxyMessageProcessor {
 
                 UUID uuid = UUID.fromString(proxyPayload.readString());
                 if (name == ModuleName.PLAYER_CONNECTED || name == ModuleName.PLAYER_DISCONNECTED) {
-                    dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, new byte[]{}));
+                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, new byte[]{}));
+                    if (proxyMessageEvent.cancelled()) {
+                        // nothing
+                    }
                     return;
                 }
 
@@ -64,18 +67,14 @@ public class ProxyMessageProcessor {
                 byte[] payload = proxyPayload.readAllBytes();
                 FEntity fEntity = optionalFEntity.get();
 
-                dispatch(new ProxyMessageEvent(sentByThisServer, server, name, fEntity, uuid, payload));
+                ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(sentByThisServer, server, name, fEntity, uuid, payload));
+                if (proxyMessageEvent.cancelled()) {
+                    // nothing
+                }
             } catch (Exception e) {
                 fLogger.warning(e);
             }
         });
-    }
-
-    private void dispatch(ProxyMessageEvent proxyMessageEvent) {
-        proxyMessageEvent = eventDispatcher.dispatch(proxyMessageEvent);
-        if (!proxyMessageEvent.cancelled() && !proxyMessageEvent.processed()) {
-            fLogger.warning("Proxy message '%s' with UUID '%s' sent by '%s' was not processed", proxyMessageEvent.name(), proxyMessageEvent.uuid(), proxyMessageEvent.sender().name());
-        }
     }
 
 }
