@@ -16,11 +16,13 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.emit.listener.EmitProxyMessageListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -50,7 +52,9 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
+    private final ProxySender proxySender;
     private final SocialService socialService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
     public void onEnable() {
@@ -119,6 +123,15 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
             return;
         }
 
+        if (!platformPlayerAdapter.isOnline(fTarget) && proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, name(), dataOutputStream -> {
+                dataOutputStream.writeAsJson(fTarget);
+                dataOutputStream.writeAsJson(destination);
+                dataOutputStream.writeString(message);
+            });
+            return;
+        }
+
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                 .sender(fPlayer)
                 .receiver(fTarget)
@@ -127,11 +140,6 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                 .message(message)
                 .destination(destination)
                 .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(fTarget);
-                    dataOutputStream.writeAsJson(destination);
-                    dataOutputStream.writeString(message);
-                })
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag(fResolver, fTarget)
                 })
