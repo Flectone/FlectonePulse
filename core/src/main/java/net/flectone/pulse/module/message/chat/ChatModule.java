@@ -200,7 +200,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     private void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Chat playerChat) {
         if (!playerChat.config().nullReceiver().enable()) return;
-        if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
+        if (localReceivers.stream().anyMatch(filterReceivers(fPlayer, playerChat.name()))) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
@@ -210,13 +210,6 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
                     .build()
             );
         }
-    }
-
-    private boolean noLocalReceiversFor(FPlayer fPlayer, List<FPlayer> receivers) {
-        return receivers.stream()
-                .filter(fReceiver -> !fReceiver.isUnknown())
-                .filter(fReceiver -> !fReceiver.equals(fPlayer))
-                .noneMatch(fReceiver -> socialService.canSeeVanished(fReceiver, fPlayer));
     }
 
     private boolean noGlobalReceiversFor(FPlayer fPlayer, String chatName) {
@@ -252,7 +245,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     private Predicate<FPlayer> filterReceivers(FPlayer fPlayer, String chatName) {
         return fReceiver -> {
-            if (fReceiver.isUnknown()) return false;
+            if (fReceiver.isUnknown() || fReceiver.isConsole()) return false;
             if (fReceiver.equals(fPlayer)) return false;
             if (!socialService.canSeeVanished(fReceiver, fPlayer)) return false;
 
