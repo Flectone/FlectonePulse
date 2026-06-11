@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.execution.pipeline.HytaleMessagePipeline;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.HytaleChatsettingModule;
 import net.flectone.pulse.module.integration.HytaleIntegrationModule;
@@ -84,7 +82,6 @@ public class HytaleInjector extends PlatformInjector {
 
         // checkers and utilities
         bind(PermissionChecker.class).to(HytalePermissionChecker.class);
-        bind(TaskScheduler.class).to(HytaleTaskScheduler.class);
         bind(MessagePipeline.class).to(HytaleMessagePipeline.class);
 
         // integrations

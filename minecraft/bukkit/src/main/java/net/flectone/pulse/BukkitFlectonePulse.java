@@ -9,6 +9,7 @@ import com.google.inject.Stage;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
@@ -63,6 +64,15 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             return;
         }
 
+        // get scheduler
+        TaskScheduler taskScheduler = get(TaskScheduler.class);
+
+        // create executor
+        taskScheduler.start();
+
+        // update tick
+        Bukkit.getScheduler().runTaskTimer(this, taskScheduler::onTick, 1L, 1L);
+
         get(FlectonePulseAPI.class).onEnable();
     }
 
@@ -74,6 +84,12 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         get(FlectonePulseAPI.class).onDisable();
+
+        // cancel custom tasks
+        injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).cancelTasks(this);
+
+        // cancel plugin tasks
+        Bukkit.getScheduler().cancelTasks(this);
     }
 
     @Override

@@ -14,6 +14,16 @@ database:
   password: "1234"
   parameters: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
   prefix: ""
+executor:
+  min_pool_size: 0
+  max_pool_size: -1
+  work_queue: "SYNCHRONOUS"
+  keep_alive:
+    duration: 60
+    time_unit: "SECONDS"
+  shutdown_timeout:
+    duration: 5
+    time_unit: "SECONDS"
 proxy:
   clusters: []
   bungeecord: false

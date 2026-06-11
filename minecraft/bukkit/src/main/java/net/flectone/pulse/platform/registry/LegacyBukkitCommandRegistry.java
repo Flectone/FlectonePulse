@@ -58,7 +58,7 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
 
     @Override
     public void init() {
-        this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
+        this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
 

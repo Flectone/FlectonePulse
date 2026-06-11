@@ -34,6 +34,9 @@ public record Config(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/database")
         Database database,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/executor")
+        Executor executor,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy")
         Proxy proxy,
 
@@ -67,16 +70,45 @@ public record Config(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Database(Boolean ignoreExistingDriver,
-                           Boolean usePlaytimeTracking,
-                           net.flectone.pulse.data.database.Database.Type type,
-                           String name,
-                           String host,
-                           String port,
-                           String user,
-                           String password,
-                           String parameters,
-                           String prefix) {
+    public record Database(
+            Boolean ignoreExistingDriver,
+            Boolean usePlaytimeTracking,
+            net.flectone.pulse.data.database.Database.Type type,
+            String name,
+            String host,
+            String port,
+            String user,
+            String password,
+            String parameters,
+            String prefix
+    ) {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Executor(
+            Integer minPoolSize,
+            Integer maxPoolSize,
+            WorkQueue workQueue,
+            DurationUnit keepAlive,
+            DurationUnit shutdownTimeout
+    ) {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record DurationUnit(
+                Long duration,
+                TimeUnit timeUnit
+        ) {
+        }
+
+        public enum WorkQueue {
+            SYNCHRONOUS,
+            LINKED_BLOCKING
+        }
+
     }
 
     @With

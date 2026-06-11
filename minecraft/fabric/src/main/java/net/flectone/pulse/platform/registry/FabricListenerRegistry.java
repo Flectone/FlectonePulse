@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.listener.player.FabricPlayerConnectionListener;
 import net.flectone.pulse.listener.player.FabricPlayerLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -22,7 +21,6 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final Provider<FabricPlayerConnectionListener> fabricBaseListenerProvider;
     private final Provider<FabricPlayerLoginListener> fabricPlayerLoginListenerProvider;
-    private final FabricTaskScheduler fabricTaskScheduler;
     private final FabricTpsTracker tpsTracker;
 
     @Inject
@@ -30,7 +28,6 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
                                   FabricFlectonePulse fabricFlectonePulse,
                                   Provider<FabricPlayerConnectionListener> fabricBaseListenerProvider,
                                   Provider<FabricPlayerLoginListener> fabricPlayerLoginListenerProvider,
-                                  FabricTaskScheduler fabricTaskScheduler,
                                   FabricTpsTracker tpsTracker,
                                   FLogger fLogger,
                                   Injector injector,
@@ -40,7 +37,6 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fabricBaseListenerProvider = fabricBaseListenerProvider;
         this.fabricPlayerLoginListenerProvider = fabricPlayerLoginListenerProvider;
-        this.fabricTaskScheduler = fabricTaskScheduler;
         this.tpsTracker = tpsTracker;
     }
 
@@ -51,7 +47,6 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
         // skip double register
         if (fabricFlectonePulse.getMinecraftServer() != null) return;
 
-        ServerTickEvents.START_SERVER_TICK.register(_ -> fabricTaskScheduler.onTick());
         ServerTickEvents.END_SERVER_TICK.register(_ -> tpsTracker.onTick());
         ServerLifecycleEvents.SERVER_STARTING.register(fabricFlectonePulse::setMinecraftServer);
         ServerLifecycleEvents.SERVER_STOPPING.register(_ -> fabricFlectonePulse.onDisable());

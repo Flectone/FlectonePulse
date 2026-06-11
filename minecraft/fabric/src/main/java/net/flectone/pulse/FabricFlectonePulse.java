@@ -11,8 +11,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
@@ -70,6 +72,15 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
         if (!isReady()) return;
 
         removeDefaultFabricCommands();
+
+        // get scheduler
+        TaskScheduler taskScheduler = get(TaskScheduler.class);
+
+        // create executor
+        taskScheduler.start();
+
+        // update tick
+        ServerTickEvents.START_SERVER_TICK.register(_ -> taskScheduler.onTick());
 
         injector.getInstance(FlectonePulseAPI.class).onEnable();
     }

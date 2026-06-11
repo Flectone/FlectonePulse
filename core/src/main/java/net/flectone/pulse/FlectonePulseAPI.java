@@ -250,8 +250,8 @@ public class FlectonePulseAPI {
         // get task scheduler
         TaskScheduler taskScheduler = instance.get(TaskScheduler.class);
 
-        // disable task scheduler
-        taskScheduler.shutdown();
+        // sync task scheduler reload
+        taskScheduler.runSync(taskScheduler::reload).join();
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
@@ -319,9 +319,6 @@ public class FlectonePulseAPI {
 
         // load minecraft localizations
         instance.get(TranslationService.class).reload();
-
-        // start scheduler
-        taskScheduler.start();
 
         // init proxies
         proxyRegistry.onEnable();
