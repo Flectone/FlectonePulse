@@ -22,6 +22,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -146,29 +147,40 @@ public class ModerationListSender {
     public Optional<ListArgument> getListArgument(ModuleCommand<?> command,
                                                   CommandContext<FPlayer> commandContext,
                                                   int startIndex) {
-        FPlayer targetFPlayer = null;
-        int page = 1;
-
         String promptPlayer = moduleCommandController.getPrompt(command, startIndex);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
-        if (optionalPlayer.isPresent()) {
-            String playerName = optionalPlayer.get();
+        if (optionalPlayer.isEmpty()) return Optional.of(new ListArgument(null, 1));
 
-            if (StringUtils.isNumeric(playerName)) {
-                page = Integer.parseInt(playerName);
-            } else {
-                String promptNumber = moduleCommandController.getPrompt(command, startIndex + 1);
-                Optional<Integer> optionalPage = commandContext.optional(promptNumber);
-                page = optionalPage.orElse(page);
-
-                targetFPlayer = fPlayerService.getFPlayer(playerName);
-                if (targetFPlayer.isUnknown()) {
-                    return Optional.empty();
-                }
-            }
+        String playerName = optionalPlayer.get();
+        if (StringUtils.isNumeric(playerName)) {
+            int page = Integer.parseInt(playerName);
+            return Optional.of(new ListArgument(null, page));
         }
 
-        return Optional.of(new ListArgument(targetFPlayer, page));
+        FPlayer fTarget = fPlayerService.getFPlayer(playerName);
+        if (fTarget.isUnknown()) return Optional.empty();
+
+        String promptNumber = moduleCommandController.getPrompt(command, startIndex + 1);
+        Optional<Integer> optionalPage = commandContext.optional(promptNumber);
+        if (optionalPage.isPresent()) {
+            int page = optionalPage.get();
+            return Optional.of(new ListArgument(fTarget, page));
+        }
+
+        if (startIndex + 2 >= moduleCommandController.getPrompts(command).size()) {
+            return Optional.of(new ListArgument(fTarget, 1));
+        }
+
+        String promptTime = moduleCommandController.getPrompt(command, startIndex + 2);
+
+        try {
+            Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptNumber);
+
+            int page = optionalTime.map(pair -> StringUtils.isNumeric(pair.getRight().trim()) ? Integer.parseInt(pair.getRight().trim()) : 1).orElse(1);
+            return Optional.of(new ListArgument(fTarget, page));
+        } catch (ClassCastException _) {
+            return Optional.empty();
+        }
     }
 
     public record ListArgument(
