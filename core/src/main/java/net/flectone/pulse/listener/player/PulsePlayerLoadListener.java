@@ -93,12 +93,12 @@ public class PulsePlayerLoadListener implements PulseListener {
 
         // confirm player connection
         if (proxyRegistry.hasEnabledProxy()) {
-            // this must be done after 2 tick so that Bukkit has time to register a channel for the player,
+            // this must be done after 2 tick so that minecraft has time to register a channel for the player,
             // otherwise message may not be sent to the proxy
             taskScheduler.runAsyncLater(() ->
                             // send player uuid as metadata, and make sender UNKNOWN so as not to send unnecessary information
                             proxySender.send(FEntity.unknown(), ModuleName.PLAYER_CONNECTED, _ -> {}, currentPlayerUUID),
-                    2L
+                    5L
             );
         }
 
