@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.exception.ProxyMessageCreateException;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -145,6 +146,7 @@ public class ProxySender {
                         @NonNull ProxyDataConsumer<SafeDataOutputStream> outputConsumer,
                         @NonNull UUID metadataUUID) {
         if (!proxyRegistry.hasEnabledProxy()) return false;
+        if (FlectonePulseAPI.isDisabling()) return false;
 
         if (sender instanceof FPlayer fPlayer) {
             List<String> constant = fileFacade.localization().message().format().names().constant();
