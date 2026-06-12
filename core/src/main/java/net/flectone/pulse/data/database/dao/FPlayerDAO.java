@@ -8,6 +8,7 @@ import net.flectone.pulse.data.database.sql.fplayer.*;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -135,6 +136,18 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 fPlayer.name(),
                 fPlayer.ip()
         ));
+    }
+
+    /**
+     * Sets all players associated with the specified server to offline status.
+     *
+     * @param server the server identifier to match against player server settings
+     */
+    public void setOfflineByServer(@NonNull String server) {
+        if (database.isClosed()) return;
+        if (StringUtils.isEmpty(server)) return;
+
+        useHandle(sql -> sql.setOfflineByServer(server));
     }
 
     /**

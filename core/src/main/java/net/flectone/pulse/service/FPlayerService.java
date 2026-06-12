@@ -131,6 +131,10 @@ public class FPlayerService {
      * @param reload whether this is a reload operation or initial startup
      */
     public void initialize(boolean reload) {
+        // force offline all players tied to this server
+        // in case of an unexpected shutdown that left them marked as online
+        fPlayerRepository.setOfflineByServer(fileFacade.config().server());
+
         // load all platform players
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
             FPlayer fPlayer = getFPlayer(uuid);

@@ -245,6 +245,15 @@ public class FPlayerRepository {
     }
 
     /**
+     * Sets all players associated with the specified server to offline status.
+     *
+     * @param server the server identifier to match against player server settings
+     */
+    public void setOfflineByServer(@NonNull String server) {
+        fPlayerDAO.setOfflineByServer(server);
+    }
+
+    /**
      * Saves a player or ignores if already exists.
      *
      * @param fPlayer the player to save

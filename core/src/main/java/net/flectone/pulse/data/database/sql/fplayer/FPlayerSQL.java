@@ -80,6 +80,24 @@ public interface FPlayerSQL extends SQL {
     void update(@Bind("id") int id, @Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip);
 
     /**
+     * Sets all players associated with the specified server to offline status.
+     * Players without a server assignment or matching the given server will be set offline.
+     *
+     * @param server the server identifier to match against player server settings
+     */
+    @SqlUpdate(
+            """
+            UPDATE `fp_player` SET `online` = false
+            WHERE `id` IN (
+                SELECT p.`id` FROM `fp_player` p
+                LEFT JOIN `fp_setting` s ON s.`player` = p.`id` AND s.`type` = 'server'
+                WHERE s.`value` IS NULL OR s.`value` = :server
+            )
+            """
+    )
+    void setOfflineByServer(@Bind("server") String server);
+
+    /**
      * Gets all online players.
      *
      * @return list of online player info
