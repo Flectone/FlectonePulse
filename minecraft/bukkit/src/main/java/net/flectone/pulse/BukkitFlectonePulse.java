@@ -71,7 +71,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         taskScheduler.start();
 
         // update tick
-        Bukkit.getScheduler().runTaskTimer(this, taskScheduler::onTick, 1L, 1L);
+        injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).runTaskTimer(taskScheduler::onTick, 1L, 1L);
 
         get(FlectonePulseAPI.class).onEnable();
     }
@@ -87,9 +87,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         // cancel custom tasks
         injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).cancelTasks(this);
-
-        // cancel plugin tasks
-        Bukkit.getScheduler().cancelTasks(this);
     }
 
     @Override
