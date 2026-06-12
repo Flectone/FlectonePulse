@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 @Singleton
 public class TaskScheduler {
 
-    private static final String THREAD_PREFIX = "FlectonePulseThread";
+    private static final String THREAD_PREFIX = "FlectonePulse Thread #";
 
     private final AtomicLong currentTick = new AtomicLong(0L);
     private final AtomicLong threadCounter = new AtomicLong(0L);
