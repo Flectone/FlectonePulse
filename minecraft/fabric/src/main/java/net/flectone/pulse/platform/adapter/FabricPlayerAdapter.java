@@ -19,7 +19,6 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.file.FileFacade;
@@ -56,7 +55,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
-    private final ModuleController moduleController;
 
     @Inject
     private Provider<MinecraftHeaderModule> headerModuleProvider;
@@ -214,7 +212,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
         MinecraftHeaderModule headerModule = headerModuleProvider.get();
 
-        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
+        if (!headerModule.isDisabledFor(fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
                 return messagePipeline.build(MessageContext.builder()
@@ -232,7 +230,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
         MinecraftFooterModule footerModule = footerModuleProvider.get();
 
-        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
+        if (!footerModule.isDisabledFor(fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
                 return messagePipeline.build(MessageContext.builder()
