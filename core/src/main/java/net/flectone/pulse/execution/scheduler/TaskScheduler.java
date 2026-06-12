@@ -360,7 +360,7 @@ public class TaskScheduler {
                     future.complete(null);
                 }
             } catch (Exception e) {
-                fLogger.warning("Task execution failed: %s", e);
+                fLogger.warning(e, "Task execution failed:");
                 future.completeExceptionally(e);
             }
         };
