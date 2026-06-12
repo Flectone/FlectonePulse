@@ -49,7 +49,7 @@ public class PlaytimeService {
         // because players may not be in the database
         if (getPlayTimesCount() == 0) {
             fPlayerService.findAllFPlayers().forEach(fPlayer -> {
-                if (fPlayer.isUnknown()) return;
+                if (fPlayer.isUnknown() || fPlayer.isConsole()) return;
 
                 PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
                 if (platformPlayTime == null) return;
