@@ -33,10 +33,10 @@ public class PlayerPreLoginProcessor {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        // if player is unknown, then he is not in database and has never been on the server before this moment,
-        // then need to update his name to display messages correctly
+        // if player is unknown, then he is not in database and has never been on the server before this moment
+        // try to search by name
         if (fPlayer.isUnknown()) {
-            fPlayer = fPlayerService.updateCache(fPlayer.withName(name));
+            fPlayer = fPlayerService.getFPlayer(name);
         }
 
         PlayerPreLoginEvent event = eventDispatcher.dispatch(new PlayerPreLoginEvent(fPlayer));
