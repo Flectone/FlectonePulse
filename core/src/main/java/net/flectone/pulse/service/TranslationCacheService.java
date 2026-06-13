@@ -1,9 +1,9 @@
 package net.flectone.pulse.service;
 
 import com.google.common.cache.Cache;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -39,8 +39,14 @@ public class TranslationCacheService {
 
     private final CacheRegistry cacheRegistry;
     private final FLogger fLogger;
+    private final Gson gson;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+    /** Minimal MyMemory response shape — only the fields actually read. */
+    private record MyMemoryResponse(MyMemoryResponseData responseData) {}
+
+    private record MyMemoryResponseData(String translatedText) {}
 
     /** In-flight requests deduplication — same (source, target, text) returns the same future. */
     private final Map<String, CompletableFuture<String>> inFlight = new ConcurrentHashMap<>();
@@ -102,22 +108,16 @@ public class TranslationCacheService {
             in.close();
 
             String jsonResponse = response.toString();
-            JsonElement root = new JsonParser().parse(jsonResponse);
-            if (!root.isJsonObject()) {
-                fLogger.warning("[AutoTranslate] MyMemory: response is not a JSON object");
-                return null;
-            }
-            JsonObject responseData = root.getAsJsonObject().getAsJsonObject("responseData");
-            if (responseData == null) {
+            MyMemoryResponse parsed = gson.fromJson(jsonResponse, MyMemoryResponse.class);
+            if (parsed == null || parsed.responseData() == null) {
                 fLogger.warning("[AutoTranslate] MyMemory: missing responseData in JSON");
                 return null;
             }
-            JsonElement translatedTextEl = responseData.get("translatedText");
-            if (translatedTextEl == null || translatedTextEl.isJsonNull()) {
+            String translation = parsed.responseData().translatedText();
+            if (translation == null) {
                 fLogger.warning("[AutoTranslate] MyMemory: missing translatedText in responseData");
                 return null;
             }
-            String translation = translatedTextEl.getAsString();
 
             return translation;
         } catch (Exception e) {
@@ -277,12 +277,12 @@ public class TranslationCacheService {
 
             String jsonResponse = response.toString();
             // Response shape: [[["translated text","original",null,null,1]],null,"en",...]
-            JsonElement root = new JsonParser().parse(jsonResponse);
-            if (!root.isJsonArray()) {
+            JsonArray root = gson.fromJson(jsonResponse, JsonArray.class);
+            if (root == null) {
                 fLogger.warning("[AutoTranslate] Google: response is not a JSON array");
                 return null;
             }
-            JsonElement segments = root.getAsJsonArray().get(0);
+            JsonElement segments = root.get(0);
             if (segments == null || !segments.isJsonArray()) {
                 fLogger.warning("[AutoTranslate] Google: missing segments array");
                 return null;
