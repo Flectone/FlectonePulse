@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.registry.CacheRegistry;
+import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.Nullable;
@@ -100,7 +101,7 @@ public class TranslationCacheService {
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "FlectonePulse/1.9.4");
+            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
 
@@ -269,7 +270,7 @@ public class TranslationCacheService {
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; FlectonePulse/1.9.4)");
+            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
 
