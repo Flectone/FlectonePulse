@@ -227,7 +227,15 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        translateModule.clearHistory(event.player());
+        // Default true — a reconnect should start with a clean chat history.
+        // Set message.format.translate.clear_history_on_quit: false to preserve
+        // entries across reconnects (useful for short reloads).
+        if (!Boolean.FALSE.equals(translateModule.config().clearHistoryOnQuit())) {
+            translateModule.clearHistory(event.player());
+        } else {
+            fLogger.debug("[History.clear] player=%s — clear_history_on_quit disabled by config, keeping entries",
+                    event.player() == null ? "null" : event.player().name());
+        }
     }
 
     /** True when message.format.translate.auto is enabled (default). */

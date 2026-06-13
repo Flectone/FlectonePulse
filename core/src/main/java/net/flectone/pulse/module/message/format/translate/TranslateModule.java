@@ -432,12 +432,18 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
      */
     public void clearHistory(FPlayer fPlayer) {
         UUID playerUUID = fPlayer.uuid();
+        int affectedEntries = 0;
         synchronized (globalHistory) {
             for (TranslateHistoryMessage entry : globalHistory) {
-                entry.viewers().remove(playerUUID);
+                if (entry.viewers().remove(playerUUID)) {
+                    affectedEntries++;
+                }
             }
         }
-        playerOriginalToggles.remove(playerUUID);
+        Set<UUID> previousToggles = playerOriginalToggles.remove(playerUUID);
+        fLogger.debug("[History.clear] player=%s — removed from %d viewer set(s), discarded %d toggle state(s)",
+                fPlayer.name(), affectedEntries,
+                previousToggles == null ? 0 : previousToggles.size());
     }
 
     /**

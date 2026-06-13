@@ -306,6 +306,12 @@ format:
     #               ⇄ button runs /translateto on click, dispatching the
     #               translated message as a new chat line
     auto: true
+    # When true (default), the player's chat history (viewer markers and
+    # toggle state) is cleared on quit — a reconnect starts with a fresh
+    # chat, no leftover entries from before. Set to false to keep entries
+    # across reconnects (useful for short reloads where you want toggle to
+    # keep working on messages sent before the reload).
+    clear_history_on_quit: true
     # Provider chain — tried in order until one returns a useful translation.
     # If a provider fails (non-200 / null / returns input verbatim), the next is tried.
     # Allowed values: GOOGLE, MYMEMORY, DEEPL, YANDEX.

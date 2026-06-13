@@ -574,7 +574,7 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Translate(Boolean enable, Boolean auto, java.util.List<String> providers) implements EnableSetting {
+        public record Translate(Boolean enable, Boolean auto, Boolean clearHistoryOnQuit, java.util.List<String> providers) implements EnableSetting {
         }
 
         @With

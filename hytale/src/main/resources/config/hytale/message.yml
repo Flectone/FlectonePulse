@@ -276,6 +276,8 @@ format:
     # auto: true → async pre-translation + /toggleoriginal button
     # auto: false → author's classic /translateto click-to-translate mode
     auto: true
+    # true → clear player chat history (viewers, toggles) on quit
+    clear_history_on_quit: true
     providers:
       - GOOGLE
       - MYMEMORY
