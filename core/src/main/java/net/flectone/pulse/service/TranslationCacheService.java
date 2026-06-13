@@ -37,6 +37,19 @@ public class TranslationCacheService {
     /** Base endpoint of the free Google Translate gtx API. */
     private static final String GOOGLE_TRANSLATE_API_URL = "https://translate.googleapis.com/translate_a/single";
 
+    /**
+     * Minecraft locales whose region is meaningful and accepted by both Google gtx
+     * and MyMemory (hyphenated, uppercase region). For these we keep the region
+     * instead of collapsing to the base ISO 639-1 code.
+     */
+    private static final Map<String, String> REGION_AWARE_LOCALES = Map.of(
+            "zh_cn", "zh-CN",
+            "zh_tw", "zh-TW",
+            "zh_hk", "zh-TW",
+            "pt_br", "pt-BR",
+            "pt_pt", "pt-PT"
+    );
+
     private final CacheRegistry cacheRegistry;
     private final FLogger fLogger;
     private final Gson gson;
@@ -309,17 +322,24 @@ public class TranslationCacheService {
 
     /**
      * Normalize language code from minecraft format to ISO 639-1.
-     * Examples: en_us → en, ru_ru → ru, zh_cn → zh.
+     * Examples: en_us → en, ru_ru → ru.
+     * Region-aware locales keep their region (zh_cn → zh-CN, pt_br → pt-BR) since
+     * both Google gtx and MyMemory accept and need it to disambiguate.
      */
     private String normalizeLangCode(String langCode) {
         if (langCode == null || langCode.isEmpty()) {
             return "en";
         }
-        int underscoreIndex = langCode.indexOf('_');
-        if (underscoreIndex > 0) {
-            return langCode.substring(0, underscoreIndex).toLowerCase();
+        String key = langCode.toLowerCase().replace('-', '_');
+        String regionAware = REGION_AWARE_LOCALES.get(key);
+        if (regionAware != null) {
+            return regionAware;
         }
-        return langCode.toLowerCase();
+        int underscoreIndex = key.indexOf('_');
+        if (underscoreIndex > 0) {
+            return key.substring(0, underscoreIndex);
+        }
+        return key;
     }
 
     public void shutdown() {
