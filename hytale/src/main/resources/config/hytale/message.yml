@@ -45,6 +45,7 @@ brand:
 bubble:
   enable: true
   visible_to_self: true
+  translate: true
   disallowed_input: ""
   max_count: 3
   max_length: 30
@@ -274,6 +275,16 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    # auto: true → async pre-translation + /toggleoriginal button
+    # auto: false → author's classic /translateto click-to-translate mode
+    auto: true
+    # true → clear player chat history (viewers, toggles) on quit
+    clear_history_on_quit: true
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"

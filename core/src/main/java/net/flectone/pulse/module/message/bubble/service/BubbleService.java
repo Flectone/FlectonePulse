@@ -14,7 +14,10 @@ import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.service.TranslationCacheService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
@@ -37,6 +40,8 @@ public class BubbleService {
     private final TaskScheduler taskScheduler;
     private final RandomGenerator randomUtil;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
+    private final TranslationCacheService translationCacheService;
 
     public void startTicker() {
         taskScheduler.runPlayerAsyncTimer(fPlayer -> {
@@ -56,21 +61,56 @@ public class BubbleService {
         );
 
 
-        List<Bubble> bubbles = splitMessageToBubbles(
-                sender,
-                messagePipeline.buildPlain(MessageContext.builder()
-                        .sender(sender)
-                        .message(message)
-                        .flags(
-                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.ITEM_DETECTION, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_TEXTURE_PROCESSING, MessageFlag.REMOVE_DISABLED_TAGS, MessageFlag.VIOLATION_PROCESSING, MessageFlag.URL_PROCESSING},
-                                new boolean[]{true, false, false, false, false, false, false, false, false, false, false}
-                        )
-                        .build()
-                ),
-                receivers
+        String plainMessage = messagePipeline.buildPlain(MessageContext.builder()
+                .sender(sender)
+                .message(message)
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.ITEM_DETECTION, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_TEXTURE_PROCESSING, MessageFlag.REMOVE_DISABLED_TAGS, MessageFlag.VIOLATION_PROCESSING, MessageFlag.URL_PROCESSING},
+                        new boolean[]{true, false, false, false, false, false, false, false, false, false, false}
+                )
+                .build()
         );
 
+        List<Bubble> bubbles = splitMessageToBubbles(sender, plainMessage, receivers);
+
         state.waitingQueue.addAll(bubbles);
+
+        warmTranslationCache(sender, plainMessage, receivers);
+    }
+
+    // Fire-and-forget cache warming: for every distinct online viewer locale that differs
+    // from the sender's, kick off a translation of the WHOLE message so the renderer can
+    // pick it up synchronously when the bubble surfaces. Gated on chat auto-translate.
+    private void warmTranslationCache(@NonNull FPlayer sender, @NonNull String fullMessage, List<FPlayer> receivers) {
+        if (!isBubbleTranslateEnabled()) return;
+        if (receivers == null || receivers.isEmpty()) return;
+
+        String senderLocale = socialService.getSetting(sender, SettingText.LOCALE);
+        if (senderLocale == null) return;
+
+        List<String> providers = fileFacade.message().format().translate().providers();
+        if (providers == null || providers.isEmpty()) return;
+
+        Set<String> targetLocales = new HashSet<>();
+        for (FPlayer receiver : receivers) {
+            if (receiver == null || receiver.isUnknown()) continue;
+            String viewerLocale = socialService.getSetting(receiver, SettingText.LOCALE);
+            if (viewerLocale == null || viewerLocale.equals(senderLocale)) continue;
+            targetLocales.add(viewerLocale);
+        }
+
+        for (String targetLocale : targetLocales) {
+            translationCacheService.translateAsync(senderLocale, targetLocale, fullMessage, providers);
+        }
+    }
+
+    // Bubble auto-translate runs only when chat auto-translate is on AND the bubble
+    // toggle is enabled (default true).
+    private boolean isBubbleTranslateEnabled() {
+        Message.Format.Translate translate = fileFacade.message().format().translate();
+        boolean chatAuto = Boolean.TRUE.equals(translate.enable()) && !Boolean.FALSE.equals(translate.auto());
+        boolean bubbleToggle = !Boolean.FALSE.equals(fileFacade.message().bubble().translate());
+        return chatAuto && bubbleToggle;
     }
 
     private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
@@ -102,27 +142,39 @@ public class BubbleService {
         int maxLength = config.maxLength();
         int maxCount = config.maxCount();
 
-        if (message.length() <= maxLength) {
-            return List.of(buildBubble(
-                    id, sender, message, duration, elevation, interactionHeight,
+        String senderLocale = socialService.getSetting(sender, SettingText.LOCALE);
+
+        List<String> chunks = splitText(message, maxLength, maxCount, hintBufferLength, wordBreakHint);
+
+        List<Bubble> bubbles = new ObjectArrayList<>();
+        for (int i = 0; i < chunks.size(); i++) {
+            bubbles.add(buildBubble(
+                    id, sender, chunks.get(i), message, senderLocale, i, chunks.size(),
+                    duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
         }
 
-        List<Bubble> bubbles = new ObjectArrayList<>();
+        return List.copyOf(bubbles);
+    }
+
+    // Symbol-level splitter shared by the original message and by re-splitting a
+    // translation at render time so both produce identically-shaped chunks.
+    public static List<String> splitText(String message, int maxLength, int maxCount, int hintBufferLength, String wordBreakHint) {
+        if (message.length() <= maxLength) {
+            return List.of(message);
+        }
+
+        List<String> chunks = new ObjectArrayList<>();
         int start = 0;
 
-        while (start < message.length() && bubbles.size() < maxCount) {
+        while (start < message.length() && chunks.size() < maxCount) {
             int end = Math.min(start + maxLength, message.length());
 
             // the last
             if (end == message.length()) {
-                bubbles.add(buildBubble(
-                        id, sender, message.substring(start).trim(), duration, elevation, interactionHeight,
-                        useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
-                        animationTime, scale, billboard, receivers
-                ));
+                chunks.add(message.substring(start).trim());
                 break;
             }
 
@@ -147,19 +199,15 @@ public class BubbleService {
                 nextStart = end;
             }
 
-            bubbles.add(buildBubble(
-                    id, sender, chunk, duration, elevation, interactionHeight,
-                    useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
-                    animationTime, scale, billboard, receivers
-            ));
-
+            chunks.add(chunk);
             start = nextStart;
         }
 
-        return List.copyOf(bubbles);
+        return List.copyOf(chunks);
     }
 
-    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, float elevation, float interactionHeight,
+    private Bubble buildBubble(int id, FPlayer sender, String message, String fullMessage, String senderLocale,
+                               int chunkIndex, int chunkCount, long duration, float elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, boolean seeThrough, int background,
                                int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
         Bubble.BubbleBuilder<?, ?> builder = useModern
@@ -176,6 +224,10 @@ public class BubbleService {
                 .id(id)
                 .sender(sender)
                 .rawMessage(message)
+                .fullMessage(fullMessage)
+                .senderLocale(senderLocale)
+                .chunkIndex(chunkIndex)
+                .chunkCount(chunkCount)
                 .duration(duration)
                 .elevation(elevation)
                 .interactionHeight(interactionHeight)
@@ -251,7 +303,7 @@ public class BubbleService {
         return (long) (((countWords + config.handicapChars()) / config.readSpeed()) * 60) * 1000L;
     }
 
-    private boolean isNotLetter(char symbol) {
+    private static boolean isNotLetter(char symbol) {
         if (Character.isLetter(symbol)) return false;
         if (Character.isSpaceChar(symbol)) return true;
 

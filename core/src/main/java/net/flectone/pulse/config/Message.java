@@ -189,6 +189,7 @@ public record Message(
     public record Bubble(
             Boolean enable,
             Boolean visibleToSelf,
+            Boolean translate,
             String disallowedInput,
             Integer maxCount,
             Integer maxLength,
@@ -578,7 +579,7 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Translate(Boolean enable) implements EnableSetting {
+        public record Translate(Boolean enable, Boolean auto, Boolean clearHistoryOnQuit, List<String> providers) implements EnableSetting {
         }
 
         @With

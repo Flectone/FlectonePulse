@@ -55,6 +55,7 @@ brand:
 bubble:
   enable: true
   visible_to_self: true
+  translate: true
   disallowed_input: ""
   max_count: 3
   max_length: 30
@@ -301,6 +302,27 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    # auto: true  → async auto-translation per receiver locale, ⇄ button toggles
+    #               between translation and original via /toggleoriginal
+    # auto: false → author's classic mode: nothing is pre-translated; the
+    #               ⇄ button runs /translateto on click, dispatching the
+    #               translated message as a new chat line
+    auto: true
+    # When true (default), the player's chat history (viewer markers and
+    # toggle state) is cleared on quit — a reconnect starts with a fresh
+    # chat, no leftover entries from before. Set to false to keep entries
+    # across reconnects (useful for short reloads where you want toggle to
+    # keep working on messages sent before the reload).
+    clear_history_on_quit: true
+    # Provider chain — tried in order until one returns a useful translation.
+    # If a provider fails (non-200 / null / returns input verbatim), the next is tried.
+    # Allowed values: GOOGLE, MYMEMORY, DEEPL, YANDEX.
+    # Empty list disables auto-translate entirely.
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"
