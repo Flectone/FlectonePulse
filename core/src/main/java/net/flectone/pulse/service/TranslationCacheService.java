@@ -32,6 +32,11 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslationCacheService {
 
+    /** Base endpoint of the MyMemory public translation API. */
+    private static final String MYMEMORY_API_URL = "https://api.mymemory.translated.net/get";
+    /** Base endpoint of the free Google Translate gtx API. */
+    private static final String GOOGLE_TRANSLATE_API_URL = "https://translate.googleapis.com/translate_a/single";
+
     private final CacheRegistry cacheRegistry;
     private final FLogger fLogger;
     private final Provider<IntegrationModule> integrationModuleProvider;
@@ -70,7 +75,7 @@ public class TranslationCacheService {
 
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
             // Pipe is encoded as %7C — java.net.URI (RFC 3986 strict) rejects raw pipe in query.
-            String urlString = "https://api.mymemory.translated.net/get?q=" + encodedText
+            String urlString = MYMEMORY_API_URL + "?q=" + encodedText
                 + "&langpair=" + normalizedSource + "%7C" + normalizedTarget;
 
             URI uri = new URI(urlString);
@@ -243,7 +248,7 @@ public class TranslationCacheService {
             String normalizedTarget = normalizeLangCode(targetLang);
 
             String encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8);
-            String urlString = "https://translate.googleapis.com/translate_a/single?client=gtx"
+            String urlString = GOOGLE_TRANSLATE_API_URL + "?client=gtx"
                     + "&sl=" + normalizedSource
                     + "&tl=" + normalizedTarget
                     + "&dt=t&ie=UTF-8&oe=UTF-8&q=" + encodedText;
