@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -18,15 +18,15 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.BukkitAttributesProvider;
-import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.BukkitPassengersProvider;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
@@ -43,14 +43,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
-    private final Injector injector;
+    private final FileFacade fileFacade;
     private final MinecraftPacketProvider packetProvider;
     private final MinecraftPacketSender packetSender;
     private final BukkitAttributesProvider attributesProvider;
     private final BukkitPassengersProvider passengersProvider;
     private final ReflectionResolver reflectionResolver;
     private final MessagePipeline messagePipeline;
-    private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
+
+    @Inject
+    private Provider<MinecraftHeaderModule> headerModuleProvider;
+
+    @Inject
+    private Provider<MinecraftFooterModule> footerModuleProvider;
 
     private MethodHandle handleMethod;
     private MethodHandle gameProfileMethod;
@@ -94,7 +100,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @Nullable UUID getPlayerByEntityId(int entityId) {
         return Bukkit.getOnlinePlayers().stream()
                 .filter(player -> player.getEntityId() == entityId)
-                .findFirst()
+                .findAny()
                 .map(Entity::getUniqueId)
                 .orElse(null);
     }
@@ -138,6 +144,18 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @NonNull String getWorldEnvironment(@NonNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         return player != null ? player.getWorld().getEnvironment().toString().toLowerCase() : "";
+    }
+
+    @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        try {
+            return player.getLocale();
+        } catch (NoSuchMethodError _) {
+            return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+        }
     }
 
     @Override
@@ -250,14 +268,17 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
+        MinecraftHeaderModule headerModule = headerModuleProvider.get();
 
         String header;
-        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
+        if (!headerModule.isDisabledFor(fPlayer)) {
             header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(header)
+                        .build()
+                );
             }
         }
 
@@ -267,19 +288,22 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         header = player.getPlayerListHeader();
         if (header == null) return Component.empty();
 
-        return LegacyComponentSerializer.legacySection().deserialize(header);
+        return componentSerializer.fromLegacy(header);
     }
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = injector.getInstance(MinecraftFooterModule.class);
+        MinecraftFooterModule footerModule = footerModuleProvider.get();
 
         String footer;
-        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
+        if (!footerModule.isDisabledFor(fPlayer)) {
             footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(footer)
+                        .build()
+                );
             }
         }
 
@@ -289,7 +313,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         footer = player.getPlayerListFooter();
         if (footer == null) return Component.empty();
 
-        return LegacyComponentSerializer.legacySection().deserialize(footer);
+        return componentSerializer.fromLegacy(footer);
     }
 
     @Override
@@ -368,7 +392,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return Collections.emptySet();
+        if (player == null) return Set.of();
 
         World world = player.getWorld();
         Location location = player.getLocation();
@@ -385,7 +409,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return Collections.emptyList();
+        if (player == null) return List.of();
 
         return passengersProvider.getPassengers(player);
     }

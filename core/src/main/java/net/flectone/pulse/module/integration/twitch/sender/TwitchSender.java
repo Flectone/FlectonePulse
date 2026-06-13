@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -18,7 +19,7 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -53,27 +54,33 @@ public class TwitchSender {
                         .range(Range.get(Range.Type.PROXY))
                         .destination(twitchModule.config().destination())
                         .sound(twitchModule.soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (_, _) -> {
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            MessageContext tagContext = messagePipeline.createContext(twitchModule.localization(fResolver).formatReply())
-                                    .addTagResolvers(
-                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            TagResolver.resolver("reply_message", (_, _) -> {
-                                                MessageContext replyContext = messagePipeline.createContext(twitchClient.sender(), fResolver, reply.second())
-                                                        .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-                                                return Tag.selfClosingInserting(messagePipeline.build(replyContext));
-                                            })
-                                    );
-
-                            return Tag.inserting(messagePipeline.build(tagContext));
+                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .message(twitchModule.localization(fResolver).formatReply())
+                                    .tagResolvers(
+                                            messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                    .sender(twitchClient.sender())
+                                                    .receiver(fResolver)
+                                                    .message(reply.getRight())
+                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                    .build()
+                                            )))
+                                    )
+                                    .build()
+                            ));
                         })})
-                        .integration(string -> StringUtils.replaceEach(
-                                string,
-                                new String[]{"<name>", "<channel>"},
-                                new String[]{nickname, channel}
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> StringUtils.replaceEach(
+                                        string,
+                                        new String[]{"<name>", "<channel>"},
+                                        new String[]{nickname, channel}
+                                ))
+                                .messageNames(List.of(twitchModule.name().name() + "_" + channel.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .nickname(nickname)

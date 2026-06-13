@@ -16,32 +16,36 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.poll.listener.PollProxyMessageListener;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -61,7 +65,11 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ComponentSerializer componentSerializer;
     private final FLogger fLogger;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -69,7 +77,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         String promptRepeatTime = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::repeatTime);
         String promptMultipleVote = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::multipleVote);
         String promptMessage = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::message);
-        commandModuleController.registerCommand(this, manager -> manager
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().create().name())
                 .required(promptTime, commandParserProvider.durationParser())
                 .required(promptRepeatTime, commandParserProvider.durationParser())
@@ -79,12 +87,11 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
         String promptId = commandModuleController.addPrompt(this, 4, Localization.Command.Prompt::id);
         String promptNumber = commandModuleController.addPrompt(this, 5, Localization.Command.Prompt::number);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "vote", CommandMeta.empty())
-                        .permission(permission().name())
-                        .required(promptId, commandParserProvider.integerParser())
-                        .required(promptNumber, commandParserProvider.integerParser())
-                        .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandVote(), commandBuilder -> commandBuilder
+                .permission(permission().name())
+                .required(promptId, commandParserProvider.integerParser())
+                .required(promptNumber, commandParserProvider.integerParser())
+                .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
         );
 
         taskScheduler.runAsyncTimer(() -> {
@@ -111,6 +118,10 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
                                 .format(resolvePollFormat(fPlayer, poll, status))
                                 .range(range)
                                 .message(poll.getTitle())
+                                .integration(IntegrationMetadata.builder()
+                                        .messageNames(List.of(name().name() + "_" + status, name().name() + "_REPEAT"))
+                                        .build()
+                                )
                                 .build()
                         )
                         .poll(poll)
@@ -122,6 +133,10 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
             toRemove.forEach(pollMap::remove);
         }, 20L);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(PollProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -192,7 +207,7 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         int firstAnswerIndex = hasTitle ? 1 : 0;
         List<String> answers = parts.length > firstAnswerIndex
                 ? List.of(Arrays.copyOfRange(parts, firstAnswerIndex, parts.length))
-                : Collections.emptyList();
+                : List.of();
 
         createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
     }
@@ -213,8 +228,8 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
     }
 
     @Override
-    public Localization.Command.Poll localization(FEntity sender) {
-        return fileFacade.localization(sender).command().poll();
+    public Localization.Command.Poll localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().poll();
     }
 
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
@@ -242,7 +257,10 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
                             dataOutputStream.writeUTF(Action.CREATE.name());
                             dataOutputStream.writeAsJson(poll);
                         })
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_START", name().name() + "_CREATE"))
+                                .build()
+                        )
                         .build()
                 )
                 .poll(poll)
@@ -332,18 +350,17 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
             int k = 0;
             for (String answer : poll.getAnswers()) {
 
-                MessageContext answerContext = messagePipeline.createContext(fPlayer, FPlayer.UNKNOWN, answer);
-                Component answerComponent = messagePipeline.build(answerContext);
+                Component answerComponent = messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(FPlayer.UNKNOWN)
+                        .message(answer)
+                        .build()
+                );
 
                 answersBuilder.append(StringUtils.replaceEach(
                         message.answerTemplate(),
-                        new String[]{"<id>", "<number>", "<answer>", "<count>"},
-                        new String[]{
-                                String.valueOf(poll.getId()),
-                                String.valueOf(k),
-                                PlainTextComponentSerializer.plainText().serialize(answerComponent),
-                                String.valueOf(poll.getCountAnswers()[k])
-                        }
+                        new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
+                        new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(poll.getCountAnswers()[k])}
                 ));
 
                 k++;

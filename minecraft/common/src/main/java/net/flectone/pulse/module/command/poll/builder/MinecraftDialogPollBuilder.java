@@ -20,16 +20,15 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.NBTPoll;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton
@@ -48,19 +47,25 @@ public class MinecraftDialogPollBuilder {
 
     public void openDialog(FPlayer fPlayer) {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
-        openDialog(fPlayer, poll.inputInitial(), false, 5.0f, 1.0f, Collections.emptyList());
+        openDialog(fPlayer, poll.inputInitial(), false, 5.0f, 1.0f, List.of());
     }
 
     public void openDialog(FPlayer fPlayer, String inputValue, boolean multipleValue, float endTimeValue, float repeatTimeValue, List<String> answers) {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, poll.header());
-        Component headerName = messagePipeline.build(headerContext);
+        Component headerName = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.header())
+                .build()
+        );
 
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
-        MessageContext inputNameContext = messagePipeline.createContext(fPlayer, poll.inputName());
-        Component inputNameComponent = messagePipeline.build(inputNameContext);
+        Component inputNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.inputName())
+                .build()
+        );
 
         Input input = new Input(INPUT_KEY, new TextInputControl(200,
                 inputNameComponent,
@@ -70,8 +75,11 @@ public class MinecraftDialogPollBuilder {
                 null
         ));
 
-        MessageContext multipleNameContext = messagePipeline.createContext(fPlayer, poll.multipleName());
-        Component multipleNameComponent = messagePipeline.build(multipleNameContext);
+        Component multipleNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.multipleName())
+                .build()
+        );
 
         Input multiple = new Input(MULTIPLE_KEY, new BooleanInputControl(
                 multipleNameComponent,
@@ -80,8 +88,11 @@ public class MinecraftDialogPollBuilder {
                 "false"
         ));
 
-        MessageContext endTimeNameContext = messagePipeline.createContext(fPlayer, poll.endTimeName());
-        Component endTimeNameComponent = messagePipeline.build(endTimeNameContext);
+        Component endTimeNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.endTimeName())
+                .build()
+        );
 
         Input endTime = new Input(END_TIME_KEY, new NumberRangeInputControl(
                 200,
@@ -90,8 +101,11 @@ public class MinecraftDialogPollBuilder {
                 new NumberRangeInputControl.RangeInfo(1.0f, 600.0f, endTimeValue, 1.0f)
         ));
 
-        MessageContext repeatTimeNameContext = messagePipeline.createContext(fPlayer, poll.repeatTimeName());
-        Component repeatTimeNameComponent = messagePipeline.build(repeatTimeNameContext);
+        Component repeatTimeNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.repeatTimeName())
+                .build()
+        );
 
         Input repeatTime = new Input(REPEAT_TIME_KEY, new NumberRangeInputControl(
                 200,
@@ -103,9 +117,11 @@ public class MinecraftDialogPollBuilder {
         List<Input> inputs = new ObjectArrayList<>(List.of(input, multiple, endTime, repeatTime));
 
         for (int i = 0; i < answers.size(); i++) {
-            String inputAnswerName = Strings.CS.replace(poll.inputAnswerName(), "<number>", String.valueOf(i + 1));
-            MessageContext answerNameContext = messagePipeline.createContext(fPlayer, inputAnswerName);
-            Component answerNameComponent = messagePipeline.build(answerNameContext);
+            Component answerNameComponent = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(Strings.CS.replace(poll.inputAnswerName(), "<number>", String.valueOf(i + 1)))
+                    .build()
+            );
 
             Input inputAnswer = new Input(ANSWER_KEY + i, new TextInputControl(200,
                     answerNameComponent,
@@ -141,8 +157,11 @@ public class MinecraftDialogPollBuilder {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
         String newAnswerButtonId = "fp_new_answer";
-        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, poll.newAnswerButtonName());
-        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+        Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.newAnswerButtonName())
+                .build()
+        );
 
         ActionButton button = new ActionButton(
                 new CommonButtonData(
@@ -173,8 +192,11 @@ public class MinecraftDialogPollBuilder {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).modern();
 
         String newAnswerButtonId = "fp_remove_answer";
-        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, poll.removeAnswerButtonName());
-        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+        Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(poll.removeAnswerButtonName())
+                .build()
+        );
 
         ActionButton button = new ActionButton(
                 new CommonButtonData(
@@ -203,8 +225,11 @@ public class MinecraftDialogPollBuilder {
 
     private MinecraftDialog.Builder addCreateButton(FPlayer fPlayer, MinecraftDialog.Builder builder) {
         String createId = "fp_create";
-        MessageContext buttonNameContext = messagePipeline.createContext(fPlayer, pollModule.localization(fPlayer).modern().createButtonName());
-        Component buttonNameComponent = messagePipeline.build(buttonNameContext);
+        Component buttonNameComponent = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(pollModule.localization(fPlayer).modern().createButtonName())
+                .build()
+        );
 
         ActionButton button = new ActionButton(
                 new CommonButtonData(
@@ -240,6 +265,6 @@ public class MinecraftDialogPollBuilder {
             answers.add(answerValue);
         }
 
-        return new NBTPoll(inputName, multiple, endTime, repeatTime, Collections.unmodifiableList(answers));
+        return new NBTPoll(inputName, multiple, endTime, repeatTime, List.copyOf(answers));
     }
 }

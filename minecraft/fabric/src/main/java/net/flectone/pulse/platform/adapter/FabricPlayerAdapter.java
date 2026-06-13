@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -19,9 +19,9 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.message.tab.footer.MinecraftFooterModule;
 import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
@@ -50,12 +50,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
+    private final FileFacade fileFacade;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
-    private final ModuleController moduleController;
-    private final Injector injector;
+
+    @Inject
+    private Provider<MinecraftHeaderModule> headerModuleProvider;
+
+    @Inject
+    private Provider<MinecraftFooterModule> footerModuleProvider;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -146,6 +151,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        ServerPlayer player = getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return player.clientInformation().language();
+    }
+
+    @Override
     public @Nullable String getIp(@NonNull UUID uuid) {
         ServerPlayer player = getPlayer(uuid);
         if (player != null) {
@@ -197,13 +210,16 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListHeader(@NonNull FPlayer fPlayer) {
-        MinecraftHeaderModule headerModule = injector.getInstance(MinecraftHeaderModule.class);
+        MinecraftHeaderModule headerModule = headerModuleProvider.get();
 
-        if (!moduleController.isDisabledFor(headerModule, fPlayer)) {
+        if (!headerModule.isDisabledFor(fPlayer)) {
             String header = headerModule.getCurrentMessage(fPlayer);
             if (header != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, header);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(header)
+                        .build()
+                );
             }
         }
 
@@ -212,13 +228,16 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull Component getPlayerListFooter(@NonNull FPlayer fPlayer) {
-        MinecraftFooterModule footerModule = injector.getInstance(MinecraftFooterModule.class);
+        MinecraftFooterModule footerModule = footerModuleProvider.get();
 
-        if (!moduleController.isDisabledFor(footerModule, fPlayer)) {
+        if (!footerModule.isDisabledFor(fPlayer)) {
             String footer = footerModule.getCurrentMessage(fPlayer);
             if (footer != null) {
-                MessageContext messageContext = messagePipeline.createContext(fPlayer, footer);
-                return messagePipeline.build(messageContext);
+                return messagePipeline.build(MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(footer)
+                        .build()
+                );
             }
         }
 
@@ -327,7 +346,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<UUID> getOnlinePlayers() {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
-        if (minecraftServer == null) return Collections.emptyList();
+        if (minecraftServer == null) return List.of();
 
         return minecraftServer.getPlayerList().getPlayers()
                 .stream()
@@ -338,7 +357,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(@NonNull UUID uuid, double x, double y, double z) {
         ServerPlayer player = getPlayer(uuid);
-        if (player == null) return Collections.emptySet();
+        if (player == null) return Set.of();
 
         Vec3 position = player.position();
         AABB searchBox = new AABB(
@@ -371,7 +390,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
         ServerPlayer player = getPlayer(uuid);
-        if (player == null) return Collections.emptyList();
+        if (player == null) return List.of();
 
         return player.getPassengers()
                 .stream()

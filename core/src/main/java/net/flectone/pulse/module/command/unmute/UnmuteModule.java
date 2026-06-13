@@ -8,26 +8,31 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.unmute.listener.UnmuteProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -44,6 +49,9 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -54,6 +62,10 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                 .required(promptPlayer, commandParserProvider.mutedParser())
                 .optional(promptReason, commandParserProvider.messageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(UnmuteProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -97,8 +109,8 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
     }
 
     @Override
-    public Localization.Command.Unmute localization(FEntity sender) {
-        return fileFacade.localization(sender).command().unmute();
+    public Localization.Command.Unmute localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().unmute();
     }
 
     public void unmute(FPlayer fPlayer, String target, int id, String reason) {
@@ -115,7 +127,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unmute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::lowerWeightGroup)
@@ -138,7 +150,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
         if (unmute == null) return;
 
         if (!fileFacade.command().mute().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MUTE);
         }
 
         EventMetadata.Builder<Localization.Command.Unmute> baseMetadataBuilder = EventMetadata.<Localization.Command.Unmute>builder()
@@ -160,7 +172,7 @@ public class UnmuteModule implements ModuleCommand<Localization.Command.Unmute> 
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unmute>builder()

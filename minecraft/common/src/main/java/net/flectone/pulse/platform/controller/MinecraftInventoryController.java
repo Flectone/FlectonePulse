@@ -9,8 +9,8 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.inventory.MinecraftInventoryClickType;
 import net.flectone.pulse.model.inventory.MinecraftInventory;
+import net.flectone.pulse.model.inventory.MinecraftInventoryClickType;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 

@@ -1,18 +1,20 @@
 package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.FPlayerSQL;
+import net.flectone.pulse.data.database.sql.fplayer.*;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,7 +31,6 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
     private final Database database;
     private final FLogger logger;
-    private final Provider<SettingDAO> settingDAOProvider;
 
     @Override
     public Database database() {
@@ -37,51 +38,74 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     @Override
-    public Class<FPlayerSQL> sqlClass() {
-        return FPlayerSQL.class;
+    public Class<? extends FPlayerSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> FPlayerH2.class;
+            case MARIADB -> FPlayerMariaDB.class;
+            case MYSQL -> FPlayerMySQL.class;
+            case POSTGRESQL -> FPlayerPostgreSQL.class;
+            case SQLITE -> FPlayerSQLite.class;
+        };
     }
 
     /**
-     * Inserts a new player into the database.
-     * Handles UUID and name conflicts by updating existing records.
+     * Inserts a new player into the database or updates an existing player.
+     * Handles conflicts by checking for existing records with the same UUID or name.
      *
      * @param uuid the player's UUID
      * @param name the player's name
-     * @return true if a new player was inserted, false if an existing player was updated
+     * @param ip the player's IP address, can be null
+     * @param online whether the player is currently online
+     * @return the created or updated FPlayer object with assigned database ID
      */
-    public boolean insert(@NonNull UUID uuid, @NonNull String name) {
+    public FPlayer insertOrUpdate(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return inTransaction(sql -> {
+            int id;
+
             Optional<PlayerInfo> existingByUUID = sql.findByUUID(uuid.toString());
             if (existingByUUID.isPresent()) {
                 PlayerInfo playerInfo = existingByUUID.get();
 
+                // get current id
+                id = playerInfo.id();
+
+                // update old record
                 String existingName = playerInfo.name();
                 if (!name.equalsIgnoreCase(existingName)) {
                     logger.warning("Player with UUID '%s' changed name: '%s' -> '%s'", uuid, existingName, name);
-
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
                 }
 
-                return false;
-            }
+                sql.update(playerInfo.id(), online, uuid.toString(), name, ip);
+            } else {
+                Optional<PlayerInfo> existingByName = sql.findByName(name);
+                if (existingByName.isPresent()) {
+                    PlayerInfo playerInfo = existingByName.get();
 
-            Optional<PlayerInfo> existingByName = sql.findByName(name);
-            if (existingByName.isPresent()) {
-                PlayerInfo playerInfo = existingByName.get();
+                    // get current id
+                    id = playerInfo.id();
 
-                UUID existingUuid = UUID.fromString(playerInfo.uuid());
-                if (!uuid.equals(existingUuid)) {
-                    logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
+                    // update old record
+                    UUID existingUuid = UUID.fromString(playerInfo.uuid());
+                    if (!uuid.equals(existingUuid)) {
+                        logger.warning("Player with name '%s' changed UUID: '%s' -> '%s'", name, existingUuid, uuid);
+                    }
 
-                    sql.update(playerInfo.id(), true, uuid.toString(), name, playerInfo.ip());
+                    sql.update(playerInfo.id(), online, uuid.toString(), name, ip);
+                } else {
+                    // insert new record
+                    id = sql.insert(online, uuid.toString(), name, ip);
                 }
-
-                return false;
             }
 
-            sql.insert(uuid.toString(), name);
-
-            return true;
+            return FPlayer.builder()
+                    .id(id)
+                    .uuid(uuid)
+                    .name(name)
+                    .ip(ip)
+                    .online(online)
+                    .build();
         });
     }
 
@@ -91,13 +115,9 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @param fPlayer the player to insert
      */
     public void insertOrIgnore(@NonNull FPlayer fPlayer) {
-        useHandle(sql -> {
-            Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.uuid().toString());
+        if (database.isClosed()) return;
 
-            if (existingPlayer.isEmpty()) {
-                sql.insertWithId(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name());
-            }
-        });
+        useHandle(sql -> sql.insertOrIgnore(fPlayer.id(), fPlayer.uuid().toString(), fPlayer.name()));
     }
 
     /**
@@ -106,6 +126,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @param fPlayer the player to update
      */
     public void update(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return;
         if (fPlayer.isUnknown()) return;
 
         useHandle(sql -> sql.update(
@@ -118,11 +139,25 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     /**
+     * Sets all players associated with the specified server to offline status.
+     *
+     * @param server the server identifier to match against player server settings
+     */
+    public void setOfflineByServer(@NonNull String server) {
+        if (database.isClosed()) return;
+        if (StringUtils.isEmpty(server)) return;
+
+        useHandle(sql -> sql.setOfflineByServer(server));
+    }
+
+    /**
      * Gets all online players from the database.
      *
      * @return list of online players
      */
     public List<FPlayer> getOnlineFPlayers() {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> convertToFPlayers(sql.getOnlinePlayers()));
     }
 
@@ -132,6 +167,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return list of all players
      */
     public List<FPlayer> getFPlayers() {
+        if (database.isClosed()) return List.of();
+
         return withHandle(sql -> convertToFPlayers(sql.getAllPlayers()));
     }
 
@@ -142,6 +179,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull String name) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByName(name)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
@@ -155,6 +194,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull InetAddress inetAddress) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByIp(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
@@ -168,6 +209,8 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(@NonNull UUID uuid) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findByUUID(uuid.toString())
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.withUuid(uuid))
@@ -181,31 +224,27 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
      * @return the player or FPlayer.UNKNOWN if not found
      */
     public FPlayer getFPlayer(int id) {
+        if (database.isClosed()) return FPlayer.UNKNOWN;
+
         return withHandle(sql -> sql.findById(id)
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
     }
 
-    private FPlayer convertToFPlayer(PlayerInfo entity) {
-        return convertToFPlayer(entity, true);
-    }
-
-    private FPlayer convertToFPlayer(PlayerInfo info, boolean loadSetting) {
-        FPlayer fPlayer = FPlayer.builder()
+    private FPlayer convertToFPlayer(PlayerInfo info) {
+        return FPlayer.builder()
                 .id(info.id())
                 .name(info.name())
                 .uuid(UUID.fromString(info.uuid()))
                 .online(info.online())
                 .ip(info.ip())
                 .build();
-
-        return loadSetting ? settingDAOProvider.get().load(fPlayer) : fPlayer;
     }
 
     private List<FPlayer> convertToFPlayers(List<PlayerInfo> entities) {
         return entities.stream()
-                .map(playerInfo -> convertToFPlayer(playerInfo, false))
+                .map(this::convertToFPlayer)
                 .toList();
     }
 
@@ -223,7 +262,13 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
             boolean online,
             @NonNull String uuid,
             @NonNull String name,
-            @Nullable String ip
+            @Nullable String ip,
+
+            // ignore value for sql
+            @Nullable Map<String, Boolean> settingsBoolean,
+
+            // ignore value for sql
+            @Nullable Map<SettingText, String> settingsText
     ) {
     }
 }

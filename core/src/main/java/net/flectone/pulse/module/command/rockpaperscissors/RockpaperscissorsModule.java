@@ -13,17 +13,22 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.rockpaperscissors.listener.RockpaperscissorsProxyMessageListener;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -47,13 +52,15 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
@@ -66,6 +73,10 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .optional(promptMove, commandParserProvider.nativeSingleMessageParser())
                 .optional(promptUUID, UUIDParser.uuidParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(RockpaperscissorsProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -80,7 +91,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
 
         String player = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::nullPlayer)
@@ -100,10 +111,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String promptMove = commandModuleController.getPrompt(this, 1);
@@ -115,7 +123,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
         UUID uuid = optionalUUID.orElse(null);
 
         if (move != null && uuid != null) {
-            finalMove(fPlayer, finalFReceiver, move, uuid);
+            finalMove(fPlayer, fReceiver, move, uuid);
             return;
         }
 
@@ -134,7 +142,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                         .sender(fPlayer)
                         .format(s -> StringUtils.replaceEach(s.formatMove(),
                                 new String[]{"<target>", "<uuid>"},
-                                new String[]{finalFReceiver.name(), rockPaperScissors.getId().toString()}
+                                new String[]{fReceiver.name(), rockPaperScissors.getId().toString()}
                         ))
                         .sound(soundOrThrow())
                         .build()
@@ -161,8 +169,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
     }
 
     @Override
-    public Localization.Command.Rockpaperscissors localization(FEntity sender) {
-        return fileFacade.localization(sender).command().rockpaperscissors();
+    public Localization.Command.Rockpaperscissors localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().rockpaperscissors();
     }
 
     public void finalMove(FPlayer fPlayer, FPlayer fReceiver, String move, UUID uuid) {
@@ -285,7 +293,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
-                        .filterPlayer(fPlayer)
+                        .receiver(fPlayer)
                         .format(message)
                         .build()
                 )
@@ -298,7 +306,7 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(winFPlayer)
-                        .filterPlayer(fReceiver)
+                        .receiver(fReceiver)
                         .format(message)
                         .build()
                 )
@@ -321,7 +329,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
         messageDispatcher.dispatch(this, RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(Localization.Command.Rockpaperscissors::receiver)
                         .build()
                 )
@@ -334,7 +343,8 @@ public class RockpaperscissorsModule implements ModuleCommand<Localization.Comma
                 .base(EventMetadata.<Localization.Command.Rockpaperscissors>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(s -> StringUtils.replaceEach(
                                 s.formatMove(),
                                 new String[]{"<target>", "<uuid>"},

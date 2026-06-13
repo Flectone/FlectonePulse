@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -18,8 +17,10 @@ import net.flectone.pulse.module.message.update.listener.PulseUpdateListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -42,6 +43,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
     private final ModuleController moduleController;
     private final Gson gson;
     private final HttpClient httpClient;
+    private final SocialService socialService;
 
     private String latestVersion;
 
@@ -68,12 +70,12 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
     }
 
     @Override
-    public Localization.Message.Update localization(FEntity sender) {
-        return fileFacade.localization(sender).message().update();
+    public Localization.Message.Update localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().update();
     }
 
     public void send(FPlayer fPlayer) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
             if (latestVersion == null) return;
 
@@ -84,7 +86,7 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
                     .base(EventMetadata.<Localization.Message.Update>builder()
                             .sender(fPlayer)
                             .format((fResolver, s) -> StringUtils.replaceEach(
-                                    fResolver.isUnknown() ? s.formatConsole() : s.formatPlayer(),
+                                    fResolver.isUnknown() || fResolver.isConsole() ? s.formatConsole() : s.formatPlayer(),
                                     new String[]{"<current_version>", "<latest_version>"},
                                     new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
                             ))

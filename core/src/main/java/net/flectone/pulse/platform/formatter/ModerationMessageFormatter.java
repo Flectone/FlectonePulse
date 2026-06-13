@@ -17,7 +17,9 @@ import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +40,7 @@ public class ModerationMessageFormatter {
     private final Provider<SwearModule> swearModuleProvider;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     public Optional<MessageContext> createMuteContext(FPlayer fPlayer, MuteChecker.Status status) {
         return switch (status) {
@@ -45,12 +48,14 @@ public class ModerationMessageFormatter {
                 List<Moderation> mutes = moderationService.getValid(fPlayer, Moderation.Type.MUTE, 1, 0);
                 if (mutes.isEmpty()) yield Optional.empty();
 
-                String format = fileFacade.localization(fPlayer).command().mute().person();
-
                 Moderation mute = mutes.getFirst();
+                String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())));
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, mute))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -58,10 +63,13 @@ public class ModerationMessageFormatter {
                 ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
                 if (mute == null) yield Optional.empty();
 
-                String format = fileFacade.localization(fPlayer).command().mute().person();
+                String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())));
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, mute))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -71,8 +79,12 @@ public class ModerationMessageFormatter {
                 if (timestamp == null) yield Optional.empty();
 
                 String format = capsModule.localization(fPlayer).formatRestrict();
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, timestamp))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -82,8 +94,12 @@ public class ModerationMessageFormatter {
                 if (timestamp == null) yield Optional.empty();
 
                 String format = floodModule.localization(fPlayer).formatRestrict();
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, timestamp))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -94,8 +110,12 @@ public class ModerationMessageFormatter {
                 if (mute == null) yield Optional.empty();
 
                 String format = newbieModule.localization(fPlayer).formatRestrict();
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, mute))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, mute))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -105,8 +125,12 @@ public class ModerationMessageFormatter {
                 if (timestamp == null) yield Optional.empty();
 
                 String format = swearModule.localization(fPlayer).formatRestrict();
-                MessageContext muteContext = messagePipeline.createContext(fPlayer, replacePlaceholders(format, fPlayer, timestamp))
-                        .addTagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()));
+
+                MessageContext muteContext = MessageContext.builder()
+                        .sender(fPlayer)
+                        .message(replacePlaceholders(format, fPlayer, timestamp))
+                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                        .build();
 
                 yield Optional.of(muteContext);
             }
@@ -115,7 +139,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
-        Localization localization = fileFacade.localization(fReceiver);
+        Localization localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE));
 
         Localization.ReasonMap constantReasons = switch (moderation.type()) {
             case BAN -> localization.command().ban().reasons();
@@ -126,6 +150,7 @@ public class ModerationMessageFormatter {
             case UNWARN -> localization.command().unwarn().reasons();
             case KICK -> localization.command().kick().reasons();
             case WHITELIST, UNWHITELIST -> localization.command().whitelist().reasons();
+            case MAINTENANCE, UNMAINTENANCE -> localization.command().maintenance().reasons();
         };
 
         String reason = constantReasons.getConstant(moderation.reason());
@@ -141,7 +166,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, long moderationId, long date, long time, String reason, boolean permanent) {
-        Localization localization = fileFacade.localization(fReceiver);
+        Localization localization = fileFacade.localization(socialService.getSetting(fReceiver, SettingText.LOCALE));
 
         String formatDate = timeFormatter.formatDate(date);
         String formatTime = permanent

@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -18,8 +17,10 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.incendo.cloud.context.CommandContext;
 
@@ -38,6 +39,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -62,9 +64,12 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        Predicate<FPlayer> filter = getFilterSee();
+        List<FPlayer> recipients = fPlayerService.getOnlineFPlayers()
+                .stream()
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
+                .filter(getFilterSee())
+                .toList();
 
-        List<FPlayer> recipients = fPlayerService.getVisibleFPlayersFor(fPlayer).stream().filter(filter).toList();
         if (recipients.isEmpty() && config().nullHelper()) {
             boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
                     .noneMatch(online -> permissionChecker.check(online, permission().see()));
@@ -95,7 +100,7 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
                 .destination(config().destination())
                 .range(config().range())
                 .message(message)
-                .filter(filter)
+                .filter(getFilterSee())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .sound(soundOrThrow())
@@ -119,8 +124,8 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
     }
 
     @Override
-    public Localization.Command.Helper localization(FEntity sender) {
-        return fileFacade.localization(sender).command().helper();
+    public Localization.Command.Helper localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().helper();
     }
 
     public Predicate<FPlayer> getFilterSee() {

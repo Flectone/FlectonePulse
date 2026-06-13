@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
@@ -30,6 +31,7 @@ public class MinecraftChatModule extends ChatModule {
     @Inject
     public MinecraftChatModule(FileFacade fileFacade,
                                FPlayerService fPlayerService,
+                               SocialService socialService,
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
@@ -42,7 +44,7 @@ public class MinecraftChatModule extends ChatModule {
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
         this.platformServerAdapter = platformServerAdapter;
@@ -50,6 +52,8 @@ public class MinecraftChatModule extends ChatModule {
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             listenerRegistry.register(MinecraftPacketChatListener.class);
         }

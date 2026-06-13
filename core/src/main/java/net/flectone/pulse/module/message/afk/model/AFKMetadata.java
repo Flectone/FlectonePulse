@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 public record AFKMetadata<L extends LocalizationSetting>(
         @NonNull BaseEventMetadata<L> base,
         boolean newStatus,
-        boolean ignoreVanish
+        boolean fakeMessage,
+        boolean vanished
 ) implements VanishMetadata<L> {
 }

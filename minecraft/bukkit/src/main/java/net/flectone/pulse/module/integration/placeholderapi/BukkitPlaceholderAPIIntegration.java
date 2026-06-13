@@ -28,7 +28,9 @@ import net.flectone.pulse.module.message.format.condition.ConditionModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -40,8 +42,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -49,6 +53,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -60,6 +65,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
     private final Provider<AfkModule> afkModuleProvider;
     private final Provider<OnlineModule> onlineModuleProvider;
     private final Provider<ToponlineModule> toponlineModuleProvider;
+    private final ReflectionResolver reflectionResolver;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -80,6 +86,32 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
     @Override
     public String getIntegrationName() {
         return "PlaceholderAPI";
+    }
+
+    @Override
+    public @NonNull List<String> getPlaceholders() {
+        return List.of(
+                "%flectonepulse_mute_suffix%",
+                "%flectonepulse_afk_duration%",
+                "%flectonepulse_afk_duration_formatted%",
+                "%flectonepulse_toponline_<position>%",
+                "%flectonepulse_online_<time>%",
+                "%flectonepulse_condition_<name>%",
+                "%flectonepulse_fcolor_<number>%",
+                "%flectonepulse_fcolor_out_<number>%",
+                "%flectonepulse_fcolor_see_<number>%",
+                "%flectonepulse_setting_<name>%",
+                "%flectonepulse_player%",
+                "%flectonepulse_ip%",
+                "%flectonepulse_ping%",
+                "%flectonepulse_online%",
+                "%flectonepulse_tps%"
+        );
+    }
+
+    @Override
+    public boolean persist() {
+        return true;
     }
 
     @Override
@@ -146,12 +178,12 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
             Map<Integer, String> colorsMap = new Object2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
             if (params.startsWith("fcolor_out")) {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.SEE));
             } else {
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
-                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.SEE));
+                colorsMap.putAll(socialService.loadColors(fPlayer, FColor.Type.OUT));
             }
 
             return colorsMap.get(Integer.parseInt(number));
@@ -163,13 +195,13 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
             SettingText settingText = SettingText.fromString(conditionName);
             if (settingText != null) {
-                String value = fPlayer.getSetting(settingText);
+                String value = socialService.getSetting(fPlayer, settingText);
                 if (settingText == SettingText.CHAT_NAME && value == null) return "default";
 
                 return StringUtils.defaultString(value);
             }
 
-            return fPlayer.isSetting(params.toUpperCase()) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            return socialService.isSetting(fPlayer, params.toUpperCase()) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
         }
 
         return switch (params) {
@@ -177,7 +209,7 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
             case "ip" -> fPlayer.ip();
             case "ping" -> String.valueOf(platformPlayerAdapter.getPing(fPlayer));
             case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
-            case "tps" -> platformServerAdapter.getTPS();
+            case "tps" -> platformServerAdapter.getTPS(fPlayer);
             default -> null;
         };
     }
@@ -202,6 +234,10 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
             fReceiver = tempFPlayer;
         }
 
+        return event.withContext(messageContext.withMessage(setPlaceholders(fPlayer, fReceiver, message, true)));
+    }
+
+    private String setPlaceholders(FPlayer fPlayer, FPlayer fReceiver, String message, boolean firstTry) {
         try {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
@@ -215,10 +251,19 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
                 message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
             }
 
-        } catch (Exception _) {
-            // ignore placeholderapi exceptions
+        } catch (Exception e) {
+            if (firstTry && e.getMessage().contains("any region")  && reflectionResolver.isFolia()) {
+                FPlayer regionFPlayer = platformPlayerAdapter.isOnline(fPlayer) ? fPlayer : fPlayerService.getRandomFPlayer();
+
+                CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+                String finalMessage = message;
+                taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(setPlaceholders(fPlayer, fReceiver, finalMessage, false)));
+
+                return completableFuture.join();
+            }
         }
 
-        return event.withContext(messageContext.withMessage(message));
+        return message;
     }
 }

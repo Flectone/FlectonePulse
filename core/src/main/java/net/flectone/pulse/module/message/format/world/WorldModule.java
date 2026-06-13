@@ -16,14 +16,15 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Singleton
@@ -32,6 +33,7 @@ public class WorldModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
@@ -63,21 +65,25 @@ public class WorldModule implements ModuleSimple {
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.WORLD.getTagName(), "world_prefix"), (_, _) -> {
-            String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
+        return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.WORLD.getTagName(), "world_prefix"), (_, _) -> {
+            String worldPrefix = socialService.getSetting(fPlayer, SettingText.WORLD_PREFIX);
             if (StringUtils.isEmpty(worldPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!worldPrefix.contains("%")) return Tag.preProcessParsed(worldPrefix);
 
-            MessageContext worldContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), worldPrefix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
+            MessageContext worldContext = MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(worldPrefix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build();
 
             return Tag.inserting(messagePipeline.build(worldContext));
         }));
     }
 
     public void update(FPlayer fPlayer) {
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             String newWorldPrefix = config().mode() == Mode.TYPE
@@ -85,11 +91,9 @@ public class WorldModule implements ModuleSimple {
                     : config().values().get(platformPlayerAdapter.getWorldName(fPlayer));
 
             SettingText setting = SettingText.WORLD_PREFIX;
-            String fPlayerWorldPrefix = fPlayer.getSetting(setting);
-            if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;
-            if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
+            if (Objects.equals(socialService.getSetting(fPlayer, setting), newWorldPrefix)) return;
 
-            fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(setting, newWorldPrefix), setting);
+            socialService.saveSetting(fPlayer, setting, newWorldPrefix);
         });
     }
 

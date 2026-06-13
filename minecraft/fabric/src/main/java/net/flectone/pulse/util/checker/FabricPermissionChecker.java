@@ -1,13 +1,14 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.integration.FabricIntegrationModule;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.platform.registry.FabricPermissionRegistry;
 import net.minecraft.server.MinecraftServer;
@@ -20,9 +21,11 @@ public class FabricPermissionChecker implements PermissionChecker {
     private static final net.minecraft.server.permissions.Permission TRUE_PERMISSION = new net.minecraft.server.permissions.Permission.HasCommandLevel(net.minecraft.server.permissions.PermissionLevel.ALL);
 
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final FabricIntegrationModule integrationModule;
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
+
+    @Inject
+    private Provider<IntegrationModule> integrationModuleProvider;
 
     @Override
     public boolean check(FEntity entity, String permission) {
@@ -31,6 +34,8 @@ public class FabricPermissionChecker implements PermissionChecker {
 
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return true;
+
+        IntegrationModule integrationModule = integrationModuleProvider.get();
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission.Type fabricPermission = fabricPermissionRegistry.getPermissions().get(permission);

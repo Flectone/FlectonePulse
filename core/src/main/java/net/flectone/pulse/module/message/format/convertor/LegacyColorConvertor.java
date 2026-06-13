@@ -40,7 +40,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -50,7 +53,7 @@ public class LegacyColorConvertor {
 
     private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("[\\da-fA-F]{6}");
 
-    private static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
+    private static final Set<Option> DEFAULT_OPTIONS = EnumSet.of(
             Option.COLOR,
             Option.HEX_COLOR_STANDALONE,
             Option.COLOR_DOUBLE_HASH,
@@ -59,7 +62,7 @@ public class LegacyColorConvertor {
             Option.FAST_RESET,
             Option.RESET,
             Option.DOUBLE_TO_ESCAPE
-    ));
+    );
 
     private final @Named("legacyColorMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;

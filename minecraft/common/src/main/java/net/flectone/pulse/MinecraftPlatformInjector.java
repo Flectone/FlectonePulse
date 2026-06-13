@@ -27,18 +27,18 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.MinecraftChatModule;
 import net.flectone.pulse.module.message.format.object.MinecraftObjectModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
-import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
-import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.MinecraftWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.MinecraftJoinModule;
-import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
-import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.MinecraftRightClickModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
+import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
+import net.flectone.pulse.module.message.scoreboard.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.sidebar.MinecraftSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.status.MinecraftStatusModule;
@@ -47,8 +47,8 @@ import net.flectone.pulse.module.message.tab.MinecraftTabModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
-import net.flectone.pulse.platform.handler.MinecraftProxyMessageHandler;
-import net.flectone.pulse.platform.handler.ProxyMessageHandler;
+import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.MinecraftListenerRegistry;
 import net.flectone.pulse.platform.render.*;
@@ -60,6 +60,8 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.MinecraftProfileResolver;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.processing.serializer.MinecraftComponentSerializer;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.service.SkinService;
@@ -133,10 +135,11 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(SoundPlayer.class).to(MinecraftSoundPlayer.class);
 
         // others
+        bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
+        bind(ComponentExtractor.class).to(MinecraftComponentExtractor.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);
-        bind(ProxyMessageHandler.class).to(MinecraftProxyMessageHandler.class);
     }
 
 }

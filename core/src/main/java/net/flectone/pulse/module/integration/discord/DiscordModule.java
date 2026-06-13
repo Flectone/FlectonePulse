@@ -10,16 +10,27 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.integration.discord.listener.DiscordPulseListener;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.IntegrationFormatter;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -29,6 +40,10 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
     private final ModuleController moduleController;
+    private final IntegrationFormatter integrationFormatter;
+    private final ListenerRegistry listenerRegistry;
+    private final TaskScheduler taskScheduler;
+    private final SocialService socialService;
     private final Injector injector;
     private final FLogger fLogger;
 
@@ -36,11 +51,15 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     public void onEnable() {
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
-        try {
-            injector.getInstance(DiscordIntegration.class).hook();
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
+        taskScheduler.runAsync(() -> {
+            try {
+                injector.getInstance(DiscordIntegration.class).hook();
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+        }, true);
+
+        listenerRegistry.register(DiscordPulseListener.class);
     }
 
     @Override
@@ -64,8 +83,8 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
     }
 
     @Override
-    public Localization.Integration.Discord localization(FEntity sender) {
-        return fileFacade.localization(sender).integration().discord();
+    public Localization.Integration.Discord localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).integration().discord();
     }
 
     private void loadLibraries(LibraryResolver libraryResolver) {
@@ -89,9 +108,28 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
         );
     }
 
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
+    public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {
+        IntegrationMetadata integrationMetadata = eventMetadata.integrationMetadata();
+        if (integrationMetadata == null) return;
+
+        // skip empty message names
+        List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMetadata, config());
+        if (messageNames.isEmpty()) return;
+
+        // skip vanished player
+        if (integrationFormatter.isVanished(eventMetadata)) return;
+
+        FEntity sender = eventMetadata.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
-        injector.getInstance(DiscordSender.class).sendMessage(sender, messageName, discordString);
+        // create formatter
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
+
+        // send to discord
+        DiscordSender discordSender = injector.getInstance(DiscordSender.class);
+        for (String specificMessageName : messageNames) {
+            discordSender.sendMessage(sender, specificMessageName, integrationFormat);
+        }
     }
+
 }

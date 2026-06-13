@@ -12,11 +12,14 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.incendo.cloud.meta.CommandMeta;
 
 @Singleton
 public class MinecraftPollModule extends PollModule {
@@ -36,9 +39,13 @@ public class MinecraftPollModule extends PollModule {
                                ModuleController moduleController,
                                ModuleCommandController commandModuleController,
                                FLogger fLogger,
+                               ComponentSerializer componentSerializer,
                                MinecraftPacketProvider packetProvider,
-                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider) {
-        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, fLogger);
+                               Provider<MinecraftDialogPollBuilder> dialogPollBuilderProvider,
+                               ListenerRegistry listenerRegistry,
+                               ProxyRegistry proxyRegistry,
+                               SocialService socialService) {
+        super(fileFacade, fPlayerService, proxySender, taskScheduler, commandParserProvider, messagePipeline, messageDispatcher, moduleController, commandModuleController, componentSerializer, fLogger, proxyRegistry, listenerRegistry, socialService);
 
         this.commandModuleController = commandModuleController;
         this.packetProvider = packetProvider;
@@ -50,10 +57,9 @@ public class MinecraftPollModule extends PollModule {
         super.onEnable();
 
         if (config().enableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
-            commandModuleController.registerCustomCommand(manager ->
-                    manager.commandBuilder(commandModuleController.getCommandName(this) + "gui", CommandMeta.empty())
-                            .permission(permission().create().name())
-                            .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
+            commandModuleController.registerSubCommand(this, config().subCommandGui(), commandBuilder -> commandBuilder
+                    .permission(permission().create().name())
+                    .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
             );
         }
 

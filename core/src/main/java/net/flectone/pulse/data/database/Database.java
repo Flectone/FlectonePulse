@@ -10,9 +10,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
-import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -33,7 +33,9 @@ import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jspecify.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -61,7 +63,7 @@ public class Database {
     private final Provider<VersionDAO> versionDAOProvider;
     private final BackupCreator backupCreator;
 
-    @Nullable private HikariDataSource dataSource;
+    @Nullable private volatile HikariDataSource dataSource;
     @Nullable private Jdbi jdbi;
 
     /**
@@ -83,13 +85,15 @@ public class Database {
 
         HikariConfig hikariConfig = createHikariConfig();
 
-        dataSource = new HikariDataSource(hikariConfig);
-        jdbi = Jdbi.create(dataSource);
+        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+        this.dataSource = hikariDataSource;
+
+        jdbi = Jdbi.create(hikariDataSource);
         jdbi.installPlugin(new SqlObjectPlugin());
 
-        setupTemplateEngine();
+        setupTemplateEngine(jdbi);
 
-        jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
+        jdbi.registerRowMapper(ConstructorMapper.factory(FColorDao.FColorInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
         jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
@@ -126,14 +130,16 @@ public class Database {
      * Disconnects from the database.
      */
     public void disconnect() {
-        if (dataSource != null) {
-            dataSource.close();
+        HikariDataSource hikariDataSource = dataSource;
+        if (hikariDataSource != null) {
+            hikariDataSource.close();
+            this.dataSource = null;
 
             fLogger.info("[-] Database disconnected");
         }
     }
 
-    private void setupTemplateEngine() {
+    private void setupTemplateEngine(Jdbi jdbi) {
         BiFunction<String, StatementContext, String> template = null;
         if (StringUtils.isNotEmpty(config().prefix())) {
             template = (sql, _) -> Strings.CS.replace(sql, "fp_", config().prefix());
@@ -150,6 +156,11 @@ public class Database {
         if (template != null) {
             jdbi.getConfig(SqlStatements.class).setTemplateEngine(template::apply);
         }
+    }
+
+    public boolean isClosed() {
+        HikariDataSource hikariDataSource = dataSource;
+        return hikariDataSource == null || hikariDataSource.isClosed();
     }
 
     private HikariConfig createHikariConfig() {
@@ -245,8 +256,11 @@ public class Database {
                 try {
                     handle.execute(finalStatement);
                 } catch (Exception e) {
-                    // skip MySQL "index already exists"
-                    if (!e.getMessage().contains("Duplicate key") && !e.getMessage().contains("already exists") && !e.getMessage().contains("Incorrect prefix key")) {
+                    // skip migration errors
+                    if (!e.getMessage().contains("Duplicate key")
+                            && !e.getMessage().contains("already exists")
+                            && !e.getMessage().contains("Incorrect prefix key")
+                            && !e.getMessage().contains("key was too long")) {
                         throw e;
                     }
                 }

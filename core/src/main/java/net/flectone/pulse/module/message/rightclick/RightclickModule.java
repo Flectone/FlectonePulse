@@ -9,15 +9,16 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -35,6 +36,7 @@ public class RightclickModule implements ModuleLocalization<Localization.Message
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public ModuleName name() {
@@ -52,14 +54,14 @@ public class RightclickModule implements ModuleLocalization<Localization.Message
     }
 
     @Override
-    public Localization.Message.Rightclick localization(FEntity sender) {
-        return fileFacade.localization(sender).message().rightclick();
+    public Localization.Message.Rightclick localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().rightclick();
     }
 
     public void send(UUID uuid, int targetId) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             UUID targetUUID = platformPlayerAdapter.getPlayerByEntityId(targetId);

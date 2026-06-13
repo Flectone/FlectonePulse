@@ -13,7 +13,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
-import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.processing.resolver.HytaleLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.libby.HytaleLibbyResolver;
@@ -64,9 +64,6 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         } catch (Exception e) {
             throwInitException(e);
         }
-
-        HytaleTaskScheduler hytaleTaskScheduler = injector.getInstance(HytaleTaskScheduler.class);
-        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(hytaleTaskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -82,6 +79,15 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void onEnable() {
         if (!isReady()) return;
+
+        // get scheduler
+        TaskScheduler taskScheduler = injector.getInstance(TaskScheduler.class);
+
+        // create executor
+        taskScheduler.start();
+
+        // update tick
+        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(taskScheduler::onTick, 50L, 50L, TimeUnit.MILLISECONDS);
 
         get(FlectonePulseAPI.class).onEnable();
     }

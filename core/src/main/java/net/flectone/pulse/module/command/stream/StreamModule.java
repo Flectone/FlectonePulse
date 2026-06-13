@@ -11,21 +11,23 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.PulseStreamListener;
+import net.flectone.pulse.module.command.stream.listener.StreamProxyMessageListener;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -34,10 +36,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,13 +45,14 @@ import java.util.stream.Collectors;
 public class StreamModule implements ModuleCommand<Localization.Command.Stream> {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -63,6 +63,10 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(StreamProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseStreamListener.class);
     }
@@ -92,7 +96,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
         if (needStart == null) return;
 
-        boolean isStream = localization().prefixTrue().equals(fPlayer.getSetting(SettingText.STREAM_PREFIX));
+        boolean isStream = localization().prefixTrue().equals(socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
@@ -136,7 +140,11 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                             .destination(config().destination())
                             .sound(soundOrThrow())
                             .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
-                            .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
+                            .integration(IntegrationMetadata.builder()
+                                    .format(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
+                                    .messageNames(List.of(name().name() + "_START"))
+                                    .build()
+                            )
                             .build()
                     )
                     .turned(true)
@@ -149,6 +157,10 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                             .sender(fPlayer)
                             .format(Localization.Command.Stream::formatEnd)
                             .destination(config().destination())
+                            .integration(IntegrationMetadata.builder()
+                                    .messageNames(List.of(name().name() + "_END"))
+                                    .build()
+                            )
                             .build()
                     )
                     .turned(false)
@@ -158,7 +170,9 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     public void setStreamPrefix(FPlayer fPlayer, String prefix) {
-        fPlayerService.saveOrUpdateSetting(fPlayer.withSetting(SettingText.STREAM_PREFIX, prefix), SettingText.STREAM_PREFIX);
+        if (Objects.equals(prefix, socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX))) return;
+
+        socialService.saveSetting(fPlayer, SettingText.STREAM_PREFIX, prefix);
     }
 
     @Override
@@ -177,8 +191,8 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
     }
 
     @Override
-    public Localization.Command.Stream localization(FEntity sender) {
-        return fileFacade.localization(sender).command().stream();
+    public Localization.Command.Stream localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().stream();
     }
 
     public MessageContext addTag(MessageContext messageContext) {
@@ -186,16 +200,19 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
         if (moduleController.isDisabledFor(this, fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (_, _) -> {
-            String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
+        return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.STREAM.getTagName(), "stream_prefix"), (_, _) -> {
+            String streamPrefix = socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!streamPrefix.contains("%")) return Tag.preProcessParsed(streamPrefix);
 
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), streamPrefix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.inserting(messagePipeline.build(prefixContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(streamPrefix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 

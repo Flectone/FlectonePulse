@@ -1,27 +1,31 @@
 package net.flectone.pulse;
 
-import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
+import net.flectone.pulse.listener.BungeecordLoginStateListener;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.*;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
 
 public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
     private static final String CHANNEL = "BungeeCord";
 
-    private final Set<UUID> firstJoinPlayers = new CopyOnWriteArraySet<>();
+    private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
     private final BungeecordLoginStateListener bungeeDisconnectListener = new BungeecordLoginStateListener();
 
     private FLogger fLogger;
@@ -32,7 +36,9 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
         fLogger.logEnabling();
 
-        registerChannel();
+        getProxy().registerChannel(CHANNEL);
+        getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerListener(this, bungeeDisconnectListener);
 
         fLogger.logEnabled();
     }
@@ -41,80 +47,78 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
     public void onDisable() {
         fLogger.logDisabling();
 
-        unregisterChannel();
+        getProxy().unregisterChannel(CHANNEL);
+        getProxy().getPluginManager().unregisterListener(this);
+        getProxy().getPluginManager().unregisterListener(bungeeDisconnectListener);
 
         fLogger.logDisabled();
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onServerConnectEvent(ServerConnectEvent event) {
+        ProxiedPlayer player = event.getPlayer();
+        if (player.getServer() != null) return;
+
+        pendingConnections.add(player.getUniqueId());
     }
 
     @EventHandler
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
-        Optional<byte[]> data = ProxyMessageProcessor.validate(event.getData());
-        if (data.isEmpty()) return;
+        ProxySender.send(event.getData(), bytes -> ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, bytes)),
+                this::onBackendJoinConfirmed
+        );
+    }
+
+    private void onBackendJoinConfirmed(UUID playerUUID) {
+        if (!pendingConnections.remove(playerUUID)) return;
+
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+        if (player == null) return;
+
+        Server server = player.getServer();
+        if (server == null) return;
+
+        String serverName = server.getInfo().getName();
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data.get()));
-    }
-
-    @EventHandler
-    public void onServerSwitchEvent(ServerSwitchEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        UUID playerUUID = player.getUniqueId();
-
-        if (event.getFrom() == null) {
-            firstJoinPlayers.add(playerUUID);
-
-            ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-                if (!player.isConnected()) {
-                    firstJoinPlayers.remove(playerUUID);
-                }
-            }, 1L, TimeUnit.SECONDS);
-        }
-    }
-
-    @EventHandler
-    public void onServerConnectedEvent(ServerConnectedEvent event) {
-        ProxiedPlayer proxiedPlayer = event.getPlayer();
-        UUID playerUUID = proxiedPlayer.getUniqueId();
-
-        byte[] dataOnline = ProxyMessageProcessor.create(ModuleName.SYSTEM_ONLINE, playerUUID);
-
-        ProxyServer.getInstance().getServers().values().stream()
-                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, dataOnline));
-
-        if (firstJoinPlayers.remove(playerUUID)) {
-            byte[] dataConnected = ProxyMessageProcessor.create(ModuleName.SYSTEM_CONNECTED, playerUUID);
-
-            ProxyServer.getInstance().getServers().values().stream()
-                    .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                    .forEach(serverInfo -> serverInfo.sendData(CHANNEL, dataConnected));
-        }
+                .forEach(serverInfo -> ProxySender.send(
+                        ModuleName.PLAYER_CONNECTED,
+                        outputStream -> {
+                            outputStream.writeUTF(playerUUID.toString());
+                            outputStream.writeBoolean(serverInfo.getName().equals(serverName));
+                        },
+                        bytes -> serverInfo.sendData(CHANNEL, bytes)
+                ));
     }
 
     @EventHandler
     public void onDisconnectEvent(PlayerDisconnectEvent event) {
         UUID playerUUID = event.getPlayer().getUniqueId();
-        if (bungeeDisconnectListener.getLoginStatus(playerUUID) != LoginStatus.CONNECTED) return;
 
-        byte[] data = ProxyMessageProcessor.create(ModuleName.SYSTEM_OFFLINE, playerUUID);
+        // clear pending connection
+        pendingConnections.remove(playerUUID);
 
-        ProxyServer.getInstance().getServers().values().stream()
-                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+        Server server = event.getPlayer().getServer();
+        if (server == null) return;
+
+        if (bungeeDisconnectListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED) {
+            String serverName = server.getInfo().getName();
+            ProxyServer.getInstance().getServers().values().stream()
+                    .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                    .forEach(serverInfo -> ProxySender.send(
+                            ModuleName.PLAYER_DISCONNECTED,
+                            outputStream -> {
+                                outputStream.writeUTF(playerUUID.toString());
+                                outputStream.writeBoolean(serverInfo.getName().equals(serverName));
+                            },
+                            bytes -> serverInfo.sendData(CHANNEL, bytes)
+                    ));
+        }
     }
 
-    private void registerChannel() {
-        getProxy().registerChannel(CHANNEL);
-        getProxy().getPluginManager().registerListener(this, this);
-        getProxy().getPluginManager().registerListener(this, bungeeDisconnectListener);
-    }
-
-    private void unregisterChannel() {
-        getProxy().unregisterChannel(CHANNEL);
-        getProxy().getPluginManager().unregisterListener(this);
-        getProxy().getPluginManager().unregisterListener(bungeeDisconnectListener);
-    }
 }

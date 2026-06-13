@@ -13,7 +13,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.file.FileFacade;
 
-import java.util.Collections;
 import java.util.Set;
 
 @Singleton
@@ -85,7 +84,7 @@ public class LuckPermsModule implements ModuleSimple {
     }
 
     public Set<String> getGroups() {
-        if (!moduleController.isEnable(this)) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Set.of();
 
         return luckPermsIntegration.getGroups();
     }

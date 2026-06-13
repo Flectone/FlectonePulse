@@ -17,6 +17,7 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -25,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +42,7 @@ public class ChatsettingHandler {
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
 
     public Permission.Message.Chat chatPermission() {
         return fileFacade.permission().message().chat();
@@ -73,14 +74,17 @@ public class ChatsettingHandler {
 
         Consumer<SubMenuItem> onSelect = item -> {
             String chatName = "default".equalsIgnoreCase(item.name()) ? null : item.name();
-            fPlayerService.updateCache(syncFPlayer(fTarget).withSetting(SettingText.CHAT_NAME, chatName));
+            socialService.saveSetting(fTarget, SettingText.CHAT_NAME, chatName);
         };
 
-        String headerStr = localization.menu().chat().inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(localization.menu().chat().inventory())
+                .build()
+        );
 
-        Runnable closeConsumer = () -> chatsettingModule.saveSetting(syncFPlayer(fTarget), SettingText.CHAT_NAME);
+        Runnable closeConsumer = () -> {};
 
         menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
@@ -122,7 +126,7 @@ public class ChatsettingHandler {
         };
 
         Consumer<SubMenuItem> onSelect = item -> {
-            Set<FColor> fColors = new ObjectOpenHashSet<>(syncFPlayer(fTarget).fColors().getOrDefault(type, Collections.emptySet()));
+            Set<FColor> fColors = new ObjectOpenHashSet<>(socialService.loadColors(fTarget).getOrDefault(type, Set.of()));
 
             // skip "null" colors replace
             item.colors().entrySet().stream()
@@ -139,14 +143,17 @@ public class ChatsettingHandler {
 
                     });
 
-            fPlayerService.updateCache(syncFPlayer(fTarget).withFColors(type, fColors));
+            socialService.saveColors(fTarget, type, fColors);
         };
 
-        String headerStr = subMenu.inventory();
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, syncFPlayer(fTarget), headerStr);
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(subMenu.inventory())
+                .build()
+        );
 
-        Runnable closeConsumer = () -> fPlayerService.saveColors(syncFPlayer(fTarget));
+        Runnable closeConsumer = () -> {};
 
         menuBuilder.openSubMenu(fPlayer, fTarget.uuid(), header, closeConsumer, items, getItemMessage, onSelect, id);
     }
@@ -175,15 +182,11 @@ public class ChatsettingHandler {
             return Status.DENIED;
         }
 
-        fTarget = syncFPlayer(fTarget);
-        boolean currentEnabled = fTarget.isSetting(messageType);
-        fPlayerService.updateCache(fTarget.withSetting(messageType, !currentEnabled));
+        boolean currentEnabled = socialService.isSetting(fTarget, messageType);
+
+        chatsettingModule.saveSetting(fTarget, messageType, !currentEnabled);
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
-    }
-
-    private FPlayer syncFPlayer(FPlayer fPlayer) {
-        return fPlayerService.getFPlayer(fPlayer);
     }
 
     public enum Status {

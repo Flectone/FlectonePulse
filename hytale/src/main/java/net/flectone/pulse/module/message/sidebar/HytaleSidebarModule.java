@@ -14,13 +14,14 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.HytaleMessageUtil;
-import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public class HytaleSidebarModule extends SidebarModule {
     private final MessagePipeline messagePipeline;
     private final HytaleMessageUtil hytaleMessageUtil;
     private final ModuleController moduleController;
+    private final ComponentSerializer componentSerializer;
 
     @Inject
     public HytaleSidebarModule(FileFacade fileFacade,
@@ -47,14 +49,17 @@ public class HytaleSidebarModule extends SidebarModule {
                                MessagePipeline messagePipeline,
                                HytaleMessageUtil hytaleMessageUtil,
                                ModuleController moduleController,
-                               RandomGenerator randomUtil) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
+                               RandomGenerator randomUtil,
+                               ComponentSerializer componentSerializer,
+                               SocialService socialService) {
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
 
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
         this.hytaleMessageUtil = hytaleMessageUtil;
         this.moduleController = moduleController;
+        this.componentSerializer = componentSerializer;
     }
 
     @Override
@@ -123,12 +128,15 @@ public class HytaleSidebarModule extends SidebarModule {
 
         for (int i = 0; i < lines.length; i++) {
             String lineId = getLineId(i, fPlayer);
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            Component line = messagePipeline.build(lineContext);
+            Component line = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             lineBuilder.addChild(LabelBuilder.label()
                     .withId(lineId)
-                    .withText(PlainTextComponentSerializer.plainText().serialize(line))
+                    .withText(componentSerializer.toPlain(line))
                     .withStyle(new HyUIStyle().setTextColor(hytaleMessageUtil.findFirstColor(line)))
                     .withPadding(new HyUIPadding(config().labelLeft(), config().labelTop(), 0, 0))
             );

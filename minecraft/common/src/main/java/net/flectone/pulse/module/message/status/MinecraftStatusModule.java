@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
@@ -46,6 +47,7 @@ public class MinecraftStatusModule extends StatusModule {
     private final EventDispatcher eventDispatcher;
     private final ModuleController moduleController;
     private final MinecraftServerStatusFormatter statusUtil;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftStatusModule(FileFacade fileFacade,
@@ -59,7 +61,8 @@ public class MinecraftStatusModule extends StatusModule {
                                  MinecraftPacketProvider packetProvider,
                                  EventDispatcher eventDispatcher,
                                  ModuleController moduleController,
-                                 MinecraftServerStatusFormatter statusUtil) {
+                                 MinecraftServerStatusFormatter statusUtil,
+                                 SocialService socialService) {
         super(fileFacade);
 
         this.MOTDModule = motdModule;
@@ -73,6 +76,7 @@ public class MinecraftStatusModule extends StatusModule {
         this.eventDispatcher = eventDispatcher;
         this.moduleController = moduleController;
         this.statusUtil = statusUtil;
+        this.socialService = socialService;
     }
 
     @Override
@@ -97,10 +101,6 @@ public class MinecraftStatusModule extends StatusModule {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
 
         JsonObject responseJson = new JsonObject();
 
@@ -160,7 +160,10 @@ public class MinecraftStatusModule extends StatusModule {
         List<Localization.Message.Status.Players.Sample> samples = playersModule.getSamples(fPlayer);
         samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample("<players>", null)) : samples;
 
-        Collection<FPlayer> onlineFPlayers = fPlayerService.getVisibleFPlayersFor(fPlayer);
+        Collection<FPlayer> onlineFPlayers = fPlayerService.getOnlineFPlayers().stream()
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
+                .toList();
+
         samples.forEach(sample -> {
             if ("<players>".equalsIgnoreCase(sample.name())) {
                 onlineFPlayers.forEach(player -> {
@@ -175,8 +178,11 @@ public class MinecraftStatusModule extends StatusModule {
 
             JsonObject playerObject = new JsonObject();
 
-            MessageContext sampleContext = messagePipeline.createContext(fPlayer, sample.name());
-            playerObject.addProperty("name", messagePipeline.buildLegacy(sampleContext));
+            playerObject.addProperty("name", messagePipeline.buildLegacy(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(sample.name())
+                    .build()
+            ));
             playerObject.addProperty("id", sample.id() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).uuid().toString() : sample.id());
 
             jsonArray.add(playerObject);

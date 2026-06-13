@@ -32,7 +32,7 @@ ball:
     enable: false
 ban:
   enable: true
-  filter_by_server: false
+  filter_by_server: true
   suggest_offline_players: true
   show_connection_attempts: true
   check_group_weight: true
@@ -460,6 +460,10 @@ flectonepulse:
   aliases:
   - "flectonepulse"
   - "fp"
+  editor:
+    host: ""
+    https: false
+    port: 25566
   destination:
     type: "CHAT"
   cooldown:
@@ -511,6 +515,7 @@ ignorelist:
     enable: false
 kick:
   enable: true
+  filter_by_server: true
   check_group_weight: true
   range: "PROXY"
   aliases:
@@ -533,7 +538,8 @@ mail:
     enable: false
 maintenance:
   enable: true
-  turned_on: false
+  filter_by_server: true
+  range: "SERVER"
   aliases:
   - "maintenance"
   destination:
@@ -555,7 +561,7 @@ me:
     enable: false
 mute:
   enable: true
-  filter_by_server: false
+  filter_by_server: true
   suggest_offline_players: true
   check_group_weight: true
   range: "PROXY"
@@ -581,6 +587,7 @@ mutelist:
 nickname:
   enable: true
   allowed_input: ""
+  sub_command_other: "other"
   aliases:
     - "nickname"
   destination:
@@ -616,6 +623,8 @@ poll:
   enable_gui: true
   last_id: 1
   range: "PROXY"
+  sub_command_vote: "vote"
+  sub_command_gui: "gui"
   aliases:
   - "poll"
   cooldown:
@@ -760,6 +769,7 @@ tell:
     enable: false
 tictactoe:
   enable: true
+  sub_command_move: "move"
   aliases:
   - "tictactoe"
   - "ttt"
@@ -844,7 +854,7 @@ unwarn:
     enable: false
 warn:
   enable: true
-  filter_by_server: false
+  filter_by_server: true
   suggest_offline_players: true
   check_group_weight: true
   range: "PROXY"
@@ -876,11 +886,11 @@ whitelist:
   auto_add: false
   auto_add_duration: -1
   check_duplicate: true
-  filter_by_server: false
+  filter_by_server: true
   show_connection_attempts: true
-  turned_on: false
   per_page: 4
   range: "PLAYER"
+  sub_command_player: "player"
   aliases:
     - "whitelist"
   destination:

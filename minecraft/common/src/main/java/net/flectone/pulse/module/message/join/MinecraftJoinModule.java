@@ -3,15 +3,13 @@ package net.flectone.pulse.module.message.join;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.MinecraftPulseJoinListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
-import net.flectone.pulse.platform.sender.IntegrationSender;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
@@ -22,15 +20,13 @@ public class MinecraftJoinModule extends JoinModule {
     @Inject
     public MinecraftJoinModule(FileFacade fileFacade,
                                PlatformPlayerAdapter platformPlayerAdapter,
-                               IntegrationModule integrationModule,
-                               ListenerRegistry listenerRegistry,
-                               TaskScheduler taskScheduler,
                                MessageDispatcher messageDispatcher,
                                ModuleController moduleController,
-                               FPlayerService fPlayerService,
-                               IntegrationSender integrationSender,
-                               ProxyRegistry proxyRegistry) {
-        super(fileFacade, platformPlayerAdapter, integrationModule, taskScheduler, messageDispatcher, moduleController, fPlayerService, integrationSender, proxyRegistry);
+                               PlaytimeService playtimeService,
+                               SocialService socialService,
+                               ProxyRegistry proxyRegistry,
+                               ListenerRegistry listenerRegistry) {
+        super(fileFacade, platformPlayerAdapter, messageDispatcher, moduleController, playtimeService, socialService, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

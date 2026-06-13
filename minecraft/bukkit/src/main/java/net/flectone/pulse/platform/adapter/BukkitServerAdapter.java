@@ -14,26 +14,25 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.platform.provider.PaperItemNameProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.util.PaperItemStackUtil;
+import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.key.Key;
+import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -41,7 +40,6 @@ import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.CachedServerIcon;
-import org.incendo.cloud.type.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -51,25 +49,29 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
     private final Plugin plugin;
-    private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
+    private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
+    private final AdventureHoverConvertor adventureHoverConvertor;
     private final ReflectionResolver reflectionResolver;
-    private final Provider<FileFacade> fileFacadeProvider;
-    private final PaperItemStackUtil paperItemStackUtil;
+    private final PaperItemNameProvider paperItemNameProvider;
     private final TaskScheduler taskScheduler;
-    private final IconConvertor iconUtil;
+    private final ComponentDecorator componentDecorator;
+    private final ComponentSerializer componentSerializer;
+    private final IconConvertor iconConvertor;
 
     private String serverIcon;
     private Pair<MethodHandle, Object> getTPSMethodPair;
+    private Boolean isModernItemStack;
 
     @Override
     public void dispatchCommand(@NonNull String command) {
@@ -77,13 +79,29 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String getTPS() {
+    public @NonNull String getTPS(FEntity entity) {
+        if (reflectionResolver.isFolia()) {
+            FPlayer regionFPlayer = entity instanceof FPlayer fPlayer && Bukkit.getPlayer(entity.uuid()) != null
+                    ? fPlayer
+                    : fPlayerServiceProvider.get().getRandomFPlayer();
+
+            CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+            taskScheduler.runRegion(regionFPlayer, () -> completableFuture.complete(getTPS()));
+
+            return completableFuture.join();
+        }
+
+        return getTPS();
+    }
+
+    private String getTPS() {
         if (getTPSMethodPair == null) {
             getTPSMethodPair = findGetTPSMethod();
         }
 
         try {
-            double[] recentTps = (double[]) getTPSMethodPair.first().invoke(getTPSMethodPair.second());
+            double[] recentTps = (double[]) getTPSMethodPair.getLeft().invoke(getTPSMethodPair.getRight());
             double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
             return String.valueOf(tps);
         } catch (Throwable _) {
@@ -91,7 +109,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
     }
 
-    public Pair<MethodHandle, Object> findGetTPSMethod() {
+    private Pair<MethodHandle, Object> findGetTPSMethod() {
         Object minecraftServer = Bukkit.getServer();
         MethodHandle getTPS = reflectionResolver.unreflectMethod(Server.class, "getTPS");
         if (getTPS == null) {
@@ -136,6 +154,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
     }
 
+    @Override
+    public @NonNull File getWhitelistFile() {
+        return new File(Bukkit.getWorldContainer(), "whitelist.json");
+    }
+
     private Optional<String> getServerIcon() {
         CachedServerIcon cachedServerIcon = Bukkit.getServerIcon();
         if (cachedServerIcon == null) return Optional.empty();
@@ -143,7 +166,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         File iconFile = new File(Bukkit.getWorldContainer(), "server-icon.png");
         if (!iconFile.exists()) return Optional.empty();
 
-        return Optional.ofNullable(iconUtil.convert(iconFile));
+        return Optional.ofNullable(iconConvertor.convert(iconFile));
     }
 
     @Override
@@ -155,11 +178,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     public int getOnlinePlayerCount() {
         return playerlistnameModuleProvider.get().isProxyMode()
                 ? (int) fPlayerServiceProvider.get().findOnlineFPlayers().stream()
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count()
                 : (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
                     .filter(fPlayer -> !fPlayer.isUnknown())
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count();
     }
 
@@ -235,13 +258,16 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         Component componentName = buildItemNameComponent(fPlayer, title);
 
         List<Component> componentLore = lore.length == 0
-                ? Collections.emptyList()
+                ? List.of()
                 : Arrays.stream(lore)
-                .map(message -> {
-                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
-                    Component component = messagePipelineProvider.get().build(messageContext);
-                    return component.decoration(TextDecoration.ITALIC, false);
-                })
+                .map(message -> messagePipelineProvider.get()
+                                .build(MessageContext.builder()
+                                       .sender(fPlayer)
+                                       .message(message)
+                                       .build()
+                                )
+                                .decoration(TextDecoration.ITALIC, false)
+                )
                 .toList();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
@@ -252,9 +278,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
-        return title.isEmpty()
-                ? Component.empty()
-                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
+        if (title.isEmpty()) return Component.empty();
+
+        return messagePipelineProvider.get().build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(title)
+                .build()
+        );
     }
 
     private @NonNull ItemStack buildModernItemStack(@NonNull Material material, @NonNull Component name, @NonNull List<Component> lore) {
@@ -269,11 +299,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
-        LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
-
-        meta.setDisplayName(legacyComponentSerializer.serialize(name));
+        meta.setDisplayName(componentSerializer.toLegacy(name));
         meta.setLore(lore.stream()
-                .map(legacyComponentSerializer::serialize)
+                .map(componentSerializer::toLegacy)
                 .toList()
         );
 
@@ -306,6 +334,55 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         plugin.saveResource(path, false);
     }
 
+    @Override
+    public @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable) {
+        if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
+
+        Component component = itemStack.getItemMeta() == null
+                || itemStack.getItemMeta().getDisplayName() == null // support legacy versions
+                || itemStack.getItemMeta().getDisplayName().isEmpty()
+                ? createTranslatableItemName(itemStack, translatable)
+                : createItemMetaName(itemStack);
+
+        if (itemStack.getType() != Material.AIR) {
+            ItemStack packetItemStack = SpigotConversionUtil.fromBukkitItemStack(itemStack);
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
+        }
+
+        return component;
+    }
+
+    private Component createItemMetaName(org.bukkit.inventory.ItemStack itemStack) {
+        // lazy init
+        if (isModernItemStack == null) {
+            isModernItemStack = reflectionResolver.hasMethod(org.bukkit.inventory.ItemStack.class, "displayName");
+        }
+
+        if (isModernItemStack) {
+            String jsonDisplayName = paperItemNameProvider.get(itemStack);
+            if (jsonDisplayName != null) {
+                return componentDecorator.decorateIfAbsent(componentSerializer.fromJson(jsonDisplayName), TextDecoration.ITALIC, TextDecoration.State.TRUE);
+            }
+        }
+
+        String displayName = itemStack.getItemMeta().getDisplayName();
+        if (displayName == null) return Component.empty();
+
+        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+                .message(displayName)
+                .build()
+        );
+
+        return Component.text(clearedDisplayName).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.TRUE);
+    }
+
+    private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {
+        String itemName = getItemName(itemStack);
+        Component itemComponent = Component.translatable(itemName);
+
+        return translatable ? itemComponent : GlobalTranslator.render(itemComponent, Locale.ROOT);
+    }
+
     private @NonNull String getModernItemName(@NonNull Material material) {
         return (material.isBlock() ? "block" : "item") + ".minecraft." + material.toString().toLowerCase();
     }
@@ -323,51 +400,4 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
     }
 
-    @Override
-    public @NonNull Component translateItemName(@NonNull Object item, @NonNull UUID messageUUID, boolean translatable) {
-        if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
-
-        Component component = itemStack.getItemMeta() == null
-                || itemStack.getItemMeta().getDisplayName() == null // support legacy versions
-                || itemStack.getItemMeta().getDisplayName().isEmpty()
-                ? createTranslatableItemName(itemStack, translatable)
-                : createItemMetaName(itemStack);
-
-        if (itemStack.getType() == Material.AIR) return component;
-
-        Key key = Key.key(itemStack.getType().name().toLowerCase());
-        int amount = itemStack.getAmount();
-
-        // This is a shitty Paper-only hack. No idea when it'll break. Admins can enable it, but it is disabled by default
-        // Pray PacketEvents merges https://github.com/retrooper/packetevents/pull/1277
-        if (reflectionResolver.isPaper() && fileFacadeProvider.get().config().module().usePaperMessageSender() && translatable) {
-            String itemMark = paperItemStackUtil.saveItem(messageUUID, itemStack);
-
-            return Component.text(itemMark)
-                    .color(NamedTextColor.WHITE)
-                    .append(component);
-        }
-
-        return component.hoverEvent(HoverEvent.showItem(key, amount));
-    }
-
-    private Component createItemMetaName(org.bukkit.inventory.ItemStack itemStack) {
-        String displayName = itemStack.getItemMeta().getDisplayName();
-        if (displayName == null) return Component.empty();
-
-        MessageContext messageContext = messagePipelineProvider.get().createContext(displayName);
-        Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
-
-        return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
-    }
-
-    private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {
-        String itemName = getItemName(itemStack);
-        Component itemComponent = Component.translatable(itemName);
-
-        return translatable
-                ? itemComponent
-                : GlobalTranslator.render(itemComponent, Locale.ROOT);
-    }
 }

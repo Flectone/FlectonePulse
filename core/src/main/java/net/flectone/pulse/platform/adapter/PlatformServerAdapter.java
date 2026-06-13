@@ -1,12 +1,14 @@
 package net.flectone.pulse.platform.adapter;
 
 import com.google.gson.JsonElement;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -27,11 +29,12 @@ public interface PlatformServerAdapter {
     void dispatchCommand(@NonNull String command);
 
     /**
-     * Gets the current server TPS (ticks per second).
+     * Gets the current server TPS (ticks per second) for a specific entity.
      *
+     * @param entity the entity for which to retrieve TPS information
      * @return formatted TPS string or empty string if unavailable
      */
-    @NonNull String getTPS();
+    @NonNull String getTPS(FEntity entity);
 
     /**
      * Gets the maximum player count for the server.
@@ -102,6 +105,13 @@ public interface PlatformServerAdapter {
      * @return the server icon as a string, or null if unavailable
      */
     @Nullable String getIcon();
+
+    /**
+     * Gets the server's whitelist file.
+     *
+     * @return the whitelist File object, never null
+     */
+    @NonNull File getWhitelistFile();
 
     /**
      * Checks if a project/resource is available on the server.
@@ -198,4 +208,5 @@ public interface PlatformServerAdapter {
             @NonNull String title,
             @NonNull String[] lore
     );
+
 }

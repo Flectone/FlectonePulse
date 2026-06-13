@@ -87,7 +87,7 @@ public abstract class BubbleModule implements ModuleSimple {
     public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, List<FPlayer> receivers) {
         if (disallowedPredicate != null && disallowedPredicate.test(rawString)) return;
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             bubbleService.addMessage(fPlayer, inputString, receivers);

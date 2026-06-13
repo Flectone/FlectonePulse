@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.module.message.format.fcolor.listener.PulseFColorListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -38,6 +39,8 @@ public class FColorModule implements ModuleSimple {
     private final ListenerRegistry listenerRegistry;
     private final LegacyColorConvertor legacyColorConvertor;
     private final ModuleController moduleController;
+    private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -80,7 +83,7 @@ public class FColorModule implements ModuleSimple {
 
         boolean isSenderColorOut = messageContext.isFlag(MessageFlag.COLOR_CONTEXT_SENDER);
 
-        messageContext = messageContext.addTagResolver(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, _) -> {
+        messageContext = messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.FCOLOR.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt number = argumentQueue.pop().asInt();
@@ -101,7 +104,7 @@ public class FColorModule implements ModuleSimple {
             color = legacyColorConvertor.convert(StringUtils.defaultString(color));
 
             return Tag.preProcessParsed(color);
-        });
+        }));
 
         // replace deprecated tag
         if (message.contains("/fcolor")) {
@@ -113,7 +116,7 @@ public class FColorModule implements ModuleSimple {
 
     private String getFColorOrDefault(FPlayer fPlayer, FColor.Type type, int index, String defaultColor) {
         if (permissionChecker.check(fPlayer, permission().colors().get(type))) {
-            Map<Integer, String> colorMap = fPlayer.getFColors(type);
+            Map<Integer, String> colorMap = socialService.loadColors(fPlayer, type);
             return colorMap.getOrDefault(index, defaultColor);
         }
 

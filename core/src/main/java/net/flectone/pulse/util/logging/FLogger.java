@@ -20,7 +20,7 @@ public record FLogger(
 ) {
 
     public static final boolean DEBUG_ENABLED = Boolean.parseBoolean(System.getProperty("flectonepulse.debug", "false"));
-    public static final String ERROR_MESSAGE_REPORT = "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues";
+    public static final String ERROR_MESSAGE_REPORT = "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues \n";
 
     private static final boolean ANSI_SUPPORTED = isAnsiSupported();
 
@@ -151,7 +151,7 @@ public record FLogger(
         PrintWriter printWriter = new PrintWriter(stringWriter);
         throwable.printStackTrace(printWriter);
 
-        log(new LogRecord(Level.WARNING, string + "\n" + stringWriter));
+        log(new LogRecord(Level.WARNING, string + " " + stringWriter));
     }
 
     public void warning(Throwable throwable, String format, Object args) {

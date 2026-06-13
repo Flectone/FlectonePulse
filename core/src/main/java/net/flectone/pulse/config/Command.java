@@ -455,10 +455,22 @@ public record Command(
             Boolean enable,
             Boolean executeInMainThread,
             List<String> aliases,
+            Editor editor,
             Destination destination,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Editor(
+                String host,
+                Boolean https,
+                Integer port
+        ) {
+        }
+
     }
 
     @With
@@ -518,6 +530,7 @@ public record Command(
     @Jacksonized
     public record Kick(
             Boolean enable,
+            Boolean filterByServer,
             Boolean checkGroupWeight,
             Range range,
             List<String> aliases,
@@ -544,7 +557,8 @@ public record Command(
     @Jacksonized
     public record Maintenance(
             Boolean enable,
-            Boolean turnedOn,
+            Boolean filterByServer,
+            Range range,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -600,6 +614,7 @@ public record Command(
     public record Nickname(
             Boolean enable,
             String allowedInput,
+            String subCommandOther,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,
@@ -641,6 +656,8 @@ public record Command(
             Boolean enableGui,
             Integer lastId,
             Range range,
+            String subCommandVote,
+            String subCommandGui,
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
@@ -743,6 +760,7 @@ public record Command(
     @Jacksonized
     public record Tictactoe(
             Boolean enable,
+            String subCommandMove,
             List<String> aliases,
             Cooldown cooldown,
             Sound sound
@@ -880,9 +898,9 @@ public record Command(
             Boolean checkDuplicate,
             Boolean filterByServer,
             Boolean showConnectionAttempts,
-            Boolean turnedOn,
             Integer perPage,
             Range range,
+            String subCommandPlayer,
             List<String> aliases,
             Destination destination,
             Cooldown cooldown,

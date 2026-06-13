@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `fp_mail` (
     `sender` INTEGER NOT NULL,
     `receiver` INTEGER NOT NULL,
     `message` TEXT NOT NULL,
-    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (1, -1)),
+    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (0, 1)),
     FOREIGN KEY(`sender`) REFERENCES `fp_player`(`id`),
     FOREIGN KEY(`receiver`) REFERENCES `fp_player`(`id`)
 );
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `fp_ignore` (
     `date` INTEGER NOT NULL,
     `initiator` INTEGER NOT NULL,
     `target` INTEGER NOT NULL,
-    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (1, -1)),
+    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (0, 1)),
     FOREIGN KEY(`initiator`) REFERENCES `fp_player`(`id`),
     FOREIGN KEY(`target`) REFERENCES `fp_player`(`id`),
     UNIQUE(`initiator`, `target`)
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `fp_moderation` (
     `reason` TEXT,
     `moderator` INTEGER NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (1, -1)),
+    `valid` INTEGER NOT NULL DEFAULT 1 CHECK(`valid` IN (0, 1)),
     `server` VARCHAR(255),
     FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
     FOREIGN KEY(`moderator`) REFERENCES `fp_player`(`id`)
@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS `fp_player_fcolor` (
     `fcolor` INTEGER NOT NULL,
     `type` VARCHAR(255) NOT NULL,
     FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
-    FOREIGN KEY(`fcolor`) REFERENCES `fp_fcolor`(`id`)
+    FOREIGN KEY(`fcolor`) REFERENCES `fp_fcolor`(`id`),
+    UNIQUE(`number`, `player`, `type`)
 );
 
 CREATE TABLE IF NOT EXISTS `fp_version` (

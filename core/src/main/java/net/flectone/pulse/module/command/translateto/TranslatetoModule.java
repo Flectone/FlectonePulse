@@ -8,18 +8,23 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.translateto.listener.TranslatetoProxyMessageListener;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -33,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -46,6 +52,9 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -57,6 +66,10 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(TranslatetoProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -111,7 +124,11 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
                             dataOutputStream.writeString(message);
                             dataOutputStream.writeString(finalMessageToTranslate);
                         })
-                        .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> Strings.CS.replace(string, "<language>", targetLang))
+                                .messageNames(List.of(name().name() + "_" + targetLang.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .targetLanguage(targetLang)
@@ -136,8 +153,8 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
     }
 
     @Override
-    public Localization.Command.Translateto localization(FEntity sender) {
-        return fileFacade.localization(sender).command().translateto();
+    public Localization.Command.Translateto localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().translateto();
     }
 
     public Function<Localization.Command.Translateto, String> replaceLanguage(String targetLang) {

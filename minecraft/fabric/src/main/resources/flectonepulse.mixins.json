@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.flectone.pulse.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ServerLoginPacketListenerImplAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

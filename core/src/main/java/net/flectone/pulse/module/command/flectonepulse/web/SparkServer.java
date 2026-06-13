@@ -26,7 +26,7 @@ public class SparkServer {
         }
 
         sparkService = Service.ignite();
-        sparkService.port(fileFacade.config().editor().port());
+        sparkService.port(fileFacade.command().flectonepulse().editor().port());
         sparkService.staticFiles.location("/");
 
         sparkService.before((_, res) -> res.type("text/html; charset=utf-8"));

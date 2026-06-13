@@ -116,6 +116,12 @@ public class TelegramClientProvider {
                 );
             } else {
                 Authenticator.setDefault(new Authenticator() {
+
+                    private final PasswordAuthentication passwordAuthentication = new PasswordAuthentication(
+                            systemVariableResolver.substituteEnvVars(proxy.user()),
+                            systemVariableResolver.substituteEnvVars(proxy.password()).toCharArray()
+                    );
+
                     @Override
                     public PasswordAuthentication requestPasswordAuthenticationInstance(String host,
                                                                                         InetAddress addr,
@@ -126,7 +132,7 @@ public class TelegramClientProvider {
                                                                                         URL url,
                                                                                         RequestorType reqType) {
                         if (proxy.host().equalsIgnoreCase(host) && proxy.port() == port) {
-                            return new PasswordAuthentication(proxy.user(), proxy.password().toCharArray());
+                            return passwordAuthentication;
                         }
 
                         return null;

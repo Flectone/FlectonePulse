@@ -22,11 +22,10 @@ public class BukkitChatListener implements Listener {
     private final ModuleController moduleController;
 
     @EventHandler
-    public void asyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         if (event.isCancelled()) return;
         if (event.getRecipients().isEmpty()) return;
         if (!event.getFormat().equals("<%1$s> %2$s")) return;
-        if (!moduleController.isEnable(chatModule)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
         if (moduleController.isDisabledFor(chatModule, fPlayer)) return;

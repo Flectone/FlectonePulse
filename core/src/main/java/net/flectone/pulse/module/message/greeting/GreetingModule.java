@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.FImage;
@@ -16,7 +16,9 @@ import net.flectone.pulse.module.message.greeting.listener.PulseGreetingListener
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 
@@ -28,9 +30,11 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
 
     private final FileFacade fileFacade;
     private final SkinService skinService;
+    private final SocialService socialService;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
+    private final TaskScheduler taskScheduler;
 
     @Override
     public void onEnable() {
@@ -53,17 +57,17 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
     }
 
     @Override
-    public Localization.Message.Greeting localization(FEntity sender) {
-        return fileFacade.localization(sender).message().greeting();
+    public Localization.Message.Greeting localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().greeting();
     }
 
     public void send(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Greeting>builder()
+        taskScheduler.runAsync(() -> messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Greeting>builder()
                 .sender(fPlayer)
-                .format(s -> {
-                    String format = s.format();
+                .format(localization -> {
+                    String format = localization.format();
                     if (!format.contains("[#][#][#][#][#][#][#][#]")) return format;
 
                     try {
@@ -71,7 +75,7 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
 
                         List<String> pixels = fImage.convertImageUrl();
 
-                        String greetingMessage = String.join("<br>", s.format());
+                        String greetingMessage = String.join("<br>", localization.format());
 
                         for (String pixel : pixels) {
                             greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
@@ -86,6 +90,6 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
                 .destination(config().destination())
                 .sound(soundOrThrow())
                 .build()
-        );
+        ), true);
     }
 }

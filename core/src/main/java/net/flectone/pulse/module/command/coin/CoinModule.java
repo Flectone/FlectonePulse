@@ -7,19 +7,25 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.coin.listener.CoinProxyMessageListener;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.util.generator.RandomGenerator;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -31,12 +37,19 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(CoinProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -53,11 +66,15 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .proxy(output -> output.writeInt(percent))
-                        .integration(string -> Strings.CS.replace(
-                                string,
-                                "<result>",
-                                percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> Strings.CS.replace(
+                                        string,
+                                        "<result>",
+                                        percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
+                                ))
+                                .messageNames(List.of(name().name() + "_" + (percent == 0 ? "DRAW" : percent > 50 ? "HEAD" : "TAIL")))
+                                .build()
+                        )
                         .build()
                 )
                 .percent(percent)
@@ -81,8 +98,8 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
     }
 
     @Override
-    public Localization.Command.Coin localization(FEntity sender) {
-        return fileFacade.localization(sender).command().coin();
+    public Localization.Command.Coin localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().coin();
     }
 
     public Function<Localization.Command.Coin, String> replaceResult(int percent) {

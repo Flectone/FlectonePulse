@@ -10,11 +10,11 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.nickname.listener.NicknameProxyMessageListener;
 import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
 import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -25,17 +25,16 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -47,6 +46,7 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
@@ -79,13 +79,16 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
         );
 
         String promptPlayer = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::player);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "other", CommandMeta.empty())
-                        .permission(permission().other().name())
-                        .required(promptPlayer, commandParserProvider.playerParser())
-                        .required(promptMessage, commandParserProvider.nativeMessageParser())
-                        .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandOther(), commandBuilder -> commandBuilder
+                .permission(permission().other().name())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .handler(commandContext -> executeOther(commandContext.sender(), commandContext))
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(NicknameProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseNicknameListener.class);
     }
@@ -119,8 +122,6 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             return;
         }
 
-        fTarget = fPlayerService.loadSettings(fTarget);
-
         String nick = commandModuleController.getArgument(this, commandContext, 0);
 
         changeName(fPlayer, fTarget, nick);
@@ -142,8 +143,8 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     @Override
-    public Localization.Command.Nickname localization(FEntity sender) {
-        return fileFacade.localization(sender).command().nickname();
+    public Localization.Command.Nickname localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().nickname();
     }
 
     @Override
@@ -164,11 +165,13 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             return;
         }
 
-        fTarget = needClear
-                ? fTarget.withoutSetting(SettingText.NICKNAME)
-                : fTarget.withSetting(SettingText.NICKNAME, nickname);
-
-        fPlayerService.saveOrUpdateSetting(fTarget, SettingText.NICKNAME);
+        if (needClear) {
+            if (socialService.getSetting(fTarget, SettingText.NICKNAME) != null) {
+                socialService.saveSetting(fTarget, SettingText.NICKNAME, null);
+            }
+        } else {
+            socialService.saveSetting(fTarget, SettingText.NICKNAME, nickname);
+        }
 
         messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
                 .base(EventMetadata.<Localization.Command.Nickname>builder()
@@ -188,9 +191,9 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     public MessageContext addTag(MessageContext messageContext) {
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.NICKNAME, (_, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.NICKNAME.getTagName(), (_, _) -> {
             // get nickname value
-            String value = fPlayerService.getFPlayer(messageContext.sender()).getSetting(SettingText.NICKNAME);
+            String value = socialService.getSetting(fPlayerService.getFPlayer(messageContext.sender()), SettingText.NICKNAME);
 
             // resolve receiver localization
             Localization.Command.Nickname localization = localization(messageContext.receiver());
@@ -206,23 +209,22 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
                 value = defaultNickname;
             }
 
-            String displayFormat = Strings.CS.replace(
-                    permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
-                    "<value>",
-                    value
-            );
-
-            MessageContext nickContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), displayFormat)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(messageContext.sender())
+                    .receiver(messageContext.receiver())
+                    .message(Strings.CS.replace(
+                            permissionChecker.check(messageContext.receiver(), permission().see()) ? localization.displaySee() : localization.display(),
+                            "<value>",
+                            value
+                    ))
+                    .flags(messageContext.flags())
+                    .flags(
                             new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.NICKNAME_MODULE, MessageFlag.ICU_MODULE},
                             new boolean[]{false, false, true}
-                    );
-
-            Component nickComponent = messagePipeline.build(nickContext);
-
-            return Tag.inserting(nickComponent);
-        });
+                    )
+                    .build()
+            ));
+        }));
     }
 
 }

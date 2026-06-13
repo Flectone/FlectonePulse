@@ -16,7 +16,7 @@ import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
@@ -52,7 +52,9 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
                               @Nullable Member member) {
         List<String> channel = discordModule.config().messageChannel().get(discordModule.name().name());
         if (channel == null) return;
-        if (!channel.contains(message.getChannelId().asString())) return;
+
+        String channelId = message.getChannelId().asString();
+        if (!channel.contains(channelId)) return;
 
         DiscordClient discordClient = discordClientProvider.get();
         if (discordClient == null) return;
@@ -69,8 +71,7 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
             // always ignore ourselves
             Optional<User> creator = webhook.getCreator();
-            if (creator.isPresent()
-                    && creator.get().getId().equals(discordClient.id())) return;
+            if (creator.isPresent() && creator.get().getId().asLong() == discordClient.id()) return;
         }
 
         // check command in message
@@ -78,6 +79,7 @@ public class DiscordMessageListener implements DiscordEventListener<MessageCreat
 
         String content = getMessageContent(message);
         discordSender.sendMessage(
+                channelId,
                 member,
                 webhook,
                 content,

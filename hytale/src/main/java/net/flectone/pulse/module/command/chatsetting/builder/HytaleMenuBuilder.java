@@ -12,7 +12,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -24,9 +23,10 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
@@ -46,6 +46,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private final ChatsettingHandler chatsettingHandler;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
+    private final HytaleComponentSerializer componentSerializer;
+    private final SocialService socialService;
 
     @Override
     public void open(FPlayer fPlayer, UUID fTargetUUID) {
@@ -67,8 +69,12 @@ public class HytaleMenuBuilder implements MenuBuilder {
         FPlayer fTarget = fPlayerService.getFPlayer(fTargetUUID);
 
         Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, fTarget, localization.inventory().trim());
-        Component header = messagePipeline.build(headerContext);
+        Component header = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(localization.inventory().trim())
+                .build()
+        );
 
         GridGroup gridGroup = new GridGroup(config().columns());
 
@@ -91,15 +97,21 @@ public class HytaleMenuBuilder implements MenuBuilder {
         int slot = checkbox.types().get(messageType);
         if (slot == -1) return gridGroup;
 
-        boolean enabled = fTarget.isSetting(messageType);
+        boolean enabled = socialService.isSetting(fTarget, messageType);
 
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
-        MessageContext titleContext = messagePipeline.createContext(fPlayer, fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled))
+                .build()
+        );
 
-        String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
-        MessageContext loreContext = messagePipeline.createContext(fPlayer, fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fTarget)
+                .message(chatsettingModule.getCheckboxLore(fPlayer, enabled))
+                .build()
+        );
 
         String id = "fp_" + UUID.randomUUID();
 
@@ -107,25 +119,28 @@ public class HytaleMenuBuilder implements MenuBuilder {
             ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
             if (status == ChatsettingHandler.Status.DENIED) return;
 
-            FPlayer finalFTarget = fPlayerService.getFPlayer(fTarget);
             boolean currentEnabled = status.toBoolean();
 
-            String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
-            MessageContext invertTitleContext = messagePipeline.createContext(fPlayer, finalFTarget, invertTitle);
-            Component componentInvertTitle = messagePipeline.build(invertTitleContext);
+            Component componentInvertTitle = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(fTarget)
+                    .message(chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled))
+                    .build()
+            );
 
-            String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
-            MessageContext invertLoreContext = messagePipeline.createContext(fPlayer, finalFTarget, invertLore);
-            Component componentInvertLore = messagePipeline.build(invertLoreContext);
+            Component componentInvertLore = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(fTarget)
+                    .message(chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled))
+                    .build()
+            );
 
             uiContext.getById(id, ButtonBuilder.class).ifPresent(buttonBuilder -> buttonBuilder
-                    .withText(PlainTextComponentSerializer.plainText().serialize(componentInvertTitle))
-                    .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentInvertLore))
+                    .withText(componentSerializer.toPlain(componentInvertTitle))
+                    .withTooltipTextSpan(componentSerializer.toHytale(componentInvertLore))
             );
 
             uiContext.updatePage(true);
-
-            chatsettingModule.saveSetting(finalFTarget, messageType);
         }));
     }
 
@@ -145,14 +160,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
                 "<chat>", localization.menu().chat().types().getOrDefault(currentChat, currentChat)
         ).split("<br>");
 
-        String title = messages.length > 0 ? messages[0] : "";
-        String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 0 ? messages[0] : "")
+                .build()
+        );
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
-
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                .build()
+        );
 
         String id = "fp_chat";
 
@@ -172,14 +190,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
 
         String[] messages = subMenu.item().split("<br>");
 
-        String title = messages.length > 0 ? messages[0] : "";
-        String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+        Component componentTitle = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 0 ? messages[0] : "")
+                .build()
+        );
 
-        MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-        Component componentTitle = messagePipeline.build(titleContext);
-
-        MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-        Component componentLore = messagePipeline.build(loreContext);
+        Component componentLore = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                .build()
+        );
 
         String id = "fp_fcolor_" + type.ordinal();
 
@@ -221,14 +242,17 @@ public class HytaleMenuBuilder implements MenuBuilder {
             String message = getItemMessage.apply(item);
             String[] messages = message.split("<br>");
 
-            String title = messages.length > 0 ? messages[0] : "";
-            String lore = messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "";
+            Component componentTitle = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(messages.length > 0 ? messages[0] : "")
+                    .build()
+            );
 
-            MessageContext titleContext = messagePipeline.createContext(fTarget, title);
-            Component componentTitle = messagePipeline.build(titleContext);
-
-            MessageContext loreContext = messagePipeline.createContext(fTarget, lore);
-            Component componentLore = messagePipeline.build(loreContext);
+            Component componentLore = messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget)
+                    .message(messages.length > 1 ? String.join("<br>", Arrays.copyOfRange(messages, 1, messages.length)) : "")
+                    .build()
+            );
 
             String subId = id + "_" + i;
 
@@ -248,8 +272,8 @@ public class HytaleMenuBuilder implements MenuBuilder {
     private ButtonBuilder createButton(String id, Component componentTitle, Component componentLore, BiConsumer<Void, UIContext> callback) {
         return ButtonBuilder.textButton()
                 .withId(id)
-                .withText(PlainTextComponentSerializer.plainText().serialize(componentTitle))
-                .withTooltipTextSpan(HytaleComponentSerializer.get().serialize(componentLore))
+                .withText(componentSerializer.toPlain(componentTitle))
+                .withTooltipTextSpan(componentSerializer.toHytale(componentLore))
                 .withAnchor(new HyUIAnchor()
                         .setWidth(config().buttonWidth())
                         .setHeight(config().buttonHeight())
@@ -263,7 +287,7 @@ public class HytaleMenuBuilder implements MenuBuilder {
                 .withLifetime(CustomPageLifetime.CanDismissOrCloseThroughInteraction)
                 .addElement(PageOverlayBuilder.pageOverlay()
                         .addChild(ContainerBuilder.container()
-                                .withTitleText(PlainTextComponentSerializer.plainText().serialize(title))
+                                .withTitleText(componentSerializer.toPlain(title))
                                 .withAnchor(new HyUIAnchor()
                                         .setWidth(config().panelWidth())
                                         .setHeight(config().panelHeight())

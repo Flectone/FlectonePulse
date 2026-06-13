@@ -16,15 +16,16 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.condition.listener.PulseConditionListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Singleton
@@ -36,6 +37,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -48,8 +50,8 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public Localization.Message.Format.Condition localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().condition();
+    public Localization.Message.Format.Condition localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().condition();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.CONDITION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.CONDITION.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String conditionName = argumentQueue.pop().lowerValue();
@@ -78,16 +80,19 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
             String conditionValue = getConditionValue(conditionName, messageContext.sender(), messageContext.receiver(), messageContext.flags());
             if (StringUtils.isEmpty(conditionValue)) return MessagePipeline.ReplacementTag.emptyTag();
 
-            MessageContext conditionValueContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), conditionValue)
-                    .withFlags(messageContext.flags());
-
-            return Tag.inserting(messagePipeline.build(conditionValueContext));
-        });
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(messageContext.sender())
+                    .receiver(messageContext.receiver())
+                    .message(conditionValue)
+                    .flags(messageContext.flags())
+                    .build()
+            ));
+        }));
     }
 
     @Nullable
     public String getConditionValue(String conditionName, FPlayer fPlayer) {
-        return getConditionValue(conditionName, fPlayer, fPlayer, Collections.emptyMap());
+        return getConditionValue(conditionName, fPlayer, fPlayer, Map.of());
     }
 
     @Nullable
@@ -139,10 +144,13 @@ public class ConditionModule implements ModuleLocalization<Localization.Message.
     }
 
     private String buildCriteriaString(FEntity fPlayer, FPlayer fReceiver, String value, Map<MessageFlag, Boolean> flags) {
-        MessageContext conditionNameContext = messagePipeline.createContext(fPlayer, fReceiver, value)
-                .withFlags(flags);
-
-        return messagePipeline.buildPlain(conditionNameContext).trim();
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(value)
+                .flags(flags)
+                .build()
+        ).trim();
     }
 
 }

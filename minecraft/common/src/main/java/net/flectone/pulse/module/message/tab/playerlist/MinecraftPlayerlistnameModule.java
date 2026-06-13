@@ -18,9 +18,9 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -28,15 +28,18 @@ import net.flectone.pulse.module.message.scoreboard.MinecraftScoreboardModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.MinecraftPulsePlayerlistnameListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -45,6 +48,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -65,6 +69,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final MinecraftPacketSender packetSender;
@@ -76,13 +81,14 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     private final ModuleController moduleController;
     private final MinecraftScoreboardModule scoreboardModule;
     private final IntegrationModule integrationModule;
+    private final RangeFilter rangeFilter;
     private final @Named("isNewerThanOrEqualsV_1_19_4") boolean isNewerThanOrEqualsV_1_19_4;
 
     @Override
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::send, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::send, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulsePlayerlistnameListener.class);
@@ -110,23 +116,25 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     @Override
-    public Localization.Message.Tab.Playerlistname localization(FEntity sender) {
-        return fileFacade.localization(sender).message().tab().playerlistname();
+    public Localization.Message.Tab.Playerlistname localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().tab().playerlistname();
     }
 
     public void update() {
         if (!moduleController.isEnable(this)) return;
 
-        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> taskScheduler.runRegion(fPlayer, () -> send(fPlayer)));
+        taskScheduler.runAsync(() -> fPlayerService.getPlatformFPlayers().forEach(this::send));
     }
 
     public void send(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
+        Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fPlayer, config().range());
+
         fPlayerService.getPlatformFPlayers().stream()
-                .filter(viewer -> integrationModule.canSeeVanished(fPlayer, viewer))
-                .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
+                .filter(viewer -> socialService.canSeeVanished(fPlayer, viewer))
+                .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver, listedFilter));
     }
 
     public void add(UUID uuid) {
@@ -141,7 +149,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         UserProfile userProfile = createUserProfile(fPlayer);
 
         fPlayerService.getPlatformFPlayers().stream()
-                .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
                 .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, createPlayerInfo(fPlayer, fReceiver, userProfile))));
     }
 
@@ -153,7 +161,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         );
     }
 
-    private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver) {
+    private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver, Predicate<FPlayer> listedFilter) {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
@@ -171,7 +179,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
-                    isListed(fPlayer, gameMode),
+                    isListed(fPlayer, gameMode) && listedFilter.test(fReceiver),
                     platformPlayerAdapter.getPing(fPlayer),
                     gameMode,
                     name,
@@ -194,7 +202,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     }
 
     public boolean isProxyMode() {
-        return moduleController.isEnable(this) && config().proxyMode() && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().is(Range.Type.PROXY) && proxyRegistry.hasEnabledProxy();
     }
 
     private boolean isListed(FPlayer fPlayer, GameMode gameMode) {
@@ -212,37 +220,24 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         return fPlayerService.findOnlineFPlayers()
                 .stream()
                 .filter(fPlayer -> !currentServerPlayers.contains(fPlayer.uuid()))
-                .filter(fPlayer -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+                .filter(fPlayer -> socialService.canSeeVanished(fPlayer, fReceiver))
                 .map(fPlayer -> createPlayerInfo(fPlayer, fReceiver, null))
                 .toList();
     }
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
-        // 3 - offline client, 4 - official client
-        boolean offlineClient = fReceiver.uuid().version() == 3;
-
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, fReceiver, localization(fReceiver).format())
-                .addFlag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, offlineClient); // disable player_head for official client
-
-        return messagePipeline.build(messageContext);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(localization(fReceiver).format())
+                // 3 - offline client, 4 - official client
+                // disable for offline client
+                .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
+                .build()
+        );
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
-        boolean updateCache = !platformPlayerAdapter.isOnline(fPlayer);
-
-        // check new settings data
-        if (!updateCache && fPlayer.settingsText().isEmpty()) {
-            // get fplayer from cache
-            fPlayer = fPlayerService.getFPlayer(fPlayer);
-
-            // check new settings data
-            updateCache = fPlayer.settingsText().isEmpty();
-        }
-
-        if (updateCache) {
-            fPlayer = fPlayerService.updateCache(fPlayerService.loadSettings(fPlayer));
-        }
-
         if (userProfile == null) {
             userProfile = createUserProfile(fPlayer);
         }

@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -22,10 +24,11 @@ public class TimeFormatter {
     private static final Format SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final FileFacade fileFacade;
+    private final SocialService socialService;
 
     public String format(FPlayer fPlayer, long time) {
 
-        Localization.Time message = fileFacade.localization(fPlayer).time();
+        Localization.Time message = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).time();
         if (message.format().isEmpty()) return "";
 
         String formattedTime = DurationFormatUtils.formatDuration(time, message.format(), false);

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -11,6 +12,7 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.placeholderapi.HytalePlaceholderAPIModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
@@ -18,23 +20,24 @@ import org.jspecify.annotations.NonNull;
 @Singleton
 public class HytaleIntegrationModule extends IntegrationModule {
 
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
 
     @Inject
     public HytaleIntegrationModule(FileFacade fileFacade,
-                                   PlatformServerAdapter platformServerAdapter,
+                                   Provider<PlatformServerAdapter> platformServerAdapterProvider,
+                                   ListenerRegistry listenerRegistry,
                                    ModuleController moduleController,
                                    Injector injector) {
-        super(fileFacade, platformServerAdapter, moduleController, injector);
+        super(fileFacade, platformServerAdapterProvider, listenerRegistry, moduleController, injector);
 
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
     }
 
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = super.childrenBuilder();
 
-        if (platformServerAdapter.hasProject("HelpChat:PlaceholderAPI")) {
+        if (platformServerAdapterProvider.get().hasProject("HelpChat:PlaceholderAPI")) {
             builder.add(HytalePlaceholderAPIModule.class);
         }
 

@@ -114,6 +114,8 @@ public interface PlatformPlayerAdapter {
         return getWorldEnvironment(entity.uuid());
     }
 
+    @NonNull String getLocale(@NonNull UUID uuid);
+
     /**
      * Gets the player IP address.
      *

@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -30,9 +30,9 @@ public class MinecraftSoundPlayer implements SoundPlayer {
     public void play(Pair<Sound, PermissionSetting> soundPermission, FEntity sender, FPlayer receiver) {
         if (soundPermission == null) return;
 
-        Sound sound = soundPermission.first();
+        Sound sound = soundPermission.getLeft();
         if (sound == null || !sound.enable()) return;
-        if (!permissionChecker.check(sender, soundPermission.second())) return;
+        if (!permissionChecker.check(sender, soundPermission.getRight())) return;
 
         packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(
                 Sounds.getByNameOrCreate(sound.name()),
@@ -46,9 +46,9 @@ public class MinecraftSoundPlayer implements SoundPlayer {
     public void play(Pair<Sound, PermissionSetting> soundPermission, FPlayer sender, Vector3i vector3i) {
         if (soundPermission == null) return;
 
-        Sound sound = soundPermission.first();
+        Sound sound = soundPermission.getLeft();
         if (sound == null || !sound.enable()) return;
-        if (!permissionChecker.check(sender, soundPermission.second())) return;
+        if (!permissionChecker.check(sender, soundPermission.getRight())) return;
 
         fPlayerService.getOnlineFPlayers().stream()
                 .filter(fReceiver -> {

@@ -7,14 +7,17 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.spy.listener.SpyProxyMessageListener;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -23,7 +26,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -33,31 +35,32 @@ import java.util.function.Predicate;
 public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
         commandModuleController.registerCommand(this, manager -> manager
                 .permission(permission().name())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(SpyProxyMessageListener.class);
+        }
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
-        if (turnedBefore) {
-            fPlayer = fPlayer.withoutSetting(SettingText.SPY_STATUS);
-        } else {
-            fPlayer = fPlayer.withSetting(SettingText.SPY_STATUS, "1");
-        }
+        boolean turnedBefore = socialService.getSetting(fPlayer, SettingText.SPY_STATUS) != null;
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);
+        socialService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
 
         messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
                 .base(EventMetadata.<Localization.Command.Spy>builder()
@@ -89,8 +92,8 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     }
 
     @Override
-    public Localization.Command.Spy localization(FEntity sender) {
-        return fileFacade.localization(sender).command().spy();
+    public Localization.Command.Spy localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().spy();
     }
 
     public void check(FPlayer fPlayer, String chat, String message, List<FPlayer> receivers) {
@@ -101,7 +104,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     }
 
     public void spy(FPlayer fPlayer, String action, String message) {
-        spy(fPlayer, action, message, Collections.emptyList());
+        spy(fPlayer, action, message, List.of());
     }
 
     public void spy(FPlayer fPlayer, String action, String message, List<FPlayer> receivers) {
@@ -122,7 +125,10 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
                         .tagResolvers(fReceiver -> new TagResolver[]{
                                 Placeholder.parsed("action", localization(fReceiver).actions().getOrDefault(action, action))
                         })
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + action.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .turned(true)
@@ -135,7 +141,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
         return fReceiver -> !fPlayer.equals(fReceiver)
                 && !receivers.contains(fReceiver)
                 && permissionChecker.check(fReceiver, permission())
-                && fReceiver.getSetting(SettingText.SPY_STATUS) != null
+                && socialService.getSetting(fReceiver, SettingText.SPY_STATUS) != null
                 && fReceiver.isOnline();
     }
 

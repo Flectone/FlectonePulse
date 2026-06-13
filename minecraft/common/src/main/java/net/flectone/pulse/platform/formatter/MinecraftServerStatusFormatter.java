@@ -3,7 +3,6 @@ package net.flectone.pulse.platform.formatter;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -14,9 +13,9 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +28,7 @@ public class MinecraftServerStatusFormatter {
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
-    private final Gson gson;
+    private final ComponentSerializer componentSerializer;
 
     @NonNull
     public JsonElement formatDescription(FPlayer fPlayer, User user, String message) {
@@ -38,16 +37,18 @@ public class MinecraftServerStatusFormatter {
 
     @NonNull
     public Component createMOTD(FPlayer fPlayer, User user, String message) {
-        MessageContext motdContext = messagePipeline.createContext(fPlayer, message)
-                .addFlag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
+        MessageContext.MessageContextBuilder messageContextBuilder = MessageContext.builder()
+                .sender(fPlayer)
+                .message(message)
+                .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
 
         // display player_head in MOTD is only available for clients 1.21.9-1.21.11
         if (user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)
                 || user.getPacketVersion().isNewerThan(ClientVersion.V_1_21_11)) {
-            motdContext = motdContext.addFlag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
+            messageContextBuilder = messageContextBuilder.flag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
         }
 
-        return messagePipeline.build(motdContext);
+        return messagePipeline.build(messageContextBuilder.build());
     }
 
     @NonNull
@@ -55,9 +56,9 @@ public class MinecraftServerStatusFormatter {
         if (motd == null) return platformServerAdapter.getMOTD();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
-            return gson.toJsonTree(motd);
+            return componentSerializer.toJsonTree(motd);
         } else {
-            String serializedText =  LegacyComponentSerializer.legacySection().serialize(motd);
+            String serializedText =  componentSerializer.toLegacy(motd);
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("text", serializedText);
             return jsonObject;

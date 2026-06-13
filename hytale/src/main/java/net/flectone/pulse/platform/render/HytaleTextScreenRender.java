@@ -8,7 +8,6 @@ import net.flectone.pulse.model.util.TextScreen;
 import net.flectone.pulse.model.util.Times;
 import net.kyori.adventure.text.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ public class HytaleTextScreenRender implements TextScreenRender {
 
     @Override
     public List<Integer> getPassengers(UUID uuid) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

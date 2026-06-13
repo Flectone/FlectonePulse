@@ -52,7 +52,7 @@ public class DiscordCommandDispatcher {
             Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization().customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
-            taskScheduler.runRegion(fPlayer, () -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
+            taskScheduler.runAsync(() -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
             return true;
         }
 
@@ -88,13 +88,15 @@ public class DiscordCommandDispatcher {
 
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull String localization) {
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, localization)
-                .addFlags(
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .sender(fPlayer)
+                .message(localization)
+                .flags(
                         new MessageFlag[]{MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_SPRITE_PROCESSING},
                         new boolean[]{false, false}
-                );
-
-        return messagePipeline.buildPlain(messageContext);
+                )
+                .build()
+        );
     }
 
 }

@@ -11,9 +11,9 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.HytaleMessageUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +23,7 @@ public class HytalyActionBarRender implements ActionBarRender {
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final HytaleMessageUtil hytaleMessageUtil;
+    private final ComponentSerializer componentSerializer;
 
     @Override
     public void render(FPlayer fPlayer, Component component, int stayTicks) {
@@ -38,7 +39,7 @@ public class HytalyActionBarRender implements ActionBarRender {
                                 .setBottom(-700)
                         )
                         .addChild(LabelBuilder.label()
-                                .withText(PlainTextComponentSerializer.plainText().serialize(component))
+                                .withText(componentSerializer.toPlain(component))
                                 .withStyle(new HyUIStyle()
                                         .setTextColor(hytaleMessageUtil.findFirstColor(component))
                                 )

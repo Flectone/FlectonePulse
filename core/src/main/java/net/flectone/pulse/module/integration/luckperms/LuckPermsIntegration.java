@@ -13,7 +13,6 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,7 +74,7 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public Set<String> getGroups() {
-        if (luckPerms == null) return Collections.emptySet();
+        if (luckPerms == null) return Set.of();
 
         return luckPerms.getGroupManager().getLoadedGroups().stream()
                 .map(Group::getName)
@@ -86,7 +85,7 @@ public class LuckPermsIntegration implements FIntegration {
         if (luckPerms == null) return null;
 
         User user = luckPerms.getUserManager().getUser(fPlayer.uuid());
-        if (user != null || fPlayer.isUnknown()) return user;
+        if (user != null || fPlayer.isUnknown() || fPlayer.isConsole()) return user;
 
         return luckPerms.getUserManager().loadUser(fPlayer.uuid()).join();
     }

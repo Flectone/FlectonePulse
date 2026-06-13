@@ -12,7 +12,6 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.BukkitChatListener;
 import net.flectone.pulse.module.message.chat.listener.PaperChatListener;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
@@ -20,23 +19,20 @@ import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
-import org.bukkit.event.EventPriority;
 
 @Singleton
 public class BukkitChatModule extends MinecraftChatModule {
 
-    private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry listenerRegistry;
     private final ReflectionResolver reflectionResolver;
-    private final ModuleController moduleController;
-    private final FLogger fLogger;
 
     @Inject
     protected BukkitChatModule(FileFacade fileFacade,
                                FPlayerService fPlayerService,
+                               SocialService socialService,
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
@@ -49,18 +45,13 @@ public class BukkitChatModule extends MinecraftChatModule {
                                DisableSender disableSender,
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
-                               ModuleController moduleController,
-                               FLogger fLogger,
                                ProxyRegistry proxyRegistry) {
-        super(fileFacade, fPlayerService, platformServerAdapter, permissionChecker,
+        super(fileFacade, fPlayerService, socialService, platformServerAdapter, permissionChecker,
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry,
                 taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
 
-        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.reflectionResolver = reflectionResolver;
-        this.moduleController = moduleController;
-        this.fLogger = fLogger;
     }
 
     @Override
@@ -69,16 +60,12 @@ public class BukkitChatModule extends MinecraftChatModule {
 
         Message.Chat.Mode mode = config().mode();
         if (mode == Message.Chat.Mode.PACKET) return; // already registered in super class
-        if (mode == Message.Chat.Mode.PAPER) {
-            if (reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
-                PaperChatListener chatPaperListener = new PaperChatListener(fPlayerService, moduleController, this);
-                listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().priority().name()));
-                return;
-            }
 
-            fLogger.warning("It is not possible to use chat in PAPER mode on your server. BUKKIT mode is currently in use.");
+        // check paper mode
+        if (mode == Message.Chat.Mode.PAPER && reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
+            listenerRegistry.register(PaperChatListener.class, config().priority());
+        } else {
+            listenerRegistry.register(BukkitChatListener.class, config().priority());
         }
-
-        listenerRegistry.register(BukkitChatListener.class, config().priority());
     }
 }

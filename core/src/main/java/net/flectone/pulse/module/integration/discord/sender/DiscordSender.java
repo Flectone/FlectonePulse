@@ -20,6 +20,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -34,7 +35,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -128,13 +129,17 @@ public class DiscordSender {
                 discordWebhookService.saveWebhook(channelID, webhookData);
             }
 
-            String username = StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
-                    ? sender.name()
-                    : messagePipeline.buildPlain(messagePipeline.createContext(sender, FPlayer.UNKNOWN, channelEmbed.webhookName()));
-
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
                     .allowedMentions(AllowedMentionsData.builder().build())
-                    .username(username)
+                    .username(StringUtils.isEmpty(channelEmbed.webhookName()) || "<player>".equals(channelEmbed.webhookName())
+                            ? sender.name()
+                            : messagePipeline.buildPlain(MessageContext.builder()
+                                                         .sender(sender)
+                                                         .receiver(FPlayer.UNKNOWN)
+                                                         .message(channelEmbed.webhookName())
+                                                         .build()
+                            )
+                    )
                     .avatarUrl(replaceSkin.apply(webhookAvatar))
                     .content(replaceString.apply(channelEmbed.content()));
 
@@ -169,7 +174,8 @@ public class DiscordSender {
                 .subscribe();
     }
 
-    public void sendMessage(@Nullable Member member,
+    public void sendMessage(@NonNull String channelId,
+                            @Nullable Member member,
                             @Nullable Webhook webhook,
                             @NonNull String message,
                             @Nullable Pair<String, String> reply) {
@@ -198,27 +204,33 @@ public class DiscordSender {
                         .destination(discordModule.config().destination())
                         .message(message)
                         .sound(discordModule.soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{TagResolver.resolver("reply", (_, _) -> {
+                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
                             if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            MessageContext tagContext = messagePipeline.createContext(discordModule.localization(fResolver).formatReply())
-                                    .addTagResolvers(
-                                            TagResolver.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.first()))),
-                                            TagResolver.resolver("reply_message", (_, _) -> {
-                                                MessageContext replyContext = messagePipeline.createContext(discordClient.sender(), fResolver, reply.second())
-                                                        .addFlag(MessageFlag.PLAYER_MESSAGE, true);
-
-                                                return Tag.selfClosingInserting(messagePipeline.build(replyContext));
-                                            })
-                                    );
-
-                            return Tag.inserting(messagePipeline.build(tagContext));
+                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                    .message(discordModule.localization(fResolver).formatReply())
+                                    .tagResolvers(
+                                            messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                    .sender(discordClient.sender())
+                                                    .receiver(fResolver)
+                                                    .message(reply.getRight())
+                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                    .build()
+                                            )))
+                                    )
+                                    .build()
+                            ));
                         })})
-                        .integration(string -> StringUtils.replaceEach(
-                                string,
-                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                new String[]{globalName, globalName, nickname, displayName, userName}
-                        ))
+                        .integration(IntegrationMetadata.builder()
+                                .format(string -> StringUtils.replaceEach(
+                                        string,
+                                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                        new String[]{globalName, globalName, nickname, displayName, userName}
+                                ))
+                                .messageNames(List.of(discordModule.name().name() + "_" + channelId))
+                                .build()
+                        )
                         .build()
                 )
                 .globalName(globalName)

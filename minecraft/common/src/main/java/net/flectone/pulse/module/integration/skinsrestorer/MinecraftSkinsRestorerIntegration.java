@@ -14,6 +14,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.skinsrestorer.api.PropertyUtils;
@@ -31,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftSkinsRestorerIntegration implements FIntegration {
 
+    private final FileFacade fileFacade;
     private final FlectonePulse flectonePulse;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -58,7 +60,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     if (fPlayer.isUnknown()) return;
 
                     // update proxy cache
-                    if (!proxySender.send(fPlayer, ModuleName.SYSTEM_SKIN)) {
+                    if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
                         skinServiceProvider.get().updateProfilePropertyCache(fPlayer);
                     }
                 });
@@ -99,13 +101,14 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
         try {
             Optional<SkinProperty> skinProperty = playerStorage.getSkinForPlayer(fPlayer.uuid(), fPlayer.name());
             if (skinProperty.isPresent()) return skinProperty.get();
+            if (fileFacade.integration().skinsrestorer().loadMojangSkin()) {
+                SkinStorage skinStorage = skinsRestorer.getSkinStorage();
+                Optional<MojangSkinDataResult> skinDataResult = skinStorage.getPlayerSkin(fPlayer.uuid().toString(), true);
+                return skinDataResult.map(MojangSkinDataResult::getSkinProperty).orElse(null);
+            }
+        } catch (Exception _) {}
 
-            SkinStorage skinStorage = skinsRestorer.getSkinStorage();
-            Optional<MojangSkinDataResult> skinDataResult = skinStorage.getPlayerSkin(fPlayer.uuid().toString(), false);
-            return skinDataResult.map(MojangSkinDataResult::getSkinProperty).orElse(null);
-        } catch (Exception _) {
-            return null;
-        }
+        return null;
     }
 
     private PlayerHeadObjectContents.ProfileProperty convertToProfileProperty(SkinProperty skinProperty) {

@@ -2,23 +2,35 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.EventRegistry;
 import com.hypixel.hytale.event.IBaseEvent;
+import com.hypixel.hytale.protocol.packets.interface_.UpdateLanguage;
 import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.flectone.pulse.listener.HytaleBaseListener;
-import net.flectone.pulse.listener.HytalePulseBaseListener;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.listener.player.HytalePlayerConnectionListener;
 import net.flectone.pulse.listener.HytaleListener;
+import net.flectone.pulse.listener.module.HytalePulseModuleEnableListener;
+import net.flectone.pulse.listener.player.HytalePlayerLoginListener;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @Singleton
@@ -26,37 +38,60 @@ public class HytaleListenerRegistry extends ListenerRegistry {
 
     // don't clear these listeners
     private final List<HytaleListener> listeners = new ObjectArrayList<>();
+    private final AtomicBoolean languageListenerRegistered = new AtomicBoolean(false);
 
+    private final FileFacade fileFacade;
     private final FLogger fLogger;
     private final Injector injector;
     private final JavaPlugin javaPlugin;
     private final EventRegistry eventRegistry;
-
-    private boolean basePacketsRegistered;
+    private final TaskScheduler taskScheduler;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
+    private final Provider<SocialService> socialServiceProvider;
 
     @Inject
-    public HytaleListenerRegistry(FLogger fLogger,
+    public HytaleListenerRegistry(ProxyRegistry proxyRegistry,
+                                  FileFacade fileFacade,
+                                  FLogger fLogger,
                                   Injector injector,
-                                  JavaPlugin javaPlugin) {
-        super(fLogger, injector);
+                                  JavaPlugin javaPlugin,
+                                  TaskScheduler taskScheduler,
+                                  Provider<FPlayerService> fPlayerServiceProvider,
+                                  Provider<SocialService> socialServiceProvider) {
+        super(proxyRegistry, fLogger, injector);
 
+        this.fileFacade = fileFacade;
         this.fLogger = fLogger;
         this.injector = injector;
         this.javaPlugin = javaPlugin;
         this.eventRegistry = javaPlugin.getEventRegistry();
+        this.taskScheduler = taskScheduler;
+        this.fPlayerServiceProvider = fPlayerServiceProvider;
+        this.socialServiceProvider = socialServiceProvider;
     }
 
     @Override
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
 
-        register(HytaleBaseListener.class);
-        register(HytalePulseBaseListener.class);
+        register(HytalePlayerLoginListener.class);
+        register(HytalePlayerConnectionListener.class);
+        register(HytalePulseModuleEnableListener.class);
 
-        if (!basePacketsRegistered) {
-            HytaleBaseListener hytaleBaseListener = injector.getInstance(HytaleBaseListener.class);
-            registerInboundWatcher(hytaleBaseListener.createUpdateLanguageWatcher());
-            basePacketsRegistered = true;
+        // Hytale has no way to remove packet listener
+        if (languageListenerRegistered.compareAndSet(false, true)) {
+            registerInboundWatcher((playerRef, packet) -> {
+                if (packet instanceof UpdateLanguage updateLanguage) {
+                    String language = StringUtils.isEmpty(updateLanguage.language)
+                            ? fileFacade.config().language().type().toLowerCase(Locale.ROOT)
+                            : Strings.CS.replace(updateLanguage.language.toLowerCase(Locale.ROOT), "-", "_");
+                    taskScheduler.runAsync(() -> {
+                        FPlayer fPlayer = fPlayerServiceProvider.get().getFPlayer(playerRef.getUuid());
+
+                        socialServiceProvider.get().updateLocale(fPlayer, language);
+                    });
+                }
+            });
         }
     }
 

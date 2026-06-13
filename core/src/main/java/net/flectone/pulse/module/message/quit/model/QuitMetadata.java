@@ -11,6 +11,7 @@ import org.jspecify.annotations.NonNull;
 @Builder
 public record QuitMetadata<L extends LocalizationSetting>(
         @NonNull BaseEventMetadata<L> base,
-        boolean ignoreVanish
+        boolean fakeMessage,
+        boolean vanished
 ) implements VanishMetadata<L> {
 }

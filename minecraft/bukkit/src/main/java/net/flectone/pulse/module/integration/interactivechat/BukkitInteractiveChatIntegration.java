@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.integration.interactivechat;
 
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.loohp.interactivechat.InteractiveChat;
@@ -18,6 +17,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -33,6 +33,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitInteractiveChatIntegration implements FIntegration, PulseListener {
 
+    private final ComponentSerializer componentSerializer;
     @Getter private final FLogger fLogger;
 
     @Override
@@ -95,7 +96,7 @@ public class BukkitInteractiveChatIntegration implements FIntegration, PulseList
         if (receiver == null) return false;
 
         try {
-            String serializedMessage = AdventureSerializer.serializer().gson().serialize(message);
+            String serializedMessage = componentSerializer.toJson(message);
             var deserializedMessage = GsonComponentSerializer.gson().deserialize(serializedMessage);
 
             InteractiveChatAPI.sendMessage(receiver, deserializedMessage);

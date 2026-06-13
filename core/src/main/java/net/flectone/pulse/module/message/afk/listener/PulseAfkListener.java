@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -16,8 +17,11 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 
 @Singleton
@@ -25,27 +29,41 @@ import net.flectone.pulse.util.constant.SettingText;
 public class PulseAfkListener implements PulseListener {
 
     private final AfkModule afkModule;
+    private final SocialService socialService;
+    private final TaskScheduler taskScheduler;
+    private final PlatformServerAdapter platformServerAdapter;
 
     @Pulse(ignoreCancelled = true)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
         String messageType = event.moduleName().name();
 
-        // check only sender-based message types
+        // for bukkit, we check this manually
+        if (platformServerAdapter.getPlatformType() == PlatformType.BUKKIT) return;
+
+        // check only chat and command messages
         if (event.moduleName() != ModuleName.MESSAGE_CHAT && !messageType.startsWith("COMMAND_")) return;
+
+        // skip afk messages
+        if (event.moduleName() == ModuleName.MESSAGE_AFK || event.moduleName() == ModuleName.COMMAND_AFK) return;
 
         EventMetadata<?> eventMetadata = event.eventMetadata();
         if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;
-        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) == null) return;
 
         int commandIndex = messageType.indexOf('_');
         String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();
-        afkModule.asyncRemoveAfk(action, fPlayer);
+
+        taskScheduler.runAsync(() -> {
+            if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) {
+                afkModule.removeAfk(action, fPlayer);
+            }
+        });
     }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.player();
-        afkModule.asyncRemoveAfk("", fPlayer);
+
+        afkModule.removeAfk("", fPlayer);
     }
 
     @Pulse
@@ -53,14 +71,14 @@ public class PulseAfkListener implements PulseListener {
         if (!event.reload()) return;
 
         FPlayer fPlayer = event.player();
-        afkModule.asyncRemoveAfk("", fPlayer);
+        afkModule.removeAfk("", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)
-    public PlayerQuitEvent onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         FPlayer fPlayer = event.player();
 
-        return event.withPlayer(afkModule.removeAfk("quit", fPlayer));
+        afkModule.removeAfk("quit", fPlayer);
     }
 
     @Pulse(priority = Event.Priority.LOW)

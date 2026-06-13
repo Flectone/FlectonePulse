@@ -10,7 +10,7 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
+import java.util.List;
 
 @Singleton
 public class WhitelistModerationParser extends ModerationParser {
@@ -30,12 +30,12 @@ public class WhitelistModerationParser extends ModerationParser {
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
         String[] words = input.input().split(" ");
-        if (words.length < 2) return Collections.emptyList();
+        if (words.length < 2) return List.of();
 
         return switch (words[1].toUpperCase()) {
             case "REMOVE", "LIST" -> moderationService.getValidNames(Moderation.Type.WHITELIST);
             case "ADD" -> offlinePlayerParser.stringSuggestions(context, input);
-            default -> Collections.emptyList();
+            default -> List.of();
         };
     }
 

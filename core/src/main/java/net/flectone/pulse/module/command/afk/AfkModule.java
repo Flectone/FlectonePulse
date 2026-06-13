@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -26,6 +26,7 @@ public class AfkModule implements ModuleCommand<Localization.Command> {
     private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -50,18 +51,18 @@ public class AfkModule implements ModuleCommand<Localization.Command> {
     }
 
     @Override
-    public Localization.Command localization(FEntity sender) {
-        return fileFacade.localization(sender).command();
+    public Localization.Command localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command();
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
-            fPlayer = afkMessageModule.removeAfk("afk", fPlayer);
+        if (socialService.getSetting(fPlayer, SettingText.AFK_SUFFIX) != null) {
+            afkMessageModule.removeAfk("afk", fPlayer);
         } else {
-            fPlayer = afkMessageModule.addAfk(fPlayer);
+            afkMessageModule.addAfk(fPlayer);
         }
 
         soundPlayer.play(soundOrThrow(), fPlayer);

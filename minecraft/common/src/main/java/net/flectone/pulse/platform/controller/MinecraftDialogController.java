@@ -11,8 +11,8 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.inventory.MinecraftDialog;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 
 import java.util.List;

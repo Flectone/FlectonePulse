@@ -18,6 +18,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.render.ActionBarRender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
     private final ActionBarRender actionBarRender;
@@ -39,7 +41,7 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
 
     // only for fabric support
     public MinecraftSimpleVoiceIntegration() {
-        this(null, null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null, null);
     }
 
     @Override
@@ -82,7 +84,7 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
         Player receiver = event.getReceiverConnection().getPlayer();
         FPlayer fReceiver = fPlayerService.getFPlayer(receiver.getUuid());
 
-        if (!fReceiver.isIgnored(fSender)) return;
+        if (!socialService.isIgnored(fReceiver, fSender)) return;
 
         event.cancel();
     }
@@ -101,7 +103,7 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
 
         event.cancel();
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             Optional<MessageContext> messageContext = moderationMessageFormatter.createMuteContext(fPlayer, status);
             if (messageContext.isEmpty()) return;
 

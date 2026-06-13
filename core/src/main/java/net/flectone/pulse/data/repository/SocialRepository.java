@@ -5,50 +5,109 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.data.database.dao.IgnoreDAO;
-import net.flectone.pulse.data.database.dao.MailDAO;
-import net.flectone.pulse.data.database.dao.TimeDAO;
+import lombok.With;
+import net.flectone.pulse.data.database.dao.*;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.util.constant.SettingText;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * Repository for managing social interactions in FlectonePulse.
- * Handles ignore relationships and mail messages between players.
+ * Repository for managing social interactions and player data in FlectonePulse.
+ * Handles ignore relationships, mail messages, color settings,
+ * and player preferences with caching support.
  *
  * @author TheFaser
  * @since 0.8.1
+ * @see IgnoreDAO
+ * @see MailDAO
+ * @see SettingDAO
+ * @see FColorDao
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SocialRepository {
 
-    private final @Named("playtime") Cache<UUID, PlayTime> playTimeCache;
+    private final @Named("playerColor") Cache<UUID, Map<FColor.Type, Set<FColor>>> playerColorCache;
+    private final @Named("playerSetting") Cache<UUID, Settings> playerSettingCache;
+    private final @Named("playerIgnore") Cache<UUID, List<Ignore>> playerIgnoreCache;
 
     private final IgnoreDAO ignoreDAO;
     private final MailDAO mailDAO;
-    private final TimeDAO timeDAO;
+    private final SettingDAO settingDAO;
+    private final FColorDao fColorDao;
 
     /**
-     * Loads ignore relationships for a player.
+     * Loads ignore relationships for a player with cache support.
+     * Returns cached ignores if available, otherwise loads from database and caches the result.
      *
      * @param fPlayer the player to load ignores for
-     * @return new FPlayer with ignores
+     * @return list of ignore relationships for the player
      */
-    public FPlayer loadIgnores(FPlayer fPlayer) {
-        return ignoreDAO.load(fPlayer);
+    public List<Ignore> loadIgnores(FPlayer fPlayer) {
+        List<Ignore> cache = playerIgnoreCache.getIfPresent(fPlayer.uuid());
+        if (cache != null) return cache;
+
+        List<Ignore> ignores = ignoreDAO.load(fPlayer);
+        playerIgnoreCache.put(fPlayer.uuid(), ignores);
+
+        return ignores;
     }
 
     /**
-     * Gets mail messages received by a player.
+     * Invalidates cached ignore relationships for a player.
      *
-     * @param fPlayer the player who received the mail
+     * @param uuid the UUID of the player whose ignore cache should be cleared
+     */
+    public void invalidateIgnores(UUID uuid) {
+        playerIgnoreCache.invalidate(uuid);
+    }
+
+    /**
+     * Saves an ignore relationship between two players and updates the cache.
+     *
+     * @param fPlayer the player who is ignoring
+     * @param fTarget the player being ignored
+     * @return Optional containing the created ignore record, or empty if creation failed
+     */
+    public Optional<Ignore> saveIgnore(FPlayer fPlayer, FPlayer fTarget) {
+        Ignore ignore = ignoreDAO.insert(fPlayer, fTarget);
+        if (ignore == null) return Optional.empty();
+
+        List<Ignore> ignores = new ArrayList<>(loadIgnores(fPlayer));
+        ignores.add(ignore);
+
+        playerIgnoreCache.put(fPlayer.uuid(), List.copyOf(ignores));
+
+        return Optional.of(ignore);
+    }
+
+    /**
+     * Deletes an ignore relationship and updates the cache.
+     *
+     * @param fPlayer the player who was ignoring
+     * @param ignore the ignore record to delete
+     */
+    public void deleteIgnore(FPlayer fPlayer, Ignore ignore) {
+        // invalidate record in database
+        ignoreDAO.invalidate(ignore);
+
+        // update cache
+        List<Ignore> ignores = new ArrayList<>(loadIgnores(fPlayer));
+        ignores.remove(ignore);
+
+        playerIgnoreCache.put(fPlayer.uuid(), List.copyOf(ignores));
+    }
+
+    /**
+     * Gets all mail messages received by a player.
+     *
+     * @param fPlayer the player who received the mail messages
      * @return list of received mail messages
      */
     public List<Mail> getReceiverMails(FPlayer fPlayer) {
@@ -56,9 +115,9 @@ public class SocialRepository {
     }
 
     /**
-     * Gets mail messages sent by a player.
+     * Gets all mail messages sent by a player.
      *
-     * @param fPlayer the player who sent the mail
+     * @param fPlayer the player who sent the mail messages
      * @return list of sent mail messages
      */
     public List<Mail> getSenderMails(FPlayer fPlayer) {
@@ -66,39 +125,20 @@ public class SocialRepository {
     }
 
     /**
-     * Saves an ignore relationship and returns the created record.
+     * Saves a mail message from one player to another.
      *
-     * @param fPlayer the player who is ignoring
-     * @param fTarget the player being ignored
-     * @return the created ignore record, or null if players are unknown
+     * @param fPlayer the sender of the mail message
+     * @param fTarget the recipient of the mail message
+     * @param message the content of the mail message
+     * @return Optional containing the created mail record, or empty if creation failed
      */
-    public @Nullable Ignore saveAndGetIgnore(FPlayer fPlayer, FPlayer fTarget) {
-        return ignoreDAO.insert(fPlayer, fTarget);
-    }
-
-    /**
-     * Saves a mail message and returns the created record.
-     *
-     * @param fPlayer the player who sent the mail
-     * @param fTarget the player who received the mail
-     * @param message the mail message content
-     * @return the created mail record, or null if players are unknown
-     */
-    public @Nullable Mail saveAndGetMail(FPlayer fPlayer, FPlayer fTarget, String message) {
+    @NonNull
+    public Optional<Mail> saveMail(FPlayer fPlayer, FPlayer fTarget, String message) {
         return mailDAO.insert(fPlayer, fTarget, message);
     }
 
     /**
-     * Deletes an ignore relationship.
-     *
-     * @param ignore the ignore record to delete
-     */
-    public void deleteIgnore(Ignore ignore) {
-        ignoreDAO.invalidate(ignore);
-    }
-
-    /**
-     * Deletes a mail message.
+     * Deletes a mail message from the database.
      *
      * @param mail the mail record to delete
      */
@@ -107,80 +147,130 @@ public class SocialRepository {
     }
 
     /**
-     * Saves a player's time session when they join the server.
+     * Loads color settings for a player with cache support.
+     * Returns cached colors if available, otherwise loads from database and caches the result.
      *
-     * @param fPlayer the player whose session is being saved
+     * @param fPlayer the player to load colors for
+     * @return map of color types to sets of FColor objects
      */
-    public void saveJoinSession(FPlayer fPlayer) {
-        timeDAO.saveJoin(fPlayer);
+    @NonNull
+    public Map<FColor.Type, Set<FColor>> loadColors(@NonNull FPlayer fPlayer) {
+        Map<FColor.Type, Set<FColor>> cache = playerColorCache.getIfPresent(fPlayer.uuid());
+        if (cache != null) return cache;
+
+        Map<FColor.Type, Set<FColor>> colors = fColorDao.load(fPlayer);
+        playerColorCache.put(fPlayer.uuid(), colors);
+
+        return colors;
     }
 
     /**
-     * Saves a player's time session when they join the server.
+     * Invalidates cached color settings for a player.
      *
-     * @param playTime session to save
+     * @param uuid the UUID of the player whose color cache should be cleared
      */
-    public void saveJoinSession(PlayTime playTime) {
-        timeDAO.saveSession(playTime);
+    public void invalidateColors(UUID uuid) {
+        playerColorCache.invalidate(uuid);
     }
 
     /**
-     * Saves a player's AFK time session.
+     * Saves color settings for a player to the database and updates the cache.
      *
-     * @param fPlayer the player whose AFK status is being updated
-     * @param afk true if the player is going AFK, false if returning
+     * @param fPlayer the player whose colors are being saved
+     * @param colors map of color types to sets of FColor objects to save
      */
-    public void saveAfkSession(FPlayer fPlayer, boolean afk) {
-        timeDAO.saveAfk(fPlayer, afk);
+    public void saveColors(@NonNull FPlayer fPlayer, @NonNull Map<FColor.Type, Set<FColor>> colors) {
+        // save colors to database
+        fColorDao.save(fPlayer, colors);
+
+        // update cache
+        playerColorCache.put(fPlayer.uuid(), colors);
     }
 
     /**
-     * Saves a player's last seen timestamp when they quit the server.
+     * Loads all settings for a player with cache support.
+     * Returns cached settings if available, otherwise loads from database and caches the result.
      *
-     * @param fPlayer the player whose last seen time is being saved
+     * @param fPlayer the player to load settings for
+     * @return Settings object containing boolean and text settings
      */
-    public void saveLastSeen(FPlayer fPlayer) {
-        timeDAO.saveQuit(fPlayer);
+    public Settings loadSettings(@NonNull FPlayer fPlayer) {
+        Settings cache = playerSettingCache.getIfPresent(fPlayer.uuid());
+        if (cache != null) return cache;
+
+        Settings settings = settingDAO.load(fPlayer).orElse(Settings.EMPTY);
+        playerSettingCache.put(fPlayer.uuid(), settings);
+
+        return settings;
     }
 
     /**
-     * Gets the play time statistics for a specific player.
+     * Invalidates cached settings for a player.
      *
-     * @param fPlayer the player to get play time for
-     * @return the player's play time statistics, or null if not found
+     * @param uuid the UUID of the player whose settings cache should be cleared
      */
-    public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        PlayTime cached = playTimeCache.getIfPresent(fPlayer.uuid());
-        if (cached != null) return cached;
-
-        Optional<PlayTime> playTime = timeDAO.getByPlayer(fPlayer);
-        playTime.ifPresent(time -> playTimeCache.put(fPlayer.uuid(), time));
-
-        return playTime.orElse(null);
+    public void invalidateSettings(UUID uuid) {
+        playerSettingCache.invalidate(uuid);
     }
 
     /**
-     * Gets the total count of all play time records in the database.
+     * Saves or updates a specific boolean setting for a player and updates the cache.
      *
-     * @return the total number of play time records
+     * @param fPlayer the player whose setting is being saved
+     * @param setting the name of the boolean setting
+     * @param value the boolean value to set
      */
-    public int getPlayTimesCount() {
-        return timeDAO.getTotalCount();
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull String setting, boolean value) {
+        // save setting to database
+        settingDAO.insertOrUpdate(fPlayer, setting, value ? "1" : "0");
+
+        Settings settings = loadSettings(fPlayer);
+
+        Map<String, Boolean> newBooleans = new HashMap<>(settings.booleans());
+
+        newBooleans.put(setting, value);
+
+        settings = settings.withBooleans(Map.copyOf(newBooleans));
+
+        playerSettingCache.put(fPlayer.uuid(), settings);
     }
 
     /**
-     * Gets a paginated list of all play time records.
+     * Saves or updates a specific text setting for a player and updates the cache.
      *
-     * @param limit the maximum number of records to retrieve
-     * @param offset the number of records to skip before starting to return results
-     * @return list of play time records within the specified range
+     * @param fPlayer the player whose setting is being saved
+     * @param setting the SettingText enum representing the text setting type
+     * @param value the text value to set, can be null to remove the setting
      */
-    public List<PlayTime> getAllPlayTimes(int limit, int offset) {
-        return timeDAO.getAllPlayTimes(limit, offset);
+    public void saveOrUpdateSetting(@NonNull FPlayer fPlayer, @NonNull SettingText setting, @Nullable String value) {
+        // save setting to database
+        settingDAO.insertOrUpdate(fPlayer, setting.name(), value);
+
+        Settings settings = loadSettings(fPlayer);
+
+        Map<SettingText, String> newTexts = settings.texts().isEmpty()
+                ? new EnumMap<>(SettingText.class)
+                : new EnumMap<>(settings.texts());
+
+        if (value == null) {
+            newTexts.remove(setting);
+        } else {
+            newTexts.put(setting, value);
+        }
+
+        settings = settings.withTexts(Map.copyOf(newTexts));
+
+        playerSettingCache.put(fPlayer.uuid(), settings);
     }
 
-    public void invalidatePlaytime(UUID uuid) {
-        playTimeCache.invalidate(uuid);
+    @With
+    public record Settings(
+            Map<String, Boolean> booleans,
+            Map<SettingText, String> texts
+    ){
+
+        public static final Settings EMPTY = new Settings(Map.of(), Map.of());
+
     }
 
 }

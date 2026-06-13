@@ -10,20 +10,20 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +39,7 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final RandomGenerator randomUtil;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -47,7 +48,7 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
 
             Ticker ticker = value.ticker();
             if (ticker.enable()) {
-                taskScheduler.runPlayerRegionTimer(fPlayer -> send(fPlayer, key, value, sound), ticker.period());
+                taskScheduler.runPlayerAsyncTimer(fPlayer -> send(fPlayer, key, value, sound), ticker.period());
             }
         });
     }
@@ -78,13 +79,13 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
     }
 
     @Override
-    public Localization.Message.Auto localization(FEntity sender) {
-        return fileFacade.localization(sender).message().auto();
+    public Localization.Message.Auto localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().auto();
     }
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

@@ -12,12 +12,10 @@ import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.Command;
-import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,14 +42,19 @@ public class ModuleCommandController {
         );
     }
 
-    public void registerCustomCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        commandRegistryProvider.get().registerCommand(builder);
+    public void registerSubCommand(ModuleCommand<?> command, String subName, UnaryOperator<Command.Builder<FPlayer>> builder) {
+        List<String> aliases = command.config().aliases().stream().map(alias -> alias + subName).toList();
+        String commandName = getCommandName(command) + subName;
+
+        commandRegistryProvider.get().registerCommand(manager ->
+                builder.apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty()))
+        );
     }
 
     // all prompt methods for solving the problems of a non-existent argument
     // when changing the plugin language at runtime
     public void clearPrompts(ModuleCommand<?> abstractModuleCommand) {
-        if (fileFacade.config().command().unregisterOnReload()) {
+        if (fileFacade.config().internal().unregisterCommandOnReload()) {
             commandPromptsMap.remove(abstractModuleCommand.getClass());
         }
     }
@@ -91,7 +94,7 @@ public class ModuleCommandController {
     }
 
     public List<String> getPrompts(ModuleCommand<?> command) {
-        return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), Collections.emptyList());
+        return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), List.of());
     }
 
     public <V extends @NonNull Object> V getArgument(ModuleCommand<?> command,

@@ -10,7 +10,10 @@ import net.flectone.pulse.module.command.spy.listener.BukkitSpyListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.entity.Entity;
@@ -25,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,14 +41,17 @@ public class BukkitBukkitSpyModule extends SpyModule {
 
     @Inject
     public BukkitBukkitSpyModule(FileFacade fileFacade,
+                                 SocialService socialService,
                                  FPlayerService fPlayerService,
                                  PermissionChecker permissionChecker,
                                  BukkitListenerRegistry bukkitListenerManager,
                                  TaskScheduler taskScheduler,
                                  MessageDispatcher messageDispatcher,
                                  ModuleController moduleController,
-                                 ModuleCommandController commandModuleController) {
-        super(fileFacade, fPlayerService, permissionChecker, messageDispatcher, moduleController, commandModuleController);
+                                 ModuleCommandController commandModuleController,
+                                 ProxyRegistry proxyRegistry,
+                                 ListenerRegistry listenerRegistry) {
+        super(fileFacade, socialService, permissionChecker, messageDispatcher, moduleController, commandModuleController, proxyRegistry, listenerRegistry);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
@@ -74,7 +79,7 @@ public class BukkitBukkitSpyModule extends SpyModule {
             FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
             FPlayer fReceiver = arguments.length > 1 ? fPlayerService.getFPlayer(arguments[1]) : FPlayer.UNKNOWN;
 
-            spy(fPlayer, commandName, event.getMessage(), fReceiver.isUnknown() ? Collections.emptyList() : List.of(fReceiver));
+            spy(fPlayer, commandName, event.getMessage(), fReceiver.isUnknown() ? List.of() : List.of(fReceiver));
         });
     }
 

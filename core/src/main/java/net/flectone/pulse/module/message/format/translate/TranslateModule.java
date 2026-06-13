@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.service.TranslationCacheService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -74,6 +75,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     private final MessageSender messageSender;
     private final TranslationCacheService translationCacheService;
     private final FLogger fLogger;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -108,8 +110,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     }
 
     @Override
-    public Localization.Message.Format.Translate localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().translate();
+    public Localization.Message.Format.Translate localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().translate();
     }
 
     public UUID saveMessage(String message) {
@@ -141,9 +143,9 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         FPlayer receiver = messageContext.receiver();
         boolean autoMode = !Boolean.FALSE.equals(config().auto()); // default true
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.TRANSLATION, (argumentQueue, _) -> {
-            String senderLocale = sender instanceof FPlayer fSender ? fSender.getSetting(SettingText.LOCALE) : null;
-            String receiverLocale = receiver != null ? receiver.getSetting(SettingText.LOCALE) : null;
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TRANSLATION.getTagName(), (argumentQueue, _) -> {
+            String senderLocale = sender instanceof FPlayer fSender ? socialService.getSetting(fSender, SettingText.LOCALE) : null;
+            String receiverLocale = receiver != null ? socialService.getSetting(receiver, SettingText.LOCALE) : null;
 
             UUID messageUUID = messageContext.messageUUID();
             String action;
@@ -195,15 +197,18 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
             }
 
-            MessageContext tagContext = messagePipeline.createContext(sender, receiver, action)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .message(action)
+                    .flags(messageContext.flags())
+                    .flags(
                             new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.TRANSLATE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
-                    );
-
-            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
-        });
+                    )
+                    .build()
+            ));
+        }));
     }
 
     /**
@@ -219,7 +224,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) return null;
 
         Set<String> uniqueLocales = fPlayerService.getOnlineFPlayers().stream()
-                .map(player -> player.getSetting(SettingText.LOCALE))
+                .map(player -> socialService.getSetting(player, SettingText.LOCALE))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -307,7 +312,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         if (locale == null) return;
 
         fPlayerService.getOnlineFPlayers().stream()
-                .filter(player -> locale.equals(player.getSetting(SettingText.LOCALE)))
+                .filter(player -> locale.equals(socialService.getSetting(player, SettingText.LOCALE)))
                 .forEach(player -> sendUpdate(player.uuid()));
     }
 
@@ -335,7 +340,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         UUID receiverUUID = receiver.uuid();
-        String receiverLocale = receiver.getSetting(SettingText.LOCALE);
+        String receiverLocale = socialService.getSetting(receiver, SettingText.LOCALE);
 
         int newGlobalSize;
         boolean wasExisting;
@@ -454,7 +459,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
      */
     public void sendUpdate(UUID receiverUUID) {
         FPlayer fPlayer = fPlayerService.getFPlayer(receiverUUID);
-        String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
+        String playerLocale = socialService.getSetting(fPlayer, SettingText.LOCALE);
 
         List<TranslateHistoryMessage> visible;
         synchronized (globalHistory) {
@@ -580,7 +585,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         TranslatedMessage tm = entry.translatedMessage();
         if (tm == null) return;
 
-        String playerLocale = fPlayer.getSetting(SettingText.LOCALE);
+        String playerLocale = socialService.getSetting(fPlayer, SettingText.LOCALE);
         if (playerLocale == null) return;
         if (playerLocale.equals(tm.originalLang())) return;
 
@@ -626,7 +631,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return messageCache.asMap().entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().equals(uuid))
-                .findFirst()
+                .findAny()
                 .map(Map.Entry::getKey)
                 .orElse(null);
     }

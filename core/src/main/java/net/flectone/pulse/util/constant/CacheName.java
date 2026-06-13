@@ -2,6 +2,7 @@ package net.flectone.pulse.util.constant;
 
 public enum CacheName {
 
+    ANIMATION,
     COOLDOWN,
     DIALOG_CLICK,
     OFFLINE_PLAYERS,
@@ -15,6 +16,9 @@ public enum CacheName {
     TRANSLATE_MESSAGE,
     TRANSLATION_CACHE,
     PROFILE_PROPERTY,
-    PLAYTIME
+    PLAYTIME,
+    PLAYER_COLOR,
+    PLAYER_SETTING,
+    PLAYER_IGNORE
 
 }

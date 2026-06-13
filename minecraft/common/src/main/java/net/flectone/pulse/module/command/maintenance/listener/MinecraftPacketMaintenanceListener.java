@@ -19,7 +19,7 @@ public class MinecraftPacketMaintenanceListener implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.isCancelled()) return;
         if (event.getPacketType() != PacketType.Status.Client.REQUEST) return;
-        if (!maintenanceModule.config().turnedOn()) return;
+        if (!maintenanceModule.isTurnedOn()) return;
 
         event.setCancelled(true);
         maintenanceModule.sendStatus(event.getUser());
@@ -29,6 +29,7 @@ public class MinecraftPacketMaintenanceListener implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
         if (event.getPacketType() != PacketType.Play.Server.SERVER_DATA) return;
+        if (!maintenanceModule.isTurnedOn()) return;
 
         maintenanceModule.updateServerData(event);
     }

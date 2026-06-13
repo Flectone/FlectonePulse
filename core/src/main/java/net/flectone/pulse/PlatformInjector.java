@@ -11,9 +11,13 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.SneakyThrows;
 import net.flectone.pulse.data.repository.CooldownRepository;
+import net.flectone.pulse.data.repository.SocialRepository;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.module.message.format.animation.AnimationModule;
 import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -23,7 +27,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import org.incendo.cloud.type.tuple.Pair;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
@@ -99,6 +102,13 @@ public abstract class PlatformInjector extends AbstractModule {
 
     @Provides
     @Singleton
+    @Named("animation")
+    public Cache<AnimationModule.AnimationKey, Integer> provideAnimationCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.ANIMATION);
+    }
+
+    @Provides
+    @Singleton
     @Named("cooldown")
     public Cache<CooldownRepository.CooldownKey, Long> provideCooldownCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.COOLDOWN);
@@ -135,7 +145,7 @@ public abstract class PlatformInjector extends AbstractModule {
     @Provides
     @Singleton
     @Named("moderation")
-    public Cache<Pair<UUID, String>, List<Moderation>> provideModerationCache(CacheRegistry cacheRegistry) {
+    public Cache<UUID, Map<String, List<Moderation>>> provideModerationCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.MODERATION);
     }
 
@@ -186,6 +196,27 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("translateMessage")
     public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.TRANSLATE_MESSAGE);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerColor")
+    public Cache<UUID, Map<FColor.Type, Set<FColor>>> providePlayerColorCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_COLOR);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerSetting")
+    public Cache<UUID, SocialRepository.Settings> providePlayerSettingCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_SETTING);
+    }
+
+    @Provides
+    @Singleton
+    @Named("playerIgnore")
+    public Cache<UUID, List<Ignore>> providePlayerIgnoreCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.PLAYER_IGNORE);
     }
 
     private ObjectMapper createMapper() {

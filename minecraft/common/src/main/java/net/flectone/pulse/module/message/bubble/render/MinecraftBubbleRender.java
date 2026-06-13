@@ -19,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -31,14 +31,16 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
@@ -58,15 +60,16 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MinecraftPacketSender packetSender;
     private final MessagePipeline messagePipeline;
-    private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final MinecraftEntityUtil entityUtil;
     private final MinecraftPacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
+    private final ReflectionResolver reflectionResolver;
 
     @Override
     public void renderBubble(Bubble bubble) {
@@ -78,10 +81,16 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         CompletableFuture<Set<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
 
-        taskScheduler.runRegion(sender, () -> {
+        SchedulerRunnable runnable = () -> {
             Set<UUID> nearbyEntities = platformPlayerAdapter.findPlayersWhoCanSee(sender, viewDistance, viewDistance, viewDistance);
             nearbyEntitiesFuture.complete(nearbyEntities);
-        }, true);
+        };
+
+        if (reflectionResolver.isFolia()) {
+            taskScheduler.runRegion(sender, runnable);
+        } else {
+            taskScheduler.runSync(runnable);
+        }
 
         nearbyEntitiesFuture.thenAcceptAsync(nearbyEntities -> nearbyEntities
                 .stream()
@@ -89,8 +98,8 @@ public class MinecraftBubbleRender implements BubbleRender {
                 .filter(fViewer -> config.visibleToSelf() || !fViewer.equals(sender))
                 .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))
                 .filter(fViewer -> !fViewer.isUnknown())
-                .filter(fViewer -> !fViewer.isIgnored(sender))
-                .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
+                .filter(fViewer -> !socialService.isIgnored(fViewer, sender))
+                .filter(fViewer -> socialService.canSeeVanished(sender, fViewer))
                 .forEach(fViewer -> renderBubble(fViewer, bubble))
         );
     }
@@ -148,7 +157,7 @@ public class MinecraftBubbleRender implements BubbleRender {
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
-        if (!integrationModule.canSeeVanished(sender, viewer)) return;
+        if (!socialService.canSeeVanished(sender, viewer)) return;
 
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;
@@ -196,20 +205,23 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
-        Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
+        Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
-        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
-                .addFlags(
+        MessageContext messageContext = MessageContext.builder()
+                .sender(bubble.getSender())
+                .receiver(viewer)
+                .message(bubble.getRawMessage())
+                .flags(
                         new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE},
                         new boolean[]{false, false, false, true}
-                );
+                )
+                .build();
 
-        Component message = messagePipeline.build(messageContext);
-
-        return messagePipeline.build(messageContext
-                .withMessage(localization.format())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
+        return messagePipeline.build(messageContext.toBuilder()
+                .message(localization.format())
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))
+                .build()
         );
     }
 

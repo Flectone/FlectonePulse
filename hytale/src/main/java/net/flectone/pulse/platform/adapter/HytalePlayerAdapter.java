@@ -3,11 +3,10 @@ package net.flectone.pulse.platform.adapter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.metrics.metric.HistoricMetric;
 import com.hypixel.hytale.protocol.GameMode;
+import com.hypixel.hytale.protocol.io.ChannelConnection;
 import com.hypixel.hytale.protocol.packets.connection.PongType;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
@@ -23,14 +22,17 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
-import io.netty.channel.Channel;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
+import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
+import org.apache.commons.lang3.Strings;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -43,6 +45,9 @@ import java.util.stream.Collectors;
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePlayerAdapter implements PlatformPlayerAdapter {
+
+    private final FileFacade fileFacade;
+    private final HytaleComponentSerializer componentSerializer;
 
     @Override
     public int getEntityId(@NonNull UUID uuid) {
@@ -82,7 +87,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull String getName(@NonNull Object platformPlayer) {
         if (platformPlayer instanceof CommandSender commandSender) {
-            return commandSender.getDisplayName();
+            return commandSender.getUsername();
         }
 
         return "";
@@ -126,13 +131,21 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public @NonNull String getLocale(@NonNull UUID uuid) {
+        PlayerRef player = getPlayer(uuid);
+        if (player == null) return fileFacade.config().language().type().toLowerCase(Locale.ROOT);
+
+        return Strings.CS.replace(player.getLanguage().toLowerCase(Locale.ROOT), "-", "_");
+    }
+
+    @Override
     public @Nullable String getIp(@NonNull UUID uuid) {
         PlayerRef player = getPlayer(uuid);
         if (player == null) return "";
 
         SocketAddress socketAddress;
 
-        Channel channel = player.getPacketHandler().getChannel();
+        ChannelConnection channel = player.getPacketHandler().getChannel();
         if (channel instanceof QuicStreamChannel quicStreamChannel) {
             socketAddress = quicStreamChannel.parent().remoteSocketAddress();
         } else {
@@ -241,9 +254,9 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         if (playerRef == null) return null;
 
         Vector3d position = playerRef.getTransform().getPosition();
-        Vector3f headRotation = playerRef.getHeadRotation();
+        Rotation3f headRotation = playerRef.getHeadRotation();
 
-        return new Coordinates(position.getX(), position.getY(), position.getZ(), headRotation.getYaw(), headRotation.getPitch());
+        return new Coordinates(position.x(), position.y(), position.z(), headRotation.yaw(), headRotation.pitch());
     }
 
     @Override
@@ -342,7 +355,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull List<UUID> getOnlinePlayers() {
         Universe universe = Universe.get();
-        if (universe == null) return Collections.emptyList();
+        if (universe == null) return List.of();
 
         return universe.getPlayers().stream()
                 .map(PlayerRef::getUuid)
@@ -352,25 +365,25 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NonNull Set<UUID> findPlayersWhoCanSee(UUID senderUuid, double viewDistanceX, double viewDistanceY, double viewDistanceZ) {
         PlayerRef senderRef = getPlayer(senderUuid);
-        if (senderRef == null) return Collections.emptySet();
+        if (senderRef == null) return Set.of();
 
         Universe universe = Universe.get();
-        if (universe == null) return Collections.emptySet();
+        if (universe == null) return Set.of();
 
         UUID worldUUID = senderRef.getWorldUuid();
-        if (worldUUID == null) return Collections.emptySet();
+        if (worldUUID == null) return Set.of();
 
         World world = universe.getWorld(worldUUID);
-        if (world == null) return Collections.emptySet();
+        if (world == null) return Set.of();
 
         Vector3d senderPos = senderRef.getTransform().getPosition();
 
         return world.getPlayerRefs().stream().filter(targetRef -> {
             Vector3d targetPos = targetRef.getTransform().getPosition();
 
-            double dx = Math.abs(senderPos.getX() - targetPos.getX());
-            double dy = Math.abs(senderPos.getY() - targetPos.getY());
-            double dz = Math.abs(senderPos.getZ() - targetPos.getZ());
+            double dx = Math.abs(senderPos.x() - targetPos.x());
+            double dy = Math.abs(senderPos.y() - targetPos.y());
+            double dz = Math.abs(senderPos.z() - targetPos.z());
 
             return dx <= viewDistanceX && dy <= viewDistanceY && dz <= viewDistanceZ
                     && hasLineOfSight(senderRef, targetRef, world);
@@ -381,9 +394,9 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         Vector3d fromPos = from.getTransform().getPosition();
         Vector3d toPos = to.getTransform().getPosition();
 
-        double dx = toPos.getX() - fromPos.getX();
-        double dy = toPos.getY() - fromPos.getY();
-        double dz = toPos.getZ() - fromPos.getZ();
+        double dx = toPos.x() - fromPos.x();
+        double dy = toPos.y() - fromPos.y();
+        double dz = toPos.z() - fromPos.z();
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
         if (distance <= 0) return true;
@@ -395,7 +408,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         Vector3i targetBlock = TargetUtil.getTargetBlock(
                 world,
                 (blockId, _) -> blockId != 0,
-                fromPos.getX(), fromPos.getY(), fromPos.getZ(),
+                fromPos.x(), fromPos.y(), fromPos.z(),
                 dx, dy, dz,
                 distance
         );
@@ -405,7 +418,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NonNull List<Integer> getPassengers(UUID uuid) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override
@@ -418,7 +431,7 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
         PlayerRef playerRef = getPlayer(fPlayer.uuid());
         if (playerRef == null) return;
 
-        playerRef.getPacketHandler().disconnect(HytaleComponentSerializer.get().serialize(reason));
+        playerRef.getPacketHandler().disconnect(componentSerializer.toHytale(reason));
     }
 
     @Nullable

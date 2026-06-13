@@ -16,24 +16,30 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.mute.listener.MuteProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -52,6 +58,9 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -64,6 +73,10 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
                 .required(promptPlayer, commandParserProvider.playerParser(config().suggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(MuteProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -82,7 +95,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
-        long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
+        long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
@@ -103,7 +116,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             return;
         }
 
-        if (config().checkGroupWeight() && !fPlayerService.hasHigherGroupThan(fPlayer, fTarget)) {
+        if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::lowerWeightGroup)
@@ -113,13 +126,13 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
         }
 
         long databaseTime = time + System.currentTimeMillis();
-        String reason = timeReasonPair.second();
+        String reason = timeReasonPair.getRight();
 
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.id());
         if (mute == null) return;
 
         if (!config().filterByServer()) {
-            proxySender.send(fTarget, ModuleName.SYSTEM_MUTE);
+            proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MUTE);
         }
 
         EventMetadata.Builder<Localization.Command.Mute> baseMetadataBuilder = EventMetadata.<Localization.Command.Mute>builder()
@@ -139,7 +152,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
                 });
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filterPlayer(fPlayer);
+            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
         messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
@@ -167,24 +180,27 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     }
 
     @Override
-    public Localization.Command.Mute localization(FEntity sender) {
-        return fileFacade.localization(sender).command().mute();
+    public Localization.Command.Mute localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute();
     }
 
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(Set.of(MessagePipeline.ReplacementTag.MUTE.getTagName(), "mute_suffix"), (_, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(Set.of(MessagePipeline.ReplacementTag.MUTE.getTagName(), "mute_suffix"), (_, _) -> {
             String suffix = getMuteSuffix(fPlayer, messageContext.receiver());
             if (StringUtils.isEmpty(suffix)) return MessagePipeline.ReplacementTag.emptyTag();
             if (!suffix.contains("%")) return Tag.preProcessParsed(suffix);
 
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, messageContext.receiver(), suffix)
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.inserting(messagePipeline.build(suffixContext));
+            return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(messageContext.receiver())
+                    .message(suffix)
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 

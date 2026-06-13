@@ -8,27 +8,29 @@ description: ${description}
 website: ${website}
 folia-supported: true
 softdepend:
-  - PlaceholderAPI
-  - LuckPerms
-  - Vault
-  - voicechat
-  - PlasmoVoice
-  - SuperVanish
-  - PremiumVanish
-  - SkinsRestorer
-  - InteractiveChat
-  - ProtocolLib
-  - packetevents
-  - TAB
-  - LibertyBans
-  - LiteBans
   - AdvancedBan
   - CMI
-  - MOTD
-  - MiniMOTD
-  - MiniPlaceholders
-  - ItemsAdder
   - floodgate
   - Geyser-Spigot
-  - ViaVersion
+  - InteractiveChat
+  - ItemsAdder
+  - LibertyBans
+  - LiteBans
+  - LuckPerms
+  - MiniMOTD
+  - MiniPlaceholders
+  - MOTD
+  - packetevents
+  - PlaceholderAPI
+  - PlasmoVoice
+  - PremiumVanish
+  - ProtocolLib
+  - ProtocolSupport
+  - SkinsRestorer
+  - SuperVanish
+  - TAB
+  - Vault
   - ViaBackwards
+  - ViaRewind
+  - ViaVersion
+  - voicechat

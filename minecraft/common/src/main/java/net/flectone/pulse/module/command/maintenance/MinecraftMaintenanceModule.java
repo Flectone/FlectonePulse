@@ -13,19 +13,26 @@ import com.google.inject.name.Named;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.maintenance.listener.MinecraftPacketMaintenanceListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
-import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.processing.converter.IconConvertor;
 import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
-import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
 
@@ -35,7 +42,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
     private final FPlayerService fPlayerService;
     private final ModuleController moduleController;
     private final ListenerRegistry listenerRegistry;
-    private final MinecraftServerStatusFormatter statusUtil;
+    private final MinecraftServerStatusFormatter serverStatusFormatter;
 
     @Inject
     public MinecraftMaintenanceModule(FileFacade fileFacade,
@@ -50,14 +57,22 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
                                       IconConvertor iconUtil,
-                                      MinecraftServerStatusFormatter statusUtil,
-                                      FLogger fLogger) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter, fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil, fLogger);
+                                      CommandParserProvider commandParserProvider,
+                                      TaskScheduler taskScheduler,
+                                      ModerationService moderationService,
+                                      ProxySender proxySender,
+                                      ModerationMessageFormatter moderationMessageFormatter,
+                                      MinecraftServerStatusFormatter serverStatusFormatter,
+                                      ProxyRegistry proxyRegistry,
+                                      SocialService socialService) {
+        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter,
+                fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil,
+                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService);
 
         this.fPlayerService = fPlayerService;
         this.moduleController = moduleController;
         this.listenerRegistry = listenerRegistry;
-        this.statusUtil = statusUtil;
+        this.serverStatusFormatter = serverStatusFormatter;
     }
 
     @Override
@@ -69,7 +84,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
     public void updateServerData(PacketSendEvent event) {
         if (!moduleController.isEnable(this)) return;
-        if (!config().turnedOn()) return;
+        if (!isTurnedOn()) return;
 
         User user = event.getUser();
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
@@ -77,19 +92,23 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
         event.markForReEncode(true);
 
         WrapperPlayServerServerData wrapperPlayServerServerData = new WrapperPlayServerServerData(event);
-        wrapperPlayServerServerData.setIcon(statusUtil.formatIcon(icon));
-        wrapperPlayServerServerData.setMOTD(statusUtil.createMOTD(fPlayer, user, localization(fPlayer).serverDescription()));
+
+        String formattedIcon = serverStatusFormatter.formatIcon(icon);
+        if (formattedIcon != null) {
+            wrapperPlayServerServerData.setIcon(formattedIcon);
+        }
+
+        Component motdComponent = serverStatusFormatter.createMOTD(fPlayer, user, localization(fPlayer).serverDescription());
+        if (Component.IS_NOT_EMPTY.test(motdComponent)) {
+            wrapperPlayServerServerData.setMOTD(motdComponent);
+        }
     }
 
     public void sendStatus(User user) {
         if (!moduleController.isEnable(this)) return;
-        if (!config().turnedOn()) return;
+        if (!isTurnedOn()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
-
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
 
         JsonObject responseJson = new JsonObject();
 
@@ -97,9 +116,9 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
 
         responseJson.add("version", getVersionJson(localizationMaintenance.serverVersion()));
         responseJson.add("players", getPlayersJson());
-        responseJson.add("description", statusUtil.formatDescription(fPlayer, user, localizationMaintenance.serverDescription()));
+        responseJson.add("description", serverStatusFormatter.formatDescription(fPlayer, user, localizationMaintenance.serverDescription()));
 
-        String favicon = statusUtil.formatIcon(icon);
+        String favicon = serverStatusFormatter.formatIcon(icon);
         if (favicon != null) {
             responseJson.addProperty("favicon", favicon);
         }

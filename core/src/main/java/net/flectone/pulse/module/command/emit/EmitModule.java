@@ -10,18 +10,24 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.emit.listener.EmitProxyMessageListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -30,7 +36,6 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +50,11 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
+    private final ProxySender proxySender;
+    private final SocialService socialService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Override
     public void onEnable() {
@@ -57,6 +67,10 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                 .required(promptType, commandParserProvider.messageParser(), typeWithMessageSuggestion())
                 .optional(promptMessage, commandParserProvider.messageParser()) // not used, only for better message help
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(EmitProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -74,11 +88,14 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
         Destination destination = parseDestination(typeWithMessage);
         String message = parseMessage(destination, typeWithMessage);
 
-        if (targetName.equalsIgnoreCase("all")) {
+        Range range = targetName.equalsIgnoreCase("all")
+                ? Range.get(Range.Type.PROXY)
+                : Range.fromString(targetName).orElse(null);
+        if (range != null) {
             messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                     .sender(fPlayer)
                     .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                    .range(Range.get(Range.Type.PROXY))
+                    .range(range)
                     .format(Localization.Command.Emit::format)
                     .message(message)
                     .destination(destination)
@@ -92,7 +109,6 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                     .integration()
                     .build()
             );
-
             return;
         }
 
@@ -107,19 +123,23 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
             return;
         }
 
+        if (!platformPlayerAdapter.isOnline(fTarget) && proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, name(), dataOutputStream -> {
+                dataOutputStream.writeAsJson(fTarget);
+                dataOutputStream.writeAsJson(destination);
+                dataOutputStream.writeString(message);
+            });
+            return;
+        }
+
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
                 .sender(fPlayer)
-                .filterPlayer(fTarget)
+                .receiver(fTarget)
                 .format(Localization.Command.Emit::format)
                 .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
                 .message(message)
                 .destination(destination)
                 .sound(soundOrThrow())
-                .proxy(dataOutputStream -> {
-                    dataOutputStream.writeAsJson(fTarget);
-                    dataOutputStream.writeAsJson(destination);
-                    dataOutputStream.writeString(message);
-                })
                 .tagResolvers(fResolver -> new TagResolver[]{
                         messagePipeline.targetTag(fResolver, fTarget)
                 })
@@ -144,8 +164,8 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
     }
 
     @Override
-    public Localization.Command.Emit localization(FEntity sender) {
-        return fileFacade.localization(sender).command().emit();
+    public Localization.Command.Emit localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().emit();
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeWithMessageSuggestion() {
@@ -162,7 +182,7 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                         .toList();
             }
 
-            return Collections.emptyList();
+            return List.of();
         };
     }
 

@@ -1,6 +1,5 @@
 package net.flectone.pulse.model.event;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.model.entity.FEntity;
@@ -12,7 +11,7 @@ import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -38,10 +37,6 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
     default @NonNull FEntity sender() {
         return base().sender();
-    }
-
-    default @Nullable FPlayer filterPlayer() {
-        return base().filterPlayer();
     }
 
     default @NonNull Predicate<FPlayer> filter() {
@@ -80,8 +75,8 @@ public interface EventMetadata<L extends LocalizationSetting> {
         return base().proxy();
     }
 
-    default @Nullable UnaryOperator<String> integration() {
-        return base().integration();
+    default @Nullable IntegrationMetadata integrationMetadata() {
+        return base().integrationMetadata();
     }
 
     default @Nullable TagResolver[] resolveTags(FPlayer player) {
@@ -99,11 +94,9 @@ public interface EventMetadata<L extends LocalizationSetting> {
     final class Builder<L extends LocalizationSetting> {
 
         private final Map<MessageFlag, Boolean> flags = new EnumMap<>(MessageFlag.class);
-        private final List<FPlayer> receivers = new ObjectArrayList<>();
 
         private UUID uuid = UUID.randomUUID();
         private FEntity sender;
-        private FPlayer filterPlayer;
         private Predicate<FPlayer> filter = _ -> true;
         private BiFunction<FPlayer, L, String> format;
         private Destination destination = Destination.EMPTY_CHAT;
@@ -112,7 +105,7 @@ public interface EventMetadata<L extends LocalizationSetting> {
         private String message;
         private Function<FPlayer, TagResolver[]> tagResolvers;
         private ProxyDataConsumer<SafeDataOutputStream> proxy;
-        private UnaryOperator<String> integration;
+        private IntegrationMetadata integrationMetadata;
 
         private Builder() {
         }
@@ -124,26 +117,19 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
         public Builder<L> sender(FEntity sender) {
             this.sender = sender;
-            return filterPlayer(sender);
+            return range(Range.Type.PLAYER);
         }
 
-        public Builder<L> filterPlayer(FEntity entity) {
-            this.range = Range.get(Range.Type.PLAYER);
-            this.filterPlayer = (entity instanceof FPlayer fp) ? fp : FPlayer.UNKNOWN;
-            return this;
+        public Builder<L> receiver(FPlayer fReceiver) {
+            return filter(fReceiver::equals);
         }
 
-        public Builder<L> filterPlayer(FPlayer player) {
-            this.filterPlayer = player;
-            return this;
-        }
-
-        public Builder<L> filterPlayer(FPlayer player, boolean senderColorOut) {
-            return filterPlayer(player).flag(MessageFlag.COLOR_CONTEXT_SENDER, senderColorOut);
+        public Builder<L> receivers(Collection<FPlayer> fReceivers) {
+            return filter(fReceivers::contains);
         }
 
         public Builder<L> filter(Predicate<FPlayer> filter) {
-            this.filter = filter;
+            this.filter = this.filter.and(filter);
             return this;
         }
 
@@ -169,6 +155,11 @@ public interface EventMetadata<L extends LocalizationSetting> {
 
         public Builder<L> destination(Destination destination) {
             this.destination = destination;
+            return this;
+        }
+
+        public Builder<L> range(Range.Type type) {
+            this.range = Range.get(type);
             return this;
         }
 
@@ -202,18 +193,23 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return this;
         }
 
-        public Builder<L> integration(UnaryOperator<String> integration) {
-            this.integration = integration;
+        public Builder<L> integration(IntegrationMetadata integrationMetadata) {
+            this.integrationMetadata = integrationMetadata;
+            return this;
+        }
+
+        public Builder<L> integration(@NonNull UnaryOperator<String> format) {
+            if (integrationMetadata == null) {
+                integrationMetadata = IntegrationMetadata.EMPTY.withFormat(format);
+            } else {
+                integrationMetadata = integrationMetadata.withFormat(format);
+            }
+
             return this;
         }
 
         public Builder<L> integration() {
-            this.integration = s -> s;
-            return this;
-        }
-
-        public Builder<L> receivers(Collection<FPlayer> receivers) {
-            this.receivers.addAll(receivers);
+            this.integrationMetadata = IntegrationMetadata.EMPTY;
             return this;
         }
 
@@ -225,9 +221,8 @@ public interface EventMetadata<L extends LocalizationSetting> {
             return new BaseEventMetadata<>(
                     uuid,
                     sender,
-                    filterPlayer,
                     filter,
-                    Collections.unmodifiableMap(flags),
+                    Map.copyOf(flags),
                     format,
                     destination,
                     range,
@@ -235,8 +230,8 @@ public interface EventMetadata<L extends LocalizationSetting> {
                     message,
                     tagResolvers,
                     proxy,
-                    integration,
-                    receivers
+                    integrationMetadata,
+                    List.of()
             );
         }
     }

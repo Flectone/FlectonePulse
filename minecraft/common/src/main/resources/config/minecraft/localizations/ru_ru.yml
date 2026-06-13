@@ -196,8 +196,8 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     dump_error: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Возникла проблема при загрузке дампа: <error>"
-    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Параметр host должен быть настроен в config.yml"
-    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Порт <port> недоступен, выбери другой в config.yml"
+    null_host_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Параметр host должен быть настроен в command.yml в строке port"
+    null_port_editor: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Порт <port> недоступен, выбери другой в command.yml в строке port"
     null_file: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Файл <file> не существует"
     file_exist: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Файл <file> уже существует"
     format_starting: "<fcolor:1>★ Начало <fcolor:2><type><fcolor:1>, подождите..."
@@ -241,11 +241,16 @@ command:
     sender: "<fcolor:2>✉ Письмо #<id> для <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>"
   maintenance:
+    already_true: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервере уже включены технические работы"
+    already_false: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>На сервере уже выключены технические работы"
     server_description: "<color:#ff7171>В настоящее время проводятся технические работы"
     server_version: "Технические работы"
-    kick: "<color:#ff7171>★ На сервере ведутся технические работы"
-    format_true: "<fcolor:1>★ Ты <fcolor:2>включил <fcolor:1>технические работы на сервере"
-    format_false: "<fcolor:1>★ Ты <fcolor:2>выключил <fcolor:1>технические работы на сервере"
+    reasons:
+      default: "На сервере ведутся технические работы"
+      disabled: "На сервере закончены технические работы"
+    format_true: "<fcolor:1>★ <fcolor:2>Включены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    format_false: "<fcolor:1>★ <fcolor:2>Выключены <fcolor:1>технические работы на сервере <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    person: "<color:#ff7171>★ <reason> (<time_left>)"
   me:
     format: "<fcolor:1>✎ <display_name> <fcolor:1><message>"
   mute:
@@ -292,7 +297,7 @@ command:
     vote_true: "<color:#4eff52>👍 Ты выбрал <answer_id> вариант в голосовании #<id>. Всего таких голосов <count>"
     vote_false: "<color:#ff4e4e>🖓 Ты передумал об <answer_id> варианте в голосовании #<id>. Всего таких голосов <count> без тебя"
     format: "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>"
-    answer_template: "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>"
+    answer_template: "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"<command> <id> <number>\"><answer> [👍]<br>"
     status:
       start: "Создано новое голосование #<b><id></b>"
       run: "Идёт голосование #<b><id></b>"
@@ -376,7 +381,7 @@ command:
     wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Такой ход невозможен"
     wrong_by_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игра закончена, потому что один из игроков не в сети"
     symbol:
-      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>"
+      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"<command> %d <move>\">☐</click></hover>"
       first: "<fcolor:2>☑"
       first_remove: "<color:#ff7171>☑</color:#ff7171>"
       first_win: "<color:#98FB98>☑</color:#98FB98>"
@@ -390,7 +395,7 @@ command:
     format_win: "<color:#98FB98><target> выиграл</color:#98FB98>"
     format_draw: "<color:#98FB98>Ничья 👬</color:#98FB98>"
     sender: "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <target>"
-    receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
+    receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
   toponline:
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игроков: <count> <br>"
@@ -456,13 +461,16 @@ command:
     already_on: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Белый список уже включен"
     already_off: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Белый список уже выключен"
     format_add: "<fcolor:1>☰ Игрок <display_name> добавлен в белый список <hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
-    format_off: "<fcolor:1>☰ Белый список <fcolor:2>выключен"
-    format_on: "<fcolor:1>☰ Белый список <fcolor:2>включен"
+    format_off: "<fcolor:1>☰ Белый список <fcolor:2>выключен <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
+    format_on: "<fcolor:1>☰ Белый список <fcolor:2>включен <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     format_remove: "<fcolor:1>☰ Игрок <display_name> удалён из белого списка <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
     person: "<color:#ff7171>☰ Тебя нет в белом списке сервера"
     connection_attempt: "<color:#ff7171>☰ Игрок <display_name>, которого нет в белом списке, попытался подключиться"
     reasons:
       default: "Ты добавлен в белый список сервера"
+      removed: "Ты был удалён из белого списка сервера"
+      enabled: "На сервере включен белый список"
+      disabled: "На сервере выключен белый список"
     global:
       header: "<fcolor:2>▋ Игроки в белом списке: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Удалить из белого списка <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
@@ -511,10 +519,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> отошёл"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> отошёл"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <nickname> вернулся"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> вернулся"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру"
   auto:
     types:
@@ -639,6 +647,7 @@ message:
         - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><nickname>\"><white><player_head></white><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
+      console: "<white><player_head:Console></white><click:suggest_command:\"/msg <name> \"><hover:show_text:\"<fcolor:2>Написать в <white><player_head:Console></white>Консоль\"><fcolor:2>Консоль"
       invisible: "<fcolor:2>👻 Невидимка"
     question_answer:
       questions:
@@ -713,7 +722,7 @@ message:
         - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
         - " "
     playerlistname:
-      format: "<!shadow><white><player_head></white></!shadow><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
+      format: "<white><player_head></white><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"
@@ -988,6 +997,8 @@ message:
       death.attack.sting: "<fcolor:1>☠ <argument:0> изжален до смерти"
       death.attack.sting.item: "<fcolor:1>☠ <argument:0> был изжален до смерти <argument:1> с помощью <fcolor:2><argument:2><fcolor:1>"
       death.attack.sting.player: "<fcolor:1>☠ <argument:0> изжален до смерти <argument:1>"
+      death.attack.sulfurCubeHot: "<fcolor:1>☠ <argument:0> обнаружил, что лавой может быть не только пол"
+      death.attack.sulfurCubeHot.player: "<fcolor:1>☠ <argument:0> показал <argument:1>, что не только пол — это лава"
       death.attack.sweetBerryBush: "<fcolor:1>☠ <argument:0> искололся до смерти в кустах сладких ягод"
       death.attack.sweetBerryBush.player: "<fcolor:1>☠ <argument:0> искололся до смерти в кустах сладких ягод, спасаясь от <argument:1>"
       death.attack.thorns: "<fcolor:1>☠ <argument:0> был убит, пытаясь навредить <argument:1>"

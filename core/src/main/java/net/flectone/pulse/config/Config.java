@@ -34,17 +34,20 @@ public record Config(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/database")
         Database database,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/executor")
+        Executor executor,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy")
         Proxy proxy,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/command")
-        Command command,
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/internal")
+        Internal internal,
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/module")
-        Module module,
+        @Deprecated(forRemoval = true)
+        DeprecatedCommand command,
 
-        @JsonPropertyDescription("https://flectone.net/pulse/docs/config/editor")
-        Editor editor,
+        @Deprecated(forRemoval = true)
+        DeprecatedModule module,
 
         @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger")
         Logger logger,
@@ -67,71 +70,118 @@ public record Config(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Database(Boolean ignoreExistingDriver,
-                           Boolean usePlaytimeTracking,
-                           net.flectone.pulse.data.database.Database.Type type,
-                           String name,
-                           String host,
-                           String port,
-                           String user,
-                           String password,
-                           String parameters,
-                           String prefix) {
+    public record Database(
+            Boolean ignoreExistingDriver,
+            Boolean usePlaytimeTracking,
+            net.flectone.pulse.data.database.Database.Type type,
+            String name,
+            String host,
+            String port,
+            String user,
+            String password,
+            String parameters,
+            String prefix
+    ) {
     }
 
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Proxy(Set<String> clusters,
-                        Boolean bungeecord,
-                        Boolean velocity,
-                        @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/proxy#redis")
-                        Redis redis) {
+    public record Executor(
+            Integer minPoolSize,
+            Integer maxPoolSize,
+            WorkQueue workQueue,
+            DurationUnit keepAlive,
+            DurationUnit shutdownTimeout
+    ) {
 
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Redis(Boolean enable,
-                            String host,
-                            Integer port,
-                            Boolean ssl,
-                            String user,
-                            String password) implements EnableSetting {
+        public record DurationUnit(
+                Long duration,
+                TimeUnit timeUnit
+        ) {
         }
+
+        public enum WorkQueue {
+            SYNCHRONOUS,
+            LINKED_BLOCKING
+        }
+
     }
 
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Command(Boolean unregisterOnReload,
-                          Set<String> disabledFabric) {
+    public record Internal(
+            Boolean enable,
+            Boolean alwaysSendSilentPacket,
+            Boolean usePaperMessageSender,
+            Boolean usePacketLoginListener,
+            Boolean unregisterCommandOnReload,
+            Set<String> vanillaCommandsToRemove
+    ) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Module(Boolean enable,
-                         Boolean usePaperMessageSender,
-                         Boolean useBukkitPreLoginListener) implements EnableSetting {
+    public record Proxy(
+            Set<String> clusters,
+            Boolean bungeecord,
+            Boolean velocity,
+            Redis redis
+    ) {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Redis(
+                Boolean enable,
+                String host,
+                Integer port,
+                Boolean ssl,
+                String user,
+                String password
+        ) implements EnableSetting {
+        }
+
+    }
+
+    @Deprecated(forRemoval = true)
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record DeprecatedCommand(
+            Boolean unregisterOnReload,
+            Set<String> disabledFabric
+    ) {
+    }
+
+    @Deprecated(forRemoval = true)
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record DeprecatedModule(
+            Boolean enable,
+            Boolean alwaysSendSilentPacket,
+            Boolean usePaperMessageSender,
+            Boolean useBukkitPreLoginListener
+    ) implements EnableSetting {
     }
 
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Editor(String host,
-                         Boolean https,
-                         Integer port) {
-    }
-
-    @With
-    @Builder(toBuilder = true)
-    @Jacksonized
-    public record Logger(String console,
-                         String prefix,
-                         List<String> description,
-                         String warn,
-                         String info,
-                         List<String> filter) {
+    public record Logger(
+            String console,
+            String prefix,
+            List<String> description,
+            String warn,
+            String info,
+            List<String> filter
+    ) {
     }
 
     @With

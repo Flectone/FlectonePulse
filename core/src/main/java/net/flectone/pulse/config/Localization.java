@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
-import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedHashMap;
@@ -499,11 +499,14 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Maintenance(
+                String alreadyTrue,
+                String alreadyFalse,
                 String serverDescription,
                 String serverVersion,
-                String kick,
+                ReasonMap reasons,
                 String formatTrue,
-                String formatFalse
+                String formatFalse,
+                String person
         ) implements LocalizationSetting {
         }
 
@@ -1225,6 +1228,7 @@ public record Localization(
                     List<String> display,
                     String entity,
                     String unknown,
+                    String console,
                     String invisible
             ) implements LocalizationSetting {
             }

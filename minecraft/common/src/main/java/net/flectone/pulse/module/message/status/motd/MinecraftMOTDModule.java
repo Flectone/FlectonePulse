@@ -10,17 +10,18 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.status.motd.listener.MinecraftPacketMOTDListener;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.generator.RandomGenerator;
-import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.Nullable;
 
@@ -40,6 +41,7 @@ public class MinecraftMOTDModule implements ModuleListLocalization<Localization.
     private final ListenerRegistry listenerRegistry;
     private final RandomGenerator randomUtil;
     private final MinecraftServerStatusFormatter statusUtil;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -67,8 +69,8 @@ public class MinecraftMOTDModule implements ModuleListLocalization<Localization.
     }
 
     @Override
-    public Localization.Message.Status.MOTD localization(FEntity sender) {
-        return fileFacade.localization(sender).message().status().motd();
+    public Localization.Message.Status.MOTD localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().status().motd();
     }
 
     @Override
@@ -98,10 +100,6 @@ public class MinecraftMOTDModule implements ModuleListLocalization<Localization.
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
 
         event.markForReEncode(true);
 

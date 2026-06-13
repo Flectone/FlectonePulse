@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
@@ -19,7 +18,9 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,7 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
     private final CommandParserProvider commandParserProvider;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -117,8 +119,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
                 new String[]{category, String.valueOf(size)}
         );
 
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(header)
+                .build()
+        ).append(Component.newline());
 
         StringBuilder symbolLine = new StringBuilder();
         for (String symbol : finalSymbols) {
@@ -126,8 +131,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
             symbolLine.append(line);
         }
 
-        MessageContext lineContext = messagePipeline.createContext(fPlayer, symbolLine.toString());
-        component = component.append(messagePipeline.build(lineContext)).append(Component.newline());
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(symbolLine.toString())
+                .build()
+        )).append(Component.newline());
 
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + category;
         String footer = StringUtils.replaceEach(
@@ -142,8 +150,11 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
                 }
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 
@@ -166,7 +177,7 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
     }
 
     @Override
-    public Localization.Command.Symbol localization(FEntity sender) {
-        return fileFacade.localization(sender).command().symbol();
+    public Localization.Command.Symbol localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().symbol();
     }
 }

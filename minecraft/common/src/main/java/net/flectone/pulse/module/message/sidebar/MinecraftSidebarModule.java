@@ -18,9 +18,10 @@ import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.generator.RandomGenerator;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class MinecraftSidebarModule extends SidebarModule {
     private final MinecraftPacketProvider packetProvider;
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftSidebarModule(FileFacade fileFacade,
@@ -50,8 +52,9 @@ public class MinecraftSidebarModule extends SidebarModule {
                                   MinecraftPacketProvider packetProvider,
                                   PermissionChecker permissionChecker,
                                   ModuleController moduleController,
-                                  RandomGenerator randomUtil) {
-        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil);
+                                  RandomGenerator randomUtil,
+                                  SocialService socialService) {
+        super(fileFacade, taskScheduler, listenerRegistry, fPlayerService, randomUtil, socialService);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -59,6 +62,7 @@ public class MinecraftSidebarModule extends SidebarModule {
         this.packetProvider = packetProvider;
         this.permissionChecker = permissionChecker;
         this.moduleController = moduleController;
+        this.socialService = socialService;
     }
 
     @Override
@@ -94,8 +98,8 @@ public class MinecraftSidebarModule extends SidebarModule {
     }
 
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
-        taskScheduler.runRegion(fPlayer, () -> {
-            if (!permissionChecker.check(fPlayer, permission()) || !fPlayer.isSetting(name())) {
+        taskScheduler.runAsync(() -> {
+            if (!permissionChecker.check(fPlayer, permission()) || !socialService.isSetting(fPlayer, name())) {
                 remove(fPlayer);
                 return;
             }
@@ -109,8 +113,11 @@ public class MinecraftSidebarModule extends SidebarModule {
             if (lines.length == 0) return;
 
             String objectiveName = getObjectiveName(fPlayer);
-            MessageContext titleContext = messagePipeline.createContext(fPlayer, lines[0]);
-            Component title = messagePipeline.build(titleContext);
+            Component title = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[0])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                     objectiveName,
@@ -138,8 +145,11 @@ public class MinecraftSidebarModule extends SidebarModule {
             int lineIndex = i - 1;
 
             String lineId = getLineId(lineIndex, fPlayer);
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            Component line = messagePipeline.build(lineContext);
+            Component line = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     lineId,
@@ -170,8 +180,11 @@ public class MinecraftSidebarModule extends SidebarModule {
         for (int i = 1; i < lines.length; i++) {
             int lineIndex = i - 1;
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, lines[i]);
-            String line = messagePipeline.buildLegacy(lineContext);
+            String line = messagePipeline.buildLegacy(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(lines[i])
+                    .build()
+            );
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     line,

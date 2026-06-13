@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.execution.pipeline.HytaleMessagePipeline;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.HytaleTaskScheduler;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.HytaleChatsettingModule;
 import net.flectone.pulse.module.integration.HytaleIntegrationModule;
@@ -16,18 +14,16 @@ import net.flectone.pulse.module.message.bubble.render.BubbleRender;
 import net.flectone.pulse.module.message.bubble.render.HytaleBubbleRender;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.HytaleChatModule;
-import net.flectone.pulse.module.message.format.scoreboard.HytaleScoreboardModule;
-import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.HytaleWorldModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.module.message.join.HytaleJoinModule;
-import net.flectone.pulse.module.message.join.JoinModule;
-import net.flectone.pulse.module.message.quit.HytaleQuitModule;
-import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.scoreboard.HytaleScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sidebar.HytaleSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.vanilla.HytaleVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
+import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
+import net.flectone.pulse.module.message.vanilla.extractor.HytaleComponentExtractor;
 import net.flectone.pulse.platform.adapter.HytalePlayerAdapter;
 import net.flectone.pulse.platform.adapter.HytaleServerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -42,6 +38,8 @@ import net.flectone.pulse.processing.resolver.HytaleProfileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ProfileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.ComponentSerializer;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.service.HytaleSkinService;
 import net.flectone.pulse.service.HytaleTranslationService;
 import net.flectone.pulse.service.SkinService;
@@ -84,7 +82,6 @@ public class HytaleInjector extends PlatformInjector {
 
         // checkers and utilities
         bind(PermissionChecker.class).to(HytalePermissionChecker.class);
-        bind(TaskScheduler.class).to(HytaleTaskScheduler.class);
         bind(MessagePipeline.class).to(HytaleMessagePipeline.class);
 
         // integrations
@@ -100,9 +97,7 @@ public class HytaleInjector extends PlatformInjector {
 //        bind(ObjectModule.class).to(MinecraftObjectModule.class);
         bind(ScoreboardModule.class).to(HytaleScoreboardModule.class);
         bind(WorldModule.class).to(HytaleWorldModule.class);
-        bind(JoinModule.class).to(HytaleJoinModule.class);
 //        bind(ObjectModule.class).to(MinecraftObjectModule.class);
-        bind(QuitModule.class).to(HytaleQuitModule.class);
 //        bind(RightclickModule.class).to(MinecraftRightClickModule.class);
         bind(SidebarModule.class).to(HytaleSidebarModule.class);
 //        bind(StatusModule.class).to(MinecraftStatusModule.class);
@@ -124,6 +119,8 @@ public class HytaleInjector extends PlatformInjector {
         bind(SoundPlayer.class).to(HytaleSoundPlayer.class);
 
         // others
+        bind(ComponentSerializer.class).to(HytaleComponentSerializer.class);
+        bind(ComponentExtractor.class).to(HytaleComponentExtractor.class);
         bind(SkinService.class).to(HytaleSkinService.class);
         bind(ProfileResolver.class).to(HytaleProfileResolver.class);
         bind(TranslationService.class).to(HytaleTranslationService.class);

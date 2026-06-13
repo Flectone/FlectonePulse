@@ -19,10 +19,7 @@ import net.flectone.pulse.model.event.lifecycle.StartReloadEvent;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.MetricsService;
-import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.service.TranslationService;
+import net.flectone.pulse.service.*;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.util.logging.filter.LogFilter;
@@ -80,9 +77,12 @@ public class FlectonePulseAPI {
     public void onEnable() {
         if (!instance.isReady()) return;
 
-        // call enable event
-        EnableEvent enableEvent = instance.get(EventDispatcher.class).dispatch(new EnableEvent(instance));
-        if (enableEvent.cancelled()) return;
+        // get event dispatcher
+        EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
+
+        // call enable init event
+        EnableEvent enableInitEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.INIT, instance));
+        if (enableInitEvent.cancelled()) return;
 
         // get configs
         FileFacade fileFacade = instance.get(FileFacade.class);
@@ -99,8 +99,11 @@ public class FlectonePulseAPI {
         // init command registry
         instance.get(CommandRegistry.class).init();
 
+        // enable proxy registry
+        instance.get(ProxyRegistry.class).onEnable();
+
         // register default listeners
-        instance.get(ListenerRegistry.class).registerDefaultListeners();
+        instance.get(ListenerRegistry.class).onEnable();
 
         // setup filter
         instance.get(LogFilter.class).setFilters(fileFacade.config().logger().filter());
@@ -111,19 +114,26 @@ public class FlectonePulseAPI {
         // initialize packetevents
         instance.initPacketAdapter();
 
+        // get fplayer service
+        FPlayerService fPlayerService = instance.get(FPlayerService.class);
+
+        // add console to database and cache
+        fPlayerService.addConsole();
+
         // init modules and their children
         instance.get(ModuleController.class).initialize();
 
         // reload fplayer service
-        instance.get(FPlayerService.class).initialize(false);
-
-        // enable proxy registry
-        instance.get(ProxyRegistry.class).onEnable();
+        fPlayerService.initialize(false);
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
             instance.get(MetricsService.class).start();
         }
+
+        // call enable ready event
+        EnableEvent enableReadyEvent = eventDispatcher.dispatch(new EnableEvent(EnableEvent.Type.READY, instance));
+        if (enableReadyEvent.cancelled()) return;
 
         // log plugin enabled
         fLogger.logEnabled();
@@ -164,9 +174,13 @@ public class FlectonePulseAPI {
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
+        PlaytimeService playtimeService = instance.get(PlaytimeService.class);
 
         // update and clear all fplayers
-        fPlayerService.getPlatformFPlayers().forEach(fPlayerService::clearAndSave);
+        fPlayerService.getPlatformFPlayers().forEach(fPlayer -> {
+            fPlayerService.clearAndSave(fPlayer);
+            playtimeService.updateLastSession(fPlayer);
+        });
         fPlayerService.invalidate();
 
         // terminate packetevents
@@ -236,8 +250,8 @@ public class FlectonePulseAPI {
         // get task scheduler
         TaskScheduler taskScheduler = instance.get(TaskScheduler.class);
 
-        // disable task scheduler
-        taskScheduler.shutdown();
+        // sync task scheduler reload
+        taskScheduler.runSync(taskScheduler::reload).join();
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
@@ -306,14 +320,14 @@ public class FlectonePulseAPI {
         // load minecraft localizations
         instance.get(TranslationService.class).reload();
 
-        // start scheduler
-        taskScheduler.start();
+        // init proxies
+        proxyRegistry.onEnable();
 
         // register default listeners
         listenerRegistry.onEnable();
 
-        // init proxies
-        proxyRegistry.onEnable();
+        // add console to database and cache
+        fPlayerService.addConsole();
 
         // init modules
         moduleController.initialize();

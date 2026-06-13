@@ -15,17 +15,20 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
-import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.command.tell.listener.TellProxyMessageListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
@@ -44,7 +47,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IgnoreSender ignoreSender;
@@ -54,6 +57,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
+    private final ProxyRegistry proxyRegistry;
 
     @Override
     public void onEnable() {
@@ -64,6 +68,10 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission().name())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(TellProxyMessageListener.class);
+        }
 
         listenerRegistry.register(PulseTellListener.class);
     }
@@ -98,8 +106,8 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
     }
 
     @Override
-    public Localization.Command.Tell localization(FEntity sender) {
-        return fileFacade.localization(sender).command().tell();
+    public Localization.Command.Tell localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().tell();
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {
@@ -121,7 +129,8 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
         if (!fReceiver.isConsole()
-                && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
+                && (fReceiver.isUnknown() || !fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)
+                || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tell>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::nullPlayer)
@@ -131,10 +140,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        fReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         // save for sender
@@ -170,7 +176,7 @@ public class TellModule implements ModuleCommand<Localization.Command.Tell> {
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Tell>builder()
                 .uuid(metadataUUID)
                 .sender(sender)
-                .filterPlayer(fReceiver)
+                .receiver(fReceiver)
                 .format(format)
                 .destination(config().destination())
                 .message(string)

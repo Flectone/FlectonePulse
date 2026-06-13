@@ -4,16 +4,17 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.PulseSidebarListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.generator.RandomGenerator;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.generator.RandomGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -29,24 +30,27 @@ public abstract class SidebarModule implements ModuleListLocalization<Localizati
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
     private final RandomGenerator randomUtil;
+    private final SocialService socialService;
 
     protected SidebarModule(FileFacade fileFacade,
                             TaskScheduler taskScheduler,
                             ListenerRegistry listenerRegistry,
                             FPlayerService fPlayerService,
-                            RandomGenerator randomUtil) {
+                            RandomGenerator randomUtil,
+                            SocialService socialService) {
         this.fileFacade = fileFacade;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
         this.fPlayerService = fPlayerService;
         this.randomUtil = randomUtil;
+        this.socialService = socialService;
     }
 
     @Override
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::update, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(PulseSidebarListener.class);
@@ -75,8 +79,8 @@ public abstract class SidebarModule implements ModuleListLocalization<Localizati
     }
 
     @Override
-    public Localization.Message.Sidebar localization(FEntity sender) {
-        return fileFacade.localization(sender).message().sidebar();
+    public Localization.Message.Sidebar localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().sidebar();
     }
 
     @Override

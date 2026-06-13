@@ -20,9 +20,11 @@ import net.flectone.pulse.module.message.format.moderation.swear.listener.PulseS
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -49,6 +51,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
     private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModerationService moderationService;
+    private final SocialService socialService;
 
     @Getter private Pattern combinedPattern;
 
@@ -89,8 +92,8 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Swear localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().swear();
+    public Localization.Message.Format.Moderation.Swear localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().swear();
     }
 
     public MessageContext format(MessageContext messageContext) {
@@ -122,7 +125,7 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.SWEAR.getTagName(), (argumentQueue, _) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -134,20 +137,28 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
 
             Component component;
             if (permissionChecker.check(receiver, permission().see())) {
-                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, localization.formatSee())
-                        .withFlags(messageContext.flags())
-                        .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                        .addTagResolvers(Placeholder.parsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(localization.formatSee())
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .tagResolvers(Placeholder.unparsed("swear", swear), Placeholder.parsed("symbols", symbols))
+                        .build()
                 );
             } else {
-                component = messagePipeline.build(messagePipeline.createContext(sender, receiver, symbols)
-                        .withFlags(messageContext.flags())
-                        .addFlag(MessageFlag.PLAYER_MESSAGE, false)
+                component = messagePipeline.build(MessageContext.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .message(symbols)
+                        .flags(messageContext.flags())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .build()
                 );
             }
 
             return Tag.selfClosingInserting(component);
-        });
+        }));
     }
 
     public boolean isRestricted(UUID uuid) {
@@ -161,8 +172,11 @@ public class SwearModule implements ModuleLocalization<Localization.Message.Form
         Matcher matcher = combinedPattern.matcher(string);
         while (matcher.find()) {
             String word = matcher.group(0);
+            if (isIgnored(word)) continue;
+
             int start = matcher.start();
-            if (isIgnored(word) || isIgnored(getFullWord(string, start))) continue;
+            String fullWord = getFullWord(string, start);
+            if (!StringUtils.isEmpty(fullWord) && isIgnored(fullWord)) continue;
 
             matcher.appendReplacement(result, "<swear:'" + word + "'>");
         }

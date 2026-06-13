@@ -9,9 +9,12 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.listener.PulseBaseListener;
-import net.flectone.pulse.listener.PulseMessageListener;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.listener.message.PulseMessagePrepareListener;
+import net.flectone.pulse.listener.message.PulseMessageSendListener;
+import net.flectone.pulse.listener.player.PulsePlayerLoadListener;
+import net.flectone.pulse.listener.player.PulsePlayerPersistAndDisposeListener;
+import net.flectone.pulse.listener.proxy.cache.*;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.command.mute.listener.PulseMuteListener;
 import net.flectone.pulse.util.logging.FLogger;
@@ -19,7 +22,10 @@ import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.UnaryOperator;
@@ -33,6 +39,7 @@ public class ListenerRegistry implements Registry {
     private final Set<PulseListener> permanentListeners = new ObjectOpenHashSet<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private final ProxyRegistry proxyRegistry;
     private final FLogger fLogger;
     private final Injector injector;
 
@@ -40,7 +47,7 @@ public class ListenerRegistry implements Registry {
         lock.readLock().lock();
         try {
             Map<Event.Priority, List<UnaryOperator<Event>>> enumMap = pulseListeners.get(event);
-            return enumMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(enumMap);
+            return enumMap == null ? Map.of() : Map.copyOf(enumMap);
         } finally {
             lock.readLock().unlock();
         }
@@ -135,8 +142,29 @@ public class ListenerRegistry implements Registry {
     }
 
     public void registerDefaultListeners() {
-        register(PulseBaseListener.class);
-        register(PulseMessageListener.class);
+        // need register here to format messages with mute from other plugins
         register(PulseMuteListener.class);
+
+        register(PulseMessagePrepareListener.class);
+        register(PulseMessageSendListener.class);
+        register(PulsePlayerLoadListener.class);
+        register(PulsePlayerPersistAndDisposeListener.class);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            register(BanCacheProxyMessageListener.class);
+            register(ColorCacheProxyMessageListener.class);
+            register(CooldownCacheProxyMessageListener.class);
+            register(IgnoreCacheProxyMessageListener.class);
+            register(KickCacheProxyMessageListener.class);
+            register(MaintenanceCacheProxyMessageListener.class);
+            register(MuteCacheProxyMessageListener.class);
+            register(PlayerConnectedProxyMessageListener.class);
+            register(PlayerDisconnectedProxyMessageListener.class);
+            register(SettingCacheProxyMessageListener.class);
+            register(SkinprofileCacheProxyMessageListener.class);
+            register(ViolationCacheProxyMessageListener.class);
+            register(WarnCacheProxyMessageListener.class);
+            register(WhitelistCacheProxyMessageListener.class);
+        }
     }
 }

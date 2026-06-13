@@ -3,10 +3,7 @@ package net.flectone.pulse.model.util;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +58,14 @@ public record Range(int value, Type type) {
         } catch (NumberFormatException _) {
             Range.Type type = Range.Type.fromString(string);
             return new Range(type);
+        }
+    }
+
+    public static Optional<Range> fromString(String string) {
+        try {
+            return Optional.of(Range.fromJson(string));
+        } catch (IllegalArgumentException _) {
+            return Optional.empty();
         }
     }
 

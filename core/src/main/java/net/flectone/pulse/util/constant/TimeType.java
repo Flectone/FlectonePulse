@@ -38,7 +38,7 @@ public enum TimeType {
     public static Optional<TimeType> fromString(String string) {
         return Arrays.stream(TimeType.values())
                 .filter(type -> type.name().equalsIgnoreCase(string))
-                .findFirst();
+                .findAny();
     }
 
 }

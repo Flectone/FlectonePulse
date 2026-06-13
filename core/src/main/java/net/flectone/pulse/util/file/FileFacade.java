@@ -6,13 +6,11 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.file.FilePack;
 import net.flectone.pulse.util.comparator.VersionComparator;
-import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.creator.BackupCreator;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -110,14 +108,11 @@ public class FileFacade {
     }
 
     public Localization localization() {
-        return localization(FPlayer.UNKNOWN);
+        return localization(null);
     }
 
-    public Localization localization(FEntity sender) {
+    public Localization localization(@Nullable String locale) {
         if (!config().language().byPlayer()) return defaultLocalization;
-        if (!(sender instanceof FPlayer fPlayer)) return defaultLocalization;
-
-        String locale = fPlayer.getSetting(SettingText.LOCALE);
         if (locale == null) return defaultLocalization;
 
         return localizations().getOrDefault(locale, defaultLocalization);
@@ -199,8 +194,12 @@ public class FileFacade {
             files = fileMigrator.migration_1_9_3(files);
         }
 
-        if (versionComparator.isOlderThan(preInitVersion, "1.9.4")) {
+        if (versionComparator.isOlderThan(preInitVersion, "1.9.4")) { // 1.9.4 == 1.10.0
             files = fileMigrator.migration_1_9_4(files);
+        }
+
+        if (versionComparator.isOlderThan(preInitVersion, "1.10.1")) {
+            files = fileMigrator.migration_1_10_1(files);
         }
 
         files = files.withConfig(files.config().withVersion(BuildConfig.PROJECT_VERSION));

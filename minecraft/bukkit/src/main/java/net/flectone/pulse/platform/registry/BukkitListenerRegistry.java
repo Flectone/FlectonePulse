@@ -4,10 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.flectone.pulse.listener.BukkitBaseListener;
+import net.flectone.pulse.listener.player.BukkitPlayerConnectionValidListener;
+import net.flectone.pulse.listener.player.PaperPlayerLoginListener;
+import net.flectone.pulse.listener.player.BukkitPlayerConnectionListener;
+import net.flectone.pulse.listener.player.BukkitPlayerLoginListener;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -20,18 +25,23 @@ import java.util.List;
 public class BukkitListenerRegistry extends MinecraftListenerRegistry {
 
     private final List<Listener> listeners = new ObjectArrayList<>();
+
     private final Plugin plugin;
     private final Injector injector;
+    private final ReflectionResolver reflectionResolver;
 
     @Inject
-    public BukkitListenerRegistry(Plugin plugin,
+    public BukkitListenerRegistry(ProxyRegistry proxyRegistry,
+                                  Plugin plugin,
                                   FLogger fLogger,
                                   Injector injector,
-                                  MinecraftPacketProvider packetProvider) {
-        super(fLogger, injector, packetProvider);
+                                  MinecraftPacketProvider packetProvider,
+                                  ReflectionResolver reflectionResolver) {
+        super(proxyRegistry, fLogger, injector, packetProvider);
 
         this.plugin = plugin;
         this.injector = injector;
+        this.reflectionResolver = reflectionResolver;
     }
 
     @Override
@@ -93,6 +103,13 @@ public class BukkitListenerRegistry extends MinecraftListenerRegistry {
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
 
-        register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        if (reflectionResolver.hasMethod(AsyncPlayerPreLoginEvent.class, "kickMessage")) {
+            register(PaperPlayerLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        } else {
+            register(BukkitPlayerLoginListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        }
+
+        register(BukkitPlayerConnectionListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        register(BukkitPlayerConnectionValidListener.class, net.flectone.pulse.model.event.Event.Priority.MONITOR);
     }
 }

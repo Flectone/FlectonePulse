@@ -9,25 +9,30 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.tictactoe.listener.TictactoeProxyMessageListener;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -42,7 +47,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     private final FPlayerService fPlayerService;
     private final TictactoeService tictactoeService;
     private final ProxySender proxySender;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final Gson gson;
     private final IgnoreSender ignoreSender;
@@ -51,12 +56,14 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
         String promptPlayer = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::player);
         String promptHard = commandModuleController.addPrompt(this, 1, Localization.Command.Prompt::hard);
-        commandModuleController.registerCommand(this, manager -> manager
+        commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptHard, commandParserProvider.booleanParser())
                 .permission(permission().name())
@@ -64,13 +71,16 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
 
         String promptId = commandModuleController.addPrompt(this, 2, Localization.Command.Prompt::id);
         String promptMove = commandModuleController.addPrompt(this, 3, Localization.Command.Prompt::move);
-        commandModuleController.registerCustomCommand(manager ->
-                manager.commandBuilder(commandModuleController.getCommandName(this) + "move")
-                        .required(promptId, commandParserProvider.integerParser())
-                        .required(promptMove, commandParserProvider.singleMessageParser())
-                        .permission(permission().name())
-                        .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
+        commandModuleController.registerSubCommand(this, config().subCommandMove(), commandBuilder -> commandBuilder
+                .required(promptId, commandParserProvider.integerParser())
+                .required(promptMove, commandParserProvider.singleMessageParser())
+                .permission(permission().name())
+                .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(TictactoeProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -90,7 +100,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         boolean isHard = optionalBoolean.orElse(true);
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::nullPlayer)
@@ -110,10 +120,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
@@ -124,7 +131,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                         .format(Localization.Command.Tictactoe::sender)
                         .sound(soundOrThrow())
                         .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                                messagePipeline.targetTag(fResolver, fReceiver)
                         })
                         .build()
                 )
@@ -136,7 +143,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, name(), dataOutputStream -> {
             dataOutputStream.writeUTF(GamePhase.CREATE.name());
-            dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
+            dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
         }, metadataUUID);
@@ -162,22 +169,23 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     }
 
     @Override
-    public Localization.Command.Tictactoe localization(FEntity sender) {
-        return fileFacade.localization(sender).command().tictactoe();
+    public Localization.Command.Tictactoe localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().tictactoe();
     }
 
     // /tictactoe %d create
     public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, UUID metadataUUID) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-        if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
-                || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
+        if (!socialService.canSeeVanished(fPlayer, fReceiver)
+                || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
         messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
-                        .format(message -> String.format(message.receiver(), ticTacToe.getId()))
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
+                        .format(message -> Strings.CS.replace(String.format(message.receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
                         .sound(soundOrThrow())
                         .build()
                 )
@@ -190,8 +198,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
     // /tictactoe %d <move>
     public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move, UUID metadataUUID) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
-        if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
-                || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
+        if (!socialService.canSeeVanished(fPlayer, fReceiver)
+                || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
         messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
@@ -212,7 +220,8 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 .base(EventMetadata.<Localization.Command.Tictactoe>builder()
                         .uuid(metadataUUID)
                         .sender(fPlayer)
-                        .filterPlayer(fReceiver, false)
+                        .receiver(fReceiver)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                         .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                         .tagResolvers(fResolver -> new TagResolver[]{
                                 messagePipeline.targetTag(fResolver, fReceiver)
@@ -251,7 +260,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         }
 
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
-        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
                     .sender(fPlayer)
@@ -333,7 +342,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                     }
             );
 
-            String symbolEmpty = messageSymbol.blank();
+            String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove());
             String symbolFirstRemove = messageSymbol.firstRemove();
             String symbolFirstWin = messageSymbol.firstWin();
             String symbolSecondRemove = messageSymbol.secondRemove();
@@ -347,7 +356,7 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                     symbolSecond,
                     symbolSecondRemove,
                     symbolSecondWin,
-                    String.format(symbolEmpty, ticTacToe.getId())
+                    symbolEmpty
             );
         };
     }

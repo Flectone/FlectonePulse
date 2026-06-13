@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
@@ -22,7 +21,9 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -65,7 +67,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        List<Ignore> ignoreList = fPlayer.ignores();
+        List<Ignore> ignoreList = socialService.loadIgnores(fPlayer);
         if (ignoreList.isEmpty()) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
                     .sender(fPlayer)
@@ -104,8 +106,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                 .toList();
 
         String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build()).append(Component.newline());
 
         for (Ignore ignore : finalIgnoreList) {
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
@@ -115,11 +116,13 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                     new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date())}
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolver(messagePipeline.targetTag(fPlayer, fTarget));
-
             component = component
-                    .append(messagePipeline.build(lineContext))
+                    .append(messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(line)
+                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                            .build()
+                    ))
                     .append(Component.newline());
         }
 
@@ -129,8 +132,11 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                 new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.COMMAND_IGNORELIST, fPlayer, component));
 
@@ -153,7 +159,7 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
     }
 
     @Override
-    public Localization.Command.Ignorelist localization(FEntity sender) {
-        return fileFacade.localization(sender).command().ignorelist();
+    public Localization.Command.Ignorelist localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().ignorelist();
     }
 }

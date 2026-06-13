@@ -11,7 +11,6 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.message.status.players.MinecraftPlayersModule;
-import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -19,7 +18,6 @@ import net.kyori.adventure.text.Component;
 public class MinecraftPulsePlayersListener implements PulseListener {
 
     private final MinecraftPlayersModule playersModule;
-    private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
 
     @Pulse
@@ -27,13 +25,11 @@ public class MinecraftPulsePlayersListener implements PulseListener {
         FPlayer fPlayer = event.player();
         if (playersModule.isAllowed(fPlayer)) return event;
 
-        if (fPlayer.fColors().isEmpty()) {
-            fPlayer = fPlayerService.loadColors(fPlayer);
-        }
-
-        String reasonMessage = playersModule.localization(fPlayer).full();
-        MessageContext reasonContext = messagePipeline.createContext(fPlayer, reasonMessage);
-        Component reason = messagePipeline.build(reasonContext);
+        Component reason = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message( playersModule.localization(fPlayer).full())
+                .build()
+        );
 
         return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
     }

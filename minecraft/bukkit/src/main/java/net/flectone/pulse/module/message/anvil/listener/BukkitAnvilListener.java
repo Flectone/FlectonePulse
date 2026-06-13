@@ -14,8 +14,6 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Optional;
-
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitAnvilListener implements Listener {
@@ -24,23 +22,21 @@ public class BukkitAnvilListener implements Listener {
     private final BukkitAnvilModule anvilModule;
 
     @EventHandler
-    public void inventoryClickEvent(InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getClickedInventory() instanceof AnvilInventory)) return;
         if (event.getSlot() != 2) return;
-        if (event.getCurrentItem() == null) return;
-        if (event.getCurrentItem().getItemMeta() == null) return;
+
+        ItemStack itemStack = event.getCurrentItem();
+        if (itemStack == null) return;
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
-        ItemStack itemStack = event.getCurrentItem();
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        Optional<String> displayName = anvilModule.format(fPlayer, itemMeta.getDisplayName());
-        if (displayName.isPresent()) {
-            itemMeta.setDisplayName(displayName.get());
-            itemStack.setItemMeta(itemMeta);
-        }
+        anvilModule.legacyFormat(fPlayer, itemMeta.getDisplayName()).ifPresent(itemMeta::setDisplayName);
+        itemStack.setItemMeta(itemMeta);
     }
 }

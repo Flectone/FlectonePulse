@@ -1,8 +1,8 @@
 plugins {
     id 'java'
     id 'java-library'
-    id 'com.gradleup.shadow' version '9.4.1'
-    id 'com.github.gmazzo.buildconfig' version '6.0.9'
+    id 'com.gradleup.shadow' version '9.4.2'
+    id 'com.github.gmazzo.buildconfig' version '6.0.10'
     id 'xyz.wagyourtail.jvmdowngrader' version '1.3.6'
     id 'com.vanniktech.maven.publish' version "0.36.0"
     id 'io.freefair.lombok' version "9.5.0"
@@ -134,12 +134,12 @@ subprojects {
         }
 
         if (project.name != "fabric") {
+            relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
+            relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
             relocate("org.incendo", "${relocated_pattern}.cloud")
         }
 
         if (project.name != "paper" && project.name != "fabric") {
-            relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
-            relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
@@ -156,10 +156,14 @@ subprojects {
 
     mavenPublishing {
         publishToMavenCentral(true)
-        coordinates("net.flectone.pulse", project.name, project_version)
+
+        def artifactId = project.parent.name == rootProject.name
+                ? "${project.name}"
+                : "${project.parent.name}-${project.name}"
+        coordinates("net.flectone.pulse", artifactId, project_version)
 
         pom {
-            name = "FlectonePulse ${project.name.capitalize()}"
+            name = "FlectonePulse ${artifactId.capitalize()}"
             description = "Every Message Under Your Control!"
             url = 'https://github.com/Flectone/FlectonePulse'
             licenses {

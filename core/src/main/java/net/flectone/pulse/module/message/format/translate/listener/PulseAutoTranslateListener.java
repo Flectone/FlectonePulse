@@ -18,6 +18,7 @@ import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -44,6 +45,7 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     private final TranslateModule translateModule;
     private final FLogger fLogger;
+    private final SocialService socialService;
 
     /** Bridges per-message PrepareEvent to per-receiver SendEvent. */
     private final Cache<UUID, TranslatedMessage> preparedTranslations = CacheBuilder.newBuilder()
@@ -74,7 +76,7 @@ public class PulseAutoTranslateListener implements PulseListener {
         FEntity senderEntity = metadata.sender();
         if (!(senderEntity instanceof FPlayer sender)) return;
 
-        String senderLocale = sender.getSetting(SettingText.LOCALE);
+        String senderLocale = socialService.getSetting(sender, SettingText.LOCALE);
         if (senderLocale == null) senderLocale = "en_us";
 
         String dedupKey = sender.uuid() + ":" + senderLocale + ":" + message;
@@ -125,7 +127,7 @@ public class PulseAutoTranslateListener implements PulseListener {
         if (translatedMessage != null) {
             sourceLang = translatedMessage.originalLang();
         } else if (event.eventMetadata().sender() instanceof FPlayer fSender) {
-            sourceLang = fSender.getSetting(SettingText.LOCALE);
+            sourceLang = socialService.getSetting(fSender, SettingText.LOCALE);
             if (sourceLang == null) sourceLang = "en_us";
         }
 
@@ -133,7 +135,7 @@ public class PulseAutoTranslateListener implements PulseListener {
         // sends. If the cache already has a translation for this receiver's
         // locale, apply it inline so the chat is translated on first display.
         if (receiver != null && !originalText.isEmpty() && sourceLang != null) {
-            String receiverLocale = receiver.getSetting(SettingText.LOCALE);
+            String receiverLocale = socialService.getSetting(receiver, SettingText.LOCALE);
             if (receiverLocale != null && !receiverLocale.equals(sourceLang)) {
                 String cached = translateModule.getCachedTranslation(sourceLang, receiverLocale, originalText);
                 if (cached != null && !cached.isEmpty() && !cached.equals(originalText)) {

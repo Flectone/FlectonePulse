@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -17,7 +16,9 @@ import net.flectone.pulse.module.message.scoreboard.objective.tabname.listener.M
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -31,12 +32,13 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
     private final MinecraftObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(this::updateScore, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::updateScore, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulseTabnameListener.class);
@@ -49,7 +51,7 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_OBJECTIVE_TABNAME;
+        return ModuleName.MESSAGE_SCOREBOARD_OBJECTIVE_TABNAME;
     }
 
     @Override
@@ -63,8 +65,8 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
     }
 
     @Override
-    public Localization.Message.Scoreboard.Objective.Tabname localization(FEntity sender) {
-        return fileFacade.localization(sender).message().scoreboard().objective().tabname();
+    public Localization.Message.Scoreboard.Objective.Tabname localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().scoreboard().objective().tabname();
     }
 
     public void create(FPlayer fPlayer) {
@@ -81,12 +83,14 @@ public class MinecraftTabnameModule implements ModuleLocalization<Localization.M
     public void updateScore(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
-            Localization.Message.Scoreboard.Objective.Tabname localization = localization(fPlayer);
-            Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
+        fPlayerService.getOnlineFPlayers().stream()
+                .filter(vanishedPlayer -> socialService.canSeeVanished(vanishedPlayer, fPlayer))
+                .forEach(fObjective -> {
+                    Localization.Message.Scoreboard.Objective.Tabname localization = localization(fPlayer);
+                    Component scoreFormat = objectiveModule.buildFormat(fObjective, fPlayer, localization.score(), localization.scoreFormat());
 
-            objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.TABLIST);
-        });
+                    objectiveModule.updateObjective(fPlayer, fObjective, scoreFormat, ScoreboardPosition.TABLIST);
+                });
     }
 
     public void remove(FPlayer fPlayer) {

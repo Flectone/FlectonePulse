@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -24,7 +25,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ public class MinecraftBossbarModule extends BossbarModule {
     private static final String RAIDERS_PLACEHOLDER = "<raiders>";
 
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -45,15 +47,17 @@ public class MinecraftBossbarModule extends BossbarModule {
     @Inject
     public MinecraftBossbarModule(FileFacade fileFacade,
                                   FPlayerService fPlayerService,
+                                  SocialService socialService,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
                                   MessageDispatcher messageDispatcher,
                                   ModuleController moduleController,
                                   MinecraftPacketSender packetSender,
                                   TaskScheduler taskScheduler) {
-        super(fileFacade);
+        super(fileFacade, socialService);
 
         this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.messageDispatcher = messageDispatcher;
@@ -71,9 +75,9 @@ public class MinecraftBossbarModule extends BossbarModule {
 
     public void send(UUID playerUUID, UUID bossbarUUID, String translationKey, boolean announce, Component oldTitle) {
         FPlayer fPlayer = fPlayerService.getFPlayer(playerUUID);
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
-            if (!fPlayer.isSetting(ModuleName.MESSAGE_BOSSBAR)) return;
+            if (!socialService.isSetting(fPlayer, ModuleName.MESSAGE_BOSSBAR)) return;
 
             String message = localization(fPlayer).types().get(translationKey);
             if (StringUtils.isEmpty(message)) return;
@@ -86,10 +90,12 @@ public class MinecraftBossbarModule extends BossbarModule {
                 message = message + RAIDERS_PLACEHOLDER;
             }
 
-            MessageContext messageContext = messagePipeline.createContext(fPlayer, message)
-                    .addTagResolver(raidersTag(fPlayer, raiders));
-
-            Component title = messagePipeline.build(messageContext);
+            Component title = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(message)
+                    .tagResolver(raidersTag(fPlayer, raiders))
+                    .build()
+            );
             if (title.equals(oldTitle)) return;
 
             WrapperPlayServerBossBar wrapper = new WrapperPlayServerBossBar(bossbarUUID, WrapperPlayServerBossBar.Action.UPDATE_TITLE);
@@ -118,13 +124,15 @@ public class MinecraftBossbarModule extends BossbarModule {
         String tag = "raiders";
         if (StringUtils.isEmpty(raiders)) return MessagePipeline.ReplacementTag.emptyResolver(tag);
 
-        return TagResolver.resolver(tag, (_, _) -> {
+        return messagePipeline.resolver(tag, (_, _) -> {
             String raidersRemaining = localization(fPlayer).types().get(RAIDERS_REMAINING_KEY);
             if (StringUtils.isEmpty(raidersRemaining)) return MessagePipeline.ReplacementTag.emptyTag();
 
-            String replaced = Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders);
-            MessageContext tagContext = messagePipeline.createContext(fPlayer, replaced);
-            return Tag.selfClosingInserting(messagePipeline.build(tagContext));
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(Strings.CS.replace(raidersRemaining, RAIDERS_PLACEHOLDER, raiders))
+                    .build()
+            ));
         });
     }
 

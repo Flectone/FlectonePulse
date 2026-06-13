@@ -3,9 +3,12 @@ package net.flectone.pulse.platform.filter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.function.Predicate;
@@ -14,10 +17,22 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RangeFilter {
 
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
 
-    public Predicate<FPlayer> createFilter(FPlayer filterPlayer, Range range) {
+    public Predicate<FPlayer> createFilter(EventMetadata<?> eventMetadata) {
+        Predicate<FPlayer> filter = eventMetadata.filter();
+
+        boolean hasCustomFilter = !filter.test(FPlayer.UNKNOWN);
+        if (eventMetadata.range().is(Range.Type.PLAYER) && hasCustomFilter) {
+            return filter;
+        }
+
+        return filter.and(createFilter(eventMetadata.sender(), eventMetadata.range()));
+    }
+
+    public Predicate<FPlayer> createFilter(FEntity filterPlayer, Range range) {
         if (range.is(Range.Type.PLAYER)) {
             return filterPlayer::equals;
         }
@@ -27,8 +42,8 @@ public class RangeFilter {
         }
 
         return fReceiver -> {
-            if (fReceiver.isUnknown()) return true;
-            if (fReceiver.isIgnored(fPlayer)) return false;
+            if (fReceiver.isUnknown() || fReceiver.isConsole()) return true;
+            if (socialService.isIgnored(fReceiver, fPlayer)) return false;
 
             return switch (range.type()) {
                 case BLOCKS -> checkDistance(fPlayer, fReceiver, range.value());

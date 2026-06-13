@@ -4,43 +4,36 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
-import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
-import net.flectone.pulse.model.util.PlayTime;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.module.command.mail.model.Mail;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * This service manages player storage across the plugin. You can use <code>getFPlayer()</code> to grab players from this service.
- * <hr>
+ * Central service for managing player data across the FlectonePulse plugin.
+ * Provides methods for retrieving, caching, and updating player information.
+ * Acts as a facade layer between platform-specific player adapters and data repositories,
+ * handling cache management and data synchronization.
  * <p>
- * For example, plugins using the Bukkit API can get an instance of the {@link FPlayer} object by simply using
- * <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Entity.html#getUniqueId()"><code>Entity.getUniqueId()</code></a>
- * and using {@link FPlayerService}'s <code>{@link UUID} getFPlayer</code> method.
- * </p>
- * <hr>
- * <p>
- * Console senders are automatically different players, which unless manually changed, will always have an ID of <code>-1</code>.
- * You can simply grab console senders by using <code lang="java">{@link FPlayerService}.getFPlayer(-1)</code>
+ * Players can be retrieved using various identifiers such as UUID, name, IP address,
+ * database ID, or platform-specific player objects. The service maintains separate
+ * caches for online and offline players to optimize performance.
  * </p>
  *
  * @see FPlayer
+ * @see FPlayerRepository
+ *
+ * @author TheFaser
+ * @since 0.0.1
  */
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -49,13 +42,14 @@ public class FPlayerService {
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerRepository fPlayerRepository;
-    private final SocialRepository socialRepository;
-    private final ModerationService moderationService;
-    private final IntegrationModule integrationModule;
-    private final TaskScheduler taskScheduler;
     private final RandomGenerator randomUtil;
     private final EventDispatcher eventDispatcher;
 
+    /**
+     * Invalidates all cached player data and reloads from scratch.
+     * Clears console player, all platform players, and empties the cache.
+     * Typically used during plugin reload or initialization.
+     */
     public void invalidate() {
         // invalidate and load console FPlayer to reload name
         fPlayerRepository.invalid(getConsole().uuid());
@@ -67,105 +61,99 @@ public class FPlayerService {
         fPlayerRepository.clearCache();
     }
 
-    public void initialize(boolean reload) {
-        addConsole();
-
-        // more like a migration for older versions below 1.9.0,
-        // because this information was not in the database before.
-        // and also we cannot add information about all players,
-        // because players may not be in the database
-        if (getPlayTimesCount() == 0) {
-            findAllFPlayers().forEach(fPlayer -> {
-                if (fPlayer.isUnknown()) return;
-
-                PlayTime platformPlayTime = platformPlayerAdapter.getPlayedTime(fPlayer);
-                if (platformPlayTime == null) return;
-
-                socialRepository.saveJoinSession(platformPlayTime);
-            });
-        }
-
-        // load all platform players
-        platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
-            String name = platformPlayerAdapter.getName(uuid);
-
-            FPlayer fPlayer = addFPlayer(uuid, name);
-            PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer, reload));
-            if (playerLoadEvent.cancelled()) {
-                fPlayerRepository.invalid(fPlayer.uuid());
-                return;
-            }
-
-            saveFPlayerData(loadData(fPlayer));
-        });
+    /**
+     * Invalidates a specific player from all caches.
+     *
+     * @param uuid the UUID of the player to invalidate
+     */
+    public void invalidate(@NonNull UUID uuid) {
+        fPlayerRepository.invalid(uuid);
     }
 
+    /**
+     * Adds the console player to the cache with configured console name.
+     * Creates a new console FPlayer if it doesn't exist, or ignores if already present.
+     */
     public void addConsole() {
         FPlayer console = FPlayer.builder()
                 .console(true)
                 .name(fileFacade.config().logger().console())
                 .build();
 
-        fPlayerRepository.invalid(console.uuid());
-        fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
+
+        addCache(console);
     }
 
+    /**
+     * Saves or updates a player in the database.
+     *
+     * @param uuid the player's UUID
+     * @param name the player's name
+     * @param ip the player's IP address, can be null
+     * @param online whether the player is currently online
+     * @return the created or updated FPlayer object with assigned database ID
+     */
+    @NonNull
+    public FPlayer saveOrUpdate(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
+        return fPlayerRepository.saveOrUpdate(uuid, name, ip, online);
+    }
+
+    /**
+     * Adds a player to the online cache.
+     *
+     * @param fPlayer the player to add to cache
+     * @return the same player instance that was added
+     */
+    @NonNull
+    public FPlayer addCache(@NonNull FPlayer fPlayer) {
+        fPlayerRepository.add(fPlayer);
+        return fPlayer;
+    }
+
+    /**
+     * Updates an existing player in the cache.
+     * Preserves online/offline status based on which cache the player is in.
+     *
+     * @param fPlayer the player data to update in cache
+     * @return the same player instance that was updated
+     */
+    @NonNull
     public FPlayer updateCache(FPlayer fPlayer) {
         fPlayerRepository.updateCache(fPlayer);
         return fPlayer;
     }
 
-    public FPlayer addFPlayer(@NonNull UUID uuid, @NonNull String name) {
-        // insert to database
-        save(uuid, name);
+    /**
+     * Initializes all online platform players by loading their data and dispatching PlayerLoadEvent.
+     * Players with cancelled events are invalidated from cache.
+     *
+     * @param reload whether this is a reload operation or initial startup
+     */
+    public void initialize(boolean reload) {
+        // force offline all players tied to this server
+        // in case of an unexpected shutdown that left them marked as online
+        fPlayerRepository.setOfflineByServer(fileFacade.config().server());
 
-        moderationService.invalidate(uuid);
-
-        // player can be in cache and be unknown
-        // or uuid and name can be invalid
-        FPlayer fPlayer = fPlayerRepository.get(uuid);
-        if (fPlayer.isUnknown() || !fPlayer.uuid().equals(uuid) || !fPlayer.name().equals(name)) {
-            fPlayerRepository.invalid(uuid);
-            fPlayer = fPlayerRepository.get(uuid);
-        }
-
-        fPlayer = fPlayer.toBuilder()
-                // most often this is not a real IP (this is server ip) on login,
-                // need to update it before calling saveFPlayerData from PlayerJoinEvent
-                .ip(platformPlayerAdapter.getIp(fPlayer))
-                // player is not fully online on server,
-                // but it should already be
-                .online(true)
-                // build
-                .build();
-
-        // add player to online cache and remove from offline
-        fPlayerRepository.add(fPlayer);
-
-        return fPlayer;
+        // load all platform players
+        platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
+            FPlayer fPlayer = getFPlayer(uuid);
+            PlayerLoadEvent playerLoadEvent = eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer, reload));
+            if (playerLoadEvent.cancelled()) {
+                invalidate(uuid);
+            }
+        });
     }
 
-    // load player data
-    public FPlayer loadData(FPlayer fPlayer) {
-        return loadIgnores(loadColors(loadSettings(fPlayer)));
-    }
-
-    public boolean save(@NonNull UUID uuid, @NonNull String name) {
-        return fPlayerRepository.save(uuid, name);
-    }
-
-    public void saveFPlayerData(FPlayer fPlayer) {
-        // skip offline FPlayer
-        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
-
-        // update data in database
-        updateFPlayer(fPlayer);
-    }
-
-    public void invalidateOffline(UUID uuid, boolean proxy) {
+    /**
+     * Removes a player from offline cache and optionally ensures online status for proxy players.
+     * Fixes race condition where proxy might report player offline while they're actually online.
+     *
+     * @param uuid the UUID of the player to remove from offline cache
+     * @param proxy whether this is called from proxy context (ensures online status if needed)
+     */
+    public void invalidateOfflineCache(@NonNull UUID uuid, boolean proxy) {
         fPlayerRepository.removeOffline(uuid);
-        socialRepository.invalidatePlaytime(uuid);
 
         // idk why, but sometimes Proxy player offline, although he is already on the server.
         // I think that request that player is logged in is sent before request as player exits.
@@ -173,83 +161,130 @@ public class FPlayerService {
         if (proxy) {
             FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
             if (!fPlayer.isOnline()) {
-                updateFPlayer(fPlayer.withOnline(true));
+                // update online cache
+                fPlayer = updateCache(fPlayer.withOnline(true));
+
+                // save to database
+                fPlayerRepository.update(fPlayer);
             }
         }
     }
 
-    public void invalidateOnline(UUID uuid) {
+    /**
+     * Removes a player from online cache.
+     *
+     * @param uuid the UUID of the player to remove from online cache
+     */
+    public void invalidateOnlineCache(@NonNull UUID uuid) {
         fPlayerRepository.removeOnline(uuid);
-        socialRepository.invalidatePlaytime(uuid);
     }
 
-    public FPlayer clearAndSave(FPlayer fPlayer) {
-        fPlayer = fPlayer.toBuilder()
-                .online(false)
-                .ip(platformPlayerAdapter.getIp(fPlayer))
-                .build();
+    /**
+     * Clears a player's online status and saves them to offline cache and database.
+     * Sets online to false, removes from online cache, updates database, and adds to offline cache.
+     *
+     * @param fPlayer the player to clear and save as offline
+     * @return the updated player with online=false
+     */
+    @NonNull
+    public FPlayer clearAndSave(@NonNull FPlayer fPlayer) {
+        // update online
+        fPlayer = fPlayer.withOnline(false);
 
+        // remove from online cache
         fPlayerRepository.removeOnline(fPlayer);
 
-        if (isPlaytimeTracking()) {
-            socialRepository.saveLastSeen(fPlayer);
-            socialRepository.invalidatePlaytime(fPlayer.uuid());
-        }
+        // update status in database
+        fPlayerRepository.update(fPlayer);
 
-        updateFPlayer(fPlayer);
+        // save to database
+        fPlayer = updateCache(fPlayer);
 
         return fPlayer;
     }
 
-    public void saveJoinSession(FPlayer fPlayer) {
-        if (isPlaytimeTracking()) {
-            socialRepository.saveJoinSession(fPlayer);
-            socialRepository.invalidatePlaytime(fPlayer.uuid());
-        }
-    }
-
-    public void updateFPlayer(FPlayer fPlayer) {
-        updateCache(fPlayer);
-        fPlayerRepository.update(fPlayer);
-    }
-
-    public FPlayer getFPlayerFromDatabase(UUID uuid) {
-        return fPlayerRepository.getFromDatabase(uuid);
-    }
-
+    /**
+     * Gets a player by database ID. Returns console player if ID is -1.
+     *
+     * @param id the database ID of the player
+     * @return the player or console player if ID is -1
+     */
+    @NonNull
     public FPlayer getFPlayer(int id) {
         if (id == -1) return getConsole();
 
         return fPlayerRepository.get(id);
     }
 
+    /**
+     * Gets the console player instance.
+     *
+     * @return the console FPlayer
+     */
+    @NonNull
     public FPlayer getConsole() {
         return getFPlayer(FEntity.UNKNOWN_UUID);
     }
 
-    public FPlayer getFPlayer(String name) {
+    /**
+     * Gets a player by name.
+     *
+     * @param name the player's name
+     * @return the player or UNKNOWN if not found
+     */
+    @NonNull
+    public FPlayer getFPlayer(@NonNull String name) {
         return fPlayerRepository.get(name);
     }
 
+    /**
+     * Gets a player by IP address.
+     *
+     * @param inetAddress the player's IP address
+     * @return the player or UNKNOWN if not found
+     */
+    @NonNull
     public FPlayer getFPlayer(InetAddress inetAddress) {
         return fPlayerRepository.get(inetAddress);
     }
 
+    /**
+     * Gets a player by UUID.
+     *
+     * @param uuid the player's UUID
+     * @return the player or UNKNOWN if not found
+     */
+    @NonNull
     public FPlayer getFPlayer(UUID uuid) {
         return fPlayerRepository.get(uuid);
     }
 
+    /**
+     * Gets a player from an FEntity by extracting its UUID.
+     *
+     * @param fEntity the entity to get the player for
+     * @return the player associated with the entity's UUID
+     */
+    @NonNull
     public FPlayer getFPlayer(FEntity fEntity) {
         return getFPlayer(fEntity.uuid());
     }
 
-    public FPlayer getFPlayer(Object player) {
-        String name = platformPlayerAdapter.getName(player);
+    /**
+     * Gets a player from a platform-specific player object (Bukkit, Fabric, etc.).
+     * Handles console detection and creates temporary FPlayer for unknown players.
+     *
+     * @param platformPlayer the platform-specific player object
+     * @return the FPlayer, console player, or a temporary player if not found
+     */
+    @NonNull
+    public FPlayer getFPlayer(@NonNull Object platformPlayer) {
+        String name = platformPlayerAdapter.getName(platformPlayer);
         if (name.isEmpty()) return FPlayer.UNKNOWN;
 
-        UUID uuid = platformPlayerAdapter.getUUID(player);
+        UUID uuid = platformPlayerAdapter.getUUID(platformPlayer);
         if (uuid == null) {
-            if (platformPlayerAdapter.isConsole(player)) {
+            if (platformPlayerAdapter.isConsole(platformPlayer)) {
                 return getConsole();
             }
 
@@ -261,13 +296,19 @@ public class FPlayerService {
             return FPlayer.builder()
                     .name(name)
                     .uuid(uuid)
-                    .type(platformPlayerAdapter.getEntityTranslationKey(player))
+                    .type(platformPlayerAdapter.getEntityTranslationKey(platformPlayer))
                     .build();
         }
 
         return fPlayer;
     }
 
+    /**
+     * Gets a random online player from platform players.
+     *
+     * @return a random FPlayer or UNKNOWN if no players are online
+     */
+    @NonNull
     public FPlayer getRandomFPlayer() {
         List<FPlayer> fPlayers = getPlatformFPlayers();
         if (fPlayers.isEmpty()) return FPlayer.UNKNOWN;
@@ -276,153 +317,57 @@ public class FPlayerService {
         return fPlayers.get(randomIndex);
     }
 
+    /**
+     * Gets all players from the database.
+     *
+     * @return list of all FPlayers in the database
+     */
+    @NonNull
     public List<FPlayer> findAllFPlayers() {
         return fPlayerRepository.getAllPlayersDatabase();
     }
 
+    /**
+     * Gets all online players from the database.
+     *
+     * @return list of online FPlayers from database
+     */
+    @NonNull
     public List<FPlayer> findOnlineFPlayers() {
         return fPlayerRepository.getOnlinePlayersDatabase();
     }
 
+    /**
+     * Gets all online players from the cache.
+     *
+     * @return list of online FPlayers from cache
+     */
+    @NonNull
     public List<FPlayer> getOnlineFPlayers() {
         return fPlayerRepository.getOnlinePlayers();
     }
 
-    public List<FPlayer> getVisibleFPlayersFor(FPlayer fViewer) {
-        return getOnlineFPlayers()
-                .stream()
-                .filter(target -> integrationModule.canSeeVanished(target, fViewer))
-                .toList();
-    }
-
+    /**
+     * Gets all online players that are actually connected to the platform.
+     * Filters cached online players by checking their actual platform online status.
+     *
+     * @return list of platform-verified online FPlayers
+     */
+    @NonNull
     public List<FPlayer> getPlatformFPlayers() {
         return fPlayerRepository.getOnlinePlayers().stream()
                 .filter(platformPlayerAdapter::isOnline)
                 .toList();
     }
 
+    /**
+     * Gets all online players including the console player.
+     *
+     * @return list of online FPlayers plus console
+     */
+    @NonNull
     public List<FPlayer> getFPlayersWithConsole() {
         return fPlayerRepository.getOnlineFPlayersWithConsole();
-    }
-
-    public FPlayer loadColors(FPlayer fPlayer) {
-        return updateCache(fPlayerRepository.loadColors(fPlayer));
-    }
-
-    public void saveColors(FPlayer fPlayer) {
-        updateCache(fPlayer);
-        fPlayerRepository.saveColors(fPlayer);
-    }
-
-    public FPlayer loadIgnoresIfOffline(FPlayer fPlayer) {
-        if (platformPlayerAdapter.isOnline(fPlayer)) return fPlayer;
-
-        return loadIgnores(fPlayer);
-    }
-
-    public FPlayer loadIgnores(FPlayer fPlayer) {
-        return socialRepository.loadIgnores(fPlayer);
-    }
-
-    public FPlayer loadSettingsIfOffline(FPlayer fPlayer) {
-        if (platformPlayerAdapter.isOnline(fPlayer)) return fPlayer;
-
-        return loadSettings(fPlayer);
-    }
-
-    public FPlayer loadSettings(FPlayer fPlayer) {
-        return fPlayerRepository.loadSettings(fPlayer);
-    }
-
-    public List<Mail> getReceiverMails(FPlayer fPlayer) {
-        return socialRepository.getReceiverMails(fPlayer);
-    }
-
-    public List<Mail> getSenderMails(FPlayer fPlayer) {
-        return socialRepository.getSenderMails(fPlayer);
-    }
-
-    public FPlayer saveIgnore(FPlayer fPlayer, FPlayer fTarget) {
-        Ignore ignore = socialRepository.saveAndGetIgnore(fPlayer, fTarget);
-        if (ignore == null) return fPlayer;
-
-        return updateCache(fPlayer.withIgnore(ignore));
-    }
-
-    public Mail saveMail(FPlayer fPlayer, FPlayer fTarget, String message) {
-        return socialRepository.saveAndGetMail(fPlayer, fTarget, message);
-    }
-
-    public FPlayer deleteIgnore(FPlayer fPlayer, Ignore ignore) {
-        socialRepository.deleteIgnore(ignore);
-        return updateCache(fPlayer.withoutIgnore(ignore));
-    }
-
-    public void deleteMail(Mail mail) {
-        socialRepository.deleteMail(mail);
-    }
-
-    public void saveAfkSession(FPlayer fPlayer, boolean afk) {
-        socialRepository.saveAfkSession(fPlayer, afk);
-        socialRepository.invalidatePlaytime(fPlayer.uuid());
-    }
-
-    public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
-        updateCache(fPlayer);
-        fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
-    }
-
-    public void saveOrUpdateSetting(FPlayer fPlayer, SettingText setting) {
-        updateCache(fPlayer);
-        fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
-    }
-
-    public void updateLocaleLater(UUID uuid, String wrapperLocale) {
-        taskScheduler.runAsyncLater(() -> {
-            FPlayer fPlayer = getFPlayer(uuid);
-            updateLocale(fPlayer, wrapperLocale);
-        }, 40L);
-    }
-
-    public boolean updateLocale(FPlayer fPlayer, String newLocale) {
-        String locale = integrationModule.getTritonLocale(fPlayer);
-        if (locale == null) {
-            locale = newLocale;
-        }
-
-        SettingText settingName = SettingText.LOCALE;
-        if (locale.equals(fPlayer.getSetting(settingName))) return false;
-        if (fPlayer.isUnknown()) return false;
-
-        saveOrUpdateSetting(fPlayer.withSetting(settingName, locale), settingName);
-        return true;
-    }
-
-    public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
-        if (source.isConsole()) return true;
-
-        boolean sourceIsOperator = platformPlayerAdapter.isOperator(source);
-        boolean targetIsOperator = platformPlayerAdapter.isOperator(target);
-        if (!sourceIsOperator && targetIsOperator) return false;
-
-        return sourceIsOperator && !targetIsOperator
-                || integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
-    }
-
-    public @Nullable PlayTime getPlayTime(FPlayer fPlayer) {
-        return isPlaytimeTracking() ? socialRepository.getPlayTime(fPlayer) : null;
-    }
-
-    public int getPlayTimesCount() {
-        return isPlaytimeTracking() ? socialRepository.getPlayTimesCount() : -1;
-    }
-
-    public List<PlayTime> getAllPlayTimes(int limit, int offset) {
-        return isPlaytimeTracking() ? socialRepository.getAllPlayTimes(limit, offset) : Collections.emptyList();
-    }
-
-    private boolean isPlaytimeTracking() {
-        return fileFacade.config().database().usePlaytimeTracking();
     }
 
 }

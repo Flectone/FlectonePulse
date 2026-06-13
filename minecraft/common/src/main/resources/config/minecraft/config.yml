@@ -1,5 +1,5 @@
 server: ""
-version: "1.9.4-SNAPSHOT"
+version: "1.10.2-SNAPSHOT"
 language:
   type: "en_us"
   by_player: true
@@ -14,6 +14,16 @@ database:
   password: "1234"
   parameters: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
   prefix: ""
+executor:
+  min_pool_size: 0
+  max_pool_size: -1
+  work_queue: "SYNCHRONOUS"
+  keep_alive:
+    duration: 60
+    time_unit: "SECONDS"
+  shutdown_timeout:
+    duration: 5
+    time_unit: "SECONDS"
 proxy:
   clusters: []
   bungeecord: false
@@ -25,25 +35,22 @@ proxy:
     ssl: false
     user: ""
     password: ""
-command:
-  unregister_on_reload: false
-  disabled_fabric:
-  - "msg"
-  - "banlist"
-  - "kick"
-  - "w"
-  - "tell"
-  - "me"
-  - "pardon"
-  - "ban"
-module:
+internal:
   enable: true
+  always_send_silent_packet: false
   use_paper_message_sender: false
-  use_bukkit_pre_login_listener: false
-editor:
-  host: ""
-  https: false
-  port: 25566
+  use_packet_login_listener: false
+  unregister_command_on_reload: false
+  vanilla_commands_to_remove:
+    - "msg"
+    - "banlist"
+    - "kick"
+    - "w"
+    - "tell"
+    - "me"
+    - "pardon"
+    - "ban"
+    - "whitelist"
 logger:
   console: "Console"
   prefix: "\e[38;2;77;166;255m(FlectonePulse) \e[0m"
@@ -68,6 +75,11 @@ logger:
   - "FlectonePulseDatabase - "
 cache:
   types:
+    ANIMATION:
+      invalidate_on_reload: true
+      duration: 1
+      time_unit: "MINUTES"
+      size: 10000
     COOLDOWN:
       invalidate_on_reload: false
       duration: 5
@@ -138,5 +150,20 @@ cache:
       duration: 10
       time_unit: "MINUTES"
       size: 100
+    PLAYER_COLOR:
+      invalidate_on_reload: true
+      duration: 10
+      time_unit: "MINUTES"
+      size: 1000
+    PLAYER_SETTING:
+      invalidate_on_reload: true
+      duration: 10
+      time_unit: "MINUTES"
+      size: 1000
+    PLAYER_IGNORE:
+      invalidate_on_reload: true
+      duration: 1
+      time_unit: "HOURS"
+      size: 1000
 metrics:
   enable: true

@@ -13,12 +13,14 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
@@ -51,6 +53,7 @@ public class CooldownSender {
     private final TimeFormatter timeFormatter;
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
+    private final SocialService socialService;
 
     /**
      * Checks if an entity is on cooldown and sends a cooldown message if applicable.
@@ -76,18 +79,23 @@ public class CooldownSender {
      * @return true if cooldown message was sent, false otherwise
      */
     public boolean sendIfCooldown(FEntity entity, Pair<Cooldown, PermissionSetting> cooldownPermission, String cooldownOwner) {
-        Cooldown cooldown = cooldownPermission.first();
+        Cooldown cooldown = cooldownPermission.getLeft();
         if (cooldown == null || !cooldown.enable()) return false;
 
         // skip message for entities
         if (!(entity instanceof FPlayer fPlayer)) return false;
 
-        if (permissionChecker.check(fPlayer, cooldownPermission.second())) return false;
+        if (permissionChecker.check(fPlayer, cooldownPermission.getRight())) return false;
         if (!cooldownChecker.check(fPlayer.uuid(), cooldown, cooldownOwner)) return false;
 
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
-        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(entity).cooldown());
-        MessageContext cooldownContext = messagePipeline.createContext(fPlayer, cooldownMessage);
+        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).cooldown());
+
+        MessageContext cooldownContext = MessageContext.builder()
+                .sender(fPlayer)
+                .message(cooldownMessage)
+                .build();
+
         Component component = messagePipeline.build(cooldownContext);
 
         eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));

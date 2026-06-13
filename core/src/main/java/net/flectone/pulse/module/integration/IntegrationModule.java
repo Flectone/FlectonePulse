@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -11,43 +12,51 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.icu.ICUModule;
+import net.flectone.pulse.module.integration.listener.PulseIntegrationListener;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 public abstract class IntegrationModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
-    private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
     private final ModuleController moduleController;
+    private final ListenerRegistry listenerRegistry;
     private final Injector injector;
 
     protected IntegrationModule(FileFacade fileFacade,
-                                PlatformServerAdapter platformServerAdapter,
+                                Provider<PlatformServerAdapter> platformServerAdapterProvider,
+                                ListenerRegistry listenerRegistry,
                                 ModuleController moduleController,
                                 Injector injector) {
         this.fileFacade = fileFacade;
-        this.platformServerAdapter = platformServerAdapter;
+        this.platformServerAdapterProvider = platformServerAdapterProvider;
+        this.listenerRegistry = listenerRegistry;
         this.moduleController = moduleController;
         this.injector = injector;
+    }
+
+    @Override
+    public void onEnable() {
+        listenerRegistry.register(PulseIntegrationListener.class);
     }
 
     @Override
     public ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> childrenBuilder() {
         ImmutableSet.Builder<@NonNull Class<? extends ModuleSimple>> builder = ModuleSimple.super.childrenBuilder();
 
-        if (platformServerAdapter.hasProject("LuckPerms")) {
+        if (platformServerAdapterProvider.get().hasProject("LuckPerms")) {
             builder.add(LuckPermsModule.class);
         }
 
@@ -143,13 +152,13 @@ public abstract class IntegrationModule implements ModuleSimple {
     }
 
     public Set<String> getGroups() {
-        if (!moduleController.isEnable(this)) return Collections.emptySet();
+        if (!moduleController.isEnable(this)) return Set.of();
 
         if (containsEnabledChild(LuckPermsModule.class)) {
             return injector.getInstance(LuckPermsModule.class).getGroups();
         }
 
-        return Collections.emptySet();
+        return Set.of();
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
@@ -157,33 +166,6 @@ public abstract class IntegrationModule implements ModuleSimple {
         if (!containsEnabledChild(LuckPermsModule.class)) return 0;
 
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
-    }
-
-    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
-        if (containsEnabledChild(DiscordModule.class) && !ModuleName.INTEGRATION_DISCORD.name().equals(messageName)) {
-            injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
-        }
-
-        if (containsEnabledChild(TwitchModule.class) && !ModuleName.INTEGRATION_TWITCH.name().equals(messageName)) {
-            injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
-        }
-
-        if (containsEnabledChild(TelegramModule.class) && !ModuleName.INTEGRATION_TELEGRAM.name().equals(messageName)) {
-            injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
-        }
-    }
-
-    public boolean hasMessenger() {
-        return moduleController.isEnable(DiscordModule.class)
-                || moduleController.isEnable(TwitchModule.class)
-                || moduleController.isEnable(TelegramModule.class);
-    }
-
-    public boolean canSeeVanished(FEntity fTarget, FEntity fViewer) {
-        if (fTarget.equals(fViewer)) return true;
-
-        boolean isVanished = isVanished(fTarget);
-        return !isVanished || hasSeeVanishPermission(fViewer);
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {

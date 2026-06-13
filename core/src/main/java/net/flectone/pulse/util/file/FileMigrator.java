@@ -87,7 +87,7 @@ public class FileMigrator {
         }
 
         Map<String, Integer> types = files.command().chatsetting().checkbox().types();
-        Map<String, Integer> oldTypes = new HashMap<>(types);
+        Map<String, Integer> oldTypes = new LinkedHashMap<>(types);
         types.clear();
 
         if (oldTypes.containsKey("AFK")) {
@@ -306,7 +306,7 @@ public class FileMigrator {
 
         Map<String, String> triggers = files.message().format().replacement().triggers();
 
-        Map<String, String> updates = new HashMap<>();
+        Map<String, String> updates = new LinkedHashMap<>();
         updates.put("smile", ":-?\\)");
         updates.put("big_smile", ":-?D");
         updates.put("sad", ":-?\\(");
@@ -435,7 +435,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_7_1(FilePack files) {
-        List<Message.Vanilla.VanillaMessage> vanillaMessages = new ArrayList<>();
+        List<Message.Vanilla.VanillaMessage> vanillaMessages = new LinkedList<>();
 
         for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
             if (!vanillaMessage.name().equals("DEATH")) {
@@ -443,7 +443,7 @@ public class FileMigrator {
                 continue;
             }
 
-            List<String> translationKeys = new ArrayList<>(vanillaMessage.translationKeys());
+            List<String> translationKeys = new LinkedList<>(vanillaMessage.translationKeys());
             if (!translationKeys.contains("death.attack.spear")) {
                 translationKeys.add("death.attack.spear");
             }
@@ -455,7 +455,7 @@ public class FileMigrator {
             vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
         }
 
-        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
         types.put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
 
         return files
@@ -580,12 +580,12 @@ public class FileMigrator {
 
         for (Localization localization : files.localizations().values()) {
 
-            Map<String, String> newChats = new HashMap<>(localization.message().chat().types());
+            Map<String, String> newChats = new LinkedHashMap<>(localization.message().chat().types());
             newChats.forEach((key, value) ->
                     newChats.put(key, replaceOldTags.apply(value))
             );
 
-            List<String> newDisplays = new ArrayList<>(localization.message().format().names().display());
+            List<String> newDisplays = new LinkedList<>(localization.message().format().names().display());
             newDisplays.replaceAll(replaceOldTags);
 
             String newPlayerListname = replaceOldTags.apply(localization.message().tab().playerlistname().format());
@@ -639,7 +639,7 @@ public class FileMigrator {
                     );
 
             if (isHytale) {
-                Map<String, String> types = new HashMap<>(localization.message().vanilla().types());
+                Map<String, String> types = new LinkedHashMap<>(localization.message().vanilla().types());
                 types.put("server.assetModule.outOfDatePacks", "");
                 types.put("server.pluginManager.outOfDatePlugins", "");
 
@@ -706,7 +706,7 @@ public class FileMigrator {
     }
 
     private <T> Map<String, T> replaceOldMessageName(Map<String, T> oldMap) {
-        Map<String, T> newMap = new HashMap<>(oldMap);
+        Map<String, T> newMap = new LinkedHashMap<>(oldMap);
 
         oldMap.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith("CHAT_"))
@@ -848,7 +848,7 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_9_1(FilePack files) {
-        Map<CacheName, Config.Cache.CacheSetting> types = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
         types.put(CacheName.ICU_MESSAGE, new Config.Cache.CacheSetting(false, 10, TimeUnit.MINUTES, 100000));
 
         return files.withConfig(files.config().withCache(files.config().cache().withTypes(types)));
@@ -871,7 +871,11 @@ public class FileMigrator {
                             .withHideNameWhenSneaking(deprecatedScoreboard.hideNameWhenSneaking())
                             .withColor(deprecatedScoreboard.color())
                             .withTicker(deprecatedScoreboard.ticker())
-            ));
+                    )
+                    .withFormat(files.message().format()
+                            .withScoreboard(null)
+                    )
+            );
         }
 
         Message.DeprecatedObjective deprecatedObjective = files.message().objective();
@@ -889,7 +893,63 @@ public class FileMigrator {
                                             .withTicker(deprecatedObjective.tabname().ticker())
                                     )
                             )
-                    ));
+                    )
+                    .withObjective(null)
+            );
+        }
+
+        Config.DeprecatedModule deprecatedModule = files.config().module();
+        if (deprecatedModule != null) {
+            files = files.withConfig(files.config()
+                    .withInternal(files.config().internal()
+                            .withEnable(deprecatedModule.enable())
+                            .withUsePaperMessageSender(deprecatedModule.usePaperMessageSender())
+                    )
+                    .withModule(null)
+            );
+        }
+
+        Config.DeprecatedCommand deprecatedCommand = files.config().command();
+        if (deprecatedCommand != null) {
+            Set<String> vanillaCommandsToRemove = new LinkedHashSet<>(deprecatedCommand.disabledFabric());
+            vanillaCommandsToRemove.add("whitelist");
+
+            files = files.withConfig(files.config()
+                    .withInternal(files.config().internal()
+                            .withUnregisterCommandOnReload(deprecatedCommand.unregisterOnReload())
+                            .withVanillaCommandsToRemove(vanillaCommandsToRemove)
+                    )
+                    .withCommand(null)
+            );
+        }
+
+        boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
+        if (isNotHytale) {
+            List<Message.Vanilla.VanillaMessage> vanillaMessages = new LinkedList<>();
+
+            for (Message.Vanilla.VanillaMessage vanillaMessage : files.message().vanilla().types()) {
+                if (!vanillaMessage.name().equals("DEATH")) {
+                    vanillaMessages.add(vanillaMessage);
+                    continue;
+                }
+
+                List<String> translationKeys = new LinkedList<>(vanillaMessage.translationKeys());
+                if (!translationKeys.contains("death.attack.sulfurCubeHot")) {
+                    translationKeys.add("death.attack.sulfurCubeHot");
+                }
+
+                if (!translationKeys.contains("death.attack.sulfurCubeHot.player")) {
+                    translationKeys.add("death.attack.sulfurCubeHot.player");
+                }
+
+                vanillaMessages.add(vanillaMessage.withTranslationKeys(translationKeys));
+            }
+
+            files = files.withMessage(files.message()
+                    .withVanilla(files.message().vanilla()
+                            .withTypes(vanillaMessages)
+                    )
+            );
         }
 
         Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
@@ -924,13 +984,35 @@ public class FileMigrator {
                                                 )
                                         )
                                 )
+                                .withObjective(null)
                         );
+            }
+
+            if (isNotHytale) {
+                Map<String, String> newVanillaTypes = new LinkedHashMap<>(localization.message().vanilla().types());
+
+                boolean isRussian = localization.language().toLowerCase().contains("ru");
+                if (isRussian) {
+                    newVanillaTypes.put("death.attack.sulfurCubeHot", "<fcolor:1>☠ <argument:0> обнаружил, что лавой может быть не только пол");
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:0> показал <argument:1>, что не только пол — это лава");
+                } else {
+                    newVanillaTypes.put("death.attack.sulfurCubeHot", "<fcolor:1>☠ <argument:0> died because not just the floor is lava");
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:0> showed <argument:1> that not just the floor is lava");
+                }
+
+                localization = localization
+                        .withMessage(localization.message()
+                                .withVanilla(localization.message().vanilla()
+                                        .withTypes(newVanillaTypes)
+                        )
+                );
             }
 
             newLocalizations.put(localization.language(), localization);
         }
 
-        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new EnumMap<>(files.config().cache().types());
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.ANIMATION, new Config.Cache.CacheSetting(true, 1, TimeUnit.MINUTES, 10000));
         cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 100));
 
         return files
@@ -943,10 +1025,38 @@ public class FileMigrator {
                                         )
                                 )
                         )
+                        .withBubble(files.message().bubble()
+                                .withModern(files.message().bubble().modern()
+                                        .withHasShadow(true)
+                                        .withSeeThrough(false)
+                                )
+                        )
                 )
                 .withConfig(files.config()
                         .withCache(files.config().cache()
                                 .withTypes(cacheTypes)
+                        )
+                );
+    }
+
+    public FilePack migration_1_10_1(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.PLAYER_COLOR, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 1, TimeUnit.HOURS, 1000));
+
+        List<String> ignore = new LinkedList<>(files.message().afk().ignore());
+        ignore.remove("afk");
+
+        return files
+                .withConfig(files.config()
+                        .withCache(files.config().cache()
+                                .withTypes(cacheTypes)
+                        )
+                )
+                .withMessage(files.message()
+                        .withAfk(files.message().afk()
+                                .withIgnore(ignore)
                         )
                 );
     }

@@ -3,10 +3,10 @@ package net.flectone.pulse.platform.sender;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import eu.mikart.adventure.platform.hytale.HytaleComponentSerializer;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.processing.serializer.HytaleComponentSerializer;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
@@ -16,6 +16,7 @@ public class HytaleMessageSender implements MessageSender {
 
     private final FLogger fLogger;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final HytaleComponentSerializer componentSerializer;
 
     @Override
     public void sendToConsole(String message) {
@@ -33,7 +34,7 @@ public class HytaleMessageSender implements MessageSender {
         if (player == null) return;
 
         PlayerRef playerRef = (PlayerRef) player;
-        playerRef.sendMessage(HytaleComponentSerializer.get().serialize(component));
+        playerRef.sendMessage(componentSerializer.toHytale(component));
     }
 
 }

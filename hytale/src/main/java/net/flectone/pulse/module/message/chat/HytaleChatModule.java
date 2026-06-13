@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -26,6 +27,7 @@ public class HytaleChatModule extends ChatModule {
     @Inject
     public HytaleChatModule(FileFacade fileFacade,
                             FPlayerService fPlayerService,
+                            SocialService socialService,
                             PermissionChecker permissionChecker,
                             IntegrationModule integrationModule,
                             Provider<BubbleModule> bubbleModuleProvider,
@@ -37,7 +39,7 @@ public class HytaleChatModule extends ChatModule {
                             MessageDispatcher messageDispatcher,
                             ProxyRegistry proxyRegistry,
                             ListenerRegistry listenerRegistry) {
-        super(fileFacade, fPlayerService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

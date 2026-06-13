@@ -8,7 +8,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -16,7 +15,6 @@ import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -24,11 +22,15 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
+
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -36,8 +38,8 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
-    private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
     private final IgnoreSender ignoreSender;
@@ -81,7 +83,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
             return;
         }
 
-        if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
+        if (fReceiver.isOnline() && socialService.canSeeVanished(fReceiver, fPlayer)) {
             if (!moduleController.isEnable(tellModule)) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
@@ -96,30 +98,29 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
             return;
         }
 
-        fReceiver = fPlayerService.loadIgnoresIfOffline(fReceiver);
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
-
-        FPlayer finalFReceiver = fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, name())) return;
 
         String message = commandModuleController.getArgument(this, commandContext, 1);
 
-        Mail mail = fPlayerService.saveMail(fPlayer, fReceiver, message);
-        if (mail == null) return;
+        Optional<Mail> mail = socialService.saveMail(fPlayer, fReceiver, message);
+        if (mail.isEmpty()) return;
+
+        int mailId = mail.get().id();
 
         messageDispatcher.dispatch(this, MailMetadata.<Localization.Command.Mail>builder()
                 .base(EventMetadata.<Localization.Command.Mail>builder()
                         .sender(fPlayer)
-                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mail.id())))
+                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mailId)))
                         .message(message)
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, finalFReceiver)
+                                messagePipeline.targetTag(fResolver, fReceiver)
                         })
                         .build()
                 )
-                .mail(mail)
+                .mail(mail.get())
                 .target(fReceiver)
                 .build()
         );
@@ -141,7 +142,7 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
     }
 
     @Override
-    public Localization.Command.Mail localization(FEntity sender) {
-        return fileFacade.localization(sender).command().mail();
+    public Localization.Command.Mail localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mail();
     }
 }

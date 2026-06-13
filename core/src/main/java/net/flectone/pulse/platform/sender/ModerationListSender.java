@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.config.setting.LocalizationSetting;
+import net.flectone.pulse.config.setting.ModerationListLocalizationSetting;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -22,6 +22,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -100,8 +101,8 @@ public class ModerationListSender {
         }
 
         String header = Strings.CS.replace(localizationType.header(), "<count>", String.valueOf(size));
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build())
+                .append(Component.newline());
 
         for (Moderation moderation : moderations) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.player());
@@ -112,14 +113,16 @@ public class ModerationListSender {
                     moderation
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolvers(
-                            messagePipeline.targetTag(fPlayer, fTarget),
-                            messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
-                    );
-
             component = component
-                    .append(messagePipeline.build(lineContext))
+                    .append(messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(line)
+                            .tagResolvers(
+                                    messagePipeline.targetTag(fPlayer, fTarget),
+                                    messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(moderation.moderator()))
+                            )
+                            .build()
+                    ))
                     .append(Component.newline());
         }
 
@@ -129,8 +132,11 @@ public class ModerationListSender {
                 new String[]{nextPageCommand, String.valueOf(listArgument.page() - 1), String.valueOf(listArgument.page() + 1), String.valueOf(listArgument.page()), String.valueOf(countPage)}
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         MessageSendEvent messageSendEvent = eventDispatcher.dispatch(new MessageSendEvent(module.name(), fPlayer, component));
         if (!messageSendEvent.cancelled()) {
@@ -141,33 +147,40 @@ public class ModerationListSender {
     public Optional<ListArgument> getListArgument(ModuleCommand<?> command,
                                                   CommandContext<FPlayer> commandContext,
                                                   int startIndex) {
-        FPlayer targetFPlayer = null;
-        int page = 1;
-
         String promptPlayer = moduleCommandController.getPrompt(command, startIndex);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
-        if (optionalPlayer.isPresent()) {
-            String playerName = optionalPlayer.get();
+        if (optionalPlayer.isEmpty()) return Optional.of(new ListArgument(null, 1));
 
-            if (StringUtils.isNumeric(playerName)) {
-                page = Integer.parseInt(playerName);
-            } else {
-                String promptNumber = moduleCommandController.getPrompt(command, startIndex + 1);
-                Optional<String> optionalPage = commandContext.optional(promptNumber);
-                try {
-                    page = optionalPage.map(Integer::parseInt).orElse(startIndex);
-                } catch (NumberFormatException _) {
-                    // nothing
-                }
-
-                targetFPlayer = fPlayerService.getFPlayer(playerName);
-                if (targetFPlayer.isUnknown()) {
-                    return Optional.empty();
-                }
-            }
+        String playerName = optionalPlayer.get();
+        if (StringUtils.isNumeric(playerName)) {
+            int page = Integer.parseInt(playerName);
+            return Optional.of(new ListArgument(null, page));
         }
 
-        return Optional.of(new ListArgument(targetFPlayer, page));
+        FPlayer fTarget = fPlayerService.getFPlayer(playerName);
+        if (fTarget.isUnknown()) return Optional.empty();
+
+        String promptNumber = moduleCommandController.getPrompt(command, startIndex + 1);
+        Optional<Integer> optionalPage = commandContext.optional(promptNumber);
+        if (optionalPage.isPresent()) {
+            int page = optionalPage.get();
+            return Optional.of(new ListArgument(fTarget, page));
+        }
+
+        if (startIndex + 2 >= moduleCommandController.getPrompts(command).size()) {
+            return Optional.of(new ListArgument(fTarget, 1));
+        }
+
+        String promptTime = moduleCommandController.getPrompt(command, startIndex + 2);
+
+        try {
+            Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptNumber);
+
+            int page = optionalTime.map(pair -> StringUtils.isNumeric(pair.getRight().trim()) ? Integer.parseInt(pair.getRight().trim()) : 1).orElse(1);
+            return Optional.of(new ListArgument(fTarget, page));
+        } catch (ClassCastException _) {
+            return Optional.empty();
+        }
     }
 
     public record ListArgument(

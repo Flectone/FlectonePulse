@@ -9,7 +9,9 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
@@ -33,6 +35,7 @@ import net.kyori.adventure.text.Component;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreSender {
 
+    private final SocialService socialService;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
@@ -40,30 +43,34 @@ public class IgnoreSender {
     /**
      * Checks if two players ignore each other and sends notification to sender.
      *
-     * @param sender the player attempting to send a message (receives notification)
-     * @param receiver the target player
+     * @param fPlayer the player attempting to send a message (receives notification)
+     * @param fTarget the target player
      * @return true if either player ignores the other, false otherwise
      */
-    public boolean sendIfIgnored(FPlayer sender, FPlayer receiver) {
-        Localization.Command.Ignore localization = fileFacade.localization(sender).command().ignore();
+    public boolean sendIfIgnored(FPlayer fPlayer, FPlayer fTarget) {
+        Localization.Command.Ignore localization = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().ignore();
 
-        if (sender.isIgnored(receiver)) {
-            sendMessage(sender, receiver, localization.you());
+        if (socialService.isIgnored(fPlayer, fTarget)) {
+            sendMessage(fPlayer, fTarget, localization.you());
             return true;
         }
 
-        if (receiver.isIgnored(sender)) {
-            sendMessage(sender, receiver, localization.he());
+        if (socialService.isIgnored(fTarget, fPlayer)) {
+            sendMessage(fPlayer, fTarget, localization.he());
             return true;
         }
 
         return false;
     }
 
-    private void sendMessage(FPlayer sender, FPlayer receiver, String ignoreMessage) {
-        MessageContext messageContext = messagePipeline.createContext(receiver, sender, ignoreMessage);
-        Component component = messagePipeline.build(messageContext);
+    private void sendMessage(FPlayer fPlayer, FPlayer fTarget, String ignoreMessage) {
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .receiver(fPlayer)
+                .message(ignoreMessage)
+                .build()
+        );
 
-        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, sender, component));
+        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));
     }
 }

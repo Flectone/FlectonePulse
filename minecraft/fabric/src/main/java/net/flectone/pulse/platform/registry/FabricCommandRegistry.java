@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.registry;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.FabricFlectonePulse;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.processing.mapper.FabricFPlayerMapper;
@@ -29,6 +30,7 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
     private final PermissionChecker permissionChecker;
     private final FabricFPlayerMapper fPlayerMapper;
     private final CommandExceptionHandler commandExceptionHandler;
+    private final TaskScheduler taskScheduler;
 
     private CommandManager<FPlayer> manager;
 
@@ -36,18 +38,20 @@ public class FabricCommandRegistry implements BrigadierCommandRegistry {
     public FabricCommandRegistry(FabricFlectonePulse fabricFlectonePulse,
                                  PermissionChecker permissionChecker,
                                  CommandExceptionHandler commandExceptionHandler,
-                                 FabricFPlayerMapper fPlayerMapper) {
+                                 FabricFPlayerMapper fPlayerMapper,
+                                 TaskScheduler taskScheduler) {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
         this.fPlayerMapper = fPlayerMapper;
         this.commandExceptionHandler = commandExceptionHandler;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
     public void init() {
         if (this.manager != null) return;
 
-        this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
+        this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         manager.settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true);

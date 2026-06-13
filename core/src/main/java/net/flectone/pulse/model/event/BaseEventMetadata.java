@@ -14,7 +14,7 @@ import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -24,14 +24,12 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 @With
 @Builder
 public record BaseEventMetadata<L extends LocalizationSetting>(
         @NonNull UUID uuid,
         @NonNull FEntity sender,
-        @Nullable FPlayer filterPlayer,
         @NonNull Predicate<FPlayer> filter,
         @NonNull Map<MessageFlag, Boolean> flags,
         @NonNull BiFunction<FPlayer, L, String> format,
@@ -41,7 +39,7 @@ public record BaseEventMetadata<L extends LocalizationSetting>(
         @Nullable String message,
         @Nullable Function<FPlayer, TagResolver[]> tagResolvers,
         @Nullable ProxyDataConsumer<SafeDataOutputStream> proxy,
-        @Nullable UnaryOperator<String> integration,
+        @Nullable IntegrationMetadata integrationMetadata,
         @NonNull List<FPlayer> receivers
 ) implements EventMetadata<L> {
 

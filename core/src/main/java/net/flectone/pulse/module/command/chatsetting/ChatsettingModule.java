@@ -6,17 +6,19 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatsetting.builder.MenuBuilder;
+import net.flectone.pulse.module.command.chatsetting.listener.ChatsettingProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -29,13 +31,14 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class ChatsettingModule implements ModuleCommand<Localization.Command.Chatsetting> {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
@@ -44,9 +47,11 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     private final TaskScheduler taskScheduler;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
+    private final ListenerRegistry listenerRegistry;
 
     protected ChatsettingModule(FileFacade fileFacade,
                                 FPlayerService fPlayerService,
+                                SocialService socialService,
                                 PermissionChecker permissionChecker,
                                 CommandParserProvider commandParserProvider,
                                 ProxySender proxySender,
@@ -54,9 +59,11 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                                 SoundPlayer soundPlayer,
                                 TaskScheduler taskScheduler,
                                 ModuleController moduleController,
-                                ModuleCommandController commandModuleController) {
+                                ModuleCommandController commandModuleController,
+                                ListenerRegistry listenerRegistry) {
         this.fileFacade = fileFacade;
         this.fPlayerService = fPlayerService;
+        this.socialService = socialService;
         this.permissionChecker = permissionChecker;
         this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
@@ -65,6 +72,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         this.taskScheduler = taskScheduler;
         this.moduleController = moduleController;
         this.commandModuleController = commandModuleController;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -78,6 +86,10 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(ChatsettingProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -94,7 +106,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, _) -> {
-            if (!permissionChecker.check(context.sender(), permission().other())) return Collections.emptyList();
+            if (!permissionChecker.check(context.sender(), permission().other())) return List.of();
 
             return Arrays.stream(ModuleName.values())
                     .map(setting -> Suggestion.suggestion(setting.name()))
@@ -136,15 +148,13 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
     }
 
     @Override
-    public Localization.Command.Chatsetting localization(FEntity sender) {
-        return fileFacade.localization(sender).command().chatsetting();
+    public Localization.Command.Chatsetting localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().chatsetting();
     }
 
     private void executeOther(FPlayer fPlayer, String target, CommandContext<FPlayer> commandContext) {
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
-
-        fTarget = fPlayerService.loadSettings(fTarget);
 
         String promptType = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalType = commandContext.optional(promptType);
@@ -159,12 +169,12 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
             String promptValue = commandModuleController.getPrompt(this, 2);
             Optional<String> optionalValue = commandContext.optional(promptValue);
 
-            saveSetting(fTarget.withSetting(settingText, optionalValue.orElse(null)), settingText);
+            saveSetting(fTarget, settingText, optionalValue.orElse(null));
             return;
         }
 
         String messageType = optionalType.get().toUpperCase();
-        saveSetting(fTarget.withSetting(messageType, !fTarget.isSetting(messageType)), messageType);
+        saveSetting(fTarget, messageType, !socialService.isSetting(fTarget, messageType));
     }
 
     protected abstract MenuBuilder getMenuBuilder();
@@ -173,9 +183,9 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         getMenuBuilder().open(fPlayer, fTarget.uuid());
     }
 
-    public void saveSetting(FPlayer fPlayer, String messageType) {
+    public void saveSetting(FPlayer fPlayer, String messageType, boolean value) {
         taskScheduler.runAsync(() -> {
-            fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
+            socialService.saveSetting(fPlayer, messageType, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
                 proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
@@ -183,9 +193,9 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
         }, true);
     }
 
-    public void saveSetting(FPlayer fPlayer, SettingText settingText) {
+    public void saveSetting(FPlayer fPlayer, SettingText settingText, String value) {
         taskScheduler.runAsync(() -> {
-            fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
+            socialService.saveSetting(fPlayer, settingText, value);
 
             if (proxyRegistry.hasEnabledProxy()) {
                 proxySender.send(fPlayer, ModuleName.COMMAND_CHATSETTING);
@@ -195,7 +205,7 @@ public abstract class ChatsettingModule implements ModuleCommand<Localization.Co
 
 
     public String getPlayerChat(FPlayer fTarget) {
-        String currentChat = fTarget.getSetting(SettingText.CHAT_NAME);
+        String currentChat = socialService.getSetting(fTarget, SettingText.CHAT_NAME);
         if (StringUtils.isEmpty(currentChat)) return "default";
 
         return currentChat;

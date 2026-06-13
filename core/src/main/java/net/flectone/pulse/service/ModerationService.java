@@ -1,6 +1,7 @@
 package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.ViolationSetting;
@@ -9,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -29,9 +31,12 @@ public class ModerationService {
     private final Map<ViolationKey, List<Long>> playerViolations = new ConcurrentHashMap<>();
 
     private final ModerationRepository moderationRepository;
-    private final IntegrationModule integrationModule;
     private final FileFacade fileFacade;
     private final ProxySender proxySender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+
+    @Inject
+    private Provider<IntegrationModule> integrationModuleProvider;
 
     public void invalidate() {
         moderationRepository.invalidateAll();
@@ -43,6 +48,20 @@ public class ModerationService {
         playerViolations.keySet().stream()
                 .filter(violationKey -> violationKey.sender().equals(uuid))
                 .forEach(playerViolations::remove);
+    }
+
+    public void invalidate(FPlayer fTarget, Moderation.Type type, int id) {
+        invalidate(fTarget, type, id, getServer(type));
+    }
+
+    public void invalidate(FPlayer fTarget, Moderation.Type type, int id, @Nullable String server) {
+        invalidate(fTarget.uuid(), type);
+
+        if (id == -1) {
+            moderationRepository.updateValid(fTarget.id(), type, server);
+        } else {
+            moderationRepository.updateValid(id, server);
+        }
     }
 
     public void invalidate(UUID uuid, Moderation.Type type) {
@@ -60,6 +79,11 @@ public class ModerationService {
     }
 
     @Nullable
+    public Moderation maintenance(FPlayer fPlayer, long time, String reason, int moderator) {
+        return add(fPlayer, time, reason, moderator, Moderation.Type.MAINTENANCE);
+    }
+
+    @Nullable
     public Moderation warn(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WARN);
     }
@@ -74,14 +98,16 @@ public class ModerationService {
         return add(fPlayer, time, reason, moderator, Moderation.Type.WHITELIST);
     }
 
+    public boolean hasValid(FPlayer fTarget, Moderation.Type type) {
+        return !getValid(fTarget, type, 1, 0).isEmpty();
+    }
+
     public boolean hasValid(FPlayer fTarget, Moderation.Type type, int id) {
-        String server = getServer(type);
+        return id == -1 ? hasValid(fTarget, type) : getValid(type, id).isPresent();
+    }
 
-        if (id == -1) {
-            return !getValid(fTarget, type, 1, 0).isEmpty();
-        }
-
-        return getValid(server, id).isPresent();
+    public Optional<Moderation> getValid(FPlayer fPlayer, Moderation.Type type) {
+        return getValid(fPlayer, type, 1, 0).stream().findAny();
     }
 
     public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type type, int limit, int offset) {
@@ -92,8 +118,8 @@ public class ModerationService {
         return moderationRepository.getValid(type, getServer(type), limit, offset);
     }
 
-    public Optional<Moderation> getValid(@Nullable String server, int id) {
-        return moderationRepository.getValid(server, id);
+    public Optional<Moderation> getValid(Moderation.Type type, int id) {
+        return moderationRepository.getValid(getServer(type), id);
     }
 
     public List<String> getValidNames(Moderation.Type type) {
@@ -131,7 +157,7 @@ public class ModerationService {
         addViolation(violationKey, violationValue);
 
         // send to proxy
-        proxySender.send(FPlayer.UNKNOWN, ModuleName.SYSTEM_VIOLATION, outputStream -> {
+        proxySender.send(FPlayer.UNKNOWN, ModuleName.UPDATE_CACHE_VIOLATION, outputStream -> {
             outputStream.writeAsJson(violationKey);
             outputStream.writeLong(violationValue);
         }, UUID.randomUUID());
@@ -177,18 +203,23 @@ public class ModerationService {
 
     @Nullable
     public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, int id, @Nullable String reason, @Nullable String server) {
-        invalidate(fTarget.uuid(), type);
+        return remove(fModerator, fTarget, type, -1, id, reason, server);
+    }
 
-        if (id == -1) {
-            moderationRepository.updateValid(fTarget.id(), type, server);
-        } else {
-            moderationRepository.updateValid(id, server);
-        }
+    @Nullable
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, long time, int id, @Nullable String reason) {
+        return remove(fModerator, fTarget, type, time, id, reason, getServer(type));
+    }
+
+    @Nullable
+    public Moderation remove(FPlayer fModerator, FPlayer fTarget, Moderation.Type type, long time, int id, @Nullable String reason, @Nullable String server) {
+        invalidate(fTarget, type, id, server);
 
         // save to un-moderation database
-        return moderationRepository.save(fTarget, System.currentTimeMillis(), -1, reason, fModerator.id(), switch (type) {
+        return moderationRepository.save(fTarget, System.currentTimeMillis(), time, reason, fModerator.id(), switch (type) {
             case BAN -> Moderation.Type.UNBAN;
             case MUTE -> Moderation.Type.UNMUTE;
+            case MAINTENANCE -> Moderation.Type.UNMAINTENANCE;
             case WARN -> Moderation.Type.UNWARN;
             case WHITELIST -> Moderation.Type.UNWHITELIST;
             default -> throw new IllegalArgumentException("Unknown un-moderation type: " + type);
@@ -199,7 +230,7 @@ public class ModerationService {
         if (time != -1 && time < 1) return false;
         if (timeLimits.isEmpty()) return true;
 
-        int groupWeight = integrationModule.getGroupWeight(fPlayer);
+        int groupWeight = integrationModuleProvider.get().getGroupWeight(fPlayer);
 
         long timeLimit = -1;
         for (Map.Entry<Integer, Long> timeEntry : timeLimits.entrySet()) {
@@ -214,11 +245,24 @@ public class ModerationService {
         return time != -1 && timeLimit != -1 && timeLimit >= time;
     }
 
+    public boolean hasHigherGroupThan(FPlayer source, FPlayer target) {
+        if (source.isConsole()) return true;
+
+        boolean sourceIsOperator = platformPlayerAdapter.isOperator(source);
+        boolean targetIsOperator = platformPlayerAdapter.isOperator(target);
+        if (!sourceIsOperator && targetIsOperator) return false;
+        if (sourceIsOperator && !targetIsOperator) return true;
+
+        IntegrationModule integrationModule = integrationModuleProvider.get();
+        return integrationModule.getGroupWeight(source) > integrationModule.getGroupWeight(target);
+    }
+
     public String getServer(Moderation.Type type) {
         return type == Moderation.Type.BAN && fileFacade.command().ban().filterByServer()
                 || type == Moderation.Type.MUTE && fileFacade.command().mute().filterByServer()
                 || type == Moderation.Type.WARN && fileFacade.command().warn().filterByServer()
                 || type == Moderation.Type.WHITELIST && fileFacade.command().whitelist().filterByServer()
+                || type == Moderation.Type.MAINTENANCE && fileFacade.command().maintenance().filterByServer()
                 ? fileFacade.config().server()
                 : null;
     }

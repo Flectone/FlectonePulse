@@ -31,6 +31,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.SettingText;
@@ -48,9 +49,11 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
+    private final FabricPlaceholderAPIModule fabricPlaceholderAPIModule;
     private final Provider<MuteModule> muteModuleProvider;
     private final Provider<ConditionModule> conditionModuleProvider;
     private final Provider<AfkModule> afkModuleProvider;
@@ -81,7 +84,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         FEntity sender = messageContext.sender();
-        if (moduleController.isDisabledFor(FabricPlaceholderAPIModule.class, sender)) return event;
+        if (moduleController.isDisabledFor(fabricPlaceholderAPIModule, sender)) return event;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.PLAYER_MESSAGE);
         if (!permissionChecker.check(sender, fileFacade.permission().integration().placeholderapi().use()) && isUserMessage) return event;
@@ -178,13 +181,13 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
             SettingText settingText = SettingText.fromString(argument);
             if (settingText != null) {
-                String value = fPlayer.getSetting(settingText);
+                String value = socialService.getSetting(fPlayer, settingText);
                 if (settingText == SettingText.CHAT_NAME && value == null) return PlaceholderResult.value("default");
 
                 return PlaceholderResult.value(StringUtils.defaultString(value));
             }
 
-            return PlaceholderResult.value(fPlayer.isSetting(argument.toUpperCase()) ? "yes" : "no");
+            return PlaceholderResult.value(socialService.isSetting(fPlayer, argument.toUpperCase()) ? "yes" : "no");
         });
 
         Placeholders.registerCommon(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":player"), (context, _) -> {
@@ -212,9 +215,12 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
                 PlaceholderResult.value(String.valueOf(platformServerAdapter.getOnlinePlayerCount()))
         );
 
-        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (_, _) ->
-                PlaceholderResult.value(platformServerAdapter.getTPS())
-        );
+        Placeholders.registerServer(Identifier.parse(BuildConfig.PROJECT_MOD_ID + ":tps"), (context, _) -> {
+            if (!context.hasPlayer()) return PlaceholderResult.invalid();
+
+            FPlayer fPlayer = fPlayerService.getFPlayer(context.player().getUUID());
+            return PlaceholderResult.value(platformServerAdapter.getTPS(fPlayer));
+        });
 
         logHook();
     }
@@ -228,7 +234,7 @@ public class FabricPlaceholderAPIIntegration implements FIntegration, PulseListe
 
         Int2ObjectArrayMap<String> colorsMap = new Int2ObjectArrayMap<>(fileFacade.message().format().fcolor().defaultColors());
         for (FColor.Type type : types) {
-            colorsMap.putAll(fPlayer.getFColors(type));
+            colorsMap.putAll(socialService.loadColors(fPlayer, type));
         }
 
         int colorNumber = Integer.parseInt(argument);

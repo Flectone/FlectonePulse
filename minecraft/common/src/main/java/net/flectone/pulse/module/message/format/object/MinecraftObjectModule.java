@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.parser.string.UUIDParser;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -28,7 +29,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.object.SpriteObjectContents;
@@ -67,8 +67,9 @@ public class MinecraftObjectModule extends ObjectModule {
                                  ModuleController moduleController,
                                  MessagePipeline messagePipeline,
                                  UUIDParser uuidParser,
-                                 @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219) {
-        super(fileFacade);
+                                 @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219,
+                                 SocialService socialService) {
+        super(fileFacade, socialService);
 
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
@@ -112,24 +113,31 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
-                        createPlayerHeadTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD.getTagName(), (argumentQueue, _) ->
+                        createPlayerHeadTag(
+                                messageContext,
+                                localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), (argumentQueue, _) -> {
-                    Component defaultComponent = argumentQueue.hasNext()
-                            ? buildArgument(messageContext, argumentQueue.pop().value())
-                            : getDefaultComponent(messageContext);
-                    return createPlayerHeadTag(messageContext, defaultComponent, argumentQueue);
-                })
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.PLAYER_HEAD_OR.getTagName(), (argumentQueue, _) ->
+                        createPlayerHeadTag(
+                                messageContext,
+                                argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
+                )
         );
     }
 
-    private Tag createPlayerHeadTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
+    private Tag createPlayerHeadTag(MessageContext messageContext,
+                                    String defaultValue,
+                                    ArgumentQueue argumentQueue) {
         if (config().playerHeadTag().hideInvisiblePlayerHead()
                 && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().playerHeadTag().needExtraSpace(), true);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().playerHeadTag().needExtraSpace(), true);
         if (receiverVersionTag != null) return receiverVersionTag;
 
         PlayerHeadObjectContents.Builder playerHeadBuilder = ObjectContents.playerHead();
@@ -149,24 +157,37 @@ public class MinecraftObjectModule extends ObjectModule {
 
         playerHeadBuilder.hat(!argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value()));
 
-        if (playerHead.length() > 16) {
-            playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
+        // first check valid player name
+        if (isValidName(playerHead)) {
+            // try load this player
+            FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
+
+            // apply custom property
+            applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
         } else {
+            // second check player uuid
             UUID playerHeadUUID = uuidParser.parse(playerHead);
             if (playerHeadUUID != null) {
+                // try load this player
                 FPlayer fPlayer = fPlayerService.getFPlayer(playerHeadUUID);
 
+                // apply custom property
                 applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.id(playerHeadUUID));
             } else {
-                FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
-
-                applyFPlayerProfileProperty(fPlayer, playerHeadBuilder, builder -> builder.name(playerHead));
+                // or insert value to textures
+                playerHeadBuilder.profileProperty(PlayerHeadObjectContents.property("textures", playerHead));
             }
         }
 
         Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
 
         return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
+    }
+
+    // https://github.com/PaperMC/adventure/blob/main/5/api/src/main/java/net/kyori/adventure/text/object/PlayerHeadObjectContentsImpl.java
+    private boolean isValidName(final String name) {
+        if (name.length() > 16) return false;
+        return name.chars().filter(c -> c <= 32 || c >= 126).findAny().isEmpty();
     }
 
     private void applyFPlayerProfileProperty(FEntity fEntity,
@@ -191,15 +212,20 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), (argumentQueue, _) ->
-                        createSpriteTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.SPRITE.getTagName(), (argumentQueue, _) ->
+                        createSpriteTag(
+                                messageContext,
+                                localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, _) -> {
-                    Component defaultComponent = argumentQueue.hasNext()
-                            ? buildArgument(messageContext, argumentQueue.pop().value())
-                            : getDefaultComponent(messageContext);
-                    return createSpriteTag(messageContext, defaultComponent, argumentQueue);
-                })
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.SPRITE_OR.getTagName(), (argumentQueue, _) ->
+                        createSpriteTag(
+                                messageContext,
+                                argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
+                )
         );
     }
 
@@ -213,20 +239,27 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return messageContext.addTagResolvers(
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), (argumentQueue, _) ->
-                        createTextureTag(messageContext, getDefaultComponent(messageContext), argumentQueue)
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.TEXTURE.getTagName(), (argumentQueue, _) ->
+                        createTextureTag(
+                                messageContext,
+                                localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
                 ),
-                TagResolver.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, _) -> {
-                    Component defaultComponent = argumentQueue.hasNext()
-                            ? buildArgument(messageContext, argumentQueue.pop().value())
-                            : getDefaultComponent(messageContext);
-                    return createTextureTag(messageContext, defaultComponent, argumentQueue);
-                })
+                messagePipeline.resolver(MessagePipeline.ReplacementTag.TEXTURE_OR.getTagName(), (argumentQueue, _) ->
+                        createTextureTag(
+                                messageContext,
+                                argumentQueue.hasNext() ? argumentQueue.pop().value() : localization(messageContext.receiver()).defaultSymbol(),
+                                argumentQueue
+                        )
+                )
         );
     }
 
-    public Tag createTextureTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().textureTag().needExtraSpace(), false);
+    public Tag createTextureTag(MessageContext messageContext,
+                                String defaultValue,
+                                ArgumentQueue argumentQueue) {
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().textureTag().needExtraSpace(), false);
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -237,8 +270,10 @@ public class MinecraftObjectModule extends ObjectModule {
         return applyDefaultFormatting(messageContext, textureComponent, config().textureTag().needExtraSpace());
     }
 
-    private Tag createSpriteTag(MessageContext messageContext, Component defaultComponent, ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultComponent, config().spriteTag().needExtraSpace(), false);
+    private Tag createSpriteTag(MessageContext messageContext,
+                                String defaultValue,
+                                ArgumentQueue argumentQueue) {
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().spriteTag().needExtraSpace(), false);
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -255,17 +290,20 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     @Nullable
-    private Tag checkAndGetReceiverTag(MessageContext messageContext, Component defaultComponent, boolean needExtraSpace, boolean skipFormattingForOldVersion) {
+    private Tag checkAndGetReceiverTag(MessageContext messageContext,
+                                       String defaultValue,
+                                       boolean needExtraSpace,
+                                       boolean skipFormattingForOldVersion) {
         // ViaVersion will not be able to process messages that contain Object on older versions
         if (!isNewerThanOrEqualsV_1_21_9) {
             return skipFormattingForOldVersion
                     ? MessagePipeline.ReplacementTag.emptyTag()
-                    : applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
+                    : applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 
         // return default formatting
         if (messageContext.isFlag(MessageFlag.OBJECT_DEFAULT_VALUE)) {
-            return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
+            return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 
         // continue building
@@ -276,8 +314,8 @@ public class MinecraftObjectModule extends ObjectModule {
         FPlayer fReceiver = messageContext.receiver();
 
         // return default formatting
-        if (fReceiver.isUnknown()) {
-            return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
+        if (fReceiver.isUnknown() || fReceiver.isConsole()) {
+            return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 
         // get user
@@ -292,7 +330,7 @@ public class MinecraftObjectModule extends ObjectModule {
         if (user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
             // bedrock player does not support object component
             if (integrationModule.isBedrockPlayer(fReceiver)) {
-                return applyDefaultFormatting(messageContext, defaultComponent, needExtraSpace);
+                return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
             }
 
             // continue building
@@ -303,15 +341,10 @@ public class MinecraftObjectModule extends ObjectModule {
         return MessagePipeline.ReplacementTag.emptyTag();
     }
 
-    private Component buildArgument(MessageContext messageContext, String argument) {
-        MessageContext argumentContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), argument)
-                .withFlags(messageContext.flags());
+    private Tag applyDefaultFormatting(MessageContext messageContext, String argument, boolean needExtraSpace) {
+        if (StringUtils.isEmpty(argument)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        return messagePipeline.build(argumentContext);
-    }
-
-    private Component getDefaultComponent(MessageContext messageContext) {
-        return Component.text(localization(messageContext.receiver()).defaultSymbol());
+        return applyDefaultFormatting(messageContext, buildArgument(messageContext, argument), needExtraSpace);
     }
 
     private Tag applyDefaultFormatting(MessageContext messageContext, Component component, boolean needExtraSpace) {
@@ -328,5 +361,15 @@ public class MinecraftObjectModule extends ObjectModule {
         }
 
         return isPlayerMessage ? Tag.selfClosingInserting(component) : Tag.inserting(component);
+    }
+
+    private Component buildArgument(MessageContext messageContext, String argument) {
+        return messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(argument)
+                .flags(messageContext.flags())
+                .build()
+        );
     }
 }

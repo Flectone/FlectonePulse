@@ -12,6 +12,9 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.MinecraftServer;
 
@@ -22,8 +25,10 @@ public class FabricVanishIntegration implements FIntegration {
     @Getter private final FLogger fLogger;
 
     @Inject
-    public FabricVanishIntegration(FabricFlectonePulse fabricFlectonePulse,
+    public FabricVanishIntegration(FileFacade fileFacade,
+                                   FabricFlectonePulse fabricFlectonePulse,
                                    FPlayerService fPlayerService,
+                                   SocialService socialService,
                                    QuitModule quitModule,
                                    JoinModule joinModule,
                                    FLogger fLogger) {
@@ -34,9 +39,21 @@ public class FabricVanishIntegration implements FIntegration {
             FPlayer fPlayer = fPlayerService.getFPlayer(player.getUUID());
 
             if (vanish) {
-                quitModule.send(fPlayer, true);
+                // proxy vanish synchronization
+                if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
+                    socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
+                    if (fileFacade.integration().supervanish().showFakeQuit()) {
+                        quitModule.send(fPlayer, true);
+                    }
+                }
             } else {
-                joinModule.send(fPlayer, true);
+                // proxy vanish synchronization
+                if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+                    socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, null);
+                    if (fileFacade.integration().supervanish().showFakeJoin()) {
+                        joinModule.send(fPlayer, true, false);
+                    }
+                }
             }
         });
     }

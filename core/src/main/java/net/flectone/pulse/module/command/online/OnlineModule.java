@@ -16,7 +16,6 @@ import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.online.listener.PulseOnlineListener;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -24,7 +23,10 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -45,9 +47,10 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
     private final TimeFormatter timeFormatter;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -87,7 +90,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         String target = commandModuleController.getArgument(this, commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
-        PlayTime playTime = fPlayerService.getPlayTime(targetFPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(targetFPlayer);
         if (playTime == null) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Online>builder()
                     .sender(fPlayer)
@@ -110,7 +113,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
                                     TimeType.FIRST.getTime(fPlayer, playTime),
                                     localization.formatFirst()
                             );
-                            case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
+                            case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && socialService.canSeeVanished(targetFPlayer, fPlayer)
                                     ? localization.formatCurrent()
                                     : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
                             default -> Strings.CS.replace(
@@ -148,8 +151,8 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     }
 
     @Override
-    public Localization.Command.Online localization(FEntity sender) {
-        return fileFacade.localization(sender).command().online();
+    public Localization.Command.Online localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().online();
     }
 
     public MessageContext addTag(MessageContext messageContext) {
@@ -157,7 +160,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer fPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ONLINE.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String timeValue = parseTimeValue(fPlayer, messageContext.receiver(), argumentQueue.pop().value());
@@ -184,7 +187,7 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
     public int getTime(FPlayer fPlayer, TimeType type) {
         if (moduleController.isDisabledFor(this, fPlayer)) return 0;
 
-        PlayTime playTime = fPlayerService.getPlayTime(fPlayer);
+        PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         if (playTime == null) return 0;
 
         return (int) type.getTime(fPlayer, playTime) / 1000;

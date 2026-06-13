@@ -39,7 +39,7 @@ public class BubbleService {
     private final MessagePipeline messagePipeline;
 
     public void startTicker() {
-        taskScheduler.runPlayerRegionTimer(fPlayer -> {
+        taskScheduler.runPlayerAsyncTimer(fPlayer -> {
             PlayerBubbleState state = playerBubbleStates.get(fPlayer.uuid());
             if (state == null) return;
 
@@ -55,13 +55,20 @@ public class BubbleService {
                 _ -> new PlayerBubbleState(new ConcurrentLinkedQueue<>(), new ConcurrentLinkedQueue<>(), new ReentrantLock())
         );
 
-        MessageContext messageContext = messagePipeline.createContext(sender, message)
-                .addFlags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.ITEM_DETECTION, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_TEXTURE_PROCESSING, MessageFlag.REMOVE_DISABLED_TAGS, MessageFlag.VIOLATION_PROCESSING, MessageFlag.URL_PROCESSING},
-                        new boolean[]{true, false, false, false, false, false, false, false, false, false, false}
-                );
 
-        List<Bubble> bubbles = splitMessageToBubbles(sender, messagePipeline.buildPlain(messageContext), receivers);
+        List<Bubble> bubbles = splitMessageToBubbles(
+                sender,
+                messagePipeline.buildPlain(MessageContext.builder()
+                        .sender(sender)
+                        .message(message)
+                        .flags(
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.ITEM_DETECTION, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_TEXTURE_PROCESSING, MessageFlag.REMOVE_DISABLED_TAGS, MessageFlag.VIOLATION_PROCESSING, MessageFlag.URL_PROCESSING},
+                                new boolean[]{true, false, false, false, false, false, false, false, false, false, false}
+                        )
+                        .build()
+                ),
+                receivers
+        );
 
         state.waitingQueue.addAll(bubbles);
     }
@@ -92,71 +99,61 @@ public class BubbleService {
         float scale = configModern.scale();
         BubbleModule.Billboard billboard = configModern.billboard();
 
-        int maxLength = fileFacade.message().bubble().maxLength();
-        if (message.length() <= maxLength) return List.of(buildBubble(
-                id, sender, message, duration, elevation, interactionHeight,
-                useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
-                animationTime, scale, billboard, receivers
-        ));
+        int maxLength = config.maxLength();
+        int maxCount = config.maxCount();
 
-        List<Bubble> bubbles = new ObjectArrayList<>();
-
-        StringBuilder line = new StringBuilder();
-
-        char[] symbols = message.toCharArray();
-        for (int i = 0; i < symbols.length; i++) {
-            char symbol = symbols[i];
-
-            boolean isNotLetter = isNotLetter(symbol);
-            int leftSymbolsLimitCount = maxLength - line.length();
-            if (line.length() < maxLength && (!isNotLetter || leftSymbolsLimitCount > hintBufferLength)) {
-                // going to the limit
-                line.append(symbol);
-                continue;
-            }
-
-            String bubbleMessage;
-            if (isNotLetter) {
-                // if it's not a letter, we can break line without hint
-                bubbleMessage = line.toString() + symbol;
-            } else {
-                // we need to add all the symbols up to the limit
-                for (int k = 0; k <= leftSymbolsLimitCount && i < symbols.length; i++, k++) {
-                    line.append(symbols[i]);
-                }
-
-                // break for last symbol
-                if (i >= symbols.length) break;
-
-                // update last symbol
-                symbol = symbols[i];
-
-                // symbol may not be a letter, so hint is not needed
-                bubbleMessage = line.toString() + (isNotLetter(symbol) ? symbol : wordBreakHint);
-
-                // need to step back, because 'k' moved 'i' further when exiting 'for'
-                i--;
-            }
-
-            line.setLength(0);
-
-            bubbles.add(buildBubble(
-                    id, sender, bubbleMessage.trim(), duration, elevation, interactionHeight,
+        if (message.length() <= maxLength) {
+            return List.of(buildBubble(
+                    id, sender, message, duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
-
-            if (bubbles.size() == config.maxCount()) {
-                return List.copyOf(bubbles);
-            }
         }
 
-        if (!line.isEmpty()) {
+        List<Bubble> bubbles = new ObjectArrayList<>();
+        int start = 0;
+
+        while (start < message.length() && bubbles.size() < maxCount) {
+            int end = Math.min(start + maxLength, message.length());
+
+            // the last
+            if (end == message.length()) {
+                bubbles.add(buildBubble(
+                        id, sender, message.substring(start).trim(), duration, elevation, interactionHeight,
+                        useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
+                        animationTime, scale, billboard, receivers
+                ));
+                break;
+            }
+
+            // looking for a separator back from the limit
+            int breakAt = -1;
+            for (int j = end; j > start && j > end - hintBufferLength; j--) {
+                if (isNotLetter(message.charAt(j))) {
+                    breakAt = j;
+                    break;
+                }
+            }
+
+            String chunk;
+            int nextStart;
+            if (breakAt != -1) {
+                // split by separator, throw away separator itself
+                chunk = message.substring(start, breakAt).trim();
+                nextStart = breakAt + 1;
+            } else {
+                // word longer than maxLength, cut with hint
+                chunk = message.substring(start, end) + wordBreakHint;
+                nextStart = end;
+            }
+
             bubbles.add(buildBubble(
-                    id, sender, line.toString().trim(), duration, elevation, interactionHeight,
+                    id, sender, chunk, duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
             ));
+
+            start = nextStart;
         }
 
         return List.copyOf(bubbles);

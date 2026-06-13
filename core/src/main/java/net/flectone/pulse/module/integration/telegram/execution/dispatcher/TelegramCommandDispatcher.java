@@ -49,7 +49,7 @@ public class TelegramCommandDispatcher {
             String localizationString = telegramModule.localization().customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
-            taskScheduler.runRegion(fPlayer, () -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
+            taskScheduler.runAsync(() -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
             return true;
         }
 
@@ -85,13 +85,15 @@ public class TelegramCommandDispatcher {
 
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull String localization) {
-        MessageContext messageContext = messagePipeline.createContext(fPlayer, localization)
-                .addFlags(
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .sender(fPlayer)
+                .message(localization)
+                .flags(
                         new MessageFlag[]{MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.OBJECT_SPRITE_PROCESSING},
                         new boolean[]{false, false}
-                );
-
-        return messagePipeline.buildPlain(messageContext);
+                )
+                .build()
+        );
     }
 
 }

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
@@ -18,12 +19,12 @@ import org.jspecify.annotations.NonNull;
 public class FabricPlaceholderAPIModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
-    private final FabricPlaceholderAPIIntegration placeholderAPIIntegration;
+    private final Provider<FabricPlaceholderAPIIntegration> placeholderAPIIntegrationProvider;
     private final ListenerRegistry listenerRegistry;
 
     @Override
     public void onEnable() {
-        placeholderAPIIntegration.hook();
+        placeholderAPIIntegrationProvider.get().hook();
 
         listenerRegistry.register(FabricPlaceholderAPIIntegration.class);
     }
@@ -35,7 +36,7 @@ public class FabricPlaceholderAPIModule implements ModuleSimple {
 
     @Override
     public void onDisable() {
-        placeholderAPIIntegration.unhook();
+        placeholderAPIIntegrationProvider.get().unhook();
     }
 
     @Override

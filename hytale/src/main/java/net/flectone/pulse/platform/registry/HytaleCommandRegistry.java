@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.registry;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.handler.CommandExceptionHandler;
 import net.flectone.pulse.platform.registry.cloud.HytaleCommandManager;
@@ -29,6 +30,7 @@ public class HytaleCommandRegistry implements CommandRegistry {
     private final HytaleFPlayerMapper fPlayerMapper;
     private final JavaPlugin javaPlugin;
     private final CommandExceptionHandler commandExceptionHandler;
+    private final TaskScheduler taskScheduler;
 
     private CommandManager<FPlayer> manager;
 
@@ -36,16 +38,18 @@ public class HytaleCommandRegistry implements CommandRegistry {
     public HytaleCommandRegistry(PermissionChecker permissionChecker,
                                  HytaleFPlayerMapper fPlayerMapper,
                                  JavaPlugin javaPlugin,
-                                 CommandExceptionHandler commandExceptionHandler) {
+                                 CommandExceptionHandler commandExceptionHandler,
+                                 TaskScheduler taskScheduler) {
         this.permissionChecker = permissionChecker;
         this.fPlayerMapper = fPlayerMapper;
         this.javaPlugin = javaPlugin;
         this.commandExceptionHandler = commandExceptionHandler;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
     public void init() {
-        this.manager = new HytaleCommandManager(ExecutionCoordinator.asyncCoordinator(), new HytaleRegistrationHandler(), fPlayerMapper, javaPlugin);
+        this.manager = new HytaleCommandManager(ExecutionCoordinator.<FPlayer>builder().executor(taskScheduler.getExecutorService()).build(), new HytaleRegistrationHandler(), fPlayerMapper, javaPlugin);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         manager.settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true);

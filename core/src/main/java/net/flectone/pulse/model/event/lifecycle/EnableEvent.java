@@ -7,11 +7,17 @@ import net.flectone.pulse.model.event.Event;
 @With
 public record EnableEvent(
         boolean cancelled,
+        Type type,
         FlectonePulse flectonePulse
 ) implements Event {
 
-    public EnableEvent(FlectonePulse flectonePulse) {
-        this(false, flectonePulse);
+    public EnableEvent(Type type, FlectonePulse flectonePulse) {
+        this(false, type, flectonePulse);
+    }
+
+    public enum Type {
+        INIT,
+        READY
     }
 
 }

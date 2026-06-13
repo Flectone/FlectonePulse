@@ -11,22 +11,25 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.chat.listener.ChatProxyMessageListener;
 import net.flectone.pulse.module.message.chat.model.Chat;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
@@ -45,6 +48,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
     private final Provider<BubbleModule> bubbleModuleProvider;
@@ -55,6 +59,14 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     private final CooldownSender cooldownSender;
     private final MessageDispatcher messageDispatcher;
     private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
+
+    @Override
+    public void onEnable() {
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(ChatProxyMessageListener.class);
+        }
+    }
 
     @Override
     public ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
@@ -80,8 +92,8 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     }
 
     @Override
-    public Localization.Message.Chat localization(FEntity sender) {
-        return fileFacade.localization(sender).message().chat();
+    public Localization.Message.Chat localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().chat();
     }
 
     public void handleChatEvent(FPlayer fPlayer, String rawString, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
@@ -137,6 +149,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     public void sendMessage(FPlayer fPlayer, String rawString, String playerMessage, Chat playerChat) {
         String chatName = playerChat.name();
+        if (chatName == null) return;
 
         ChatMetadata<Localization.Message.Chat> chatMetadata = messageDispatcher.dispatch(this, ChatMetadata.<Localization.Message.Chat>builder()
                 .base(EventMetadata.<Localization.Message.Chat>builder()
@@ -151,7 +164,10 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
                             dataOutputStream.writeString(chatName);
                             dataOutputStream.writeString(playerMessage);
                         })
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name() + "_" + chatName.toUpperCase()))
+                                .build()
+                        )
                         .build()
                 )
                 .chat(playerChat)
@@ -184,7 +200,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     private void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Chat playerChat) {
         if (!playerChat.config().nullReceiver().enable()) return;
-        if (!noLocalReceiversFor(fPlayer, localReceivers)) return;
+        if (localReceivers.stream().anyMatch(filterReceivers(fPlayer, playerChat.name()))) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
@@ -196,13 +212,6 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         }
     }
 
-    private boolean noLocalReceiversFor(FPlayer fPlayer, List<FPlayer> receivers) {
-        return receivers.stream()
-                .filter(fReceiver -> !fReceiver.isUnknown())
-                .filter(fReceiver -> !fReceiver.equals(fPlayer))
-                .noneMatch(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer));
-    }
-
     private boolean noGlobalReceiversFor(FPlayer fPlayer, String chatName) {
         List<FPlayer> serverReceivers = fPlayerService.getOnlineFPlayers()
                 .stream()
@@ -211,7 +220,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
         // check online server players first
         for (FPlayer fReceiver : serverReceivers) {
-            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(ModuleName.MESSAGE_CHAT)) {
+            if (!socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT)) {
                 return false;
             }
         }
@@ -225,8 +234,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
             // check proxy players only if no online server receivers found
             for (FPlayer fReceiver : proxyReceivers) {
-                fReceiver = fPlayerService.loadSettings(fPlayerService.loadIgnores(fReceiver));
-                if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(ModuleName.MESSAGE_CHAT)) {
+                if (!socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT)) {
                     return false;
                 }
             }
@@ -237,16 +245,16 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
     private Predicate<FPlayer> filterReceivers(FPlayer fPlayer, String chatName) {
         return fReceiver -> {
-            if (fReceiver.isUnknown()) return false;
+            if (fReceiver.isUnknown() || fReceiver.isConsole()) return false;
             if (fReceiver.equals(fPlayer)) return false;
-            if (!integrationModule.canSeeVanished(fReceiver, fPlayer)) return false;
+            if (!socialService.canSeeVanished(fReceiver, fPlayer)) return false;
 
             return permissionFilter(chatName).test(fReceiver);
         };
     }
 
     private Chat getPlayerChat(FPlayer fPlayer, String eventMessage) {
-        String returnedChatName = fPlayer.getSetting(SettingText.CHAT_NAME);
+        String returnedChatName = socialService.getSetting(fPlayer, SettingText.CHAT_NAME);
         Message.Chat.Type playerChat = config().types().get(returnedChatName);
         Permission.Message.Chat.Type chatPermission = permission().types().get(returnedChatName);
 

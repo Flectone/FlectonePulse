@@ -15,6 +15,8 @@ import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.MessageFlag;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ public class PulseMailListener implements PulseListener {
 
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
 
@@ -32,7 +35,7 @@ public class PulseMailListener implements PulseListener {
         FPlayer fReceiver = event.player();
         if (moduleController.isDisabledFor(mailModule, fReceiver)) return;
 
-        List<Mail> mails = fPlayerService.getReceiverMails(fReceiver);
+        List<Mail> mails = socialService.getReceiverMails(fReceiver);
         if (mails.isEmpty()) return;
 
         for (Mail mail : mails) {
@@ -41,7 +44,8 @@ public class PulseMailListener implements PulseListener {
             messageDispatcher.dispatch(mailModule, MailMetadata.<Localization.Command.Mail>builder()
                     .base(EventMetadata.<Localization.Command.Mail>builder()
                             .sender(fPlayer)
-                            .filterPlayer(fReceiver, false)
+                            .receiver(fReceiver)
+                            .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                             .format(Localization.Command.Mail::receiver)
                             .destination(mailModule.config().destination())
                             .message(mail.message())
@@ -52,7 +56,7 @@ public class PulseMailListener implements PulseListener {
                     .build()
             );
 
-            fPlayerService.deleteMail(mail);
+            socialService.deleteMail(mail);
         }
     }
 

@@ -23,17 +23,17 @@ import net.flectone.pulse.module.message.format.questionanswer.listener.PulseQue
 import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.CooldownChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuestionAnswerModule implements ModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
-    private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
 
     private final FileFacade fileFacade;
@@ -53,7 +52,9 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     private final CooldownChecker cooldownChecker;
     private final TaskScheduler taskScheduler;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -82,7 +83,6 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
 
     @Override
     public void onDisable() {
-        processedQuestions.clear();
         patternMap.clear();
     }
 
@@ -102,8 +102,8 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
     }
 
     @Override
-    public Localization.Message.Format.QuestionAnswer localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().questionAnswer();
+    public Localization.Message.Format.QuestionAnswer localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().questionAnswer();
     }
 
     public MessageContext format(MessageContext messageContext) {
@@ -135,31 +135,22 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        UUID processId = messageContext.messageUUID();
         FEntity receiver = messageContext.receiver();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.QUESTION.getTagName(), (argumentQueue, _) -> {
             Tag.Argument questionTag = argumentQueue.peek();
             if (questionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
             String questionKey = questionTag.value();
             if (questionKey.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-            sendAnswer(processId, sender, receiver, questionKey);
+            sendAnswer(sender, receiver, questionKey);
 
             return MessagePipeline.ReplacementTag.emptyTag();
-        });
+        }));
     }
 
-    private void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {
-        if (processedQuestions.containsKey(processId)) return;
-
-        processedQuestions.put(processId, true);
-
-        sendAnswerLater(sender, receiver, question);
-    }
-
-    private void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
+    private void sendAnswer(FEntity sender, FEntity receiver, String question) {
         Message.Format.QuestionAnswer.Question questionMessage = config().questions().get(question);
         if (questionMessage == null) return;
 
@@ -173,7 +164,7 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .base(EventMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                         .sender(sender)
-                        .filterPlayer(fReceiver)
+                        .receiver(fReceiver)
                         .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
                         .destination(questionMessage.destination())
                         .sound(sound)

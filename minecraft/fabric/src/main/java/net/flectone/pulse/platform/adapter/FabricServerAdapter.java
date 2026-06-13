@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLor
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -12,27 +13,34 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.FabricTpsTracker;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.decorator.ComponentDecorator;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,16 +61,18 @@ import java.util.*;
 public class FabricServerAdapter implements PlatformServerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
-    private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
+    private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
+    private final AdventureHoverConvertor adventureHoverConvertor;
     private final @Named("projectPath") Path projectPath;
     private final FabricTpsTracker tpsTracker;
     private final FLogger fLogger;
-    private final RandomGenerator randomUtil;
-    private final IconConvertor iconUtil;
+    private final ComponentDecorator componentDecorator;
+    private final RandomGenerator randomGenerator;
+    private final IconConvertor iconConvertor;
 
     private String serverIcon;
 
@@ -79,7 +89,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NonNull String getTPS() {
+    public @NonNull String getTPS(FEntity entity) {
         return String.format("%.2f", tpsTracker.getTPS());
     }
 
@@ -98,11 +108,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         return playerlistnameModuleProvider.get().isProxyMode()
                 ? (int) fPlayerServiceProvider.get().findOnlineFPlayers().stream()
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count()
                 : (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
                     .filter(fPlayer -> !fPlayer.isUnknown())
-                    .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
+                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count();
     }
 
@@ -114,7 +124,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
     @Override
     public int generateEntityId() {
-        return randomUtil.nextInt(Integer.MAX_VALUE);
+        return randomGenerator.nextInt(Integer.MAX_VALUE);
     }
 
     @Override
@@ -166,7 +176,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
             File iconFile = minecraftServer.getFile("server-icon.png").toFile();
 
             if (iconFile.exists()) {
-                serverIcon = iconUtil.convert(iconFile);
+                serverIcon = iconConvertor.convert(iconFile);
             }
 
             // empty string is an indicator that it is already initialized
@@ -177,6 +187,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         }
 
         return StringUtils.isNotEmpty(serverIcon) ? serverIcon : null;
+    }
+
+    @Override
+    public @NonNull File getWhitelistFile() {
+        return FabricLoader.getInstance().getConfigDir().getParent().resolve("whitelist.json").toFile();
     }
 
     @Override
@@ -254,28 +269,76 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 ? createTranslatableItemName(itemStack, translatable)
                 : createItemMetaName(itemStack);
 
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer != null) {
+            // convert fabric itemStack to packetevents
+            ItemStack packetItemStack = fromMinecraftStack(itemStack, minecraftServer.registryAccess());
+
+            // translation for checking component
+            String translationKey = getTranslationKey(itemStack);
+
+            // first try custom name
+            Optional<Component> itemName = packetItemStack.getComponent(ComponentTypes.CUSTOM_NAME);
+            if (itemName.isPresent() && !isTranslatableItemComponent(itemName.get(), translationKey)) {
+                component = itemName.get();
+            } else {
+                // else try item name
+                itemName = packetItemStack.getComponent(ComponentTypes.ITEM_NAME);
+                if (itemName.isPresent() && !isTranslatableItemComponent(itemName.get(), translationKey)) {
+                    component = itemName.get();
+                }
+            }
+
+            // final translatable component
+            if (!isTranslatableItemComponent(component, translationKey)) {
+                component = componentDecorator.decorateIfAbsent(component, TextDecoration.ITALIC, TextDecoration.State.TRUE);
+            }
+
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
+        }
+
         Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());
-        return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
+        return componentDecorator.hoverIfAbsent(component, HoverEvent.showItem(key, itemStack.getCount()));
     }
 
+    private boolean isTranslatableItemComponent(Component component, String translationKey) {
+        return component instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals(translationKey);
+    }
+
+    // https://github.com/retrooper/packetevents/pull/1147/changes#diff-9647df572bdd365fa3ce0333c7491ea491ee6b602bfadcb0f46d8660b580f419R142
+    private ItemStack fromMinecraftStack(net.minecraft.world.item.ItemStack stack, RegistryAccess registries) {
+        ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
+        try {
+            net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode(
+                    new RegistryFriendlyByteBuf(buf, registries), stack);
+            return PacketWrapper.createUniversalPacketWrapper(buf).readItemStack();
+        } finally {
+            buf.release();
+        }
+    }
 
     private Component createItemMetaName(net.minecraft.world.item.ItemStack itemStack) {
         net.minecraft.network.chat.Component customName = itemStack.getCustomName();
         if (customName == null) return Component.empty();
 
-        MessageContext messageContext = messagePipelineProvider.get().createContext(customName.getString());
-        Component componentName = messagePipelineProvider.get().build(messageContext);
-        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
+        String clearedDisplayName = messagePipelineProvider.get().buildPlain(MessageContext.builder()
+                .message(customName.getString())
+                .build()
+        );
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }
 
     private Component createTranslatableItemName(net.minecraft.world.item.ItemStack itemStack, boolean translatable) {
-        Component itemComponent = Component.translatable(itemStack.getItem().getDescriptionId());
+        Component itemComponent = Component.translatable(getTranslationKey(itemStack));
 
         return translatable
                 ? itemComponent
                 : GlobalTranslator.render(itemComponent, Locale.ROOT);
+    }
+
+    private String getTranslationKey(net.minecraft.world.item.ItemStack itemStack) {
+        return itemStack.getItem().getDescriptionId();
     }
 
     @Override
@@ -295,13 +358,16 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         Component componentName = buildItemNameComponent(fPlayer, title);
 
         List<Component> componentLore = lore.length == 0
-                ? Collections.emptyList()
+                ? List.of()
                 : Arrays.stream(lore)
-                .map(message -> {
-                    MessageContext messageContext = messagePipelineProvider.get().createContext(fPlayer, message);
-                    Component component = messagePipelineProvider.get().build(messageContext);
-                    return component.decoration(TextDecoration.ITALIC, false);
-                })
+                .map(message -> messagePipelineProvider.get()
+                                .build(MessageContext.builder()
+                                       .sender(fPlayer)
+                                       .message(message)
+                                       .build()
+                                )
+                                .decoration(TextDecoration.ITALIC, false)
+                )
                 .toList();
 
         return new ItemStack.Builder()
@@ -312,8 +378,12 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     private @NonNull Component buildItemNameComponent(@NonNull FPlayer fPlayer, @NonNull String title) {
-        return title.isEmpty()
-                ? Component.empty()
-                : messagePipelineProvider.get().build(messagePipelineProvider.get().createContext(fPlayer, title));
+        if (title.isEmpty()) return Component.empty();
+
+        return messagePipelineProvider.get().build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(title)
+                .build()
+        );
     }
 }

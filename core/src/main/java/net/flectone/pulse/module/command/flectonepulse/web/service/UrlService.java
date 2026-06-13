@@ -3,7 +3,7 @@ package net.flectone.pulse.module.command.flectonepulse.web.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Config;
+import net.flectone.pulse.config.Command;
 import net.flectone.pulse.module.command.flectonepulse.web.exception.EmptyHostException;
 import net.flectone.pulse.util.file.FileFacade;
 
@@ -18,8 +18,8 @@ public class UrlService {
 
     private final FileFacade fileFacade;
 
-    public Config.Editor config() {
-        return fileFacade.config().editor();
+    public Command.Flectonepulse.Editor config() {
+        return fileFacade.command().flectonepulse().editor();
     }
 
     public String generateUrl() {

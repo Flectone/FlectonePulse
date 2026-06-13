@@ -4,14 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.IgnoreSQL;
+import net.flectone.pulse.data.database.sql.ignore.*;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -33,8 +31,14 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
     }
 
     @Override
-    public Class<IgnoreSQL> sqlClass() {
-        return IgnoreSQL.class;
+    public Class<? extends IgnoreSQL> sqlClass() {
+        return switch (database.config().type()) {
+            case H2 -> IgnoreH2.class;
+            case MARIADB -> IgnoreMariaDB.class;
+            case MYSQL -> IgnoreMySQL.class;
+            case POSTGRESQL -> IgnorePostgreSQL.class;
+            case SQLITE -> IgnoreSQLite.class;
+        };
     }
 
     /**
@@ -45,22 +49,13 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * @return the ignore record, or null if players are unknown
      */
     public @Nullable Ignore insert(@NonNull FPlayer fSender, @NonNull FPlayer fIgnored) {
+        if (database.isClosed()) return null;
         if (fSender.isUnknown() || fIgnored.isUnknown()) return null;
 
         return inTransaction(sql -> {
             long currentTime = System.currentTimeMillis();
-            int updated = sql.update(currentTime, fSender.id(), fIgnored.id());
 
-            if (updated == 0) {
-                try {
-                    int insertedId = sql.insert(currentTime, fSender.id(), fIgnored.id());
-                    return new Ignore(insertedId, currentTime, fIgnored.id());
-                } catch (UnableToExecuteStatementException e) {
-                    if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                        sql.update(currentTime, fSender.id(), fIgnored.id());
-                    } else throw e;
-                }
-            }
+            sql.upsert(currentTime, fSender.id(), fIgnored.id());
 
             return sql.findByInitiatorAndTarget(fSender.id(), fIgnored.id()).orElseThrow();
         });
@@ -72,22 +67,15 @@ public class IgnoreDAO implements BaseDAO<IgnoreSQL> {
      * @param ignore the ignore record to invalidate
      */
     public void invalidate(@NonNull Ignore ignore) {
+        if (database.isClosed()) return;
+
         useHandle(sql -> sql.invalidate(ignore.id()));
     }
 
-    /**
-     * Loads ignore relationships for a player.
-     *
-     * @param fPlayer the player to load ignores for
-     * @return new FPlayer with ignores
-     */
-    public FPlayer load(@NonNull FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return fPlayer;
+    public List<Ignore> load(@NonNull FPlayer fPlayer) {
+        if (database.isClosed()) return List.of();
+        if (fPlayer.isUnknown()) return List.of();
 
-        List<Ignore> ignores = withHandle(sql ->
-                sql.findByInitiator(fPlayer.id())
-        );
-
-        return fPlayer.withIgnores(ignores);
+        return withHandle(sql -> sql.findByInitiator(fPlayer.id()));
     }
 }

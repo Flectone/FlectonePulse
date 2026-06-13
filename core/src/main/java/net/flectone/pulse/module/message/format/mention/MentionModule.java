@@ -22,31 +22,29 @@ import net.flectone.pulse.module.message.format.mention.listener.PulseMentionLis
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.util.Optional;
-import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MentionModule implements ModuleLocalization<Localization.Message.Format.Mention> {
 
-    private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
-
     private final @Named("mentionMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final IntegrationModule integrationModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
@@ -66,7 +64,6 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
 
     @Override
     public void onDisable() {
-        processedMentions.clear();
         messageCache.invalidateAll();
     }
 
@@ -86,8 +83,8 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     @Override
-    public Localization.Message.Format.Mention localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().mention();
+    public Localization.Message.Format.Mention localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().mention();
     }
 
     public MessageContext format(MessageContext messageContext) {
@@ -113,9 +110,8 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
-        UUID processId = messageContext.messageUUID();
         FPlayer receiver = messageContext.receiver();
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.MENTION.getTagName(), (argumentQueue, _) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -127,14 +123,15 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
             Optional<String> group = findGroup(mention);
             if (group.isPresent()) {
                 if (permissionChecker.check(sender, permission().group().name() + "." + group.get())) {
-                    sendMention(processId, receiver);
+                    sendMention(receiver);
+
                     return mentionTag(messageContext, mention);
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && integrationModule.canSeeVanished(mentionFPlayer, sender)) {
+                if (!mentionFPlayer.isUnknown() && mentionFPlayer.isOnline() && socialService.canSeeVanished(mentionFPlayer, sender)) {
                     if (mentionFPlayer.equals(receiver)) {
-                        sendMention(processId, mentionFPlayer);
+                        sendMention(mentionFPlayer);
                     }
 
                     return mentionTag(messageContext, mention);
@@ -142,7 +139,7 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
             }
 
             return Tag.preProcessParsed(config().trigger() + mention);
-        });
+        }));
     }
 
     private boolean isUnknownSender(FEntity sender) {
@@ -154,17 +151,17 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     private Tag mentionTag(MessageContext messageContext, String mention) {
-        String format = StringUtils.replaceEach(localization(messageContext.receiver()).format(),
-                new String[]{"<player>", "<target>"},
-                new String[]{mention, mention}
-        );
-
-        MessageContext newContext = messagePipeline.createContext(messageContext.sender(), messageContext.receiver(), format)
-                .withFlags(messageContext.flags())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-        Component component = messagePipeline.build(newContext);
-        return Tag.selfClosingInserting(component);
+        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                .sender(messageContext.sender())
+                .receiver(messageContext.receiver())
+                .message(StringUtils.replaceEach(localization(messageContext.receiver()).format(),
+                        new String[]{"<player>", "<target>"},
+                        new String[]{mention, mention}
+                ))
+                .flags(messageContext.flags())
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .build()
+        ));
     }
 
     private String replace(String message) {
@@ -206,14 +203,11 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
         return integrationModule.getGroups()
                 .stream()
                 .filter(string -> string.equalsIgnoreCase(finalGroup))
-                .findFirst();
+                .findAny();
     }
 
-    public void sendMention(UUID processId, FPlayer fPlayer) {
+    public void sendMention(FPlayer fPlayer) {
         if (permissionChecker.check(fPlayer, permission().bypass())) return;
-        if (processedMentions.containsKey(processId)) return;
-
-        processedMentions.put(processId, true);
 
         messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Format.Mention>builder()
                 .sender(fPlayer)

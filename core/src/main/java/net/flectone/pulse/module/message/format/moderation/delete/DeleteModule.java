@@ -18,8 +18,10 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -46,6 +48,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
     private final ModuleController moduleController;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -74,8 +77,8 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
     }
 
     @Override
-    public Localization.Message.Format.Moderation.Delete localization(FEntity sender) {
-        return fileFacade.localization(sender).message().format().moderation().delete();
+    public Localization.Message.Format.Moderation.Delete localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).message().format().moderation().delete();
     }
 
     public void clearHistory(FPlayer fPlayer) {
@@ -89,28 +92,30 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
 
         UUID messageUUID = messageContext.messageUUID();
 
-        return messageContext.addTagResolver(MessagePipeline.ReplacementTag.DELETE, (_, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DELETE.getTagName(), (_, _) -> {
             String placeholder = Strings.CS.replace(
                     localization(receiver).placeholder(),
                     "<uuid>",
                     messageUUID.toString()
             );
 
-            MessageContext newContext = messagePipeline.createContext(sender, receiver, placeholder)
-                    .withFlags(messageContext.flags())
-                    .addFlags(
+            Component componentPlaceholder = messagePipeline.build(MessageContext.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .message(placeholder)
+                    .flags(
                             new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.DELETE_MODULE, MessageFlag.PLAYER_MESSAGE},
                             new boolean[]{false, false, false, false, false}
-                    );
-
-            Component componentPlaceholder = messagePipeline.build(newContext);
+                    )
+                    .build()
+            );
 
             return Tag.selfClosingInserting(componentPlaceholder);
-        });
+        }));
     }
 
     public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
-        // skip console
+        // skip unknown
         if (receiver.isUnknown()) return;
         // skip offline history
         if (!receiver.isOnline()) return;
@@ -166,8 +171,12 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
                 for (int i = 0; i < history.size(); i++) {
                     HistoryMessage historyMessage = history.get(i);
                     if (messageUUID.equals(historyMessage.uuid())) {
-                        MessageContext messageContext = messagePipeline.createContext(sender, fReceiver, format);
-                        Component removedComponent = messagePipeline.build(messageContext);
+                        Component removedComponent = messagePipeline.build(MessageContext.builder()
+                                .sender(sender)
+                                .receiver(fReceiver)
+                                .message(format)
+                                .build()
+                        );
                         history.set(i, new HistoryMessage(messageUUID, removedComponent));
                     }
                 }

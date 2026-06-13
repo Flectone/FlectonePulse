@@ -7,9 +7,8 @@ import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.protocol.MountController;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
@@ -28,15 +27,16 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
-import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
+import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.joml.Vector3d;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -55,16 +55,19 @@ public class HytaleBubbleRender implements BubbleRender {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final TaskScheduler taskScheduler;
+    private final SocialService socialService;
 
     @Inject
     public HytaleBubbleRender(FileFacade fileFacade,
                               PlatformPlayerAdapter platformPlayerAdapter,
                               MessagePipeline messagePipeline,
-                              TaskScheduler taskScheduler) {
+                              TaskScheduler taskScheduler,
+                              SocialService socialService) {
         this.fileFacade = fileFacade;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.messagePipeline = messagePipeline;
         this.taskScheduler = taskScheduler;
+        this.socialService = socialService;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         String playerKey = sender.uuid().toString();
 
-        String bubbleText = PlainTextComponentSerializer.plainText().serialize(createFormattedMessage(bubble, viewer));
+        String bubbleText = createFormattedMessage(bubble, viewer);
 
         Transform playerTransform = playerRef.getTransform();
         world.execute(() -> {
@@ -101,15 +104,15 @@ public class HytaleBubbleRender implements BubbleRender {
                 TransformComponent transform = entityStore.getStore().getComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType());
                 if (transform != null) {
                     Vector3d currentPosition = transform.getPosition();
-                    Vector3d newPosition = new Vector3d(currentPosition.getX(), currentPosition.getY() + bubble.getInteractionHeight(), currentPosition.getZ());
+                    Vector3d newPosition = new Vector3d(currentPosition.x(), currentPosition.y() + bubble.getInteractionHeight(), currentPosition.z());
                     TransformComponent newTransform = new TransformComponent(newPosition, transform.getRotation());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), TransformComponent.getComponentType(), newTransform);
                 }
 
                 MountedComponent mounted = entityStore.getStore().getComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType());
                 if (mounted != null) {
-                    Vector3f currentOffset = mounted.getAttachmentOffset();
-                    Vector3f newOffset = new Vector3f(currentOffset.getX(), currentOffset.getY() + bubble.getInteractionHeight(), currentOffset.getZ());
+                    Rotation3f currentOffset = mounted.getAttachmentOffset();
+                    Rotation3f newOffset = new Rotation3f(currentOffset.x(), currentOffset.y() + bubble.getInteractionHeight(), currentOffset.z());
                     MountedComponent newMounted = new MountedComponent(playerRef.getReference(), newOffset, mounted.getControllerType());
                     entityStore.getStore().putComponent(bubbleEntity.entityRef(), MountedComponent.getComponentType(), newMounted);
                 }
@@ -121,9 +124,11 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(ProjectileComponent.getComponentType(), projectileComponent);
 
             double baseHeight = bubble.getElevation();
+            Vector3d playerPosition = playerTransform.getPosition();
+
             holder.putComponent(TransformComponent.getComponentType(),
                     new TransformComponent(
-                            playerTransform.getPosition().add(new Vector3d(0, baseHeight, 0)).clone(),
+                            new Vector3d(playerPosition.x(), playerPosition.y() + baseHeight, playerPosition.z()),
                             playerTransform.getRotation().clone()
                     )
             );
@@ -148,7 +153,7 @@ public class HytaleBubbleRender implements BubbleRender {
             holder.putComponent(MountedComponent.getComponentType(),
                     new MountedComponent(
                             playerRef.getReference(),
-                            new Vector3f(0.0F, (float) baseHeight, 0.0F),
+                            new Rotation3f(0.0F, (float) baseHeight, 0.0F),
                             MountController.Minecart
                     )
             );
@@ -189,21 +194,26 @@ public class HytaleBubbleRender implements BubbleRender {
         }
     }
 
-    private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
-        Localization.Message.Bubble localization = fileFacade.localization(viewer).message().bubble();
+    private String createFormattedMessage(Bubble bubble, FPlayer viewer) {
+        Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
-        MessageContext messageContext = messagePipeline.createContext(bubble.getSender(), viewer, bubble.getRawMessage())
-                .addFlags(
+        MessageContext messageContext = MessageContext.builder()
+                .sender(bubble.getSender())
+                .receiver(viewer)
+                .message(bubble.getRawMessage())
+                .flags(
                         new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE},
                         new boolean[]{false, false, false, true}
-                );
+                )
+                .build();
 
         Component message = messagePipeline.build(messageContext);
 
-        return messagePipeline.build(messageContext
-                .withMessage(localization.format())
-                .addFlag(MessageFlag.PLAYER_MESSAGE, false)
-                .addTagResolver(TagResolver.resolver("message", (_, _) -> Tag.inserting(message)))
+        return messagePipeline.buildPlain(messageContext.toBuilder()
+                .message(localization.format())
+                .flag(MessageFlag.PLAYER_MESSAGE, false)
+                .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
+                .build()
         );
     }
 

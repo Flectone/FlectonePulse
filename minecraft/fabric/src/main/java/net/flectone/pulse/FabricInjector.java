@@ -2,8 +2,6 @@ package net.flectone.pulse;
 
 import com.google.inject.Singleton;
 import net.fabricmc.loader.api.FabricLoader;
-import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
@@ -49,7 +47,6 @@ public class FabricInjector extends MinecraftPlatformInjector {
 
         // checkers and utilities
         bind(PermissionChecker.class).to(FabricPermissionChecker.class);
-        bind(TaskScheduler.class).to(FabricTaskScheduler.class);
 
         bind(MinecraftIntegrationModule.class).to(FabricIntegrationModule.class);
 

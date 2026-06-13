@@ -5,8 +5,7 @@ afk:
   range: "SERVER"
   delay: 36000
   radius: 1.0
-  ignore:
-  - "afk"
+  ignore: []
   destination:
     type: "CHAT"
   ticker:
@@ -16,6 +15,7 @@ afk:
     enable: false
 anvil:
   enable: false
+  allow_object: false
 auto:
   enable: false
   types:
@@ -30,6 +30,7 @@ auto:
         enable: false
 book:
   enable: false
+  allow_object: false
 bossbar:
   enable: false
   announce: {}
@@ -58,8 +59,8 @@ bubble:
     height: 0.4
   modern:
     enable: true
-    has_shadow: false
-    see_through: true
+    has_shadow: true
+    see_through: false
     animation_time: 5
     scale: 1.0
     background: "#00000040"
@@ -334,7 +335,7 @@ scoreboard:
   ticker:
     enable: false
   objective:
-    enable: true
+    enable: false
     belowname:
       enable: false
       ticker:
@@ -368,6 +369,7 @@ sidebar:
     period: 100
 sign:
   enable: false
+  allow_object: false
 status:
   enable: false
   icon:
@@ -410,7 +412,7 @@ tab:
     hide_invisible: false
     hide_spectator: false
     spectator_list_order: false
-    proxy_mode: true
+    range: "PROXY"
     ticker:
       enable: true
       period: 100
@@ -422,6 +424,7 @@ update:
     enable: false
 vanilla:
   enable: true
+  cancel_default_death_screen: true
   types:
     - name: "DEATH"
       multi_message: true

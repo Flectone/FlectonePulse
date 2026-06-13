@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
@@ -49,8 +50,9 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      ListenerRegistry listenerRegistry,
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,
-                                     Provider<IntegrationModule> integrationModuleProvider) {
-        super(fileFacade, listenerRegistry, platformPlayerAdapter);
+                                     Provider<IntegrationModule> integrationModuleProvider,
+                                     SocialService socialService) {
+        super(fileFacade, listenerRegistry, platformPlayerAdapter, socialService);
 
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -66,7 +68,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerRegionTimer(fPlayer -> {
+            taskScheduler.runPlayerAsyncTimer(fPlayer -> {
                 Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
                 if (oldTeam == null) return;
 
@@ -86,7 +88,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     @Override
     public void create(FPlayer fPlayer, boolean skipCacheTeam) {
 
-        taskScheduler.runRegion(fPlayer, () -> {
+        taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             if (!skipCacheTeam) {
@@ -144,16 +146,22 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
 
         Component prefix = Component.empty();
         if (!localization().prefix().isEmpty()) {
-            MessageContext prefixContext = messagePipeline.createContext(fPlayer, localization().prefix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            prefix = messagePipeline.build(prefixContext);
+            prefix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().prefix())
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
+                    .build()
+            );
         }
 
         Component suffix = Component.empty();
         if (!localization().suffix().isEmpty()) {
-            MessageContext suffixContext = messagePipeline.createContext(fPlayer, localization().suffix())
-                    .addFlag(MessageFlag.INVISIBLE_NAME_DETECTION, false);
-            suffix = messagePipeline.build(suffixContext);
+            suffix = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(localization().suffix())
+                    .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
+                    .build()
+            );
         }
 
         WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = isInvisibleNameFor(fPlayer)
@@ -161,9 +169,11 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 : WrapperPlayServerTeams.NameTagVisibility.ALWAYS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
 
-        MessageContext colorContext = messagePipeline.createContext(fPlayer, config().color());
-        Component colorComponent = messagePipeline.build(colorContext);
-        TextColor color = colorComponent.color();
+        TextColor color = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(config().color())
+                .build()
+        ).color();
 
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 

@@ -9,7 +9,6 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.TelegramMessageListener;
@@ -25,10 +24,13 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatTit
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramIntegration implements FIntegration {
+
+    private final AtomicLong taskGeneration = new AtomicLong(0);
 
     private final FileFacade fileFacade;
     private final TelegramClientProvider telegramClientProvider;
@@ -49,8 +51,19 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        long taskId = taskGeneration.incrementAndGet();
+
         TelegramClient telegramClient = telegramClientProvider.create();
         if (telegramClient == null) return;
+
+        if (taskGeneration.get() != taskId) {
+            try {
+                telegramClient.application().close();
+            } catch (Exception _) {
+                // just ignore
+            }
+            return;
+        }
 
         try {
             // register listener
@@ -61,7 +74,7 @@ public class TelegramIntegration implements FIntegration {
 
             if (channelInfo.enable() && channelInfo.ticker().enable()) {
                 long period = channelInfo.ticker().period();
-                taskScheduler.runRegionTimer(FPlayer.UNKNOWN, this::updateChannelInfo, period, period);
+                taskScheduler.runAsyncTimer(this::updateChannelInfo, period, period);
                 updateChannelInfo();
             }
 
@@ -123,8 +136,10 @@ public class TelegramIntegration implements FIntegration {
 
     @NonNull
     private String getNewChatName(@NonNull String value) {
-        MessageContext messageContext = messagePipeline.createContext(value);
-        return messagePipeline.buildPlain(messageContext);
+        return messagePipeline.buildPlain(MessageContext.builder()
+                .message(value)
+                .build()
+        );
     }
 
 }

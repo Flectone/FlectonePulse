@@ -59,8 +59,8 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot ban a player with equal or higher permissions"
     reasons:
       default: "You have been banned from this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has banned <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    person: "<color:#ff7171>[!] BAN< fcolor:1><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has banned <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    person: "<color:#ff7171>[!] BAN< fcolor:1><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     connection_attempt: "<color:#ff7171>[!] <fcolor:1>Banned <display_name> tried to log in, remaining time: <time_left>"
   banlist:
     empty: "<color:#98FB98>No bans found"
@@ -196,8 +196,8 @@ command:
     format: "<fcolor:4><message>"
   flectonepulse:
     dump_error: "<color:#ff7171>An error occurred while uploading the dump: <error>"
-    null_host_editor: "<color:#ff7171>Host parameter must be configured in config.yml"
-    null_port_editor: "<color:#ff7171>Port <port> is unavailable, choose another one in config.yml"
+    null_host_editor: "<color:#ff7171>Host parameter must be configured in command.yml, field port"
+    null_port_editor: "<color:#ff7171>Port <port> is unavailable, choose another one in command.yml, field port"
     null_file: "<color:#ff7171>File <file> does not exist"
     file_exist: "<color:#ff7171>File <file> already exists"
     format_starting: "<fcolor:1>[*] Starting <fcolor:2><type><fcolor:1>, please wait..."
@@ -241,11 +241,16 @@ command:
     sender: "<fcolor:2>[^] Mail #<id> for <target> » <fcolor:1><message>"
     receiver: "<fcolor:2>[^] Mail from <display_name> » <fcolor:1><message>"
   maintenance:
-    server_description: "<color:#ff7171>The server is under maintenance"
+    already_true: "<color:#ff7171>Server maintenance is already enabled"
+    already_false: "<color:#ff7171>Server maintenance is already disabled"
+    server_description: "<color:#ff7171>Server maintenance is currently underway"
     server_version: "Maintenance"
-    kick: "<color:#ff7171>[*] The server is under maintenance"
-    format_true: "<fcolor:1>[*] You have <fcolor:2>enabled <fcolor:1>maintenance on the server"
-    format_false: "<fcolor:1>[*] You have <fcolor:2>disabled <fcolor:1>maintenance on the server"
+    reasons:
+      default: "Server maintenance is in progress"
+      disabled: "Server maintenance is finished"
+    format_true: "<fcolor:1>[*] <fcolor:2>Enabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_false: "<fcolor:1>[*] <fcolor:2>Disabled <fcolor:1>server maintenance <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    person: "<color:#ff7171>[*] <reason> (<time_left>)"
   me:
     format: "<fcolor:1>> <display_name> <fcolor:1><message>"
   mute:
@@ -255,7 +260,7 @@ command:
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "You have been muted on this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has muted <display_name> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>has muted <display_name> <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are muted, <time_left> left"
   mutelist:
     empty: "<color:#98FB98>No mutes found"
@@ -292,7 +297,7 @@ command:
     vote_true: "<color:#4eff52>[+] You voted for option <answer_id> in poll #<id>. There are <count> of you"
     vote_false: "<color:#ff4e4e>[-] You rejected option <answer_id> in poll #<id>. There are <count> without you"
     format: "<br><color:#fce303>| <status> <br>| <message><reset> <color:#fce303><br>├─────────────<br><answers>"
-    answer_template: "<color:#fce303>| <count> -> <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [+]<br>"
+    answer_template: "<color:#fce303>| <count> -> <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"<command> <id> <number>\"><answer> [+]<br>"
     status:
       start: "New poll #<b><id></b> has been created"
       run: "Poll #<b><id></b> is in progress"
@@ -376,7 +381,7 @@ command:
     wrong_move: "<color:#ff7171>This step is not possible"
     wrong_by_player: "<color:#ff7171>This game ended because player quit"
     symbol:
-      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">[ ]</click></hover>"
+      blank: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"<command> %d <move>\">[ ]</click></hover>"
       first: "<fcolor:2>[X]"
       first_remove: "<color:#ff7171>[X]</color:#ff7171>"
       first_win: "<color:#98FB98>[X]</color:#98FB98>"
@@ -390,7 +395,7 @@ command:
     format_win: "<color:#98FB98><target> won this game</color:#98FB98>"
     format_draw: "<color:#98FB98>The game ended in a draw [H]</color:#98FB98>"
     sender: "<fcolor:1>[ ] An offer to play was sent to <target>"
-    receiver: "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>[ ] Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
+    receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>[ ] Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
   toponline:
     null_page: "<color:#ff7171>This page doesn't exist"
     header: "<fcolor:2>| Players: <count> <br>"
@@ -432,7 +437,7 @@ command:
     lower_weight_group: "<color:#ff7171>You cannot warn a player with equal or higher permissions"
     reasons:
       default: "You have been warned on this server"
-    server: "<color:#ff7171>[!] <moderator> <fcolor:1>gave a warning to <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    server: "<color:#ff7171>[!] <moderator> <fcolor:1>gave a warning to <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[!] You are warned a <time>"
   warnlist:
     empty: "<color:#98FB98>No warns found"
@@ -456,13 +461,16 @@ command:
     already_on: "<color:#ff7171>Whitelist is already enabled"
     already_off: "<color:#ff7171>Whitelist is already disabled"
     format_add: "<fcolor:1>[=] Player <display_name> has been added to the whitelist <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
-    format_off: "<fcolor:1>[=] Whitelist <fcolor:2>disabled"
-    format_on: "<fcolor:1>[=] Whitelist <fcolor:2>enabled"
+    format_off: "<fcolor:1>[=] Whitelist <fcolor:2>disabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
+    format_on: "<fcolor:1>[=] Whitelist <fcolor:2>enabled <br><fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
     format_remove: "<fcolor:1>[=] Player <display_name> has been removed from the whitelist <br><fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>"
     person: "<color:#ff7171>[=] You are not on the server whitelist"
     connection_attempt: "<color:#ff7171>[=] Player <display_name>, who is not on the whitelist, attempted to connect"
     reasons:
       default: "You have been added to the server whitelist"
+      removed: "You have been removed from the server whitelist"
+      enabled: "Whitelist is enabled on the server"
+      disabled: "Whitelist is disabled on the server"
     global:
       header: "<fcolor:2>| Whitelisted players: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Reason: <reason>"
@@ -610,6 +618,7 @@ message:
         - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <nickname>\"><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><name></hover>"
       unknown: "<fcolor:2><name>"
+      console: "<click:suggest_command:\"/msg <name> \"><hover:show_text:\"<fcolor:2>Write to Console\">Console"
       invisible: "<fcolor:2>[Invisible]"
     question_answer:
       questions:

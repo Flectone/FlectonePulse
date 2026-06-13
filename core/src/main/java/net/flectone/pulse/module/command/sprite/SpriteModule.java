@@ -11,7 +11,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
@@ -22,8 +21,10 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -37,6 +38,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,6 +71,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     private final ModuleCommandController commandModuleController;
     private final WebUtil webUtil;
     private final FLogger fLogger;
+    private final SocialService socialService;
     private final @Named("minecraftPath") Path minecraftPath;
 
     @Override
@@ -119,10 +122,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                     .build()
             );
 
-            if (!downloadAtlasFile(atlas)) {
+            int responseCode = downloadAtlasFile(atlas);
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
                         .sender(fPlayer)
-                        .format(Localization.Command.Sprite::downloadError)
+                        .format(localization -> responseCode != HttpURLConnection.HTTP_NOT_FOUND ? localization.downloadError() : localization.nullAtlas())
                         .build()
                 );
                 return;
@@ -172,8 +176,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 new String[]{atlas, String.valueOf(size)}
         );
 
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(header)
+                .build()
+        ).append(Component.newline());
 
         StringBuilder spriteLine = new StringBuilder();
         for (String sprite : finalSprites) {
@@ -188,8 +195,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
             spriteLine.append(line);
         }
 
-        MessageContext lineContext = messagePipeline.createContext(fPlayer, spriteLine.toString());
-        component = component.append(messagePipeline.build(lineContext)).append(Component.newline());
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(spriteLine.toString())
+                .build()
+        ).append(Component.newline()));
 
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + atlas;
         String footer = StringUtils.replaceEach(
@@ -204,8 +214,11 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 }
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 
@@ -228,8 +241,8 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
     }
 
     @Override
-    public Localization.Command.Sprite localization(FEntity sender) {
-        return fileFacade.localization(sender).command().sprite();
+    public Localization.Command.Sprite localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().sprite();
     }
 
     private void lazyLoadLocalAtlases() {
@@ -258,9 +271,9 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
         });
     }
 
-    private boolean downloadAtlasFile(String atlasName) {
+    private int downloadAtlasFile(String atlasName) {
         Path outputPath = resolveAtlasesFolder().resolve(Strings.CS.replace(ATLAS_FILE_NAME, "<atlas>", atlasName));
-        if (Files.exists(outputPath)) return true;
+        if (Files.exists(outputPath)) return HttpURLConnection.HTTP_OK;
 
         String url = StringUtils.replaceEach(
                 FLECTONEPULSE_ATLAS_API,
@@ -268,7 +281,7 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 new String[]{platformServerAdapter.getServerVersionName(), atlasName}
         );
 
-        return webUtil.downloadFile(url, outputPath);
+        return webUtil.downloadFile(url, outputPath, false);
     }
 
     private Path resolveAtlasesFolder() {

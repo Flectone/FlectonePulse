@@ -1,11 +1,10 @@
 package net.flectone.pulse.platform.proxy;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.processing.processor.ProxyMessageProcessor;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import org.bukkit.Bukkit;
@@ -20,7 +19,7 @@ public class BukkitProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final Plugin plugin;
-    private final Provider<BukkitProxyListener> proxyListenerProvider;
+    private final ProxyMessageProcessor proxyMessageProcessor;
 
     private String channel;
 
@@ -37,7 +36,13 @@ public class BukkitProxy implements Proxy {
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, channel);
-        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, proxyListenerProvider.get());
+        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, (proxyChannel, _, message) -> {
+            if (!proxyChannel.equals(channel) || !isEnable()) {
+                return;
+            }
+
+            proxyMessageProcessor.process(message);
+        });
     }
 
     @Override
@@ -78,7 +83,7 @@ public class BukkitProxy implements Proxy {
         return Bukkit.getOnlinePlayers().stream()
                 .map(Player.class::cast)
                 .filter(player -> !player.getUniqueId().equals(sender.uuid())) // we always need another player, because sender may no longer be on the server
-                .findFirst()
+                .findAny()
                 .orElse(Bukkit.getPlayer(sender.uuid()));
     }
 }

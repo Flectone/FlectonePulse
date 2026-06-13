@@ -17,7 +17,7 @@ public class ObjectiveModule implements ModuleSimple {
 
     @Override
     public ModuleName name() {
-        return ModuleName.MESSAGE_OBJECTIVE;
+        return ModuleName.MESSAGE_SCOREBOARD_OBJECTIVE;
     }
 
     @Override

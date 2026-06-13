@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.ModuleCommand;
@@ -20,7 +19,9 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
@@ -43,6 +44,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
+    private final SocialService socialService;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
@@ -60,7 +62,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
                     List<String> cache = suggestionCache.getIfPresent(fPlayer.uuid());
                     if (cache != null) return cache;
 
-                    List<String> suggestion = fPlayerService.getSenderMails(fPlayer)
+                    List<String> suggestion = socialService.getSenderMails(fPlayer)
                             .stream()
                             .map(mail -> String.valueOf(mail.id()))
                             .toList();
@@ -82,7 +84,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
 
         int mailID = commandModuleController.getArgument(this, commandContext, 0);
 
-        Optional<Mail> optionalMail = fPlayerService.getSenderMails(fPlayer)
+        Optional<Mail> optionalMail = socialService.getSenderMails(fPlayer)
                 .stream()
                 .filter(mail -> mail.id() == mailID)
                 .findAny();
@@ -99,7 +101,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
 
         FPlayer fReceiver = fPlayerService.getFPlayer(optionalMail.get().receiver());
 
-        fPlayerService.deleteMail(optionalMail.get());
+        socialService.deleteMail(optionalMail.get());
 
         messageDispatcher.dispatch(this, ClearmailMetadata.<Localization.Command.Clearmail>builder()
                 .base(EventMetadata.<Localization.Command.Clearmail>builder()
@@ -134,7 +136,7 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
     }
 
     @Override
-    public Localization.Command.Clearmail localization(FEntity sender) {
-        return fileFacade.localization(sender).command().clearmail();
+    public Localization.Command.Clearmail localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().clearmail();
     }
 }

@@ -25,11 +25,14 @@
 			"net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceIntegration"
         ]
 	},
+	"mixins": [
+		"flectonepulse.mixins.json"
+	],
 	"depends": {
       "fabricloader": "*",
       "fabric-api-base": "*",
       "minecraft": ">=26.1",
       "java": ">=25",
-      "packetevents": ">=2.12.0"
+      "packetevents": ">=2.12.2"
 	}
 }

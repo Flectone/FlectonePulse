@@ -24,12 +24,14 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -50,9 +52,11 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
     private final FPlayerService fPlayerService;
+    private final PlaytimeService playtimeService;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
+    private final SocialService socialService;
 
     @Override
     public void onEnable() {
@@ -78,7 +82,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
-        int size = fPlayerService.getPlayTimesCount();
+        int size = playtimeService.getPlayTimesCount();
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
@@ -92,13 +96,15 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
             return;
         }
 
-        List<PlayTime> finalPlayedTimePlayers = fPlayerService.getAllPlayTimes(perPage, (page - 1) * perPage);
+        List<PlayTime> finalPlayedTimePlayers = playtimeService.getAllPlayTimes(perPage, (page - 1) * perPage);
 
         Localization.Command.Toponline localization = localization(fPlayer);
 
-        String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
-        MessageContext headerContext = messagePipeline.createContext(fPlayer, header);
-        Component component = messagePipeline.build(headerContext).append(Component.newline());
+        Component component = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(Strings.CS.replace(localization.header(), "<count>", String.valueOf(size)))
+                .build()
+        ).append(Component.newline());
 
         for (PlayTime timePlayer : finalPlayedTimePlayers) {
             FPlayer fTarget = fPlayerService.getFPlayer(timePlayer.playerId());
@@ -111,13 +117,13 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
                     timeFormatter.format(fPlayer, timePlayer.total())
             );
 
-            MessageContext lineContext = messagePipeline.createContext(fPlayer, line)
-                    .addTagResolvers(
-                            messagePipeline.targetTag("time_player", fPlayer, fTarget)
-                    );
-
             component = component
-                    .append(messagePipeline.build(lineContext))
+                    .append(messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(line)
+                            .tagResolver(messagePipeline.targetTag("time_player", fPlayer, fTarget))
+                            .build()
+                    ))
                     .append(Component.newline());
         }
 
@@ -126,8 +132,11 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
                 new String[]{"/" + commandModuleController.getCommandName(this), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
         );
 
-        MessageContext footerContext = messagePipeline.createContext(fPlayer, footer);
-        component = component.append(messagePipeline.build(footerContext));
+        component = component.append(messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(footer)
+                .build()
+        ));
 
         eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
 
@@ -150,8 +159,8 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     }
 
     @Override
-    public Localization.Command.Toponline localization(FEntity sender) {
-        return fileFacade.localization(sender).command().toponline();
+    public Localization.Command.Toponline localization(FPlayer fPlayer) {
+        return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().toponline();
     }
 
     public MessageContext addTag(MessageContext messageContext) {
@@ -159,7 +168,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
         if (!(sender instanceof FPlayer)) return messageContext;
 
-        return messageContext.addTagResolver(TagResolver.resolver(MessagePipeline.ReplacementTag.TOPONLINE.getTagName(), (argumentQueue, _) -> {
+        return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TOPONLINE.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt optionalInt = argumentQueue.pop().asInt();
@@ -168,11 +177,14 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
             Optional<FPlayer> fTarget = getPlayerByPosition(optionalInt.getAsInt());
             if (fTarget.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
-            MessageContext toponlineContext = messagePipeline.createContext(fTarget.get(), messageContext.receiver(), "<display_name>")
-                    .withFlags(messageContext.flags())
-                    .addFlag(MessageFlag.PLAYER_MESSAGE, false);
-
-            return Tag.selfClosingInserting(messagePipeline.build(toponlineContext));
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(fTarget.get())
+                    .receiver(messageContext.receiver())
+                    .message("<display_name>")
+                    .flags(messageContext.flags())
+                    .flag(MessageFlag.PLAYER_MESSAGE, false)
+                    .build()
+            ));
         }));
     }
 
@@ -190,7 +202,7 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
     public Optional<FPlayer> getPlayerByPosition(int position) {
         if (position < 1) return Optional.empty();
 
-        List<PlayTime> playTimeList = fPlayerService.getAllPlayTimes(1, position - 1);
+        List<PlayTime> playTimeList = playtimeService.getAllPlayTimes(1, position - 1);
         if (playTimeList.isEmpty()) return Optional.empty();
 
         return Optional.of(fPlayerService.getFPlayer(playTimeList.getFirst().playerId()));

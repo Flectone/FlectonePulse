@@ -3,7 +3,6 @@ package net.flectone.pulse.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonValue;
-import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.Builder;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
@@ -14,7 +13,6 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.util.constant.AdventureTag;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +119,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Anvil(Boolean enable) implements EnableSetting {
+    public record Anvil(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With
@@ -147,7 +148,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Book(Boolean enable) implements EnableSetting {
+    public record Book(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With
@@ -752,7 +756,10 @@ public record Message(
     @With
     @Builder(toBuilder = true)
     @Jacksonized
-    public record Sign(Boolean enable) implements EnableSetting {
+    public record Sign(
+            Boolean enable,
+            Boolean allowObject
+    ) implements EnableSetting {
     }
 
     @With
@@ -862,7 +869,7 @@ public record Message(
                 Boolean hideInvisible,
                 Boolean hideSpectator,
                 Boolean spectatorListOrder,
-                Boolean proxyMode,
+                Range range,
                 Ticker ticker
         ) implements EnableSetting {
         }
@@ -883,6 +890,7 @@ public record Message(
     @Jacksonized
     public record Vanilla(
             Boolean enable,
+            Boolean cancelDefaultDeathScreen,
             List<VanillaMessage> types
     ) implements EnableSetting {
 
@@ -925,7 +933,7 @@ public record Message(
 
             @Override
             public List<String> translationKeys() {
-                return translationKeys != null ? new ObjectImmutableList<>(translationKeys) : Collections.emptyList();
+                return translationKeys != null ? List.copyOf(translationKeys) : List.of();
             }
 
             @JsonValue

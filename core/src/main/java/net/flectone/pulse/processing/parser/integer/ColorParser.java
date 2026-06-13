@@ -16,7 +16,6 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.List;
 
 @Singleton
@@ -51,7 +50,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
         boolean hasOtherPermission = permissionChecker.check(context.sender(), fileFacade.permission().command().chatcolor().other());
         if (!hasOtherPermission && args.length >= maxColors ||
                 hasOtherPermission && args.length >= maxColors + 1) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<String> suggestions = new ObjectArrayList<>();

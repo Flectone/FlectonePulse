@@ -11,9 +11,8 @@ import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.listener.RedisListener;
+import net.flectone.pulse.listener.proxy.RedisProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -28,7 +27,7 @@ public class RedisProxy implements Proxy {
 
     private final FileFacade fileFacade;
     private final FLogger fLogger;
-    private final Provider<RedisListener> redisListenerProvider;
+    private final Provider<RedisProxyListener> redisListenerProvider;
     private final SystemVariableResolver systemVariableResolver;
 
     private RedisClient redisClient;

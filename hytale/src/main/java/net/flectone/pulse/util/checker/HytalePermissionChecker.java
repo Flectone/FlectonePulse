@@ -1,6 +1,7 @@
 package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +16,18 @@ import net.flectone.pulse.platform.registry.HytalePermissionRegistry;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HytalePermissionChecker implements PermissionChecker {
 
-    private final IntegrationModule integrationModule;
     private final HytalePermissionRegistry hytalePermissionRegistry;
     private final HytalePlayerAdapter hytalePlayerAdapter;
+
+    @Inject
+    private Provider<IntegrationModule> integrationModuleProvider;
 
     @Override
     public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
         if (!(entity instanceof FPlayer fPlayer) || fPlayer.isConsole()) return true;
+
+        IntegrationModule integrationModule = integrationModuleProvider.get();
         if (integrationModule.hasFPlayerPermission(fPlayer, permission)) return true;
 
         Permission.Type hytalePermission = hytalePermissionRegistry.getPermissions().get(permission);

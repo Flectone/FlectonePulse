@@ -10,9 +10,9 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPacketVanillaListener;
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPulseVanillaListener;
@@ -21,7 +21,9 @@ import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -34,7 +36,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -49,10 +51,11 @@ public class MinecraftVanillaModule extends VanillaModule {
     private final TaskScheduler taskScheduler;
     private final MinecraftPacketSender packetSender;
     private final ModuleController moduleController;
-    private final IntegrationModule integrationModule;
+    private final SocialService socialService;
 
     @Inject
     public MinecraftVanillaModule(FileFacade fileFacade,
+                                  ProxyRegistry proxyRegistry,
                                   MinecraftComponentExtractor extractor,
                                   ListenerRegistry listenerRegistry,
                                   MessagePipeline messagePipeline,
@@ -61,8 +64,8 @@ public class MinecraftVanillaModule extends VanillaModule {
                                   TaskScheduler taskScheduler,
                                   MinecraftPacketSender packetSender,
                                   ModuleController moduleController,
-                                  IntegrationModule integrationModule) {
-        super(fileFacade);
+                                  SocialService socialService) {
+        super(fileFacade, proxyRegistry, listenerRegistry, socialService);
 
         this.extractor = extractor;
         this.listenerRegistry = listenerRegistry;
@@ -72,7 +75,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
         this.moduleController = moduleController;
-        this.integrationModule = integrationModule;
+        this.socialService = socialService;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     public void send(FPlayer fPlayer, ParsedComponent parsedComponent) {
-        taskScheduler.runRegion(fPlayer, () -> privateSend(fPlayer, parsedComponent));
+        taskScheduler.runAsync(() -> privateSend(fPlayer, parsedComponent));
     }
 
     private void privateSend(FPlayer fPlayer, ParsedComponent parsedComponent) {
@@ -99,11 +102,12 @@ public class MinecraftVanillaModule extends VanillaModule {
                 if (!target.equals(fPlayer)) {
                     if (parsedComponent.vanillaMessage().multiMessage()) return;
                 } else {
-                    String format = StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey()));
-                    MessageContext messageContext = messagePipeline.createContext(fPlayer, format)
-                            .addTagResolver(argumentTag(fPlayer, parsedComponent));
-
-                    sendPersonalDeath(fPlayer, messagePipeline.build(messageContext));
+                    sendPersonalDeath(fPlayer, messagePipeline.build(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
+                            .tagResolver(argumentTag(fPlayer, parsedComponent))
+                            .build()
+                    ));
                 }
             } else {
                 range = Range.get(Range.Type.PLAYER);
@@ -114,6 +118,7 @@ public class MinecraftVanillaModule extends VanillaModule {
         }
 
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
+        boolean vanished = socialService.isVanished(fPlayer);
 
         messageDispatcher.dispatch(this, VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .base(EventMetadata.<Localization.Message.Vanilla>builder()
@@ -121,19 +126,26 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
                         .tagResolvers(fResolver -> new TagResolver[]{argumentTag(fResolver, parsedComponent)})
                         .range(range)
-                        .filter(fResolver -> integrationModule.canSeeVanished(fPlayer, fResolver)
-                                && (vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
-                        )
+                        .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
+                        .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
                         .destination(parsedComponent.vanillaMessage().destination())
-                        .integration()
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
+                                        ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
+                                        : List.of()
+                                )
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(parsedComponent.translationKey());
                             dataOutputStream.writeAsJson(parsedComponent.arguments());
+                            dataOutputStream.writeBoolean(vanished);
                         })
                         .build()
                 )
                 .parsedComponent(parsedComponent)
-                .ignoreVanish(false)
+                .fakeMessage(false)
+                .vanished(vanished)
                 .build()
         );
     }
@@ -149,7 +161,7 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     @Override
     public TagResolver argumentTag(FPlayer fResolver, ParsedComponent parsedComponent) {
-        return TagResolver.resolver(ARGUMENT, (argumentQueue, _) -> {
+        return messagePipeline.resolver(ARGUMENT, (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             OptionalInt numberArgument = argumentQueue.pop().asInt();
@@ -232,7 +244,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                 }
 
                 // fix serialization issue [%s] for console and integration
-                if (fResolver.isUnknown() && component instanceof TranslatableComponent translatableComponent
+                if ((fResolver.isUnknown() || fResolver.isConsole()) && component instanceof TranslatableComponent translatableComponent
                         && translatableComponent.key().equals("chat.square_brackets")) {
                     yield Tag.selfClosingInserting(
                             Component.text("[").color(color)
@@ -249,12 +261,15 @@ public class MinecraftVanillaModule extends VanillaModule {
 
     private Component buildFEntityComponent(FEntity fTarget, FPlayer fResolver) {
         Localization.Message.Vanilla localization = localization(fResolver);
-        String formatTarget = fTarget.type().equals(FPlayer.PLAYER_TYPE)
-                ? localization.formatPlayer()
-                : localization.formatEntity();
-
-        MessageContext context = messagePipeline.createContext(fTarget, fResolver, formatTarget);
-        return messagePipeline.build(context);
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fTarget)
+                .receiver(fResolver)
+                .message(fTarget.type().equals(FPlayer.PLAYER_TYPE)
+                        ? localization.formatPlayer()
+                        : localization.formatEntity()
+                )
+                .build()
+        );
     }
 
     private Component extractInnerText(Component component) {
@@ -271,7 +286,7 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private Component clearComponent(Component component) {
-        return component.style(Style.empty()).children(Collections.emptyList());
+        return component.style(Style.empty()).children(List.of());
     }
 
     private HoverEvent<?> findFirstHoverEvent(Component component) {
@@ -292,6 +307,6 @@ public class MinecraftVanillaModule extends VanillaModule {
     }
 
     private void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component)));
+        taskScheduler.runSync(() -> packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(platformPlayerAdapter.getEntityId(fPlayer), null, component), config().cancelDefaultDeathScreen()));
     }
 }

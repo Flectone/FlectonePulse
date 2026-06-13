@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.twitch.execution.dispatcher.TwitchCommandDispatcher;
 import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
-import org.incendo.cloud.type.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
