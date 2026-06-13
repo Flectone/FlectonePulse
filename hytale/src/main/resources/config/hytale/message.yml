@@ -45,6 +45,7 @@ brand:
 bubble:
   enable: true
   visible_to_self: true
+  translate: true
   disallowed_input: ""
   max_count: 3
   max_length: 30

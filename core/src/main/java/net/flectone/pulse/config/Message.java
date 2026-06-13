@@ -189,6 +189,7 @@ public record Message(
     public record Bubble(
             Boolean enable,
             Boolean visibleToSelf,
+            Boolean translate,
             String disallowedInput,
             Integer maxCount,
             Integer maxLength,
