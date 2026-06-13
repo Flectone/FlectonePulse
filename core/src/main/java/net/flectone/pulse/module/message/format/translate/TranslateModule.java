@@ -153,23 +153,14 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             if (autoMode) {
                 // Auto-translate mode — only player-to-player messages get the button
                 if (!(sender instanceof FPlayer)) {
-                    fLogger.debug("[History.addTag] no button — sender is not FPlayer (uuid=%s)", messageUUID);
                     return Tag.selfClosingInserting(Component.empty());
                 }
                 // Same-locale receiver — no translation done, no button
                 if (senderLocale != null && senderLocale.equals(receiverLocale)) {
-                    fLogger.debug("[History.addTag] no button — same locale %s for sender=%s receiver=%s uuid=%s",
-                            senderLocale,
-                            sender instanceof FPlayer fp ? fp.name() : "?",
-                            receiver == null ? "null" : receiver.name(),
-                            messageUUID);
                     return Tag.selfClosingInserting(Component.empty());
                 }
                 action = localization(receiver).action();
                 action = Strings.CS.replace(action, "<message>", messageUUID.toString());
-                fLogger.debug("[History.addTag] auto button: receiver=%s receiverLocale=%s senderLocale=%s uuid=%s → /toggleoriginal %s",
-                        receiver == null ? "null" : receiver.name(),
-                        receiverLocale, senderLocale, messageUUID, messageUUID);
             } else {
                 // Classic /translateto mode — author's original behavior.
                 // Parse optional <translation:src:dst> args, fallback to auto/receiver-locale.
@@ -230,11 +221,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         uniqueLocales.add(sourceLang);
 
-        fLogger.debug("[AutoTranslate] translateToAllLocales: source=%s text='%s' unique locales=%s",
-                sourceLang, originalText, uniqueLocales);
-
         if (uniqueLocales.size() <= 1) {
-            fLogger.debug("[AutoTranslate] translateToAllLocales: skip — only one locale online");
             return null;
         }
 
@@ -251,11 +238,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 .filter(targetLang -> !targetLang.equals(sourceLang))
                 .toList();
 
-        fLogger.debug("[AutoTranslate] translateToAllLocales: launching %d async translation(s) %s → %s",
-                targetLangs.size(), sourceLang, targetLangs);
-
         java.util.List<String> providers = config().providers();
-        fLogger.debug("[AutoTranslate] translateToAllLocales: provider chain=%s", providers);
 
         targetLangs.forEach(targetLang -> {
             // SYNC cache hit → populate translations immediately, NO replay needed.
@@ -266,8 +249,6 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             String cached = translationCacheService.get(sourceLang, targetLang, originalText);
             if (cached != null && !cached.isEmpty() && !cached.equals(originalText)) {
                 translations.put(targetLang, cached);
-                fLogger.debug("[AutoTranslate] translateToAllLocales: %s→%s cache HIT='%s' — populated translations, no async, no replay",
-                        sourceLang, targetLang, cached);
                 return;
             }
 
@@ -278,12 +259,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                     .thenAccept(translated -> {
                         String text = (translated != null && !translated.isEmpty()) ? translated : originalText;
                         translations.put(targetLang, text);
-                        if (text.equals(originalText)) {
-                            fLogger.debug("[AutoTranslate] translation %s→%s == original (or no provider succeeded), skipping replay",
-                                    sourceLang, targetLang);
-                        } else {
-                            fLogger.debug("[AutoTranslate] translation arrived %s→%s, triggering replay for matching receivers",
-                                    sourceLang, targetLang);
+                        if (!text.equals(originalText)) {
                             replayForLocale(targetLang);
                         }
                     })
@@ -331,20 +307,15 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                      @Nullable TranslatedMessage translatedMessage,
                      boolean needToCache) {
         if (receiver.isUnknown()) {
-            fLogger.debug("[History.save] skip — receiver is UNKNOWN (console etc), uuid=%s", messageUUID);
             return;
         }
         if (!receiver.isOnline()) {
-            fLogger.debug("[History.save] skip — receiver=%s is offline, uuid=%s", receiver.name(), messageUUID);
             return;
         }
 
         UUID receiverUUID = receiver.uuid();
         String receiverLocale = socialService.getSetting(receiver, SettingText.LOCALE);
 
-        int newGlobalSize;
-        boolean wasExisting;
-        int newViewersCount;
         synchronized (globalHistory) {
             TranslateHistoryMessage existing = null;
             for (TranslateHistoryMessage e : globalHistory) {
@@ -379,8 +350,6 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                         existing.translatedMessage().translations().putAll(translatedMessage.translations());
                     }
                 }
-                wasExisting = true;
-                newViewersCount = existing.viewers().size();
             } else {
                 TranslateHistoryMessage entry = TranslateHistoryMessage.create(
                         messageUUID, receiverLocale, component, originalText, translatedMessage
@@ -390,16 +359,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 while (globalHistory.size() > historyLength()) {
                     globalHistory.remove(0);
                 }
-                wasExisting = false;
-                newViewersCount = entry.viewers().size();
             }
-            newGlobalSize = globalHistory.size();
         }
-
-        fLogger.debug("[History.save] uuid=%s receiver=%s locale=%s text='%s' hasTranslatedMessage=%s mode=%s viewersNow=%d globalSize=%d",
-                messageUUID, receiver.name(), receiverLocale, originalText,
-                translatedMessage != null, wasExisting ? "UPDATE" : "CREATE",
-                newViewersCount, newGlobalSize);
 
         if (needToCache && !isCached(component)) {
             selfOriginatedComponents.add(component);
@@ -437,18 +398,12 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
      */
     public void clearHistory(FPlayer fPlayer) {
         UUID playerUUID = fPlayer.uuid();
-        int affectedEntries = 0;
         synchronized (globalHistory) {
             for (TranslateHistoryMessage entry : globalHistory) {
-                if (entry.viewers().remove(playerUUID)) {
-                    affectedEntries++;
-                }
+                entry.viewers().remove(playerUUID);
             }
         }
-        Set<UUID> previousToggles = playerOriginalToggles.remove(playerUUID);
-        fLogger.debug("[History.clear] player=%s — removed from %d viewer set(s), discarded %d toggle state(s)",
-                fPlayer.name(), affectedEntries,
-                previousToggles == null ? 0 : previousToggles.size());
+        playerOriginalToggles.remove(playerUUID);
     }
 
     /**
@@ -469,8 +424,6 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         if (visible.isEmpty()) {
-            fLogger.debug("[Toggle] sendUpdate: nothing to redraw for player=%s (no entries with this viewer)",
-                    fPlayer.name());
             return;
         }
 
@@ -480,29 +433,13 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         int len = historyLength();
         int emptyLines = Math.max(0, len - visible.size());
-        fLogger.debug("[Toggle] sendUpdate: player=%s locale=%s visibleEntries=%d emptyLines=%d globalSize=%d",
-                fPlayer.name(), playerLocale, visible.size(), emptyLines,
-                globalHistorySize());
 
         for (int i = 0; i < emptyLines; i++) {
             messageSender.sendMessage(fPlayer, Component.newline(), true);
         }
-        int idx = 0;
         for (TranslateHistoryMessage entry : visible) {
             boolean showOriginal = toggles.contains(entry.uuid());
-            String translationText = entry.translatedMessage() != null
-                    ? entry.translatedMessage().getTranslation(playerLocale)
-                    : null;
-            fLogger.debug("[Toggle] sendUpdate:  [%d/%d] uuid=%s text='%s' showOriginal=%s translationForLocale=%s",
-                    idx++, visible.size(), entry.uuid(), entry.originalText(),
-                    showOriginal, translationText == null ? "<none>" : "'" + translationText + "'");
             messageSender.sendMessage(fPlayer, entry.getDisplayComponent(playerLocale, showOriginal), true);
-        }
-    }
-
-    private int globalHistorySize() {
-        synchronized (globalHistory) {
-            return globalHistory.size();
         }
     }
 
@@ -519,23 +456,15 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             String cached = translationCacheService.get(tm.originalLang(), receiverLocale, entry.originalText());
             if (cached != null && !cached.isEmpty() && !cached.equals(entry.originalText())) {
                 tm.translations().put(receiverLocale, cached);
-                fLogger.debug("[Toggle] sendUpdate: filled %s→%s translation from global cache for uuid=%s = '%s'",
-                        tm.originalLang(), receiverLocale, entry.uuid(), cached);
             }
         }
     }
 
     public boolean toggleOriginal(FPlayer fPlayer, UUID messageUUID) {
-        fLogger.debug("[Toggle] toggleOriginal called: player=%s uuid=%s",
-                fPlayer == null ? "null" : fPlayer.name(), messageUUID);
-
         if (moduleController.isDisabledFor(this, fPlayer)) {
-            fLogger.debug("[Toggle] skip: module disabled for player=%s",
-                    fPlayer == null ? "null" : fPlayer.name());
             return false;
         }
         if (messageUUID == null) {
-            fLogger.debug("[Toggle] skip: messageUUID is null");
             return false;
         }
 
@@ -552,15 +481,12 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         if (entry == null) {
-            fLogger.debug("[Toggle] skip: entry uuid=%s not found in global history", messageUUID);
             return false;
         }
         if (!entry.viewers().contains(playerUUID)) {
-            fLogger.debug("[Toggle] skip: player=%s did not see uuid=%s", fPlayer.name(), messageUUID);
             return false;
         }
         if (!entry.hasTranslations()) {
-            fLogger.debug("[Toggle] skip: entry uuid=%s has no translations (server/system message)", messageUUID);
             return false;
         }
 
@@ -569,9 +495,6 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         boolean nowShowingOriginal = !wasShowingOriginal;
         if (nowShowingOriginal) toggles.add(messageUUID);
         else toggles.remove(messageUUID);
-
-        fLogger.debug("[Toggle] flipped player=%s showOriginal for uuid=%s: %s → %s (originalText='%s')",
-                fPlayer.name(), messageUUID, wasShowingOriginal, nowShowingOriginal, entry.originalText());
 
         // If toggled to "show translation" but no usable translation exists, kick off retry.
         if (!nowShowingOriginal) {
@@ -593,20 +516,13 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         boolean usable = existing != null && !existing.isEmpty() && !existing.equals(entry.originalText());
         if (usable) return;
 
-        fLogger.debug("[Toggle] no usable translation for %s→%s on uuid=%s, kicking off retry via chain",
-                tm.originalLang(), playerLocale, entry.uuid());
-
         UUID receiverUUID = fPlayer.uuid();
         translationCacheService.translateAsync(tm.originalLang(), playerLocale, entry.originalText(), config().providers())
                 .thenAccept(result -> {
                     if (result == null || result.isEmpty() || result.equals(entry.originalText())) {
-                        fLogger.debug("[Toggle] retry %s→%s for uuid=%s produced no usable translation",
-                                tm.originalLang(), playerLocale, entry.uuid());
                         return;
                     }
                     tm.translations().put(playerLocale, result);
-                    fLogger.debug("[Toggle] retry %s→%s for uuid=%s succeeded with '%s', redrawing",
-                            tm.originalLang(), playerLocale, entry.uuid(), result);
                     sendUpdate(receiverUUID);
                 });
     }

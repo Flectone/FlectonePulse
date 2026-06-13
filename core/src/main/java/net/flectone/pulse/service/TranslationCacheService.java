@@ -51,14 +51,12 @@ public class TranslationCacheService {
     public @Nullable String get(String sourceLang, String targetLang, String text) {
         String key = getCacheKey(sourceLang, targetLang, text);
         String cached = getCache().getIfPresent(key);
-        fLogger.debug("[AutoTranslate] cache GET %s → %s", key, cached == null ? "MISS" : "HIT='" + cached + "'");
         return cached;
     }
 
     public void put(String sourceLang, String targetLang, String text, String translation) {
         String key = getCacheKey(sourceLang, targetLang, text);
         getCache().put(key, translation);
-        fLogger.debug("[AutoTranslate] cache PUT %s → '%s'", key, translation);
     }
 
     /**
@@ -75,8 +73,6 @@ public class TranslationCacheService {
             String urlString = "https://api.mymemory.translated.net/get?q=" + encodedText
                 + "&langpair=" + normalizedSource + "%7C" + normalizedTarget;
 
-            fLogger.debug("[AutoTranslate] MyMemory: GET %s", urlString);
-
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("GET");
@@ -85,7 +81,6 @@ public class TranslationCacheService {
             connection.setReadTimeout(5000);
 
             int responseCode = connection.getResponseCode();
-            fLogger.debug("[AutoTranslate] MyMemory: response code=%d for %s→%s", responseCode, normalizedSource, normalizedTarget);
 
             if (responseCode != 200) {
                 fLogger.warning("[AutoTranslate] MyMemory: non-200 response (%d) for %s→%s, returning null",
@@ -102,9 +97,6 @@ public class TranslationCacheService {
             in.close();
 
             String jsonResponse = response.toString();
-            String preview = jsonResponse.length() > 300 ? jsonResponse.substring(0, 300) + "...[truncated]" : jsonResponse;
-            fLogger.debug("[AutoTranslate] MyMemory: response body (preview)=%s", preview);
-
             JsonElement root = new JsonParser().parse(jsonResponse);
             if (!root.isJsonObject()) {
                 fLogger.warning("[AutoTranslate] MyMemory: response is not a JSON object");
@@ -121,9 +113,6 @@ public class TranslationCacheService {
                 return null;
             }
             String translation = translatedTextEl.getAsString();
-
-            fLogger.debug("[AutoTranslate] MyMemory: parsed translation %s→%s = '%s'",
-                    normalizedSource, normalizedTarget, translation);
 
             return translation;
         } catch (Exception e) {
@@ -156,14 +145,12 @@ public class TranslationCacheService {
                                                     @Nullable List<String> providers) {
         String cached = get(sourceLang, targetLang, text);
         if (cached != null && !cached.isEmpty()) {
-            fLogger.debug("[AutoTranslate] chain %s→%s: cache HIT, returning immediately", sourceLang, targetLang);
             return CompletableFuture.completedFuture(cached);
         }
 
         String key = sourceLang + ":" + targetLang + ":" + text;
         CompletableFuture<String> existing = inFlight.get(key);
         if (existing != null) {
-            fLogger.debug("[AutoTranslate] chain %s→%s: request in flight, joining existing future", sourceLang, targetLang);
             return existing;
         }
 
@@ -190,17 +177,12 @@ public class TranslationCacheService {
     private @Nullable String iterateProviders(String sourceLang, String targetLang, String text, List<String> providers) {
         for (String provider : providers) {
             String upper = provider == null ? "" : provider.trim().toUpperCase();
-            fLogger.debug("[AutoTranslate] chain %s→%s: trying provider %s", sourceLang, targetLang, upper);
 
             String result = callProvider(upper, sourceLang, targetLang, text);
             if (result != null && !result.isEmpty() && !result.equals(text)) {
-                fLogger.debug("[AutoTranslate] chain %s→%s: %s succeeded with '%s'",
-                        sourceLang, targetLang, upper, result);
                 put(sourceLang, targetLang, text, result);
                 return result;
             }
-            fLogger.debug("[AutoTranslate] chain %s→%s: %s failed or returned input verbatim, trying next",
-                    sourceLang, targetLang, upper);
         }
         fLogger.warning("[AutoTranslate] chain %s→%s: ALL providers failed for text='%s'",
                 sourceLang, targetLang, text);
@@ -232,22 +214,13 @@ public class TranslationCacheService {
                                                   TranslateFn fn) {
         String cached = get(sourceLang, targetLang, text);
         if (cached != null && !cached.isEmpty()) {
-            fLogger.debug("[AutoTranslate] async %s %s→%s: using cached translation, skip API call",
-                    providerLabel, sourceLang, targetLang);
             return CompletableFuture.completedFuture(cached);
         }
 
-        fLogger.debug("[AutoTranslate] async %s %s→%s: submitting API task to executor",
-                providerLabel, sourceLang, targetLang);
         return CompletableFuture.supplyAsync(() -> {
-            fLogger.debug("[AutoTranslate] async %s %s→%s: executor started task on thread=%s",
-                    providerLabel, sourceLang, targetLang, Thread.currentThread().getName());
             String translation = fn.translate(sourceLang, targetLang, text);
             if (translation != null && !translation.isEmpty()) {
                 put(sourceLang, targetLang, text, translation);
-            } else {
-                fLogger.debug("[AutoTranslate] async %s %s→%s: API returned null/empty, not caching",
-                        providerLabel, sourceLang, targetLang);
             }
             return translation;
         }, executorService);
@@ -275,8 +248,6 @@ public class TranslationCacheService {
                     + "&tl=" + normalizedTarget
                     + "&dt=t&ie=UTF-8&oe=UTF-8&q=" + encodedText;
 
-            fLogger.debug("[AutoTranslate] Google: GET %s", urlString);
-
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("GET");
@@ -285,8 +256,6 @@ public class TranslationCacheService {
             connection.setReadTimeout(5000);
 
             int responseCode = connection.getResponseCode();
-            fLogger.debug("[AutoTranslate] Google: response code=%d for %s→%s",
-                    responseCode, normalizedSource, normalizedTarget);
 
             if (responseCode != 200) {
                 fLogger.warning("[AutoTranslate] Google: non-200 response (%d), returning null", responseCode);
@@ -302,9 +271,6 @@ public class TranslationCacheService {
             in.close();
 
             String jsonResponse = response.toString();
-            String preview = jsonResponse.length() > 300 ? jsonResponse.substring(0, 300) + "...[truncated]" : jsonResponse;
-            fLogger.debug("[AutoTranslate] Google: response body (preview)=%s", preview);
-
             // Response shape: [[["translated text","original",null,null,1]],null,"en",...]
             JsonElement root = new JsonParser().parse(jsonResponse);
             if (!root.isJsonArray()) {
@@ -327,9 +293,6 @@ public class TranslationCacheService {
                 }
             });
             String translation = translatedBuilder.toString();
-
-            fLogger.debug("[AutoTranslate] Google: parsed translation %s→%s = '%s'",
-                    normalizedSource, normalizedTarget, translation);
 
             return translation.isEmpty() ? null : translation;
         } catch (Exception e) {

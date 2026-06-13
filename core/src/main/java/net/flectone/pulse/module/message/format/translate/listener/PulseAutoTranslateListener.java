@@ -20,7 +20,6 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
 import java.util.Map;
@@ -44,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 public class PulseAutoTranslateListener implements PulseListener {
 
     private final TranslateModule translateModule;
-    private final FLogger fLogger;
     private final SocialService socialService;
 
     /** Bridges per-message PrepareEvent to per-receiver SendEvent. */
@@ -81,19 +79,12 @@ public class PulseAutoTranslateListener implements PulseListener {
 
         String dedupKey = sender.uuid() + ":" + senderLocale + ":" + message;
         if (recentMessages.getIfPresent(dedupKey) != null) {
-            fLogger.debug("[AutoTranslate] PrepareEvent: skip uuid=%s — duplicate of recent message (sender=%s text='%s')",
-                    messageUUID, sender.name(), message);
             return;
         }
         recentMessages.put(dedupKey, Boolean.TRUE);
 
-        fLogger.debug("[AutoTranslate] PrepareEvent: uuid=%s sender=%s senderLocale=%s message='%s'",
-                messageUUID, sender.name(), senderLocale, message);
-
         TranslatedMessage translatedMessage = translateModule.translateToAllLocales(message, senderLocale);
         if (translatedMessage == null) {
-            fLogger.debug("[AutoTranslate] PrepareEvent: uuid=%s — nothing to translate (single locale or module disabled)",
-                    messageUUID);
             return;
         }
 
@@ -156,15 +147,11 @@ public class PulseAutoTranslateListener implements PulseListener {
                                 .originalLang(sourceLang)
                                 .translations(translations)
                                 .build();
-                        fLogger.debug("[AutoTranslate] SendEvent: synthesized TranslatedMessage for dedup-skipped uuid=%s",
-                                messageUUID);
                     } else {
                         translatedMessage.translations().put(receiverLocale, cached);
                     }
 
                     event = event.withMessage(translatedComponent);
-                    fLogger.debug("[AutoTranslate] SendEvent: cache HIT %s→%s for uuid=%s receiver=%s — applied translation directly",
-                            sourceLang, receiverLocale, messageUUID, receiver.name());
                 }
             }
         }
@@ -216,8 +203,6 @@ public class PulseAutoTranslateListener implements PulseListener {
         String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
                 .serialize(component);
         if (plain.isBlank()) {
-            fLogger.debug("[History.receive] skip — empty/blank plain text from MessageReceiveEvent for receiver=%s",
-                    event.player() == null ? "null" : event.player().name());
             return;
         }
 
@@ -234,9 +219,6 @@ public class PulseAutoTranslateListener implements PulseListener {
         // entries across reconnects (useful for short reloads).
         if (!Boolean.FALSE.equals(translateModule.config().clearHistoryOnQuit())) {
             translateModule.clearHistory(event.player());
-        } else {
-            fLogger.debug("[History.clear] player=%s — clear_history_on_quit disabled by config, keeping entries",
-                    event.player() == null ? "null" : event.player().name());
         }
     }
 
