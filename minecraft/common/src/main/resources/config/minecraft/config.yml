@@ -137,7 +137,7 @@ cache:
       size: 5000
     TRANSLATION_CACHE:
       invalidate_on_reload: false
-      duration: 24
+      duration: 1
       time_unit: "HOURS"
       size: 50000
     PROFILE_PROPERTY:
