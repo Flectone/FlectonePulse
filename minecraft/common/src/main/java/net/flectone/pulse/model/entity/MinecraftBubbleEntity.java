@@ -2,6 +2,7 @@ package net.flectone.pulse.model.entity;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
+import lombok.Setter;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.kyori.adventure.text.Component;
 
@@ -10,7 +11,12 @@ public class MinecraftBubbleEntity extends MinecraftPacketEntity {
 
     private final Bubble bubble;
     private final FPlayer viewer;
-    private final Component message;
+
+    // Mutable so a late-arriving translation can replace the rendered text in place
+    // (metadata packet, no respawn) when the chunk count is unchanged.
+    @Setter
+    private Component message;
+
     private final boolean visible;
 
     public MinecraftBubbleEntity(int id, EntityType entityType, Bubble bubble, FPlayer viewer, Component message, boolean visible) {
