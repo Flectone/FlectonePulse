@@ -47,7 +47,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     // Server-wide, time-ordered chat history. Each entry is shared across all its
     // viewers (Set<UUID>) — one Component per message, not one per receiver.
     // Synchronize on this list; snapshots take a local copy under lock.
-    private final List<TranslateHistoryMessage> globalHistory = new java.util.ArrayList<>();
+    private final List<TranslateHistoryMessage> globalHistory = new ArrayList<>();
 
     // Per-player "show original" toggles, kept separate because history entries are shared.
     private final Map<UUID, Set<UUID>> playerOriginalToggles = new ConcurrentHashMap<>();
@@ -212,7 +212,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 .filter(targetLang -> !targetLang.equals(sourceLang))
                 .toList();
 
-        java.util.List<String> providers = config().providers();
+        List<String> providers = config().providers();
 
         targetLangs.forEach(targetLang -> {
             // SYNC cache hit → populate translations immediately, NO replay needed.
@@ -374,7 +374,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
 
         fillTranslationsFromCache(visible, playerLocale);
 
-        Set<UUID> toggles = playerOriginalToggles.getOrDefault(receiverUUID, java.util.Set.of());
+        Set<UUID> toggles = playerOriginalToggles.getOrDefault(receiverUUID, Set.of());
 
         int len = historyLength();
         int emptyLines = Math.max(0, len - visible.size());
