@@ -6,19 +6,9 @@ import lombok.With;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Holds the original chat text plus per-locale translation strings (not Components).
- *
- * <p>Translations are kept as plain text — the formatted Component is produced
- * lazily by {@code Component.replaceText} against the stored
- * {@code originalComponent} in {@code TranslateHistoryMessage}, swapping
- * {@code originalText} → translation. This preserves all original formatting
- * (player name, colors, ⇄ button) without rebuilding through the message
- * pipeline.
- *
- * <p>The map is concurrent so async-translation callbacks can write while
- * the chat redraw reads.
- */
+// Original chat text plus per-locale translation strings (plain text, not Components —
+// the Component is produced lazily via replaceText in TranslateHistoryMessage).
+// The map is concurrent so async callbacks can write while the redraw reads.
 @With
 @Builder(toBuilder = true)
 public record TranslatedMessage(

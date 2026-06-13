@@ -44,25 +44,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslateModule implements ModuleLocalization<Localization.Message.Format.Translate> {
 
-    /**
-     * Global server-wide chat history, time-ordered. Each entry carries the
-     * formatted Component and a {@code Set<UUID> viewers} — every player who
-     * saw it. Memory: 100 players seeing one message = 1 entry with a 100-set
-     * of viewer UUIDs, not 100 duplicated Component trees.
-     *
-     * <p>Synchronize on this list for add/remove operations; iteration during
-     * a snapshot (sendUpdate, toggle lookup) takes a local copy under lock.
-     */
+    // Server-wide, time-ordered chat history. Each entry is shared across all its
+    // viewers (Set<UUID>) — one Component per message, not one per receiver.
+    // Synchronize on this list; snapshots take a local copy under lock.
     private final List<TranslateHistoryMessage> globalHistory = new java.util.ArrayList<>();
 
-    /**
-     * Per-player toggle state: which message UUIDs that player has flipped to
-     * "show original". Stored separately from the history entries because it's
-     * per-player; the entries themselves are shared.
-     */
+    // Per-player "show original" toggles, kept separate because history entries are shared.
     private final Map<UUID, Set<UUID>> playerOriginalToggles = new ConcurrentHashMap<>();
 
-    /** Components originated by FlectonePulse itself — dedup against MessageReceiveEvent. */
+    // Components the plugin itself sent — dedup against MessageReceiveEvent.
     private final List<Component> selfOriginatedComponents = new CopyOnWriteArrayList<>();
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
@@ -124,18 +114,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return uuid;
     }
 
-    /**
-     * Adds the {@code <translation>} tag resolver. Two button modes:
-     *
-     * <ul>
-     *   <li><b>auto: true</b> (default) — our async-translate path. Button runs
-     *       {@code /toggleoriginal <uuid>}. Hidden for same-locale receivers
-     *       (no translation done for them so nothing to toggle).</li>
-     *   <li><b>auto: false</b> — author's classic on-demand path. Button runs
-     *       {@code /translateto <src> <dst> <uuid>} which synchronously
-     *       translates and dispatches a new chat line. No history, no toggle.</li>
-     * </ul>
-     */
+    // Adds the <translation> tag resolver. auto:true (default) builds a /toggleoriginal
+    // button; auto:false keeps the classic on-demand /translateto path.
     public MessageContext addTag(MessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
@@ -202,15 +182,9 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }));
     }
 
-    /**
-     * Start async translation jobs for each unique online locale other than the source.
-     * Returns the {@link TranslatedMessage} immediately — its {@code translations} map
-     * is populated by the async callbacks. When each translation lands, the listener
-     * triggers a chat redraw via {@link #sendUpdate(UUID)} for matching receivers.
-     *
-     * <p>Returns {@code null} if only one locale is online (source locale only) — no
-     * translation is needed.
-     */
+    // Kicks off async translation for each unique online locale != source. The returned
+    // TranslatedMessage's translations map is filled by the callbacks. Null if only the
+    // source locale is online (nothing to translate).
     public @Nullable TranslatedMessage translateToAllLocales(String originalText, String sourceLang) {
         if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) return null;
 
@@ -274,16 +248,11 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return translatedMessage;
     }
 
-    /** Synchronous cache lookup — returns the cached translation if present. */
     public @Nullable String getCachedTranslation(String sourceLang, String targetLang, String text) {
         return translationCacheService.get(sourceLang, targetLang, text);
     }
 
-    /**
-     * After a translation lands for {@code locale}, redraw chat for every online
-     * receiver whose locale matches — they had the original; now they see the
-     * translation.
-     */
+    // After a translation lands, redraw chat for every online receiver with that locale.
     private void replayForLocale(String locale) {
         if (locale == null) return;
 
@@ -292,14 +261,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 .forEach(player -> sendUpdate(player.uuid()));
     }
 
-    // ---- Global chat history & per-player replay ----
-
-    /**
-     * Store the chat event in the global history, adding this receiver to the
-     * viewer set of the entry. If the message UUID already exists (because
-     * another receiver saved it first), we just add this receiver to viewers;
-     * the Component itself is shared.
-     */
+    // Stores the chat event in the global history and adds this receiver to the entry's
+    // viewer set. If the UUID already exists, only the viewer is added — Component is shared.
     public void save(FPlayer receiver,
                      UUID messageUUID,
                      Component component,
@@ -330,23 +293,17 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 if (receiverLocale != null && !existing.componentsByLocale().containsKey(receiverLocale)) {
                     existing.componentsByLocale().put(receiverLocale, component);
                 }
-                // Merge translatedMessage into existing entry. Save() is called multiple
-                // times per messageUUID (once per receiver). The first call may have a
-                // null TranslatedMessage (e.g. for the sender themselves whose locale
-                // matches the source so no translation was synthesized); a later call
-                // for another receiver may have synthesized one from cache. Without this
-                // merge the entry would be stuck with the first save's null TM and
-                // toggle would report 'has no translations'.
+                // save() runs once per receiver; the first call may carry a null TM (e.g.
+                // the sender, whose locale matches the source). Merge in a later non-null TM
+                // so the entry stays toggleable instead of stuck on the first save's null.
                 if (translatedMessage != null) {
                     if (existing.translatedMessage() == null) {
-                        // Replace the entry in-place — record fields are final.
+                        // Record fields are final — replace the entry in-place.
                         TranslateHistoryMessage updated = existing.withTranslatedMessage(translatedMessage);
                         int idx = globalHistory.indexOf(existing);
                         if (idx >= 0) globalHistory.set(idx, updated);
                         existing = updated;
                     } else {
-                        // Both non-null — merge per-locale translations into the
-                        // existing TranslatedMessage's mutable translations map.
                         existing.translatedMessage().translations().putAll(translatedMessage.translations());
                     }
                 }
@@ -375,16 +332,9 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         selfOriginatedComponents.remove(component);
     }
 
-    /**
-     * Register a Component as plugin-originated for ReceiveEvent dedup.
-     *
-     * <p>Caller must pass the EXACT Component instance that will be carried by
-     * the outgoing packet — i.e. the result of any prior {@code event.withMessage(...)}
-     * substitution, not the pre-modification original. PacketEvents forwards
-     * the same reference back via {@code wrapper.getMessage()}; {@link #isCached}
-     * compares by reference, so passing the wrong variant silently breaks dedup
-     * and the listener saves a duplicate history entry.
-     */
+    // Registers a Component as plugin-originated for ReceiveEvent dedup. Must be the
+    // EXACT instance carried by the outgoing packet (post-withMessage) — isCached compares
+    // by reference, so the wrong variant silently breaks dedup and duplicates the entry.
     public void markSelfOriginated(Component sentComponent) {
         if (sentComponent == null) return;
         if (!selfOriginatedComponents.contains(sentComponent)) {
@@ -392,10 +342,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
     }
 
-    /**
-     * Player left — drop them from every viewer set and discard their toggle state.
-     * Entries themselves stay (other players may still view them).
-     */
+    // Player left — drop them from every viewer set and discard their toggles.
+    // Entries themselves stay (other players may still view them).
     public void clearHistory(FPlayer fPlayer) {
         UUID playerUUID = fPlayer.uuid();
         synchronized (globalHistory) {
@@ -406,12 +354,9 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         playerOriginalToggles.remove(playerUUID);
     }
 
-    /**
-     * Brute-force chat redraw for one receiver: filter the global history to
-     * entries this receiver saw, fill any missing translations from the global
-     * cache, then push enough empty newlines to scroll old chat off-screen
-     * before reprinting.
-     */
+    // Brute-force chat redraw for one receiver: filter history to what they saw, fill
+    // missing translations from cache, then push empty newlines to scroll old chat
+    // off-screen before reprinting.
     public void sendUpdate(UUID receiverUUID) {
         FPlayer fPlayer = fPlayerService.getFPlayer(receiverUUID);
         String playerLocale = socialService.getSetting(fPlayer, SettingText.LOCALE);
@@ -527,15 +472,10 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                 });
     }
 
-    /**
-     * History length — borrows the value from DeleteModule's config to keep behavior
-     * consistent (both modules push out the same number of empty lines).
-     */
+    // Borrows DeleteModule's config so both push out the same number of empty lines.
     private int historyLength() {
         return fileFacade.message().format().moderation().delete().historyLength();
     }
-
-    // ---- Original message lookup by UUID (kept from author's code) ----
 
     @Nullable
     public String getMessage(String stringUUID) {

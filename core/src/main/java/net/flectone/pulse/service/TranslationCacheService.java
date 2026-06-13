@@ -33,16 +33,11 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslationCacheService {
 
-    /** Base endpoint of the MyMemory public translation API. */
     private static final String MYMEMORY_API_URL = "https://api.mymemory.translated.net/get";
-    /** Base endpoint of the free Google Translate gtx API. */
     private static final String GOOGLE_TRANSLATE_API_URL = "https://translate.googleapis.com/translate_a/single";
 
-    /**
-     * Minecraft locales whose region is meaningful and accepted by both Google gtx
-     * and MyMemory (hyphenated, uppercase region). For these we keep the region
-     * instead of collapsing to the base ISO 639-1 code.
-     */
+    // Locales whose region is accepted by both providers — keep the region instead
+    // of collapsing to the base ISO 639-1 code.
     private static final Map<String, String> REGION_AWARE_LOCALES = Map.of(
             "zh_cn", "zh-CN",
             "zh_tw", "zh-TW",
@@ -57,12 +52,11 @@ public class TranslationCacheService {
     private final Provider<IntegrationModule> integrationModuleProvider;
     private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-    /** Minimal MyMemory response shape — only the fields actually read. */
     private record MyMemoryResponse(MyMemoryResponseData responseData) {}
 
     private record MyMemoryResponseData(String translatedText) {}
 
-    /** In-flight requests deduplication — same (source, target, text) returns the same future. */
+    // Same (source, target, text) shares one future while a request is running.
     private final Map<String, CompletableFuture<String>> inFlight = new ConcurrentHashMap<>();
 
     private Cache<String, String> getCache() {
@@ -84,10 +78,6 @@ public class TranslationCacheService {
         getCache().put(key, translation);
     }
 
-    /**
-     * Translate via MyMemory public API. Returns null on any failure.
-     * Response JSON is parsed with Gson so unicode escapes are decoded properly.
-     */
     public @Nullable String translateWithMyMemory(String sourceLang, String targetLang, String text) {
         try {
             String normalizedSource = normalizeLangCode(sourceLang);
@@ -149,15 +139,8 @@ public class TranslationCacheService {
         return submitAsync("Google", sourceLang, targetLang, text, this::translateWithGoogle);
     }
 
-    /**
-     * Run the configured provider chain — try each in order, return the first
-     * non-null/non-empty translation that differs from the input text. Any 200-OK
-     * with text==input or any error response moves on to the next provider.
-     *
-     * <p>De-duplicated by (source, target, text) — concurrent requests for the
-     * same key share a single future. Empty providers list → warning with a
-     * config example, auto-translate is effectively disabled for this call.
-     */
+    // Tries each provider in order, returns the first translation that differs from
+    // the input. Concurrent requests for the same key share one future (inFlight).
     public CompletableFuture<String> translateAsync(String sourceLang,
                                                     String targetLang,
                                                     String text,
@@ -250,12 +233,7 @@ public class TranslationCacheService {
         @Nullable String translate(String sourceLang, String targetLang, String text);
     }
 
-    /**
-     * Translate via free Google Translate gtx endpoint — no API key required.
-     * Used as the default auto-translate provider; MyMemory is opt-in because
-     * it tends to return Azerbaijani/etc on auto-detect and has a 1000 word/day
-     * IP rate limit.
-     */
+    // Free Google Translate gtx endpoint — no API key required, default provider.
     public @Nullable String translateWithGoogle(String sourceLang, String targetLang, String text) {
         try {
             String normalizedSource = normalizeLangCode(sourceLang);
@@ -321,12 +299,8 @@ public class TranslationCacheService {
         }
     }
 
-    /**
-     * Normalize language code from minecraft format to ISO 639-1.
-     * Examples: en_us → en, ru_ru → ru.
-     * Region-aware locales keep their region (zh_cn → zh-CN, pt_br → pt-BR) since
-     * both Google gtx and MyMemory accept and need it to disambiguate.
-     */
+    // minecraft locale → ISO 639-1 (en_us → en), except region-aware locales which
+    // keep their region (zh_cn → zh-CN) since providers need it to disambiguate.
     private String normalizeLangCode(String langCode) {
         if (langCode == null || langCode.isEmpty()) {
             return "en";

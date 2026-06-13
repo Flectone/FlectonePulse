@@ -27,17 +27,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Drives auto-translation of chat plus captures the full chat stream so the
- * replay (triggered on translation arrival or toggle click) restores all
- * messages a player has seen — chat, server announcements, join/quit, etc.
- *
- * <p>Without the full stream, replay would only redraw player chat and push
- * server messages off-screen, since the brute-redraw rewrites the visible
- * chat area from scratch.
- *
- * <p>Self-contained: no reference to DeleteModule.
- */
+// Drives auto-translation and captures the full chat stream (chat, announcements,
+// join/quit) so the brute-redraw can restore everything a player saw — otherwise
+// replay would only redraw player chat and push the rest off-screen.
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseAutoTranslateListener implements PulseListener {
@@ -45,16 +37,13 @@ public class PulseAutoTranslateListener implements PulseListener {
     private final TranslateModule translateModule;
     private final SocialService socialService;
 
-    /** Bridges per-message PrepareEvent to per-receiver SendEvent. */
+    // Bridges per-message PrepareEvent to per-receiver SendEvent.
     private final Cache<UUID, TranslatedMessage> preparedTranslations = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build();
 
-    /**
-     * Dedupes duplicate PrepareEvent fires within 1s for the same (sender, text).
-     * On Paper/Purpur the chat pipeline sometimes dispatches twice — without this
-     * we'd issue 2 API calls, save 2 history entries, and trigger 2 replays.
-     */
+    // Dedupes duplicate PrepareEvent fires within 1s for the same (sender, text):
+    // Paper/Purpur sometimes dispatch chat twice, which would double API calls/entries/replays.
     private final Cache<String, Boolean> recentMessages = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
             .build();
@@ -91,12 +80,8 @@ public class PulseAutoTranslateListener implements PulseListener {
         preparedTranslations.put(messageUUID, translatedMessage);
     }
 
-    /**
-     * Per-receiver chat send — record EVERY chat into history, with or without
-     * translation. This is critical for replay: when a translation lands and
-     * we redraw chat, we must also redraw all other player chat that came in
-     * between, otherwise it gets pushed off-screen.
-     */
+    // Records EVERY chat into history (translated or not). Needed for replay: when a
+    // translation lands we redraw all chat that came between, else it scrolls off-screen.
     @Pulse(priority = Event.Priority.HIGH)
     public MessageSendEvent onMessageSendEvent(MessageSendEvent event) {
         if (!isAutoMode()) return event;
@@ -156,33 +141,20 @@ public class PulseAutoTranslateListener implements PulseListener {
             }
         }
 
-        // Always save to history. Three cases:
-        //   - Player chat with TranslatedMessage → full toggle support.
-        //   - Dedup-skipped repeat with cache HIT → TranslatedMessage was just synthesized
-        //     above, toggle also works.
-        //   - System / server-side messages (join/quit, /give output, plugin announcements)
-        //     where sender isn't FPlayer → translatedMessage is null, entry is not toggleable
-        //     but is still redrawn during sendUpdate so chat history stays intact.
-        // needToCache=false on save: dedup against the outgoing packet is handled below by
-        // markSelfOriginated against event.message(), which reflects any prior withMessage.
+        // Always save. translatedMessage may be null (system/server messages) — those stay
+        // non-toggleable but are still redrawn so history is intact. needToCache=false: dedup
+        // is handled below via markSelfOriginated against the actual outgoing component.
         translateModule.save(receiver, messageUUID, originalComponent, originalText, translatedMessage, false);
 
-        // Register what is actually about to be sent (may be a translated variant after
-        // event.withMessage). The outgoing PacketSendEvent → MessageReceiveEvent will see
-        // the same Component reference and isCached will skip it — no duplicate entries.
+        // Register the component actually about to be sent (may be the translated variant).
+        // ReceiveEvent will see the same reference and isCached skips it — no duplicate entry.
         translateModule.markSelfOriginated(event.message());
 
         return event;
     }
 
-    /**
-     * Server-originated messages (join/quit, vanilla broadcasts, other plugins'
-     * messages) arrive here. Save them into the same history so chat redraw
-     * preserves them.
-     *
-     * <p>Self-originated components (those the plugin sent in onMessageSendEvent
-     * just above) get filtered out via the isCached flag to avoid duplicates.
-     */
+    // Server-originated messages (join/quit, broadcasts, other plugins) land here and go
+    // into the same history. Self-originated components are filtered via isCached.
     @Pulse(priority = Event.Priority.MONITOR)
     public void onMessageReceiveEvent(MessageReceiveEvent event) {
         if (!isAutoMode()) return;
@@ -195,11 +167,8 @@ public class PulseAutoTranslateListener implements PulseListener {
             return;
         }
 
-        // Skip components whose plain-text serialization is blank — these are
-        // typically chat-pipeline echoes (bubble updates, internal newlines, the
-        // plugin's own already-sent chat caught on the return trip) that bloat
-        // the global history with empty-text entries. The visible chat doesn't
-        // care about them, and replay rendering would show empty lines.
+        // Skip blank components — chat-pipeline echoes (bubble updates, internal newlines)
+        // that would bloat history with empty entries and render as blank replay lines.
         String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
                 .serialize(component);
         if (plain.isBlank()) {
@@ -222,7 +191,6 @@ public class PulseAutoTranslateListener implements PulseListener {
         }
     }
 
-    /** True when message.format.translate.auto is enabled (default). */
     private boolean isAutoMode() {
         return !Boolean.FALSE.equals(translateModule.config().auto());
     }

@@ -20,14 +20,9 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.util.UUID;
 
-/**
- * /toggleoriginal &lt;message-uuid&gt; — flip the displayed version of a chat message
- * between auto-translated and original.
- *
- * <p>Wired to {@link TranslateModule#toggleOriginal} only — no DeleteModule reference.
- * Reuses the Deletemessage command config (cooldown / aliases / permission) since
- * the plugin doesn't have a dedicated config record for this command.
- */
+// /toggleoriginal <message-uuid> — flips a chat message between translated and original.
+// Reuses the Deletemessage command config (cooldown/aliases/permission) since there's no
+// dedicated config record for this command.
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ToggleOriginalModule implements ModuleCommand<Localization.Command.Deletemessage> {
