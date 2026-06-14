@@ -137,6 +137,22 @@ public class PulseAutoTranslateListener implements PulseListener {
                     }
 
                     event = event.withMessage(translatedComponent);
+                } else if (translatedMessage == null) {
+                    // Cold cache AND no prepared TranslatedMessage. This is the private-message
+                    // (tell/reply) receiver copy: its PrepareEvent is deduped against the sender
+                    // copy (same sender+text), so no TM was ever wired to its UUID, and without a
+                    // TM the history entry can never be backfilled by replay. Synthesize a TM now
+                    // so fillTranslationsFromCache can fill it later, and drive the async fill
+                    // ourselves scoped to THIS receiver (no leak to other same-locale players).
+                    Map<String, String> translations = new ConcurrentHashMap<>();
+                    translations.put(sourceLang, originalText);
+                    translatedMessage = TranslatedMessage.builder()
+                            .originalText(originalText)
+                            .originalLang(sourceLang)
+                            .translations(translations)
+                            .build();
+
+                    translateModule.ensureTranslationForReceiver(sourceLang, receiverLocale, originalText, receiver.uuid());
                 }
             }
         }
