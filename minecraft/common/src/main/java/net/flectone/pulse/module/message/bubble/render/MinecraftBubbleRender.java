@@ -121,8 +121,8 @@ public class MinecraftBubbleRender implements BubbleRender {
         maybeScheduleTranslationUpdate(fViewer, bubble, chunkTexts, textEntities);
     }
 
-    // Renders the vertical stack (one text entity per chunk, top chunk first) and returns
-    // the created text entities in chunk order.
+    // Renders the vertical stack (one text entity per chunk, chunkIndex 0 on top) and
+    // returns the created text entities in chunk order (index i == chunkIndex i).
     private List<MinecraftBubbleEntity> renderChunkStack(FPlayer fViewer, Bubble bubble, List<String> chunkTexts) {
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
@@ -130,9 +130,11 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         List<MinecraftBubbleEntity> textEntities = new ObjectArrayList<>();
 
-        // Push so the FIRST chunk ends up on top of the stack: iterate in reverse, as
-        // each push prepends to the deque.
-        for (int i = chunkTexts.size() - 1; i >= 0; i--) {
+        // Iterate chunks in forward order, mirroring how the original code pushed each
+        // chunk one-by-one in queue order: every push prepends to the deque, so the
+        // first chunk ends up at the back (top of the column) and the last chunk at the
+        // front (bottom). This keeps reading order top-to-bottom (chunkIndex 0 on top).
+        for (int i = 0; i < chunkTexts.size(); i++) {
             Component formattedMessage = createFormattedMessage(bubble, fViewer, chunkTexts.get(i));
 
             MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
@@ -152,8 +154,8 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         rideEntities(sender, fViewer);
 
-        // textEntities was built bottom-up; reverse to chunk order (top chunk first).
-        java.util.Collections.reverse(textEntities);
+        // textEntities is already in chunk order (index i == chunkIndex i), matching
+        // the order applyTranslationUpdate expects for in-place text swaps.
         return textEntities;
     }
 
