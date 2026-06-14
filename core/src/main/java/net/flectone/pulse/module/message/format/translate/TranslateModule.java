@@ -252,6 +252,36 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         return translationCacheService.get(sourceLang, targetLang, text);
     }
 
+    // Ensures a translation for a single (sourceLang -> targetLang) pair is available.
+    // Used by private-message (tell/reply) receiver copies: unlike broadcast chat, the
+    // receiver copy isn't guaranteed to have its locale covered by translateToAllLocales
+    // (the sender copy is deduped against it), so it drives its own async fill here.
+    // On completion replay redraws history for the given receiver only — keeping private
+    // messages scoped to their single viewer (see sendUpdate's viewers() filter).
+    public void ensureTranslationForReceiver(String sourceLang, String targetLang, String text, UUID receiverUUID) {
+        if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) return;
+        if (sourceLang == null || targetLang == null || text == null || text.isEmpty()) return;
+        if (sourceLang.equals(targetLang)) return;
+
+        String cached = translationCacheService.get(sourceLang, targetLang, text);
+        if (cached != null && !cached.isEmpty() && !cached.equals(text)) {
+            // Already cached — the synchronous send path applies it inline; nothing to do.
+            return;
+        }
+
+        translationCacheService.translateAsync(sourceLang, targetLang, text, config().providers())
+                .thenAccept(translated -> {
+                    if (translated == null || translated.isEmpty() || translated.equals(text)) return;
+                    // Redraw only this receiver's history; fillTranslationsFromCache picks up the value.
+                    sendUpdate(receiverUUID);
+                })
+                .exceptionally(throwable -> {
+                    fLogger.warning(throwable, "[AutoTranslate] private-message chain failed %s",
+                            sourceLang + "→" + targetLang);
+                    return null;
+                });
+    }
+
     // After a translation lands, redraw chat for every online receiver with that locale.
     private void replayForLocale(String locale) {
         if (locale == null) return;
