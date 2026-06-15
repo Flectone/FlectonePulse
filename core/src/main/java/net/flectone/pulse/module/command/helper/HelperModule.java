@@ -71,18 +71,12 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
                 .toList();
 
         if (recipients.isEmpty() && config().nullHelper()) {
-            boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
-                    .noneMatch(online -> permissionChecker.check(online, permission().see()));
-
-            if (nullHelper) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Helper>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Helper::nullHelper)
-                        .build()
-                );
-
-                return;
-            }
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Helper>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Helper::nullHelper)
+                    .build()
+            );
+            return;
         }
 
         String message = commandModuleController.getArgument(this, commandContext, 0);

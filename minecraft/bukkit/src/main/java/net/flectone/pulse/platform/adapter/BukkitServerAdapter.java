@@ -17,7 +17,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.message.tab.playerlist.MinecraftPlayerlistnameModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.PaperItemNameProvider;
 import net.flectone.pulse.processing.converter.IconConvertor;
@@ -58,7 +57,6 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Plugin plugin;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
-    private final Provider<MinecraftPlayerlistnameModule> playerlistnameModuleProvider;
     private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
     private final AdventureHoverConvertor adventureHoverConvertor;
@@ -176,11 +174,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public int getOnlinePlayerCount() {
-        return playerlistnameModuleProvider.get().isProxyMode()
-                ? (int) fPlayerServiceProvider.get().findOnlineFPlayers().stream()
-                    .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
-                    .count()
-                : (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
+        return (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
                     .filter(fPlayer -> !fPlayer.isUnknown())
                     .filter(fPlayer -> !socialServiceProvider.get().isVanished(fPlayer))
                     .count();

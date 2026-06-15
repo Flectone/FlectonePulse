@@ -71,6 +71,13 @@ public class FPlayerService {
     }
 
     /**
+     * Loads all online players from the database into the cache.
+     */
+    public void loadOnlineCache() {
+        fPlayerRepository.getOnlinePlayersDatabase().forEach(this::addCache);
+    }
+
+    /**
      * Adds the console player to the cache with configured console name.
      * Creates a new console FPlayer if it doesn't exist, or ignores if already present.
      */
@@ -325,16 +332,6 @@ public class FPlayerService {
     @NonNull
     public List<FPlayer> findAllFPlayers() {
         return fPlayerRepository.getAllPlayersDatabase();
-    }
-
-    /**
-     * Gets all online players from the database.
-     *
-     * @return list of online FPlayers from database
-     */
-    @NonNull
-    public List<FPlayer> findOnlineFPlayers() {
-        return fPlayerRepository.getOnlinePlayersDatabase();
     }
 
     /**

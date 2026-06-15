@@ -53,7 +53,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
     }
 
     public List<String> createSuggestions(FPlayer sender) {
-        return playerService.findOnlineFPlayers().stream()
+        return playerService.getOnlineFPlayers().stream()
                 .filter(player -> socialService.canSeeVanished(player, sender))
                 .filter(fPlayer -> isVisible(sender, fPlayer))
                 .map(FEntity::name)

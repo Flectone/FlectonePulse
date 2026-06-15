@@ -90,7 +90,7 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
                     ? Range.get(Range.Type.PROXY)
                     : Range.fromString(player).orElse(null);
             if (range != null) {
-                fPlayerService.findOnlineFPlayers().stream()
+                fPlayerService.getOnlineFPlayers().stream()
                         .filter(rangeFilter.createFilter(fPlayer, range))
                         .forEach(this::clearChat);
                 return;

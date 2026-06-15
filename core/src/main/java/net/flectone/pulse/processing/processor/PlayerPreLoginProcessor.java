@@ -29,6 +29,7 @@ public class PlayerPreLoginProcessor {
             // clears the cache of players who might have left from other servers
             fPlayerService.invalidate();
             fPlayerService.addConsole();
+            fPlayerService.loadOnlineCache();
         }
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);

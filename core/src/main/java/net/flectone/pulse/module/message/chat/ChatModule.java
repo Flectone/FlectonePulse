@@ -213,34 +213,10 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     }
 
     private boolean noGlobalReceiversFor(FPlayer fPlayer, String chatName) {
-        List<FPlayer> serverReceivers = fPlayerService.getOnlineFPlayers()
+        return fPlayerService.getOnlineFPlayers()
                 .stream()
                 .filter(filterReceivers(fPlayer, chatName))
-                .toList();
-
-        // check online server players first
-        for (FPlayer fReceiver : serverReceivers) {
-            if (!socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT)) {
-                return false;
-            }
-        }
-
-        if (proxyRegistry.hasEnabledProxy()) {
-            List<FPlayer> proxyReceivers = fPlayerService.findOnlineFPlayers()
-                    .stream()
-                    .filter(fReceiver -> !serverReceivers.contains(fReceiver))
-                    .filter(filterReceivers(fPlayer, chatName))
-                    .toList();
-
-            // check proxy players only if no online server receivers found
-            for (FPlayer fReceiver : proxyReceivers) {
-                if (!socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+                .noneMatch(fReceiver -> !socialService.isIgnored(fReceiver, fPlayer) && socialService.isSetting(fReceiver, ModuleName.MESSAGE_CHAT));
     }
 
     private Predicate<FPlayer> filterReceivers(FPlayer fPlayer, String chatName) {
