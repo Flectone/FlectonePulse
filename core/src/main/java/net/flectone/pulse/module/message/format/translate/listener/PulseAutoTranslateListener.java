@@ -17,8 +17,10 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
+import net.flectone.pulse.module.message.format.translate.model.TranslateHistoryMessage;
 import net.flectone.pulse.module.message.format.translate.model.TranslatedMessage;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 
@@ -50,7 +52,9 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        if (!isAutoMode()) return;
+        // PrepareEvent only drives broadcast-chat pre-translation (the PM receiver copy
+        // is deduped against the sender copy and never reaches here), so gate on chat.
+        if (!isChatAuto()) return;
 
         EventMetadata<?> metadata = event.eventMetadata();
         UUID messageUUID = metadata.uuid();
@@ -84,13 +88,33 @@ public class PulseAutoTranslateListener implements PulseListener {
     // translation lands we redraw all chat that came between, else it scrolls off-screen.
     @Pulse(priority = Event.Priority.HIGH)
     public MessageSendEvent onMessageSendEvent(MessageSendEvent event) {
-        if (!isAutoMode()) return event;
-        if (event.eventMetadata().destination().type() != Destination.Type.CHAT) return event;
+        if (!isAutoMode()) {
+            return event;
+        }
+        if (event.eventMetadata().destination().type() != Destination.Type.CHAT) {
+            return event;
+        }
 
         UUID messageUUID = event.eventMetadata().uuid();
         FPlayer receiver = event.receiver();
         String originalText = event.eventMetadata().message();
         if (originalText == null) originalText = "";
+
+        // Cold private-message path: the receiver fill must run AFTER save() so the history
+        // entry (with the synthesized TM) already exists when ensureTranslationForReceiver's
+        // synchronous cache-HIT branch calls applyTranslationToEntry. We capture the call here
+        // and fire it once save() has landed the entry into globalHistory.
+        Runnable deferredReceiverFill = null;
+
+        // Decide whether THIS message may be translated, strictly by its source module:
+        // broadcast chat -> auto.chat, private messages (tell/reply) -> auto.private.
+        // System/server messages (join/quit, other modules) are never translated here —
+        // they're only captured for history/replay below (gated by isAutoMode()).
+        boolean broadcastChat = event.moduleName() == ModuleName.MESSAGE_CHAT;
+        boolean privateMessage = event.moduleName() == ModuleName.COMMAND_TELL
+                || event.moduleName() == ModuleName.COMMAND_REPLY;
+        boolean translateChat = broadcastChat && isChatAuto();
+        boolean translatePrivate = privateMessage && isPrivateAuto();
 
         TranslatedMessage translatedMessage = preparedTranslations.getIfPresent(messageUUID);
         Component originalComponent = event.message();
@@ -110,15 +134,19 @@ public class PulseAutoTranslateListener implements PulseListener {
         // Synchronous cache check — applies for both prepared and dedup-skipped
         // sends. If the cache already has a translation for this receiver's
         // locale, apply it inline so the chat is translated on first display.
-        if (receiver != null && !originalText.isEmpty() && sourceLang != null) {
+        // Gated per message type: broadcast chat only when auto.chat, private
+        // messages only when auto.private — never cross-influences the other.
+        if ((translateChat || translatePrivate)
+                && receiver != null && !originalText.isEmpty() && sourceLang != null) {
             String receiverLocale = socialService.getSetting(receiver, SettingText.LOCALE);
             if (receiverLocale != null && !receiverLocale.equals(sourceLang)) {
                 String cached = translateModule.getCachedTranslation(sourceLang, receiverLocale, originalText);
                 if (cached != null && !cached.isEmpty() && !cached.equals(originalText)) {
-                    String literal = originalText;
-                    Component translatedComponent = originalComponent.replaceText(b -> b
-                            .matchLiteral(literal)
-                            .replacement(cached));
+                    // Use the shared cross-node replacer (same as getDisplayComponent's cold path):
+                    // matchLiteral fails when format modules split the message across styled nodes,
+                    // which is exactly what happens for private messages.
+                    Component translatedComponent =
+                            TranslateHistoryMessage.replaceMessageText(originalComponent, originalText, cached);
 
                     // For dedup-skipped chats PrepareEvent didn't create a TranslatedMessage.
                     // Synthesize one so the entry that's about to land in history carries the
@@ -137,7 +165,7 @@ public class PulseAutoTranslateListener implements PulseListener {
                     }
 
                     event = event.withMessage(translatedComponent);
-                } else if (translatedMessage == null) {
+                } else if (translatedMessage == null && translatePrivate) {
                     // Cold cache AND no prepared TranslatedMessage. This is the private-message
                     // (tell/reply) receiver copy: its PrepareEvent is deduped against the sender
                     // copy (same sender+text), so no TM was ever wired to its UUID, and without a
@@ -152,7 +180,16 @@ public class PulseAutoTranslateListener implements PulseListener {
                             .translations(translations)
                             .build();
 
-                    translateModule.ensureTranslationForReceiver(sourceLang, receiverLocale, originalText, receiver.uuid());
+                    // Defer the actual fill until AFTER save() (below) so the history entry —
+                    // carrying THIS synthesized TM — already exists when the cache-HIT branch
+                    // synchronously calls applyTranslationToEntry → sendUpdate.
+                    final String fSourceLang = sourceLang;
+                    final String fReceiverLocale = receiverLocale;
+                    final String fOriginalText = originalText;
+                    final UUID fReceiverUUID = receiver.uuid();
+                    final UUID fMessageUUID = messageUUID;
+                    deferredReceiverFill = () -> translateModule.ensureTranslationForReceiver(
+                            fSourceLang, fReceiverLocale, fOriginalText, fReceiverUUID, fMessageUUID);
                 }
             }
         }
@@ -165,6 +202,13 @@ public class PulseAutoTranslateListener implements PulseListener {
         // Register the component actually about to be sent (may be the translated variant).
         // ReceiveEvent will see the same reference and isCached skips it — no duplicate entry.
         translateModule.markSelfOriginated(event.message());
+
+        // Cold private-message receiver fill, now that the history entry (with its synthesized
+        // TM) is in place: ensureTranslationForReceiver can apply the translation to the entry
+        // and then sendUpdate repaints exactly the receiver's own history.
+        if (deferredReceiverFill != null) {
+            deferredReceiverFill.run();
+        }
 
         return event;
     }
@@ -207,7 +251,19 @@ public class PulseAutoTranslateListener implements PulseListener {
         }
     }
 
+    // Any auto path on (chat OR private). Used by the shared history-capture/replay
+    // logic that serves both broadcast chat and private messages.
     private boolean isAutoMode() {
+        return isChatAuto() || isPrivateAuto();
+    }
+
+    // message.format.translate.auto — single master toggle for chat AND private messages.
+    private boolean isChatAuto() {
+        return !Boolean.FALSE.equals(translateModule.config().auto());
+    }
+
+    // message.format.translate.auto — same master toggle drives private messages (tell/reply).
+    private boolean isPrivateAuto() {
         return !Boolean.FALSE.equals(translateModule.config().auto());
     }
 }

@@ -121,7 +121,8 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
         FPlayer receiver = messageContext.receiver();
-        boolean autoMode = !Boolean.FALSE.equals(config().auto()); // default true
+        // Auto-mode (toggle button) applies when the master auto-translate toggle is on (default true).
+        boolean autoMode = !Boolean.FALSE.equals(config().auto());
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.TRANSLATION.getTagName(), (argumentQueue, _) -> {
             String senderLocale = sender instanceof FPlayer fSender ? socialService.getSetting(fSender, SettingText.LOCALE) : null;
@@ -258,21 +259,40 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     // (the sender copy is deduped against it), so it drives its own async fill here.
     // On completion replay redraws history for the given receiver only — keeping private
     // messages scoped to their single viewer (see sendUpdate's viewers() filter).
-    public void ensureTranslationForReceiver(String sourceLang, String targetLang, String text, UUID receiverUUID) {
-        if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) return;
-        if (sourceLang == null || targetLang == null || text == null || text.isEmpty()) return;
-        if (sourceLang.equals(targetLang)) return;
+    public void ensureTranslationForReceiver(String sourceLang, String targetLang, String text, UUID receiverUUID, UUID messageUUID) {
+        if (moduleController.isDisabledFor(this, FPlayer.UNKNOWN)) {
+            return;
+        }
+        if (sourceLang == null || targetLang == null || text == null || text.isEmpty()) {
+            return;
+        }
+        if (sourceLang.equals(targetLang)) {
+            return;
+        }
 
         String cached = translationCacheService.get(sourceLang, targetLang, text);
         if (cached != null && !cached.isEmpty() && !cached.equals(text)) {
-            // Already cached — the synchronous send path applies it inline; nothing to do.
+            // Already cached — write it into the receiver's history entry, then redraw exactly
+            // like chat (sendUpdate). The translation is now present in translations BEFORE the
+            // repaint, so getDisplayComponent renders the translated line. Order is strict:
+            // applyTranslationToEntry first, sendUpdate after.
+            applyTranslationToEntry(messageUUID, targetLang, cached);
+            sendUpdate(receiverUUID);
             return;
         }
 
         translationCacheService.translateAsync(sourceLang, targetLang, text, config().providers())
                 .thenAccept(translated -> {
-                    if (translated == null || translated.isEmpty() || translated.equals(text)) return;
-                    // Redraw only this receiver's history; fillTranslationsFromCache picks up the value.
+                    if (translated == null || translated.isEmpty() || translated.equals(text)) {
+                        return;
+                    }
+                    // Write the translation straight into the matching history entry FIRST, so
+                    // the value is present in translations before the repaint, then redraw the
+                    // receiver's history exactly like chat does (sendUpdate). Because sendUpdate
+                    // filters by viewers.contains(receiverUUID), only this receiver's own history
+                    // is repainted — no leak to other same-locale players. Order is strict:
+                    // applyTranslationToEntry first, sendUpdate after.
+                    applyTranslationToEntry(messageUUID, targetLang, translated);
                     sendUpdate(receiverUUID);
                 })
                 .exceptionally(throwable -> {
@@ -280,6 +300,24 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
                             sourceLang + "→" + targetLang);
                     return null;
                 });
+    }
+
+    // Writes a translation directly into the TranslatedMessage of the matching history entry.
+    // Used by the private-message cold path so replay shows the translation deterministically,
+    // independent of when the global translation cache becomes readable.
+    private void applyTranslationToEntry(UUID messageUUID, String targetLang, String translation) {
+        if (messageUUID == null || targetLang == null || translation == null || translation.isEmpty()) return;
+        synchronized (globalHistory) {
+            for (TranslateHistoryMessage e : globalHistory) {
+                if (e.uuid().equals(messageUUID)) {
+                    TranslatedMessage tm = e.translatedMessage();
+                    if (tm != null) {
+                        tm.translations().put(targetLang, translation);
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     // After a translation lands, redraw chat for every online receiver with that locale.
