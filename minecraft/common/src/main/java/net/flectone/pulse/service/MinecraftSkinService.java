@@ -41,9 +41,8 @@ public class MinecraftSkinService implements SkinService {
         MinecraftPlayerlistnameModule minecraftPlayerlistnameModule = playerlistnameModuleProvider.get();
 
         if (platformPlayerAdapter.isOnline(fPlayer)) {
-            taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModule.send(fPlayer), 2L);
+            taskScheduler.runAsyncLater(() -> minecraftPlayerlistnameModule.update(fPlayer), 2L);
         } else {
-            minecraftPlayerlistnameModule.remove(fPlayer.uuid());
             minecraftPlayerlistnameModule.update();
         }
     }

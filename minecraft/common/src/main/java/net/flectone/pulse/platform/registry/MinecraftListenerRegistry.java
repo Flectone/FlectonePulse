@@ -13,8 +13,6 @@ import net.flectone.pulse.listener.player.MinecraftPacketPlayerConnectionListene
 import net.flectone.pulse.listener.dialog.MinecraftPacketDialogListener;
 import net.flectone.pulse.listener.inventory.MinecraftPacketInventoryListener;
 import net.flectone.pulse.listener.module.MinecraftPulseModuleEnableListener;
-import net.flectone.pulse.listener.proxy.cache.MinecraftPlayerConnectedProxyMessageListener;
-import net.flectone.pulse.listener.proxy.cache.MinecraftPlayerDisconnectedProxyMessageListener;
 import net.flectone.pulse.listener.proxy.cache.MinecraftSkinprofileCacheProxyMessageListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -56,8 +54,6 @@ public class MinecraftListenerRegistry extends ListenerRegistry {
         }
 
         if (proxyRegistry.hasEnabledProxy()) {
-            register(MinecraftPlayerConnectedProxyMessageListener.class);
-            register(MinecraftPlayerDisconnectedProxyMessageListener.class);
             register(MinecraftSkinprofileCacheProxyMessageListener.class);
         }
     }

@@ -43,11 +43,10 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import org.jspecify.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Predicate;
 
 @Singleton
@@ -66,6 +65,8 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME,
             WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LIST_ORDER
     );
+
+    private final Map<UUID, Set<UUID>> proxyPlayers = new ConcurrentHashMap<>();
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -88,7 +89,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     public void onEnable() {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerAsyncTimer(this::send, ticker.period());
+            taskScheduler.runAsyncTimer(this::update, ticker.period());
         }
 
         listenerRegistry.register(MinecraftPulsePlayerlistnameListener.class);
@@ -123,106 +124,123 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     public void update() {
         if (!moduleController.isEnable(this)) return;
 
-        taskScheduler.runAsync(() -> fPlayerService.getPlatformFPlayers().forEach(this::send));
+        taskScheduler.runAsync(() -> {
+            fPlayerService.getOnlineFPlayers().forEach(this::update);
+
+            if (proxyPlayers.isEmpty()) return;
+
+            proxyPlayers.forEach((key, value) -> value.stream()
+                    .filter(uuid -> {
+                        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+                        FPlayer fReceiver = fPlayerService.getFPlayer(key);
+                        return !fPlayer.isOnline() || !socialService.canSeeVanished(fPlayer, fReceiver);
+                    })
+                    .forEach(uuid -> {
+                        packetSender.send(key, new WrapperPlayServerPlayerInfoRemove(uuid));
+
+                        value.remove(uuid);
+
+                        if (value.isEmpty()) {
+                            proxyPlayers.remove(key);
+                        }
+                    })
+            );
+        });
     }
 
-    public void send(FPlayer fPlayer) {
-        if (moduleController.isDisabledFor(this, fPlayer)) return;
-        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
+    public void update(FPlayer fSender) {
+        if (moduleController.isDisabledFor(this, fSender)) return;
 
-        Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fPlayer, config().range());
+        Predicate<FPlayer> listedFilter = rangeFilter.createFilter(fSender, config().range());
 
         fPlayerService.getPlatformFPlayers().stream()
-                .filter(viewer -> socialService.canSeeVanished(fPlayer, viewer))
-                .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver, listedFilter));
+                .filter(viewer -> socialService.canSeeVanished(fSender, viewer))
+                .forEach(fReceiver -> update(fSender, fReceiver, listedFilter));
     }
 
-    public void add(UUID uuid) {
-        if (!isProxyMode()) return;
+    public void update(FPlayer fSender, FPlayer fReceiver, Predicate<FPlayer> listedFilter) {
+        User user = packetProvider.getUser(fSender);
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        if (fPlayer.isUnknown()) return;
+        UserProfile userProfile;
 
-        // platform players will be added automatically
-        if (platformPlayerAdapter.isOnline(fPlayer)) return;
+        boolean proxyPlayer = false;
+        if (user == null) {
+            if (!isProxyMode()) {
+                return;
+            }
 
-        UserProfile userProfile = createUserProfile(fPlayer);
+            Set<UUID> forPlayers = proxyPlayers.getOrDefault(fReceiver.uuid(), new CopyOnWriteArraySet<>());
+            if (!forPlayers.contains(fSender.uuid())) {
+                forPlayers.add(fSender.uuid());
+                proxyPlayer = true;
+            }
 
-        fPlayerService.getPlatformFPlayers().stream()
-                .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
-                .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, createPlayerInfo(fPlayer, fReceiver, userProfile))));
+            proxyPlayers.put(fReceiver.uuid(), forPlayers);
+
+            userProfile = createUserProfile(fSender);
+        } else {
+            userProfile = user.getProfile();
+        }
+
+        Component name = buildFPlayerName(fSender, fReceiver);
+
+        if (isNewerThanOrEqualsV_1_19_4) {
+            GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender));
+
+            WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
+                    userProfile,
+                    isListed(fSender, fReceiver, gameMode) && listedFilter.test(fReceiver),
+                    platformPlayerAdapter.getPing(fSender),
+                    gameMode,
+                    name,
+                    null,
+                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getGroupWeight(fSender) : 0
+            );
+
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(proxyPlayer ? ADD_ACTIONS : UPDATE_ACTIONS, playerInfo));
+            return;
+        }
+
+        WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
+                name,
+                userProfile,
+                GameMode.valueOf(platformPlayerAdapter.getGamemode(fSender)),
+                platformPlayerAdapter.getPing(fSender)
+        );
+
+        packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(proxyPlayer ? WrapperPlayServerPlayerInfo.Action.ADD_PLAYER : WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
     }
 
     public void remove(UUID uuid) {
-        if (!isProxyMode()) return;
+        if (isProxyMode()) {
+            proxyPlayers.values().forEach(uuids -> uuids.removeIf(uuid::equals));
+        }
 
         platformPlayerAdapter.getOnlinePlayers().forEach(onlineUUID ->
                 packetSender.send(onlineUUID, new WrapperPlayServerPlayerInfoRemove(uuid))
         );
     }
 
-    private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver, Predicate<FPlayer> listedFilter) {
-        User user = packetProvider.getUser(fPlayer);
-        if (user == null) return;
-
-        Component name = buildFPlayerName(fPlayer, fReceiver);
-
-        if (isNewerThanOrEqualsV_1_19_4) {
-            if (isProxyMode()) {
-                List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> proxyPlayersInfo = getProxyPlayerInfos(fReceiver);
-                if (!proxyPlayersInfo.isEmpty()) {
-                    packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(ADD_ACTIONS, proxyPlayersInfo));
-                }
-            }
-
-            GameMode gameMode = GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer));
-
-            WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
-                    user.getProfile(),
-                    isListed(fPlayer, gameMode) && listedFilter.test(fReceiver),
-                    platformPlayerAdapter.getPing(fPlayer),
-                    gameMode,
-                    name,
-                    null,
-                    gameMode != GameMode.SPECTATOR || config().spectatorListOrder() ? integrationModule.getGroupWeight(fPlayer) : 0
-            );
-
-            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(UPDATE_ACTIONS, playerInfo));
-            return;
+    public void clearProxyPlayers(UUID uuid) {
+        if (isProxyMode()) {
+            proxyPlayers.remove(uuid);
         }
-
-        WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
-                name,
-                user.getProfile(),
-                GameMode.valueOf(platformPlayerAdapter.getGamemode(fPlayer)),
-                platformPlayerAdapter.getPing(fPlayer)
-        );
-
-        packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
     }
 
     public boolean isProxyMode() {
         return moduleController.isEnable(this) && config().range().is(Range.Type.PROXY) && proxyRegistry.hasEnabledProxy();
     }
 
-    private boolean isListed(FPlayer fPlayer, GameMode gameMode) {
-        if (config().hideInvisible()
-                && platformPlayerAdapter.hasPotionEffect(fPlayer, PotionUtil.INVISIBILITY_POTION_NAME)) {
+    private boolean isListed(FPlayer fPlayer, FPlayer fReceiver, GameMode gameMode) {
+        if (config().hideInvisible() && platformPlayerAdapter.hasPotionEffect(fPlayer, PotionUtil.INVISIBILITY_POTION_NAME)) {
             return false;
         }
 
-        return !config().hideSpectator() || gameMode != GameMode.SPECTATOR;
-    }
+        if (config().hideSpectator() && gameMode == GameMode.SPECTATOR) {
+            return false;
+        }
 
-    private List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> getProxyPlayerInfos(FPlayer fReceiver) {
-        List<UUID> currentServerPlayers = platformPlayerAdapter.getOnlinePlayers();
-
-        return fPlayerService.findOnlineFPlayers()
-                .stream()
-                .filter(fPlayer -> !currentServerPlayers.contains(fPlayer.uuid()))
-                .filter(fPlayer -> socialService.canSeeVanished(fPlayer, fReceiver))
-                .map(fPlayer -> createPlayerInfo(fPlayer, fReceiver, null))
-                .toList();
+        return socialService.canSeeVanished(fPlayer, fReceiver);
     }
 
     private Component buildFPlayerName(FPlayer fPlayer, FPlayer fReceiver) {
@@ -234,21 +252,6 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
                 // disable for offline client
                 .flag(MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, fReceiver.uuid().version() == 3)
                 .build()
-        );
-    }
-
-    private WrapperPlayServerPlayerInfoUpdate.PlayerInfo createPlayerInfo(FPlayer fPlayer, FPlayer fReceiver, @Nullable UserProfile userProfile) {
-        if (userProfile == null) {
-            userProfile = createUserProfile(fPlayer);
-        }
-
-        return new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
-                userProfile,
-                true,
-                -1,
-                GameMode.SURVIVAL,
-                buildFPlayerName(fPlayer, fReceiver),
-                null
         );
     }
 
