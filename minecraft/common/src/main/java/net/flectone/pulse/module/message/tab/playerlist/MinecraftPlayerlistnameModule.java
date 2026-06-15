@@ -214,6 +214,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
     public void remove(UUID uuid) {
         if (isProxyMode()) {
             proxyPlayers.values().forEach(uuids -> uuids.removeIf(uuid::equals));
+            scoreboardModule.remove(fPlayerService.getFPlayer(uuid));
         }
 
         platformPlayerAdapter.getOnlinePlayers().forEach(onlineUUID ->
