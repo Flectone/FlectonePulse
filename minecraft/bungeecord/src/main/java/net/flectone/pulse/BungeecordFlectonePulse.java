@@ -16,10 +16,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
@@ -57,7 +54,10 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerConnectEvent(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if (player.getServer() != null) return;
+        if (player.getServer() != null) {
+            sendPlayerConnectedEvent(event.getPlayer().getUniqueId(), false);
+            return;
+        }
 
         pendingConnections.add(player.getUniqueId());
     }
@@ -69,31 +69,12 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
         ProxySender.send(event.getData(), bytes -> ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
                 .forEach(serverInfo -> serverInfo.sendData(CHANNEL, bytes)),
-                this::onBackendJoinConfirmed
+                playerUUID -> {
+                    if (pendingConnections.remove(playerUUID)) {
+                        sendPlayerConnectedEvent(playerUUID, true);
+                    }
+                }
         );
-    }
-
-    private void onBackendJoinConfirmed(UUID playerUUID) {
-        if (!pendingConnections.remove(playerUUID)) return;
-
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
-        if (player == null) return;
-
-        Server server = player.getServer();
-        if (server == null) return;
-
-        String serverName = server.getInfo().getName();
-
-        ProxyServer.getInstance().getServers().values().stream()
-                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
-                .forEach(serverInfo -> ProxySender.send(
-                        ModuleName.PLAYER_CONNECTED,
-                        outputStream -> {
-                            outputStream.writeUTF(playerUUID.toString());
-                            outputStream.writeBoolean(serverInfo.getName().equals(serverName));
-                        },
-                        bytes -> serverInfo.sendData(CHANNEL, bytes)
-                ));
     }
 
     @EventHandler
@@ -119,6 +100,28 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
                             bytes -> serverInfo.sendData(CHANNEL, bytes)
                     ));
         }
+    }
+
+    private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+        if (player == null) return;
+
+        Server server = player.getServer();
+        if (server == null) return;
+
+        String serverName = server.getInfo().getName();
+
+        ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> ProxySender.send(
+                        ModuleName.PLAYER_CONNECTED,
+                        outputStream -> {
+                            outputStream.writeUTF(playerUUID.toString());
+                            outputStream.writeBoolean(serverInfo.getName().equals(serverName));
+                            outputStream.writeBoolean(firstTime);
+                        },
+                        bytes -> serverInfo.sendData(CHANNEL, bytes)
+                ));
     }
 
 }

@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -70,10 +71,17 @@ public class VelocityFlectonePulse {
     }
 
     @Subscribe(order = PostOrder.LAST)
-    public void onServerPostConnectEvent(ServerPreConnectEvent event) {
+    public void onServerPreConnectEvent(ServerPreConnectEvent event) {
         if (event.getPreviousServer() != null) return;
 
         pendingConnections.add(event.getPlayer().getUniqueId());
+    }
+
+    @Subscribe
+    public void onServerPostConnectEvent(ServerPostConnectEvent event) {
+        if (event.getPreviousServer() == null) return;
+
+        sendPlayerConnectedEvent(event.getPlayer().getUniqueId(), false);
     }
 
     @Subscribe
@@ -83,33 +91,14 @@ public class VelocityFlectonePulse {
         ProxySender.send(event.getData(), bytes -> proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
                 .forEach(registeredServer -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)),
-                this::onBackendJoinConfirmed
+                playerUUID -> {
+                    if (pendingConnections.remove(playerUUID)) {
+                        sendPlayerConnectedEvent(playerUUID, true);
+                    }
+                }
         );
 
         event.setResult(PluginMessageEvent.ForwardResult.handled());
-    }
-
-    private void onBackendJoinConfirmed(UUID playerUUID) {
-        if (!pendingConnections.remove(playerUUID)) return;
-
-        Optional<Player> player = proxyServer.getPlayer(playerUUID);
-        if (player.isEmpty()) return;
-
-        Optional<ServerConnection> serverConnection = player.get().getCurrentServer();
-        if (serverConnection.isEmpty()) return;
-
-        String serverName = serverConnection.get().getServerInfo().getName();
-
-        proxyServer.getAllServers().stream()
-                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
-                .forEach(registeredServer -> ProxySender.send(
-                        ModuleName.PLAYER_CONNECTED,
-                        outputStream -> {
-                            outputStream.writeUTF(playerUUID.toString());
-                            outputStream.writeBoolean(registeredServer.getServerInfo().getName().equals(serverName));
-                        },
-                        bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
-                ));
     }
 
     @Subscribe
@@ -135,6 +124,28 @@ public class VelocityFlectonePulse {
                             bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
                     ));
         }
+    }
+
+    private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {
+        Optional<Player> player = proxyServer.getPlayer(playerUUID);
+        if (player.isEmpty()) return;
+
+        Optional<ServerConnection> serverConnection = player.get().getCurrentServer();
+        if (serverConnection.isEmpty()) return;
+
+        String serverName = serverConnection.get().getServerInfo().getName();
+
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(registeredServer -> ProxySender.send(
+                        ModuleName.PLAYER_CONNECTED,
+                        outputStream -> {
+                            outputStream.writeUTF(playerUUID.toString());
+                            outputStream.writeBoolean(registeredServer.getServerInfo().getName().equals(serverName));
+                            outputStream.writeBoolean(firstTime);
+                        },
+                        bytes -> registeredServer.sendPluginMessage(IDENTIFIER, bytes)
+                ));
     }
 
 }

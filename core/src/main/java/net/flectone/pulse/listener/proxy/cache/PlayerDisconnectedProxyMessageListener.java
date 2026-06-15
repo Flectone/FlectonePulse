@@ -16,6 +16,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -36,9 +37,16 @@ public class PlayerDisconnectedProxyMessageListener implements PulseListener {
         }
 
         if (!event.sentByThisServer()) {
-            fPlayerService.invalidate(fEntity.uuid());
-            playtimeService.invalidate(fEntity.uuid());
-            socialService.invalidate(fEntity.uuid());
+            UUID playerUUID = fEntity.uuid();
+
+            // online -> offline player
+            fPlayerService.invalidateOnlineCache(playerUUID);
+
+            // clear playtime cache
+            playtimeService.invalidate(playerUUID);
+
+            // clear social cache
+            socialService.invalidate(playerUUID);
         }
 
         return event.withProcessed(true);
