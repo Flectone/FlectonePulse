@@ -42,12 +42,19 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
+        boolean sendMessage = fileFacade.integration().supervanish().showFakeQuit();
+
         // proxy vanish synchronization
-        if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
-            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
-            if (fileFacade.integration().supervanish().showFakeQuit()) {
-                quitModule.send(fPlayer, true);
+        if (fileFacade.integration().supervanish().proxySync()) {
+            if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
+                socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
+            } else {
+                sendMessage = false;
             }
+        }
+
+        if (sendMessage) {
+            quitModule.send(fPlayer, true);
         }
 
         event.setSilent(true);
@@ -59,12 +66,19 @@ public class BukkitSuperVanishIntegration implements Listener, FIntegration {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer().getUniqueId());
 
+        boolean sendMessage = fileFacade.integration().supervanish().showFakeJoin();
+
         // proxy vanish synchronization
-        if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
-            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, null);
-            if (fileFacade.integration().supervanish().showFakeJoin()) {
-                joinModule.send(fPlayer, true, false);
+        if (fileFacade.integration().supervanish().proxySync()) {
+            if (socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+                socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, null);
+            } else {
+                sendMessage = false;
             }
+        }
+
+        if (sendMessage) {
+            joinModule.send(fPlayer, true, false);
         }
 
         event.setSilent(true);

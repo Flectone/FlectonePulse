@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -40,6 +41,9 @@ public class SocialService {
     private final SocialRepository socialRepository;
     private final ProxyRegistry proxyRegistry;
     private final ProxySender proxySender;
+
+    @Inject
+    private Provider<FileFacade> fileFacadeProvider;
 
     @Inject
     private Provider<IntegrationModule> integrationModuleProvider;
@@ -407,7 +411,9 @@ public class SocialService {
      * @return true if the entity is vanished, false otherwise
      */
     public boolean isVanished(@NonNull FEntity fEntity) {
-        if (fEntity instanceof FPlayer fPlayer && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+        if (fEntity instanceof FPlayer fPlayer
+                && fileFacadeProvider.get().integration().supervanish().proxySync()
+                && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
             return true;
         }
 

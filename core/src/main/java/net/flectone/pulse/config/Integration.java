@@ -374,7 +374,8 @@ public record Integration(
     public record Supervanish(
             Boolean enable,
             Boolean showFakeQuit,
-            Boolean showFakeJoin
+            Boolean showFakeJoin,
+            Boolean proxySync
     ) implements EnableSetting {
     }
 

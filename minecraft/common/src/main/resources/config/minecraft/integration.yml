@@ -121,6 +121,7 @@ supervanish:
   enable: true
   show_fake_quit: true
   show_fake_join: true
+  proxy_sync: true
 tab:
   enable: true
   disable_flectonepulse_scoreboard: true
