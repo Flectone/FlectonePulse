@@ -24,6 +24,7 @@ import org.incendo.cloud.setting.ManagerSetting;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @Singleton
@@ -133,6 +134,12 @@ public class LegacyBukkitCommandRegistry implements CommandRegistry {
     }
 
     public void unregisterVanillaCommands() {
+        // skip deleting commands for default config, because they will be deleted anyway.
+        // if user has changed the value, then he knows what he is doing
+        if (fileFacade.config().internal().vanillaCommandsToRemove().equals(Set.of("msg", "banlist", "kick", "w", "tell", "me", "pardon", "whitelist", "ban"))) {
+            return;
+        }
+
         try {
             Field declaredField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             declaredField.setAccessible(true);
