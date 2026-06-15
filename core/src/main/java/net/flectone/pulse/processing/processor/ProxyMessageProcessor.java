@@ -42,7 +42,7 @@ public class ProxyMessageProcessor {
 
                 UUID uuid = UUID.fromString(proxyPayload.readString());
                 if (name == ModuleName.PLAYER_CONNECTED || name == ModuleName.PLAYER_DISCONNECTED) {
-                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, new byte[]{}));
+                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, proxyPayload.readAllBytes()));
                     if (proxyMessageEvent.cancelled()) {
                         // nothing
                     }
