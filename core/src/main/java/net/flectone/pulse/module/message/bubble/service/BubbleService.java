@@ -104,13 +104,13 @@ public class BubbleService {
         }
     }
 
-    // Bubble auto-translate runs only when chat auto-translate is on AND the bubble
-    // toggle is enabled (default true).
+    // Bubble auto-translate runs only when the translate module is enabled AND the
+    // bubble auto-translate toggle (message.format.translate.bubble) is on (default true).
     private boolean isBubbleTranslateEnabled() {
         Message.Format.Translate translate = fileFacade.message().format().translate();
-        boolean chatAuto = Boolean.TRUE.equals(translate.enable()) && !Boolean.FALSE.equals(translate.auto());
-        boolean bubbleToggle = !Boolean.FALSE.equals(fileFacade.message().bubble().translate());
-        return chatAuto && bubbleToggle;
+        boolean enabled = Boolean.TRUE.equals(translate.enable());
+        boolean bubbleToggle = !Boolean.FALSE.equals(translate.bubble());
+        return enabled && bubbleToggle;
     }
 
     private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {

@@ -45,7 +45,6 @@ brand:
 bubble:
   enable: true
   visible_to_self: true
-  translate: true
   disallowed_input: ""
   max_count: 3
   max_length: 30
@@ -275,9 +274,11 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
-    # auto: true → async pre-translation + /toggleoriginal button
-    # auto: false → author's classic /translateto click-to-translate mode
+    # Master auto-translate toggle for chat AND private messages (/tell, /msg, /reply, ...).
+    # true → async pre-translation + /toggleoriginal button; false → classic /translateto.
     auto: true
+    # Independent auto-translate toggle for bubbles above the head.
+    bubble: true
     # true → clear player chat history (viewers, toggles) on quit
     clear_history_on_quit: true
     providers:
