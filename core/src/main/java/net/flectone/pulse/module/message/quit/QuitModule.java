@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.quit.listener.QuitProxyMessageListener;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -43,7 +44,7 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
 
     @Override
     public void onEnable() {
-        if (proxyRegistry.hasEnabledProxy()) {
+        if (isProxyMode()) {
             listenerRegistry.register(QuitProxyMessageListener.class);
         }
 
@@ -71,7 +72,7 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public boolean isProxyMode() {
-        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy(proxy -> !(proxy instanceof RedisProxy));
     }
 
     public void send(FPlayer fPlayer, boolean fakeMessage) {

@@ -19,6 +19,7 @@ import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -34,6 +35,10 @@ public class ProxyRegistry {
 
     public boolean hasEnabledProxy() {
         return proxies.stream().anyMatch(Proxy::isEnable);
+    }
+
+    public boolean hasEnabledProxy(Predicate<Proxy> proxyPredicate) {
+        return proxies.stream().filter(proxyPredicate).anyMatch(Proxy::isEnable);
     }
 
     public void registry(Proxy proxy) {

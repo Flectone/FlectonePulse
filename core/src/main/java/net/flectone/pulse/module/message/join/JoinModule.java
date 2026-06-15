@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.join.listener.PulseJoinListener;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.proxy.RedisProxy;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.PlaytimeService;
@@ -40,7 +41,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
 
     @Override
     public void onEnable() {
-        if (proxyRegistry.hasEnabledProxy()) {
+        if (isProxyMode()) {
             listenerRegistry.register(JoinProxyMessageListener.class);
         }
 
@@ -68,7 +69,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
     }
 
     public boolean isProxyMode() {
-        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy();
+        return moduleController.isEnable(this) && config().range().type() == Range.Type.PROXY && proxyRegistry.hasEnabledProxy(proxy -> !(proxy instanceof RedisProxy));
     }
 
     public void send(FPlayer fPlayer, boolean fakeMessage) {
