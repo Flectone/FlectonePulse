@@ -42,7 +42,7 @@ public class PlayerConnectedProxyMessageListener implements PulseListener {
                 UUID playerUUID = event.sender().uuid();
 
                 // offline -> online player
-                fPlayerService.invalidateOfflineCache(playerUUID);
+                fPlayerService.invalidateOfflineCache(playerUUID, true);
 
                 // clear playtime cache
                 playtimeService.invalidate(playerUUID);

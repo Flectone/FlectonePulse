@@ -561,7 +561,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             }
 
             // invalidate cached unknown player
-            fPlayerService.invalidateOfflineCache(uuid);
+            fPlayerService.invalidateOfflineCache(uuid, false);
 
             fTarget = fPlayerService.getFPlayer(uuid);
         } else {

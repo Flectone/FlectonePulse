@@ -178,12 +178,28 @@ public class FPlayerService {
     }
 
     /**
-     * Removes a player from offline cache.
+     * Removes a player from offline cache and optionally ensures online status for proxy players.
+     * Fixes race condition where proxy might report player offline while they're actually online.
      *
      * @param uuid the UUID of the player to remove from offline cache
+     * @param proxy whether this is called from proxy context (ensures online status if needed)
      */
-    public void invalidateOfflineCache(@NonNull UUID uuid) {
+    public void invalidateOfflineCache(@NonNull UUID uuid, boolean proxy) {
         fPlayerRepository.removeOffline(uuid);
+
+        // idk why, but sometimes Proxy player offline, although he is already on the server.
+        // I think that request that player is logged in is sent before request as player exits.
+        // this is the only way to fix it
+        if (proxy) {
+            FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
+            if (!fPlayer.isOnline()) {
+                // update online cache
+                fPlayer = updateCache(fPlayer.withOnline(true));
+
+                // save to database
+                fPlayerRepository.update(fPlayer);
+            }
+        }
     }
 
     /**
