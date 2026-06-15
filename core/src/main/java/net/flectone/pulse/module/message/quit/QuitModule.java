@@ -25,6 +25,8 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 
+import java.util.UUID;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuitModule implements ModuleLocalization<Localization.Message.Quit> {
@@ -81,12 +83,15 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
             return;
         }
 
+        UUID playerUUID = fPlayer.uuid();
+
         // server does not accept requests from proxy, if there are no players
-        if (platformServerAdapter.isOnlyPlayerOnline(fPlayer.uuid())) {
+        if (platformServerAdapter.isOnlyPlayerOnline(playerUUID)) {
             // server can check player is offline (and has not reconnected to another server) only from database
             taskScheduler.runAsyncLater(() -> {
-                if (!fPlayerService.getFPlayer(fPlayer).isOnline()) {
-                    send(fPlayer, false, vanished);
+                FPlayer cacheFPlayer = fPlayerService.getFPlayer(playerUUID);
+                if (!cacheFPlayer.isOnline()) {
+                    send(cacheFPlayer, false, vanished);
                 }
             }, 100L);
         }
