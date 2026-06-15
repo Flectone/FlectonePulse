@@ -372,7 +372,7 @@ command:
   tell:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     sender: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
-    receiver: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>"
+    receiver: "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message><reset><translation>"
     myself: "<fcolor:2>✉ [Note] <fcolor:1><message>"
   tictactoe:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
