@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
-import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 
@@ -18,20 +17,10 @@ import java.util.function.Consumer;
 public class PlayerPreLoginProcessor {
 
     private final FPlayerService fPlayerService;
-    private final ProxyRegistry proxyRegistry;
     private final EventDispatcher eventDispatcher;
     private final PlaytimeService playtimeService;
 
     public void processLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> kickConsumer) {
-        // if no one was on the server, the cache may be invalid for other servers
-        // because FlectonePulse on Proxy cannot send a message for servers that have no player
-        if (fPlayerService.getOnlineFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
-            // clears the cache of players who might have left from other servers
-            fPlayerService.invalidate();
-            fPlayerService.addConsole();
-            fPlayerService.loadOnlineCache();
-        }
-
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
         // if player is unknown, then he is not in database and has never been on the server before this moment

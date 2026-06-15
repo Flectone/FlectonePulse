@@ -5,10 +5,12 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.jspecify.annotations.NonNull;
@@ -44,6 +46,8 @@ public class FPlayerService {
     private final FPlayerRepository fPlayerRepository;
     private final RandomGenerator randomUtil;
     private final EventDispatcher eventDispatcher;
+    private final TaskScheduler taskScheduler;
+    private final ProxyRegistry proxyRegistry;
 
     /**
      * Invalidates all cached player data and reloads from scratch.
@@ -58,7 +62,7 @@ public class FPlayerService {
         platformPlayerAdapter.getOnlinePlayers().forEach(fPlayerRepository::invalid);
 
         // clear cache
-        fPlayerRepository.clearCache();
+        invalidateCache();
     }
 
     /**
@@ -68,6 +72,14 @@ public class FPlayerService {
      */
     public void invalidate(@NonNull UUID uuid) {
         fPlayerRepository.invalid(uuid);
+    }
+
+    /**
+     * Clears all cached player data from both online and offline caches.
+     * This operation removes all players from memory but does not affect the database.
+     */
+    public void invalidateCache() {
+        fPlayerRepository.clearCache();
     }
 
     /**
@@ -150,31 +162,28 @@ public class FPlayerService {
                 invalidate(uuid);
             }
         });
+
+        // if no one was on the server, the cache may be invalid for other servers
+        // because FlectonePulse on Proxy cannot send a message for servers that have no player
+        if (proxyRegistry.hasEnabledProxy()) {
+            taskScheduler.runAsyncTimer(() -> {
+                // clears the cache of players who might have left from other servers
+                if (platformPlayerAdapter.getOnlinePlayers().isEmpty()) {
+                    invalidateCache();
+                    addConsole();
+                    loadOnlineCache();
+                }
+            }, 20L, 20L);
+        }
     }
 
     /**
-     * Removes a player from offline cache and optionally ensures online status for proxy players.
-     * Fixes race condition where proxy might report player offline while they're actually online.
+     * Removes a player from offline cache.
      *
      * @param uuid the UUID of the player to remove from offline cache
-     * @param proxy whether this is called from proxy context (ensures online status if needed)
      */
-    public void invalidateOfflineCache(@NonNull UUID uuid, boolean proxy) {
+    public void invalidateOfflineCache(@NonNull UUID uuid) {
         fPlayerRepository.removeOffline(uuid);
-
-        // idk why, but sometimes Proxy player offline, although he is already on the server.
-        // I think that request that player is logged in is sent before request as player exits.
-        // this is the only way to fix it
-        if (proxy) {
-            FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
-            if (!fPlayer.isOnline()) {
-                // update online cache
-                fPlayer = updateCache(fPlayer.withOnline(true));
-
-                // save to database
-                fPlayerRepository.update(fPlayer);
-            }
-        }
     }
 
     /**
@@ -218,8 +227,6 @@ public class FPlayerService {
      */
     @NonNull
     public FPlayer getFPlayer(int id) {
-        if (id == -1) return getConsole();
-
         return fPlayerRepository.get(id);
     }
 
@@ -230,7 +237,12 @@ public class FPlayerService {
      */
     @NonNull
     public FPlayer getConsole() {
-        return getFPlayer(FEntity.UNKNOWN_UUID);
+        FPlayer fPlayer = getFPlayer(FEntity.UNKNOWN_UUID);
+        if (!fPlayer.isConsole()) {
+            return getFPlayer(-1);
+        }
+
+        return fPlayer;
     }
 
     /**
