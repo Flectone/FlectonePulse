@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.fplayer.*;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
@@ -14,7 +13,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -262,13 +260,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
             boolean online,
             @NonNull String uuid,
             @NonNull String name,
-            @Nullable String ip,
-
-            // ignore value for sql
-            @Nullable Map<String, Boolean> settingsBoolean,
-
-            // ignore value for sql
-            @Nullable Map<SettingText, String> settingsText
+            @Nullable String ip
     ) {
     }
 }
