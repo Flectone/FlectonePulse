@@ -71,12 +71,10 @@ public class MinecraftPacketPlayerConnectionListener implements PacketListener {
         String wrapperLocale = wrapperPlayClientSettings.getLocale();
 
         if (wrapperLocale.equals(socialService.getSetting(fPlayer, SettingText.LOCALE))) return;
-        if (socialService.updateLocale(fPlayer, wrapperLocale)) return;
+        if (fPlayer.isOnline() && socialService.updateLocale(fPlayer, wrapperLocale)) return;
 
         // first time player joined, wait for it to be added
-        taskScheduler.runAsyncLater(() ->
-                socialService.updateLocale(fPlayerService.getFPlayer(uuid), wrapperLocale)
-        );
+        taskScheduler.runAsyncLater(() -> socialService.updateLocale(fPlayerService.getFPlayer(uuid), wrapperLocale), 40L);
     }
 
     @Override
