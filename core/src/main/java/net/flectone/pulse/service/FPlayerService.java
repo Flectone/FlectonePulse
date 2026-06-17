@@ -48,6 +48,7 @@ public class FPlayerService {
     private final EventDispatcher eventDispatcher;
     private final TaskScheduler taskScheduler;
     private final ProxyRegistry proxyRegistry;
+    private final RandomGenerator randomGenerator;
 
     /**
      * Invalidates all cached player data and reloads from scratch.
@@ -95,8 +96,9 @@ public class FPlayerService {
      */
     public void addConsole() {
         FPlayer console = FPlayer.builder()
-                .console(true)
+                .id(FPlayer.CONSOLE_ID)
                 .name(fileFacade.config().logger().console())
+                .type(FPlayer.CONSOLE_TYPE)
                 .build();
 
         fPlayerRepository.saveOrIgnore(console);
@@ -323,12 +325,17 @@ public class FPlayerService {
                 return getConsole();
             }
 
-            return FPlayer.builder().name(name).build();
+            return FPlayer.builder()
+                    .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
+                    .name(name)
+                    .uuid(UUID.randomUUID())
+                    .build();
         }
 
         FPlayer fPlayer = getFPlayer(uuid);
-        if (fPlayer.isUnknown()) {
+        if (!name.equals(fPlayer.name())) {
             return FPlayer.builder()
+                    .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
                     .name(name)
                     .uuid(uuid)
                     .type(platformPlayerAdapter.getEntityTranslationKey(platformPlayer))

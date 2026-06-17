@@ -21,6 +21,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.discord.model.DiscordClient;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,7 @@ import reactor.netty.transport.ProxyProvider;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -36,6 +38,7 @@ public class DiscordClientProvider {
 
     private final DiscordModule discordModule;
     private final SystemVariableResolver systemVariableResolver;
+    private final RandomGenerator randomGenerator;
 
     private volatile DiscordClient discordClient;
 
@@ -55,9 +58,16 @@ public class DiscordClientProvider {
 
         long clientID = applicationInfo.getId().asLong();
 
+        FPlayer fPlayer = FPlayer.builder()
+                .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
+                .name(discordModule.localization().senderName())
+                .uuid(UUID.randomUUID())
+                .type(FPlayer.INTEGRATION_TYPE)
+                .build();
+
         discordClient = new DiscordClient(
                 token,
-                FPlayer.builder().integration(true).name(discordModule.localization().senderName()).build(),
+                fPlayer,
                 discord4JClient,
                 gateway,
                 clientID

@@ -8,6 +8,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
@@ -22,6 +23,7 @@ import org.telegram.telegrambots.meta.api.methods.GetMe;
 
 import java.lang.reflect.Field;
 import java.net.*;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -31,6 +33,7 @@ public class TelegramClientProvider {
 
     private final TelegramModule telegramModule;
     private final SystemVariableResolver systemVariableResolver;
+    private final RandomGenerator randomGenerator;
     private final FLogger fLogger;
 
     private volatile TelegramClient telegramClient;
@@ -58,9 +61,16 @@ public class TelegramClientProvider {
             // get bot id
             long id = client.execute(new GetMe()).getId();
 
+            FPlayer fPlayer = FPlayer.builder()
+                    .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
+                    .name(telegramModule.localization().senderName())
+                    .uuid(UUID.randomUUID())
+                    .type(FPlayer.INTEGRATION_TYPE)
+                    .build();
+
             telegramClient = new TelegramClient(
                     token,
-                    FPlayer.builder().integration(true).name(telegramModule.localization().senderName()).build(),
+                    fPlayer,
                     client,
                     application,
                     id

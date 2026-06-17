@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.fplayer.*;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
     private final Database database;
+    private final RandomGenerator randomGenerator;
     private final FLogger logger;
 
     @Override
@@ -181,7 +183,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
         return withHandle(sql -> sql.findByName(name)
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.toBuilder().name(name).uuid(UUID.randomUUID()).build())
+                .orElse(FPlayer.UNKNOWN.toBuilder().id(nextRandomId()).name(name).uuid(UUID.randomUUID()).build())
         );
     }
 
@@ -196,7 +198,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
         return withHandle(sql -> sql.findByIp(inetAddress.getHostAddress())
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.toBuilder().ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
+                .orElse(FPlayer.UNKNOWN.toBuilder().id(nextRandomId()).ip(inetAddress.getHostAddress()).uuid(UUID.randomUUID()).build())
         );
     }
 
@@ -211,7 +213,7 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
 
         return withHandle(sql -> sql.findByUUID(uuid.toString())
                 .map(this::convertToFPlayer)
-                .orElse(FPlayer.UNKNOWN.withUuid(uuid))
+                .orElse(FPlayer.UNKNOWN.toBuilder().id(nextRandomId()).uuid(uuid).build())
         );
     }
 
@@ -228,6 +230,10 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
                 .map(this::convertToFPlayer)
                 .orElse(FPlayer.UNKNOWN.toBuilder().id(id).uuid(UUID.randomUUID()).build())
         );
+    }
+
+    private int nextRandomId() {
+        return randomGenerator.nextInt(Integer.MIN_VALUE, -1);
     }
 
     private FPlayer convertToFPlayer(PlayerInfo info) {

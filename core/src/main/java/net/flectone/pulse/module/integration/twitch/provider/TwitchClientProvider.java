@@ -12,11 +12,13 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.Proxy;
+import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -24,6 +26,7 @@ public class TwitchClientProvider {
 
     private final SystemVariableResolver systemVariableResolver;
     private final TwitchModule twitchModule;
+    private final RandomGenerator randomGenerator;
 
     private volatile TwitchClient twitchClient;
 
@@ -38,10 +41,17 @@ public class TwitchClientProvider {
 
         com.github.twitch4j.TwitchClient client = createTwitch4JClient(identityProvider, token);
 
+        FPlayer fPlayer = FPlayer.builder()
+                .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
+                .name(twitchModule.localization().senderName())
+                .uuid(UUID.randomUUID())
+                .type(FPlayer.INTEGRATION_TYPE)
+                .build();
+
         twitchClient = new TwitchClient(
                 token,
                 identityProvider,
-                FPlayer.builder().integration(true).name(twitchModule.localization().senderName()).build(),
+                fPlayer,
                 client
         );
 

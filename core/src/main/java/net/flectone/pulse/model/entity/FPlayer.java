@@ -27,6 +27,10 @@ public interface FPlayer extends FEntity {
         return new FPlayerImpl.FPlayerImplBuilder();
     }
 
+    int UNKNOWN_ID = Integer.MIN_VALUE;
+
+    int CONSOLE_ID = -1;
+
     String PLAYER_TYPE = "PLAYER";
 
     String CONSOLE_TYPE = "CONSOLE";
@@ -51,8 +55,6 @@ public interface FPlayer extends FEntity {
 
     FPlayer withUuid(UUID uuid);
 
-    FPlayer withConsole(boolean console);
-
     FPlayer withOnline(boolean online);
 
     FPlayer withId(Integer id);
@@ -65,7 +67,7 @@ public interface FPlayer extends FEntity {
 
     @Override
     default boolean isUnknown() {
-        return id() == -1 && !isConsole();
+        return id() < 0 && !isConsole();
     }
 
     @Builder(toBuilder = true)
@@ -75,8 +77,6 @@ public interface FPlayer extends FEntity {
             UUID uuid,
             String type,
             Integer id,
-            boolean console,
-            boolean integration,
             boolean online,
             @Nullable String ip,
             List<Component> constants,
@@ -87,24 +87,18 @@ public interface FPlayer extends FEntity {
             if (name == null) name = FEntity.UNKNOWN_NAME;
             if (uuid == null) uuid = FEntity.UNKNOWN_UUID;
             if (type == null) type = PLAYER_TYPE;
-            if (id == null) id = -1;
+            if (id == null) id = UNKNOWN_ID;
             if (constants == null) constants = List.of();
-
-            console = console || type.equalsIgnoreCase(CONSOLE_TYPE);
-            if (console) type = CONSOLE_TYPE;
-
-            integration = integration || type.equalsIgnoreCase(INTEGRATION_TYPE);
-            if (integration) type = INTEGRATION_TYPE;
         }
 
         @Override
         public boolean isConsole() {
-            return console;
+            return id == CONSOLE_ID;
         }
 
         @Override
         public boolean isIntegration() {
-            return integration;
+            return type.equals(INTEGRATION_TYPE);
         }
 
         @Override
@@ -116,8 +110,7 @@ public interface FPlayer extends FEntity {
         public boolean equals(Object object) {
             if (this == object) return true;
             if (!(object instanceof FPlayer fPlayer)) return false;
-            if (this.console != fPlayer.isConsole()) return false;
-            if (this.integration != fPlayer.isIntegration()) return false;
+            if (!Objects.equals(this.type, fPlayer.type())) return false;
             if (!Objects.equals(this.uuid, fPlayer.uuid())) return false;
 
             return Objects.equals(this.id, fPlayer.id());
@@ -125,7 +118,7 @@ public interface FPlayer extends FEntity {
 
         @Override
         public int hashCode() {
-            return Objects.hash(uuid, id, console, integration);
+            return Objects.hash(uuid, id, type);
         }
 
         @Override
