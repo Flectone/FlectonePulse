@@ -1,6 +1,6 @@
 dependencies {
     implementation project(":minecraft:common")
-    implementation fileTree("library") { include "*.jar" }
+    implementation "net.flectone:libby-bukkit:$libby_version"
 
     compileOnly project(":core")
     compileOnly project(":minecraft:paper")

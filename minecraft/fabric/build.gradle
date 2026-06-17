@@ -21,9 +21,9 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 	compileOnly("org.incendo:cloud-fabric:${cloud_fabric_version}")
 
-    implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")
     implementation project(":minecraft:common")
+	implementation "net.flectone:libby-fabric:$libby_version"
 }
 
 shadowJar {
