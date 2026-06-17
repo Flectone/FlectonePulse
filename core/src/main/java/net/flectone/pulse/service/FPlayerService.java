@@ -257,7 +257,7 @@ public class FPlayerService {
     public FPlayer getConsole() {
         FPlayer fPlayer = getFPlayer(FEntity.UNKNOWN_UUID);
         if (!fPlayer.isConsole()) {
-            return getFPlayer(-1);
+            return getFPlayer(FPlayer.CONSOLE_ID);
         }
 
         return fPlayer;
