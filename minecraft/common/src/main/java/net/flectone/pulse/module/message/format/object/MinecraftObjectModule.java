@@ -21,6 +21,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.checker.ValidNameChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.file.FileFacade;
@@ -52,6 +53,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private final ModuleController moduleController;
     private final MessagePipeline messagePipeline;
     private final UUIDParser uuidParser;
+    private final ValidNameChecker validNameChecker;
     private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
@@ -67,6 +69,7 @@ public class MinecraftObjectModule extends ObjectModule {
                                  ModuleController moduleController,
                                  MessagePipeline messagePipeline,
                                  UUIDParser uuidParser,
+                                 ValidNameChecker validNameChecker,
                                  @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV1219,
                                  SocialService socialService) {
         super(fileFacade, socialService);
@@ -82,6 +85,7 @@ public class MinecraftObjectModule extends ObjectModule {
         this.moduleController = moduleController;
         this.messagePipeline = messagePipeline;
         this.uuidParser = uuidParser;
+        this.validNameChecker = validNameChecker;
         this.isNewerThanOrEqualsV_1_21_9 = isNewerThanOrEqualsV1219;
     }
 
@@ -158,7 +162,7 @@ public class MinecraftObjectModule extends ObjectModule {
         playerHeadBuilder.hat(!argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value()));
 
         // first check valid player name
-        if (isValidName(playerHead)) {
+        if (validNameChecker.check(playerHead)) {
             // try load this player
             FPlayer fPlayer = fPlayerService.getFPlayer(playerHead);
 
@@ -182,12 +186,6 @@ public class MinecraftObjectModule extends ObjectModule {
         Component playerHeadComponent = Component.object().contents(playerHeadBuilder.build()).build();
 
         return applyDefaultFormatting(messageContext, playerHeadComponent, config().playerHeadTag().needExtraSpace());
-    }
-
-    // https://github.com/PaperMC/adventure/blob/main/5/api/src/main/java/net/kyori/adventure/text/object/PlayerHeadObjectContentsImpl.java
-    private boolean isValidName(final String name) {
-        if (name.length() > 16) return false;
-        return name.chars().filter(c -> c <= 32 || c >= 126).findAny().isEmpty();
     }
 
     private void applyFPlayerProfileProperty(FEntity fEntity,
