@@ -42,6 +42,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.checker.ValidNameChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
@@ -92,6 +93,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private final FLogger fLogger;
     private final ProxyRegistry proxyRegistry;
     private final SocialService socialService;
+    private final ValidNameChecker validNameChecker;
 
     @Override
     public void onEnable() {
@@ -530,52 +532,65 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     }
 
     @Nullable
-    private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String argument, @Nullable String existingName) {
-        UUID uuid = uuidParser.parse(argument);
-
+    private FPlayer parseFPlayerAndSaveNew(FPlayer fPlayer, String uuidOrName, @Nullable String name) {
+        UUID uuid = uuidParser.parse(uuidOrName);
         boolean isUuid = uuid != null;
-        if (!isUuid) {
-            argument = StringUtils.left(argument, 16);
+
+        FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(uuidOrName);
+        if (fTarget.isConsole() || !isUuid && !validNameChecker.check(uuidOrName)) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::nullPlayer)
+                    .build()
+            );
+            return null;
         }
 
-        FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(argument);
-        if (fTarget.isConsole()) return null;
+        if (!fTarget.isUnknown() && config().checkDuplicate() && isWhitelisted(fTarget)) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Whitelist::alreadyAdd)
+                    .build()
+            );
+            return null;
+        }
 
-        if (fTarget.isUnknown()) {
-            if (isUuid) {
-                // just save random string for update in feature
-                existingName = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineName(uuid) : existingName == null ? uuid.toString() : existingName;
-                fPlayerService.saveOrUpdate(uuid, existingName, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
-            } else {
-                uuid = platformServerAdapter.isOnlineMode() ? profileResolver.resolveOnlineUUID(argument) : profileResolver.resolveOfflineUUID(argument);
-                if (uuid == null) {
-                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Command.Whitelist::nullPlayer)
-                            .build()
-                    );
-                    return null;
-                }
-
-                fPlayerService.saveOrUpdate(uuid, argument, platformPlayerAdapter.getIp(fTarget), platformPlayerAdapter.isOnline(fTarget));
-            }
-
-            // invalidate cached unknown player
-            fPlayerService.invalidateOfflineCache(uuid, false);
-
-            fTarget = fPlayerService.getFPlayer(uuid);
+        String resolvedName;
+        if (isUuid) {
+            resolvedName = platformServerAdapter.isOnlineMode()
+                    ? profileResolver.resolveOnlineName(uuid)
+                    : (validNameChecker.check(name) ? name : uuid.toString());
         } else {
-            if (config().checkDuplicate() && isWhitelisted(fTarget)) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Whitelist::alreadyAdd)
-                        .build()
-                );
-                return null;
+            resolvedName = StringUtils.left(uuidOrName, 16);
+
+            uuid = platformServerAdapter.isOnlineMode()
+                    ? profileResolver.resolveOnlineUUID(uuidOrName)
+                    : profileResolver.resolveOfflineUUID(uuidOrName);
+
+            // use offline uuid if empty
+            if (uuid == null) {
+                uuid = profileResolver.resolveOfflineUUID(uuidOrName);
             }
         }
 
-        return fTarget;
+        // just save uuid name string for update in feature
+        if (StringUtils.isEmpty(resolvedName) || !validNameChecker.check(resolvedName)) {
+            resolvedName = uuid.toString();
+        }
+
+        // get player ip
+        String playerIp = platformPlayerAdapter.getIp(fTarget);
+
+        // is player online?
+        boolean isOnline = platformPlayerAdapter.isOnline(fTarget);
+
+        // save to database
+        fPlayerService.saveOrUpdate(uuid, StringUtils.left(resolvedName, 16), playerIp, isOnline);
+
+        // invalidate cached unknown player
+        fPlayerService.invalidateOfflineCache(uuid, false);
+
+        return fPlayerService.getFPlayer(uuid);
     }
 
     public void kickPlayer(FEntity fModerator, FPlayer fTarget) {
