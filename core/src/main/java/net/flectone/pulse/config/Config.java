@@ -178,6 +178,7 @@ public record Config(
             String console,
             String prefix,
             List<String> description,
+            String primary,
             String warn,
             String info,
             List<String> filter

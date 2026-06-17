@@ -23,6 +23,7 @@ public record FLogger(
     public static final String ERROR_MESSAGE_REPORT = "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues \n";
 
     private static final boolean ANSI_SUPPORTED = isAnsiSupported();
+    private static final String RESET_COLOR = "\033[0m";
 
     // Idea taken from net.kyori.ansi.ColorLevel
     private static boolean isAnsiSupported() {
@@ -52,21 +53,15 @@ public record FLogger(
             return;
         }
 
-        String color = "";
         if (ANSI_SUPPORTED) {
-            color = switch (logRecord.getLevel().intValue()) {
+            String color = switch (logRecord.getLevel().intValue()) {
                 case 900 -> config.warn();
                 case 800 -> config.info();
-                default -> "";
+                default -> config.primary();
             };
-        }
-
-        String prefix = config.prefix();
-
-        if (ANSI_SUPPORTED && !color.isEmpty()) {
-            logRecord.setMessage(prefix + color + logRecord.getMessage() + "\033[0m");
+            logRecord.setMessage(config.primary() + config.prefix() + RESET_COLOR + color + logRecord.getMessage() + RESET_COLOR);
         } else {
-            logRecord.setMessage(prefix + logRecord.getMessage());
+            logRecord.setMessage(config.prefix() + logRecord.getMessage());
         }
 
         logRecord.setLoggerName("");
