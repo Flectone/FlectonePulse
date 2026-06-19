@@ -301,6 +301,28 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    # Master auto-translate toggle for chat AND private messages (/tell, /msg, /reply, ...).
+    # When true (default), both get async auto-translation per receiver locale, with the ⇄
+    # button toggling between translation and original via /toggleoriginal. When false, both
+    # fall back to the classic on-demand /translateto behavior (nothing pre-translated).
+    auto: true
+    # Independent auto-translate toggle for bubbles above the head.
+    bubble: true
+    # When true (default), the player's chat history (viewer markers and
+    # toggle state) is cleared on quit — a reconnect starts with a fresh
+    # chat, no leftover entries from before. Set to false to keep entries
+    # across reconnects (useful for short reloads where you want toggle to
+    # keep working on messages sent before the reload).
+    clear_history_on_quit: true
+    # Provider chain — tried in order until one returns a useful translation.
+    # If a provider fails (non-200 / null / returns input verbatim), the next is tried.
+    # Allowed values: GOOGLE, MYMEMORY, DEEPL, YANDEX.
+    # Empty list disables auto-translate entirely.
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"

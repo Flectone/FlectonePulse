@@ -578,7 +578,16 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record Translate(Boolean enable) implements EnableSetting {
+        public record Translate(
+                Boolean enable,
+                // Single master toggle for chat AND private-message auto-translate.
+                // Both are driven together (key: message.format.translate.auto).
+                Boolean auto,
+                // Independent bubble auto-translate toggle (key: message.format.translate.bubble).
+                Boolean bubble,
+                Boolean clearHistoryOnQuit,
+                List<String> providers
+        ) implements EnableSetting {
         }
 
         @With

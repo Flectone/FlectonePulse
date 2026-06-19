@@ -26,6 +26,7 @@ import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
+import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
@@ -34,6 +35,7 @@ import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.service.TranslationCacheService;
 import net.flectone.pulse.util.MinecraftEntityUtil;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
@@ -70,6 +72,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     private final MinecraftPacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
     private final ReflectionResolver reflectionResolver;
+    private final TranslationCacheService translationCacheService;
 
     @Override
     public void renderBubble(Bubble bubble) {
@@ -105,27 +108,55 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     public void renderBubble(FPlayer fViewer, Bubble bubble) {
-        Component formattedMessage = createFormattedMessage(bubble, fViewer);
+        // Chunks of one message share an id; render the whole stack on the first chunk
+        // and ignore the rest (they only exist to drive the queue/maxCount accounting).
+        if (bubble.getChunkIndex() != 0) return;
 
+        // Per-viewer language resolution: same locale → original chunks; otherwise the
+        // translated-and-re-split chunks if cached, else original now + async update.
+        List<String> chunkTexts = resolveChunkTexts(bubble, fViewer);
+
+        List<MinecraftBubbleEntity> textEntities = renderChunkStack(fViewer, bubble, chunkTexts);
+
+        maybeScheduleTranslationUpdate(fViewer, bubble, chunkTexts, textEntities);
+    }
+
+    // Renders the vertical stack (one text entity per chunk, chunkIndex 0 on top) and
+    // returns the created text entities in chunk order (index i == chunkIndex i).
+    private List<MinecraftBubbleEntity> renderChunkStack(FPlayer fViewer, Bubble bubble, List<String> chunkTexts) {
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
         Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
 
-        // create bubble entity
-        MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
-        bubbleEntities.push(bubbleEntity);
+        List<MinecraftBubbleEntity> textEntities = new ObjectArrayList<>();
 
-        if (bubble.isInteractionRiding()) {
-            bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
-        } else {
-            for (int i = 0; i < bubble.getElevation(); i++) {
+        // Iterate chunks in forward order, mirroring how the original code pushed each
+        // chunk one-by-one in queue order: every push prepends to the deque, so the
+        // first chunk ends up at the back (top of the column) and the last chunk at the
+        // front (bottom). This keeps reading order top-to-bottom (chunkIndex 0 on top).
+        for (int i = 0; i < chunkTexts.size(); i++) {
+            Component formattedMessage = createFormattedMessage(bubble, fViewer, chunkTexts.get(i));
+
+            MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
+            bubbleEntities.push(bubbleEntity);
+            textEntities.add(bubbleEntity);
+
+            if (bubble.isInteractionRiding()) {
                 bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+            } else {
+                for (int j = 0; j < bubble.getElevation(); j++) {
+                    bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+                }
             }
         }
 
         activeBubbleEntities.put(key, bubbleEntities);
 
         rideEntities(sender, fViewer);
+
+        // textEntities is already in chunk order (index i == chunkIndex i), matching
+        // the order applyTranslationUpdate expects for in-place text swaps.
+        return textEntities;
     }
 
     @Override
@@ -204,13 +235,148 @@ public class MinecraftBubbleRender implements BubbleRender {
         return nextBubbleEntity.getId();
     }
 
-    private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
+    // Returns the chunk texts to render for this viewer: original chunks when translation
+    // is disabled / same locale / not yet cached, otherwise the re-split translation.
+    private List<String> resolveChunkTexts(Bubble bubble, FPlayer fViewer) {
+        List<String> original = splitFull(bubble, bubble.getFullMessage());
+
+        if (!isBubbleTranslateEnabled()) return original;
+
+        String senderLocale = bubble.getSenderLocale();
+        String viewerLocale = socialService.getSetting(fViewer, SettingText.LOCALE);
+        if (senderLocale == null || viewerLocale == null || viewerLocale.equals(senderLocale)) {
+            return original;
+        }
+
+        String cached = translationCacheService.get(senderLocale, viewerLocale, bubble.getFullMessage());
+        if (cached != null && !cached.isEmpty() && !cached.equals(bubble.getFullMessage())) {
+            return splitFull(bubble, cached);
+        }
+
+        // Not cached yet — show original now, async update will replace it.
+        return original;
+    }
+
+    // Re-splits a (translated or original) full message into chunks using the exact same
+    // symbol rules the queue used.
+    private List<String> splitFull(Bubble bubble, String fullMessage) {
+        if (fullMessage == null) return List.of(bubble.getRawMessage());
+
+        Message.Bubble config = fileFacade.message().bubble();
+        return BubbleService.splitText(
+                fullMessage,
+                config.maxLength(),
+                config.maxCount(),
+                config.hintBufferLength(),
+                config.wordBreakHint()
+        );
+    }
+
+    // If a translation isn't cached yet, kick it off and, on completion, update this
+    // viewer's already-rendered bubble: in-place text swap when the chunk count matches,
+    // full re-render (despawn + respawn the stack) when it differs.
+    private void maybeScheduleTranslationUpdate(FPlayer fViewer, Bubble bubble,
+                                                List<String> renderedChunks,
+                                                List<MinecraftBubbleEntity> textEntities) {
+        if (!isBubbleTranslateEnabled()) return;
+
+        String senderLocale = bubble.getSenderLocale();
+        String viewerLocale = socialService.getSetting(fViewer, SettingText.LOCALE);
+        if (senderLocale == null || viewerLocale == null || viewerLocale.equals(senderLocale)) return;
+
+        String cached = translationCacheService.get(senderLocale, viewerLocale, bubble.getFullMessage());
+        if (cached != null && !cached.isEmpty() && !cached.equals(bubble.getFullMessage())) {
+            // Already rendered with translation in resolveChunkTexts — nothing to do.
+            return;
+        }
+
+        List<String> providers = fileFacade.message().format().translate().providers();
+        if (providers == null || providers.isEmpty()) return;
+
+        translationCacheService.translateAsync(senderLocale, viewerLocale, bubble.getFullMessage(), providers)
+                .thenAccept(translated -> {
+                    if (translated == null || translated.isEmpty() || translated.equals(bubble.getFullMessage())) {
+                        return;
+                    }
+                    applyTranslationUpdate(fViewer, bubble, renderedChunks, textEntities, translated);
+                });
+    }
+
+    private void applyTranslationUpdate(FPlayer fViewer, Bubble bubble,
+                                        List<String> renderedChunks,
+                                        List<MinecraftBubbleEntity> textEntities,
+                                        String translated) {
+        String key = bubble.getSender().uuid().toString() + fViewer.uuid();
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.get(key);
+        // Guard against TTL despawn / cleared state arriving before this async callback.
+        if (bubbleEntities == null || bubbleEntities.isEmpty()) return;
+        if (textEntities.isEmpty()) return;
+        if (!bubbleEntities.contains(textEntities.get(0))) return;
+        if (!fViewer.isOnline()) return;
+
+        List<String> newChunks = splitFull(bubble, translated);
+
+        if (newChunks.size() == renderedChunks.size()) {
+            // Same shape — swap text on each existing entity with a metadata packet.
+            for (int i = 0; i < textEntities.size(); i++) {
+                MinecraftBubbleEntity entity = textEntities.get(i);
+                if (!entity.isCreated()) continue;
+                Component formatted = createFormattedMessage(bubble, fViewer, newChunks.get(i));
+                entity.setMessage(formatted);
+                updateEntityText(entity, formatted);
+            }
+            return;
+        }
+
+        // Chunk count changed — despawn this message's stack for the viewer and re-render
+        // with the translated chunks (reflows the vertical stack).
+        removeBubbleForViewer(bubble, fViewer);
+        // Translation is now cached, so the re-render resolves it synchronously; no
+        // further async update is scheduled.
+        renderChunkStack(fViewer, bubble, newChunks);
+    }
+
+    // Pushes a single metadata packet that replaces just the text field of an existing
+    // bubble entity (TEXT_DISPLAY: ADV_COMPONENT; AREA_EFFECT_CLOUD: OPTIONAL_ADV_COMPONENT).
+    private void updateEntityText(MinecraftBubbleEntity entity, Component message) {
+        EntityType entityType = entity.getEntityType();
+        List<EntityData<?>> metadataList = new ObjectArrayList<>();
+
+        if (entityType == EntityTypes.TEXT_DISPLAY) {
+            metadataList.add(new EntityData<>(entityUtil.textDisplayOffset(), EntityDataTypes.ADV_COMPONENT, message));
+        } else if (entityType == EntityTypes.AREA_EFFECT_CLOUD) {
+            metadataList.add(new EntityData<>(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(message)));
+        } else {
+            return;
+        }
+
+        packetSender.send(entity.getViewer(), new WrapperPlayServerEntityMetadata(entity.getId(), metadataList));
+    }
+
+    // Removes only this message's entities for a single viewer (one sender+viewer stack).
+    private void removeBubbleForViewer(Bubble bubble, FPlayer fViewer) {
+        String key = bubble.getSender().uuid().toString() + fViewer.uuid();
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.get(key);
+        if (bubbleEntities == null || bubbleEntities.isEmpty()) return;
+
+        List<MinecraftBubbleEntity> toRemove = bubbleEntities.stream()
+                .filter(entity -> entity.getBubble().equals(bubble))
+                .toList();
+        if (toRemove.isEmpty()) return;
+
+        toRemove.forEach(this::despawnBubbleEntity);
+        bubbleEntities.removeAll(toRemove);
+
+        rideEntities(bubble.getSender(), fViewer);
+    }
+
+    private Component createFormattedMessage(Bubble bubble, FPlayer viewer, String chunkText) {
         Localization.Message.Bubble localization = fileFacade.localization(socialService.getSetting(viewer, SettingText.LOCALE)).message().bubble();
 
         MessageContext messageContext = MessageContext.builder()
                 .sender(bubble.getSender())
                 .receiver(viewer)
-                .message(bubble.getRawMessage())
+                .message(chunkText)
                 .flags(
                         new MessageFlag[]{MessageFlag.MENTION_MODULE, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.QUESTIONANSWER_MODULE, MessageFlag.PLAYER_MESSAGE},
                         new boolean[]{false, false, false, true}
@@ -381,6 +547,15 @@ public class MinecraftBubbleRender implements BubbleRender {
                 && !platformPlayerAdapter.hasPotionEffect(sender, PotionUtil.INVISIBILITY_POTION_NAME)
                 && textScreenRender.getPassengers(sender.uuid()).isEmpty()
                 && passengers.isEmpty();
+    }
+
+    // Bubble auto-translate runs only when the translate module is enabled AND the
+    // bubble auto-translate toggle (message.format.translate.bubble) is on (default true).
+    private boolean isBubbleTranslateEnabled() {
+        Message.Format.Translate translate = fileFacade.message().format().translate();
+        boolean enabled = Boolean.TRUE.equals(translate.enable());
+        boolean bubbleToggle = !Boolean.FALSE.equals(translate.bubble());
+        return enabled && bubbleToggle;
     }
 
     @Override

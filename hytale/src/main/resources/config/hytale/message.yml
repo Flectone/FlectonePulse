@@ -274,6 +274,18 @@ format:
       strikethrough: "(?<!\\S)~~([^~~\\n]+)~~(?!\\S)"
   translate:
     enable: true
+    # Master auto-translate toggle for chat AND private messages (/tell, /msg, /reply, ...).
+    # true → async pre-translation + /toggleoriginal button; false → classic /translateto.
+    auto: true
+    # Independent auto-translate toggle for bubbles above the head.
+    bubble: true
+    # true → clear player chat history (viewers, toggles) on quit
+    clear_history_on_quit: true
+    providers:
+      - GOOGLE
+      - MYMEMORY
+      - DEEPL
+      - YANDEX
   world:
     enable: true
     mode: "TYPE"
