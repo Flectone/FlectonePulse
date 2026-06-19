@@ -39,6 +39,7 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.ArrayUtils;
@@ -70,6 +71,7 @@ public class MinecraftBubbleRender implements BubbleRender {
     private final MinecraftPacketProvider packetProvider;
     private final TextScreenRender textScreenRender;
     private final ReflectionResolver reflectionResolver;
+    private final FLogger fLogger;
 
     @Override
     public void renderBubble(Bubble bubble) {
@@ -100,8 +102,11 @@ public class MinecraftBubbleRender implements BubbleRender {
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !socialService.isIgnored(fViewer, sender))
                 .filter(fViewer -> socialService.canSeeVanished(sender, fViewer))
-                .forEach(fViewer -> renderBubble(fViewer, bubble))
-        );
+                .forEach(fViewer -> renderBubble(fViewer, bubble)), taskScheduler.getExecutorService()
+        ).exceptionally(e -> {
+            fLogger.warning(e);
+            return null;
+        });
     }
 
     public void renderBubble(FPlayer fViewer, Bubble bubble) {
