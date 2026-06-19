@@ -997,7 +997,7 @@ message:
       death.attack.sting.item: "<fcolor:1>☠ <argument:0> was stung to death by <argument:1> using <fcolor:2><argument:2><fcolor:1>"
       death.attack.sting.player: "<fcolor:1>☠ <argument:0> was stung to death by <argument:1>"
       death.attack.sulfurCubeHot: "<fcolor:1>☠ <argument:0> died because not just the floor is lava"
-      death.attack.sulfurCubeHot.player: "<fcolor:1>☠ <argument:0> showed <argument:1> that not just the floor is lava"
+      death.attack.sulfurCubeHot.player: "<fcolor:1>☠ <argument:1> showed <argument:0> that not just the floor is lava"
       death.attack.sweetBerryBush: "<fcolor:1>☠ <argument:0> was poked to death by a sweet berry bush"
       death.attack.sweetBerryBush.player: "<fcolor:1>☠ <argument:0> was poked to death by a sweet berry bush while trying to escape <argument:1>"
       death.attack.thorns: "<fcolor:1>☠ <argument:0> was killed while trying to hurt <argument:1>"

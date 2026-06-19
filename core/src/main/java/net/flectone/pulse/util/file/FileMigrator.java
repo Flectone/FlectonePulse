@@ -994,10 +994,10 @@ public class FileMigrator {
                 boolean isRussian = localization.language().toLowerCase().contains("ru");
                 if (isRussian) {
                     newVanillaTypes.put("death.attack.sulfurCubeHot", "<fcolor:1>☠ <argument:0> обнаружил, что лавой может быть не только пол");
-                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:0> показал <argument:1>, что не только пол — это лава");
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> показал <argument:0>, что не только пол — это лава");
                 } else {
                     newVanillaTypes.put("death.attack.sulfurCubeHot", "<fcolor:1>☠ <argument:0> died because not just the floor is lava");
-                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:0> showed <argument:1> that not just the floor is lava");
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> showed <argument:0> that not just the floor is lava");
                 }
 
                 localization = localization
@@ -1059,6 +1059,36 @@ public class FileMigrator {
                                 .withIgnore(ignore)
                         )
                 );
+    }
+
+    public FilePack migration_1_10_3(FilePack files) {
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
+
+        boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
+        for (Localization localization : files.localizations().values()) {
+
+            if (isNotHytale) {
+                Map<String, String> newVanillaTypes = new LinkedHashMap<>(localization.message().vanilla().types());
+
+                boolean isRussian = localization.language().toLowerCase().contains("ru");
+                if (isRussian) {
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> показал <argument:0>, что не только пол — это лава");
+                } else {
+                    newVanillaTypes.put("death.attack.sulfurCubeHot.player", "<fcolor:1>☠ <argument:1> showed <argument:0> that not just the floor is lava");
+                }
+
+                localization = localization
+                        .withMessage(localization.message()
+                                .withVanilla(localization.message().vanilla()
+                                        .withTypes(newVanillaTypes)
+                                )
+                        );
+            }
+
+            newLocalizations.put(localization.language(), localization);
+        }
+
+        return files.withLocalizations(newLocalizations);
     }
 
 }
