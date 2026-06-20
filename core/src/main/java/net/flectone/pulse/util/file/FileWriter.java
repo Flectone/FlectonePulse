@@ -230,7 +230,7 @@ public class FileWriter {
 
         if (numbers.isEmpty()) return -1;
 
-        int g = numbers.getFirst();
+        int g = numbers.getInt(0);
         for (int n : numbers) {
             g = gcd(g, n);
         }
