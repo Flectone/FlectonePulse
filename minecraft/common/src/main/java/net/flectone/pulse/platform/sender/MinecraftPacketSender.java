@@ -97,15 +97,25 @@ public class MinecraftPacketSender {
     }
 
     /**
-     * Broadcasts a packet to all online players.
+     * Broadcasts a packet to all online players (not silent).
      *
      * @param packetWrapper the packet to broadcast
      */
     public void send(PacketWrapper<?> packetWrapper) {
+        send(packetWrapper, false);
+    }
+
+    /**
+     * Broadcasts a packet to all online players.
+     *
+     * @param packetWrapper the packet to broadcast
+     * @param silent whether to send silently
+     */
+    public void send(PacketWrapper<?> packetWrapper, boolean silent) {
         packetProvider.getApi().getProtocolManager()
                 .getUsers()
                 .forEach(user -> {
-                    if (fileFacade.config().internal().alwaysSendSilentPacket()) {
+                    if (silent || fileFacade.config().internal().alwaysSendSilentPacket()) {
                         user.sendPacketSilently(packetWrapper);
                     } else {
                         user.sendPacket(packetWrapper);
