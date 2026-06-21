@@ -43,9 +43,7 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public void createObjective(FPlayer fPlayer, Component displayName, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
-        removeObjective(fPlayer, scoreboardPosition);
-
-        String objectiveName = scoreboardPosition.name() + fPlayer.uuid();
+        String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
@@ -62,7 +60,7 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public void updateObjective(FPlayer fPlayer, FPlayer fObjective, Component scoreFormat, ScoreboardPosition scoreboardPosition) {
-        String objectiveName = scoreboardPosition.name() + fPlayer.uuid();
+        String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
 
         packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                 fObjective.name(),
@@ -75,7 +73,7 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public void removeObjective(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
-        String objectiveName = scoreboardPosition.name() + fPlayer.uuid();
+        String objectiveName = getObjectiveName(fPlayer, scoreboardPosition);
 
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
@@ -103,4 +101,9 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
                 .build()
         );
     }
+
+    private String getObjectiveName(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
+        return scoreboardPosition.name() + "_" + fPlayer.id();
+    }
+
 }
