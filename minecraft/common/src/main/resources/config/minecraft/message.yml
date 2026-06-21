@@ -58,7 +58,7 @@ bubble:
   disallowed_input: ""
   max_count: 3
   max_length: 30
-  elevation: 0.4
+  elevation: 0.3
   distance: 30.0
   read_speed: 90.0
   handicap_chars: 10.0
@@ -66,7 +66,7 @@ bubble:
   word_break_hint: "‑"
   interaction:
     enable: true
-    height: 0.4
+    height: 0.3
   modern:
     enable: true
     has_shadow: true
