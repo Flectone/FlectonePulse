@@ -90,17 +90,24 @@ public class FColorModule implements ModuleSimple {
             if (number.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             int index = number.getAsInt();
-            String color = getFColorOrDefault(receiver, FColor.Type.SEE, index, config().defaultColors().get(index));
 
-            // send out colors
+            // get receiver SEE color
+            String color = getFColorOrDefault(receiver, FColor.Type.SEE, index, config().defaultColors().getOrDefault(index, ""));
+
+            // if colors must be from sender, we must check OUT colors from sender, otherwise we take them from receiver
+            // We can't make it so that we take OUT receiver first and then OUT sender,
+            // because the display will be mixed up and will be incorrect
             if (isSenderColorOut) {
                 if (sender instanceof FPlayer fPlayer) {
+                    // get sender OUT color
                     color = getFColorOrDefault(fPlayer, FColor.Type.OUT, index, color);
                 }
             } else {
+                // get receiver OUT color
                 color = getFColorOrDefault(receiver, FColor.Type.OUT, index, color);
             }
 
+            // convert legacy color to modern
             color = legacyColorConvertor.convert(StringUtils.defaultString(color));
 
             return Tag.preProcessParsed(color);
