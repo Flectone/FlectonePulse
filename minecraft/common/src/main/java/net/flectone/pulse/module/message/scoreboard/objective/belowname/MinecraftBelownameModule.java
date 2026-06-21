@@ -1,8 +1,14 @@
 package net.flectone.pulse.module.message.scoreboard.objective.belowname;
 
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -12,9 +18,13 @@ import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.scoreboard.objective.MinecraftObjectiveModule;
 import net.flectone.pulse.module.message.scoreboard.objective.ScoreboardPosition;
+import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPacketBelownameListener;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.listener.MinecraftPulseBelownameListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -22,9 +32,14 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 
+import java.util.List;
+import java.util.UUID;
+
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftBelownameModule implements ModuleLocalization<Localization.Message.Scoreboard.Objective.Belowname> {
+
+    private static final int ATTRIBUTE_BASE_VALUE = 10;
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -33,6 +48,10 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     private final ListenerRegistry listenerRegistry;
     private final ModuleController moduleController;
     private final SocialService socialService;
+    private final MinecraftPacketSender packetSender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MinecraftPacketProvider packetProvider;
+    private final @Named("isNewerThanOrEqualsV_26_2") boolean isNewerThanOrEqualsV262;
 
     @Override
     public void onEnable() {
@@ -42,11 +61,21 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
         }
 
         listenerRegistry.register(MinecraftPulseBelownameListener.class);
+
+        if (isNewerThanOrEqualsV262) {
+            listenerRegistry.register(MinecraftPacketBelownameListener.class);
+
+            sendForAll(false);
+        }
     }
 
     @Override
     public void onDisable() {
         fPlayerService.getPlatformFPlayers().forEach(this::remove);
+
+        if (!FlectonePulseAPI.isDisabling()) {
+            sendForAll(true);
+        }
     }
 
     @Override
@@ -97,6 +126,32 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
+    }
+
+    public boolean isModernPlayer(UUID uuid) {
+        User user = packetProvider.getUser(uuid);
+        if (user == null) return false;
+
+        return user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
+    }
+
+    public void sendForAll(boolean baseValue) {
+        List<UUID> onlinePlayers = platformPlayerAdapter.getOnlinePlayers();
+        onlinePlayers.forEach(player -> {
+            int entityId = platformPlayerAdapter.getEntityId(player);
+            if (entityId == 0) return;
+
+            onlinePlayers.stream()
+                    .filter(this::isModernPlayer)
+                    .forEach(receiver -> send(receiver, entityId, baseValue));
+        });
+    }
+
+    public void send(UUID uuid, int entityId, boolean baseValue) {
+        packetSender.send(uuid, new WrapperPlayServerUpdateAttributes(
+                entityId,
+                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BELOW_NAME_DISTANCE, baseValue ? ATTRIBUTE_BASE_VALUE : config().distance(), List.of())))
+        );
     }
 
 

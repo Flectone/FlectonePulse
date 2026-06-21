@@ -720,6 +720,7 @@ public record Message(
             @Jacksonized
             public record Belowname(
                     Boolean enable,
+                    Double distance,
                     Ticker ticker
             ) implements EnableSetting {
             }

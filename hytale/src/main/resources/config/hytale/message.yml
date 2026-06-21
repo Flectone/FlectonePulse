@@ -328,6 +328,7 @@ scoreboard:
     enable: false
     belowname:
       enable: false
+      distance: 64
       ticker:
         enable: true
         period: 100
