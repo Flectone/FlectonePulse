@@ -19,6 +19,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 import java.util.UUID;
@@ -27,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class HytaleScoreboardModule extends ScoreboardModule {
 
-    private final Map<UUID, CustomName> uuidTeamMap = new ConcurrentHashMap<>();
+    private final Map<UUID, CustomName> teamMap = new ConcurrentHashMap<>();
+
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -59,12 +61,12 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
             taskScheduler.runPlayerAsyncTimer(fPlayer -> {
-                if (!uuidTeamMap.containsKey(fPlayer.uuid())) return;
+                if (!teamMap.containsKey(fPlayer.uuid())) return;
 
                 CustomName customName = createNameplate(fPlayer);
                 sendPacket(fPlayer.uuid(), customName.value());
 
-                uuidTeamMap.put(fPlayer.uuid(), customName);
+                teamMap.put(fPlayer.uuid(), customName);
 
             }, ticker.period());
         }
@@ -74,36 +76,36 @@ public class HytaleScoreboardModule extends ScoreboardModule {
     public void onDisable() {
         super.onDisable();
 
-        uuidTeamMap.forEach((uuid, customName) -> sendPacket(uuid, customName.original()));
-        uuidTeamMap.clear();
+        teamMap.forEach((uuid, customName) -> sendPacket(uuid, customName.original()));
+        teamMap.clear();
     }
 
     @Override
-    public void create(FPlayer fPlayer, boolean skipCacheTeam) {
+    public void createOrUpdate(@NonNull FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
             CustomName customName = createNameplate(fPlayer);
             sendPacket(fPlayer.uuid(), customName.value());
 
-            uuidTeamMap.put(fPlayer.uuid(), customName);
+            teamMap.put(fPlayer.uuid(), customName);
         });
     }
 
     @Override
-    public void remove(FPlayer fPlayer) {
+    public void remove(@NonNull FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-            CustomName customName = uuidTeamMap.get(fPlayer.uuid());
+            CustomName customName = teamMap.get(fPlayer.uuid());
             if (customName == null) return;
 
-            uuidTeamMap.remove(fPlayer.uuid());
+            teamMap.remove(fPlayer.uuid());
             sendPacket(fPlayer.uuid(), customName.original());
         });
     }
 
-    private void sendPacket(UUID uuid, String newName) {
+    private void sendPacket(@NonNull UUID uuid, @NonNull String newName) {
         if (!(platformPlayerAdapter.convertToPlatformPlayer(uuid) instanceof PlayerRef playerRef)) return;
 
         Ref<EntityStore> storeRef = playerRef.getReference();
@@ -119,7 +121,8 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         });
     }
 
-    private CustomName createNameplate(FPlayer fPlayer) {
+    @NonNull
+    private CustomName createNameplate(@NonNull FPlayer fPlayer) {
         if (isInvisibleNameFor(fPlayer)) return new CustomName(fPlayer.name(), "");
 
         Component displayName = Component.text(fPlayer.name());

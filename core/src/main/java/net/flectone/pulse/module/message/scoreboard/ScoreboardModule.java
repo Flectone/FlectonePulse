@@ -64,12 +64,12 @@ public abstract class ScoreboardModule implements ModuleLocalization<Localizatio
         listenerRegistry.register(PulseScoreboardListener.class);
     }
 
-    public boolean isInvisibleNameFor(FPlayer fPlayer) {
+    protected boolean isInvisibleNameFor(@NonNull FPlayer fPlayer) {
         return !config().nameVisible() || config().hideNameWhenSneaking() && platformPlayerAdapter.isSneaking(fPlayer);
     }
 
-    public abstract void create(FPlayer fPlayer, boolean skipCacheTeam);
+    public abstract void createOrUpdate(@NonNull FPlayer fPlayer);
 
-    public abstract void remove(FPlayer fPlayer);
+    public abstract void remove(@NonNull FPlayer fPlayer);
 
 }

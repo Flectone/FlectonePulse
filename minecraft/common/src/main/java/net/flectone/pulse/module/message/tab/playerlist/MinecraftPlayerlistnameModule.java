@@ -177,7 +177,7 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
 
             proxyPlayers.put(fReceiver.uuid(), forPlayers);
 
-            userProfile = createUserProfile(fSender);
+            userProfile = createUserProfile(fSender, fReceiver);
         } else {
             userProfile = user.getProfile();
         }
@@ -256,9 +256,9 @@ public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localiz
         );
     }
 
-    private UserProfile createUserProfile(FPlayer fPlayer) {
-        if (!scoreboardModule.hasTeam(fPlayer)) {
-            scoreboardModule.create(fPlayer, true);
+    private UserProfile createUserProfile(FPlayer fPlayer, FPlayer fReceiver) {
+        if (!scoreboardModule.hasTeam(fPlayer, fReceiver)) {
+            scoreboardModule.createOrUpdate(fPlayer);
         }
 
         PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(fPlayer);

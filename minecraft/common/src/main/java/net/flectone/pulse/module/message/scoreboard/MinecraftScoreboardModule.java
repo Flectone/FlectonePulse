@@ -1,45 +1,63 @@
 package net.flectone.pulse.module.message.scoreboard;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.scoreboard.listener.MinecraftPacketScoreboardListener;
 import net.flectone.pulse.module.message.scoreboard.model.Team;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class MinecraftScoreboardModule extends ScoreboardModule {
 
-    private final Map<UUID, Team> uuidTeamMap = new ConcurrentHashMap<>();
+    private static final int ATTRIBUTE_BASE_VALUE = 64;
+    private static final int ATTRIBUTE_INVISIBLE_VALUE = 0;
 
+    private final Map<UUID, Map<UUID, Team>> playerReceiverTeamMap = new ConcurrentHashMap<>();
+
+    private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final ModuleController moduleController;
     private final Provider<IntegrationModule> integrationModuleProvider;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final FPlayerService fPlayerService;
+    private final boolean isNewerThanOrEqualsV118;
+    private final boolean isNewerThanOrEqualsV262;
 
     @Inject
     public MinecraftScoreboardModule(FileFacade fileFacade,
@@ -51,29 +69,40 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                                      PlatformPlayerAdapter platformPlayerAdapter,
                                      ModuleController moduleController,
                                      Provider<IntegrationModule> integrationModuleProvider,
-                                     SocialService socialService) {
+                                     SocialService socialService,
+                                     FPlayerService fPlayerService,
+                                     @Named("isNewerThanOrEqualsV_1_18") boolean isNewerThanOrEqualsV118,
+                                     @Named("isNewerThanOrEqualsV_26_2") boolean isNewerThanOrEqualsV262) {
         super(fileFacade, listenerRegistry, platformPlayerAdapter, socialService);
 
+        this.listenerRegistry = listenerRegistry;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.moduleController = moduleController;
         this.integrationModuleProvider = integrationModuleProvider;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.fPlayerService = fPlayerService;
+        this.isNewerThanOrEqualsV118 = isNewerThanOrEqualsV118;
+        this.isNewerThanOrEqualsV262 = isNewerThanOrEqualsV262;
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
 
+        if (isNewerThanOrEqualsV262) {
+            listenerRegistry.register(MinecraftPacketScoreboardListener.class);
+
+            if (!config().nameVisible()) {
+                sendForAll(false);
+            }
+        }
+
         Ticker ticker = config().ticker();
         if (ticker.enable()) {
-            taskScheduler.runPlayerAsyncTimer(fPlayer -> {
-                Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
-                if (oldTeam == null) return;
-
-                createOrUpdate(fPlayer, oldTeam);
-            }, ticker.period());
+            taskScheduler.runPlayerAsyncTimer(this::createOrUpdate, ticker.period());
         }
     }
 
@@ -81,124 +110,175 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     public void onDisable() {
         super.onDisable();
 
-        uuidTeamMap.values().forEach(team -> sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE));
-        uuidTeamMap.clear();
+        playerReceiverTeamMap.values().forEach(teamMap ->
+                teamMap.forEach((uuid, team) ->
+                        send(uuid, team, WrapperPlayServerTeams.TeamMode.REMOVE)
+                )
+        );
+
+        if (!FlectonePulseAPI.isDisabling()) {
+            sendForAll(true);
+        }
+
+        playerReceiverTeamMap.clear();
     }
 
     @Override
-    public void create(FPlayer fPlayer, boolean skipCacheTeam) {
-
+    public void createOrUpdate(@NonNull FPlayer fPlayer) {
         taskScheduler.runAsync(() -> {
             if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-            if (!skipCacheTeam) {
-                uuidTeamMap.values().forEach(cacheTeam ->
-                        packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
+            fPlayerService.getPlatformFPlayers().forEach(fReceiver -> {
+                createOrUpdate(fPlayer, fReceiver);
+
+                if (!hasTeam(fReceiver, fPlayer)) {
+                    createOrUpdate(fReceiver, fPlayer);
+                }
+            });
+        });
+    }
+
+    @Override
+    public void remove(@NonNull FPlayer fPlayer) {
+        taskScheduler.runAsync(() -> {
+            if (moduleController.isDisabledFor(this, fPlayer)) return;
+
+            Map<UUID, Team> receivers = playerReceiverTeamMap.remove(fPlayer.uuid());
+            if (receivers != null && !receivers.isEmpty()) {
+                receivers.forEach((receiver, team) ->
+                        send(receiver, team, WrapperPlayServerTeams.TeamMode.REMOVE)
                 );
             }
 
-            Team oldTeam = uuidTeamMap.get(fPlayer.uuid());
-            if (oldTeam != null) {
-                createOrUpdate(fPlayer, oldTeam);
-            } else {
-                Team newTeam = createTeam(fPlayer);
-                sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
-
-                uuidTeamMap.put(fPlayer.uuid(), newTeam);
-            }
+            playerReceiverTeamMap.values().forEach(teamMap -> teamMap.remove(fPlayer.uuid()));
         });
     }
 
-    public boolean hasTeam(FPlayer fPlayer) {
-        return uuidTeamMap.containsKey(fPlayer.uuid());
+    public boolean hasTeam(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
+        return getTeam(fPlayer, fReceiver).isPresent();
     }
 
-    @Override
-    public void remove(FPlayer fPlayer) {
-        taskScheduler.runAsync(() -> {
-            if (moduleController.isDisabledFor(this, fPlayer)) return;
+    // in new versions 26.2+, name can be hidden using an attribute to avoid problems with displaying name for pets
+    // check MinecraftPacketScoreboardListener.class
+    public boolean isModernPlayer(UUID uuid) {
+        User user = packetProvider.getUser(uuid);
+        if (user == null) return false;
 
-            Team team = uuidTeamMap.get(fPlayer.uuid());
-            if (team == null) return;
+        return user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
+    }
 
-            uuidTeamMap.remove(fPlayer.uuid());
-            sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
+    public void send(@NonNull FPlayer fReceiver, @NonNull Team team, WrapperPlayServerTeams.@NonNull TeamMode teamMode) {
+        send(fReceiver.uuid(), team, teamMode);
+    }
+
+    public void send(@NonNull UUID receiver, @NonNull Team team, WrapperPlayServerTeams.@NonNull TeamMode teamMode) {
+        packetSender.send(receiver, new WrapperPlayServerTeams(team.name(), teamMode, team.info(), List.of(team.owner())));
+    }
+
+    public void sendForAll(boolean visible) {
+        List<UUID> onlinePlayers = platformPlayerAdapter.getOnlinePlayers();
+        onlinePlayers.forEach(player -> {
+            int entityId = platformPlayerAdapter.getEntityId(player);
+            if (entityId == 0) return;
+
+            onlinePlayers.stream()
+                    .filter(this::isModernPlayer)
+                    .forEach(receiver -> send(receiver, entityId, visible));
         });
     }
 
-    private void createOrUpdate(FPlayer fPlayer, Team oldTeam) {
+    public void send(@NonNull UUID receiver, int playerId, boolean visible) {
+        packetSender.send(receiver, new WrapperPlayServerUpdateAttributes(
+                playerId,
+                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.NAME_TAG_DISTANCE, visible ? ATTRIBUTE_BASE_VALUE : ATTRIBUTE_INVISIBLE_VALUE, List.of())))
+        );
+    }
+
+    private Optional<Team> getTeam(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
+        Map<UUID, Team> teamMap = playerReceiverTeamMap.get(fPlayer.uuid());
+        if (teamMap == null || teamMap.isEmpty()) return Optional.empty();
+
+        return Optional.ofNullable(teamMap.get(fReceiver.uuid()));
+    }
+
+    private void createOrUpdate(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
         // new info
-        Team newTeam = createTeam(fPlayer);
-        if (newTeam.name().equals(oldTeam.name())) {
-            sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
+        Team newTeam = create(fPlayer, fReceiver);
+
+        Optional<Team> optionalTeam = getTeam(fPlayer, fReceiver);
+        if (optionalTeam.isPresent()) {
+            Team oldTeam = optionalTeam.get();
+            if (newTeam.name().equals(oldTeam.name())) {
+                send(fReceiver, newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
+            } else {
+                send(fReceiver, oldTeam, WrapperPlayServerTeams.TeamMode.REMOVE);
+                send(fReceiver, newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
+            }
         } else {
-            sendPacket(oldTeam, WrapperPlayServerTeams.TeamMode.REMOVE);
-            sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
+            send(fReceiver, newTeam, WrapperPlayServerTeams.TeamMode.CREATE);
         }
 
         // update info
-        uuidTeamMap.put(fPlayer.uuid(), newTeam);
+        playerReceiverTeamMap.computeIfAbsent(fPlayer.uuid(), _ -> new ConcurrentHashMap<>()).put(fReceiver.uuid(), newTeam);
     }
 
-    private Team createTeam(FPlayer fPlayer) {
-        String teamName = getSortedName(fPlayer);
-        Component displayName = Component.text(teamName);
-
+    @NonNull
+    private Team create(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
         Component prefix = Component.empty();
-        if (!localization().prefix().isEmpty()) {
+        if (StringUtils.isNotEmpty(localization(fReceiver).prefix())) {
             prefix = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .message(localization().prefix())
+                    .receiver(fReceiver)
+                    .message(localization(fReceiver).prefix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
                     .build()
             );
         }
 
         Component suffix = Component.empty();
-        if (!localization().suffix().isEmpty()) {
+        if (StringUtils.isNotEmpty(localization(fReceiver).suffix())) {
             suffix = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .message(localization().suffix())
+                    .receiver(fReceiver)
+                    .message(localization(fReceiver).suffix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
                     .build()
             );
         }
 
-        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = isInvisibleNameFor(fPlayer)
-                ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS
-                : WrapperPlayServerTeams.NameTagVisibility.ALWAYS;
-        WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
-
-        TextColor color = messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(config().color())
-                .build()
-        ).color();
-
-        WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
+        String teamName = getSortedName(fPlayer);
 
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(
-                displayName,
+                Component.text(teamName),
                 prefix,
                 suffix,
-                nameTagVisibility,
-                collisionRule,
-                color == null ? NamedTextColor.WHITE : NamedTextColor.nearestTo(color),
-                optionData
+                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                WrapperPlayServerTeams.CollisionRule.ALWAYS,
+                getColor(fPlayer, fReceiver),
+                WrapperPlayServerTeams.OptionData.NONE
         );
 
         return new Team(teamName, fPlayer.name(), info);
     }
 
-    private void sendPacket(Team team, WrapperPlayServerTeams.TeamMode teamMode) {
-        packetSender.send(new WrapperPlayServerTeams(team.name(), teamMode, team.info(), List.of(team.owner())));
+    @NonNull
+    private NamedTextColor getColor(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
+        TextColor color = messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .receiver(fReceiver)
+                .message(config().color())
+                .build()
+        ).color();
+
+        return color == null ? NamedTextColor.WHITE : NamedTextColor.nearestTo(color);
     }
 
-    public String getSortedName(FPlayer fPlayer) {
+    @NonNull
+    private String getSortedName(@NonNull FPlayer fPlayer) {
         int weight = integrationModuleProvider.get().getGroupWeight(fPlayer);
 
         // 32767 limit
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+        if (isNewerThanOrEqualsV118) {
             String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
             String paddedName = String.format("%-16s", fPlayer.name());
             return paddedRank + paddedName;
