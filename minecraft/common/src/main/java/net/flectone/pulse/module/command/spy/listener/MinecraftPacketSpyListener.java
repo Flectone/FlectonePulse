@@ -3,7 +3,7 @@ package net.flectone.pulse.module.command.spy.listener;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.protocol.nbt.NBTList;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
@@ -31,6 +31,14 @@ public class MinecraftPacketSpyListener implements PacketListener {
     private final Map<UUID, String> anvilPlayers = new ConcurrentHashMap<>();
 
     private final SpyModule spyModule;
+
+    @Override
+    public void onUserDisconnect(UserDisconnectEvent event) {
+        UUID uuid = event.getUser().getUUID();
+        if (uuid == null) return;
+
+        anvilPlayers.remove(uuid);
+    }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
