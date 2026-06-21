@@ -4,8 +4,8 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.module.command.spy.BukkitBukkitSpyModule;
-import net.flectone.pulse.module.command.spy.SpyModule;
+import net.flectone.pulse.module.command.spy.BukkitSpyModule;
+import net.flectone.pulse.module.command.spy.MinecraftSpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.simplevoice.BukkitSimpleVoiceModule;
@@ -111,7 +111,7 @@ public class BukkitInjector extends MinecraftPlatformInjector {
         bind(AfkModule.class).to(BukkitAfkModule.class);
         bind(MinecraftChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
-        bind(SpyModule.class).to(BukkitBukkitSpyModule.class);
+        bind(MinecraftSpyModule.class).to(BukkitSpyModule.class);
         bind(MinecraftJoinModule.class).to(BukkitJoinModule.class);
         bind(MinecraftQuitModule.class).to(BukkitQuitModule.class);
 

@@ -188,7 +188,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         }
 
         // send to spy module
-        spyModuleProvider.get().check(fPlayer, chatName, playerMessage, receiversWithSender);
+        spyModuleProvider.get().checkChat(fPlayer, chatName, playerMessage, receiversWithSender);
 
         // send to bubble module
         bubbleModuleProvider.get().add(fPlayer, rawString, playerMessage, receiversWithSender);

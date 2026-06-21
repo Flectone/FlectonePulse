@@ -13,6 +13,8 @@ import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.command.maintenance.MinecraftMaintenanceModule;
 import net.flectone.pulse.module.command.poll.MinecraftPollModule;
 import net.flectone.pulse.module.command.poll.PollModule;
+import net.flectone.pulse.module.command.spy.MinecraftSpyModule;
+import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.message.MessageModule;
@@ -96,6 +98,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(ChatsettingModule.class).to(MinecraftChatSettingModule.class);
         bind(MaintenanceModule.class).to(MinecraftMaintenanceModule.class);
         bind(PollModule.class).to(MinecraftPollModule.class);
+        bind(SpyModule.class).to(MinecraftSpyModule.class);
 
         // integrations
         bind(IntegrationModule.class).to(MinecraftIntegrationModule.class);
