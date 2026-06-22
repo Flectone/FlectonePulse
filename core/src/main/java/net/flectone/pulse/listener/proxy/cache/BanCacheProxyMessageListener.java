@@ -10,7 +10,6 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.util.Moderation;
-import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.ModuleName;

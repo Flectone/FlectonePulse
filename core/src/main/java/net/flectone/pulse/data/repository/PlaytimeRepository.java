@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.data.database.dao.*;
+import net.flectone.pulse.data.database.dao.TimeDAO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.PlayTime;
 import org.jspecify.annotations.Nullable;
