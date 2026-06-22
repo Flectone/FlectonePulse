@@ -61,6 +61,21 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     public FPlayer insertOrUpdate(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
         if (database.isClosed()) return FPlayer.UNKNOWN;
 
+        try {
+            return insertOrUpdateInTransaction(uuid, name, ip, online);
+        } catch (Exception e) {
+            // player has changed after select and an error appears due to cache, trying to insert a second time
+            if (e.getMessage().contains("Record has changed since last read")) {
+                return insertOrUpdateInTransaction(uuid, name, ip, online);
+            }
+
+            logger.warning(e);
+        }
+
+        return FPlayer.UNKNOWN;
+    }
+
+    private FPlayer insertOrUpdateInTransaction(@NonNull UUID uuid, @NonNull String name, @Nullable String ip, boolean online) {
         return inTransaction(sql -> {
             int id;
 
