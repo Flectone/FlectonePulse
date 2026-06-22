@@ -14,6 +14,7 @@ import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.MinecraftBelownameModule;
 import net.flectone.pulse.module.message.scoreboard.objective.tabname.MinecraftTabnameModule;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -85,15 +86,21 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format) {
+        return buildFormat(fPlayer, fReceiver, score, format, true);
+    }
+
+    public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format, boolean colorContextSender) {
         return messagePipeline.build(MessageContext.builder()
                 .sender(fPlayer)
                 .receiver(fReceiver)
                 .message(format)
+                .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
                 .tagResolver(messagePipeline.resolver("score", (_, _) ->
                         Tag.inserting(messagePipeline.build(MessageContext.builder()
                                         .sender(fPlayer)
                                         .receiver(fReceiver)
                                         .message(score)
+                                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
                                         .build()
                                 )
                         )
