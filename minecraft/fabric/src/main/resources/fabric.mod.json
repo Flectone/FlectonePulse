@@ -33,6 +33,6 @@
       "fabric-api-base": "*",
       "minecraft": ">=26.1",
       "java": ">=25",
-      "packetevents": ">=2.12.2"
+      "packetevents": ">=2.13.0"
 	}
 }
