@@ -1,5 +1,5 @@
 server: ""
-version: "1.10.3-SNAPSHOT"
+version: "1.11.0"
 language:
   type: "en_us"
   by_player: true
