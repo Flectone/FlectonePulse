@@ -4,6 +4,7 @@ public enum PlatformType {
 
     BUKKIT,
     FABRIC,
-    HYTALE
+    HYTALE,
+    NEOFORGE
 
 }
