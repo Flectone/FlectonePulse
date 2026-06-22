@@ -31,7 +31,7 @@ public class OfflinePlayerParser extends PlayerParser {
     @Override
     public List<String> createSuggestions(FPlayer sender) {
         return fPlayerService.findAllFPlayers().stream()
-                .filter(player -> !player.isUnknown())
+                .filter(fPlayer -> !fPlayer.isUnknown() && !fPlayer.isConsole())
                 .filter(fPlayer -> isVisible(sender, fPlayer))
                 .map(FEntity::name)
                 .toList();
