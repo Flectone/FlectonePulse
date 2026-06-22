@@ -181,8 +181,8 @@ public class Database {
                 hikariConfig.setDriverClassName("org.postgresql.Driver");
                 hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
                 hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
-                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
-                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
             }
             case H2 -> {
                 connectionURL = connectionURL +
@@ -193,8 +193,8 @@ public class Database {
 
                 hikariConfig.setDriverClassName("org.h2.Driver");
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
-                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
             }
             case SQLITE -> {
                 connectionURL = connectionURL +
@@ -228,10 +228,17 @@ public class Database {
                 hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
                 hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
-                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
                 hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
+                hikariConfig.addDataSourceProperty("useLocalSessionState", "true");
                 hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
+                hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
+                hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
+                hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
+                hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
+                hikariConfig.addDataSourceProperty("alwaysSendSetIsolation", "false");
+                hikariConfig.addDataSourceProperty("cacheCallableStmts", "true");
             }
             default -> throw new IllegalStateException(config().type() + " not supported");
         }
