@@ -10,6 +10,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
+import net.flectone.pulse.service.SocialService;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -17,6 +18,7 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
 
     private final FPlayerService fPlayerService;
     private final PlaytimeService playtimeService;
+    private final SocialService socialService;
 
     @Pulse(priority = Event.Priority.LOW)
     public PlayerPersistAndDisposeEvent onPlayerPersistAndDispose(PlayerPersistAndDisposeEvent event) {
@@ -24,6 +26,9 @@ public class PulsePlayerPersistAndDisposeListener implements PulseListener {
 
         // update last session
         playtimeService.updateLastSession(fPlayer);
+
+        // clear social cache
+        socialService.invalidate(fPlayer.uuid());
 
         return event.withPlayer(fPlayer);
     }
