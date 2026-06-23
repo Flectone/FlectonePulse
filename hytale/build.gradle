@@ -1,6 +1,5 @@
 dependencies {
     implementation project(":core")
-    implementation fileTree("library") { include "*.jar" }
     implementation "net.flectone:libby-standalone:$libby_version"
 
     compileOnly "org.incendo:cloud-core:$cloud_core_version"

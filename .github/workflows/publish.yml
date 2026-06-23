@@ -29,10 +29,10 @@ jobs:
         run: ./gradlew clean minecraft:bukkit:buildFinalJar --no-daemon
 
       - name: Build Fabric version
-        run: ./gradlew minecraft:fabric:buildFinalJar -PadventureVersion=4.26.1 --no-daemon
+        run: ./gradlew minecraft:fabric:buildFinalJar --no-daemon
 
       - name: Build Hytale version
-        run: ./gradlew hytale:buildFinalJar --no-daemon
+        run: ./gradlew hytale:buildFinalJar -PadventureVersion=5.1.1 --no-daemon
 
       - name: Publish artifact to GitHub
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

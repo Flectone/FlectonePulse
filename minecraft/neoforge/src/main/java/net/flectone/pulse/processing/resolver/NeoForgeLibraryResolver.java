@@ -21,7 +21,7 @@ public class NeoForgeLibraryResolver extends LibraryResolver {
         getAdventureArtifactIds().forEach(artifactId -> addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId(artifactId)
-                .version(BuildConfig.LEGACY_ADVENTURE_API)
+                .version(BuildConfig.ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
