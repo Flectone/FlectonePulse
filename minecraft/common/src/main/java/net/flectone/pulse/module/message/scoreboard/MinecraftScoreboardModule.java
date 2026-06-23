@@ -190,8 +190,12 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     public void send(@NonNull UUID receiver, int playerId, boolean visible) {
         packetSender.send(receiver, new WrapperPlayServerUpdateAttributes(
                 playerId,
-                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.NAME_TAG_DISTANCE, visible ? ATTRIBUTE_BASE_VALUE : ATTRIBUTE_INVISIBLE_VALUE, List.of())))
+                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.NAME_TAG_DISTANCE, visible ? ATTRIBUTE_BASE_VALUE : getNameDistanceValue(), List.of())))
         );
+    }
+
+    private double getNameDistanceValue() {
+        return config().nameDistance() == -1 ? ATTRIBUTE_INVISIBLE_VALUE : config().nameDistance();
     }
 
     private Optional<Team> getTeam(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
@@ -252,7 +256,9 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 Component.text(teamName),
                 prefix,
                 suffix,
-                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                // if name distance is -1 then player's name will be hidden anyway by attribute,
+                // so we can choose not to use scoreboard for that
+                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) && config().nameDistance() != -1 ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
                 WrapperPlayServerTeams.CollisionRule.ALWAYS,
                 getColor(fPlayer, fReceiver),
                 WrapperPlayServerTeams.OptionData.NONE

@@ -692,6 +692,7 @@ public record Message(
     public record Scoreboard(
             Boolean enable,
             Boolean nameVisible,
+            double nameDistance,
             Boolean hideNameWhenSneaking,
             String color,
             Ticker ticker,
