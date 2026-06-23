@@ -132,7 +132,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
         User user = packetProvider.getUser(uuid);
         if (user == null) return false;
 
-        return user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
+        return user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
     }
 
     public void sendForAll(boolean baseValue) {

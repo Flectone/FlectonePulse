@@ -77,7 +77,7 @@ public class MinecraftServerlinkModule implements ModuleLocalization<Localizatio
     public BiPredicate<FEntity, Boolean> disablePredicate() {
         return ModuleLocalization.super.disablePredicate().or((fEntity, _) -> {
             User user = packetProvider.getUser(fEntity.uuid());
-            return user == null || user.getClientVersion().isOlderThan(ClientVersion.V_1_21);
+            return user == null || user.getPacketVersion().isOlderThan(ClientVersion.V_1_21);
         });
     }
 
