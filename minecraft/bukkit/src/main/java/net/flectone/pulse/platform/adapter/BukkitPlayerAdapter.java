@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.bukkit.*;
@@ -51,6 +52,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final ReflectionResolver reflectionResolver;
     private final MessagePipeline messagePipeline;
     private final ComponentSerializer componentSerializer;
+    private final FLogger fLogger;
 
     @Inject
     private Provider<MinecraftHeaderModule> headerModuleProvider;
@@ -131,7 +133,12 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         Object platformPlayer = convertToPlatformPlayer(fPlayer);
         if (platformPlayer == null) return 0;
 
-        return packetProvider.getPing(platformPlayer);
+        try {
+            return packetProvider.getPing(platformPlayer);
+        } catch (Exception e) {
+            fLogger.warning(e);
+            return 0;
+        }
     }
 
     @Override

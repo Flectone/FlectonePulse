@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.tab.header.MinecraftHeaderModule;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.sender.MinecraftPacketSender;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.commands.CommandSourceStack;
@@ -55,6 +56,7 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
     private final MinecraftPacketSender packetSender;
     private final MinecraftPacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
+    private final FLogger fLogger;
 
     @Inject
     private Provider<MinecraftHeaderModule> headerModuleProvider;
@@ -134,7 +136,12 @@ public class NeoForgePlayerAdapter implements PlatformPlayerAdapter {
         Object platformPlayer = convertToPlatformPlayer(fPlayer);
         if (platformPlayer == null) return 0;
 
-        return packetProvider.getPing(platformPlayer);
+        try {
+            return packetProvider.getPing(platformPlayer);
+        } catch (Exception e) {
+            fLogger.warning(e);
+            return 0;
+        }
     }
 
     @Override
