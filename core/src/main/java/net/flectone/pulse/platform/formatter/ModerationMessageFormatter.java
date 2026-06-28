@@ -22,6 +22,7 @@ import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.List;
 import java.util.Optional;
@@ -182,7 +183,7 @@ public class ModerationMessageFormatter {
     public String replacePlaceholders(String message, String moderationId, String reason, String date, String time, String timeLeft) {
         return StringUtils.replaceEach(message,
                 new String[]{"<id>", "<reason>", "<date>", "<time>", "<time_left>"},
-                new String[]{moderationId, reason, date, time, timeLeft}
+                new String[]{moderationId, Strings.CS.replace(reason, "\\", "\\\\"), date, time, timeLeft}
         );
     }
 }
