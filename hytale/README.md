@@ -113,7 +113,7 @@ FlectonePulse Hytale takes control of virtually every event that produces text
 |-------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
 | [![Join](https://flectone.net/pulse/hytale/join.png)](https://flectone.net/pulse/docs/hytale/message/join/)                                           | Fully formatted join messages with placeholders and sounds |
 | [![Quit](https://flectone.net/pulse/hytale/quit.png)](https://flectone.net/pulse/docs/hytale/message/quit/)                                           | Customizable quit messages                                 |
-| [![Death](https://flectone.net/pulse/hytale/death.png)](https://flectone.net/pulse/docs/hytale/message/death/)                                        | Replace default death messages with your own style         |
+| [![Death](https://flectone.net/pulse/hytale/death.png)](https://flectone.net/pulse/docs/hytale/message/vanilla/)                                      | Replace default death messages with your own style         |
 | [![Chat](https://flectone.net/pulse/hytale/chat.png)](https://flectone.net/pulse/docs/hytale/message/chat/)                                           | Full chat formatting with gradients, hover, click and more |
 | [![Bubbles](https://github.com/user-attachments/assets/2b38da15-9e76-458b-a8ac-6d6b9ae48d2c)](https://flectone.net/pulse/docs/hytale/message/bubble/) | Visual message bubbles above players                       |
 | [![AFK](https://flectone.net/pulse/hytale/afkglobalmessage.png)](https://flectone.net/pulse/docs/hytale/message/afk/)                                 | Auto-mark and notify when players go idle                  |
@@ -130,9 +130,9 @@ Players open a full in-game menu `/chatsetting` to toggle messages, change color
 
 | Module                                                                                                                     | Description                                                                                             |
 |----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| [![ball](https://flectone.net/pulse/hytale/commandball.png)](https://flectone.net/pulse/docs/hytale/command/)              | **/ball** – magic 8‑ball with customizable answers                                                      |
-| [![stream](https://flectone.net/pulse/hytale/commandstream.png)](https://flectone.net/pulse/docs/hytale/command/)          | **/stream** – announce you're going live                                                                |
-| [![try](https://flectone.net/pulse/hytale/commandtry.png)](https://flectone.net/pulse/docs/hytale/command/)                | **/try** – random luck roll from 0% to 100%                                                             |
+| [![ball](https://flectone.net/pulse/hytale/commandball.png)](https://flectone.net/pulse/docs/hytale/command/ball/)         | **/ball** – magic 8‑ball with customizable answers                                                      |
+| [![stream](https://flectone.net/pulse/hytale/commandstream.png)](https://flectone.net/pulse/docs/hytale/command/stream/)   | **/stream** – announce you're going live                                                                |
+| [![try](https://flectone.net/pulse/hytale/commandtry.png)](https://flectone.net/pulse/docs/hytale/command/try/)            | **/try** – random luck roll from 0% to 100%                                                             |
 | [![ban](https://flectone.net/pulse/hytale/commandban.png)](https://flectone.net/pulse/docs/command/ban/)                   | **/ban** – ban a player with a reason and optional duration                                             |
 | [![whitelist](https://flectone.net/pulse/hytale/commandwhitelist.png)](https://flectone.net/pulse/docs/command/whitelist/) | **/whitelist** – manage server whitelist with reason and optional duration (add, remove, list, on, off) |
 
