@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -62,8 +61,8 @@ public class ComponentDecorator {
 
         // recursively apply hover event to translation arguments if this is a translatable component
         if (result instanceof TranslatableComponent translatableComponent) {
-            List<TranslationArgument> translationArguments = translatableComponent.arguments().stream()
-                    .map(translationArgument -> hoverTranslationArgument(translationArgument, hoverEvent, ifAbsent))
+            List<Component> translationArguments = translatableComponent.arguments().stream()
+                    .map(translationArgument -> hover(translationArgument.asComponent(), hoverEvent, ifAbsent))
                     .toList();
 
             result = translatableComponent.arguments(translationArguments);
@@ -75,14 +74,6 @@ public class ComponentDecorator {
                 .toList();
 
         return result.children(newChildren);
-    }
-
-    private TranslationArgument hoverTranslationArgument(TranslationArgument argument, HoverEvent<?> hoverEvent, boolean ifAbsent) {
-        if (argument instanceof Component component) {
-            return (TranslationArgument) hover(component, hoverEvent, ifAbsent);
-        }
-
-        return argument;
     }
 
     /**
@@ -128,8 +119,8 @@ public class ComponentDecorator {
 
         // recursively apply decoration to translation arguments if this is a translatable component
         if (result instanceof TranslatableComponent translatableComponent) {
-            List<TranslationArgument> translationArguments = translatableComponent.arguments().stream()
-                    .map(translationArgument -> decorateTranslationArgument(translationArgument, decoration, state, ifAbsent))
+            List<Component> translationArguments = translatableComponent.arguments().stream()
+                    .map(translationArgument -> decorate(translationArgument.asComponent(), decoration, state, ifAbsent))
                     .toList();
 
             result = translatableComponent.arguments(translationArguments);
@@ -141,14 +132,6 @@ public class ComponentDecorator {
                 .toList();
 
         return result.children(newChildren);
-    }
-
-    private TranslationArgument decorateTranslationArgument(TranslationArgument argument, TextDecoration decoration, TextDecoration.State state, boolean ifAbsent) {
-        if (argument instanceof Component component) {
-            return (TranslationArgument) decorate(component, decoration, state, ifAbsent);
-        }
-
-        return argument;
     }
 
 }
