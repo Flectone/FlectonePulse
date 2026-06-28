@@ -28,6 +28,8 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.file.FileFacade;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
@@ -165,10 +167,14 @@ public class MinecraftStatusModule extends StatusModule {
                 .toList();
 
         samples.forEach(sample -> {
-            if ("<players>".equalsIgnoreCase(sample.name())) {
+            if (StringUtils.isNotEmpty(sample.name()) && sample.name().contains("<players>")) {
                 onlineFPlayers.forEach(player -> {
                     JsonObject playerObject = new JsonObject();
-                    playerObject.addProperty("name", player.name());
+                    playerObject.addProperty("name", sample.name().equals("<players>") ? player.name() : messagePipeline.buildLegacy(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(Strings.CS.replace(sample.name(), "<players>", player.name()))
+                            .build()
+                    ));
                     playerObject.addProperty("id", player.uuid().toString());
                     jsonArray.add(playerObject);
                 });
