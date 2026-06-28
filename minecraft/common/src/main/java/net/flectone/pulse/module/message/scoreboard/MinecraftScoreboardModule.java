@@ -95,9 +95,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         if (isNewerThanOrEqualsV262) {
             listenerRegistry.register(MinecraftPacketScoreboardListener.class);
 
-            if (!config().nameVisible()) {
-                sendForAll(false);
-            }
+            sendForAll(false);
         }
 
         Ticker ticker = config().ticker();
@@ -161,6 +159,8 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     // in new versions 26.2+, name can be hidden using an attribute to avoid problems with displaying name for pets
     // check MinecraftPacketScoreboardListener.class
     public boolean isModernPlayer(UUID uuid) {
+        if (config().nameDistance() == -1) return false;
+
         User user = packetProvider.getUser(uuid);
         if (user == null) return false;
 
@@ -190,12 +190,8 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
     public void send(@NonNull UUID receiver, int playerId, boolean visible) {
         packetSender.send(receiver, new WrapperPlayServerUpdateAttributes(
                 playerId,
-                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.NAME_TAG_DISTANCE, visible ? ATTRIBUTE_BASE_VALUE : getNameDistanceValue(), List.of())))
+                List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.NAME_TAG_DISTANCE, visible ? ATTRIBUTE_BASE_VALUE : config().nameDistance(), List.of())))
         );
-    }
-
-    private double getNameDistanceValue() {
-        return config().nameDistance() == -1 ? ATTRIBUTE_INVISIBLE_VALUE : config().nameDistance();
     }
 
     private Optional<Team> getTeam(@NonNull FPlayer fPlayer, @NonNull FPlayer fReceiver) {
@@ -258,7 +254,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 suffix,
                 // if name distance is -1 then player's name will be hidden anyway by attribute,
                 // so we can choose not to use scoreboard for that
-                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) && config().nameDistance() != -1 ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
+                isInvisibleNameFor(fPlayer) && !isModernPlayer(fReceiver.uuid()) ? WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS : WrapperPlayServerTeams.NameTagVisibility.ALWAYS,
                 WrapperPlayServerTeams.CollisionRule.ALWAYS,
                 getColor(fPlayer, fReceiver),
                 WrapperPlayServerTeams.OptionData.NONE
