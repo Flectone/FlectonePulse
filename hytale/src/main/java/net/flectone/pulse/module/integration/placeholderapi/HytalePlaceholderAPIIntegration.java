@@ -286,7 +286,11 @@ public class HytalePlaceholderAPIIntegration extends PlaceholderExpansion implem
                 receiver = offlinePlayer;
             }
 
-            formattedMessage = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer, receiver, formattedMessage);
+            try {
+                // perhaps in the future it is worth checking player and receiver for null, but is it necessary?
+                formattedMessage = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer, receiver, formattedMessage);
+            } catch (NullPointerException _) {
+            }
         }
 
         return formattedMessage;

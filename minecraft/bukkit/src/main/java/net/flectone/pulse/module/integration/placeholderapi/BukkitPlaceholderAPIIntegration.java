@@ -239,20 +239,27 @@ public class BukkitPlaceholderAPIIntegration extends PlaceholderExpansion implem
 
     private String setPlaceholders(FPlayer fPlayer, FPlayer fReceiver, String message, boolean firstTry) {
         try {
+            // get offline player
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.uuid());
+
+            // set placeholders
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
 
-            if (fPlayer.isOnline()) {
-                Player receiver = Bukkit.getPlayer(fReceiver.uuid());
-                if (receiver == null) {
-                    receiver = offlinePlayer.getPlayer();
-                }
+            // if player is offline, then no relation placeholders
+            if (!fPlayer.isOnline()) return message;
 
-                message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
+            Player player = offlinePlayer.getPlayer();
+            Player receiver = Bukkit.getPlayer(fReceiver.uuid());
+            if (receiver == null) {
+                receiver = player;
             }
 
+            // perhaps in the future it is worth checking player and receiver for null, but is it necessary?
+            message = PlaceholderAPI.setRelationalPlaceholders(player, receiver, message);
+        } catch (NullPointerException _) {
+            return message;
         } catch (Exception e) {
-            if (firstTry && e.getMessage().contains("any region")  && reflectionResolver.isFolia()) {
+            if (firstTry && e.getMessage().contains("any region") && reflectionResolver.isFolia()) {
                 FPlayer regionFPlayer = platformPlayerAdapter.isOnline(fPlayer) ? fPlayer : fPlayerService.getRandomFPlayer();
 
                 CompletableFuture<String> completableFuture = new CompletableFuture<>();
