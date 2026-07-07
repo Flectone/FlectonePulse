@@ -1061,4 +1061,12 @@ public class FileMigrator {
                 );
     }
 
+    public FilePack migration_1_10_2(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
+        types.put(CacheName.TRANSLATION_CACHE, new Config.Cache.CacheSetting(false, 1, TimeUnit.HOURS, 50000));
+
+        return files
+                .withConfig(files.config().withCache(files.config().cache().withTypes(types)));
+    }
+
 }
