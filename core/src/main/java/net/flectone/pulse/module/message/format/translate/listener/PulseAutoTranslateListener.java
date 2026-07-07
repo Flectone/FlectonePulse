@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 // Drives auto-translation and captures the full chat stream (chat, announcements,
@@ -47,6 +48,19 @@ public class PulseAutoTranslateListener implements PulseListener {
     // Dedupes duplicate PrepareEvent fires within 1s for the same (sender, text):
     // Paper/Purpur sometimes dispatch chat twice, which would double API calls/entries/replays.
     private final Cache<String, Boolean> recentMessages = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .build();
+
+    // Coalesces the burst of identical external-broadcast packets (join/quit, other plugins)
+    // into ONE shared history entry. A single server broadcast is dispatched as a separate
+    // per-receiver packet, so without this every same-locale receiver would mint a fresh
+    // random UUID and add its OWN history entry — one join on 50 players = 50 entries, which
+    // evicts translatable chat out of history before a player can toggle it. Keyed by
+    // structural component equality so same-locale receivers map to the same UUID and share
+    // one entry via the viewers set (like self-originated messages already do). The 1s window
+    // only merges the near-simultaneous burst of a single broadcast, not distinct later
+    // messages that happen to carry the same text.
+    private final Cache<Component, UUID> externalMessageUUIDs = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
             .build();
 
@@ -236,7 +250,16 @@ public class PulseAutoTranslateListener implements PulseListener {
         }
 
         FPlayer receiver = event.player();
-        UUID messageUUID = UUID.randomUUID();
+
+        // Share one UUID (hence one history entry + shared viewers) across all receivers of the
+        // same external broadcast. Component.get(key, loader) is atomic, so a burst of concurrent
+        // per-receiver packets on netty threads resolves to a single UUID minted exactly once.
+        UUID messageUUID;
+        try {
+            messageUUID = externalMessageUUIDs.get(component, UUID::randomUUID);
+        } catch (ExecutionException e) {
+            messageUUID = UUID.randomUUID();
+        }
 
         translateModule.save(receiver, messageUUID, component, "", null, false);
     }
