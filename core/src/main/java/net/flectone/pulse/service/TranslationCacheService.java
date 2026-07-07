@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -28,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -51,10 +53,6 @@ public class TranslationCacheService {
     private final Gson gson;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private volatile ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-    private record MyMemoryResponse(MyMemoryResponseData responseData) {}
-
-    private record MyMemoryResponseData(String translatedText) {}
 
     // Same (source, target, text) shares one future while a request is running.
     private final Map<String, CompletableFuture<String>> inFlight = new ConcurrentHashMap<>();
@@ -90,45 +88,88 @@ public class TranslationCacheService {
 
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            try {
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
 
-            int responseCode = connection.getResponseCode();
+                int responseCode = connection.getResponseCode();
 
-            if (responseCode != 200) {
-                fLogger.warning("[AutoTranslate] MyMemory: non-200 response (%d) for %s→%s, returning null",
-                        responseCode, normalizedSource, normalizedTarget);
-                return null;
+                if (responseCode != 200) {
+                    fLogger.warning("[AutoTranslate] MyMemory: non-200 response (%d) for %s→%s, returning null",
+                            responseCode, normalizedSource, normalizedTarget);
+                    return null;
+                }
+
+                String jsonResponse;
+                try (BufferedReader in = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    jsonResponse = response.toString();
+                }
+
+                return parseMyMemoryResponse(jsonResponse);
+            } finally {
+                connection.disconnect();
             }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            String jsonResponse = response.toString();
-            MyMemoryResponse parsed = gson.fromJson(jsonResponse, MyMemoryResponse.class);
-            if (parsed == null || parsed.responseData() == null) {
-                fLogger.warning("[AutoTranslate] MyMemory: missing responseData in JSON");
-                return null;
-            }
-            String translation = parsed.responseData().translatedText();
-            if (translation == null) {
-                fLogger.warning("[AutoTranslate] MyMemory: missing translatedText in responseData");
-                return null;
-            }
-
-            return translation;
         } catch (Exception e) {
             fLogger.warning(e, "[AutoTranslate] MyMemory: exception during request for %s",
                     sourceLang + "→" + targetLang);
             return null;
         }
+    }
+
+    // MyMemory answers with HTTP 200 even on errors (quota, invalid language),
+    // signalling failure only inside the body: responseStatus != 200 and/or a
+    // "MYMEMORY WARNING" placeholder in translatedText. Returning null on those
+    // lets iterateProviders move to the next provider instead of caching garbage
+    // for an hour. responseStatus arrives as a number (200) or string ("200")
+    // depending on the endpoint, so both forms are handled.
+    @Nullable String parseMyMemoryResponse(String jsonResponse) {
+        JsonObject root;
+        try {
+            root = gson.fromJson(jsonResponse, JsonObject.class);
+        } catch (Exception e) {
+            fLogger.warning("[AutoTranslate] MyMemory: response is not valid JSON");
+            return null;
+        }
+        if (root == null) {
+            fLogger.warning("[AutoTranslate] MyMemory: empty JSON response");
+            return null;
+        }
+
+        JsonElement statusElement = root.get("responseStatus");
+        if (statusElement != null && statusElement.isJsonPrimitive()) {
+            String status = statusElement.getAsString().trim();
+            if (!"200".equals(status)) {
+                fLogger.warning("[AutoTranslate] MyMemory: responseStatus=%s (not 200), returning null", status);
+                return null;
+            }
+        }
+
+        JsonElement dataElement = root.get("responseData");
+        if (dataElement == null || !dataElement.isJsonObject()) {
+            fLogger.warning("[AutoTranslate] MyMemory: missing responseData in JSON");
+            return null;
+        }
+        JsonElement textElement = dataElement.getAsJsonObject().get("translatedText");
+        if (textElement == null || textElement.isJsonNull() || !textElement.isJsonPrimitive()) {
+            fLogger.warning("[AutoTranslate] MyMemory: missing translatedText in responseData");
+            return null;
+        }
+
+        String translation = textElement.getAsString();
+        if (translation.startsWith("MYMEMORY WARNING")) {
+            fLogger.warning("[AutoTranslate] MyMemory: warning placeholder instead of translation: %s", translation);
+            return null;
+        }
+
+        return translation;
     }
 
     public CompletableFuture<String> translateWithMyMemoryAsync(String sourceLang, String targetLang, String text) {
@@ -150,12 +191,6 @@ public class TranslationCacheService {
             return CompletableFuture.completedFuture(cached);
         }
 
-        String key = sourceLang + ":" + targetLang + ":" + text;
-        CompletableFuture<String> existing = inFlight.get(key);
-        if (existing != null) {
-            return existing;
-        }
-
         if (providers == null || providers.isEmpty()) {
             fLogger.warning("[AutoTranslate] chain: no providers configured. Add to config/message.yml under format.translate:%n"
                     + "  providers:%n"
@@ -167,13 +202,19 @@ public class TranslationCacheService {
             return CompletableFuture.completedFuture(null);
         }
 
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(
-                () -> iterateProviders(sourceLang, targetLang, text, providers),
-                executorService
-        );
-        inFlight.put(key, future);
-        future.whenComplete((result, throwable) -> inFlight.remove(key));
-        return future;
+        String key = sourceLang + ":" + targetLang + ":" + text;
+        // computeIfAbsent makes check-then-act atomic: only one thread per key
+        // creates the future and starts a network request; the rest share it.
+        return inFlight.computeIfAbsent(key, k -> {
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(
+                    () -> iterateProviders(sourceLang, targetLang, text, providers),
+                    executorService
+            );
+            // remove(k, future) drops only THIS future, never a newer one that a
+            // later request may have installed for the same key.
+            future.whenComplete((result, throwable) -> inFlight.remove(k, future));
+            return future;
+        });
     }
 
     private @Nullable String iterateProviders(String sourceLang, String targetLang, String text, List<String> providers) {
@@ -247,51 +288,57 @@ public class TranslationCacheService {
 
             URI uri = new URI(urlString);
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            try {
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
 
-            int responseCode = connection.getResponseCode();
+                int responseCode = connection.getResponseCode();
 
-            if (responseCode != 200) {
-                fLogger.warning("[AutoTranslate] Google: non-200 response (%d), returning null", responseCode);
-                return null;
-            }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            String jsonResponse = response.toString();
-            // Response shape: [[["translated text","original",null,null,1]],null,"en",...]
-            JsonArray root = gson.fromJson(jsonResponse, JsonArray.class);
-            if (root == null) {
-                fLogger.warning("[AutoTranslate] Google: response is not a JSON array");
-                return null;
-            }
-            JsonElement segments = root.get(0);
-            if (segments == null || !segments.isJsonArray()) {
-                fLogger.warning("[AutoTranslate] Google: missing segments array");
-                return null;
-            }
-
-            StringBuilder translatedBuilder = new StringBuilder();
-            segments.getAsJsonArray().forEach(seg -> {
-                if (seg.isJsonArray() && seg.getAsJsonArray().size() > 0) {
-                    JsonElement piece = seg.getAsJsonArray().get(0);
-                    if (piece != null && !piece.isJsonNull()) {
-                        translatedBuilder.append(piece.getAsString());
-                    }
+                if (responseCode != 200) {
+                    fLogger.warning("[AutoTranslate] Google: non-200 response (%d), returning null", responseCode);
+                    return null;
                 }
-            });
-            String translation = translatedBuilder.toString();
 
-            return translation.isEmpty() ? null : translation;
+                String jsonResponse;
+                try (BufferedReader in = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    jsonResponse = response.toString();
+                }
+
+                // Response shape: [[["translated text","original",null,null,1]],null,"en",...]
+                JsonArray root = gson.fromJson(jsonResponse, JsonArray.class);
+                if (root == null) {
+                    fLogger.warning("[AutoTranslate] Google: response is not a JSON array");
+                    return null;
+                }
+                JsonElement segments = root.get(0);
+                if (segments == null || !segments.isJsonArray()) {
+                    fLogger.warning("[AutoTranslate] Google: missing segments array");
+                    return null;
+                }
+
+                StringBuilder translatedBuilder = new StringBuilder();
+                segments.getAsJsonArray().forEach(seg -> {
+                    if (seg.isJsonArray() && seg.getAsJsonArray().size() > 0) {
+                        JsonElement piece = seg.getAsJsonArray().get(0);
+                        if (piece != null && !piece.isJsonNull()) {
+                            translatedBuilder.append(piece.getAsString());
+                        }
+                    }
+                });
+                String translation = translatedBuilder.toString();
+
+                return translation.isEmpty() ? null : translation;
+            } finally {
+                connection.disconnect();
+            }
         } catch (Exception e) {
             fLogger.warning(e, "[AutoTranslate] Google: exception during request for %s",
                     sourceLang + "→" + targetLang);
@@ -318,8 +365,17 @@ public class TranslationCacheService {
     }
 
     public void shutdown() {
+        // Swap in a fresh pool first so the service stays usable after a reload,
+        // then hard-stop the old one and drop any in-flight futures — lingering
+        // 5s HTTP tasks must not keep writing to the cache/history after disable.
         ExecutorService old = executorService;
         executorService = Executors.newFixedThreadPool(4);
-        old.shutdown();
+        inFlight.clear();
+        old.shutdownNow();
+        try {
+            old.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
