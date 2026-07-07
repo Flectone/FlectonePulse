@@ -114,11 +114,11 @@ public class MinecraftBubbleRender implements BubbleRender {
 
         // Per-viewer language resolution: same locale → original chunks; otherwise the
         // translated-and-re-split chunks if cached, else original now + async update.
-        List<String> chunkTexts = resolveChunkTexts(bubble, fViewer);
+        ResolvedChunks resolved = resolveChunkTexts(bubble, fViewer);
 
-        List<MinecraftBubbleEntity> textEntities = renderChunkStack(fViewer, bubble, chunkTexts);
+        List<MinecraftBubbleEntity> textEntities = renderChunkStack(fViewer, bubble, resolved.chunks());
 
-        maybeScheduleTranslationUpdate(fViewer, bubble, chunkTexts, textEntities);
+        maybeScheduleTranslationUpdate(fViewer, bubble, resolved.chunks(), resolved.translated(), textEntities);
     }
 
     // Renders the vertical stack (one text entity per chunk, chunkIndex 0 on top) and
@@ -126,33 +126,40 @@ public class MinecraftBubbleRender implements BubbleRender {
     private List<MinecraftBubbleEntity> renderChunkStack(FPlayer fViewer, Bubble bubble, List<String> chunkTexts) {
         FPlayer sender = bubble.getSender();
         String key = sender.uuid().toString() + fViewer.uuid();
-        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
+        // Atomic get-or-create: a getOrDefault + put is a non-atomic read-modify-write,
+        // so two concurrent renders for one key (async render pool + translation-callback
+        // pool) could each install a fresh deque and lose one — orphaning the entities it
+        // referenced (spawned on the client, never despawned → leaked entity ids).
+        Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.computeIfAbsent(key, _ -> new ConcurrentLinkedDeque<>());
 
         List<MinecraftBubbleEntity> textEntities = new ObjectArrayList<>();
 
-        // Iterate chunks in forward order, mirroring how the original code pushed each
-        // chunk one-by-one in queue order: every push prepends to the deque, so the
-        // first chunk ends up at the back (top of the column) and the last chunk at the
-        // front (bottom). This keeps reading order top-to-bottom (chunkIndex 0 on top).
-        for (int i = 0; i < chunkTexts.size(); i++) {
-            Component formattedMessage = createFormattedMessage(bubble, fViewer, chunkTexts.get(i));
+        // Serialize every mutation of one key's stack (render / translation re-render /
+        // expiry removal) on the deque monitor so a late translation re-render cannot
+        // interleave with TTL despawn and leave orphaned entities behind.
+        synchronized (bubbleEntities) {
+            // Iterate chunks in forward order, mirroring how the original code pushed each
+            // chunk one-by-one in queue order: every push prepends to the deque, so the
+            // first chunk ends up at the back (top of the column) and the last chunk at the
+            // front (bottom). This keeps reading order top-to-bottom (chunkIndex 0 on top).
+            for (int i = 0; i < chunkTexts.size(); i++) {
+                Component formattedMessage = createFormattedMessage(bubble, fViewer, chunkTexts.get(i));
 
-            MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
-            bubbleEntities.push(bubbleEntity);
-            textEntities.add(bubbleEntity);
+                MinecraftBubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
+                bubbleEntities.push(bubbleEntity);
+                textEntities.add(bubbleEntity);
 
-            if (bubble.isInteractionRiding()) {
-                bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
-            } else {
-                for (int j = 0; j < bubble.getElevation(); j++) {
+                if (bubble.isInteractionRiding()) {
                     bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+                } else {
+                    for (int j = 0; j < bubble.getElevation(); j++) {
+                        bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+                    }
                 }
             }
+
+            rideEntities(sender, fViewer);
         }
-
-        activeBubbleEntities.put(key, bubbleEntities);
-
-        rideEntities(sender, fViewer);
 
         // textEntities is already in chunk order (index i == chunkIndex i), matching
         // the order applyTranslationUpdate expects for in-place text swaps.
@@ -162,24 +169,29 @@ public class MinecraftBubbleRender implements BubbleRender {
     @Override
     public void removeBubbleIf(Predicate<Bubble> bubbleEntityPredicate) {
         activeBubbleEntities.forEach((_, bubbleEntities) -> {
-            if (bubbleEntities.isEmpty()) return;
+            // Same monitor as renderChunkStack / applyTranslationUpdate: expiry removal
+            // and a late translation re-render for one key never overlap, so the liveness
+            // check-and-respawn in applyTranslationUpdate is atomic against this removal.
+            synchronized (bubbleEntities) {
+                if (bubbleEntities.isEmpty()) return;
 
-            List<MinecraftBubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
-                    .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
-                    .toList();
+                List<MinecraftBubbleEntity> bubbleEntitiesToRemove = bubbleEntities.stream()
+                        .filter(bubbleEntity -> bubbleEntityPredicate.test(bubbleEntity.getBubble()))
+                        .toList();
 
-            if (bubbleEntitiesToRemove.isEmpty()) return;
+                if (bubbleEntitiesToRemove.isEmpty()) return;
 
-            // despawn entities
-            bubbleEntitiesToRemove.forEach(this::despawnBubbleEntity);
+                // despawn entities
+                bubbleEntitiesToRemove.forEach(this::despawnBubbleEntity);
 
-            // remove from active bubbles
-            bubbleEntities.removeAll(bubbleEntitiesToRemove);
+                // remove from active bubbles
+                bubbleEntities.removeAll(bubbleEntitiesToRemove);
 
-            // remove space
-            MinecraftBubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
+                // remove space
+                MinecraftBubbleEntity bubbleEntity = bubbleEntitiesToRemove.getFirst();
 
-            rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
+                rideEntities(bubbleEntity.getBubble().getSender(), bubbleEntity.getViewer());
+            }
         });
     }
 
@@ -236,25 +248,33 @@ public class MinecraftBubbleRender implements BubbleRender {
     }
 
     // Returns the chunk texts to render for this viewer: original chunks when translation
-    // is disabled / same locale / not yet cached, otherwise the re-split translation.
-    private List<String> resolveChunkTexts(Bubble bubble, FPlayer fViewer) {
+    // is disabled / same locale / not yet cached, otherwise the re-split translation. The
+    // returned flag records whether these chunks came from a cached translation, so the
+    // caller decides on what was ACTUALLY rendered instead of a second cache lookup that
+    // could race a concurrent warm-up (TOCTOU).
+    private ResolvedChunks resolveChunkTexts(Bubble bubble, FPlayer fViewer) {
         List<String> original = splitFull(bubble, bubble.getFullMessage());
 
-        if (!isBubbleTranslateEnabled()) return original;
+        if (!isBubbleTranslateEnabled()) return new ResolvedChunks(original, false);
 
         String senderLocale = bubble.getSenderLocale();
         String viewerLocale = socialService.getSetting(fViewer, SettingText.LOCALE);
         if (senderLocale == null || viewerLocale == null || viewerLocale.equals(senderLocale)) {
-            return original;
+            return new ResolvedChunks(original, false);
         }
 
         String cached = translationCacheService.get(senderLocale, viewerLocale, bubble.getFullMessage());
         if (cached != null && !cached.isEmpty() && !cached.equals(bubble.getFullMessage())) {
-            return splitFull(bubble, cached);
+            return new ResolvedChunks(splitFull(bubble, cached), true);
         }
 
         // Not cached yet — show original now, async update will replace it.
-        return original;
+        return new ResolvedChunks(original, false);
+    }
+
+    // Chunks to render for a viewer plus whether they were produced from a cached
+    // translation (as opposed to the sender-language original).
+    private record ResolvedChunks(List<String> chunks, boolean translated) {
     }
 
     // Re-splits a (translated or original) full message into chunks using the exact same
@@ -277,18 +297,19 @@ public class MinecraftBubbleRender implements BubbleRender {
     // full re-render (despawn + respawn the stack) when it differs.
     private void maybeScheduleTranslationUpdate(FPlayer fViewer, Bubble bubble,
                                                 List<String> renderedChunks,
+                                                boolean renderedTranslated,
                                                 List<MinecraftBubbleEntity> textEntities) {
         if (!isBubbleTranslateEnabled()) return;
+
+        // Decide on what resolveChunkTexts ACTUALLY rendered, not on a fresh cache
+        // lookup: a warm-up completing between the two reads would otherwise make us
+        // conclude "already translated" and skip the update, leaving the cold-rendered
+        // original stuck in the sender's language (TOCTOU).
+        if (renderedTranslated) return;
 
         String senderLocale = bubble.getSenderLocale();
         String viewerLocale = socialService.getSetting(fViewer, SettingText.LOCALE);
         if (senderLocale == null || viewerLocale == null || viewerLocale.equals(senderLocale)) return;
-
-        String cached = translationCacheService.get(senderLocale, viewerLocale, bubble.getFullMessage());
-        if (cached != null && !cached.isEmpty() && !cached.equals(bubble.getFullMessage())) {
-            // Already rendered with translation in resolveChunkTexts — nothing to do.
-            return;
-        }
 
         List<String> providers = fileFacade.message().format().translate().providers();
         if (providers == null || providers.isEmpty()) return;
@@ -311,29 +332,38 @@ public class MinecraftBubbleRender implements BubbleRender {
         // Guard against TTL despawn / cleared state arriving before this async callback.
         if (bubbleEntities == null || bubbleEntities.isEmpty()) return;
         if (textEntities.isEmpty()) return;
-        if (!bubbleEntities.contains(textEntities.get(0))) return;
         if (!fViewer.isOnline()) return;
 
-        List<String> newChunks = splitFull(bubble, translated);
+        // Same monitor as expiry removal (removeBubbleIf): checking that the stack is
+        // still alive and (re)rendering happen atomically against TTL despawn. Without
+        // this, expiry could remove the stack between the check and the respawn, and the
+        // ticker — having already processed this bubble — would never despawn the newly
+        // spawned entities (permanently hanging stack).
+        synchronized (bubbleEntities) {
+            if (!bubbleEntities.contains(textEntities.get(0))) return;
 
-        if (newChunks.size() == renderedChunks.size()) {
-            // Same shape — swap text on each existing entity with a metadata packet.
-            for (int i = 0; i < textEntities.size(); i++) {
-                MinecraftBubbleEntity entity = textEntities.get(i);
-                if (!entity.isCreated()) continue;
-                Component formatted = createFormattedMessage(bubble, fViewer, newChunks.get(i));
-                entity.setMessage(formatted);
-                updateEntityText(entity, formatted);
+            List<String> newChunks = splitFull(bubble, translated);
+
+            if (newChunks.size() == renderedChunks.size()) {
+                // Same shape — swap text on each existing entity with a metadata packet.
+                for (int i = 0; i < textEntities.size(); i++) {
+                    MinecraftBubbleEntity entity = textEntities.get(i);
+                    if (!entity.isCreated()) continue;
+                    Component formatted = createFormattedMessage(bubble, fViewer, newChunks.get(i));
+                    entity.setMessage(formatted);
+                    updateEntityText(entity, formatted);
+                }
+                return;
             }
-            return;
-        }
 
-        // Chunk count changed — despawn this message's stack for the viewer and re-render
-        // with the translated chunks (reflows the vertical stack).
-        removeBubbleForViewer(bubble, fViewer);
-        // Translation is now cached, so the re-render resolves it synchronously; no
-        // further async update is scheduled.
-        renderChunkStack(fViewer, bubble, newChunks);
+            // Chunk count changed — despawn this message's stack for the viewer and re-render
+            // with the translated chunks (reflows the vertical stack). removeBubbleForViewer
+            // and renderChunkStack re-enter this same deque monitor (reentrant).
+            removeBubbleForViewer(bubble, fViewer);
+            // Translation is now cached, so the re-render resolves it synchronously; no
+            // further async update is scheduled.
+            renderChunkStack(fViewer, bubble, newChunks);
+        }
     }
 
     // Pushes a single metadata packet that replaces just the text field of an existing
@@ -359,15 +389,17 @@ public class MinecraftBubbleRender implements BubbleRender {
         Deque<MinecraftBubbleEntity> bubbleEntities = activeBubbleEntities.get(key);
         if (bubbleEntities == null || bubbleEntities.isEmpty()) return;
 
-        List<MinecraftBubbleEntity> toRemove = bubbleEntities.stream()
-                .filter(entity -> entity.getBubble().equals(bubble))
-                .toList();
-        if (toRemove.isEmpty()) return;
+        synchronized (bubbleEntities) {
+            List<MinecraftBubbleEntity> toRemove = bubbleEntities.stream()
+                    .filter(entity -> entity.getBubble().equals(bubble))
+                    .toList();
+            if (toRemove.isEmpty()) return;
 
-        toRemove.forEach(this::despawnBubbleEntity);
-        bubbleEntities.removeAll(toRemove);
+            toRemove.forEach(this::despawnBubbleEntity);
+            bubbleEntities.removeAll(toRemove);
 
-        rideEntities(bubble.getSender(), fViewer);
+            rideEntities(bubble.getSender(), fViewer);
+        }
     }
 
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer, String chunkText) {
