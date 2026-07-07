@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format.translate;
 
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -37,7 +38,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -52,13 +55,24 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     // Per-player "show original" toggles, kept separate because history entries are shared.
     private final Map<UUID, Set<UUID>> playerOriginalToggles = new ConcurrentHashMap<>();
 
-    // Components the plugin itself sent — dedup against MessageReceiveEvent. Used as a
-    // MULTISET (bag): a broadcast to N receivers with the SAME locale renders N structurally
-    // equal components and fires N per-receiver MessageReceiveEvents, so we must keep N tokens
-    // (one per send) and remove one per receive. Matching is structural, not by reference:
-    // the received component is deserialized fresh from the outgoing packet, so it is a new
-    // instance that only equals() the marked one — identity matching would never dedup at all.
-    private final List<Component> selfOriginatedComponents = new CopyOnWriteArrayList<>();
+    // Components the plugin itself sent — dedup against MessageReceiveEvent. A structural
+    // MULTISET (bag) keyed by Component with a per-key AtomicInteger token count: a broadcast to
+    // N receivers with the SAME locale renders N structurally equal components and fires N
+    // per-receiver MessageReceiveEvents, so we hold N tokens (one incrementAndGet per send) and
+    // release one (decrementAndGet) per receive. Matching is structural, not by reference: the
+    // received component is deserialized fresh from the outgoing packet, so it is a new instance
+    // that only equals() the marked one — identity matching would never dedup at all.
+    //
+    // Backed by a Guava cache with expireAfterWrite so LEAKED tokens self-expire. A token is
+    // normally released by its paired ReceiveEvent, but that pairing can be broken (receiver
+    // disconnects between send and packet emit, delivery is filtered, an integration such as
+    // InteractiveChat swallows the packet) — the token would otherwise linger forever. The
+    // send→receive window is milliseconds, so the TTL is only a safety net; it never touches
+    // tokens that are still balancing. maximumSize is a second guard against unbounded growth.
+    private final Cache<Component, AtomicInteger> selfOriginatedComponents = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .maximumSize(10_000)
+            .build();
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;
@@ -85,7 +99,7 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
             globalHistory.clear();
         }
         playerOriginalToggles.clear();
-        selfOriginatedComponents.clear();
+        selfOriginatedComponents.invalidateAll();
         translationCacheService.shutdown();
     }
 
@@ -393,28 +407,42 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         }
 
         if (needToCache && !isCached(component)) {
-            selfOriginatedComponents.add(component);
+            markSelfOriginated(component);
         }
     }
 
+    // A token is "cached" while its counter is present AND positive. A counter left at 0 (its
+    // last receive already balanced it) reads as not-cached and is later evicted by the TTL.
     public boolean isCached(Component component) {
-        return selfOriginatedComponents.contains(component);
+        AtomicInteger counter = selfOriginatedComponents.getIfPresent(component);
+        return counter != null && counter.get() > 0;
     }
 
+    // Release one token for a received component. Decrement (never remove the entry) so we don't
+    // race a concurrent markSelfOriginated that just re-created/incremented the same counter; a
+    // counter that reaches 0 stays as a harmless 0-entry until the TTL/size limit reclaims it.
     public void removeCache(Component component) {
-        selfOriginatedComponents.remove(component);
+        AtomicInteger counter = selfOriginatedComponents.getIfPresent(component);
+        if (counter != null) {
+            counter.decrementAndGet();
+        }
     }
 
     // Registers a Component as plugin-originated for ReceiveEvent dedup. Must be the outgoing
     // component (post-withMessage) so it equals() what the packet carries back. Always adds a
-    // token — no "already present" guard — because the list is a multiset: N same-locale
-    // receivers each fire markSelfOriginated + a matching MessageReceiveEvent, so N tokens must
-    // be present for the N removeCache() calls to balance. The old guard collapsed N equal
-    // components into ONE token, leaving N-1 receives to be misclassified as external messages
-    // (random UUID, empty originalText) and duplicated into history.
+    // token (incrementAndGet) — no "already present" guard — because this is a multiset: N
+    // same-locale receivers each fire markSelfOriginated + a matching MessageReceiveEvent, so N
+    // tokens must be present for the N removeCache() calls to balance. Collapsing N equal
+    // components into ONE token would leave N-1 receives misclassified as external messages
+    // (random UUID, empty originalText) and duplicated into history. The get(key, loader) is
+    // atomic, so concurrent send/receive threads never lose an increment.
     public void markSelfOriginated(Component sentComponent) {
         if (sentComponent == null) return;
-        selfOriginatedComponents.add(sentComponent);
+        try {
+            selfOriginatedComponents.get(sentComponent, () -> new AtomicInteger(0)).incrementAndGet();
+        } catch (ExecutionException e) {
+            // The loader (new AtomicInteger) cannot throw; nothing to recover from.
+        }
     }
 
     // Player left — drop them from every viewer set and discard their toggles.
