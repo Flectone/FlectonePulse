@@ -205,6 +205,66 @@ class TranslationCacheServiceTest {
         assertEquals("en", normalize(""));
     }
 
+    // --- MyMemory response validation (offline, pure JSON parsing) ------------
+
+    @Test
+    void testMyMemoryParsesTranslationOnNumericStatus200() {
+        String json = "{\"responseData\":{\"translatedText\":\"привет\"},\"responseStatus\":200}";
+        assertEquals("привет", translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryParsesTranslationOnStringStatus200() {
+        // MyMemory sometimes returns responseStatus as a quoted string.
+        String json = "{\"responseData\":{\"translatedText\":\"привет\"},\"responseStatus\":\"200\"}";
+        assertEquals("привет", translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryParsesTranslationWhenStatusAbsent() {
+        // No responseStatus field at all → treat as success if text is present.
+        String json = "{\"responseData\":{\"translatedText\":\"привет\"}}";
+        assertEquals("привет", translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryRejectsNon200Status() {
+        // Quota exceeded: HTTP 200 body but responseStatus 429 → must not be cached.
+        String json = "{\"responseData\":{\"translatedText\":\"MYMEMORY WARNING: YOU USED ALL AVAILABLE FREE TRANSLATIONS\"},"
+                + "\"responseStatus\":429}";
+        assertNull(translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryRejectsWarningPlaceholderEvenWithStatus200() {
+        // Defensive: warning text must be dropped regardless of the status field.
+        String json = "{\"responseData\":{\"translatedText\":\"MYMEMORY WARNING: SOMETHING\"},\"responseStatus\":200}";
+        assertNull(translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryRejectsInvalidLanguageStatus() {
+        // "'AUTO' IS AN INVALID SOURCE LANGUAGE" arrives with a non-200 status.
+        String json = "{\"responseData\":{\"translatedText\":\"'AUTO' IS AN INVALID SOURCE LANGUAGE\"},"
+                + "\"responseStatus\":\"403\"}";
+        assertNull(translationCacheService.parseMyMemoryResponse(json));
+    }
+
+    @Test
+    void testMyMemoryRejectsMissingResponseData() {
+        assertNull(translationCacheService.parseMyMemoryResponse("{\"responseStatus\":200}"));
+    }
+
+    @Test
+    void testMyMemoryRejectsMissingTranslatedText() {
+        assertNull(translationCacheService.parseMyMemoryResponse("{\"responseData\":{},\"responseStatus\":200}"));
+    }
+
+    @Test
+    void testMyMemoryRejectsMalformedJson() {
+        assertNull(translationCacheService.parseMyMemoryResponse("not json at all"));
+    }
+
     // --- in-flight dedup (offline via the empty-providers fast path) ----------
 
     @Test
