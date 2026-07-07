@@ -149,7 +149,7 @@ public class BubbleService {
         List<Bubble> bubbles = new ObjectArrayList<>();
         for (int i = 0; i < chunks.size(); i++) {
             bubbles.add(buildBubble(
-                    id, sender, chunks.get(i), message, senderLocale, i, chunks.size(),
+                    id, sender, chunks.get(i), message, senderLocale, i,
                     duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
                     animationTime, scale, billboard, receivers
@@ -207,7 +207,7 @@ public class BubbleService {
     }
 
     private Bubble buildBubble(int id, FPlayer sender, String message, String fullMessage, String senderLocale,
-                               int chunkIndex, int chunkCount, long duration, float elevation, float interactionHeight,
+                               int chunkIndex, long duration, float elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, boolean seeThrough, int background,
                                int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
         Bubble.BubbleBuilder<?, ?> builder = useModern
@@ -227,7 +227,6 @@ public class BubbleService {
                 .fullMessage(fullMessage)
                 .senderLocale(senderLocale)
                 .chunkIndex(chunkIndex)
-                .chunkCount(chunkCount)
                 .duration(duration)
                 .elevation(elevation)
                 .interactionHeight(interactionHeight)

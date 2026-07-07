@@ -30,14 +30,11 @@ public class Bubble {
     // Sender's locale (source language for translation). May be null.
     private final String senderLocale;
 
-    // Index of this chunk within its message (chunks of one message share the same id),
-    // and the total number of original chunks. The renderer renders the whole re-split
-    // stack on chunkIndex == 0 and treats chunkIndex > 0 as a no-op.
+    // Index of this chunk within its message (chunks of one message share the same id).
+    // The renderer renders the whole re-split stack on chunkIndex == 0 and treats
+    // chunkIndex > 0 as a no-op.
     @lombok.Builder.Default
     private final int chunkIndex = 0;
-
-    @lombok.Builder.Default
-    private final int chunkCount = 1;
 
     private final long duration;
 
