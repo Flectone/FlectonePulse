@@ -52,7 +52,12 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
     // Per-player "show original" toggles, kept separate because history entries are shared.
     private final Map<UUID, Set<UUID>> playerOriginalToggles = new ConcurrentHashMap<>();
 
-    // Components the plugin itself sent — dedup against MessageReceiveEvent.
+    // Components the plugin itself sent — dedup against MessageReceiveEvent. Used as a
+    // MULTISET (bag): a broadcast to N receivers with the SAME locale renders N structurally
+    // equal components and fires N per-receiver MessageReceiveEvents, so we must keep N tokens
+    // (one per send) and remove one per receive. Matching is structural, not by reference:
+    // the received component is deserialized fresh from the outgoing packet, so it is a new
+    // instance that only equals() the marked one — identity matching would never dedup at all.
     private final List<Component> selfOriginatedComponents = new CopyOnWriteArrayList<>();
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
@@ -400,14 +405,16 @@ public class TranslateModule implements ModuleLocalization<Localization.Message.
         selfOriginatedComponents.remove(component);
     }
 
-    // Registers a Component as plugin-originated for ReceiveEvent dedup. Must be the
-    // EXACT instance carried by the outgoing packet (post-withMessage) — isCached compares
-    // by reference, so the wrong variant silently breaks dedup and duplicates the entry.
+    // Registers a Component as plugin-originated for ReceiveEvent dedup. Must be the outgoing
+    // component (post-withMessage) so it equals() what the packet carries back. Always adds a
+    // token — no "already present" guard — because the list is a multiset: N same-locale
+    // receivers each fire markSelfOriginated + a matching MessageReceiveEvent, so N tokens must
+    // be present for the N removeCache() calls to balance. The old guard collapsed N equal
+    // components into ONE token, leaving N-1 receives to be misclassified as external messages
+    // (random UUID, empty originalText) and duplicated into history.
     public void markSelfOriginated(Component sentComponent) {
         if (sentComponent == null) return;
-        if (!selfOriginatedComponents.contains(sentComponent)) {
-            selfOriginatedComponents.add(sentComponent);
-        }
+        selfOriginatedComponents.add(sentComponent);
     }
 
     // Player left — drop them from every viewer set and discard their toggles.
