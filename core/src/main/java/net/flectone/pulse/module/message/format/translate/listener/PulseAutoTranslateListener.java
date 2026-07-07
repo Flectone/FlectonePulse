@@ -66,9 +66,17 @@ public class PulseAutoTranslateListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        // PrepareEvent only drives broadcast-chat pre-translation (the PM receiver copy
-        // is deduped against the sender copy and never reaches here), so gate on chat.
         if (!isChatAuto()) return;
+
+        // Only PUBLIC chat may be pre-translated to every online locale. Private messages
+        // (tell/reply) also carry destination CHAT and would otherwise reach this handler via
+        // their sender copy, leaking the private text to external translators for EVERY online
+        // locale — including players who will never see the PM — and burning API quota. Gate on
+        // the source module, same as onMessageSendEvent (moduleName == MESSAGE_CHAT). The PM
+        // receiver still gets translated: its receiver copy is handled per-recipient in
+        // onMessageSendEvent via ensureTranslationForReceiver (its own async fill, scoped to the
+        // real addressee), which does not depend on this all-locales pre-warm.
+        if (event.moduleName() != ModuleName.MESSAGE_CHAT) return;
 
         EventMetadata<?> metadata = event.eventMetadata();
         UUID messageUUID = metadata.uuid();
