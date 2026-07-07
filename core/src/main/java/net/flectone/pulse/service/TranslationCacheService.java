@@ -176,10 +176,6 @@ public class TranslationCacheService {
         return submitAsync("MyMemory", sourceLang, targetLang, text, this::translateWithMyMemory);
     }
 
-    public CompletableFuture<String> translateWithGoogleAsync(String sourceLang, String targetLang, String text) {
-        return submitAsync("Google", sourceLang, targetLang, text, this::translateWithGoogle);
-    }
-
     // Tries each provider in order, returns the first translation that differs from
     // the input. Concurrent requests for the same key share one future (inFlight).
     public CompletableFuture<String> translateAsync(String sourceLang,
