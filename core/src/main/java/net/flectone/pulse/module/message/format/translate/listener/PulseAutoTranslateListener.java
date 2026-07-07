@@ -187,13 +187,29 @@ public class PulseAutoTranslateListener implements PulseListener {
                     }
 
                     event = event.withMessage(translatedComponent);
-                } else if (translatedMessage == null && translatePrivate) {
-                    // Cold cache AND no prepared TranslatedMessage. This is the private-message
-                    // (tell/reply) receiver copy: its PrepareEvent is deduped against the sender
-                    // copy (same sender+text), so no TM was ever wired to its UUID, and without a
-                    // TM the history entry can never be backfilled by replay. Synthesize a TM now
-                    // so fillTranslationsFromCache can fill it later, and drive the async fill
-                    // ourselves scoped to THIS receiver (no leak to other same-locale players).
+                } else if (translatedMessage == null && (translatePrivate || translateChat)) {
+                    // Cold cache AND no prepared TranslatedMessage. Two shapes reach here:
+                    //  1. the private-message (tell/reply) receiver copy — its PrepareEvent is
+                    //     deduped against the sender copy (same sender+text), so no TM was ever
+                    //     wired to its UUID;
+                    //  2. a rapid CHAT repeat — the same text sent twice within 1s. The second
+                    //     PrepareEvent is swallowed by recentMessages dedup, so translateToAllLocales
+                    //     never ran for this UUID and preparedTranslations has nothing. On a warm
+                    //     cache the sync branch above already handles it; on a COLD cache the second
+                    //     entry would land with tm == null and stay untranslated FOREVER —
+                    //     fillTranslationsFromCache skips tm == null, so even once the first copy's
+                    //     translation lands in the shared cache the second entry has no vessel to
+                    //     receive it and no button ever works.
+                    // Either way, without a TM the history entry can never be backfilled by replay.
+                    // Synthesize a TM now so fillTranslationsFromCache can fill it later, and drive
+                    // the async fill ourselves scoped to THIS receiver (no leak to other same-locale
+                    // players). For the chat repeat this issues NO extra HTTP: ensureTranslationFor
+                    // Receiver → translateAsync reuses the first copy's in-flight future (same
+                    // source:target:text key) or the now-warm cache, so the dedup's real purpose —
+                    // not double-calling the external API — is preserved. It also closes the race
+                    // where the first copy's translation lands between this cold cache check and
+                    // save(): the cache re-check / shared future inside ensureTranslationForReceiver
+                    // still delivers it to this entry.
                     Map<String, String> translations = new ConcurrentHashMap<>();
                     translations.put(sourceLang, originalText);
                     translatedMessage = TranslatedMessage.builder()
