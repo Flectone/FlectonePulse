@@ -175,6 +175,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe")
             Tictactoe tictactoe,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toggleoriginal")
+            Toggleoriginal toggleoriginal,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline")
             Toponline toponline,
 
@@ -739,6 +742,14 @@ public record Localization(
                     String secondWin
             ) {
             }
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Toggleoriginal(
+                String format
+        ) implements LocalizationSetting {
         }
 
         @With

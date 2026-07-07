@@ -462,6 +462,15 @@ command:
     sound:
       name: "flectonepulse.module.command.tictactoe.sound"
       type: "TRUE"
+  toggleoriginal:
+    name: "flectonepulse.module.command.toggleoriginal"
+    type: "TRUE"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.toggleoriginal.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.toggleoriginal.sound"
+      type: "TRUE"
   toponline:
     name: "flectonepulse.module.command.toponline"
     type: "TRUE"

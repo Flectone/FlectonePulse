@@ -150,6 +150,9 @@ public record Command(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe")
         Tictactoe tictactoe,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toggleoriginal")
+        Toggleoriginal toggleoriginal,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline")
         Toponline toponline,
 
@@ -761,6 +764,17 @@ public record Command(
     public record Tictactoe(
             Boolean enable,
             String subCommandMove,
+            List<String> aliases,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Toggleoriginal(
+            Boolean enable,
             List<String> aliases,
             Cooldown cooldown,
             Sound sound

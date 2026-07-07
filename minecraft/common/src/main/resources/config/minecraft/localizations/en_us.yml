@@ -396,6 +396,8 @@ command:
     format_draw: "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>"
     sender: "<fcolor:1>☐ An offer to play was sent to <target>"
     receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
+  toggleoriginal:
+    format: "<fcolor:2>Show original/translation"
   toponline:
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This page doesn't exist"
     header: "<fcolor:2>▋ Players: <count> <br>"

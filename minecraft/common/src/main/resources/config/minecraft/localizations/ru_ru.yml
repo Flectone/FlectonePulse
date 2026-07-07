@@ -396,6 +396,8 @@ command:
     format_draw: "<color:#98FB98>Ничья 👬</color:#98FB98>"
     sender: "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <target>"
     receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
+  toggleoriginal:
+    format: "<fcolor:2>Показать оригинал/перевод"
   toponline:
     null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
     header: "<fcolor:2>▋ Игроков: <count> <br>"

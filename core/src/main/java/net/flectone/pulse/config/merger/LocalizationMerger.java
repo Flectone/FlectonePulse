@@ -65,6 +65,7 @@ public interface LocalizationMerger {
     @Mapping(target = "symbol", expression = "java(mergeCommandSymbol(target.build().symbol().toBuilder(), source.symbol()))")
     @Mapping(target = "tell", expression = "java(mergeCommandTell(target.build().tell().toBuilder(), source.tell()))")
     @Mapping(target = "tictactoe", expression = "java(mergeCommandTictactoe(target.build().tictactoe().toBuilder(), source.tictactoe()))")
+    @Mapping(target = "toggleoriginal", expression = "java(mergeCommandToggleoriginal(target.build().toggleoriginal().toBuilder(), source.toggleoriginal()))")
     @Mapping(target = "toponline", expression = "java(mergeCommandToponline(target.build().toponline().toBuilder(), source.toponline()))")
     @Mapping(target = "translateto", expression = "java(mergeCommandTranslateto(target.build().translateto().toBuilder(), source.translateto()))")
     @Mapping(target = "commandTry", expression = "java(mergeCommandTry(target.build().commandTry().toBuilder(), source.commandTry()))")
@@ -177,6 +178,8 @@ public interface LocalizationMerger {
     Localization.Command.Tictactoe mergeCommandTictactoe(@MappingTarget Localization.Command.Tictactoe.TictactoeBuilder target, Localization.Command.Tictactoe source);
 
     Localization.Command.Tictactoe.Symbol mergeCommandTictactoeSymbol(@MappingTarget Localization.Command.Tictactoe.Symbol.SymbolBuilder target, Localization.Command.Tictactoe.Symbol source);
+
+    Localization.Command.Toggleoriginal mergeCommandToggleoriginal(@MappingTarget Localization.Command.Toggleoriginal.ToggleoriginalBuilder target, Localization.Command.Toggleoriginal source);
 
     Localization.Command.Toponline mergeCommandToponline(@MappingTarget Localization.Command.Toponline.ToponlineBuilder target, Localization.Command.Toponline source);
 

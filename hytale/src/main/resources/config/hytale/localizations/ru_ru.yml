@@ -372,7 +372,7 @@ command:
   tell:
     null_player: "<color:#ff7171>Игрок не найден"
     sender: "<fcolor:2><display_name> → <target> » <fcolor:1><message>"
-    receiver: "<fcolor:2><display_name> → <target> » <fcolor:1><message>"
+    receiver: "<fcolor:2><display_name> → <target> » <fcolor:1><message><reset><translation>"
     myself: "<fcolor:2>[Note] <fcolor:1><message>"
   tictactoe:
     null_player: "<color:#ff7171>Игрок не найден"
@@ -396,6 +396,8 @@ command:
     format_draw: "<color:#98FB98>Ничья [H]</color:#98FB98>"
     sender: "<fcolor:1>[ ] Предложение сыграть в крестики-нолики отправлено для <target>"
     receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>[ ] Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]"
+  toggleoriginal:
+    format: "<fcolor:2>Показать оригинал/перевод"
   toponline:
     null_page: "<color:#ff7171>Страница не найдена"
     header: "<fcolor:2>| Игроков: <count> <br>"
@@ -628,7 +630,8 @@ message:
         server: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!"
         flectone: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом"
     translate:
-      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>[<~>]"
+      action: " <click:run_command:\"/toggleoriginal <message>\"><hover:show_text:\"<fcolor:2>Показать оригинал/перевод\"><fcolor:1>[<~>]"
+      action_manual: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>[<~>]"
   greeting:
     format: "<fcolor:1>Привет, <fcolor:2><nickname>"
   join:

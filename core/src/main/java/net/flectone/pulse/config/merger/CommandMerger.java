@@ -56,6 +56,7 @@ public interface CommandMerger {
     @Mapping(target = "symbol", expression = "java(mergeSymbol(target.build().symbol().toBuilder(), source.symbol()))")
     @Mapping(target = "tell", expression = "java(mergeTell(target.build().tell().toBuilder(), source.tell()))")
     @Mapping(target = "tictactoe", expression = "java(mergeTictactoe(target.build().tictactoe().toBuilder(), source.tictactoe()))")
+    @Mapping(target = "toggleoriginal", expression = "java(mergeToggleoriginal(target.build().toggleoriginal().toBuilder(), source.toggleoriginal()))")
     @Mapping(target = "toponline", expression = "java(mergeToponline(target.build().toponline().toBuilder(), source.toponline()))")
     @Mapping(target = "translateto", expression = "java(mergeTranslateto(target.build().translateto().toBuilder(), source.translateto()))")
     @Mapping(target = "commandTry", expression = "java(mergeCommandTry(target.build().commandTry().toBuilder(), source.commandTry()))")
@@ -161,6 +162,8 @@ public interface CommandMerger {
     Command.Tell mergeTell(@MappingTarget Command.Tell.TellBuilder target, Command.Tell source);
 
     Command.Tictactoe mergeTictactoe(@MappingTarget Command.Tictactoe.TictactoeBuilder target, Command.Tictactoe source);
+
+    Command.Toggleoriginal mergeToggleoriginal(@MappingTarget Command.Toggleoriginal.ToggleoriginalBuilder target, Command.Toggleoriginal source);
 
     Command.Toponline mergeToponline(@MappingTarget Command.Toponline.ToponlineBuilder target, Command.Toponline source);
 

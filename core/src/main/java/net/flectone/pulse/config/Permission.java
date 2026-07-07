@@ -168,6 +168,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe")
             Tictactoe tictactoe,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toggleoriginal")
+            Toggleoriginal toggleoriginal,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline")
             Toponline toponline,
 
@@ -627,6 +630,17 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Tictactoe(
+                String name,
+                Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Toggleoriginal(
                 String name,
                 Permission.Type type,
                 PermissionEntry cooldownBypass,

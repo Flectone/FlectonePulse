@@ -372,7 +372,7 @@ command:
   tell:
     null_player: "<color:#ff7171>This player does not exist"
     sender: "<fcolor:2><display_name> => <target> » <fcolor:1><message>"
-    receiver: "<fcolor:2><display_name> => <target> » <fcolor:1><message>"
+    receiver: "<fcolor:2><display_name> => <target> » <fcolor:1><message><reset><translation>"
     myself: "<fcolor:2>[Note] <fcolor:1><message>"
   tictactoe:
     null_player: "<color:#ff7171>This player does not exist"
@@ -396,6 +396,8 @@ command:
     format_draw: "<color:#98FB98>The game ended in a draw [H]</color:#98FB98>"
     sender: "<fcolor:1>[ ] An offer to play was sent to <target>"
     receiver: "<click:run_command:\"<command> %d create\"><fcolor:1>[ ] Received an invite to play tic-tac-toe with <display_name>, accept? [+]"
+  toggleoriginal:
+    format: "<fcolor:2>Show original/translation"
   toponline:
     null_page: "<color:#ff7171>This page doesn't exist"
     header: "<fcolor:2>| Players: <count> <br>"
@@ -625,7 +627,10 @@ message:
         server: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, this is a vanilla server in minecraft!"
         flectone: "<fcolor:2>[Q\\&A] @<player><fcolor:1>, this is a brand and projects created by TheFaser"
     translate:
-      action: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>[<~>]"
+      # Used when message.format.translate.auto: true (auto-translate mode)
+      action: " <click:run_command:\"/toggleoriginal <message>\"><hover:show_text:\"<fcolor:2>Show original/translation\"><fcolor:1>[<~>]"
+      # Used when message.format.translate.auto: false (classic /translateto mode)
+      action_manual: " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>[<~>]"
   greeting:
     format: "<fcolor:1>Hello, <fcolor:2><nickname>"
   join:

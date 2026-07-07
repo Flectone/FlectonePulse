@@ -64,6 +64,7 @@ public interface PermissionMerger {
     @Mapping(target = "symbol", expression = "java(mergeCommandSymbol(target.build().symbol().toBuilder(), source.symbol()))")
     @Mapping(target = "tell", expression = "java(mergeCommandTell(target.build().tell().toBuilder(), source.tell()))")
     @Mapping(target = "tictactoe", expression = "java(mergeCommandTictactoe(target.build().tictactoe().toBuilder(), source.tictactoe()))")
+    @Mapping(target = "toggleoriginal", expression = "java(mergeCommandToggleoriginal(target.build().toggleoriginal().toBuilder(), source.toggleoriginal()))")
     @Mapping(target = "toponline", expression = "java(mergeCommandToponline(target.build().toponline().toBuilder(), source.toponline()))")
     @Mapping(target = "translateto", expression = "java(mergeCommandTranslateto(target.build().translateto().toBuilder(), source.translateto()))")
     @Mapping(target = "commandTry", expression = "java(mergeCommandTry(target.build().commandTry().toBuilder(), source.commandTry()))")
@@ -150,6 +151,8 @@ public interface PermissionMerger {
     Permission.Command.Tell mergeCommandTell(@MappingTarget Permission.Command.Tell.TellBuilder target, Permission.Command.Tell source);
 
     Permission.Command.Tictactoe mergeCommandTictactoe(@MappingTarget Permission.Command.Tictactoe.TictactoeBuilder target, Permission.Command.Tictactoe source);
+
+    Permission.Command.Toggleoriginal mergeCommandToggleoriginal(@MappingTarget Permission.Command.Toggleoriginal.ToggleoriginalBuilder target, Permission.Command.Toggleoriginal source);
 
     Permission.Command.Toponline mergeCommandToponline(@MappingTarget Permission.Command.Toponline.ToponlineBuilder target, Permission.Command.Toponline source);
 

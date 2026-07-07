@@ -777,6 +777,14 @@ tictactoe:
     enable: false
   sound:
     enable: false
+toggleoriginal:
+  enable: true
+  aliases:
+  - "toggleoriginal"
+  cooldown:
+    enable: false
+  sound:
+    enable: false
 toponline:
   enable: true
   per_page: 10
