@@ -20,6 +20,8 @@ dependencies {
     compileOnly "io.lettuce:lettuce-core:$lettuce_version"
     compileOnly "com.ibm.icu:icu4j:$icu4j_version"
 
+    testImplementation "net.kyori:adventure-api:$adventure_api"
+    testImplementation "net.kyori:adventure-text-serializer-plain:$adventure_api"
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
     testImplementation "org.mockito:mockito-core:5.5.0"
     testImplementation "org.mockito:mockito-junit-jupiter:5.5.0"
