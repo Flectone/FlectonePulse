@@ -133,7 +133,29 @@ public record TranslateHistoryMessage(
 
         // Advance the plain-text cursor past characters emitted by a node we don't edit
         // (non-text nodes, e.g. translatable player heads), keeping offsets in sync.
+        //
+        // When such a node's plain-text span overlaps the active match window, those
+        // characters ARE part of the literal being replaced but live in a node we cannot
+        // rewrite. We still count them into matchedChars so that the following text nodes
+        // drop exactly the remaining matched characters and no more. Without this, the
+        // overlapping characters were silently missing from matchedChars and the counter
+        // "made up" the shortfall from later text nodes, cutting more than the match and
+        // leaving the non-text node in place (a garbled string). The non-text node itself
+        // stays verbatim; if the match STARTS inside it, the replacement is emitted by the
+        // first subsequent text node still within the window (and if the whole match lies
+        // inside non-text nodes, the text is left untouched rather than corrupted).
         private void advance(int chars) {
+            if (chars <= 0) return;
+            if (!finished && matchedChars < matchLength) {
+                int matchEnd = matchStart + matchLength;
+                int overlapStart = Math.max(position, matchStart);
+                int overlapEnd = Math.min(position + chars, matchEnd);
+                int overlap = overlapEnd - overlapStart;
+                if (overlap > 0) {
+                    matchedChars += overlap;
+                    if (matchedChars >= matchLength) finished = true;
+                }
+            }
             position += chars;
         }
 
