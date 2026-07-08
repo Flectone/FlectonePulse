@@ -145,18 +145,25 @@ public class BubbleService {
         String senderLocale = socialService.getSetting(sender, SettingText.LOCALE);
 
         List<String> chunks = splitText(message, maxLength, maxCount, hintBufferLength, wordBreakHint);
+        if (chunks.isEmpty()) return List.of();
 
-        List<Bubble> bubbles = new ObjectArrayList<>();
-        for (int i = 0; i < chunks.size(); i++) {
-            bubbles.add(buildBubble(
-                    id, sender, chunks.get(i), message, senderLocale, i,
-                    duration, elevation, interactionHeight,
-                    useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
-                    animationTime, scale, billboard, receivers
-            ));
-        }
+        // One message = one queue element = one maxCount slot.
+        // All chunks of a message share a single id, and the renderer rebuilds the whole
+        // vertical stack itself by re-splitting the full message (renderChunkStack via
+        // splitFull) on the chunkIndex == 0 bubble. So per-chunk "phantom" bubbles were
+        // never displayed (renderBubble(fViewer, bubble) returns for chunkIndex != 0) and
+        // were not needed for expiry (removeBubbleIf matches by shared id). Enqueuing only
+        // the chunkIndex == 0 bubble keeps maxCount/activeBubbles counting MESSAGES instead
+        // of chunks, and avoids K-1 wasted renderBubble/findPlayersWhoCanSee passes on the
+        // main thread that render nothing.
+        Bubble bubble = buildBubble(
+                id, sender, chunks.get(0), message, senderLocale, 0,
+                duration, elevation, interactionHeight,
+                useInteractionRiding, useModernBubble, hasShadow, seeThrough, background,
+                animationTime, scale, billboard, receivers
+        );
 
-        return List.copyOf(bubbles);
+        return List.of(bubble);
     }
 
     // Symbol-level splitter shared by the original message and by re-splitting a
