@@ -1,6 +1,7 @@
 package net.flectone.pulse.service;
 
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -56,6 +57,19 @@ public class TranslationCacheService {
 
     // Same (source, target, text) shares one future while a request is running.
     private final Map<String, CompletableFuture<String>> inFlight = new ConcurrentHashMap<>();
+
+    // Short negative cache of keys whose WHOLE provider chain just failed (all
+    // providers returned null — rate-limit/errors/network). Without it every
+    // toggle click, every bubble render to a new viewer and every replay reruns
+    // all 4 HTTP providers on the same text → a fast path to rate limits on a
+    // public server. TTL is deliberately short (2 min): long enough to absorb
+    // bursts of retries for the same text, short enough that a transient blip
+    // recovers on its own without blocking a legitimate retranslation for long.
+    // maximumSize is only a safety bound against unbounded growth.
+    private final Cache<String, Boolean> negativeCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(2, TimeUnit.MINUTES)
+            .maximumSize(10_000)
+            .build();
 
     private Cache<String, String> getCache() {
         return cacheRegistry.getCache(CacheName.TRANSLATION_CACHE);
@@ -199,6 +213,13 @@ public class TranslationCacheService {
         }
 
         String key = sourceLang + ":" + targetLang + ":" + text;
+        // Negative cache-hit: the whole provider chain failed for this exact key
+        // very recently. Short-circuit with null WITHOUT touching HTTP and WITHOUT
+        // registering an in-flight future. Order is positive-hit → negative-hit →
+        // inFlight, so a fresh translation is never blocked by a stale negative.
+        if (negativeCache.getIfPresent(key) != null) {
+            return CompletableFuture.completedFuture(null);
+        }
         // computeIfAbsent makes check-then-act atomic: only one thread per key
         // creates the future and starts a network request; the rest share it.
         return inFlight.computeIfAbsent(key, k -> {
@@ -225,7 +246,19 @@ public class TranslationCacheService {
         }
         fLogger.warning("[AutoTranslate] chain %s→%s: ALL providers failed for text='%s'",
                 sourceLang, targetLang, text);
+        // Remember the full-chain failure so retries (toggle/render/replay) short-
+        // circuit for a while instead of re-hammering the HTTP providers.
+        markTranslationFailed(sourceLang, targetLang, text);
         return null;
+    }
+
+    // package-private for tests: mark/check a full-chain translation failure.
+    void markTranslationFailed(String sourceLang, String targetLang, String text) {
+        negativeCache.put(getCacheKey(sourceLang, targetLang, text), Boolean.TRUE);
+    }
+
+    boolean isTranslationFailed(String sourceLang, String targetLang, String text) {
+        return negativeCache.getIfPresent(getCacheKey(sourceLang, targetLang, text)) != null;
     }
 
     private @Nullable String callProvider(String provider, String sourceLang, String targetLang, String text) {
@@ -367,6 +400,9 @@ public class TranslationCacheService {
         ExecutorService old = executorService;
         executorService = Executors.newFixedThreadPool(4);
         inFlight.clear();
+        // Drop remembered failures too, so a reload starts with a clean slate and
+        // a previously-failing text can be retried immediately after re-enable.
+        negativeCache.invalidateAll();
         old.shutdownNow();
         try {
             old.awaitTermination(1, TimeUnit.SECONDS);

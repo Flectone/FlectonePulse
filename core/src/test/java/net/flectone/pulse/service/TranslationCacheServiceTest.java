@@ -309,6 +309,61 @@ class TranslationCacheServiceTest {
         assertEquals("привет", future.join());
     }
 
+    // --- negative cache of full-chain failures (offline) ---------------------
+
+    @Test
+    void testNegativeCacheShortCircuitsAfterMarkedFailure() {
+        // A key marked as recently-failed must short-circuit translateAsync to a
+        // completed null future WITHOUT calling any provider. The integration
+        // provider stub throws if touched, and DEEPL would use it — so reaching a
+        // provider here would fail the test loudly.
+        translationCacheService.markTranslationFailed("en", "ru", "hello");
+        assertTrue(translationCacheService.isTranslationFailed("en", "ru", "hello"));
+
+        CompletableFuture<String> future = translationCacheService.translateAsync(
+                "en", "ru", "hello", java.util.List.of("DEEPL"));
+
+        assertTrue(future.isDone());
+        assertNull(future.join());
+    }
+
+    @Test
+    void testNegativeCacheIsKeyScoped() {
+        // A failure for one key must not suppress a different key. The unmarked
+        // key falls through to the executor; join() would surface any provider
+        // touch (the stub throws) — but GOOGLE hits the network, so we only assert
+        // that the call is NOT short-circuited synchronously to null.
+        translationCacheService.markTranslationFailed("en", "ru", "hello");
+
+        assertFalse(translationCacheService.isTranslationFailed("en", "ru", "world"));
+        assertFalse(translationCacheService.isTranslationFailed("en", "de", "hello"));
+    }
+
+    @Test
+    void testPositiveCacheHitWinsOverNegative() {
+        // If both a real translation and a stale negative mark exist for a key,
+        // the positive cache-hit must win (order: positive → negative → inFlight).
+        translationCacheService.put("en", "ru", "hello", "привет");
+        translationCacheService.markTranslationFailed("en", "ru", "hello");
+
+        CompletableFuture<String> future = translationCacheService.translateAsync(
+                "en", "ru", "hello", java.util.List.of("DEEPL"));
+
+        assertTrue(future.isDone());
+        assertEquals("привет", future.join());
+    }
+
+    @Test
+    void testShutdownClearsNegativeCache() {
+        // A reload must not carry over remembered failures.
+        translationCacheService.markTranslationFailed("en", "ru", "hello");
+        assertTrue(translationCacheService.isTranslationFailed("en", "ru", "hello"));
+
+        translationCacheService.shutdown();
+
+        assertFalse(translationCacheService.isTranslationFailed("en", "ru", "hello"));
+    }
+
     // --- network / integration tests (excluded from default suite) -----------
 
     @Test
