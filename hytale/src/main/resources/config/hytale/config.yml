@@ -18,6 +18,7 @@ executor:
   min_pool_size: 0
   max_pool_size: -1
   work_queue: "SYNCHRONOUS"
+  allow_core_thread_timeout: false
   keep_alive:
     duration: 60
     time_unit: "SECONDS"

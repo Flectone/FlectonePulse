@@ -391,13 +391,17 @@ public class TaskScheduler {
                 .name(THREAD_PREFIX, threadCounter.getAndIncrement())
                 .factory();
 
-        return new ThreadPoolExecutor(
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 config.minPoolSize(),
                 config.maxPoolSize() == -1 ? Integer.MAX_VALUE : config.maxPoolSize(),
                 config.keepAlive().duration(), config.keepAlive().timeUnit(),
                 config.workQueue() == Config.Executor.WorkQueue.SYNCHRONOUS ? new SynchronousQueue<>() : new LinkedBlockingQueue<>(),
                 factory
         );
+
+        threadPoolExecutor.allowCoreThreadTimeOut(config.allowCoreThreadTimeout());
+
+        return threadPoolExecutor;
     }
 
     @With

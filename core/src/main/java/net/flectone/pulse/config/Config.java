@@ -90,6 +90,7 @@ public record Config(
     public record Executor(
             Integer minPoolSize,
             Integer maxPoolSize,
+            Boolean allowCoreThreadTimeout,
             WorkQueue workQueue,
             DurationUnit keepAlive,
             DurationUnit shutdownTimeout
