@@ -73,7 +73,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
     public void onDisable() {
         fPlayerService.getPlatformFPlayers().forEach(this::remove);
 
-        if (!FlectonePulseAPI.isDisabling()) {
+        if (!FlectonePulseAPI.isDisabling() && isNewerThanOrEqualsV262) {
             sendForAll(true);
         }
     }
@@ -132,7 +132,7 @@ public class MinecraftBelownameModule implements ModuleLocalization<Localization
         User user = packetProvider.getUser(uuid);
         if (user == null) return false;
 
-        return user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
+        return user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
     }
 
     public void sendForAll(boolean baseValue) {

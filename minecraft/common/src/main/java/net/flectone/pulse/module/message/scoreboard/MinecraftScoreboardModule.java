@@ -114,7 +114,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
                 )
         );
 
-        if (!FlectonePulseAPI.isDisabling()) {
+        if (!FlectonePulseAPI.isDisabling() && isNewerThanOrEqualsV262) {
             sendForAll(true);
         }
 
@@ -164,7 +164,7 @@ public class MinecraftScoreboardModule extends ScoreboardModule {
         User user = packetProvider.getUser(uuid);
         if (user == null) return false;
 
-        return user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
+        return user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2);
     }
 
     public void send(@NonNull FPlayer fReceiver, @NonNull Team team, WrapperPlayServerTeams.@NonNull TeamMode teamMode) {

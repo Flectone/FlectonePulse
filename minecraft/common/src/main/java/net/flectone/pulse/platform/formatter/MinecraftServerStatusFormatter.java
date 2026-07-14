@@ -43,8 +43,8 @@ public class MinecraftServerStatusFormatter {
                 .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
 
         // display player_head in MOTD is only available for clients 1.21.9-1.21.11
-        if (user.getPacketVersion().isOlderThan(ClientVersion.V_1_21_9)
-                || user.getPacketVersion().isNewerThan(ClientVersion.V_1_21_11)) {
+        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)
+                || user.getClientVersion().isNewerThan(ClientVersion.V_1_21_11)) {
             messageContextBuilder = messageContextBuilder.flag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
         }
 
