@@ -141,7 +141,7 @@ public class MinecraftObjectModule extends ObjectModule {
                 && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
                 && platformPlayerAdapter.hasPotionEffect(messageContext.sender(), PotionUtil.INVISIBILITY_POTION_NAME)) return MessagePipeline.ReplacementTag.emptyTag();
 
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().playerHeadTag().needExtraSpace(), true);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().playerHeadTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
 
         PlayerHeadObjectContents.Builder playerHeadBuilder = ObjectContents.playerHead();
@@ -257,7 +257,7 @@ public class MinecraftObjectModule extends ObjectModule {
     public Tag createTextureTag(MessageContext messageContext,
                                 String defaultValue,
                                 ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().textureTag().needExtraSpace(), false);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().textureTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -271,7 +271,7 @@ public class MinecraftObjectModule extends ObjectModule {
     private Tag createSpriteTag(MessageContext messageContext,
                                 String defaultValue,
                                 ArgumentQueue argumentQueue) {
-        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().spriteTag().needExtraSpace(), false);
+        Tag receiverVersionTag = checkAndGetReceiverTag(messageContext, defaultValue, config().spriteTag().needExtraSpace());
         if (receiverVersionTag != null) return receiverVersionTag;
         if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
@@ -288,15 +288,10 @@ public class MinecraftObjectModule extends ObjectModule {
     }
 
     @Nullable
-    private Tag checkAndGetReceiverTag(MessageContext messageContext,
-                                       String defaultValue,
-                                       boolean needExtraSpace,
-                                       boolean skipFormattingForOldVersion) {
-        // ViaVersion will not be able to process messages that contain Object on older versions
+    private Tag checkAndGetReceiverTag(MessageContext messageContext, String defaultValue, boolean needExtraSpace) {
+        // Via will not be able to process messages that contain Object on older versions
         if (!isNewerThanOrEqualsV_1_21_9) {
-            return skipFormattingForOldVersion
-                    ? MessagePipeline.ReplacementTag.emptyTag()
-                    : applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
+            return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 
         // return default formatting
@@ -324,19 +319,18 @@ public class MinecraftObjectModule extends ObjectModule {
             return null;
         }
 
-        // check player version
-        if (user.getPacketVersion().isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
-            // bedrock player does not support object component
-            if (integrationModule.isBedrockPlayer(fReceiver)) {
-                return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
-            }
-
-            // continue building
-            return null;
+        // check client version because Via can let player in lower than 1.21.9 version
+        if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)) {
+            return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
         }
 
-        // for old client
-        return MessagePipeline.ReplacementTag.emptyTag();
+        // bedrock player does not support object component
+        if (integrationModule.isBedrockPlayer(fReceiver)) {
+            return applyDefaultFormatting(messageContext, defaultValue, needExtraSpace);
+        }
+
+        // continue building
+        return null;
     }
 
     private Tag applyDefaultFormatting(MessageContext messageContext, String argument, boolean needExtraSpace) {
