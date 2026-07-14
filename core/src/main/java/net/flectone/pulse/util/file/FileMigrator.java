@@ -1091,4 +1091,22 @@ public class FileMigrator {
         return files.withLocalizations(newLocalizations);
     }
 
+    public FilePack migration_1_11_1(FilePack files) {
+        Config.Executor configExecutor = files.config().executor();
+        if (configExecutor.workQueue() == Config.Executor.WorkQueue.SYNCHRONOUS
+                && configExecutor.minPoolSize() == 0
+                && configExecutor.maxPoolSize() == -1) {
+            files = files
+                    .withConfig(files.config()
+                            .withExecutor(files.config().executor()
+                                    .withMinPoolSize(8)
+                                    .withMaxPoolSize(8)
+                                    .withWorkQueue(Config.Executor.WorkQueue.LINKED_BLOCKING)
+                            )
+                    );
+        }
+
+        return files;
+    }
+
 }

@@ -15,10 +15,10 @@ database:
   parameters: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
   prefix: ""
 executor:
-  min_pool_size: 0
-  max_pool_size: -1
-  work_queue: "SYNCHRONOUS"
+  min_pool_size: 8
+  max_pool_size: 8
   allow_core_thread_timeout: false
+  work_queue: "LINKED_BLOCKING"
   keep_alive:
     duration: 60
     time_unit: "SECONDS"
