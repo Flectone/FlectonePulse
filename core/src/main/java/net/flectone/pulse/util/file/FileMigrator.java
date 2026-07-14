@@ -1106,7 +1106,43 @@ public class FileMigrator {
                     );
         }
 
-        return files;
+        UnaryOperator<String> replacePlayerHead = string -> Strings.CS.replace(string, "<player_head>", "<player_head_or:''>");
+
+        Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
+
+        boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
+        for (Localization localization : files.localizations().values()) {
+            if (isNotHytale) {
+                localization = localization
+                        .withMessage(localization.message()
+                                .withAfk(localization.message().afk()
+                                        .withFormatTrue(localization.message().afk().formatTrue()
+                                                .withGlobal(replacePlayerHead.apply(localization.message().afk().formatTrue().global()))
+                                        )
+                                        .withFormatFalse(localization.message().afk().formatFalse()
+                                                .withGlobal(replacePlayerHead.apply(localization.message().afk().formatFalse().global()))
+                                        )
+                                )
+                                .withFormat(localization.message().format()
+                                        .withNames(localization.message().format().names()
+                                                .withDisplay(localization.message().format().names().display().stream()
+                                                        .map(replacePlayerHead)
+                                                        .collect(Collectors.toCollection(LinkedList::new))
+                                                )
+                                        )
+                                )
+                                .withTab(localization.message().tab()
+                                        .withPlayerlistname(localization.message().tab().playerlistname()
+                                                .withFormat(replacePlayerHead.apply(localization.message().tab().playerlistname().format()))
+                                        )
+                                )
+                        );
+            }
+
+            newLocalizations.put(localization.language(), localization);
+        }
+
+        return files.withLocalizations(newLocalizations);
     }
 
 }

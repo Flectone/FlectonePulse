@@ -519,10 +519,10 @@ message:
   afk:
     suffix: " <color:#FFFF00>⌚</color>"
     format_true:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> отошёл"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head_or:''></white><nickname> отошёл"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры"
     format_false:
-      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head></white><nickname> вернулся"
+      global: "<gradient:#ffd500:#FFFF00>⌚ <white><player_head_or:''></white><nickname> вернулся"
       local: "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру"
   auto:
     types:
@@ -644,7 +644,7 @@ message:
     names:
       constant: []
       display:
-        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white><nickname>\"><white><player_head></white><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
+        - "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head_or:''></white><nickname>\"><white><player_head_or:''></white><prefix><stream><fcolor:2><nickname><afk><suffix><reset>"
       entity: "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>"
       unknown: "<fcolor:2><name>"
       console: "<white><player_head:Console></white><click:suggest_command:\"/msg <name> \"><hover:show_text:\"<fcolor:2>Написать в <white><player_head:Console></white>Консоль\"><fcolor:2>Консоль"
@@ -721,7 +721,7 @@ message:
         - "<fcolor:1>ТПС <replacement:tps>, Онлайн <replacement:online>"
         - " "
     playerlistname:
-      format: "<white><player_head></white><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
+      format: "<white><player_head_or:''></white><world>▋ <reset><prefix><stream><fcolor:2><nickname><afk><mute><suffix>"
   update:
     format_player: "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <replacement:url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!"
     format_console: "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse"
