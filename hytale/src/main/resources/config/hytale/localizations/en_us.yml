@@ -57,6 +57,7 @@ command:
     null_player: "<color:#ff7171>This player does not exist"
     null_time: "<color:#ff7171>Incorrect time"
     lower_weight_group: "<color:#ff7171>You cannot ban a player with equal or higher permissions"
+    already_banned: "<color:#ff7171>Player is already banned"
     reasons:
       default: "You have been banned from this server"
     server: "<color:#ff7171>[!] <moderator> <fcolor:1>has banned <display_name> <br>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>"
@@ -257,6 +258,7 @@ command:
     null_player: "<color:#ff7171>This player does not exist"
     null_time: "<color:#ff7171>Incorrect time"
     lower_weight_group: "<color:#ff7171>You cannot mute a player with equal or higher permissions"
+    already_muted: "<color:#ff7171>Player is already muted"
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "You have been muted on this server"

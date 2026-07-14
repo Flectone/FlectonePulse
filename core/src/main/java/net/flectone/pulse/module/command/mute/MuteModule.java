@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.mute.listener.MuteProxyMessageListener;
+import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
@@ -35,6 +36,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 
@@ -61,6 +63,7 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     private final ListenerRegistry listenerRegistry;
     private final ProxyRegistry proxyRegistry;
     private final SocialService socialService;
+    private final UnmuteModule unmuteModule;
 
     @Override
     public void onEnable() {
@@ -120,6 +123,16 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::lowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
+        if (config().checkDuplicate() && moderationService.hasValid(fTarget, Moderation.Type.MUTE)) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
+                    .sender(fPlayer)
+                    .format(localization -> Strings.CS.replace(localization.alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
+                    .tagResolvers(_ -> new TagResolver[]{messagePipeline.targetTag(fPlayer, fTarget)})
                     .build()
             );
             return;

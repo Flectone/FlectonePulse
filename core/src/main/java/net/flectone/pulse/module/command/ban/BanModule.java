@@ -17,6 +17,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanProxyMessageListener;
 import net.flectone.pulse.module.command.ban.listener.PulseBanListener;
+import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -32,6 +33,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
@@ -57,6 +59,7 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final SocialService socialService;
+    private final UnbanModule unbanModule;
 
     @Override
     public void onEnable() {
@@ -146,6 +149,16 @@ public class BanModule implements ModuleCommand<Localization.Command.Ban> {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::lowerWeightGroup)
+                    .build()
+            );
+            return;
+        }
+
+        if (config().checkDuplicate() && moderationService.hasValid(fTarget, Moderation.Type.BAN)) {
+            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ban>builder()
+                    .sender(fPlayer)
+                    .format(localization -> Strings.CS.replace(localization.alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
+                    .tagResolvers(_ -> new TagResolver[]{messagePipeline.targetTag(fPlayer, fTarget)})
                     .build()
             );
             return;

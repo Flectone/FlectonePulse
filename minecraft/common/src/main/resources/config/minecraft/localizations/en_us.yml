@@ -57,6 +57,7 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot ban a player with equal or higher permissions"
+    already_banned: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Player is already banned. <hover:show_text:\"<fcolor:1>Click to unban <target>\"><click:run_command:\"<command>\"><color:#ff7171>Revoke the previous punishment? ☑</click></hover>"
     reasons:
       default: "You have been banned from this server"
     server: "<color:#ff7171>🔒 <moderator> <fcolor:1>has banned <display_name> <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Time left: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
@@ -257,6 +258,7 @@ command:
     null_player: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This player does not exist"
     null_time: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Incorrect time"
     lower_weight_group: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>You cannot mute a player with equal or higher permissions"
+    already_muted: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Player is already muted. <hover:show_text:\"<fcolor:1>Click to unmute <target>\"><click:run_command:\"<command>\"><color:#ff7171>Revoke the previous punishment? ☑</click></hover>"
     suffix: " <color:#ff7171>🔒</color>"
     reasons:
       default: "You have been muted on this server"

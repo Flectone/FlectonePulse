@@ -57,6 +57,7 @@ command:
     null_player: "<color:#ff7171>Игрок не найден"
     null_time: "<color:#ff7171>Невозможное время"
     lower_weight_group: "<color:#ff7171>Ты не можешь забанить игрока с такими же или большими правами"
+    already_banned: "<color:#ff7171>Игрок уже забанен"
     reasons:
       default: "Ты заблокирован на этом сервере"
     server: "<color:#ff7171>[!] <moderator> <fcolor:1>заблокировал игрока <display_name> <br>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>"
@@ -257,6 +258,7 @@ command:
     null_player: "<color:#ff7171>Игрок не найден"
     null_time: "<color:#ff7171>Невозможное время"
     lower_weight_group: "<color:#ff7171>Ты не можешь замутить игрока с такими же или большими правами"
+    already_muted: "<color:#ff7171>Игрок уже замучен"
     suffix: " <color:#ff7171>[!]</color>"
     reasons:
       default: "Ты был замучен на сервере"

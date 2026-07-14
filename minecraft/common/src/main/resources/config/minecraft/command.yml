@@ -36,6 +36,7 @@ ban:
   suggest_offline_players: true
   show_connection_attempts: true
   check_group_weight: true
+  check_duplicate: false
   range: "PROXY"
   time_limits:
     0: -1
@@ -564,6 +565,7 @@ mute:
   filter_by_server: true
   suggest_offline_players: true
   check_group_weight: true
+  check_duplicate: false
   range: "PROXY"
   time_limits:
     0: -1
