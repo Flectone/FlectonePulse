@@ -20,6 +20,7 @@ public interface ConfigMerger {
 
     @Mapping(target = "language", expression = "java(mergeLanguage(target.build().language().toBuilder(), source.language()))")
     @Mapping(target = "database", expression = "java(mergeDatabase(target.build().database().toBuilder(), source.database()))")
+    @Mapping(target = "executor", expression = "java(mergeExecutor(target.build().executor().toBuilder(), source.executor()))")
     @Mapping(target = "proxy", expression = "java(mergeProxy(target.build().proxy().toBuilder(), source.proxy()))")
     @Mapping(target = "internal", expression = "java(mergeInternal(target.build().internal().toBuilder(), source.internal()))")
     @Mapping(target = "logger", expression = "java(mergeLogger(target.build().logger().toBuilder(), source.logger()))")
@@ -30,6 +31,12 @@ public interface ConfigMerger {
     Config.Language mergeLanguage(@MappingTarget Config.Language.LanguageBuilder target, Config.Language source);
 
     Config.Database mergeDatabase(@MappingTarget Config.Database.DatabaseBuilder target, Config.Database source);
+
+    @Mapping(target = "keepAlive", expression = "java(mergeExecutorDurationUnit(target.build().keepAlive().toBuilder(), source.keepAlive()))")
+    @Mapping(target = "shutdownTimeout", expression = "java(mergeExecutorDurationUnit(target.build().shutdownTimeout().toBuilder(), source.shutdownTimeout()))")
+    Config.Executor mergeExecutor(@MappingTarget Config.Executor.ExecutorBuilder target, Config.Executor source);
+
+    Config.Executor.DurationUnit mergeExecutorDurationUnit(@MappingTarget Config.Executor.DurationUnit.DurationUnitBuilder target, Config.Executor.DurationUnit source);
 
     @Mapping(target = "redis", expression = "java(mergeProxyRedis(target.build().redis().toBuilder(), source.redis()))")
     Config.Proxy mergeProxy(@MappingTarget Config.Proxy.ProxyBuilder target, Config.Proxy source);
