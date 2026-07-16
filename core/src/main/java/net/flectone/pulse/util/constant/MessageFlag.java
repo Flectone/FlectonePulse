@@ -100,6 +100,11 @@ public enum MessageFlag {
     OBJECT_TEXTURE_PROCESSING(true),
 
     /**
+     * Enables Padding module processing.
+     */
+    PADDING_MODULE(true),
+
+    /**
      * Controls how integration placeholders (e.g., PlaceholderAPI) are processed.
      * If enabled, placeholders are processed on behalf of the sender.
      * If disabled, placeholders are processed on behalf of the recipient.

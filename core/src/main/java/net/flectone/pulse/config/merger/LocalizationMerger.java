@@ -246,6 +246,7 @@ public interface LocalizationMerger {
     @Mapping(target = "animation", expression = "java(mergeMessageFormatAnimation(target.build().animation().toBuilder(), source.animation()))")
     @Mapping(target = "condition", expression = "java(mergeMessageFormatCondition(target.build().condition().toBuilder(), source.condition()))")
     @Mapping(target = "object", expression = "java(mergeMessageFormatObject(target.build().object().toBuilder(), source.object()))")
+    @Mapping(target = "padding", expression = "java(mergeMessageFormatPadding(target.build().padding().toBuilder(), source.padding()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "mention", expression = "java(mergeMessageFormatMention(target.build().mention().toBuilder(), source.mention()))")
     @Mapping(target = "moderation", expression = "java(mergeMessageFormatModeration(target.build().moderation().toBuilder(), source.moderation()))")
@@ -259,6 +260,8 @@ public interface LocalizationMerger {
     Localization.Message.Format.Condition mergeMessageFormatCondition(@MappingTarget Localization.Message.Format.Condition.ConditionBuilder target, Localization.Message.Format.Condition source);
 
     Localization.Message.Format.Object mergeMessageFormatObject(@MappingTarget Localization.Message.Format.Object.ObjectBuilder target, Localization.Message.Format.Object source);
+
+    Localization.Message.Format.Padding mergeMessageFormatPadding(@MappingTarget Localization.Message.Format.Padding.PaddingBuilder target, Localization.Message.Format.Padding source);
 
     Localization.Message.Format.Replacement mergeMessageFormatReplacement(@MappingTarget Localization.Message.Format.Replacement.ReplacementBuilder target, Localization.Message.Format.Replacement source);
 

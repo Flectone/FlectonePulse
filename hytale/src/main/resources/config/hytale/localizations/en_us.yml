@@ -579,6 +579,16 @@ message:
           "false": "Player"
     object:
       default_symbol: ""
+    padding:
+      values:
+        example_left_5:
+          symbol: "->"
+          start: ""
+          end: ""
+        example_center_10:
+          symbol: "-"
+          start: "="
+          end: "="
     replacement:
       spoiler_symbol: "-"
       values:

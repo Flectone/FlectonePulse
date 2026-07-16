@@ -1276,6 +1276,9 @@ public record Permission(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/padding")
+                Padding padding,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer")
                 @JsonProperty("question_answer")
                 QuestionAnswer questionAnswer,
@@ -1434,6 +1437,16 @@ public record Permission(
                     PermissionEntry playerHeadTag,
                     PermissionEntry spriteTag,
                     PermissionEntry textureTag
+            ) implements PermissionSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Padding(
+                    String name,
+                    Permission.Type type,
+                    Map<String, PermissionEntry> values
             ) implements PermissionSetting {
             }
 

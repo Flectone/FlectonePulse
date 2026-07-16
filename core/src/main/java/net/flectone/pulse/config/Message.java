@@ -301,6 +301,9 @@ public record Message(
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/object")
             Object object,
 
+            @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/padding")
+            Padding padding,
+
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/questionanswer")
             @JsonProperty("question_answer")
             QuestionAnswer questionAnswer,
@@ -525,6 +528,32 @@ public record Message(
                     String mineskinApiKey,
                     Map<String, String> values
             ) implements EnableSetting {
+            }
+
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Padding(
+                Boolean enable,
+                Map<String, Value> values
+        ) implements EnableSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Value(
+                    Type type,
+                    Integer length
+            ){}
+
+            public enum Type {
+                LEFT,
+                RIGHT,
+                CENTER,
+                CENTER_LEFT,
+                CENTER_RIGHT
             }
 
         }

@@ -259,6 +259,7 @@ public class MessagePipeline {
         MENTION,
         TOPONLINE,
         ONLINE,
+        PADDING,
         SWEAR,
         QUESTION,
         TRANSLATION,

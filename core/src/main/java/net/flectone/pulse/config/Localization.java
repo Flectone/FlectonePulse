@@ -1106,6 +1106,9 @@ public record Localization(
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object")
                 Object object,
 
+                @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/padding")
+                Padding padding,
+
                 @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement")
                 Replacement replacement,
 
@@ -1148,6 +1151,25 @@ public record Localization(
             public record Object(
                     String defaultSymbol
             ) implements LocalizationSetting {
+            }
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Padding(
+                    Map<String, Value> values
+            ) implements LocalizationSetting {
+
+                @With
+                @Builder(toBuilder = true)
+                @Jacksonized
+                public record Value(
+                        String symbol,
+                        String start,
+                        String end
+                ){
+                }
+
             }
 
             @With

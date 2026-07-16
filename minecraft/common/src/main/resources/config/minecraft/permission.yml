@@ -865,6 +865,16 @@ message:
       texture_tag:
         name: "flectonepulse.module.message.format.object.texture"
         type: "OP"
+    padding:
+      name: "flectonepulse.module.message.format.padding"
+      type: "OP"
+      values:
+        example_left_5:
+          name: "flectonepulse.module.message.format.padding.example_left_5"
+          type: "TRUE"
+        example_center_10:
+          name: "flectonepulse.module.message.format.padding.example_center_10"
+          type: "TRUE"
     question_answer:
       name: "flectonepulse.module.message.format.questionanswer"
       type: "TRUE"

@@ -25,6 +25,7 @@ import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.names.NamesModule;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
+import net.flectone.pulse.module.message.format.padding.PaddingModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
@@ -73,6 +74,7 @@ public class FormatModule implements ModuleLocalization<Localization.Message.For
                 ModerationModule.class,
                 NamesModule.class,
                 ObjectModule.class,
+                PaddingModule.class,
                 QuestionAnswerModule.class,
                 ReplacementModule.class,
                 TranslateModule.class,

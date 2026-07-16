@@ -71,6 +71,7 @@ public interface MessageMerger {
     @Mapping(target = "moderation", expression = "java(mergeFormatModeration(target.build().moderation().toBuilder(), source.moderation()))")
     @Mapping(target = "names", expression = "java(mergeFormatNames(target.build().names().toBuilder(), source.names()))")
     @Mapping(target = "object", expression = "java(mergeFormatObject(target.build().object().toBuilder(), source.object()))")
+    @Mapping(target = "padding", expression = "java(mergeFormatPadding(target.build().padding().toBuilder(), source.padding()))")
     @Mapping(target = "questionAnswer", expression = "java(mergeFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "translate", expression = "java(mergeFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
@@ -107,6 +108,8 @@ public interface MessageMerger {
     Message.Format.Names mergeFormatNames(@MappingTarget Message.Format.Names.NamesBuilder target, Message.Format.Names source);
 
     Message.Format.Object mergeFormatObject(@MappingTarget Message.Format.Object.ObjectBuilder target, Message.Format.Object source);
+
+    Message.Format.Padding mergeFormatPadding(@MappingTarget Message.Format.Padding.PaddingBuilder target, Message.Format.Padding source);
 
     Message.Format.QuestionAnswer mergeFormatQuestionAnswer(@MappingTarget Message.Format.QuestionAnswer.QuestionAnswerBuilder target, Message.Format.QuestionAnswer source);
 

@@ -331,6 +331,7 @@ public interface PermissionMerger {
     @Mapping(target = "moderation", expression = "java(mergeMessageFormatModeration(target.build().moderation().toBuilder(), source.moderation()))")
     @Mapping(target = "names", expression = "java(mergeMessageFormatNames(target.build().names().toBuilder(), source.names()))")
     @Mapping(target = "object", expression = "java(mergeMessageFormatObject(target.build().object().toBuilder(), source.object()))")
+    @Mapping(target = "padding", expression = "java(mergeMessageFormatPadding(target.build().padding().toBuilder(), source.padding()))")
     @Mapping(target = "questionAnswer", expression = "java(mergeMessageFormatQuestionAnswer(target.build().questionAnswer().toBuilder(), source.questionAnswer()))")
     @Mapping(target = "replacement", expression = "java(mergeMessageFormatReplacement(target.build().replacement().toBuilder(), source.replacement()))")
     @Mapping(target = "translate", expression = "java(mergeMessageFormatTranslate(target.build().translate().toBuilder(), source.translate()))")
@@ -367,6 +368,8 @@ public interface PermissionMerger {
     Permission.Message.Format.Names mergeMessageFormatNames(@MappingTarget Permission.Message.Format.Names.NamesBuilder target, Permission.Message.Format.Names source);
 
     Permission.Message.Format.Object mergeMessageFormatObject(@MappingTarget Permission.Message.Format.Object.ObjectBuilder target, Permission.Message.Format.Object source);
+
+    Permission.Message.Format.Padding mergeMessageFormatPadding(@MappingTarget Permission.Message.Format.Padding.PaddingBuilder target, Permission.Message.Format.Padding source);
 
     Permission.Message.Format.QuestionAnswer mergeMessageFormatQuestionAnswer(@MappingTarget Permission.Message.Format.QuestionAnswer.QuestionAnswerBuilder target, Permission.Message.Format.QuestionAnswer source);
 

@@ -243,6 +243,15 @@ format:
       mineskin_api_key: ""
       values:
         example: ""
+  padding:
+    enable: true
+    values:
+      example_left_5:
+        type: LEFT
+        length: 5
+      example_center_10:
+        type: CENTER
+        length: 10
   question_answer:
     enable: false
     questions:
