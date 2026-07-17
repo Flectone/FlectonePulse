@@ -44,16 +44,7 @@ public class PulsePlayerLoadListener implements PulseListener {
     public PlayerLoadEvent onPlayerLoadEvent(PlayerLoadEvent event) {
         FPlayer fPlayer = event.player();
 
-        // player uuid
         UUID currentPlayerUUID = fPlayer.uuid();
-
-        // clears the cache of players who might have left or not in online cache from other servers
-        if (!event.reload() && proxyRegistry.hasEnabledProxy() && platformServerAdapter.isOnlyPlayerOnline(currentPlayerUUID)) {
-            fPlayerService.invalidateCache();
-            fPlayerService.addConsole();
-            fPlayerService.loadOnlineCache();
-        }
-
         String currentPlayerName = platformPlayerAdapter.getName(currentPlayerUUID);
         String currentPlayerIp = platformPlayerAdapter.getIp(currentPlayerUUID);
 
