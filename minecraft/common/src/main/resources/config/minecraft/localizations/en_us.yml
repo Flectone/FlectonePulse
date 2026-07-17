@@ -481,6 +481,14 @@ command:
       header: "<fcolor:2>▋ Player whitelist records: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Delete record <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+  whois:
+    empty: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>No players with that IP found"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Page not found"
+    online: "<hover:show_text:\"<color:#98FB98>Online\"><white><sprite_or:\"☑\":gui:icon/ping_5></white></hover>"
+    offline: "<hover:show_text:\"<color:#ff7171>Offline\"><white><sprite_or:\"☒\":gui:icon/ping_unknown></white></hover>"
+    header: "<fcolor:2>▋ <fcolor:1>Players with IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"
+    line: "<fcolor:1><online><hover:show_text:\"<color:#9955FF>View playtime\"><click:run_command:\"<command_online> total <target_name>\"><color:#9955FF><sprite_or:\"[PLAYTIME]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#00FFCC>View geolocation\"><click:run_command:\"<command_geolocate> <ip>\"><color:#00FFCC><sprite_or:\"[GEOLOCATION]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#00FF00>View whitelist\"><click:run_command:\"<command_whitelist> list <target_name>\"><color:#00FF00><sprite_or:\"[WHITELIST]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FFEE00>View warnings\"><click:run_command:\"<command_warnlist> <target_name>\"><color:#FFEE00><sprite_or:\"[WARNINGS]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FF8800>View mutes\"><click:run_command:\"<command_mutelist> <target_name>\"><color:#FF8800><sprite_or:\"[MUTES]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FF0000>View bans\"><click:run_command:\"<command_banlist> <target_name>\"><color:#FF0000><sprite_or:\"[BANS]\":gui:container/crafter/disabled_slot></color></click></hover><target>"
+    footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
 integration:
   discord:
     null_player: "This player does not exist"

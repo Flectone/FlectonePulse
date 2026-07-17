@@ -481,6 +481,14 @@ command:
       header: "<fcolor:2>▋ Записи игрока в белом списке: <count> <br>"
       line: "<hover:show_text:\"<fcolor:1>Удалить запись <target>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <target></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>"
       footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
+  whois:
+    empty: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Игроков с таким айпи не найдено"
+    null_page: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Страница не найдена"
+    online: "<hover:show_text:\"<color:#98FB98>В сети\"><white><sprite_or:\"☑\":gui:icon/ping_5></white></hover>"
+    offline: "<hover:show_text:\"<color:#ff7171>Не в сети\"><white><sprite_or:\"☒\":gui:icon/ping_unknown></white></hover>"
+    header: "<fcolor:2>▋ <fcolor:1>Игроков с IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"
+    line: "<fcolor:1><online><hover:show_text:\"<color:#9955FF>Посмотреть время игры\"><click:run_command:\"<command_online> total <target_name>\"><color:#9955FF><sprite_or:\"[ВРЕМЯ ИГРЫ]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#00FFCC>Посмотреть геолокацию\"><click:run_command:\"<command_geolocate> <ip>\"><color:#00FFCC><sprite_or:\"[ГЕОЛОКАЦИЯ]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#00FF00>Посмотреть белый список\"><click:run_command:\"<command_whitelist> list <target_name>\"><color:#00FF00><sprite_or:\"[БЕЛЫЙ СПИСОК]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FFEE00>Посмотреть предупреждения\"><click:run_command:\"<command_warnlist> <target_name>\"><color:#FFEE00><sprite_or:\"[ПРЕДУПРЕЖДЕНИЯ]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FF8800>Посмотреть муты\"><click:run_command:\"<command_mutelist> <target_name>\"><color:#FF8800><sprite_or:\"[МУТЫ]\":gui:container/crafter/disabled_slot></color></click></hover><hover:show_text:\"<color:#FF0000>Посмотреть баны\"><click:run_command:\"<command_banlist> <target_name>\"><color:#FF0000><sprite_or:\"[БАНЫ]\":gui:container/crafter/disabled_slot></color></click></hover><target>"
+    footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
 integration:
   discord:
     null_player: "Игрок не найден"

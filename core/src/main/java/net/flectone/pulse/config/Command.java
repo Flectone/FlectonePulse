@@ -176,7 +176,10 @@ public record Command(
         Warnlist warnlist,
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
-        Whitelist whitelist
+        Whitelist whitelist,
+
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whois")
+        Whois whois
 
 ) implements EnableSetting {
 
@@ -905,6 +908,18 @@ public record Command(
             String subCommandPlayer,
             List<String> aliases,
             Destination destination,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Whois(
+            Boolean enable,
+            Integer perPage,
+            List<String> aliases,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {

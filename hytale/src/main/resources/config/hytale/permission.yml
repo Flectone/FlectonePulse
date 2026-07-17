@@ -546,6 +546,15 @@ command:
     sound:
       name: "flectonepulse.module.command.whitelist.sound"
       type: "TRUE"
+  whois:
+    name: "flectonepulse.module.command.whois"
+    type: "OP"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.whois.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.whois.sound"
+      type: "TRUE"
 integration:
   name: "flectonepulse.module.integration"
   type: "TRUE"

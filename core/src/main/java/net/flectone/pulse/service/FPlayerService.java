@@ -360,6 +360,29 @@ public class FPlayerService {
     }
 
     /**
+     * Gets the total count of players with the specified IP address.
+     *
+     * @param ip the IP address to count players for
+     * @return the total number of players with the given IP
+     */
+    public int getTotalFPlayersCountByIp(@NonNull String ip) {
+        return fPlayerRepository.getTotalPlayersCountByIp(ip);
+    }
+
+    /**
+     * Gets a paginated list of players with the specified IP address.
+     *
+     * @param ip the IP address to filter players by
+     * @param limit the maximum number of players to return
+     * @param offset the number of players to skip
+     * @return list of players matching the IP, ordered by ID descending
+     */
+    @NonNull
+    public List<FPlayer> getFPlayersByIp(String ip, int limit, int offset) {
+        return fPlayerRepository.getPlayersByIp(ip, limit, offset);
+    }
+
+    /**
      * Gets all players from the database.
      *
      * @return list of all FPlayers in the database

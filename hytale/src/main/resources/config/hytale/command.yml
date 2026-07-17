@@ -901,3 +901,12 @@ whitelist:
     enable: false
   sound:
     enable: false
+whois:
+  enable: true
+  per_page: 4
+  aliases:
+    - "whois"
+  cooldown:
+    enable: false
+  sound:
+    enable: false

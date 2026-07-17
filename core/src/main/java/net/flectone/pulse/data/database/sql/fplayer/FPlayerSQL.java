@@ -106,6 +106,26 @@ public interface FPlayerSQL extends SQL {
     List<FPlayerDAO.PlayerInfo> getOnlinePlayers();
 
     /**
+     * Gets the total count of players with the specified IP address.
+     *
+     * @param ip the IP address to count players for
+     * @return the total number of players with the given IP
+     */
+    @SqlQuery("SELECT COUNT(id) FROM `fp_player` WHERE `ip` = :ip")
+    int getTotalPlayersCountByIp(@Bind("ip") String ip);
+
+    /**
+     * Gets a paginated list of players with the specified IP address.
+     *
+     * @param ip the IP address to filter players by
+     * @param limit the maximum number of players to return
+     * @param offset the number of players to skip
+     * @return list of player info matching the IP, ordered by ID descending
+     */
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip ORDER BY `id` DESC LIMIT :limit OFFSET :offset")
+    List<FPlayerDAO.PlayerInfo> getPlayersByIp(@Bind("ip") String ip, @Bind("limit") int limit, @Bind("offset") int offset);
+
+    /**
      * Gets all players.
      *
      * @return list of all player info

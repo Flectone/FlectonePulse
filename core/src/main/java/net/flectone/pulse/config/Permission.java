@@ -194,7 +194,11 @@ public record Permission(
             Warnlist warnlist,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
-            Whitelist whitelist
+            Whitelist whitelist,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whois")
+            Whois whois
+
     ) implements PermissionSetting {
 
         @With
@@ -733,6 +737,18 @@ public record Permission(
                 PermissionEntry sound
         ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {
         }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Whois(
+                String name,
+                Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {
+        }
+
     }
 
     @With
@@ -1478,15 +1494,6 @@ public record Permission(
                     String name,
                     Permission.Type type,
                     Map<String, PermissionEntry> values
-            ) implements PermissionSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            public record Spoiler(
-                    String name,
-                    Permission.Type type
             ) implements PermissionSetting {
             }
 

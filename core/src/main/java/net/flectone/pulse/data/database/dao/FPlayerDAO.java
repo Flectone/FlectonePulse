@@ -177,6 +177,32 @@ public class FPlayerDAO implements BaseDAO<FPlayerSQL> {
     }
 
     /**
+     * Gets the total count of players with the specified IP address.
+     *
+     * @param ip the IP address to count players for
+     * @return the total number of players with the given IP, or 0 if the database is closed
+     */
+    public int getTotalFPlayersCountByIp(@NonNull String ip) {
+        if (database.isClosed()) return 0;
+
+        return withHandle(sql -> sql.getTotalPlayersCountByIp(ip));
+    }
+
+    /**
+     * Gets a paginated list of players with the specified IP address.
+     *
+     * @param ip the IP address to filter players by
+     * @param limit the maximum number of players to return
+     * @param offset the number of players to skip
+     * @return list of players matching the IP, ordered by ID descending, or an empty list if the database is closed
+     */
+    public List<FPlayer> getFPlayersByIp(@NonNull String ip, int limit, int offset) {
+        if (database.isClosed()) return List.of();
+
+        return withHandle(sql -> convertToFPlayers(sql.getPlayersByIp(ip, limit, offset)));
+    }
+
+    /**
      * Gets all players from the database.
      *
      * @return list of all players

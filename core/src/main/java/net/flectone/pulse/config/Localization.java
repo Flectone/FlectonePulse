@@ -201,7 +201,11 @@ public record Localization(
             Warnlist warnlist,
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whitelist")
-            Whitelist whitelist
+            Whitelist whitelist,
+
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/whois")
+            Whois whois
+
     ) implements LocalizationSetting {
 
         @With
@@ -859,6 +863,21 @@ public record Localization(
                 ListTypeMessage player
         ) implements LocalizationSetting, ModerationListLocalizationSetting {
         }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Whois(
+                String empty,
+                String nullPage,
+                String online,
+                String offline,
+                String header,
+                String line,
+                String footer
+        ) implements LocalizationSetting {
+        }
+
     }
 
     @With

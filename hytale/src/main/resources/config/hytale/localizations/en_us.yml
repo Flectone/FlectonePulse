@@ -481,6 +481,14 @@ command:
       header: "<fcolor:2>| Player whitelist records: <count> <br>"
       line: "<color:#ff7171>[X] <target> <fcolor:1>Reason: <reason>"
       footer: "<br><fcolor:2>| <click:run_command:\"<command> <prev_page>\">[<]</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">[>]"
+  whois:
+    empty: "<color:#ff7171>No players with that IP found"
+    null_page: "<color:#ff7171>Page not found"
+    online: "<hover:show_text:\"<color:#98FB98>Online\"><color:#98FB98>[+]</color></hover>"
+    offline: "<hover:show_text:\"<color:#ff7171>Offline\"><color:#ff7171>[-]</color></hover>"
+    header: "<fcolor:2>▋ <fcolor:1>Players with IP <fcolor:2><ip><fcolor:1>: <fcolor:2><count> <br>"
+    line: "<fcolor:1><online><hover:show_text:\"<color:#9955FF>View playtime\"><click:run_command:\"<command_online> total <target_name>\"><color:#9955FF>[PLAYTIME]</color></click></hover><hover:show_text:\"<color:#00FFCC>View geolocation\"><click:run_command:\"<command_geolocate> <ip>\"><color:#00FFCC>[GEOLOCATION]</color></click></hover><hover:show_text:\"<color:#00FF00>View whitelist\"><click:run_command:\"<command_whitelist> list <target_name>\"><color:#00FF00>[WHITELIST]</color></click></hover><hover:show_text:\"<color:#FFEE00>View warnings\"><click:run_command:\"<command_warnlist> <target_name>\"><color:#FFEE00>[WARNINGS]</color></click></hover><hover:show_text:\"<color:#FF8800>View mutes\"><click:run_command:\"<command_mutelist> <target_name>\"><color:#FF8800>[MUTES]</color></click></hover><hover:show_text:\"<color:#FF0000>View bans\"><click:run_command:\"<command_banlist> <target_name>\"><color:#FF0000>[BANS]</color></click></hover><target>"
+    footer: "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
 integration:
   discord:
     null_player: "This player does not exist"
