@@ -23,6 +23,7 @@ import java.util.UUID;
 
 public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
+    private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final String CHANNEL = "BungeeCord";
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
@@ -82,16 +83,15 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
     @EventHandler
     public void onDisconnectEvent(PlayerDisconnectEvent event) {
-        UUID playerUUID = event.getPlayer().getUniqueId();
+        ProxiedPlayer player = event.getPlayer();
+        UUID playerUUID = player.getUniqueId();
 
         // clear pending connection
         pendingConnections.remove(playerUUID);
 
-        Server server = event.getPlayer().getServer();
-        if (server == null) return;
-
         if (bungeeDisconnectListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED) {
-            String serverName = server.getInfo().getName();
+            Server server = event.getPlayer().getServer();
+            String serverName = server != null ? server.getInfo().getName() : UNKNOWN_SERVER_NAME;
             ProxyServer.getInstance().getServers().values().stream()
                     .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
                     .forEach(serverInfo -> ProxySender.send(
@@ -107,12 +107,11 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
 
     private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
-        if (player == null) return;
 
-        Server server = player.getServer();
-        if (server == null) return;
-
-        String serverName = server.getInfo().getName();
+        String serverName = player != null
+                ? player.getServer() != null
+                  ? player.getServer().getInfo().getName() : UNKNOWN_SERVER_NAME
+                : UNKNOWN_SERVER_NAME;
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())

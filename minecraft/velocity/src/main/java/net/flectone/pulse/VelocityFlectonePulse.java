@@ -10,9 +10,7 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -21,7 +19,10 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Plugin(
         id = "flectonepulse",
@@ -33,6 +34,7 @@ import java.util.*;
 )
 public class VelocityFlectonePulse {
 
+    private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
@@ -109,10 +111,10 @@ public class VelocityFlectonePulse {
         pendingConnections.remove(playerUUID);
 
         if (velocityLoginStateListener.getLoginStatus(playerUUID) == LoginStatus.CONNECTED) {
-            Optional<ServerConnection> serverConnection = event.getPlayer().getCurrentServer();
-            if (serverConnection.isEmpty()) return;
+            String serverName = event.getPlayer().getCurrentServer()
+                    .map(serverConnection -> serverConnection.getServerInfo().getName())
+                    .orElse(UNKNOWN_SERVER_NAME);
 
-            String serverName = serverConnection.get().getServerInfo().getName();
             proxyServer.getAllServers().stream()
                     .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
                     .forEach(registeredServer -> ProxySender.send(
@@ -127,13 +129,12 @@ public class VelocityFlectonePulse {
     }
 
     private void sendPlayerConnectedEvent(UUID playerUUID, boolean firstTime) {
-        Optional<Player> player = proxyServer.getPlayer(playerUUID);
-        if (player.isEmpty()) return;
-
-        Optional<ServerConnection> serverConnection = player.get().getCurrentServer();
-        if (serverConnection.isEmpty()) return;
-
-        String serverName = serverConnection.get().getServerInfo().getName();
+        String serverName = proxyServer.getPlayer(playerUUID)
+                .map(player -> player.getCurrentServer()
+                        .map(serverConnection -> serverConnection.getServerInfo().getName())
+                        .orElse(UNKNOWN_SERVER_NAME)
+                )
+                .orElse(UNKNOWN_SERVER_NAME);
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
