@@ -169,39 +169,45 @@ public class FPlayerService {
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
         if (proxyRegistry.hasEnabledProxy()) {
             taskScheduler.runAsyncTimer(() -> {
-                // clears the cache of players who might have left from other servers
-                if (platformPlayerAdapter.getOnlinePlayers().isEmpty()) {
-                    invalidateCache();
-                    addConsole();
-                    loadOnlineCache();
-                }
+                List<FPlayer> onlineCachedPlayers = fPlayerRepository.getOnlinePlayers();
+                List<FPlayer> onlineDatabasePlayers = fPlayerRepository.getOnlinePlayersDatabase();
+
+                onlineCachedPlayers.forEach(fPlayer -> {
+                    if (!onlineDatabasePlayers.contains(fPlayer)) {
+                        fPlayerRepository.removeOnline(fPlayer);
+                    }
+                });
+
+                onlineDatabasePlayers.forEach(fPlayer -> {
+                    if (!onlineCachedPlayers.contains(fPlayer)) {
+                        addCache(fPlayer);
+                    }
+                });
+
+                List<UUID> platformPlayers = platformPlayerAdapter.getOnlinePlayers();
+                platformPlayers.forEach(uuid -> {
+                    if (onlineDatabasePlayers.stream().anyMatch(fPlayer -> fPlayer.uuid().equals(uuid))) return;
+
+                    FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
+                    if (fPlayer.isOnline()) return;
+
+                    fPlayer = fPlayer.withOnline(true);
+
+                    fPlayerRepository.update(fPlayer);
+
+                    addCache(fPlayer);
+                });
             }, 20L, 20L);
         }
     }
 
     /**
      * Removes a player from offline cache and optionally ensures online status for proxy players.
-     * Fixes race condition where proxy might report player offline while they're actually online.
      *
      * @param uuid the UUID of the player to remove from offline cache
-     * @param proxy whether this is called from proxy context (ensures online status if needed)
      */
-    public void invalidateOfflineCache(@NonNull UUID uuid, boolean proxy) {
+    public void invalidateOfflineCache(@NonNull UUID uuid) {
         fPlayerRepository.removeOffline(uuid);
-
-        // idk why, but sometimes Proxy player offline, although he is already on the server.
-        // I think that request that player is logged in is sent before request as player exits.
-        // this is the only way to fix it
-        if (proxy) {
-            FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
-            if (!fPlayer.isOnline()) {
-                // update online cache
-                fPlayer = updateCache(fPlayer.withOnline(true));
-
-                // save to database
-                fPlayerRepository.update(fPlayer);
-            }
-        }
     }
 
     /**

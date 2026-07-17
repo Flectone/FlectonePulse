@@ -588,7 +588,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         fPlayerService.saveOrUpdate(uuid, StringUtils.left(resolvedName, 16), playerIp, isOnline);
 
         // invalidate cached unknown player
-        fPlayerService.invalidateOfflineCache(uuid, false);
+        fPlayerService.invalidateOfflineCache(uuid);
 
         return fPlayerService.getFPlayer(uuid);
     }
