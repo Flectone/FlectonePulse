@@ -165,39 +165,54 @@ public class FPlayerService {
             }
         });
 
-        // if no one was on the server, the cache may be invalid for other servers
-        // because FlectonePulse on Proxy cannot send a message for servers that have no player
+        // if we have proxy mode enabled, we can't always be sure that the players are synchronized between servers
+        // we need to handle cases where a server doesn't send or receive a request through Proxy for some reason, resulting in incorrect player status
         if (proxyRegistry.hasEnabledProxy()) {
             taskScheduler.runAsyncTimer(() -> {
+                // online players of the current server, which are stored in cache
                 List<FPlayer> onlineCachedPlayers = fPlayerRepository.getOnlinePlayers();
+
+                // online players from the database before we start checking
                 List<FPlayer> onlineDatabasePlayers = fPlayerRepository.getOnlinePlayersDatabase();
 
+                // first, we need to make sure that online players in cache are actually online
                 onlineCachedPlayers.forEach(fPlayer -> {
+                    // we check their status in the database
                     if (!onlineDatabasePlayers.contains(fPlayer)) {
+                        // and if it's not online, we need to remove them from the cache
                         fPlayerRepository.removeOnline(fPlayer);
                     }
                 });
 
+                // next, we need to check that online players in the database are in the local online cache
                 onlineDatabasePlayers.forEach(fPlayer -> {
                     if (!onlineCachedPlayers.contains(fPlayer)) {
+                        // if they are not, we add them
                         addCache(fPlayer);
                     }
                 });
 
+                // the most important thing!
+                // during these operations, another server may have already changed player's status in cache and database
+                // we need to get all online players on the current server and check that their status in the database
                 List<UUID> platformPlayers = platformPlayerAdapter.getOnlinePlayers();
                 platformPlayers.forEach(uuid -> {
+                    // if it is not online, we need to get player from the database and check their current status
                     if (onlineDatabasePlayers.stream().anyMatch(fPlayer -> fPlayer.uuid().equals(uuid))) return;
 
                     FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
-                    if (fPlayer.isOnline()) return;
 
-                    fPlayer = fPlayer.withOnline(true);
+                    // if player is not online even in the database, we need to update their status to online
+                    if (!fPlayer.isOnline()) {
+                        fPlayer = fPlayer.withOnline(true);
 
-                    fPlayerRepository.update(fPlayer);
+                        fPlayerRepository.update(fPlayer);
+                    }
 
+                    // finally, we need to add player to online cache
                     addCache(fPlayer);
                 });
-            }, 20L, 20L);
+            }, 20L, 20L); // I think 1 second is enough to avoid visual sync problems
         }
     }
 
