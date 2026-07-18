@@ -1,8 +1,10 @@
 package net.flectone.pulse.execution.pipeline;
 
+import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -31,8 +33,9 @@ public class HytaleMessagePipeline extends MessagePipeline {
                                  MiniMessage miniMessage,
                                  EventDispatcher eventDispatcher,
                                  ComponentSerializer componentSerializer,
-                                 Provider<SocialService> socialServiceProvider) {
-        super(fLogger, miniMessage, eventDispatcher, componentSerializer);
+                                 Provider<SocialService> socialServiceProvider,
+                                 @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache) {
+        super(fLogger, miniMessage, eventDispatcher, componentSerializer, messageContextCache);
 
         this.socialServiceProvider = socialServiceProvider;
     }
