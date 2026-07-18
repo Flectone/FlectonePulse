@@ -362,7 +362,7 @@ rightclick:
 scoreboard:
   enable: true
   name_visible: false
-  name_distance: 0
+  name_distance: -1
   hide_name_when_sneaking: false
   color: "<white>"
   ticker:
