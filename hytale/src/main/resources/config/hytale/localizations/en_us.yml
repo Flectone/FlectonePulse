@@ -254,6 +254,28 @@ command:
     person: "<color:#ff7171>[*] <reason> (<time_left>)"
   me:
     format: "<fcolor:1>> <display_name> <fcolor:1><message>"
+  minesweeper:
+    wrong_parameters: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Cannot create a game with these parameters"
+    wrong_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This game does not exist"
+    wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This move is impossible"
+    cell:
+      unknown: "<fcolor:1><hover:show_text:\"<fcolor:1>Move <row> <column>\"><click:run_command:\"<command> move <row> <column>\">⓪</click></hover>"
+      flag: "<color:#ffb74d><hover:show_text:\"<color:#ffb74d>Remove flag <row> <column>\"><click:run_command:\"<command> move <row> <column>\">⓪</click></hover>"
+      mine: "<color:#ff7171>⓪"
+      number_0: "<color:#c8ccd4>⓪"
+      number_1: "<color:#5b9bd5>①"
+      number_2: "<color:#6aab73>②"
+      number_3: "<color:#3cc4b0>③"
+      number_4: "<color:#7b6fbe>④"
+      number_5: "<color:#b05279>⑤"
+      number_6: "<color:#5599b0>⑥"
+      number_7: "<color:#6b7c8a>⑦"
+      number_8: "<color:#9ba0a8>⑧"
+    line: "<padding:3><fcolor:1>| <line> <fcolor:1>|<br>"
+    format_start: "<br><padding:8><fcolor:2>Minesweeper</fcolor> <color:#ff7171>💣 <remaining></color> <hover:show_text:\"<fcolor:1>Last move → <row> <column><br>Click to copy seed\"><click:copy_to_clipboard:'<seed>'><color:#ffb74d>🔑</color></click></hover><br><br><field>"
+    format_move: "<br><padding:8><fcolor:2>Minesweeper</fcolor> <color:#ff7171>💣 <remaining></color> <hover:show_text:\"<fcolor:1>Last move → <row> <column><br>Click to copy seed\"><click:copy_to_clipboard:'<seed>'><color:#ffb74d>🔑</color></click></hover><br><br><field>"
+    format_win: "<padding:7><color:#98FB98>Victory!</color> <color:#ff7171>💣 <remaining></color> <hover:show_text:\"<fcolor:1>Last move → <row> <column><br>Click to copy seed\"><click:copy_to_clipboard:'<seed>'><color:#ffb74d>🔑</color></click></hover><br><br><field>"
+    format_lose: "<padding:5><color:#ff7171>Defeat!</color> <color:#ff7171>💣 <remaining></color> <hover:show_text:\"<fcolor:1>Last move → <row> <column><br>Click to copy seed\"><click:copy_to_clipboard:'<seed>'><color:#ffb74d>🔑</color></click></hover><br><br><field>"
   mute:
     null_player: "<color:#ff7171>This player does not exist"
     null_time: "<color:#ff7171>Incorrect time"

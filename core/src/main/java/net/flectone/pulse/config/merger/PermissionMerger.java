@@ -50,6 +50,7 @@ public interface PermissionMerger {
     @Mapping(target = "mail", expression = "java(mergeCommandMail(target.build().mail().toBuilder(), source.mail()))")
     @Mapping(target = "maintenance", expression = "java(mergeCommandMaintenance(target.build().maintenance().toBuilder(), source.maintenance()))")
     @Mapping(target = "me", expression = "java(mergeCommandMe(target.build().me().toBuilder(), source.me()))")
+    @Mapping(target = "minesweeper", expression = "java(mergeCommandMinesweeper(target.build().minesweeper().toBuilder(), source.minesweeper()))")
     @Mapping(target = "mute", expression = "java(mergeCommandMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeCommandMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
     @Mapping(target = "nickname", expression = "java(mergeCommandNickname(target.build().nickname().toBuilder(), source.nickname()))")
@@ -123,6 +124,8 @@ public interface PermissionMerger {
     Permission.Command.Maintenance mergeCommandMaintenance(@MappingTarget Permission.Command.Maintenance.MaintenanceBuilder target, Permission.Command.Maintenance source);
 
     Permission.Command.Me mergeCommandMe(@MappingTarget Permission.Command.Me.MeBuilder target, Permission.Command.Me source);
+
+    Permission.Command.Minesweeper mergeCommandMinesweeper(@MappingTarget Permission.Command.Minesweeper.MinesweeperBuilder target, Permission.Command.Minesweeper source);
 
     Permission.Command.Mute mergeCommandMute(@MappingTarget Permission.Command.Mute.MuteBuilder target, Permission.Command.Mute source);
 

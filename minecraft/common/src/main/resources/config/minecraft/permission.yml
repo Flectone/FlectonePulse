@@ -327,6 +327,15 @@ command:
     sound:
       name: "flectonepulse.module.command.me.sound"
       type: "TRUE"
+  minesweeper:
+    name: "flectonepulse.module.command.minesweeper"
+    type: "TRUE"
+    cooldown_bypass:
+      name: "flectonepulse.module.command.minesweeper.cooldown.bypass"
+      type: "OP"
+    sound:
+      name: "flectonepulse.module.command.minesweeper.sound"
+      type: "TRUE"
   mute:
     name: "flectonepulse.module.command.mute"
     type: "OP"

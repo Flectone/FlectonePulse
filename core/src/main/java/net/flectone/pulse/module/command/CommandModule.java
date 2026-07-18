@@ -32,6 +32,7 @@ import net.flectone.pulse.module.command.kick.KickModule;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.command.me.MeModule;
+import net.flectone.pulse.module.command.minesweeper.MinesweeperModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.mutelist.MutelistModule;
 import net.flectone.pulse.module.command.nickname.NicknameModule;
@@ -93,6 +94,7 @@ public class CommandModule implements ModuleSimple {
                 MailModule.class,
                 MaintenanceModule.class,
                 MeModule.class,
+                MinesweeperModule.class,
                 MuteModule.class,
                 MutelistModule.class,
                 NicknameModule.class,

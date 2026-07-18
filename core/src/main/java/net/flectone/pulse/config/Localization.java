@@ -133,6 +133,9 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me")
             Me me,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/minesweeper")
+            Minesweeper minesweeper,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute")
             Mute mute,
 
@@ -519,6 +522,50 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Me(String format) implements LocalizationSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Minesweeper(
+                String wrongParameters,
+                String wrongGame,
+                String wrongMove,
+                Cell cell,
+                String line,
+                String formatStart,
+                String formatMove,
+                String formatWin,
+                String formatLose
+        ) implements LocalizationSetting {
+
+            @With
+            @Builder(toBuilder = true)
+            @Jacksonized
+            public record Cell(
+                    String unknown,
+                    String flag,
+                    String mine,
+                    @JsonProperty("number_0")
+                    String number0,
+                    @JsonProperty("number_1")
+                    String number1,
+                    @JsonProperty("number_2")
+                    String number2,
+                    @JsonProperty("number_3")
+                    String number3,
+                    @JsonProperty("number_4")
+                    String number4,
+                    @JsonProperty("number_5")
+                    String number5,
+                    @JsonProperty("number_6")
+                    String number6,
+                    @JsonProperty("number_7")
+                    String number7,
+                    @JsonProperty("number_8")
+                    String number8
+            ) {
+            }
         }
 
         @With

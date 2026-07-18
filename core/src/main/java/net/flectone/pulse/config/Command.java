@@ -108,6 +108,9 @@ public record Command(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me")
         Me me,
 
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/minesweeper")
+        Minesweeper minesweeper,
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute")
         Mute mute,
 
@@ -578,6 +581,20 @@ public record Command(
             Range range,
             List<String> aliases,
             Destination destination,
+            Cooldown cooldown,
+            Sound sound
+    ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {
+    }
+
+    @With
+    @Builder(toBuilder = true)
+    @Jacksonized
+    public record Minesweeper(
+            Boolean enable,
+            Integer maxRow,
+            Integer maxColumn,
+            Integer defaultMine,
+            List<String> aliases,
             Cooldown cooldown,
             Sound sound
     ) implements CommandSetting, CooldownConfigSetting, SoundConfigSetting {

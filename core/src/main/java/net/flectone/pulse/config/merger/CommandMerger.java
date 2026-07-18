@@ -42,6 +42,7 @@ public interface CommandMerger {
     @Mapping(target = "mail", expression = "java(mergeMail(target.build().mail().toBuilder(), source.mail()))")
     @Mapping(target = "maintenance", expression = "java(mergeMaintenance(target.build().maintenance().toBuilder(), source.maintenance()))")
     @Mapping(target = "me", expression = "java(mergeMe(target.build().me().toBuilder(), source.me()))")
+    @Mapping(target = "minesweeper", expression = "java(mergeMinesweeper(target.build().minesweeper().toBuilder(), source.minesweeper()))")
     @Mapping(target = "mute", expression = "java(mergeMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
     @Mapping(target = "nickname", expression = "java(mergeNickname(target.build().nickname().toBuilder(), source.nickname()))")
@@ -134,6 +135,8 @@ public interface CommandMerger {
     Command.Maintenance mergeMaintenance(@MappingTarget Command.Maintenance.MaintenanceBuilder target, Command.Maintenance source);
 
     Command.Me mergeMe(@MappingTarget Command.Me.MeBuilder target, Command.Me source);
+
+    Command.Minesweeper mergeMinesweeper(@MappingTarget Command.Minesweeper.MinesweeperBuilder target, Command.Minesweeper source);
 
     Command.Mute mergeMute(@MappingTarget Command.Mute.MuteBuilder target, Command.Mute source);
 

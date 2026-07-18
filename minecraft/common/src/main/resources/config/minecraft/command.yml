@@ -560,6 +560,17 @@ me:
     enable: false
   sound:
     enable: false
+minesweeper:
+  enable: true
+  max_row: 9
+  max_column: 9
+  default_mine: 10
+  aliases:
+    - "minesweeper"
+  cooldown:
+    enable: false
+  sound:
+    enable: false
 mute:
   enable: true
   filter_by_server: true

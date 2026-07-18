@@ -126,6 +126,9 @@ public record Permission(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me")
             Me me,
 
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/minesweeper")
+            Minesweeper minesweeper,
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute")
             Mute mute,
 
@@ -474,6 +477,17 @@ public record Permission(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Me(
+                String name,
+                Permission.Type type,
+                PermissionEntry cooldownBypass,
+                PermissionEntry sound
+        ) implements CooldownPermissionSetting, SoundPermissionSetting, PermissionSetting {
+        }
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Minesweeper(
                 String name,
                 Permission.Type type,
                 PermissionEntry cooldownBypass,

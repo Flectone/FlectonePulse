@@ -51,6 +51,7 @@ public interface LocalizationMerger {
     @Mapping(target = "mail", expression = "java(mergeCommandMail(target.build().mail().toBuilder(), source.mail()))")
     @Mapping(target = "maintenance", expression = "java(mergeCommandMaintenance(target.build().maintenance().toBuilder(), source.maintenance()))")
     @Mapping(target = "me", expression = "java(mergeCommandMe(target.build().me().toBuilder(), source.me()))")
+    @Mapping(target = "minesweeper", expression = "java(mergeCommandMinesweeper(target.build().minesweeper().toBuilder(), source.minesweeper()))")
     @Mapping(target = "mute", expression = "java(mergeCommandMute(target.build().mute().toBuilder(), source.mute()))")
     @Mapping(target = "mutelist", expression = "java(mergeCommandMutelist(target.build().mutelist().toBuilder(), source.mutelist()))")
     @Mapping(target = "nickname", expression = "java(mergeCommandNickname(target.build().nickname().toBuilder(), source.nickname()))")
@@ -139,6 +140,8 @@ public interface LocalizationMerger {
     Localization.Command.Maintenance mergeCommandMaintenance(@MappingTarget Localization.Command.Maintenance.MaintenanceBuilder target, Localization.Command.Maintenance source);
 
     Localization.Command.Me mergeCommandMe(@MappingTarget Localization.Command.Me.MeBuilder target, Localization.Command.Me source);
+
+    Localization.Command.Minesweeper mergeCommandMinesweeper(@MappingTarget Localization.Command.Minesweeper.MinesweeperBuilder target, Localization.Command.Minesweeper source);
 
     Localization.Command.Mute mergeCommandMute(@MappingTarget Localization.Command.Mute.MuteBuilder target, Localization.Command.Mute source);
 
