@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.minesweeper.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ public class Minesweeper {
     private final int[][] adjacentMineCount;
     private final boolean[][] revealed;
     private final boolean[][] flagged;
+
+    @Setter
+    private boolean flagMode = false;
 
     private boolean minesPlaced = false;
     private GameState state = GameState.IN_PROGRESS;

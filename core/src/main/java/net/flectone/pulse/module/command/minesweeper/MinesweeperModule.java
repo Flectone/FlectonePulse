@@ -23,6 +23,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -98,9 +99,15 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
         Optional<Integer> optionalRow = commandContext.optional(promptNumber + " " + 1);
         Optional<Integer> optionalColumn = commandContext.optional(promptNumber + " " + 2);
 
+        boolean isFlagCommand = type.equalsIgnoreCase("flag");
+        if (optionalRow.isEmpty() && optionalColumn.isEmpty() && isFlagCommand) {
+            minesweeper.setFlagMode(!minesweeper.isFlagMode());
+            sendMessage(fPlayer, minesweeper, config().maxRow(), config().maxColumn(), Localization.Command.Minesweeper::formatMove);
+            return;
+        }
+
         int row = optionalRow.orElse(config().maxRow());
         int column = optionalColumn.orElse(config().maxColumn());
-
         if (!minesweeper.checkBounds(row, column)) {
             messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Minesweeper>builder()
                     .sender(fPlayer)
@@ -110,7 +117,7 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
             return;
         }
 
-        if (type.equalsIgnoreCase("flag")) {
+        if (isFlagCommand || minesweeper.isFlagMode()) {
             flag(fPlayer, minesweeper, row, column);
         } else {
             move(fPlayer, minesweeper, row, column);
@@ -149,7 +156,7 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
 
         playerGames.put(fPlayer.uuid(), minesweeper);
 
-        sendMessage(fPlayer, minesweeper, rowCount, mineCount, Localization.Command.Minesweeper::formatStart);
+        sendMessage(fPlayer, minesweeper, rowCount, columnCount, Localization.Command.Minesweeper::formatStart);
     }
 
     private void flag(FPlayer fPlayer, Minesweeper minesweeper, int row, int column) {
@@ -191,8 +198,21 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
                         .sender(fPlayer)
                         .format(localization -> StringUtils.replaceEach(
                                 localizationFunction.apply(localization),
-                                new String[]{"<row>", "<column>", "<remaining>", "<seed>", "<field>"},
-                                new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount()), String.valueOf(minesweeper.getSeed()), render(minesweeper, localization)}
+                                new String[]{"<seed>", "<remaining>", "<flag>", "<field>"},
+                                new String[]{
+                                        StringUtils.replaceEach(
+                                                localization.seed(),
+                                                new String[]{"<row>", "<column>", "<seed>"},
+                                                new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getSeed())}
+                                        ),
+                                        String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount()),
+                                        Strings.CS.replace(
+                                                minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
+                                                "<command>",
+                                                commandModuleController.getCommandName(this)
+                                        ),
+                                        render(minesweeper, localization),
+                                }
                         ))
                         .sound(soundOrThrow())
                         .build()
