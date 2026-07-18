@@ -14,6 +14,7 @@ import net.flectone.pulse.data.repository.CooldownRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -140,6 +141,13 @@ public abstract class PlatformInjector extends AbstractModule {
     @Named("dialogClick")
     public Cache<UUID, AtomicInteger> provideDialogClickCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.DIALOG_CLICK);
+    }
+
+    @Provides
+    @Singleton
+    @Named("messageContext")
+    public Cache<MessageContext.CacheKey, Component> provideMessageContextCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.MESSAGE_CONTEXT);
     }
 
     @Provides

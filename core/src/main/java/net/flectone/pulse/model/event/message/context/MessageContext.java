@@ -152,4 +152,18 @@ public record MessageContext(
         return flags.getOrDefault(flag, flag.getDefaultValue());
     }
 
+    public CacheKey createCacheKey() {
+        return new CacheKey(this.flags(), this.tagResolver(), this.sender().uuid(), this.receiver().uuid(), this.message(), this.userMessage());
+    }
+
+    public record CacheKey(
+            @NonNull Map<MessageFlag, Boolean> flags,
+            @NonNull TagResolver tagResolver,
+            @NonNull UUID sender,
+            @NonNull UUID receiver,
+            @NonNull String message,
+            @Nullable String userMessage
+    ){
+    }
+
 }

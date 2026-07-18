@@ -1,8 +1,9 @@
 package net.flectone.pulse.execution.pipeline;
 
-import com.google.gson.JsonElement;
+import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
@@ -39,6 +40,7 @@ public class MessagePipeline {
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
     private final ComponentSerializer componentSerializer;
+    private final @Named("messageContext") Cache<MessageContext.CacheKey, Component> messageContextCache;
 
     @NonNull
     public String buildStandard(MessageContext messageContext) {
@@ -98,14 +100,15 @@ public class MessagePipeline {
     }
 
     @NonNull
-    public JsonElement buildJsonTree(MessageContext messageContext) {
-        return componentSerializer.toJsonTree(build(messageContext));
-    }
-
-    @NonNull
     public Component build(MessageContext messageContext) {
         // no need to build empty message
         if (StringUtils.isEmpty(messageContext.message())) return Component.empty();
+
+        // if a message is created very often, it can be retrieved from the cache
+        // because it is only 1 second and context of placeholders will be correct
+        MessageContext.CacheKey messageContextCacheKey = messageContext.createCacheKey();
+        Component cachedComponent = messageContextCache.getIfPresent(messageContextCacheKey);
+        if (cachedComponent != null) return cachedComponent;
 
         MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(messageContext));
         MessageContext eventContext = event.context();
@@ -119,17 +122,24 @@ public class MessagePipeline {
             );
         }
 
+        Component component;
         try {
-            return miniMessage.deserialize(
+            component = miniMessage.deserialize(
                     // always need to replace legacy § with & to avoid MiniMessage problems
                     Strings.CS.replace(eventContext.message(), "§", "&"),
                     eventContext.tagResolver()
             );
         } catch (Exception e) {
             fLogger.warning(e);
+
+            // fallback
+            component = Component.empty();
         }
 
-        return Component.empty();
+        // save to cache
+        messageContextCache.put(messageContextCacheKey, component);
+
+        return component;
     }
 
     public TagResolver messageTag(Component message) {

@@ -97,6 +97,11 @@ cache:
       duration: 1
       time_unit: "HOURS"
       size: 1000
+    MESSAGE_CONTEXT:
+      invalidate_on_reload: true
+      duration: 1
+      time_unit: "SECONDS"
+      size: 10000
     MODERATION:
       invalidate_on_reload: false
       duration: 1

@@ -1092,6 +1092,16 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_11_1(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.MESSAGE_CONTEXT, new Config.Cache.CacheSetting(true, 1, TimeUnit.SECONDS, 10000));
+
+        files = files
+                .withConfig(files.config()
+                        .withCache(files.config().cache()
+                                .withTypes(cacheTypes)
+                        )
+                );
+
         Config.Executor configExecutor = files.config().executor();
         if (configExecutor.workQueue() == Config.Executor.WorkQueue.SYNCHRONOUS
                 && configExecutor.minPoolSize() == 0
