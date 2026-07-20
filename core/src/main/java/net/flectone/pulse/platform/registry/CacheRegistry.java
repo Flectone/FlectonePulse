@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.constant.CacheName;
 import net.flectone.pulse.util.file.FileFacade;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -34,43 +35,31 @@ public class CacheRegistry {
         cacheMap.keySet().forEach(this::invalidate);
     }
 
-    public <K, V> void create(CacheName cacheName) {
+    public void create(CacheName cacheName) {
         if (cacheMap.containsKey(cacheName)) {
             throw new IllegalArgumentException("Cache already created for " + cacheName);
         }
 
-        Config.Cache.CacheSetting cacheSetting = fileFacade.config()
-                .cache()
-                .types()
-                .get(cacheName);
-
-        if (cacheSetting == null) {
-            throw new IllegalArgumentException("No cache setting for " + cacheName);
-        }
-
-        Cache<K, V> cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(cacheSetting.duration(), cacheSetting.timeUnit())
-                .maximumSize(cacheSetting.size())
-                .build();
+        Config.Cache.CacheSetting cacheSetting = config(cacheName);
+        Cache<?, ?> cache = cacheSetting.expireAfterWrite()
+                ? CacheBuilder.newBuilder()
+                  .expireAfterWrite(cacheSetting.duration(), cacheSetting.timeUnit())
+                  .maximumSize(cacheSetting.size())
+                  .build()
+                : CacheBuilder.newBuilder()
+                  .expireAfterAccess(cacheSetting.duration(), cacheSetting.timeUnit())
+                  .maximumSize(cacheSetting.size())
+                  .build();
 
         cacheMap.put(cacheName, cache);
     }
 
-    public void invalidate(CacheName cacheName) {
-        if (!cacheMap.containsKey(cacheName)) return;
+    public boolean invalidate(CacheName cacheName) {
+        Config.Cache.CacheSetting cacheSetting = config(cacheName);
+        if (!cacheSetting.invalidateOnReload()) return false;
 
-        Config.Cache.CacheSetting cacheSetting = fileFacade.config()
-                .cache()
-                .types()
-                .get(cacheName);
-
-        if (cacheSetting == null) {
-            throw new IllegalArgumentException("No cache setting for " + cacheName);
-        }
-
-        if (cacheSetting.invalidateOnReload()) {
-            cacheMap.get(cacheName).invalidateAll();
-        }
+        getCache(cacheName).invalidateAll();
+        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -81,5 +70,18 @@ public class CacheRegistry {
         }
 
         return (Cache<K, V>) cache;
+    }
+
+    private Config.Cache.@NonNull CacheSetting config(CacheName cacheName) {
+        Config.Cache.CacheSetting cacheSetting = fileFacade.config()
+                .cache()
+                .types()
+                .get(cacheName);
+
+        if (cacheSetting == null) {
+            throw new IllegalArgumentException("No cache setting for " + cacheName);
+        }
+
+        return cacheSetting;
     }
 }

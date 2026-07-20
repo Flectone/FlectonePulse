@@ -194,7 +194,13 @@ public record Config(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        public record CacheSetting(boolean invalidateOnReload, long duration, TimeUnit timeUnit, long size) {
+        public record CacheSetting(
+                boolean invalidateOnReload,
+                boolean expireAfterWrite,
+                long duration,
+                TimeUnit timeUnit,
+                long size
+        ) {
         }
     }
 

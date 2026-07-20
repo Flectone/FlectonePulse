@@ -456,7 +456,7 @@ public class FileMigrator {
         }
 
         Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
-        types.put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, 5, TimeUnit.HOURS, 5000));
+        types.put(CacheName.COOLDOWN, new Config.Cache.CacheSetting(false, false, 5, TimeUnit.HOURS, 5000));
 
         return files
                 .withConfig(files.config().withCache(files.config().cache().withTypes(types)))
@@ -849,7 +849,7 @@ public class FileMigrator {
 
     public FilePack migration_1_9_1(FilePack files) {
         Map<CacheName, Config.Cache.CacheSetting> types = new LinkedHashMap<>(files.config().cache().types());
-        types.put(CacheName.ICU_MESSAGE, new Config.Cache.CacheSetting(false, 10, TimeUnit.MINUTES, 100000));
+        types.put(CacheName.ICU_MESSAGE, new Config.Cache.CacheSetting(false, false,10, TimeUnit.MINUTES, 100000));
 
         return files.withConfig(files.config().withCache(files.config().cache().withTypes(types)));
     }
@@ -1012,8 +1012,8 @@ public class FileMigrator {
         }
 
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
-        cacheTypes.put(CacheName.ANIMATION, new Config.Cache.CacheSetting(true, 1, TimeUnit.MINUTES, 10000));
-        cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 100));
+        cacheTypes.put(CacheName.ANIMATION, new Config.Cache.CacheSetting(true, false, 1, TimeUnit.MINUTES, 10000));
+        cacheTypes.put(CacheName.PLAYTIME, new Config.Cache.CacheSetting(true, false, 10, TimeUnit.MINUTES, 100));
 
         return files
                 .withLocalizations(newLocalizations)
@@ -1041,9 +1041,9 @@ public class FileMigrator {
 
     public FilePack migration_1_10_1(FilePack files) {
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
-        cacheTypes.put(CacheName.PLAYER_COLOR, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
-        cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, 10, TimeUnit.MINUTES, 1000));
-        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, 1, TimeUnit.HOURS, 1000));
+        cacheTypes.put(CacheName.PLAYER_COLOR, new Config.Cache.CacheSetting(true, false, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_SETTING, new Config.Cache.CacheSetting(true, false, 10, TimeUnit.MINUTES, 1000));
+        cacheTypes.put(CacheName.PLAYER_IGNORE, new Config.Cache.CacheSetting(true, false, 1, TimeUnit.HOURS, 1000));
 
         List<String> ignore = new LinkedList<>(files.message().afk().ignore());
         ignore.remove("afk");
@@ -1093,7 +1093,7 @@ public class FileMigrator {
 
     public FilePack migration_1_11_1(FilePack files) {
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
-        cacheTypes.put(CacheName.MESSAGE_CONTEXT, new Config.Cache.CacheSetting(true, 1, TimeUnit.SECONDS, 10000));
+        cacheTypes.put(CacheName.MESSAGE_CONTEXT, new Config.Cache.CacheSetting(true, true, 1, TimeUnit.SECONDS, 10000));
 
         files = files
                 .withConfig(files.config()
