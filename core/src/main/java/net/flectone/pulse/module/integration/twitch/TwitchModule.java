@@ -16,8 +16,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.module.ModuleLocalization;
-import net.flectone.pulse.module.integration.telegram.sender.TelegramSender;
 import net.flectone.pulse.module.integration.twitch.listener.TwitchPulseListener;
+import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.IntegrationFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -96,10 +96,10 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
         // create formatter
         UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
 
-        // send to discord
-        TelegramSender telegramSender = injector.getInstance(TelegramSender.class);
+        // send to twitch
+        TwitchSender twitchSender = injector.getInstance(TwitchSender.class);
         for (String specificMessageName : messageNames) {
-            telegramSender.sendMessage(sender, specificMessageName, integrationFormat);
+            twitchSender.sendMessage(sender, specificMessageName, integrationFormat);
         }
     }
 
