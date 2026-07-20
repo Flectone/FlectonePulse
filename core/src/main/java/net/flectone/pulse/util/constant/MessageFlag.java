@@ -152,7 +152,14 @@ public enum MessageFlag {
     /**
      * Enables URL detection and processing.
      */
-    URL_PROCESSING(true);
+    URL_PROCESSING(true),
+
+    /**
+     * Enables caching of processed messages.
+     * If enabled, processed messages are stored in cache
+     * and reused for identical messages to improve performance.
+     */
+    USE_CACHE(true);
 
     private final boolean defaultValue;
 

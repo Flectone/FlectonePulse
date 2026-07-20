@@ -153,12 +153,11 @@ public record MessageContext(
     }
 
     public CacheKey createCacheKey() {
-        return new CacheKey(this.flags(), this.tagResolver(), this.sender().uuid(), this.receiver().uuid(), this.message(), this.userMessage());
+        return new CacheKey(this.flags(), this.sender().uuid(), this.receiver().uuid(), this.message(), this.userMessage());
     }
 
     public record CacheKey(
             @NonNull Map<MessageFlag, Boolean> flags,
-            @NonNull TagResolver tagResolver,
             @NonNull UUID sender,
             @NonNull UUID receiver,
             @NonNull String message,

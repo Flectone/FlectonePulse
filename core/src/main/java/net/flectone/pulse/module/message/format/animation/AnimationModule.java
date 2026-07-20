@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -72,20 +73,25 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
     public MessageContext addTag(MessageContext messageContext) {
         if (moduleController.isDisabledFor(this, messageContext.sender())) return messageContext;
 
+        if (messageContext.message().contains("<animation:")) {
+            messageContext = messageContext.addFlag(MessageFlag.USE_CACHE, false);
+        }
+
+        MessageContext finalMessageContext = messageContext;
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.ANIMATION.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
 
             String animation = argumentQueue.pop().value();
-            if (!permissionChecker.check(messageContext.receiver(), permission().values().get(animation))) return MessagePipeline.ReplacementTag.emptyTag();
+            if (!permissionChecker.check(finalMessageContext.receiver(), permission().values().get(animation))) return MessagePipeline.ReplacementTag.emptyTag();
 
-            List<String> texts = localization(messageContext.receiver()).values().get(animation);
+            List<String> texts = localization(finalMessageContext.receiver()).values().get(animation);
             if (texts == null || texts.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
 
             Message.Format.Animation.AnimationConfig animationConfig = config().values().get(animation);
             if (animationConfig == null || animationConfig.interval() < 0) return MessagePipeline.ReplacementTag.emptyTag();
 
-            UUID sender = messageContext.sender().uuid();
-            UUID receiver = messageContext.receiver().uuid();
+            UUID sender = finalMessageContext.sender().uuid();
+            UUID receiver = finalMessageContext.receiver().uuid();
             int playerIndex = increment(sender, receiver, animation, animationConfig.interval(), texts.size());
 
             try {
@@ -93,10 +99,11 @@ public class AnimationModule implements ModuleLocalization<Localization.Message.
                 if (Boolean.TRUE.equals(animationConfig.raw())) return Tag.preProcessParsed(text);
 
                 return Tag.inserting(messagePipeline.build(MessageContext.builder()
-                        .sender(messageContext.sender())
-                        .receiver(messageContext.receiver())
+                        .sender(finalMessageContext.sender())
+                        .receiver(finalMessageContext.receiver())
                         .message(text)
-                        .flags(messageContext.flags())
+                        .flags(finalMessageContext.flags())
+                        .flag(MessageFlag.USE_CACHE, true)
                         .build()
                 ));
             } catch (IndexOutOfBoundsException _) { // reload safety

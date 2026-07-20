@@ -110,36 +110,40 @@ public class MessagePipeline {
         Component cachedComponent = messageContextCache.getIfPresent(messageContextCacheKey);
         if (cachedComponent != null) return cachedComponent;
 
-        MessageFormattingEvent event = eventDispatcher.dispatch(new MessageFormattingEvent(messageContext));
-        MessageContext eventContext = event.context();
+        // update context
+        messageContext = eventDispatcher.dispatch(new MessageFormattingEvent(messageContext)).context();
 
-        if (eventContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !eventContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
-            TagResolver tagResolver = eventContext.tagResolver();
-            eventContext = eventContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
+        Component component = deserialize(messageContext);
+
+        if (messageContext.isFlag(MessageFlag.USE_CACHE)) {
+            messageContextCache.put(messageContextCacheKey, component);
+        }
+
+        return component;
+    }
+
+    @NonNull
+    private Component deserialize(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.REMOVE_DISABLED_TAGS) && !messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)) {
+            TagResolver tagResolver = messageContext.tagResolver();
+            messageContext = messageContext.addTagResolvers(Arrays.stream(ReplacementTag.values())
                     .filter(tag -> !tagResolver.has(tag.getTagName()))
                     .map(ReplacementTag::emptyResolver)
                     .toArray(TagResolver[]::new)
             );
         }
 
-        Component component;
         try {
-            component = miniMessage.deserialize(
+            return miniMessage.deserialize(
                     // always need to replace legacy § with & to avoid MiniMessage problems
-                    Strings.CS.replace(eventContext.message(), "§", "&"),
-                    eventContext.tagResolver()
+                    Strings.CS.replace(messageContext.message(), "§", "&"),
+                    messageContext.tagResolver()
             );
         } catch (Exception e) {
             fLogger.warning(e);
-
-            // fallback
-            component = Component.empty();
         }
 
-        // save to cache
-        messageContextCache.put(messageContextCacheKey, component);
-
-        return component;
+        return Component.empty();
     }
 
     public TagResolver messageTag(Component message) {
