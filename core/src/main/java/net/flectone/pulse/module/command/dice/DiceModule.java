@@ -46,7 +46,7 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
 
     @Override
     public void onEnable() {
-        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::message);
+        String promptMessage = commandModuleController.addPrompt(this, 0, Localization.Command.Prompt::number);
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .optional(promptMessage, commandParserProvider.integerParser(config().min(), config().max()))
