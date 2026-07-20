@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.SocialService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
@@ -81,6 +82,10 @@ public class CommandExceptionHandler {
                         new String[]{"<correct_syntax>", "<command>"},
                         new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
                 ))
+                .flags(
+                        new MessageFlag[]{MessageFlag.PLAYER_NAME, MessageFlag.REMOVE_DISABLED_TAGS},
+                        new boolean[]{false, false}
+                )
                 .build()
         ));
     }
