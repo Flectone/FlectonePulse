@@ -128,11 +128,6 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
             }));
         }
 
-        // Nickname module can be disabled in config, but its placeholder is used, so we need to add it
-        Set<String> playerNameTags = !messageContext.tagResolver().has(MessagePipeline.ReplacementTag.NICKNAME.getTagName()) && messageContext.isFlag(MessageFlag.NICKNAME_MODULE)
-                ? Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName(), MessagePipeline.ReplacementTag.NICKNAME.getTagName())
-                : Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName());
-
         return messageContext
                 .addTagResolvers(
                         messagePipeline.resolver(MessagePipeline.ReplacementTag.CONSTANT.getTagName(), (argumentQueue, _) -> {
@@ -199,7 +194,7 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             String suffix = integrationModule.getSuffix(fPlayer);
                             return buildVaultTag(fPlayer, fReceiver, suffix, messageContext);
                         }),
-                        messagePipeline.resolver(playerNameTags, (_, _) ->
+                        messagePipeline.resolver(getPlayerNameTags(messageContext), (_, _) ->
                                 Tag.preProcessParsed(profileResolver.resolveName(fPlayer))
                         )
                 );
@@ -227,6 +222,24 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
         return config().shouldCheckInvisibility()
                 && platformPlayerAdapter.hasPotionEffect(entity, PotionUtil.INVISIBILITY_POTION_NAME)
                 && permissionChecker.check(entity, permission().invisible());
+    }
+
+    private Set<String> getPlayerNameTags(MessageContext messageContext) {
+        // Nickname module can be disabled in config, but its placeholder is used, so we need to add it
+        boolean needNickname = !messageContext.tagResolver().has(MessagePipeline.ReplacementTag.NICKNAME.getTagName())
+                && messageContext.isFlag(MessageFlag.NICKNAME_MODULE);
+
+        if (messageContext.isFlag(MessageFlag.PLAYER_NAME)) {
+            return needNickname
+                    ? Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName(), MessagePipeline.ReplacementTag.NICKNAME.getTagName())
+                    : Set.of(MessagePipeline.ReplacementTag.PLAYER.getTagName());
+        }
+
+        if (needNickname) {
+            return Set.of(MessagePipeline.ReplacementTag.NICKNAME.getTagName());
+        }
+
+        return Set.of();
     }
 
     private Tag buildVaultTag(FPlayer fPlayer, FPlayer fReceiver, String vaultTag, MessageContext messageContext) {

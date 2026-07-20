@@ -118,6 +118,13 @@ public enum MessageFlag {
     PLAYER_MESSAGE(false),
 
     /**
+     * Enables &lt;player&gt tag name processing.
+     * If enabled, &lt;player&gt; tag are resolved and displayed.
+     * If disabled, &lt;player&gt; are not processed.
+     */
+    PLAYER_NAME(true),
+
+    /**
      * Enables QuestionAnswer module processing.
      */
     QUESTIONANSWER_MODULE(true),
