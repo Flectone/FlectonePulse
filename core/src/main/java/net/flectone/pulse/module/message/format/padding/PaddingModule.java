@@ -74,8 +74,11 @@ public class PaddingModule implements ModuleLocalization<Localization.Message.Fo
     }
 
     public MessageContext addTag(MessageContext messageContext) {
+        if (!moduleController.isEnable(this)) return messageContext;
+
         FEntity sender = messageContext.sender();
-        if (moduleController.isDisabledFor(this, sender)) return messageContext;
+        if (messageContext.isFlag(MessageFlag.PLAYER_MESSAGE)
+                && !permissionChecker.check(sender, permission())) return messageContext;
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.PADDING.getTagName(), (argumentQueue, _) -> {
             if (!argumentQueue.hasNext()) return MessagePipeline.ReplacementTag.emptyTag();
