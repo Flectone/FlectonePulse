@@ -151,7 +151,7 @@ public class FPlayerService {
      *
      * @param reload whether this is a reload operation or initial startup
      */
-    public void initialize(boolean reload) {
+    public void initialize(SocialService socialService, boolean reload) {
         // force offline all players tied to this server
         // in case of an unexpected shutdown that left them marked as online
         fPlayerRepository.setOfflineByServer(fileFacade.config().server());
@@ -181,6 +181,7 @@ public class FPlayerService {
                     if (!onlineDatabasePlayers.contains(fPlayer)) {
                         // and if it's not online, we need to remove them from the cache
                         fPlayerRepository.removeOnline(fPlayer);
+                        socialService.invalidate(fPlayer.uuid());
                     }
                 });
 
@@ -189,6 +190,7 @@ public class FPlayerService {
                     if (!onlineCachedPlayers.contains(fPlayer)) {
                         // if they are not, we add them
                         addCache(fPlayer);
+                        socialService.invalidate(fPlayer.uuid());
                     }
                 });
 
@@ -211,6 +213,7 @@ public class FPlayerService {
 
                     // finally, we need to add player to online cache
                     addCache(fPlayer);
+                    socialService.invalidate(fPlayer.uuid());
                 });
             }, 20L, 20L); // I think 1 second is enough to avoid visual sync problems
         }
