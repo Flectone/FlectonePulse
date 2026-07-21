@@ -46,6 +46,16 @@ public class SocialRepository {
     private final FColorDao fColorDao;
 
     /**
+     * Invalidates all cached data in the social repository.
+     * Clears player color cache, settings cache, and ignore cache
+     */
+    public void invalidate() {
+        playerColorCache.invalidateAll();
+        playerSettingCache.invalidateAll();
+        playerIgnoreCache.invalidateAll();
+    }
+
+    /**
      * Loads ignore relationships for a player with cache support.
      * Returns cached ignores if available, otherwise loads from database and caches the result.
      *

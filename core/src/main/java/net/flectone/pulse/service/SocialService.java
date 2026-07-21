@@ -49,6 +49,14 @@ public class SocialService {
     private Provider<IntegrationModule> integrationModuleProvider;
 
     /**
+     * Invalidates all cached data in the social repository.
+     * Clears player colors, settings and ignores
+     */
+    public void invalidate() {
+        socialRepository.invalidate();
+    }
+
+    /**
      * Invalidates all cached social data for a player including colors, settings, and ignores.
      *
      * @param uuid the UUID of the player whose social data cache should be cleared

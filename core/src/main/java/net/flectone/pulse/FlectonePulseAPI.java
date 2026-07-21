@@ -124,7 +124,7 @@ public class FlectonePulseAPI {
         instance.get(ModuleController.class).initialize();
 
         // reload fplayer service
-        fPlayerService.initialize(false);
+        fPlayerService.initialize(instance.get(SocialService.class), false);
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
@@ -259,6 +259,12 @@ public class FlectonePulseAPI {
         // invalidate players
         fPlayerService.invalidate();
 
+        // get social service
+        SocialService socialService = instance.get(SocialService.class);
+
+        // invalidate social caches
+        socialService.invalidate();
+
         // invalidate cache
         instance.get(CacheRegistry.class).invalidate();
 
@@ -333,7 +339,7 @@ public class FlectonePulseAPI {
         moduleController.initialize();
 
         // reload fplayer service
-        fPlayerService.initialize(true);
+        fPlayerService.initialize(socialService,true);
 
         // reload metrics service if enabled
         if (fileFacade.config().metrics().enable()) {
