@@ -563,13 +563,19 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         } else {
             resolvedName = StringUtils.left(uuidOrName, 16);
 
-            uuid = platformServerAdapter.isOnlineMode()
-                    ? profileResolver.resolveOnlineUUID(uuidOrName)
-                    : profileResolver.resolveOfflineUUID(uuidOrName);
+            if (!fTarget.isUnknown()) {
+                // player already known under this name — trust their real recorded uuid
+                // instead of recomputing (Bedrock/Floodgate/proxy uuids won't match Mojang lookup)
+                uuid = fTarget.uuid();
+            } else {
+                uuid = platformServerAdapter.isOnlineMode()
+                        ? profileResolver.resolveOnlineUUID(uuidOrName)
+                        : profileResolver.resolveOfflineUUID(uuidOrName);
 
-            // use offline uuid if empty
-            if (uuid == null) {
-                uuid = profileResolver.resolveOfflineUUID(uuidOrName);
+                // use offline uuid if empty
+                if (uuid == null) {
+                    uuid = profileResolver.resolveOfflineUUID(uuidOrName);
+                }
             }
         }
 
