@@ -130,6 +130,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
             String urls = Arrays.stream(rawString.split("\\s+"))
                     .filter(this::isUrl)
+                    .map(url -> StringUtils.substringBefore(url, "?"))
                     .collect(Collectors.joining(" "));
 
             messageDispatcher.dispatch(this, StreamMetadata.<Localization.Command.Stream>builder()
