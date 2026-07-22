@@ -430,10 +430,17 @@ public record Integration(
             Proxy proxy,
             Map<String, Command> customCommand,
             Map<String, List<String>> messageChannel,
-            Map<String, List<String>> followChannel,
+            Map<String, Channel> channelAction,
             Destination destination,
             Sound sound
     ) implements MessageChannelSetting, SoundConfigSetting, EnableSetting {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record Channel(List<String> online, List<String> offline) {
+        }
+
     }
 
     @With

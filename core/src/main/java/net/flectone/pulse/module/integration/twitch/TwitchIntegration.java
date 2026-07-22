@@ -1,7 +1,9 @@
 package net.flectone.pulse.module.integration.twitch;
 
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
+import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -60,23 +62,36 @@ public class TwitchIntegration implements FIntegration {
             }
         }
 
-        for (String channel : integration.followChannel().keySet()) {
+        for (String channel : integration.channelAction().keySet()) {
             twitchClient.client().getClientHelper().enableStreamEventListener(channel);
         }
 
-        twitchClient.client().getEventManager().onEvent(ChannelGoLiveEvent.class, event -> {
+        EventManager eventManager = twitchClient.client().getEventManager();
+
+        // online action
+        eventManager.onEvent(ChannelGoLiveEvent.class, event -> {
             String channelName = event.getChannel().getName();
 
-            List<String> commands = integration.followChannel().get(channelName);
-            if (commands == null) return;
+            Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
+            if (channel == null || channel.online().isEmpty()) return;
 
-            commands.forEach(platformServerAdapter::dispatchCommand);
+            channel.online().forEach(platformServerAdapter::dispatchCommand);
+        });
+
+        // offline action
+        eventManager.onEvent(ChannelGoOfflineEvent.class, event -> {
+            String channelName = event.getChannel().getName();
+
+            Integration.Twitch.Channel channel = integration.channelAction().get(channelName);
+            if (channel == null || channel.offline().isEmpty()) return;
+
+            channel.offline().forEach(platformServerAdapter::dispatchCommand);
         });
 
         if (!integration.messageChannel().isEmpty()) {
             TwitchMessageListener twitchMessageListener = injector.getInstance(TwitchMessageListener.class);
 
-            twitchClient.client().getEventManager().onEvent(twitchMessageListener.getEventType(), channelMessageEvent ->
+            eventManager.onEvent(twitchMessageListener.getEventType(), channelMessageEvent ->
                     taskScheduler.runAsync(() -> twitchMessageListener.execute(channelMessageEvent))
             );
         }

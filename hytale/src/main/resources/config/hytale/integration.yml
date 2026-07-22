@@ -184,9 +184,11 @@ twitch:
     - "faseri4ka"
     MESSAGE_CHAT_GLOBAL:
     - "faseri4ka"
-  follow_channel:
+  channel_action:
     faseri4ka:
-    - "stream start https://twitch.tv/faseri4ka"
+      online:
+      - "stream start https://twitch.tv/faseri4ka"
+      offline: []
   destination:
     type: "CHAT"
   sound:
