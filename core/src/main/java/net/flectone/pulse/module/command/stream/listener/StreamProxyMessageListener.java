@@ -14,6 +14,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.controller.ModuleController;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
 
@@ -45,6 +46,7 @@ public class StreamProxyMessageListener implements PulseListener {
                             .range(Range.get(Range.Type.SERVER))
                             .destination(streamModule.config().destination())
                             .sound(streamModule.soundOrThrow())
+                            .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
                             .build()
                     )
                     .turned(true)

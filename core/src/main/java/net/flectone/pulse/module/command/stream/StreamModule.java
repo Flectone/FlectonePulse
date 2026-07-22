@@ -146,6 +146,7 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                                     .messageNames(List.of(name().name() + "_START"))
                                     .build()
                             )
+                            .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
                             .build()
                     )
                     .turned(true)
