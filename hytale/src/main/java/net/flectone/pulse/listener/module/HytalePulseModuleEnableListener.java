@@ -9,9 +9,11 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.command.deletemessage.DeletemessageModule;
+import net.flectone.pulse.module.command.minesweeper.MinesweeperModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
 import net.flectone.pulse.module.command.sprite.SpriteModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
+import net.flectone.pulse.module.command.whois.WhoisModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.book.BookModule;
 import net.flectone.pulse.module.message.bossbar.BossbarModule;
@@ -44,7 +46,9 @@ public class HytalePulseModuleEnableListener implements PulseListener {
             DeletemessageModule.class,
             RockpaperscissorsModule.class,
             SpriteModule.class,
-            TictactoeModule.class
+            TictactoeModule.class,
+            WhoisModule.class,
+            MinesweeperModule.class
     );
 
     private final FLogger fLogger;
