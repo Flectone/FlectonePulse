@@ -17,4 +17,4 @@ include "minecraft:bukkit"
 include "minecraft:paper"
 include "minecraft:velocity"
 include "minecraft:bungeecord"
-include 'minecraft:neoforge'
+//include 'minecraft:neoforge'
