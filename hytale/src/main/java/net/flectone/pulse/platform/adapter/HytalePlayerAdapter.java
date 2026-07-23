@@ -11,6 +11,7 @@ import com.hypixel.hytale.protocol.packets.connection.PongType;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.io.PacketHandler;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
@@ -335,18 +336,13 @@ public class HytalePlayerAdapter implements PlatformPlayerAdapter {
                 return;
             }
 
-            Player player = playerRef.getReference().getStore().getComponent(playerRef.getReference(), Player.getComponentType());
-            if (player == null) {
+            InventoryComponent.Hotbar hotbarComponent = playerRef.getReference().getStore().getComponent(playerRef.getReference(), InventoryComponent.Hotbar.getComponentType());
+            if (hotbarComponent == null) {
                 completableFuture.complete(null);
                 return;
             }
 
-            // waiting for Inventory to be removed?
-            try {
-                completableFuture.complete(player.getInventory().getActiveHotbarItem());
-            } catch (Exception _) {
-                completableFuture.complete(null);
-            }
+            completableFuture.complete(hotbarComponent.getActiveItem());
         });
 
         return completableFuture.join();
