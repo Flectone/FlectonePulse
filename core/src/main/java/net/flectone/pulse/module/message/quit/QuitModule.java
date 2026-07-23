@@ -99,6 +99,8 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     }
 
     public void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished) {
+        if (moduleController.isDisabledFor(this, fPlayer)) return;
+
         messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
                 .base(EventMetadata.<Localization.Message.Quit>builder()
                         .sender(fPlayer)
