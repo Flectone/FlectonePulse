@@ -546,13 +546,18 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             return null;
         }
 
-        if (!fTarget.isUnknown() && config().checkDuplicate() && isWhitelisted(fTarget)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::alreadyAdd)
-                    .build()
-            );
-            return null;
+        if (!fTarget.isUnknown()) {
+            if (config().checkDuplicate() && isWhitelisted(fTarget)) {
+                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
+                        .sender(fPlayer)
+                        .format(Localization.Command.Whitelist::alreadyAdd)
+                        .build()
+                );
+                return null;
+            }
+
+            // player already known
+            return fTarget;
         }
 
         String resolvedName;
@@ -563,19 +568,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         } else {
             resolvedName = StringUtils.left(uuidOrName, 16);
 
-            if (!fTarget.isUnknown()) {
-                // player already known under this name — trust their real recorded uuid
-                // instead of recomputing (Bedrock/Floodgate/proxy uuids won't match Mojang lookup)
-                uuid = fTarget.uuid();
-            } else {
-                uuid = platformServerAdapter.isOnlineMode()
-                        ? profileResolver.resolveOnlineUUID(uuidOrName)
-                        : profileResolver.resolveOfflineUUID(uuidOrName);
+            uuid = platformServerAdapter.isOnlineMode()
+                    ? profileResolver.resolveOnlineUUID(uuidOrName)
+                    : profileResolver.resolveOfflineUUID(uuidOrName);
 
-                // use offline uuid if empty
-                if (uuid == null) {
-                    uuid = profileResolver.resolveOfflineUUID(uuidOrName);
-                }
+            // use offline uuid if empty
+            if (uuid == null) {
+                uuid = profileResolver.resolveOfflineUUID(uuidOrName);
             }
         }
 
