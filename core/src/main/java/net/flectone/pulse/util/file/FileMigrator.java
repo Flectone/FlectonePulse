@@ -1117,12 +1117,18 @@ public class FileMigrator {
         }
 
         UnaryOperator<String> replacePlayerHead = string -> Strings.CS.replace(string, "<player_head>", "<player_head_or:''>");
+        UnaryOperator<String> replaceSprite = string -> Strings.CS.replace(string, "<sprite:", "<sprite_or:'':");
 
         Map<String, Localization> newLocalizations = new Object2ObjectArrayMap<>();
 
         boolean isNotHytale = platformServerAdapterProvider.get().getPlatformType() != PlatformType.HYTALE;
         for (Localization localization : files.localizations().values()) {
             if (isNotHytale) {
+                Map<String, String> newBossbarTypes = new LinkedHashMap<>();
+                localization.message().bossbar().types().forEach((string, value) ->
+                        newBossbarTypes.put(string, replaceSprite.apply(value))
+                );
+
                 localization = localization
                         .withMessage(localization.message()
                                 .withAfk(localization.message().afk()
@@ -1133,12 +1139,17 @@ public class FileMigrator {
                                                 .withGlobal(replacePlayerHead.apply(localization.message().afk().formatFalse().global()))
                                         )
                                 )
+                                .withBossbar(localization.message().bossbar()
+                                        .withTypes(newBossbarTypes)
+                                )
                                 .withFormat(localization.message().format()
                                         .withNames(localization.message().format().names()
                                                 .withDisplay(localization.message().format().names().display().stream()
                                                         .map(replacePlayerHead)
                                                         .collect(Collectors.toCollection(LinkedList::new))
                                                 )
+                                                .withEntity(replaceSprite.apply(localization.message().format().names().entity()))
+                                                .withConsole(Strings.CS.replace(localization.message().format().names().console(), "<player_head:", "<player_head_or:'':"))
                                         )
                                 )
                                 .withTab(localization.message().tab()
