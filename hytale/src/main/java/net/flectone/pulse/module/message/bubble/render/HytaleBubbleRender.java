@@ -211,6 +211,7 @@ public class HytaleBubbleRender implements BubbleRender {
 
         return messagePipeline.buildPlain(messageContext.toBuilder()
                 .message(localization.format())
+                .userMessage(bubble.getRawMessage()) // indicator for cache that these are different messages
                 .flag(MessageFlag.PLAYER_MESSAGE, false)
                 .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
                 .build()
