@@ -201,10 +201,10 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
 
         if (!oldFColors.equals(newFColors)) {
             socialService.saveColors(fPlayer, type, newFColors);
-
-            // update proxy players
-            proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, _ -> {}, metadataUUID);
         }
+
+        if (!fPlayer.isOnline()) return;
+        if (proxySender.send(fPlayer, ModuleName.COMMAND_CHATCOLOR, _ -> {}, metadataUUID)) return;
 
         sendMessageWithUpdatedColors(fPlayer, metadataUUID);
     }
