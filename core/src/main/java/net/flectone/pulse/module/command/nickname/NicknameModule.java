@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -36,6 +37,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -173,9 +175,16 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
             socialService.saveSetting(fTarget, SettingText.NICKNAME, nickname);
         }
 
+        if (proxySender.send(fTarget, ModuleName.COMMAND_NICKNAME, dataOutputStream -> dataOutputStream.writeString(nickname))) return;
+
+        sendMessageWithUpdatedNickname(fPlayer, nickname, UUID.randomUUID());
+    }
+
+    public void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID) {
         messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
                 .base(EventMetadata.<Localization.Command.Nickname>builder()
-                        .sender(fTarget)
+                        .uuid(metadataUUID)
+                        .sender(fPlayer)
                         .format(Localization.Command.Nickname::format)
                         .destination(config().destination())
                         .sound(soundOrThrow())
@@ -184,10 +193,6 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
                 .nickname(nickname)
                 .build()
         );
-
-        if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fTarget, ModuleName.COMMAND_NICKNAME);
-        }
     }
 
     public MessageContext addTag(MessageContext messageContext) {
