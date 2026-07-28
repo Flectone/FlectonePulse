@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.FlectonePulseAPI;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -76,6 +77,8 @@ public class MinecraftBubbleRender implements BubbleRender {
 
     @Override
     public void renderBubble(Bubble bubble) {
+        if (FlectonePulseAPI.isDisabling()) return;
+
         FPlayer sender = bubble.getSender();
         if (!isCorrectPlayer(sender)) return;
 
