@@ -1,9 +1,9 @@
 dependencies {
     compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
     compileOnly "io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT"
-    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+    compileOnlyApi "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
 
-    compileOnly project(":minecraft:common")
-    compileOnly project(":core")
-    compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
+    compileOnlyApi project(":minecraft:common")
+    compileOnlyApi project(":core")
+    compileOnlyApi "org.incendo:cloud-paper:$cloud_paper_version"
 }

@@ -1,8 +1,8 @@
 dependencies {
     implementation project(":core")
-    compileOnly "net.flectone:libby-core:$libby_version"
-    compileOnly "org.incendo:cloud-core:$cloud_core_version"
-    compileOnly "org.incendo:cloud-brigadier:$cloud_paper_version"
+    compileOnlyApi "net.flectone:libby-core:$libby_version"
+    compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
+    compileOnlyApi "org.incendo:cloud-brigadier:$cloud_paper_version"
 
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
     compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
