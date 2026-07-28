@@ -24,6 +24,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.entity.MinecraftBubbleEntity;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -222,11 +223,14 @@ public class MinecraftBubbleRender implements BubbleRender {
                 )
                 .build();
 
-        return messagePipeline.build(messageContext.toBuilder()
-                .message(localization.format())
-                .userMessage(bubble.getRawMessage()) // indicator for cache that these are different messages
-                .flag(MessageFlag.PLAYER_MESSAGE, false)
-                .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))
+        return messagePipeline.build(StringMessageContext.builder()
+                .base(messageContext.toBuilder()
+                        .message(localization.format())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(messagePipeline.build(messageContext))))
+                        .build()
+                )
+                .string(bubble.getRawMessage())
                 .build()
         );
     }

@@ -17,7 +17,7 @@ import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExt
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPacketVanillaListener;
 import net.flectone.pulse.module.message.vanilla.listener.MinecraftPulseVanillaListener;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -102,10 +102,14 @@ public class MinecraftVanillaModule extends VanillaModule {
                 if (!target.equals(fPlayer)) {
                     if (parsedComponent.vanillaMessage().multiMessage()) return;
                 } else {
-                    sendPersonalDeath(fPlayer, messagePipeline.build(MessageContext.builder()
-                            .sender(fPlayer)
-                            .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
-                            .tagResolver(argumentTag(fPlayer, parsedComponent))
+                    sendPersonalDeath(fPlayer, messagePipeline.build(VanillaMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .message(StringUtils.defaultString(localization(fPlayer).types().get(parsedComponent.translationKey())))
+                                    .tagResolver(argumentTag(fPlayer, parsedComponent))
+                                    .build()
+                            )
+                            .parsedComponent(parsedComponent)
                             .build()
                     ));
                 }
@@ -120,36 +124,36 @@ public class MinecraftVanillaModule extends VanillaModule {
         String vanillaMessageName = parsedComponent.vanillaMessage().name();
         boolean vanished = socialService.isVanished(fPlayer);
 
-        messageDispatcher.dispatch(this, VanillaMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(range)
-                        .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                        .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
-                        .destination(parsedComponent.vanillaMessage().destination())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(range)
+                .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
+                .filter(fResolver -> socialService.canSeeVanished(fPlayer, fResolver, vanished))
+                .destination(parsedComponent.vanillaMessage().destination())
+                .messageContext(fResolver -> VanillaMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).types().get(parsedComponent.translationKey()))
                                 .tagResolvers(argumentTag(fResolver, parsedComponent))
                                 .build()
                         )
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
-                                        ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
-                                        : List.of()
-                                )
-                                .build()
-                        )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeString(parsedComponent.translationKey());
-                            dataOutputStream.writeAsJson(parsedComponent.arguments());
-                            dataOutputStream.writeBoolean(vanished);
-                        })
+                        .parsedComponent(parsedComponent)
+                        .fakeMessage(false)
+                        .vanished(vanished)
                         .build()
                 )
-                .parsedComponent(parsedComponent)
-                .fakeMessage(false)
-                .vanished(vanished)
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(StringUtils.isNotEmpty(vanillaMessageName)
+                                ? List.of(vanillaMessageName.toUpperCase(), parsedComponent.translationKey())
+                                : List.of()
+                        )
+                        .build()
+                )
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(parsedComponent.translationKey());
+                    dataOutputStream.writeAsJson(parsedComponent.arguments());
+                    dataOutputStream.writeBoolean(vanished);
+                })
                 .build()
         );
     }

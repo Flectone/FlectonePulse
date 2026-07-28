@@ -11,6 +11,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -107,22 +108,26 @@ public class NamesModule implements ModuleLocalization {
                     ));
                 }
 
-                return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                        .sender(sender)
-                        .receiver(fReceiver)
-                        .message(sender.type().equals(FEntity.UNKNOWN_TYPE)
-                                ? localizationName.unknown()
-                                : StringUtils.replaceEach(
-                                localizationName.entity(),
-                                new String[]{"<type>", "<uuid>"},
-                                new String[]{sender.type(), sender.uuid().toString()}
-                        ))
-                        .tagResolver(messagePipeline.resolver("name", showEntityName))
-                        .flags(messageContext.flags())
-                        .flags(
-                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
-                                new boolean[]{false, false}
+                return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(sender)
+                                .receiver(fReceiver)
+                                .message(sender.type().equals(FEntity.UNKNOWN_TYPE)
+                                        ? localizationName.unknown()
+                                        : StringUtils.replaceEach(
+                                        localizationName.entity(),
+                                        new String[]{"<type>", "<uuid>"},
+                                        new String[]{sender.type(), sender.uuid().toString()}
+                                ))
+                                .tagResolver(messagePipeline.resolver("name", showEntityName))
+                                .flags(messageContext.flags())
+                                .flags(
+                                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.MENTION_MODULE},
+                                        new boolean[]{false, false}
+                                )
+                                .build()
                         )
+                        .component(showEntityName)
                         .build()
                 ));
             }));

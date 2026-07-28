@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.message.bossbar.listener.MinecraftPacketBossbarListener;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -89,10 +90,14 @@ public class MinecraftBossbarModule extends BossbarModule {
                 message = message + RAIDERS_PLACEHOLDER;
             }
 
-            Component title = messagePipeline.build(MessageContext.builder()
-                    .sender(fPlayer)
-                    .message(message)
-                    .tagResolver(raidersTag(fPlayer, raiders))
+            Component title = messagePipeline.build(ComponentMessageContext.builder()
+                    .base(MessageContext.builder()
+                            .sender(fPlayer)
+                            .message(message)
+                            .tagResolver(raidersTag(fPlayer, raiders))
+                            .build()
+                    )
+                    .component(oldTitle)
                     .build()
             );
             if (title.equals(oldTitle)) return;

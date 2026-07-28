@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.listener.CoinProxyMessageListener;
-import net.flectone.pulse.module.command.coin.model.CoinMetadata;
+import net.flectone.pulse.module.command.coin.model.CoinMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -58,30 +58,30 @@ public class CoinModule implements ModuleCommand {
 
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 
-        messageDispatcher.dispatch(this, CoinMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> CoinMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceResult(fResolver, percent))
                                 .build()
                         )
-                        .proxy(output -> output.writeInt(percent))
-                        .integration(IntegrationMetadata.builder()
-                                .format(string -> Strings.CS.replace(
-                                        string,
-                                        "<result>",
-                                        percent == 0 ? "" : percent > 50 ? localization(FPlayer.UNKNOWN).head() : localization(FPlayer.UNKNOWN).tail()
-                                ))
-                                .messageNames(List.of(name().name() + "_" + (percent == 0 ? "DRAW" : percent > 50 ? "HEAD" : "TAIL")))
-                                .build()
-                        )
+                        .percent(percent)
                         .build()
                 )
-                .percent(percent)
+                .proxy(output -> output.writeInt(percent))
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> Strings.CS.replace(
+                                string,
+                                "<result>",
+                                percent == 0 ? "" : percent > 50 ? localization(FPlayer.UNKNOWN).head() : localization(FPlayer.UNKNOWN).tail()
+                        ))
+                        .messageNames(List.of(name().name() + "_" + (percent == 0 ? "DRAW" : percent > 50 ? "HEAD" : "TAIL")))
+                        .build()
+                )
                 .build()
         );
     }

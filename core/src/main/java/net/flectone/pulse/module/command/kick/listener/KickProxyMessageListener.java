@@ -11,9 +11,9 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.kick.KickModule;
@@ -52,12 +52,12 @@ public class KickProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
             if (moduleController.isDisabledFor(kickModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(kickModule, ModerationMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(kickModule.config().destination())
-                            .sound(kickModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(kickModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(kickModule.config().destination())
+                    .sound(kickModule.soundOrThrow())
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -65,9 +65,9 @@ public class KickProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                     .build()
                             )
+                            .moderation(kick)
                             .build()
                     )
-                    .moderation(kick)
                     .build()
             );
         }

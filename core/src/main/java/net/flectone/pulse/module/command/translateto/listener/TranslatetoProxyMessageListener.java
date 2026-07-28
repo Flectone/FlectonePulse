@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
-import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
+import net.flectone.pulse.module.command.translateto.model.TranslatetoMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -41,12 +41,12 @@ public class TranslatetoProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
             String messageToTranslate = proxyPayload.readString();
 
-            messageDispatcher.dispatch(translatetoModule, TranslatetoMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(translatetoModule.config().destination())
-                            .sound(translatetoModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(translatetoModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(translatetoModule.config().destination())
+                    .sound(translatetoModule.soundOrThrow())
+                    .messageContext(fResolver -> TranslatetoMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -54,10 +54,11 @@ public class TranslatetoProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
                                     .build()
                             )
+                            .string(message)
+                            .targetLanguage(targetLang)
+                            .messageToTranslate(messageToTranslate)
                             .build()
                     )
-                    .targetLanguage(targetLang)
-                    .messageToTranslate(messageToTranslate)
                     .build()
             );
         }

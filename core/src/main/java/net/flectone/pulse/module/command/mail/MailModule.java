@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
-import net.flectone.pulse.module.command.mail.model.MailMetadata;
+import net.flectone.pulse.module.command.mail.model.MailMessageContext;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -116,21 +116,22 @@ public class MailModule implements ModuleCommand {
 
         int mailId = mail.get().id();
 
-        messageDispatcher.dispatch(this, MailMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MailMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(Strings.CS.replaceOnce(localization(fResolver).sender(), "<id>", String.valueOf(mailId)))
                                 .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fReceiver))
                                 .build()
                         )
+                        .string(message)
+                        .mail(mail.get())
+                        .target(fReceiver)
                         .build()
                 )
-                .mail(mail.get())
-                .target(fReceiver)
                 .build()
         );
     }

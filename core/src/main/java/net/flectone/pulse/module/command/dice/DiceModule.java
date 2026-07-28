@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.dice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -13,7 +12,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.dice.listener.DiceProxyMessageListener;
-import net.flectone.pulse.module.command.dice.model.DiceMetadata;
+import net.flectone.pulse.module.command.dice.model.DiceMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -29,6 +28,7 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -73,28 +73,30 @@ public class DiceModule implements ModuleCommand {
         Optional<Integer> optionalNumber = commandContext.optional(promptMessage);
 
         int number = optionalNumber.orElse(min);
-
-        List<Integer> cubes = new ObjectArrayList<>();
-        for (int i = 0; i < number; i++) {
-            cubes.add(randomUtil.nextInt(min, max + 1));
+        if (number < min) {
+            number = min;
         }
 
-        messageDispatcher.dispatch(this, DiceMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        List<Integer> cubes = IntStream.range(0, number)
+                .mapToObj(_ -> randomUtil.nextInt(min, max + 1))
+                .toList();
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> DiceMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceResult(fResolver, cubes))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
-                        .integration(_ -> replaceResult(FPlayer.UNKNOWN, cubes))
+                        .cubes(cubes)
                         .build()
                 )
-                .cubes(cubes)
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
+                .integration(_ -> replaceResult(FPlayer.UNKNOWN, cubes))
                 .build()
         );
     }

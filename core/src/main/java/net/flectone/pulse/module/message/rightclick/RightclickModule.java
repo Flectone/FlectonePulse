@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
+import net.flectone.pulse.module.message.rightclick.model.RightClickMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
@@ -73,11 +74,15 @@ public class RightclickModule implements ModuleLocalization {
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionUtil.INVISIBILITY_POTION_NAME)) return;
 
             messageDispatcher.dispatch(this, EventMetadata.builder()
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(localization(fResolver).format())
-                            .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
+                    .messageContext(fResolver -> RightClickMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).format())
+                                    .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
+                                    .build()
+                            )
+                            .target(fTarget)
                             .build()
                     )
                     .destination(config().destination())

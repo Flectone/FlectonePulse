@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.minesweeper.listener.MinesweeperPulseListener;
 import net.flectone.pulse.module.command.minesweeper.model.Minesweeper;
-import net.flectone.pulse.module.command.minesweeper.model.MinesweeperMetadata;
+import net.flectone.pulse.module.command.minesweeper.model.MinesweeperMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -206,38 +206,37 @@ public class MinesweeperModule implements ModuleCommand {
                              int row,
                              int column,
                              Function<Localization.Command.Minesweeper, String> localizationFunction) {
-        messageDispatcher.dispatch(this, MinesweeperMetadata.builder()
-                .base(EventMetadata.builder()
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> {
-                            Localization.Command.Minesweeper localization = localization(fResolver);
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> {
+                    Localization.Command.Minesweeper localization = localization(fResolver);
 
-                            return MessageContext.builder()
+                    String seed = StringUtils.replaceEach(
+                            localization.seed(),
+                            new String[]{"<row>", "<column>", "<seed>"},
+                            new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getSeed())}
+                    );
+                    String remaining = String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount());
+                    String flag = Strings.CS.replace(
+                            minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
+                            "<command>",
+                            commandModuleController.getCommandName(this)
+                    );
+
+                    return MinesweeperMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(StringUtils.replaceEach(
                                             localizationFunction.apply(localization),
                                             new String[]{"<seed>", "<remaining>", "<flag>", "<field>"},
-                                            new String[]{
-                                                    StringUtils.replaceEach(
-                                                            localization.seed(),
-                                                            new String[]{"<row>", "<column>", "<seed>"},
-                                                            new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getSeed())}
-                                                    ),
-                                                    String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount()),
-                                                    Strings.CS.replace(
-                                                            minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
-                                                            "<command>",
-                                                            commandModuleController.getCommandName(this)
-                                                    ),
-                                                    render(minesweeper, localization),
-                                            }
+                                            new String[]{seed, remaining, flag, render(minesweeper, localization)}
                                     ))
-                                    .build();
-                        })
-                        .build()
-                )
-                .minesweeper(minesweeper)
+                                    .build()
+                            )
+                            .minesweeper(minesweeper)
+                            .build();
+                })
                 .build()
         );
     }

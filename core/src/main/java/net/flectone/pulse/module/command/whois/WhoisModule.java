@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -23,7 +22,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -49,8 +47,6 @@ public class WhoisModule implements ModuleCommand {
     private final ModuleCommandController commandModuleController;
     private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final SoundPlayer soundPlayer;
-    private final EventDispatcher eventDispatcher;
 
     private final MutelistModule mutelistModule;
     private final BanlistModule banlistModule;

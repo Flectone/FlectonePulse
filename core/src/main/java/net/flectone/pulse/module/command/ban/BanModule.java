@@ -10,8 +10,8 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -165,18 +165,22 @@ public class BanModule implements ModuleCommand {
             return;
         }
 
-        if (config().checkDuplicate() && moderationService.hasValid(fTarget, Moderation.Type.BAN)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(Strings.CS.replace(localization(fResolver).alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
-                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+        if (config().checkDuplicate()) {
+            Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.BAN);
+            moderation.ifPresent(value -> messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(Strings.CS.replace(localization(fResolver).alreadyBanned(), "<command>", "/" + commandModuleController.getCommandName(unbanModule) + " " + fTarget.name()))
+                                    .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                                    .build()
+                            )
+                            .moderation(value)
                             .build()
                     )
                     .build()
-            );
-            return;
+            ));
         }
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
@@ -188,15 +192,19 @@ public class BanModule implements ModuleCommand {
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_BAN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
-        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
+        EventMetadata.Builder eventMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(moderation)
                         .build()
                 )
                 .proxy(dataOutputStream ->
@@ -207,14 +215,10 @@ public class BanModule implements ModuleCommand {
                 );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
+            eventMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(moderation)
-                .build()
-        );
+        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
 
         kick(moderation);
     }
@@ -229,11 +233,15 @@ public class BanModule implements ModuleCommand {
         Localization.Command.Ban localization = localization(fTarget);
         String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, ban);
 
-        platformPlayerAdapter.kick(fTarget, messagePipeline.build(MessageContext.builder()
-                .sender(fModerator)
-                .receiver(fTarget)
-                .message(formatPlayer)
-                .tagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator))
+        platformPlayerAdapter.kick(fTarget, messagePipeline.build(ModerationMessageContext.builder()
+                .base(MessageContext.builder()
+                        .sender(fModerator)
+                        .receiver(fTarget)
+                        .message(formatPlayer)
+                        .tagResolver(messagePipeline.targetTag("moderator", fTarget, fModerator))
+                        .build()
+                )
+                .moderation(ban)
                 .build())
         );
     }

@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tell.listener.PulseTellListener;
@@ -116,11 +117,15 @@ public class TellModule implements ModuleCommand {
         if (fPlayer.name().equalsIgnoreCase(playerName)) {
             messageDispatcher.dispatch(this, EventMetadata.builder()
                     .destination(config().destination())
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(localization(fResolver).myself())
-                            .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                    .messageContext(fResolver -> StringMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).myself())
+                                    .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                    .build()
+                            )
+                            .string(message)
                             .build()
                     )
                     .build()
@@ -185,12 +190,16 @@ public class TellModule implements ModuleCommand {
                 .filter(fReceiver)
                 .destination(config().destination())
                 .sound(isSenderToSender ? null : soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .uuid(metadataUUID)
-                        .sender(sender)
-                        .receiver(fResolver)
-                        .message(format.apply(localization(fResolver)))
-                        .tagResolvers(messagePipeline.messageTag(sender, fResolver, string), messagePipeline.targetTag(fResolver, target))
+                .messageContext(fResolver -> StringMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .uuid(metadataUUID)
+                                .sender(sender)
+                                .receiver(fResolver)
+                                .message(format.apply(localization(fResolver)))
+                                .tagResolvers(messagePipeline.messageTag(sender, fResolver, string), messagePipeline.targetTag(fResolver, target))
+                                .build()
+                        )
+                        .string(string)
                         .build()
                 )
                 .build()

@@ -16,7 +16,7 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.model.Chat;
-import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.module.message.chat.model.ChatMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -54,13 +54,13 @@ public class ChatProxyMessageListener implements PulseListener {
 
             Chat playerChat = new Chat(proxyChatName, chatType, chatModule.permission().types().get(proxyChatName));
 
-            messageDispatcher.dispatch(chatModule, ChatMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.Type.SERVER)
-                            .filter(chatModule.permissionFilter(proxyChatName))
-                            .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
-                            .sound(playerChat.sound())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(chatModule, EventMetadata.builder()
+                    .range(Range.Type.SERVER)
+                    .filter(chatModule.permissionFilter(proxyChatName))
+                    .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
+                    .sound(playerChat.sound())
+                    .messageContext(fResolver -> ChatMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -68,9 +68,10 @@ public class ChatProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
                                     .build()
                             )
+                            .string(message)
+                            .chat(playerChat)
                             .build()
                     )
-                    .chat(playerChat)
                     .build()
             );
         }

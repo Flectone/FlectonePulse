@@ -14,6 +14,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -397,20 +398,24 @@ public class ReplacementModule implements ModuleLocalization {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
-        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                .sender(messageContext.sender())
-                .receiver(messageContext.receiver())
-                .message(Strings.CS.replace(
-                        localization(messageContext.receiver()).values().getOrDefault("skin", ""),
-                        "<message_1>",
-                        url
-                ))
-                .flags(messageContext.flags())
-                .flags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
-                        new boolean[]{false, false}
+        return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
+                .base(MessageContext.builder()
+                        .sender(messageContext.sender())
+                        .receiver(messageContext.receiver())
+                        .message(Strings.CS.replace(
+                                localization(messageContext.receiver()).values().getOrDefault("skin", ""),
+                                "<message_1>",
+                                url
+                        ))
+                        .flags(messageContext.flags())
+                        .flags(
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
+                                new boolean[]{false, false}
+                        )
+                        .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                        .build()
                 )
-                .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                .component(componentPixels)
                 .build()
         ));
     }
@@ -419,16 +424,20 @@ public class ReplacementModule implements ModuleLocalization {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.uuid(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
-        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                .sender(messageContext.sender())
-                .receiver(messageContext.receiver())
-                .message(localization(messageContext.receiver()).values().getOrDefault("item", ""))
-                .flags(messageContext.flags())
-                .flags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
-                        new boolean[]{false, false}
+        return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
+                .base(MessageContext.builder()
+                        .sender(messageContext.sender())
+                        .receiver(messageContext.receiver())
+                        .message(localization(messageContext.receiver()).values().getOrDefault("item", ""))
+                        .flags(messageContext.flags())
+                        .flags(
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE},
+                                new boolean[]{false, false}
+                        )
+                        .tagResolver(messagePipeline.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)))
+                        .build()
                 )
-                .tagResolver(messagePipeline.resolver("message_1", (_, _) -> Tag.selfClosingInserting(componentItem)))
+                .component(componentItem)
                 .build()
         ));
     }
@@ -467,20 +476,24 @@ public class ReplacementModule implements ModuleLocalization {
             return MessagePipeline.ReplacementTag.emptyTag();
         }
 
-        return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                .sender(messageContext.sender())
-                .receiver(messageContext.receiver())
-                .message(Strings.CS.replace(
-                        localization(messageContext.receiver()).values().getOrDefault("image", ""),
-                        "<message_1>",
-                        url
-                ))
-                .flags(messageContext.flags())
-                .flags(
-                        new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
-                        new boolean[]{false, false, false}
+        return Tag.selfClosingInserting(messagePipeline.build(ComponentMessageContext.builder()
+                .base(MessageContext.builder()
+                        .sender(messageContext.sender())
+                        .receiver(messageContext.receiver())
+                        .message(Strings.CS.replace(
+                                localization(messageContext.receiver()).values().getOrDefault("image", ""),
+                                "<message_1>",
+                                url
+                        ))
+                        .flags(messageContext.flags())
+                        .flags(
+                                new MessageFlag[]{MessageFlag.PLAYER_MESSAGE, MessageFlag.REPLACEMENT_MODULE, MessageFlag.LEGACY_COLOR_CONVERSION},
+                                new boolean[]{false, false, false}
+                        )
+                        .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                        .build()
                 )
-                .tagResolver(messagePipeline.resolver("pixels", (_, _) -> Tag.inserting(componentPixels)))
+                .component(componentPixels)
                 .build()
         ));
     }

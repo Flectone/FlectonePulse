@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.try_.listener.TryProxyMessageListener;
-import net.flectone.pulse.module.command.try_.model.TryMetadata;
+import net.flectone.pulse.module.command.try_.model.TryMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -74,28 +74,29 @@ public class TryModule implements ModuleCommand {
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, TryMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> TryMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replacePercent(fResolver, random))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeInt(random);
-                            dataOutputStream.writeString(message);
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_" + String.valueOf(isGood(random)).toUpperCase()))
-                                .build())
+                        .string(message)
+                        .percent(random)
                         .build()
                 )
-                .percent(random)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(random);
+                    dataOutputStream.writeString(message);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name().name() + "_" + String.valueOf(isGood(random)).toUpperCase()))
+                        .build())
                 .build()
         );
     }

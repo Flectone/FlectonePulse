@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.helper.listener.HelperProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -111,11 +112,15 @@ public class HelperModule implements ModuleCommand {
                 .filter(getFilterSee())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fPlayer)
-                        .receiver(fResolver)
-                        .message(localization(fResolver).global())
-                        .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                .messageContext(fResolver -> StringMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).global())
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                .build()
+                        )
+                        .string(message)
                         .build()
                 )
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))

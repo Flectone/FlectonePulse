@@ -14,7 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
+import net.flectone.pulse.module.command.clearmail.model.ClearMessageContext;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -103,24 +103,27 @@ public class ClearmailModule implements ModuleCommand {
             return;
         }
 
-        FPlayer fReceiver = fPlayerService.getFPlayer(optionalMail.get().receiver());
+        Mail mail = optionalMail.get();
 
-        socialService.deleteMail(optionalMail.get());
+        FPlayer fReceiver = fPlayerService.getFPlayer(mail.receiver());
 
-        messageDispatcher.dispatch(this, ClearmailMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        socialService.deleteMail(mail);
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> ClearMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(Strings.CS.replaceOnce(localization(fResolver).format(), "<id>", String.valueOf(mailID)))
-                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, optionalMail.get().message()), messagePipeline.targetTag(fResolver, fReceiver))
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, mail.message()), messagePipeline.targetTag(fResolver, fReceiver))
                                 .build()
                         )
+                        .string(mail.message())
+                        .mail(mail)
                         .build()
                 )
-                .mail(optionalMail.get())
                 .build()
         );
     }

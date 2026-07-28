@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.online.listener.PulseOnlineListener;
-import net.flectone.pulse.module.command.online.model.OnlineMetadata;
+import net.flectone.pulse.module.command.online.model.OnlineMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -104,14 +104,14 @@ public class OnlineModule implements ModuleCommand {
             return;
         }
 
-        messageDispatcher.dispatch(this, OnlineMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> {
-                            Localization.Command.Online localization = localization(fResolver);
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> {
+                    Localization.Command.Online localization = localization(fResolver);
 
-                            return MessageContext.builder()
+                    return OnlineMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(switch (type.toUpperCase()) {
@@ -134,11 +134,11 @@ public class OnlineModule implements ModuleCommand {
                                         );
                                     })
                                     .tagResolver(messagePipeline.targetTag(fResolver, targetFPlayer))
-                                    .build();
-                        })
-                        .build()
-                )
-                .type(type)
+                                    .build()
+                            )
+                            .type(type)
+                            .build();
+                })
                 .build()
         );
     }

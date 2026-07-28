@@ -24,7 +24,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatProxyMessageListener;
 import net.flectone.pulse.module.message.chat.model.Chat;
-import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.module.message.chat.model.ChatMessageContext;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
@@ -38,7 +38,10 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -156,30 +159,31 @@ public class ChatModule implements ModuleLocalization {
         String chatName = playerChat.name();
         if (chatName == null) return;
 
-        Set<FPlayer> receivers = messageDispatcher.dispatch(this, ChatMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(playerChat.config().range())
-                        .filter(permissionFilter(chatName))
-                        .destination(playerChat.config().destination())
-                        .sound(playerChat.sound())
-                        .messageContext(fResolver -> MessageContext.builder()
+        Set<FPlayer> receivers = messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(playerChat.config().range())
+                .filter(permissionFilter(chatName))
+                .destination(playerChat.config().destination())
+                .sound(playerChat.sound())
+                .messageContext(fResolver -> ChatMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).types().get(chatName))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, playerMessage))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeString(chatName);
-                            dataOutputStream.writeString(playerMessage);
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name() + "_" + chatName.toUpperCase()))
-                                .build()
-                        )
+                        .string(playerMessage)
+                        .chat(playerChat)
                         .build()
                 )
-                .chat(playerChat)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(chatName);
+                    dataOutputStream.writeString(playerMessage);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name() + "_" + chatName.toUpperCase()))
+                        .build()
+                )
                 .build()
         );
 

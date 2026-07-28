@@ -13,7 +13,6 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
 import net.flectone.pulse.util.logging.FLogger;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permissible;
 import org.jspecify.annotations.Nullable;
@@ -50,9 +49,6 @@ public class BukkitItemsAdderIntegration implements FIntegration, PulseListener 
         if (!isHooked()) return event;
 
         Permissible permissible = Bukkit.getPlayer(messageContext.sender().uuid());
-        if (StringUtils.isNotEmpty(messageContext.userMessage())) {
-            messageContext = messageContext.withUserMessage(formatFontImages(permissible, messageContext.userMessage()));
-        }
 
         return event.withContext(messageContext.withMessage(formatFontImages(permissible, messageContext.message())));
     }

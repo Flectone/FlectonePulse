@@ -16,12 +16,13 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenanceProxyMessageListener;
 import net.flectone.pulse.module.command.maintenance.listener.PulseMaintenanceListener;
-import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
+import net.flectone.pulse.module.command.maintenance.model.MaintenanceMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -222,11 +223,16 @@ public class MaintenanceModule implements ModuleCommand {
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse(), fResolver, moderation))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> MaintenanceMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse(), fResolver, moderation))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(moderation)
+                        .turned(turned)
                         .build()
                 )
                 .proxy(dataOutputStream -> {
@@ -242,12 +248,7 @@ public class MaintenanceModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, MaintenanceMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(moderation)
-                .turned(turned)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
 
         if (moderation.type() == Moderation.Type.MAINTENANCE) {
             kickOnlinePlayers(moderation);
@@ -266,11 +267,15 @@ public class MaintenanceModule implements ModuleCommand {
                     Localization.Command.Maintenance localization = localization(fReceiver);
                     String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, maintenance);
 
-                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(MessageContext.builder()
-                            .sender(fModerator)
-                            .receiver(fReceiver)
-                            .message(formatPlayer)
-                            .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fModerator))
+                    platformPlayerAdapter.kick(fReceiver, messagePipeline.build(ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fModerator)
+                                    .receiver(fReceiver)
+                                    .message(formatPlayer)
+                                    .tagResolver(messagePipeline.targetTag("moderator", fReceiver, fModerator))
+                                    .build()
+                            )
+                            .moderation(maintenance)
                             .build()
                     ));
                 });

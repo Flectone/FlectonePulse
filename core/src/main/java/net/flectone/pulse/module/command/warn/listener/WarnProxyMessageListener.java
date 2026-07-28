@@ -11,9 +11,9 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.warn.WarnModule;
@@ -52,12 +52,12 @@ public class WarnProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(warnModule, ModerationMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(warnModule.config().destination())
-                            .sound(warnModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(warnModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(warnModule.config().destination())
+                    .sound(warnModule.soundOrThrow())
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -65,9 +65,9 @@ public class WarnProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                     .build()
                             )
+                            .moderation(warn)
                             .build()
                     )
-                    .moderation(warn)
                     .build()
             );
         }

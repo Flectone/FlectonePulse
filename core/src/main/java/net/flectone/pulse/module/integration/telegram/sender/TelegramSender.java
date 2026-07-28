@@ -14,7 +14,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.telegram.extractor.TelegramChatIdExtractor;
 import net.flectone.pulse.module.integration.telegram.model.TelegramClient;
-import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
+import net.flectone.pulse.module.integration.telegram.model.TelegramMessageContext;
 import net.flectone.pulse.module.integration.telegram.provider.TelegramClientProvider;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
@@ -121,12 +121,12 @@ public class TelegramSender {
         String firstName = user.getFirstName();
         String lastName = StringUtils.defaultString(user.getLastName());
 
-        messageDispatcher.dispatch(telegramModule, TelegramMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(Range.get(Range.Type.PROXY))
-                        .destination(telegramModule.config().destination())
-                        .sound(telegramModule.soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(telegramModule, EventMetadata.builder()
+                .range(Range.get(Range.Type.PROXY))
+                .destination(telegramModule.config().destination())
+                .sound(telegramModule.soundOrThrow())
+                .messageContext(fResolver -> TelegramMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(telegramClient.sender())
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
@@ -153,23 +153,24 @@ public class TelegramSender {
                                     ));
                                 }))
                                 .build()
-
                         )
-                        .integration(IntegrationMetadata.builder()
-                                .format(string -> StringUtils.replaceEach(
-                                        string,
-                                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                                        new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
-                                ))
-                                .messageNames(List.of(telegramModule.name().name() + "_" + chatId, telegramModule.name().name() + "_" + chat.toUpperCase()))
-                                .build()
-                        )
+                        .string(message)
+                        .userName(userName)
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .chat(chat)
+                        .reply(reply)
                         .build()
                 )
-                .userName(userName)
-                .firstName(firstName)
-                .lastName(lastName)
-                .chat(chat)
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                                new String[]{userName, userName, firstName, lastName, StringUtils.defaultString(chat)}
+                        ))
+                        .messageNames(List.of(telegramModule.name().name() + "_" + chatId, telegramModule.name().name() + "_" + chat.toUpperCase()))
+                        .build()
+                )
                 .build()
         );
     }

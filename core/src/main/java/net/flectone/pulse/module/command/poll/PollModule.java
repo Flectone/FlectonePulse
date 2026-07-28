@@ -22,7 +22,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.poll.listener.PollProxyMessageListener;
 import net.flectone.pulse.module.command.poll.model.Poll;
-import net.flectone.pulse.module.command.poll.model.PollMetadata;
+import net.flectone.pulse.module.command.poll.model.PollMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -111,25 +111,26 @@ public class PollModule implements ModuleCommand {
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = config().range();
 
-                messageDispatcher.dispatch(this, PollMetadata.builder()
-                        .base(EventMetadata.builder()
-                                .range(range)
-                                .messageContext(fResolver -> MessageContext.builder()
+                messageDispatcher.dispatch(this, EventMetadata.builder()
+                        .range(range)
+                        .messageContext(fResolver -> PollMessageContext.builder()
+                                .base(MessageContext.builder()
                                         .sender(fPlayer)
                                         .receiver(fResolver)
                                         .message(resolvePollFormat(fResolver, poll, status))
                                         .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
                                         .build()
                                 )
-                                .integration(IntegrationMetadata.builder()
-                                        .messageNames(List.of(name().name() + "_" + status, name().name() + "_REPEAT"))
-                                        .build()
-                                )
+                                .string(poll.getTitle())
+                                .poll(poll)
+                                .status(status)
+                                .action(Action.REPEAT)
                                 .build()
                         )
-                        .poll(poll)
-                        .status(status)
-                        .action(Action.REPEAT)
+                        .integration(IntegrationMetadata.builder()
+                                .messageNames(List.of(name().name() + "_" + status, name().name() + "_REPEAT"))
+                                .build()
+                        )
                         .build()
                 );
             });
@@ -247,32 +248,31 @@ public class PollModule implements ModuleCommand {
 
         saveAndUpdateLast(poll);
 
-        Range range = config().range();
-
-        messageDispatcher.dispatch(this, PollMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(range)
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> PollMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(resolvePollFormat(fResolver, poll, Status.START))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeUTF(Action.CREATE.name());
-                            dataOutputStream.writeAsJson(poll);
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_START", name().name() + "_CREATE"))
-                                .build()
-                        )
+                        .string(poll.getTitle())
+                        .poll(poll)
+                        .status(Status.START)
+                        .action(Action.CREATE)
                         .build()
                 )
-                .poll(poll)
-                .status(Status.START)
-                .action(Action.CREATE)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeUTF(Action.CREATE.name());
+                    dataOutputStream.writeAsJson(poll);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name().name() + "_START", name().name() + "_CREATE"))
+                        .build()
+                )
                 .build()
         );
     }
@@ -340,20 +340,20 @@ public class PollModule implements ModuleCommand {
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        messageDispatcher.dispatch(this, PollMetadata.builder()
-                .base(EventMetadata.builder()
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> PollMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(resolveVote(fResolver, voteType, numberVote, pollID, count))
                                 .build()
                         )
+                        .poll(poll)
+                        .status(Status.RUN)
+                        .action(Action.VOTE)
                         .build()
                 )
-                .poll(poll)
-                .status(Status.RUN)
-                .action(Action.VOTE)
                 .build()
         );
     }

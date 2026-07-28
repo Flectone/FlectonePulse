@@ -4,15 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
@@ -52,26 +51,22 @@ public class PulseBanListener implements PulseListener {
         Moderation ban = bans.getFirst();
         FPlayer fModerator = fPlayerService.getFPlayer(ban.moderator());
 
-        // replace string moderation placeholders
-        Localization.Command.Ban localization = banModule.localization(fPlayer);
-        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, ban);
-
         // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
-            messageDispatcher.dispatch(banModule, ModerationMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .filter(filter -> permissionChecker.check(filter, banModule.permission()))
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(banModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .filter(filter -> permissionChecker.check(filter, banModule.permission()))
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fResolver).connectionAttempt(), fResolver, ban))
                                     .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                     .build()
                             )
+                            .moderation(ban)
                             .build()
                     )
-                    .moderation(ban)
                     .build()
             );
         }
@@ -79,11 +74,15 @@ public class PulseBanListener implements PulseListener {
         return event
                 .withPlayer(fPlayer)
                 .withAllowed(false)
-                .withKickReason(messagePipeline.build(MessageContext.builder()
-                        .sender(fModerator)
-                        .receiver(fPlayer)
-                        .message(formatPlayer)
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                .withKickReason(messagePipeline.build(ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fModerator)
+                                .receiver(fPlayer)
+                                .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fPlayer).person(), fPlayer, ban))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                                .build()
+                        )
+                        .moderation(ban)
                         .build()
                 ));
     }

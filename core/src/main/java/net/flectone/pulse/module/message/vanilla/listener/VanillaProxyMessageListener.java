@@ -20,7 +20,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.model.ParsedComponent;
-import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -61,13 +61,13 @@ public class VanillaProxyMessageListener implements PulseListener {
             String vanillaMessageName = vanillaMessage.name();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(vanillaModule, VanillaMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
-                            .filter(fResolver -> socialService.canSeeVanished(event.sender(), fResolver, vanished))
-                            .destination(parsedComponent.vanillaMessage().destination())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(vanillaModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
+                    .filter(fResolver -> socialService.canSeeVanished(event.sender(), fResolver, vanished))
+                    .destination(parsedComponent.vanillaMessage().destination())
+                    .messageContext(fResolver -> VanillaMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -75,11 +75,11 @@ public class VanillaProxyMessageListener implements PulseListener {
                                     .tagResolver(vanillaModule.argumentTag(fResolver, parsedComponent))
                                     .build()
                             )
+                            .parsedComponent(parsedComponent)
+                            .fakeMessage(false)
+                            .vanished(vanished)
                             .build()
                     )
-                    .parsedComponent(parsedComponent)
-                    .fakeMessage(false)
-                    .vanished(vanished)
                     .build()
             );
         }

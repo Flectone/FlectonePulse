@@ -11,8 +11,8 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -139,18 +139,22 @@ public class MuteModule implements ModuleCommand {
             return;
         }
 
-        if (config().checkDuplicate() && moderationService.hasValid(fTarget, Moderation.Type.MUTE)) {
-            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
-                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+        if (config().checkDuplicate()) {
+            Optional<Moderation> moderation = moderationService.getValid(fTarget, Moderation.Type.MUTE);
+            moderation.ifPresent(value -> messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
+                                    .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                                    .build()
+                            )
+                            .moderation(value)
                             .build()
                     )
                     .build()
-            );
-            return;
+            ));
         }
 
         long databaseTime = time + System.currentTimeMillis();
@@ -167,11 +171,15 @@ public class MuteModule implements ModuleCommand {
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, mute))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(mute)
                         .build()
                 )
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
@@ -183,11 +191,7 @@ public class MuteModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(mute)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
 
         sendForTarget(fPlayer, fTarget, mute);
     }
@@ -242,11 +246,15 @@ public class MuteModule implements ModuleCommand {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
         messageDispatcher.dispatch(this, EventMetadata.builder()
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fReceiver)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fReceiver, mute))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                .messageContext(fResolver -> ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fReceiver)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fReceiver, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                .build()
+                        )
+                        .moderation(mute)
                         .build()
                 )
                 .build()

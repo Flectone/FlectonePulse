@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.twitch.model.TwitchClient;
-import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
+import net.flectone.pulse.module.integration.twitch.model.TwitchMessageContext;
 import net.flectone.pulse.module.integration.twitch.provider.TwitchClientProvider;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -41,12 +41,12 @@ public class TwitchSender {
         TwitchClient twitchClient = twitchClientProvider.get();
         if (twitchClient == null) return;
 
-        messageDispatcher.dispatch(twitchModule, TwitchMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(Range.get(Range.Type.PROXY))
-                        .destination(twitchModule.config().destination())
-                        .sound(twitchModule.soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(twitchModule, EventMetadata.builder()
+                .range(Range.get(Range.Type.PROXY))
+                .destination(twitchModule.config().destination())
+                .sound(twitchModule.soundOrThrow())
+                .messageContext(fResolver -> TwitchMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(twitchClient.sender())
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(
@@ -74,19 +74,21 @@ public class TwitchSender {
                                 }))
                                 .build()
                         )
-                        .integration(IntegrationMetadata.builder()
-                                .format(string -> StringUtils.replaceEach(
-                                        string,
-                                        new String[]{"<name>", "<channel>"},
-                                        new String[]{nickname, channel}
-                                ))
-                                .messageNames(List.of(twitchModule.name().name() + "_" + channel.toUpperCase()))
-                                .build()
-                        )
+                        .string(message)
+                        .nickname(nickname)
+                        .channel(channel)
+                        .reply(reply)
                         .build()
                 )
-                .nickname(nickname)
-                .channel(channel)
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<channel>"},
+                                new String[]{nickname, channel}
+                        ))
+                        .messageNames(List.of(twitchModule.name().name() + "_" + channel.toUpperCase()))
+                        .build()
+                )
                 .build()
         );
     }

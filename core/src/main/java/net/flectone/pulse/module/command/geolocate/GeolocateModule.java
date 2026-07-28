@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
-import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
+import net.flectone.pulse.module.command.geolocate.model.GeolocateMessageContext;
 import net.flectone.pulse.module.command.geolocate.model.IpResponse;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -119,11 +119,11 @@ public class GeolocateModule implements ModuleCommand {
 
         String userCurrentTime = getUserCurrentTime(response);
 
-        messageDispatcher.dispatch(this, GeolocateMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> GeolocateMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(localization(fResolver).format(),
@@ -133,9 +133,9 @@ public class GeolocateModule implements ModuleCommand {
                                 .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
                                 .build()
                         )
+                        .response(response)
                         .build()
                 )
-                .response(response)
                 .build()
         );
     }

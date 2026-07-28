@@ -10,8 +10,8 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -167,11 +167,15 @@ public class UnbanModule implements ModuleCommand {
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).format(), fResolver, unban))
-                        .tagResolver( messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).format(), fResolver, unban))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(unban)
                         .build()
                 )
                 .proxy(dataOutputStream ->
@@ -185,10 +189,6 @@ public class UnbanModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(unban)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
     }
 }

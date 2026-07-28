@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
+import net.flectone.pulse.module.command.ignore.model.IgnoreMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -108,21 +108,21 @@ public class IgnoreModule implements ModuleCommand {
             metadataIgnore = ignore.get();
         }
 
-        messageDispatcher.dispatch(this, IgnoreMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> IgnoreMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(optionalIgnore.isEmpty() ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse())
                                 .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
                                 .build()
                         )
+                        .ignore(metadataIgnore)
+                        .ignored(optionalIgnore.isEmpty())
                         .build()
                 )
-                .ignore(metadataIgnore)
-                .ignored(optionalIgnore.isEmpty())
                 .build()
         );
     }

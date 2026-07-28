@@ -11,6 +11,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.do_.DoModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -42,12 +43,16 @@ public class DoProxyMessageListener implements PulseListener {
                     .range(Range.get(Range.Type.SERVER))
                     .destination(doModule.config().destination())
                     .sound(doModule.soundOrThrow())
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .receiver(fResolver)
-                            .message(doModule.localization(fResolver).format())
-                            .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                    .messageContext(fResolver -> StringMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(doModule.localization(fResolver).format())
+                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .build()
+                            )
+                            .string(message)
                             .build()
                     )
                     .build()

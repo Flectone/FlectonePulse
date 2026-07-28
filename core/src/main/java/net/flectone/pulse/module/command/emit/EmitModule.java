@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -96,12 +97,16 @@ public class EmitModule implements ModuleCommand {
                     .range(range)
                     .destination(destination)
                     .sound(soundOrThrow())
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                            .message(localization(fResolver).format())
-                            .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                    .messageContext(fResolver -> StringMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                    .message(localization(fResolver).format())
+                                    .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                    .build()
+                            )
+                            .string(message)
                             .build()
                     )
                     .proxy(dataOutputStream -> {
@@ -144,12 +149,16 @@ public class EmitModule implements ModuleCommand {
                 .filter(fTarget)
                 .destination(destination)
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fPlayer)
-                        .receiver(fResolver)
-                        .message(localization(fResolver).format())
-                        .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                        .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fTarget))
+                .messageContext(fResolver -> StringMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).format())
+                                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fTarget))
+                                .build()
+                        )
+                        .string(message)
                         .build()
                 )
                 .integration()

@@ -150,6 +150,16 @@ public class MessagePipeline {
         return resolver("message", (_, _) -> Tag.inserting(message));
     }
 
+    public TagResolver messageTag(FEntity sender, FPlayer receiver, String message) {
+        return messageTag(build(MessageContext.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .message(message)
+                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                .build())
+        );
+    }
+
     public TagResolver targetTag(@TagPattern String tag, String formatTarget, FPlayer receiver, @Nullable FEntity target) {
         if (target == null) return emptyResolver(tag);
 

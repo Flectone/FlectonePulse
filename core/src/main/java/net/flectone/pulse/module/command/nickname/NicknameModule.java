@@ -17,7 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.nickname.listener.NicknameProxyMessageListener;
 import net.flectone.pulse.module.command.nickname.listener.PulseNicknameListener;
-import net.flectone.pulse.module.command.nickname.model.NicknameMetadata;
+import net.flectone.pulse.module.command.nickname.model.NicknameMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -189,20 +189,20 @@ public class NicknameModule implements ModuleCommand {
     }
 
     public void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID) {
-        messageDispatcher.dispatch(this, NicknameMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> NicknameMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())
                                 .build()
                         )
+                        .nickname(nickname)
                         .build()
                 )
-                .nickname(nickname)
                 .build()
         );
     }

@@ -12,7 +12,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.listener.DeletemessageProxyMessageListener;
-import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
+import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMessageContext;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -84,19 +84,19 @@ public class DeletemessageModule implements ModuleCommand {
                 UUID.randomUUID()
         );
 
-        messageDispatcher.dispatch(this, DeletemessageMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> DeletemessageMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())
                                 .build()
                         )
+                        .deletedUUID(uuid)
                         .build()
                 )
-                .deletedUUID(uuid)
                 .build()
         );
     }

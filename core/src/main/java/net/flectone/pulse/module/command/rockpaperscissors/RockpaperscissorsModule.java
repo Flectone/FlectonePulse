@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.listener.RockpaperscissorsProxyMessageListener;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
-import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
+import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -145,10 +145,10 @@ public class RockpaperscissorsModule implements ModuleCommand {
 
         create(rockPaperScissors.getId(), fPlayer, fReceiver.uuid());
 
-        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.builder()
-                .base(EventMetadata.builder()
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(StringUtils.replaceEach(localization(fResolver).formatMove(),
@@ -157,10 +157,10 @@ public class RockpaperscissorsModule implements ModuleCommand {
                                 ))
                                 .build()
                         )
+                        .rockPaperScissors(rockPaperScissors)
+                        .gamePhase(GamePhase.CREATE)
                         .build()
                 )
-                .rockPaperScissors(rockPaperScissors)
-                .gamePhase(GamePhase.CREATE)
                 .build()
         );
     }
@@ -316,10 +316,10 @@ public class RockpaperscissorsModule implements ModuleCommand {
 
         FEntity winFPlayer = config().strategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
-        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(List.of(fPlayer, fReceiver))
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(List.of(fPlayer, fReceiver))
+                .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(winFPlayer)
                                 .receiver(fResolver)
@@ -330,10 +330,10 @@ public class RockpaperscissorsModule implements ModuleCommand {
                                 ))
                                 .build()
                         )
+                        .rockPaperScissors(rockPaperScissors)
+                        .gamePhase(GamePhase.END)
                         .build()
                 )
-                .rockPaperScissors(rockPaperScissors)
-                .gamePhase(GamePhase.END)
                 .build()
         );
     }
@@ -348,27 +348,27 @@ public class RockpaperscissorsModule implements ModuleCommand {
 
         rockPaperScissors.setSenderMove(move);
 
-        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(fReceiver)
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fReceiver)
+                .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
                                 .message(localization(fResolver).receiver())
                                 .build()
                         )
+                        .rockPaperScissors(rockPaperScissors)
+                        .gamePhase(GamePhase.MOVE)
                         .build()
                 )
-                .rockPaperScissors(rockPaperScissors)
-                .gamePhase(GamePhase.MOVE)
                 .build()
         );
 
-        messageDispatcher.dispatch(this, RockPaperScissorsMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(fReceiver)
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fReceiver)
+                .messageContext(fResolver -> RockPaperScissorsMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -380,10 +380,10 @@ public class RockpaperscissorsModule implements ModuleCommand {
                                 ))
                                 .build()
                         )
+                        .rockPaperScissors(rockPaperScissors)
+                        .gamePhase(GamePhase.MOVE)
                         .build()
                 )
-                .rockPaperScissors(rockPaperScissors)
-                .gamePhase(GamePhase.MOVE)
                 .build()
         );
     }

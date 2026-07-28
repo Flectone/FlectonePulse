@@ -16,14 +16,13 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.whitelist.listener.PulseWhitelistListener;
 import net.flectone.pulse.module.command.whitelist.listener.WhitelistProxyMessageListener;
-import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
+import net.flectone.pulse.module.command.whitelist.model.WhitelistMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -285,11 +284,16 @@ public class WhitelistModule implements ModuleCommand {
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatOn() : localization(fResolver).formatOff(), fResolver, moderation))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> WhitelistMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatOn() : localization(fResolver).formatOff(), fResolver, moderation))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(moderation)
+                        .turnedOn(turned)
                         .build()
                 )
                 .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
@@ -302,12 +306,7 @@ public class WhitelistModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, WhitelistMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(moderation)
-                .turnedOn(turned)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
 
         if (moderation.type() == Moderation.Type.WHITELIST) {
             kickOnlinePlayers(moderation);
@@ -392,11 +391,15 @@ public class WhitelistModule implements ModuleCommand {
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatAdd(), fResolver, whitelist))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> WhitelistMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatAdd(), fResolver, whitelist))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(whitelist)
                         .build()
                 )
                 .proxy(dataOutputStream -> {
@@ -413,11 +416,7 @@ public class WhitelistModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(whitelist)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
     }
 
     private void actionRemove(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
@@ -488,11 +487,15 @@ public class WhitelistModule implements ModuleCommand {
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fTarget)
-                        .receiver(fResolver)
-                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatRemove(), fResolver, unwhitelist))
-                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                .messageContext(fResolver -> WhitelistMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fTarget)
+                                .receiver(fResolver)
+                                .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatRemove(), fResolver, unwhitelist))
+                                .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                                .build()
+                        )
+                        .moderation(unwhitelist)
                         .build()
                 )
                 .proxy(dataOutputStream -> {
@@ -509,11 +512,7 @@ public class WhitelistModule implements ModuleCommand {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.builder()
-                .base(baseMetadataBuilder.build())
-                .moderation(unwhitelist)
-                .build()
-        );
+        messageDispatcher.dispatch(this, baseMetadataBuilder.build());
 
         kickPlayer(fPlayer, fTarget);
     }

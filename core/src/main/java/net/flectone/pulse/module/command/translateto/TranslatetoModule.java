@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.translateto.listener.TranslatetoProxyMessageListener;
-import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
+import net.flectone.pulse.module.command.translateto.model.TranslatetoMessageContext;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -117,32 +117,33 @@ public class TranslatetoModule implements ModuleCommand {
         }
 
         String finalMessageToTranslate = messageToTranslate;
-        messageDispatcher.dispatch(this, TranslatetoMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(config().range())
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> TranslatetoMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceLanguage(fResolver, targetLang))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, translatedMessage))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeString(targetLang);
-                            dataOutputStream.writeString(message);
-                            dataOutputStream.writeString(finalMessageToTranslate);
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .format(string -> Strings.CS.replace(string, "<language>", targetLang))
-                                .messageNames(List.of(name().name() + "_" + targetLang.toUpperCase()))
-                                .build()
-                        )
+                        .string(translatedMessage)
+                        .targetLanguage(targetLang)
+                        .messageToTranslate(finalMessageToTranslate)
                         .build()
                 )
-                .targetLanguage(targetLang)
-                .messageToTranslate(messageToTranslate)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(targetLang);
+                    dataOutputStream.writeString(message);
+                    dataOutputStream.writeString(finalMessageToTranslate);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> Strings.CS.replace(string, "<language>", targetLang))
+                        .messageNames(List.of(name().name() + "_" + targetLang.toUpperCase()))
+                        .build()
+                )
                 .build()
         );
     }

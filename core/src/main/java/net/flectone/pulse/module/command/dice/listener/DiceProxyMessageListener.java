@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.dice.DiceModule;
-import net.flectone.pulse.module.command.dice.model.DiceMetadata;
+import net.flectone.pulse.module.command.dice.model.DiceMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -41,21 +41,21 @@ public class DiceProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             List<Integer> cubes = gson.fromJson(proxyPayload.readString(), new TypeToken<List<Integer>>() {}.getType());
 
-            messageDispatcher.dispatch(diceModule, DiceMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(diceModule.config().destination())
-                            .sound(diceModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(diceModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(diceModule.config().destination())
+                    .sound(diceModule.soundOrThrow())
+                    .messageContext(fResolver -> DiceMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(diceModule.replaceResult(fResolver, cubes))
                                     .build()
                             )
+                            .cubes(cubes)
                             .build()
                     )
-                    .cubes(cubes)
                     .build()
             );
         }

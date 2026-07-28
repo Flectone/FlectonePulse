@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ball.listener.BallProxyMessageListener;
-import net.flectone.pulse.module.command.ball.model.BallMetadata;
+import net.flectone.pulse.module.command.ball.model.BallMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -70,34 +70,35 @@ public class BallModule implements ModuleCommand {
         int answer = randomUtil.nextInt(0, localization(FPlayer.UNKNOWN).answers().size());
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, BallMetadata.builder()
-                .base(EventMetadata.builder()
-                        .destination(config().destination())
-                        .range(config().range())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .destination(config().destination())
+                .range(config().range())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> BallMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(replaceAnswer(fResolver, answer))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeInt(answer);
-                            dataOutputStream.writeString(message);
-                        })
-                        .integration(string -> {
-                            List<String> answers = localization(FPlayer.UNKNOWN).answers();
-
-                            String answerString = !answers.isEmpty()
-                                    ? answers.get(Math.min(answer, answers.size() - 1))
-                                    : StringUtils.EMPTY;
-
-                            return Strings.CS.replace(string, "<answer>", answerString);
-                        })
+                        .string(message)
+                        .answer(answer)
                         .build()
                 )
-                .answer(answer)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(answer);
+                    dataOutputStream.writeString(message);
+                })
+                .integration(string -> {
+                    List<String> answers = localization(FPlayer.UNKNOWN).answers();
+
+                    String answerString = !answers.isEmpty()
+                            ? answers.get(Math.min(answer, answers.size() - 1))
+                            : StringUtils.EMPTY;
+
+                    return Strings.CS.replace(string, "<answer>", answerString);
+                })
                 .build()
         );
     }

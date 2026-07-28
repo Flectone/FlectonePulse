@@ -26,6 +26,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.model.entity.HytaleBubbleEntity;
@@ -209,11 +210,14 @@ public class HytaleBubbleRender implements BubbleRender {
 
         Component message = messagePipeline.build(messageContext);
 
-        return messagePipeline.buildPlain(messageContext.toBuilder()
-                .message(localization.format())
-                .userMessage(bubble.getRawMessage()) // indicator for cache that these are different messages
-                .flag(MessageFlag.PLAYER_MESSAGE, false)
-                .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
+        return messagePipeline.buildPlain(StringMessageContext.builder()
+                .base(messageContext.toBuilder()
+                        .message(localization.format())
+                        .flag(MessageFlag.PLAYER_MESSAGE, false)
+                        .tagResolver(messagePipeline.resolver("message", (_, _) -> Tag.inserting(message)))
+                        .build()
+                )
+                .string(bubble.getRawMessage())
                 .build()
         );
     }

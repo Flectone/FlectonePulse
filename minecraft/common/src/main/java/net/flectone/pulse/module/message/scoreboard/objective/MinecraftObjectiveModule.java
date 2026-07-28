@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.ModuleSimple;
 import net.flectone.pulse.module.message.scoreboard.objective.belowname.MinecraftBelownameModule;
 import net.flectone.pulse.module.message.scoreboard.objective.tabname.MinecraftTabnameModule;
@@ -90,21 +91,25 @@ public class MinecraftObjectiveModule extends ObjectiveModule {
     }
 
     public Component buildFormat(FPlayer fPlayer, FPlayer fReceiver, String score, String format, boolean colorContextSender) {
-        return messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .receiver(fReceiver)
-                .message(format)
-                .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
-                .tagResolver(messagePipeline.resolver("score", (_, _) ->
-                        Tag.inserting(messagePipeline.build(MessageContext.builder()
-                                        .sender(fPlayer)
-                                        .receiver(fReceiver)
-                                        .message(score)
-                                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
-                                        .build()
+        return messagePipeline.build(StringMessageContext.builder()
+                .base(MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fReceiver)
+                        .message(format)
+                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
+                        .tagResolver(messagePipeline.resolver("score", (_, _) ->
+                                Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                                .sender(fPlayer)
+                                                .receiver(fReceiver)
+                                                .message(score)
+                                                .flag(MessageFlag.COLOR_CONTEXT_SENDER, colorContextSender)
+                                                .build()
+                                        )
                                 )
-                        )
-                ))
+                        ))
+                        .build()
+                )
+                .string(score)
                 .build()
         );
     }

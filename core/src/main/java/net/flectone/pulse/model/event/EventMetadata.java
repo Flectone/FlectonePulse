@@ -24,7 +24,7 @@ public interface EventMetadata {
         return new Builder();
     }
 
-    BaseEventMetadata base();
+    EventMetadata base();
 
     default @NonNull Predicate<FPlayer> filter() {
         return base().filter();
@@ -135,10 +135,10 @@ public interface EventMetadata {
             return this;
         }
 
-        public BaseEventMetadata build() {
+        public EventMetadataImpl build() {
             Objects.requireNonNull(messageContext);
 
-            return new BaseEventMetadata(
+            return new EventMetadataImpl(
                     filter,
                     destination,
                     range,

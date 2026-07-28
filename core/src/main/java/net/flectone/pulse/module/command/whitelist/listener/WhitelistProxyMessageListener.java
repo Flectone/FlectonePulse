@@ -11,13 +11,12 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.whitelist.WhitelistModule;
-import net.flectone.pulse.module.command.whitelist.model.WhitelistMetadata;
+import net.flectone.pulse.module.command.whitelist.model.WhitelistMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
@@ -55,20 +54,20 @@ public class WhitelistProxyMessageListener implements PulseListener {
 
                     boolean turnedOn = action == WhitelistModule.Action.ON;
 
-                    messageDispatcher.dispatch(whitelistModule, WhitelistMetadata.builder()
-                            .base(EventMetadata.builder()
-                                    .range(Range.Type.SERVER)
-                                    .destination(whitelistModule.config().destination())
-                                    .sound(whitelistModule.soundOrThrow())
-                                    .messageContext(fResolver -> MessageContext.builder()
+                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                            .range(Range.Type.SERVER)
+                            .destination(whitelistModule.config().destination())
+                            .sound(whitelistModule.soundOrThrow())
+                            .messageContext(fResolver -> WhitelistMessageContext.builder()
+                                    .base(MessageContext.builder()
                                             .sender(event.sender())
                                             .receiver(fResolver)
                                             .message(turnedOn ? whitelistModule.localization(fResolver).formatOn() : whitelistModule.localization(fResolver).formatOff())
                                             .build()
                                     )
+                                    .turnedOn(turnedOn)
                                     .build()
                             )
-                            .turnedOn(turnedOn)
                             .build()
                     );
                 }
@@ -78,12 +77,12 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     FPlayer fModerator = fPlayerService.getFPlayer(whitelist.moderator());
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
-                    messageDispatcher.dispatch(whitelistModule, ModerationMetadata.builder()
-                            .base(EventMetadata.builder()
-                                    .range(Range.Type.SERVER)
-                                    .destination(whitelistModule.config().destination())
-                                    .sound(whitelistModule.soundOrThrow())
-                                    .messageContext(fResolver -> MessageContext.builder()
+                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                            .range(Range.Type.SERVER)
+                            .destination(whitelistModule.config().destination())
+                            .sound(whitelistModule.soundOrThrow())
+                            .messageContext(fResolver -> WhitelistMessageContext.builder()
+                                    .base(MessageContext.builder()
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
@@ -91,9 +90,9 @@ public class WhitelistProxyMessageListener implements PulseListener {
                                             .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                             .build()
                                     )
+                                    .moderation(whitelist)
                                     .build()
                             )
-                            .moderation(whitelist)
                             .build()
                     );
                 }
@@ -103,12 +102,12 @@ public class WhitelistProxyMessageListener implements PulseListener {
                     FPlayer fModerator = fPlayerService.getFPlayer(unwhitelist.moderator());
                     if (moduleController.isDisabledFor(whitelistModule, fModerator)) return event.withProcessed(true);
 
-                    messageDispatcher.dispatch(whitelistModule, ModerationMetadata.builder()
-                            .base(EventMetadata.builder()
-                                    .range(Range.Type.SERVER)
-                                    .destination(whitelistModule.config().destination())
-                                    .sound(whitelistModule.soundOrThrow())
-                                    .messageContext(fResolver -> MessageContext.builder()
+                    messageDispatcher.dispatch(whitelistModule, EventMetadata.builder()
+                            .range(Range.Type.SERVER)
+                            .destination(whitelistModule.config().destination())
+                            .sound(whitelistModule.soundOrThrow())
+                            .messageContext(fResolver -> WhitelistMessageContext.builder()
+                                    .base(MessageContext.builder()
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
@@ -116,9 +115,9 @@ public class WhitelistProxyMessageListener implements PulseListener {
                                             .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                             .build()
                                     )
+                                    .moderation(unwhitelist)
                                     .build()
                             )
-                            .moderation(unwhitelist)
                             .build()
                     );
                 }

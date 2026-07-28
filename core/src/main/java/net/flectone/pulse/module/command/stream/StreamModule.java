@@ -16,7 +16,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.PulseStreamListener;
 import net.flectone.pulse.module.command.stream.listener.StreamProxyMessageListener;
-import net.flectone.pulse.module.command.stream.model.StreamMetadata;
+import net.flectone.pulse.module.command.stream.model.StreamMessageContext;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -140,47 +140,47 @@ public class StreamModule implements ModuleCommand {
                     .map(url -> StringUtils.substringBefore(url, "?"))
                     .collect(Collectors.joining(" "));
 
-            messageDispatcher.dispatch(this, StreamMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(config().range())
-                            .destination(config().destination())
-                            .sound(soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .range(config().range())
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> StreamMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
                                     .message(replaceUrls(fResolver, urls))
                                     .build()
                             )
-                            .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
-                            .integration(IntegrationMetadata.builder()
-                                    .format(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
-                                    .messageNames(List.of(name().name() + "_START"))
-                                    .build()
-                            )
+                            .turned(true)
+                            .urls(urls)
                             .build()
                     )
-                    .turned(true)
-                    .urls(urls)
+                    .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
+                    .integration(IntegrationMetadata.builder()
+                            .format(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
+                            .messageNames(List.of(name().name() + "_START"))
+                            .build()
+                    )
                     .build()
             );
         } else {
-            messageDispatcher.dispatch(this, StreamMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(config().destination())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .destination(config().destination())
+                    .messageContext(fResolver -> StreamMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(localization(fResolver).formatEnd())
                                     .build()
                             )
-                            .integration(IntegrationMetadata.builder()
-                                    .messageNames(List.of(name().name() + "_END"))
-                                    .build()
-                            )
+                            .turned(false)
                             .build()
                     )
-                    .turned(false)
+                    .integration(IntegrationMetadata.builder()
+                            .messageNames(List.of(name().name() + "_END"))
+                            .build()
+                    )
                     .build()
             );
         }

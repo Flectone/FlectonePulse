@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.quit.listener.PulseQuitListener;
 import net.flectone.pulse.module.message.quit.listener.QuitProxyMessageListener;
-import net.flectone.pulse.module.message.quit.model.QuitMetadata;
+import net.flectone.pulse.module.message.quit.model.QuitMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.proxy.RedisProxy;
@@ -102,27 +102,27 @@ public class QuitModule implements ModuleLocalization {
     public void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, QuitMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(config().range().is(Range.Type.PROXY) && !fakeMessage ? Range.get(Range.Type.SERVER) : config().range())
-                        .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(config().range().is(Range.Type.PROXY) && !fakeMessage ? Range.get(Range.Type.SERVER) : config().range())
+                .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> QuitMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).format())
                                 .build()
                         )
-                        .integration()
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeBoolean(fakeMessage);
-                            dataOutputStream.writeBoolean(vanished);
-                        })
+                        .fakeMessage(fakeMessage)
+                        .vanished(vanished)
                         .build()
                 )
-                .fakeMessage(fakeMessage)
-                .vanished(vanished)
+                .integration()
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeBoolean(fakeMessage);
+                    dataOutputStream.writeBoolean(vanished);
+                })
                 .build()
         );
     }

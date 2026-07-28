@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.mail.model.Mail;
-import net.flectone.pulse.module.command.mail.model.MailMetadata;
+import net.flectone.pulse.module.command.mail.model.MailMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
@@ -43,11 +43,11 @@ public class PulseMailListener implements PulseListener {
         for (Mail mail : mails) {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
-            messageDispatcher.dispatch(mailModule, MailMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .filter(fReceiver)
-                            .destination(mailModule.config().destination())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(mailModule, EventMetadata.builder()
+                    .filter(fReceiver)
+                    .destination(mailModule.config().destination())
+                    .messageContext(fResolver -> MailMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(mailModule.localization(fResolver).receiver())
@@ -55,10 +55,11 @@ public class PulseMailListener implements PulseListener {
                                     .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, mail.message()))
                                     .build()
                             )
+                            .string(mail.message())
+                            .mail(mail)
+                            .target(fReceiver)
                             .build()
                     )
-                    .mail(mail)
-                    .target(fReceiver)
                     .build()
             );
 

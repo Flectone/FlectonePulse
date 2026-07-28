@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.PulseUpdateListener;
-import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
+import net.flectone.pulse.module.message.update.model.UpdateMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SocialService;
@@ -83,11 +83,11 @@ public class UpdateModule implements ModuleLocalization {
             String currentVersion = fileFacade.config().version();
             if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
-            messageDispatcher.dispatch(this, UpdateMessageMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(config().destination())
-                            .sound(soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> UpdateMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(StringUtils.replaceEach(
@@ -97,10 +97,10 @@ public class UpdateModule implements ModuleLocalization {
                                     ))
                                     .build()
                             )
+                            .currentVersion(currentVersion)
+                            .latestVersion(latestVersion)
                             .build()
                     )
-                    .currentVersion(currentVersion)
-                    .latestVersion(latestVersion)
                     .build()
             );
         });

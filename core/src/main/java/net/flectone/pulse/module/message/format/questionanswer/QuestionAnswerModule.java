@@ -20,7 +20,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.PulseQuestionAnswerListener;
-import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
+import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.service.SocialService;
@@ -161,20 +161,21 @@ public class QuestionAnswerModule implements ModuleLocalization {
         Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
-        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(fReceiver)
-                        .destination(questionMessage.destination())
-                        .sound(sound)
-                        .messageContext(fResolver -> MessageContext.builder()
+        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fReceiver)
+                .destination(questionMessage.destination())
+                .sound(sound)
+                .messageContext(fResolver -> QuestionAnswerMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(sender)
                                 .receiver(fResolver)
                                 .message(localization(fReceiver).questions().getOrDefault(question, ""))
                                 .build()
                         )
+                        .string(question)
+                        .question(question)
                         .build()
                 )
-                .question(question)
                 .build()
         ), 1L);
     }

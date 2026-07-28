@@ -37,18 +37,24 @@ public class MinecraftServerStatusFormatter {
 
     @NonNull
     public Component createMOTD(FPlayer fPlayer, User user, String message) {
-        MessageContext.MessageContextBuilder messageContextBuilder = MessageContext.builder()
-                .sender(fPlayer)
-                .message(message)
-                .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false);
-
         // display player_head in MOTD is only available for clients 1.21.9-1.21.11
         if (user.getClientVersion().isOlderThan(ClientVersion.V_1_21_9)
                 || user.getClientVersion().isNewerThan(ClientVersion.V_1_21_11)) {
-            messageContextBuilder = messageContextBuilder.flag(MessageFlag.OBJECT_DEFAULT_VALUE, true);
+            return messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .message(message)
+                    .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false)
+                    .flag(MessageFlag.OBJECT_DEFAULT_VALUE, true)
+                    .build()
+            );
         }
 
-        return messagePipeline.build(messageContextBuilder.build());
+        return messagePipeline.build(MessageContext.builder()
+                .sender(fPlayer)
+                .message(message)
+                .flag(MessageFlag.OBJECT_RECEIVER_VALIDATION, false)
+                .build()
+        );
     }
 
     @NonNull

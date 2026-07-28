@@ -14,7 +14,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.spy.SpyModule;
-import net.flectone.pulse.module.command.spy.model.SpyMetadata;
+import net.flectone.pulse.module.command.spy.model.SpyMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -42,12 +42,12 @@ public class SpyProxyMessageListener implements PulseListener {
             String action = proxyPayload.readString();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(spyModule, SpyMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Set.of()))
-                            .destination(spyModule.config().destination())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(spyModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Set.of()))
+                    .destination(spyModule.config().destination())
+                    .messageContext(fResolver -> SpyMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -55,10 +55,11 @@ public class SpyProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
                                     .build()
                             )
+                            .string(message)
+                            .turned(true)
+                            .action(action)
                             .build()
                     )
-                    .turned(true)
-                    .action(action)
                     .build()
             );
         }

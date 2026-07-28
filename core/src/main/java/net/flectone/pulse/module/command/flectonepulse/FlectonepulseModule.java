@@ -21,6 +21,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
@@ -174,11 +175,15 @@ public class FlectonepulseModule implements ModuleCommand {
 
             messageDispatcher.dispatch(this, EventMetadata.builder()
                     .destination(config().destination())
-                    .messageContext(fResolver -> MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(localization(fResolver).formatFalse())
-                            .tagResolver(messagePipeline.resolver("error", Component.text(e.getLocalizedMessage())))
+                    .messageContext(fResolver -> ComponentMessageContext.builder()
+                            .base(MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).formatFalse())
+                                    .tagResolver(messagePipeline.resolver("error", Component.text(e.getLocalizedMessage())))
+                                    .build()
+                            )
+                            .component(Component.text(e.getLocalizedMessage()))
                             .build()
                     )
                     .build()

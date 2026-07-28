@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.StringMessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.PulseTranslateListener;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -81,7 +82,7 @@ public class TranslateModule implements ModuleLocalization {
         return uuid;
     }
 
-    public MessageContext addTag(MessageContext messageContext) {
+    public MessageContext addTag(StringMessageContext messageContext) {
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return messageContext;
 
@@ -111,7 +112,7 @@ public class TranslateModule implements ModuleLocalization {
             String action = localization(receiver).action();
             action = Strings.CS.replaceOnce(action, "<language>", firstLang);
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
-            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.userMessage()).toString());
+            action = Strings.CS.replace(action, "<message>", saveMessage(messageContext.string()).toString());
 
             return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                     .sender(sender)

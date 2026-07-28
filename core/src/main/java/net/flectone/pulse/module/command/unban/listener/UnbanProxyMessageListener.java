@@ -11,9 +11,9 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ban.BanModule;
@@ -54,12 +54,12 @@ public class UnbanProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unban.moderator());
             if (moduleController.isDisabledFor(unbanModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unbanModule, ModerationMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(unbanModule.config().destination())
-                            .range(Range.get(Range.Type.SERVER))
-                            .sound(unbanModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(unbanModule, EventMetadata.builder()
+                    .destination(unbanModule.config().destination())
+                    .range(Range.get(Range.Type.SERVER))
+                    .sound(unbanModule.soundOrThrow())
+                    .messageContext(fResolver -> ModerationMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -67,9 +67,9 @@ public class UnbanProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                     .build()
                             )
+                            .moderation(unban)
                             .build()
                     )
-                    .moderation(unban)
                     .build()
             );
         }

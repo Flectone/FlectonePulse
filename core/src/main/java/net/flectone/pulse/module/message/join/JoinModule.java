@@ -15,7 +15,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.join.listener.JoinProxyMessageListener;
 import net.flectone.pulse.module.message.join.listener.PulseJoinListener;
-import net.flectone.pulse.module.message.join.model.JoinMetadata;
+import net.flectone.pulse.module.message.join.model.JoinMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.proxy.RedisProxy;
@@ -89,10 +89,16 @@ public class JoinModule implements ModuleLocalization {
                 .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> MessageContext.builder()
-                        .sender(fPlayer)
-                        .receiver(fResolver)
-                        .message(hasPlayedBefore || !config().first() ? localization(fResolver).format() : localization(fResolver).formatFirstTime())
+                .messageContext(fResolver -> JoinMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(hasPlayedBefore || !config().first() ? localization(fResolver).format() : localization(fResolver).formatFirstTime())
+                                .build()
+                        )
+                        .playedBefore(hasPlayedBefore)
+                        .fakeMessage(fakeMessage)
+                        .vanished(vanished)
                         .build()
                 )
                 .integration();
@@ -105,13 +111,7 @@ public class JoinModule implements ModuleLocalization {
             });
         }
 
-        messageDispatcher.dispatch(this, JoinMetadata.builder()
-                .base(eventMetadataBuilder.build())
-                .playedBefore(hasPlayedBefore)
-                .fakeMessage(fakeMessage)
-                .vanished(vanished)
-                .build()
-        );
+        messageDispatcher.dispatch(this, eventMetadataBuilder.build());
     }
 
 }

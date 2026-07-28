@@ -25,7 +25,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.discord.model.DiscordClient;
-import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
+import net.flectone.pulse.module.integration.discord.model.DiscordMessageContext;
 import net.flectone.pulse.module.integration.discord.parser.DiscordSnowflakeParser;
 import net.flectone.pulse.module.integration.discord.provider.DiscordClientProvider;
 import net.flectone.pulse.module.integration.discord.service.DiscordWebhookService;
@@ -187,15 +187,15 @@ public class DiscordSender {
         String displayName = member != null ? member.getDisplayName() : globalName;
         String nickname = member != null ? member.getNickname().orElse(userName) : userName;
 
-        messageDispatcher.dispatch(discordModule, DiscordMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(Range.get(Range.Type.PROXY))
-                        .destination(discordModule.config().destination())
-                        .sound(discordModule.soundOrThrow())
-                        .messageContext(fResolver -> {
-                            Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization(fResolver).messageChannel().get(discordModule.name().name());
+        messageDispatcher.dispatch(discordModule, EventMetadata.builder()
+                .range(Range.get(Range.Type.PROXY))
+                .destination(discordModule.config().destination())
+                .sound(discordModule.soundOrThrow())
+                .messageContext(fResolver -> {
+                    Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization(fResolver).messageChannel().get(discordModule.name().name());
 
-                            return MessageContext.builder()
+                    return DiscordMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(discordClient.sender())
                                     .receiver(fResolver)
                                     .message(channelEmbed == null ? "" : StringUtils.replaceEach(
@@ -221,23 +221,25 @@ public class DiscordSender {
                                                 .build()
                                         ));
                                     }))
-                                    .build();
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .format(string -> StringUtils.replaceEach(
-                                        string,
-                                        new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                        new String[]{globalName, globalName, nickname, displayName, userName}
-                                ))
-                                .messageNames(List.of(discordModule.name().name() + "_" + channelId))
-                                .build()
-                        )
+                                    .build()
+                            )
+                            .string(message)
+                            .globalName(globalName)
+                            .nickname(nickname)
+                            .displayName(displayName)
+                            .userName(userName)
+                            .reply(reply)
+                            .build();
+                })
+                .integration(IntegrationMetadata.builder()
+                        .format(string -> StringUtils.replaceEach(
+                                string,
+                                new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                new String[]{globalName, globalName, nickname, displayName, userName}
+                        ))
+                        .messageNames(List.of(discordModule.name().name() + "_" + channelId))
                         .build()
                 )
-                .globalName(globalName)
-                .nickname(nickname)
-                .displayName(displayName)
-                .userName(userName)
                 .build()
         );
     }

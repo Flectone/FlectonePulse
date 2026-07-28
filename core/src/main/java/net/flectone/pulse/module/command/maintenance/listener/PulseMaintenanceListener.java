@@ -4,18 +4,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.kyori.adventure.text.Component;
 
 import java.util.Optional;
 
@@ -41,20 +40,20 @@ public class PulseMaintenanceListener implements PulseListener {
         Moderation maintenance = currentModeration.get();
         FPlayer fModerator = fPlayerService.getFPlayer(maintenance.moderator());
 
-        // replace string moderation placeholders
-        Localization.Command.Maintenance localization = maintenanceModule.localization(fPlayer);
-        String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.person(), fPlayer, maintenance);
-
-        // build message
-        Component reason = messagePipeline.build(MessageContext.builder()
-                .sender(fModerator)
-                .receiver(fPlayer)
-                .message(formatPlayer)
-                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
-                .build()
-        );
-
-        return event.withPlayer(fPlayer).withAllowed(false).withKickReason(reason);
+        return event
+                .withPlayer(fPlayer)
+                .withAllowed(false)
+                .withKickReason(messagePipeline.build(ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fModerator)
+                                .receiver(fPlayer)
+                                .message(moderationMessageFormatter.replacePlaceholders(maintenanceModule.localization(fPlayer).person(), fPlayer, maintenance))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fModerator))
+                                .build()
+                        )
+                        .moderation(maintenance)
+                        .build()
+                ));
     }
 
 }

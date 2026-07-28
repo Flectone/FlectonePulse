@@ -12,7 +12,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.coin.CoinModule;
-import net.flectone.pulse.module.command.coin.model.CoinMetadata;
+import net.flectone.pulse.module.command.coin.model.CoinMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -37,21 +37,21 @@ public class CoinProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             int percent = proxyPayload.readInt();
 
-            messageDispatcher.dispatch(coinModule, CoinMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(coinModule.config().destination())
-                            .sound(coinModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(coinModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(coinModule.config().destination())
+                    .sound(coinModule.soundOrThrow())
+                    .messageContext(fResolver -> CoinMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(coinModule.replaceResult(fResolver, percent))
                                     .build()
                             )
+                            .percent(percent)
                             .build()
                     )
-                    .percent(percent)
                     .build()
             );
         }

@@ -12,7 +12,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.stream.StreamModule;
-import net.flectone.pulse.module.command.stream.model.StreamMetadata;
+import net.flectone.pulse.module.command.stream.model.StreamMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -38,12 +38,12 @@ public class StreamProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(streamModule, StreamMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(streamModule.config().destination())
-                            .sound(streamModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(streamModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .destination(streamModule.config().destination())
+                    .sound(streamModule.soundOrThrow())
+                    .messageContext(fResolver -> StreamMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -51,10 +51,10 @@ public class StreamProxyMessageListener implements PulseListener {
                                     .message(streamModule.replaceUrls(fResolver, message))
                                     .build()
                             )
+                            .turned(true)
+                            .urls(message)
                             .build()
                     )
-                    .turned(true)
-                    .urls(message)
                     .build()
             );
         }

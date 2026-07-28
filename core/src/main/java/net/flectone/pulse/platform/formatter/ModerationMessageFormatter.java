@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.context.ExternalModerationMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -52,10 +54,14 @@ public class ModerationMessageFormatter {
                 Moderation mute = mutes.getFirst();
                 String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, mute))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())))
+                MessageContext muteContext = ModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderator())))
+                                .build()
+                        )
+                        .moderation(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -66,10 +72,14 @@ public class ModerationMessageFormatter {
 
                 String format = fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().mute().person();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, mute))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())))
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getFPlayer(mute.moderatorName())))
+                                .build()
+                        )
+                        .externalModeration(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -81,10 +91,24 @@ public class ModerationMessageFormatter {
 
                 String format = capsModule.localization(fPlayer).formatRestrict();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, timestamp))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                ExternalModeration mute = new ExternalModeration(
+                        fPlayer.name(),
+                        fileFacade.config().logger().console(),
+                        capsModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        -1,
+                        System.currentTimeMillis(),
+                        timestamp,
+                        false
+                );
+
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                                .build()
+                        )
+                        .externalModeration(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -96,10 +120,24 @@ public class ModerationMessageFormatter {
 
                 String format = floodModule.localization(fPlayer).formatRestrict();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, timestamp))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                ExternalModeration mute = new ExternalModeration(
+                        fPlayer.name(),
+                        fileFacade.config().logger().console(),
+                        floodModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        -1,
+                        System.currentTimeMillis(),
+                        timestamp,
+                        false
+                );
+
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                                .build()
+                        )
+                        .externalModeration(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -112,10 +150,14 @@ public class ModerationMessageFormatter {
 
                 String format = newbieModule.localization(fPlayer).formatRestrict();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, mute))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                                .build()
+                        )
+                        .externalModeration(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -127,10 +169,24 @@ public class ModerationMessageFormatter {
 
                 String format = swearModule.localization(fPlayer).formatRestrict();
 
-                MessageContext muteContext = MessageContext.builder()
-                        .sender(fPlayer)
-                        .message(replacePlaceholders(format, fPlayer, timestamp))
-                        .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                ExternalModeration mute = new ExternalModeration(
+                        fPlayer.name(),
+                        fileFacade.config().logger().console(),
+                        swearModule.localization(FPlayer.UNKNOWN).formatRestrict(),
+                        -1,
+                        System.currentTimeMillis(),
+                        timestamp,
+                        false
+                );
+
+                MessageContext muteContext = ExternalModerationMessageContext.builder()
+                        .base(MessageContext.builder()
+                                .sender(fPlayer)
+                                .message(replacePlaceholders(format, fPlayer, mute))
+                                .tagResolver(messagePipeline.targetTag("moderator", fPlayer, fPlayerService.getConsole()))
+                                .build()
+                        )
+                        .externalModeration(mute)
                         .build();
 
                 yield Optional.of(muteContext);
@@ -160,10 +216,6 @@ public class ModerationMessageFormatter {
 
     public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
         return replacePlaceholders(message, fReceiver, moderation.moderationId(), moderation.date(), moderation.time(), moderation.reason(), moderation.permanent());
-    }
-
-    public String replacePlaceholders(String message, FPlayer fReceiver, Long timestamp) {
-        return replacePlaceholders(message, fReceiver, -1, System.currentTimeMillis(), timestamp, "", false);
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, long moderationId, long date, long time, String reason, boolean permanent) {

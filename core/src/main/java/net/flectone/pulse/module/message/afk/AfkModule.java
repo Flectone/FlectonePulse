@@ -18,7 +18,7 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.afk.listener.AfkProxyMessageListener;
 import net.flectone.pulse.module.message.afk.listener.PulseAfkListener;
-import net.flectone.pulse.module.message.afk.model.AFKMetadata;
+import net.flectone.pulse.module.message.afk.model.AFKMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
@@ -259,11 +259,11 @@ public class AfkModule implements ModuleLocalization {
 
         Range range = config().range();
         if (range.is(Range.Type.PLAYER)) {
-            messageDispatcher.dispatch(this, AFKMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(config().destination())
-                            .sound(soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> AFKMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
                                     .message(isAfk
@@ -272,9 +272,9 @@ public class AfkModule implements ModuleLocalization {
                                     )
                                     .build()
                             )
+                            .newStatus(isAfk)
                             .build()
                     )
-                    .newStatus(isAfk)
                     .build()
             );
 
@@ -282,13 +282,13 @@ public class AfkModule implements ModuleLocalization {
         }
 
         boolean vanished = socialService.isVanished(fPlayer);
-        messageDispatcher.dispatch(this, AFKMetadata.builder()
-                .base(EventMetadata.builder()
-                        .range(range)
-                        .destination(config().destination())
-                        .sound(soundOrThrow())
-                        .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .range(range)
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
+                .messageContext(fResolver -> AFKMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(isAfk
@@ -297,19 +297,19 @@ public class AfkModule implements ModuleLocalization {
                                 )
                                 .build()
                         )
-                        .proxy(dataOutputStream -> {
-                            dataOutputStream.writeBoolean(isAfk);
-                            dataOutputStream.writeBoolean(vanished);
-                        })
-                        .integration(IntegrationMetadata.builder()
-                                .messageNames(List.of(name().name() + "_" + String.valueOf(isAfk).toUpperCase()))
-                                .build()
-                        )
+                        .newStatus(isAfk)
+                        .fakeMessage(false)
+                        .vanished(vanished)
                         .build()
                 )
-                .newStatus(isAfk)
-                .fakeMessage(false)
-                .vanished(vanished)
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeBoolean(isAfk);
+                    dataOutputStream.writeBoolean(vanished);
+                })
+                .integration(IntegrationMetadata.builder()
+                        .messageNames(List.of(name().name() + "_" + String.valueOf(isAfk).toUpperCase()))
+                        .build()
+                )
                 .build()
         );
     }

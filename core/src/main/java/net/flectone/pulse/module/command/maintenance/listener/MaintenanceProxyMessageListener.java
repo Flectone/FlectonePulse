@@ -17,7 +17,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
-import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
+import net.flectone.pulse.module.command.maintenance.model.MaintenanceMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
@@ -57,34 +57,34 @@ public class MaintenanceProxyMessageListener implements PulseListener {
 
             boolean turned = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(maintenanceModule, MaintenanceMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(maintenanceModule.config().destination())
-                            .sound(maintenanceModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(maintenanceModule, EventMetadata.builder()
+                    .destination(maintenanceModule.config().destination())
+                    .sound(maintenanceModule.soundOrThrow())
+                    .messageContext(fResolver -> MaintenanceMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
                                     .message(moderationMessageFormatter.replacePlaceholders(turned
-                                            ? maintenanceModule.localization(fResolver).formatTrue()
-                                            : maintenanceModule.localization(fResolver).formatFalse(),
+                                                    ? maintenanceModule.localization(fResolver).formatTrue()
+                                                    : maintenanceModule.localization(fResolver).formatFalse(),
                                             fResolver, maintenance
                                     ))
                                     .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
                                     .build()
                             )
-                            .proxy(dataOutputStream -> {
-                                dataOutputStream.writeAsJson(maintenance);
-                                dataOutputStream.writeBoolean(turned);
-                            })
-                            .integration(IntegrationMetadata.builder()
-                                    .messageNames(List.of(maintenanceModule.name().name() + "_" + String.valueOf(turned).toUpperCase()))
-                                    .build()
-                            )
+                            .moderation(maintenance)
+                            .turned(turned)
                             .build()
                     )
-                    .moderation(maintenance)
-                    .turned(turned)
+                    .proxy(dataOutputStream -> {
+                        dataOutputStream.writeAsJson(maintenance);
+                        dataOutputStream.writeBoolean(turned);
+                    })
+                    .integration(IntegrationMetadata.builder()
+                            .messageNames(List.of(maintenanceModule.name().name() + "_" + String.valueOf(turned).toUpperCase()))
+                            .build()
+                    )
                     .build()
             );
         }

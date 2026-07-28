@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.listener.TictactoeProxyMessageListener;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
-import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
+import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMessageContext;
 import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -132,20 +132,20 @@ public class TictactoeModule implements ModuleCommand {
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
-                .base(EventMetadata.builder()
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> TicTacToeMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(localization(fResolver).sender())
                                 .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
                                 .build()
                         )
+                        .ticTacToe(ticTacToe)
+                        .gamePhase(GamePhase.CREATE)
                         .build()
                 )
-                .ticTacToe(ticTacToe)
-                .gamePhase(GamePhase.CREATE)
                 .build()
         );
 
@@ -188,11 +188,11 @@ public class TictactoeModule implements ModuleCommand {
         if (!socialService.canSeeVanished(fPlayer, fReceiver)
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(fReceiver)
-                        .sound(soundOrThrow())
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fReceiver)
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> TicTacToeMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -200,10 +200,10 @@ public class TictactoeModule implements ModuleCommand {
                                 .message(Strings.CS.replace(String.format(localization(fResolver).receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
                                 .build()
                         )
+                        .ticTacToe(ticTacToe)
+                        .gamePhase(GamePhase.CREATE)
                         .build()
                 )
-                .ticTacToe(ticTacToe)
-                .gamePhase(GamePhase.CREATE)
                 .build()
         );
     }
@@ -215,26 +215,26 @@ public class TictactoeModule implements ModuleCommand {
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
-                .base(EventMetadata.builder()
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> TicTacToeMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
                                 .message(getMoveMessage(fReceiver, fResolver, ticTacToe, typeTitle, move))
                                 .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
                                 .build()
                         )
+                        .ticTacToe(ticTacToe)
+                        .gamePhase(GamePhase.MOVE)
                         .build()
                 )
-                .ticTacToe(ticTacToe)
-                .gamePhase(GamePhase.MOVE)
                 .build()
         );
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
-                .base(EventMetadata.builder()
-                        .filter(fReceiver)
-                        .messageContext(fResolver -> MessageContext.builder()
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fReceiver)
+                .messageContext(fResolver -> TicTacToeMessageContext.builder()
+                        .base(MessageContext.builder()
                                 .uuid(metadataUUID)
                                 .sender(fPlayer)
                                 .receiver(fResolver)
@@ -243,10 +243,10 @@ public class TictactoeModule implements ModuleCommand {
                                 .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
                                 .build()
                         )
+                        .ticTacToe(ticTacToe)
+                        .gamePhase(GamePhase.MOVE)
                         .build()
                 )
-                .ticTacToe(ticTacToe)
-                .gamePhase(GamePhase.MOVE)
                 .build()
         );
     }

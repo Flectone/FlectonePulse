@@ -12,7 +12,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.afk.AfkModule;
-import net.flectone.pulse.module.message.afk.model.AFKMetadata;
+import net.flectone.pulse.module.message.afk.model.AFKMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -40,13 +40,13 @@ public class AfkProxyMessageListener implements PulseListener {
             boolean isAfk = proxyPayload.readBoolean();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(afkModule, AFKMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .range(Range.get(Range.Type.SERVER))
-                            .filter(fReceiver -> socialService.canSeeVanished(event.sender(), fReceiver, vanished))
-                            .destination(afkModule.config().destination())
-                            .sound(afkModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(afkModule, EventMetadata.builder()
+                    .range(Range.get(Range.Type.SERVER))
+                    .filter(fReceiver -> socialService.canSeeVanished(event.sender(), fReceiver, vanished))
+                    .destination(afkModule.config().destination())
+                    .sound(afkModule.soundOrThrow())
+                    .messageContext(fResolver -> AFKMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -56,11 +56,11 @@ public class AfkProxyMessageListener implements PulseListener {
                                     )
                                     .build()
                             )
+                            .newStatus(isAfk)
+                            .fakeMessage(false)
+                            .vanished(vanished)
                             .build()
                     )
-                    .newStatus(isAfk)
-                    .fakeMessage(false)
-                    .vanished(vanished)
                     .build()
             );
         }

@@ -91,7 +91,7 @@ public class NewbieModule implements ModuleLocalization {
         return new ExternalModeration(fPlayer.name(),
                 fileFacade.config().logger().console(),
                 localization(FPlayer.UNKNOWN).formatRestrict(),
-                1,
+                -1,
                 firstPlayed,
                 moderationTime,
                 false

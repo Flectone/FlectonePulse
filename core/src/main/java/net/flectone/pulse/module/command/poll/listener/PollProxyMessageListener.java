@@ -15,7 +15,7 @@ import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.Poll;
-import net.flectone.pulse.module.command.poll.model.PollMetadata;
+import net.flectone.pulse.module.command.poll.model.PollMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -47,11 +47,11 @@ public class PollProxyMessageListener implements PulseListener {
                     Poll poll = gson.fromJson(proxyPayload.readString(), Poll.class);
                     pollModule.saveAndUpdateLast(poll);
 
-                    messageDispatcher.dispatch(pollModule, PollMetadata.builder()
-                            .base(EventMetadata.builder()
-                                    .range(Range.get(Range.Type.SERVER))
-                                    .sound(pollModule.soundOrThrow())
-                                    .messageContext(fResolver -> MessageContext.builder()
+                    messageDispatcher.dispatch(pollModule, EventMetadata.builder()
+                            .range(Range.get(Range.Type.SERVER))
+                            .sound(pollModule.soundOrThrow())
+                            .messageContext(fResolver -> PollMessageContext.builder()
+                                    .base(MessageContext.builder()
                                             .uuid(event.uuid())
                                             .sender(event.sender())
                                             .receiver(fResolver)
@@ -59,9 +59,12 @@ public class PollProxyMessageListener implements PulseListener {
                                             .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, poll.getTitle()))
                                             .build()
                                     )
+                                    .string(poll.getTitle())
+                                    .poll(poll)
+                                    .status(PollModule.Status.START)
+                                    .action(PollModule.Action.CREATE)
                                     .build()
                             )
-                            .poll(poll)
                             .build()
                     );
                 }

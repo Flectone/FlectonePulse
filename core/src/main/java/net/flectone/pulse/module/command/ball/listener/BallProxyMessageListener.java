@@ -13,7 +13,7 @@ import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ball.BallModule;
-import net.flectone.pulse.module.command.ball.model.BallMetadata;
+import net.flectone.pulse.module.command.ball.model.BallMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
@@ -40,12 +40,12 @@ public class BallProxyMessageListener implements PulseListener {
             int answer = proxyPayload.readInt();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(ballModule, BallMetadata.builder()
-                    .base(EventMetadata.builder()
-                            .destination(ballModule.config().destination())
-                            .range(Range.get(Range.Type.SERVER))
-                            .sound(ballModule.soundOrThrow())
-                            .messageContext(fResolver -> MessageContext.builder()
+            messageDispatcher.dispatch(ballModule, EventMetadata.builder()
+                    .destination(ballModule.config().destination())
+                    .range(Range.get(Range.Type.SERVER))
+                    .sound(ballModule.soundOrThrow())
+                    .messageContext(fResolver -> BallMessageContext.builder()
+                            .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
@@ -53,9 +53,10 @@ public class BallProxyMessageListener implements PulseListener {
                                     .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
                                     .build()
                             )
+                            .string(message)
+                            .answer(answer)
                             .build()
                     )
-                    .answer(answer)
                     .build()
             );
         }

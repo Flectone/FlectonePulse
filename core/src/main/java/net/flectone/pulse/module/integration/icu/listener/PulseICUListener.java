@@ -10,7 +10,6 @@ import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.icu.ICUModule;
 import net.flectone.pulse.util.constant.MessageFlag;
-import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -26,13 +25,6 @@ public class PulseICUListener implements PulseListener {
         String convertedMessage = icuModule.process(messageContext.sender(), messageContext.receiver(), messageContext.message());
         if (!convertedMessage.equals(messageContext.message())) {
             messageContext = messageContext.withMessage(convertedMessage);
-        }
-
-        if (StringUtils.isNotEmpty(messageContext.userMessage())) {
-            String convertedUserMessage = icuModule.process(messageContext.sender(), messageContext.receiver(), messageContext.userMessage());
-            if (!convertedUserMessage.equals(messageContext.userMessage())) {
-                messageContext = messageContext.withUserMessage(convertedUserMessage);
-            }
         }
 
         return event.context().equals(messageContext) ? event : event.withContext(messageContext);
