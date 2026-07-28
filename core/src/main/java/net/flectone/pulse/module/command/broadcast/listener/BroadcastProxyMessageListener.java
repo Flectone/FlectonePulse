@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -25,6 +26,7 @@ public class BroadcastProxyMessageListener implements PulseListener {
     private final BroadcastModule broadcastModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -36,14 +38,18 @@ public class BroadcastProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(broadcastModule, EventMetadata.<Localization.Command.Broadcast>builder()
-                    .uuid(event.uuid())
-                    .sender(event.sender())
-                    .format(Localization.Command.Broadcast::format)
+            messageDispatcher.dispatch(broadcastModule, EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(broadcastModule.config().destination())
-                    .message(message)
                     .sound(broadcastModule.soundOrThrow())
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .uuid(event.uuid())
+                            .sender(event.sender())
+                            .receiver(fResolver)
+                            .message(broadcastModule.localization(fResolver).format())
+                            .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                            .build()
+                    )
                     .build()
             );
         }

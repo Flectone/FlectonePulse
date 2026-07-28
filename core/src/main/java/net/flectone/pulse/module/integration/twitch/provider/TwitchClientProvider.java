@@ -43,7 +43,7 @@ public class TwitchClientProvider {
 
         FPlayer fPlayer = FPlayer.builder()
                 .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
-                .name(twitchModule.localization().senderName())
+                .name(twitchModule.localization(FPlayer.UNKNOWN).senderName())
                 .uuid(UUID.randomUUID())
                 .type(FPlayer.INTEGRATION_TYPE)
                 .build();

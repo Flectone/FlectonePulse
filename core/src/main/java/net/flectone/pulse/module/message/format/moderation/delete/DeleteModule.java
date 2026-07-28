@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeleteModule implements ModuleLocalization<Localization.Message.Format.Moderation.Delete> {
+public class DeleteModule implements ModuleLocalization {
 
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
 
@@ -90,7 +90,7 @@ public class DeleteModule implements ModuleLocalization<Localization.Message.For
         FPlayer receiver = messageContext.receiver();
         if (moduleController.isDisabledFor(this, receiver)) return messageContext;
 
-        UUID messageUUID = messageContext.messageUUID();
+        UUID messageUUID = messageContext.uuid();
 
         return messageContext.addTagResolver(messagePipeline.resolver(MessagePipeline.ReplacementTag.DELETE.getTagName(), (_, _) -> {
             String placeholder = Strings.CS.replace(

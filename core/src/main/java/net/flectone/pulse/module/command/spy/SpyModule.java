@@ -7,10 +7,12 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.spy.listener.SpyProxyMessageListener;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
@@ -25,7 +27,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.NonNull;
@@ -33,17 +34,20 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
+public class SpyModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final SocialService socialService;
     private final PermissionChecker permissionChecker;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ProxyRegistry proxyRegistry;
@@ -70,12 +74,16 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
 
         socialService.saveSetting(fPlayer, SettingText.SPY_STATUS, turnedBefore ? null : "1");
 
-        messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
-                .base(EventMetadata.<Localization.Command.Spy>builder()
-                        .sender(fPlayer)
-                        .format(localization -> !turnedBefore ? localization.formatTrue() : localization.formatFalse())
+        messageDispatcher.dispatch(this, SpyMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(!turnedBefore ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse())
+                                .build()
+                        )
                         .build()
                 )
                 .turned(!turnedBefore)
@@ -162,7 +170,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
             FPlayer fPlayer = fPlayerService.getFPlayer(player);
             FPlayer fReceiver = arguments.length > 1 ? fPlayerService.getFPlayer(arguments[1]) : FPlayer.UNKNOWN;
 
-            spy(fPlayer, commandName, command, fReceiver.isUnknown() ? List.of() : List.of(fReceiver));
+            spy(fPlayer, commandName, command, fReceiver.isUnknown() ? Set.of() : Set.of(fReceiver));
         });
     }
 
@@ -174,12 +182,12 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
             FPlayer fPlayer = fPlayerService.getFPlayer(player);
             checkChat(fPlayer, "chat", message, receivers.stream()
                     .map(fPlayerService::getFPlayer)
-                    .toList()
+                    .collect(Collectors.toSet())
             );
         });
     }
 
-    public void checkChat(@NonNull FPlayer fPlayer, @NonNull String chat, @NonNull String message, @NonNull List<FPlayer> receivers) {
+    public void checkChat(@NonNull FPlayer fPlayer, @NonNull String chat, @NonNull String message, @NonNull Set<FPlayer> receivers) {
         if (!moduleController.isEnable(this)) return;
         if (!needToSpy("action", chat)) return;
 
@@ -187,26 +195,27 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
     }
 
     public void spy(@NonNull FPlayer fPlayer, @NonNull String action, @NonNull String message) {
-        spy(fPlayer, action, message, List.of());
+        spy(fPlayer, action, message, Set.of());
     }
 
-    public void spy(@NonNull FPlayer fPlayer, @NonNull String action, @NonNull String message, @NonNull List<FPlayer> receivers) {
+    public void spy(@NonNull FPlayer fPlayer, @NonNull String action, @NonNull String message, @NonNull Set<FPlayer> receivers) {
         if (!moduleController.isEnable(this)) return;
 
-        messageDispatcher.dispatch(this, SpyMetadata.<Localization.Command.Spy>builder()
-                .base(EventMetadata.<Localization.Command.Spy>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Spy::formatLog)
+        messageDispatcher.dispatch(this, SpyMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range())
-                        .destination(config().destination())
-                        .message(message)
                         .filter(createFilter(fPlayer, receivers))
+                        .destination(config().destination())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).formatLog())
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), Placeholder.parsed("action", localization(fResolver).actions().getOrDefault(action, action)))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(action);
                             dataOutputStream.writeString(message);
-                        })
-                        .tagResolvers(fReceiver -> new TagResolver[]{
-                                Placeholder.parsed("action", localization(fReceiver).actions().getOrDefault(action, action))
                         })
                         .integration(IntegrationMetadata.builder()
                                 .messageNames(List.of(name().name() + "_" + action.toUpperCase()))
@@ -220,7 +229,7 @@ public class SpyModule implements ModuleCommand<Localization.Command.Spy> {
         );
     }
 
-    public Predicate<FPlayer> createFilter(FPlayer fPlayer, List<FPlayer> receivers) {
+    public Predicate<FPlayer> createFilter(FPlayer fPlayer, Set<FPlayer> receivers) {
         return fReceiver -> !fPlayer.equals(fReceiver)
                 && !receivers.contains(fReceiver)
                 && permissionChecker.check(fReceiver, permission())

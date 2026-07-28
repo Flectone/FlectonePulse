@@ -6,13 +6,14 @@ import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.emit.EmitModule;
@@ -31,6 +32,7 @@ public class EmitProxyMessageListener implements PulseListener {
     private final EmitModule emitModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final Gson gson;
 
     @Pulse
@@ -47,27 +49,35 @@ public class EmitProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
 
             if (fTarget.isConsole()) {
-                messageDispatcher.dispatch(emitModule, EventMetadata.<Localization.Command.Emit>builder()
-                        .uuid(event.uuid())
-                        .sender(event.sender())
-                        .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                messageDispatcher.dispatch(emitModule, EventMetadata.builder()
                         .range(Range.get(Range.Type.SERVER))
-                        .format(Localization.Command.Emit::format)
-                        .message(message)
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(event.uuid())
+                                .sender(event.sender())
+                                .receiver(fResolver)
+                                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                .message(emitModule.localization(fResolver).format())
+                                .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                .build()
+                        )
                         .build()
                 );
             } else {
-                messageDispatcher.dispatch(emitModule, EventMetadata.<Localization.Command.Emit>builder()
-                        .uuid(event.uuid())
-                        .sender(event.sender())
-                        .receiver(fTarget)
-                        .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                        .format(Localization.Command.Emit::format)
-                        .message(message)
+                messageDispatcher.dispatch(emitModule, EventMetadata.builder()
+                        .filter(fTarget)
                         .destination(destination)
                         .sound(emitModule.soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(event.uuid())
+                                .sender(event.sender())
+                                .receiver(fResolver)
+                                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                                .message(emitModule.localization(fResolver).format())
+                                .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                .build()
+                        )
                         .build()
                 );
             }

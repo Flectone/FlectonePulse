@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -45,10 +46,11 @@ public class BukkitChatModule extends MinecraftChatModule {
                                DisableSender disableSender,
                                CooldownSender cooldownSender,
                                MessageDispatcher messageDispatcher,
+                               MessagePipeline messagePipeline,
                                ProxyRegistry proxyRegistry) {
         super(fileFacade, fPlayerService, socialService, platformServerAdapter, permissionChecker,
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry,
-                taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry);
+                taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, messagePipeline, proxyRegistry);
 
         this.listenerRegistry = listenerRegistry;
         this.reflectionResolver = reflectionResolver;

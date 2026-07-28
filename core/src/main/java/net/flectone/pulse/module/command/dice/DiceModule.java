@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.dice.listener.DiceProxyMessageListener;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
@@ -27,12 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
+public class DiceModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -79,15 +79,19 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
             cubes.add(randomUtil.nextInt(min, max + 1));
         }
 
-        messageDispatcher.dispatch(this, DiceMetadata.<Localization.Command.Dice>builder()
-                .base(EventMetadata.<Localization.Command.Dice>builder()
-                        .sender(fPlayer)
-                        .format(dice -> replaceResult(cubes, dice.symbols(), dice.format()))
+        messageDispatcher.dispatch(this, DiceMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range())
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replaceResult(fResolver, cubes))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
-                        .integration(string -> replaceResult(cubes, localization().symbols(), string))
+                        .integration(_ -> replaceResult(FPlayer.UNKNOWN, cubes))
                         .build()
                 )
                 .cubes(cubes)
@@ -115,7 +119,9 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().dice();
     }
 
-    public String replaceResult(List<Integer> cubes, Map<Integer, String> symbols, String format) {
+    public String replaceResult(FPlayer fPlayer, List<Integer> cubes) {
+        Localization.Command.Dice localization = localization(fPlayer);
+
         StringBuilder stringBuilder = new StringBuilder();
         int sum = 0;
 
@@ -123,12 +129,12 @@ public class DiceModule implements ModuleCommand<Localization.Command.Dice> {
             sum += integer;
 
             stringBuilder
-                    .append(symbols.get(integer))
+                    .append(localization.symbols().get(integer))
                     .append(" ");
         }
 
         return StringUtils.replaceEach(
-                format,
+                localization.format(),
                 new String[]{"<sum>", "<message>"},
                 new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
         );

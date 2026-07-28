@@ -32,8 +32,7 @@ public class ModuleCommandController {
     private final FileFacade fileFacade;
     private final ModuleController moduleController;
 
-    public void registerCommand(ModuleCommand<?> command,
-                                UnaryOperator<Command.Builder<FPlayer>> builder) {
+    public void registerCommand(ModuleCommand command, UnaryOperator<Command.Builder<FPlayer>> builder) {
         List<String> aliases = command.config().aliases();
         String commandName = getCommandName(command);
 
@@ -42,7 +41,7 @@ public class ModuleCommandController {
         );
     }
 
-    public void registerSubCommand(ModuleCommand<?> command, String subName, UnaryOperator<Command.Builder<FPlayer>> builder) {
+    public void registerSubCommand(ModuleCommand command, String subName, UnaryOperator<Command.Builder<FPlayer>> builder) {
         List<String> aliases = command.config().aliases().stream().map(alias -> alias + subName).toList();
         String commandName = getCommandName(command) + subName;
 
@@ -53,15 +52,13 @@ public class ModuleCommandController {
 
     // all prompt methods for solving the problems of a non-existent argument
     // when changing the plugin language at runtime
-    public void clearPrompts(ModuleCommand<?> abstractModuleCommand) {
+    public void clearPrompts(ModuleCommand abstractModuleCommand) {
         if (fileFacade.config().internal().unregisterCommandOnReload()) {
             commandPromptsMap.remove(abstractModuleCommand.getClass());
         }
     }
 
-    public String addPrompt(ModuleCommand<?> command,
-                            int index,
-                            Function<Localization.Command.Prompt, String> promptLocalization) {
+    public String addPrompt(ModuleCommand command, int index, Function<Localization.Command.Prompt, String> promptLocalization) {
         List<String> prompts = getPrompts(command);
 
         // this prompt already registered
@@ -84,7 +81,7 @@ public class ModuleCommandController {
         return prompt;
     }
 
-    public String getPrompt(ModuleCommand<?> command, int index) {
+    public String getPrompt(ModuleCommand command, int index) {
         List<String> prompts = getPrompts(command);
         if (prompts.size() - 1 < index) {
             throw new IllegalArgumentException("Argument at index " + index + " is not registered in the " + getCommandName(command) + " command");
@@ -93,18 +90,16 @@ public class ModuleCommandController {
         return prompts.get(index);
     }
 
-    public List<String> getPrompts(ModuleCommand<?> command) {
+    public List<String> getPrompts(ModuleCommand command) {
         return commandPromptsMap.getOrDefault(moduleController.getRoot(command.getClass()), List.of());
     }
 
-    public <V extends @NonNull Object> V getArgument(ModuleCommand<?> command,
-                                                     CommandContext<FPlayer> context,
-                                                     int promptIndex) {
+    public <V extends @NonNull Object> V getArgument(ModuleCommand command, CommandContext<FPlayer> context, int promptIndex) {
         String prompt = getPrompt(command, promptIndex);
         return context.get(prompt);
     }
 
-    public String getCommandName(ModuleCommand<?> command) {
+    public String getCommandName(ModuleCommand command) {
         List<String> aliases = command.config().aliases();
         if (aliases.isEmpty()) return "flectonepulsenull";
 

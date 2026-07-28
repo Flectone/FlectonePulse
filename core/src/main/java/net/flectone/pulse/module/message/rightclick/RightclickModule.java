@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -20,14 +21,13 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.PotionUtil;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.UUID;
 
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class RightclickModule implements ModuleLocalization<Localization.Message.Rightclick> {
+public class RightclickModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -72,12 +72,14 @@ public class RightclickModule implements ModuleLocalization<Localization.Message
             if (config().shouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
             if (config().hideNameWhenInvisible() && platformPlayerAdapter.hasPotionEffect(fTarget, PotionUtil.INVISIBILITY_POTION_NAME)) return;
 
-            messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Rightclick>builder()
-                    .sender(fPlayer)
-                    .tagResolvers(fResolver -> new TagResolver[]{
-                            messagePipeline.targetTag(fResolver, fTarget)
-                    })
-                    .format(Localization.Message.Rightclick::format)
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).format())
+                            .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
+                            .build()
+                    )
                     .destination(config().destination())
                     .sound(soundOrThrow())
                     .build()

@@ -7,8 +7,10 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ball.listener.BallProxyMessageListener;
 import net.flectone.pulse.module.command.ball.model.BallMetadata;
@@ -27,16 +29,16 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
-import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BallModule implements ModuleCommand<Localization.Command.Ball> {
+public class BallModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final RandomGenerator randomUtil;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
@@ -65,23 +67,27 @@ public class BallModule implements ModuleCommand<Localization.Command.Ball> {
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (moduleController.isDisabledFor(this, fPlayer, true)) return;
 
-        int answer = randomUtil.nextInt(0, localization().answers().size());
+        int answer = randomUtil.nextInt(0, localization(FPlayer.UNKNOWN).answers().size());
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, BallMetadata.<Localization.Command.Ball>builder()
-                .base(EventMetadata.<Localization.Command.Ball>builder()
-                        .sender(fPlayer)
-                        .format(replaceAnswer(answer))
-                        .message(message)
+        messageDispatcher.dispatch(this, BallMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .range(config().range())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replaceAnswer(fResolver, answer))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeInt(answer);
                             dataOutputStream.writeString(message);
                         })
                         .integration(string -> {
-                            List<String> answers = localization().answers();
+                            List<String> answers = localization(FPlayer.UNKNOWN).answers();
 
                             String answerString = !answers.isEmpty()
                                     ? answers.get(Math.min(answer, answers.size() - 1))
@@ -116,15 +122,14 @@ public class BallModule implements ModuleCommand<Localization.Command.Ball> {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().ball();
     }
 
-    public Function<Localization.Command.Ball, String> replaceAnswer(int answer) {
-        return message -> {
-            List<String> answers = message.answers();
+    public String replaceAnswer(FPlayer fPlayer, int answer) {
+        Localization.Command.Ball localization = localization(fPlayer);
+        List<String> answers = localization.answers();
 
-            String answerString = !answers.isEmpty()
-                    ? answers.get(Math.min(answer, answers.size() - 1))
-                    : StringUtils.EMPTY;
+        String answerString = !answers.isEmpty()
+                ? answers.get(Math.min(answer, answers.size() - 1))
+                : StringUtils.EMPTY;
 
-            return Strings.CS.replace(message.format(), "<answer>", answerString);
-        };
+        return Strings.CS.replace(localization.format(), "<answer>", answerString);
     }
 }

@@ -4,13 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
@@ -19,7 +20,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -28,6 +29,7 @@ public class SpyProxyMessageListener implements PulseListener {
     private final SpyModule spyModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -40,15 +42,19 @@ public class SpyProxyMessageListener implements PulseListener {
             String action = proxyPayload.readString();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(spyModule, SpyMetadata.<Localization.Command.Spy>builder()
-                    .base(EventMetadata.<Localization.Command.Spy>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(Localization.Command.Spy::formatLog)
+            messageDispatcher.dispatch(spyModule, SpyMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
+                            .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, Set.of()))
                             .destination(spyModule.config().destination())
-                            .message(message)
-                            .filter(spyModule.createFilter(event.sender() instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN, List.of()))
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(spyModule.localization(fResolver).formatLog())
+                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .build()
+                            )
                             .build()
                     )
                     .turned(true)

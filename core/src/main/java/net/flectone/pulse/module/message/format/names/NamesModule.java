@@ -36,7 +36,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NamesModule implements ModuleLocalization<Localization.Message.Format.Names> {
+public class NamesModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;
@@ -156,15 +156,16 @@ public class NamesModule implements ModuleLocalization<Localization.Message.Form
                             return Tag.inserting(constants.get(constantIndex));
                         }),
                         messagePipeline.resolver(MessagePipeline.ReplacementTag.DISPLAY_NAME.getTagName(), (argumentQueue, _) -> {
+                            Localization.Message.Format.Names localization = localization(fReceiver);
+
                             int displayNameIndex = 0;
                             if (argumentQueue.hasNext()) {
                                 displayNameIndex = argumentQueue.pop().asInt().orElse(0);
-                                if (displayNameIndex > localization().display().size()) {
+                                if (displayNameIndex > localization.display().size()) {
                                     displayNameIndex = 0;
                                 }
                             }
 
-                            Localization.Message.Format.Names localization = localization(fReceiver);
                             String displayName;
                             if (fPlayer.isUnknown() || localization.display().isEmpty()) {
                                 displayName = Strings.CS.replace(localization.unknown(), "<name>", profileResolver.resolveName(fPlayer));

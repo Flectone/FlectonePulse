@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class ChatsettingModule implements ModuleCommand<Localization.Command.Chatsetting> {
+public abstract class ChatsettingModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

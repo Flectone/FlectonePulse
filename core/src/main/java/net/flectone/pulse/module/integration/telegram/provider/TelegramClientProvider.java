@@ -63,7 +63,7 @@ public class TelegramClientProvider {
 
             FPlayer fPlayer = FPlayer.builder()
                     .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
-                    .name(telegramModule.localization().senderName())
+                    .name(telegramModule.localization(FPlayer.UNKNOWN).senderName())
                     .uuid(UUID.randomUUID())
                     .type(FPlayer.INTEGRATION_TYPE)
                     .build();

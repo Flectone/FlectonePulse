@@ -24,7 +24,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NewbieModule implements ModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
+public class NewbieModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -90,7 +90,7 @@ public class NewbieModule implements ModuleLocalization<Localization.Message.For
 
         return new ExternalModeration(fPlayer.name(),
                 fileFacade.config().logger().console(),
-                localization().formatRestrict(),
+                localization(FPlayer.UNKNOWN).formatRestrict(),
                 1,
                 firstPlayed,
                 moderationTime,

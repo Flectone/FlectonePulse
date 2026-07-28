@@ -6,13 +6,11 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.ModuleCommand;
@@ -22,7 +20,6 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.PlaytimeService;
 import net.flectone.pulse.service.SocialService;
@@ -30,8 +27,8 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -42,15 +39,13 @@ import java.util.OptionalInt;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ToponlineModule implements ModuleCommand<Localization.Command.Toponline> {
+public class ToponlineModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
-    private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
-    private final SoundPlayer soundPlayer;
     private final FPlayerService fPlayerService;
     private final PlaytimeService playtimeService;
     private final ModuleController moduleController;
@@ -87,9 +82,13 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Toponline>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Toponline::nullPage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPage())
+                            .build()
+                    )
                     .build()
             );
 
@@ -100,47 +99,52 @@ public class ToponlineModule implements ModuleCommand<Localization.Command.Topon
 
         Localization.Command.Toponline localization = localization(fPlayer);
 
-        Component component = messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(Strings.CS.replace(localization.header(), "<count>", String.valueOf(size)))
-                .build()
-        ).append(Component.newline());
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (PlayTime timePlayer : finalPlayedTimePlayers) {
-            FPlayer fTarget = fPlayerService.getFPlayer(timePlayer.playerId());
+        // header
+        stringBuilder
+                .append(Strings.CS.replace(localization.header(), "<count>", String.valueOf(size)))
+                .append("<br>");
 
-            // take only time that is saved in database and do not check player online,
-            // otherwise there will be an incorrect order
-            String line = Strings.CS.replace(
-                    localization.line(),
-                    "<time>",
-                    timeFormatter.format(fPlayer, timePlayer.total())
-            );
+        TagResolver tagResolvers = TagResolver.empty();
 
-            component = component
-                    .append(messagePipeline.build(MessageContext.builder()
-                            .sender(fPlayer)
-                            .message(line)
-                            .tagResolver(messagePipeline.targetTag("time_player", fPlayer, fTarget))
-                            .build()
+        for (int i = 0; i < finalPlayedTimePlayers.size(); i++) {
+            PlayTime playTime = finalPlayedTimePlayers.get(i);
+            FPlayer fTarget = fPlayerService.getFPlayer(playTime.playerId());
+
+            // line
+            stringBuilder
+                    .append(StringUtils.replaceEach(
+                            localization.line(),
+                            new String[]{"<time>", "<time_player"},
+                            new String[]{timeFormatter.format(fPlayer, playTime.total()), "<time_player_" + i}
                     ))
-                    .append(Component.newline());
+                    .append("<br>");
+
+            tagResolvers = TagResolver.resolver(
+                    tagResolvers, messagePipeline.targetTag("time_player_" + i, fPlayer, fTarget)
+            );
         }
 
-        String footer = StringUtils.replaceEach(localization.footer(),
+        stringBuilder.append(StringUtils.replaceEach(localization.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
                 new String[]{"/" + commandModuleController.getCommandName(this), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
-        );
-
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(footer)
-                .build()
         ));
 
-        eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
+        String message = stringBuilder.toString();
+        TagResolver finalTagResolvers = tagResolvers;
 
-        soundPlayer.play(soundOrThrow(), fPlayer);
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(message)
+                        .tagResolver(finalTagResolvers)
+                        .build()
+                )
+                .build()
+        );
     }
 
     @Override

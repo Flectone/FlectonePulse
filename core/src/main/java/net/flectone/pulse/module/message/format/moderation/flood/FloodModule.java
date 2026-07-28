@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FloodModule implements ModuleLocalization<Localization.Message.Format.Moderation.Flood> {
+public class FloodModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;

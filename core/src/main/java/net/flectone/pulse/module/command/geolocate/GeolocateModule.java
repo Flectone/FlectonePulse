@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
 import net.flectone.pulse.module.command.geolocate.model.IpResponse;
@@ -25,7 +26,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -41,7 +41,7 @@ import java.util.Scanner;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class GeolocateModule implements ModuleCommand<Localization.Command.Geolocate> {
+public class GeolocateModule implements ModuleCommand {
 
     private static final String IP_API_URL = "http://ip-api.com/json/<ip>?fields=status,country,regionName,city,timezone,offset,mobile,proxy,hosting,query";
 
@@ -93,17 +93,25 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
         IpResponse response = getGeolocation(ip);
         if (response == null || !response.isSuccess()) {
             if (fTarget.isUnknown()) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Geolocate::nullPlayer)
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).nullPlayer())
+                                .build()
+                        )
                         .build()
                 );
                 return;
             }
 
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Geolocate>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Geolocate::nullOrError)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullOrError())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -111,18 +119,20 @@ public class GeolocateModule implements ModuleCommand<Localization.Command.Geolo
 
         String userCurrentTime = getUserCurrentTime(response);
 
-        messageDispatcher.dispatch(this, GeolocateMetadata.<Localization.Command.Geolocate>builder()
-                .base(EventMetadata.<Localization.Command.Geolocate>builder()
-                        .sender(fPlayer)
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fTarget)
-                        })
-                        .format(geolocate -> StringUtils.replaceEach(geolocate.format(),
-                                new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
-                                new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}
-                        ))
+        messageDispatcher.dispatch(this, GeolocateMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(StringUtils.replaceEach(localization(fResolver).format(),
+                                        new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>", "<current_time>"},
+                                        new String[]{response.country(), response.region(), response.city(), response.timezone(), String.valueOf(response.mobile()), String.valueOf(response.proxy()), String.valueOf(response.hosting()), response.query(), userCurrentTime}
+                                ))
+                                .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
+                                .build()
+                        )
                         .build()
                 )
                 .response(response)

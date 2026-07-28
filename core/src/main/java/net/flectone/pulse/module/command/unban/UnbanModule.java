@@ -10,7 +10,8 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.UnModerationMetadata;
+import net.flectone.pulse.model.event.ModerationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -28,7 +29,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
@@ -37,7 +37,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
+public class UnbanModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -118,27 +118,39 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Unban::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
             return;
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Unban::lowerWeightGroup)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).lowerWeightGroup())
+                            .build()
+                    )
                     .build()
             );
             return;
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.BAN, id)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Unban>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Unban::nullId)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullId())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -151,31 +163,31 @@ public class UnbanModule implements ModuleCommand<Localization.Command.Unban> {
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_BAN, dataOutputStream -> dataOutputStream.writeAsJson(unban));
         }
 
-        EventMetadata.Builder<Localization.Command.Unban> baseMetadataBuilder = EventMetadata.<Localization.Command.Unban>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unban)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
                 .destination(config().destination())
                 .range(config().range())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).format(), fResolver, unban))
+                        .tagResolver( messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream ->
                         dataOutputStream.writeAsJson(unban)
                 )
                 .integration(string ->
                         moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unban)
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Unban>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
-                .unmoderation(unban)
+                .moderation(unban)
                 .build()
         );
     }

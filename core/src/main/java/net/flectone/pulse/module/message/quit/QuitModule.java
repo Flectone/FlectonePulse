@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.quit.listener.PulseQuitListener;
@@ -30,7 +31,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuitModule implements ModuleLocalization<Localization.Message.Quit> {
+public class QuitModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final TaskScheduler taskScheduler;
@@ -101,14 +102,18 @@ public class QuitModule implements ModuleLocalization<Localization.Message.Quit>
     public void send(FPlayer fPlayer, boolean fakeMessage, boolean vanished) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, QuitMetadata.<Localization.Message.Quit>builder()
-                .base(EventMetadata.<Localization.Message.Quit>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Message.Quit::format)
-                        .destination(config().destination())
+        messageDispatcher.dispatch(this, QuitMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range().is(Range.Type.PROXY) && !fakeMessage ? Range.get(Range.Type.SERVER) : config().range())
-                        .sound(soundOrThrow())
                         .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
+                        .destination(config().destination())
+                        .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).format())
+                                .build()
+                        )
                         .integration()
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeBoolean(fakeMessage);

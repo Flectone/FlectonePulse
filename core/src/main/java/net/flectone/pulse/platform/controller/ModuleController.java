@@ -95,7 +95,7 @@ public class ModuleController {
         if (!isEnable(module)) return true;
         if (!permissionChecker.check(fEntity, module.permission())) return true;
 
-        if (checkLocalizationModule && module instanceof ModuleLocalization<?> localizationModule) {
+        if (checkLocalizationModule && module instanceof ModuleLocalization localizationModule) {
             if (disableSender.sendIfDisabled(fEntity, fEntity, localizationModule.name())) return true;
             if (cooldownSender.sendIfCooldown(fEntity, localizationModule.cooldown(), getRoot(module.getClass()).getName())) return true;
             if (muteSender.sendIfMuted(fEntity)) return true;

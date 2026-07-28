@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.minesweeper.listener.MinesweeperPulseListener;
 import net.flectone.pulse.module.command.minesweeper.model.Minesweeper;
@@ -38,7 +39,7 @@ import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinesweeperModule implements ModuleCommand<Localization.Command.Minesweeper> {
+public class MinesweeperModule implements ModuleCommand {
 
     private final Map<UUID, Minesweeper> playerGames = new ConcurrentHashMap<>();
 
@@ -86,9 +87,13 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
 
         Minesweeper minesweeper = playerGames.get(fPlayer.uuid());
         if (minesweeper == null || minesweeper.getState() != Minesweeper.GameState.IN_PROGRESS) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Minesweeper>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Minesweeper::wrongGame)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongGame())
+                            .build()
+                    )
                     .build()
             );
 
@@ -109,9 +114,13 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
         int row = optionalRow.orElse(config().maxRow());
         int column = optionalColumn.orElse(config().maxColumn());
         if (!minesweeper.checkBounds(row, column)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Minesweeper>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Minesweeper::wrongMove)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongMove())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -142,9 +151,13 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
                 || columnCount <= 0
                 || mineCount < 0
                 || mineCount > rowCount * columnCount - Math.min(9, rowCount * columnCount)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Minesweeper>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Minesweeper::wrongParameters)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongParameters())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -193,28 +206,35 @@ public class MinesweeperModule implements ModuleCommand<Localization.Command.Min
                              int row,
                              int column,
                              Function<Localization.Command.Minesweeper, String> localizationFunction) {
-        messageDispatcher.dispatch(this, MinesweeperMetadata.<Localization.Command.Minesweeper>builder()
-                .base(EventMetadata.<Localization.Command.Minesweeper>builder()
-                        .sender(fPlayer)
-                        .format(localization -> StringUtils.replaceEach(
-                                localizationFunction.apply(localization),
-                                new String[]{"<seed>", "<remaining>", "<flag>", "<field>"},
-                                new String[]{
-                                        StringUtils.replaceEach(
-                                                localization.seed(),
-                                                new String[]{"<row>", "<column>", "<seed>"},
-                                                new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getSeed())}
-                                        ),
-                                        String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount()),
-                                        Strings.CS.replace(
-                                                minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
-                                                "<command>",
-                                                commandModuleController.getCommandName(this)
-                                        ),
-                                        render(minesweeper, localization),
-                                }
-                        ))
+        messageDispatcher.dispatch(this, MinesweeperMetadata.builder()
+                .base(EventMetadata.builder()
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> {
+                            Localization.Command.Minesweeper localization = localization(fResolver);
+
+                            return MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(StringUtils.replaceEach(
+                                            localizationFunction.apply(localization),
+                                            new String[]{"<seed>", "<remaining>", "<flag>", "<field>"},
+                                            new String[]{
+                                                    StringUtils.replaceEach(
+                                                            localization.seed(),
+                                                            new String[]{"<row>", "<column>", "<seed>"},
+                                                            new String[]{String.valueOf(row), String.valueOf(column), String.valueOf(minesweeper.getSeed())}
+                                                    ),
+                                                    String.valueOf(minesweeper.getMineCount() - minesweeper.getFlaggedCellCount()),
+                                                    Strings.CS.replace(
+                                                            minesweeper.isFlagMode() ? localization.flagDisabled() : localization.flagEnabled(),
+                                                            "<command>",
+                                                            commandModuleController.getCommandName(this)
+                                                    ),
+                                                    render(minesweeper, localization),
+                                            }
+                                    ))
+                                    .build();
+                        })
                         .build()
                 )
                 .minesweeper(minesweeper)

@@ -34,7 +34,7 @@ import java.util.OptionalInt;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PaddingModule implements ModuleLocalization<Localization.Message.Format.Padding> {
+public class PaddingModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;

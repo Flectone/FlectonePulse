@@ -14,7 +14,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -80,11 +80,11 @@ public abstract class BubbleModule implements ModuleSimple {
         bubbleService.clear();
     }
 
-    public void add(@NonNull FPlayer fPlayer, @NonNull String inputString, List<FPlayer> receivers) {
+    public void add(@NonNull FPlayer fPlayer, @NonNull String inputString, Set<FPlayer> receivers) {
         add(fPlayer, inputString, inputString, receivers);
     }
 
-    public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, List<FPlayer> receivers) {
+    public void add(@NonNull FPlayer fPlayer, @NonNull String rawString, @NonNull String inputString, Set<FPlayer> receivers) {
         if (disallowedPredicate != null && disallowedPredicate.test(rawString)) return;
 
         taskScheduler.runAsync(() -> {

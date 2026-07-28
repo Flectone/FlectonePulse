@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.listener.CoinProxyMessageListener;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
@@ -26,11 +27,10 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
-import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
+public class CoinModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final RandomGenerator randomUtil;
@@ -58,19 +58,23 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
 
         int percent = randomUtil.nextInt(config().draw() ? 0 : 1, 101);
 
-        messageDispatcher.dispatch(this, CoinMetadata.<Localization.Command.Coin>builder()
-                .base(EventMetadata.<Localization.Command.Coin>builder()
-                        .sender(fPlayer)
-                        .format(replaceResult(percent))
+        messageDispatcher.dispatch(this, CoinMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range())
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replaceResult(fResolver, percent))
+                                .build()
+                        )
                         .proxy(output -> output.writeInt(percent))
                         .integration(IntegrationMetadata.builder()
                                 .format(string -> Strings.CS.replace(
                                         string,
                                         "<result>",
-                                        percent == 0 ? "" : percent > 50 ? localization().head() : localization().tail()
+                                        percent == 0 ? "" : percent > 50 ? localization(FPlayer.UNKNOWN).head() : localization(FPlayer.UNKNOWN).tail()
                                 ))
                                 .messageNames(List.of(name().name() + "_" + (percent == 0 ? "DRAW" : percent > 50 ? "HEAD" : "TAIL")))
                                 .build()
@@ -102,9 +106,10 @@ public class CoinModule implements ModuleCommand<Localization.Command.Coin> {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().coin();
     }
 
-    public Function<Localization.Command.Coin, String> replaceResult(int percent) {
-        return message -> percent != 0
-                ? Strings.CS.replace(message.format(), "<result>", percent > 50 ? message.head() : message.tail())
-                : message.formatDraw();
+    public String replaceResult(FPlayer fPlayer, int percent) {
+        Localization.Command.Coin localization = localization(fPlayer);
+        return percent != 0
+                ? Strings.CS.replace(localization.format(), "<result>", percent > 50 ? localization.head() : localization.tail())
+                : localization.formatDraw();
     }
 }

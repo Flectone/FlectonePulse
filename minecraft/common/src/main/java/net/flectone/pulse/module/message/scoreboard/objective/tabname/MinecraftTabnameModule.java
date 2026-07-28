@@ -24,7 +24,7 @@ import net.kyori.adventure.text.Component;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftTabnameModule implements ModuleLocalization<Localization.Message.Scoreboard.Objective.Tabname> {
+public class MinecraftTabnameModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;

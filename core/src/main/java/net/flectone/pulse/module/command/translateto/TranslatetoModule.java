@@ -8,9 +8,11 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.translateto.listener.TranslatetoProxyMessageListener;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
@@ -39,17 +41,17 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TranslatetoModule implements ModuleCommand<Localization.Command.Translateto> {
+public class TranslatetoModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
@@ -101,9 +103,13 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Translateto>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Translateto::nullOrError)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullOrError())
+                            .build()
+                    )
                     .build()
             );
 
@@ -111,14 +117,18 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
         }
 
         String finalMessageToTranslate = messageToTranslate;
-        messageDispatcher.dispatch(this, TranslatetoMetadata.<Localization.Command.Translateto>builder()
-                .base(EventMetadata.<Localization.Command.Translateto>builder()
-                        .sender(fPlayer)
-                        .format(replaceLanguage(targetLang))
+        messageDispatcher.dispatch(this, TranslatetoMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range())
                         .destination(config().destination())
-                        .message(translatedMessage)
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replaceLanguage(fResolver, targetLang))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, translatedMessage))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(targetLang);
                             dataOutputStream.writeString(message);
@@ -157,8 +167,8 @@ public class TranslatetoModule implements ModuleCommand<Localization.Command.Tra
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().translateto();
     }
 
-    public Function<Localization.Command.Translateto, String> replaceLanguage(String targetLang) {
-        return message -> Strings.CS.replace(message.format(), "<language>", targetLang);
+    public String replaceLanguage(FPlayer fPlayer, String targetLang) {
+        return Strings.CS.replace(localization(fPlayer).format(), "<language>", targetLang);
     }
 
     public String translate(FPlayer fPlayer, String source, String target, String text) {

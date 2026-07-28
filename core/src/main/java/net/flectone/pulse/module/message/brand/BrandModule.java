@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.PulseBrandListener;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BrandModule implements ModuleListLocalization<Localization.Message.Brand> {
+public class BrandModule implements ModuleListLocalization {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -101,10 +102,14 @@ public class BrandModule implements ModuleListLocalization<Localization.Message.
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Brand>builder()
-                .sender(fPlayer)
-                .format(format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(format)
+                        .build()
+                )
                 .build()
         );
     }

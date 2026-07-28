@@ -23,7 +23,7 @@ public record MessageContext(
         @NonNull TagResolver tagResolver,
         @NonNull FEntity sender,
         @NonNull FPlayer receiver,
-        @NonNull UUID messageUUID,
+        @NonNull UUID uuid,
         @NonNull String message,
         @Nullable String userMessage
 ) {
@@ -31,7 +31,7 @@ public record MessageContext(
     public MessageContext {
         if (sender == null) sender = FPlayer.UNKNOWN;
         if (receiver == null) receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
-        if (messageUUID == null) messageUUID = UUID.randomUUID();
+        if (uuid == null) uuid = UUID.randomUUID();
 
         flags = Map.copyOf(new EnumMap<>(flags != null && !flags.isEmpty() ? flags : new EnumMap<>(MessageFlag.class)));
         tagResolver = tagResolver == null ? TagResolver.builder().build() : tagResolver;

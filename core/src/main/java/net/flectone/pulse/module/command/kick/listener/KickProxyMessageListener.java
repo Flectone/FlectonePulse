@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
@@ -14,6 +13,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.kick.KickModule;
@@ -23,7 +23,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 
@@ -53,17 +52,19 @@ public class KickProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(kick.moderator());
             if (moduleController.isDisabledFor(kickModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(kickModule, ModerationMetadata.<Localization.Command.Kick>builder()
-                    .base(EventMetadata.<Localization.Command.Kick>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format((fReceiver, message) ->
-                                    moderationMessageFormatter.replacePlaceholders(message.server(), fReceiver, kick)
-                            )
-                            .destination(kickModule.config().destination())
+            messageDispatcher.dispatch(kickModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
+                            .destination(kickModule.config().destination())
                             .sound(kickModule.soundOrThrow())
-                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(kickModule.localization(fResolver).server(), fResolver, kick))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .build()
                     )
                     .moderation(kick)

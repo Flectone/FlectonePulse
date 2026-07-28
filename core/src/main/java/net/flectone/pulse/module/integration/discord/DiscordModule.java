@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.discord.listener.DiscordPulseListener;
 import net.flectone.pulse.module.integration.discord.sender.DiscordSender;
@@ -35,7 +36,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DiscordModule implements ModuleLocalization<Localization.Integration.Discord> {
+public class DiscordModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -108,7 +109,7 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
         );
     }
 
-    public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {
+    public void sendMessage(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext) {
         IntegrationMetadata integrationMetadata = eventMetadata.integrationMetadata();
         if (integrationMetadata == null) return;
 
@@ -119,11 +120,11 @@ public class DiscordModule implements ModuleLocalization<Localization.Integratio
         // skip vanished player
         if (integrationFormatter.isVanished(eventMetadata)) return;
 
-        FEntity sender = eventMetadata.sender();
+        FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
         // create formatter
-        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMetadata, messageContext);
 
         // send to discord
         DiscordSender discordSender = injector.getInstance(DiscordSender.class);

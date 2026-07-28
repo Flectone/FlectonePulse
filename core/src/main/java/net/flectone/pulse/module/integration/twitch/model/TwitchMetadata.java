@@ -2,16 +2,15 @@ package net.flectone.pulse.module.integration.twitch.model;
 
 import lombok.Builder;
 import lombok.With;
-import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.event.BaseEventMetadata;
 import net.flectone.pulse.model.event.EventMetadata;
 import org.jspecify.annotations.NonNull;
 
 @With
 @Builder
-public record TwitchMetadata<L extends LocalizationSetting>(
-        @NonNull BaseEventMetadata<L> base,
+public record TwitchMetadata(
+        @NonNull BaseEventMetadata base,
         @NonNull String nickname,
         @NonNull String channel
-) implements EventMetadata<L> {
+) implements EventMetadata {
 }

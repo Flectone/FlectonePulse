@@ -51,7 +51,7 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftPlayerlistnameModule implements ModuleLocalization<Localization.Message.Tab.Playerlistname> {
+public class MinecraftPlayerlistnameModule implements ModuleLocalization {
 
     private static final EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> ADD_ACTIONS = EnumSet.of(
             WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER,

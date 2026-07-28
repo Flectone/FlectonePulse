@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -28,7 +29,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class JoinModule implements ModuleLocalization<Localization.Message.Join> {
+public class JoinModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -83,13 +84,17 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
         PlayTime playTime = playtimeService.getPlayTime(fPlayer);
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer) || (playTime != null && playTime.sessions() > 1);
         boolean vanished = socialService.isVanished(fPlayer);
-        EventMetadata.Builder<Localization.Message.Join> eventMetadataBuilder = EventMetadata.<Localization.Message.Join>builder()
-                .sender(fPlayer)
-                .format(localization -> hasPlayedBefore || !config().first() ? localization.format() : localization.formatFirstTime())
-                .destination(config().destination())
+        EventMetadata.Builder eventMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
-                .sound(soundOrThrow())
                 .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(hasPlayedBefore || !config().first() ? localization(fResolver).format() : localization(fResolver).formatFirstTime())
+                        .build()
+                )
                 .integration();
 
         if (isProxyMode()) {
@@ -100,7 +105,7 @@ public class JoinModule implements ModuleLocalization<Localization.Message.Join>
             });
         }
 
-        messageDispatcher.dispatch(this, JoinMetadata.<Localization.Message.Join>builder()
+        messageDispatcher.dispatch(this, JoinMetadata.builder()
                 .base(eventMetadataBuilder.build())
                 .playedBefore(hasPlayedBefore)
                 .fakeMessage(fakeMessage)

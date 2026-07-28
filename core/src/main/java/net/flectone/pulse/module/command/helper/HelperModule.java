@@ -9,12 +9,16 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
+import net.flectone.pulse.module.command.helper.listener.HelperProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
@@ -29,14 +33,16 @@ import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class HelperModule implements ModuleCommand<Localization.Command.Helper> {
+public class HelperModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final ProxyRegistry proxyRegistry;
+    private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final SocialService socialService;
@@ -48,6 +54,10 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
                 .permission(permission().name())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            listenerRegistry.register(HelperProxyMessageListener.class);
+        }
     }
 
     @Override
@@ -71,9 +81,13 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
                 .toList();
 
         if (recipients.isEmpty() && config().nullHelper()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Helper>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Helper::nullHelper)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullHelper())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -81,23 +95,31 @@ public class HelperModule implements ModuleCommand<Localization.Command.Helper> 
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Helper>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.Helper::player)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).player())
+                        .build()
+                )
                 .build()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Helper>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.Helper::global)
-                .destination(config().destination())
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .range(config().range())
-                .message(message)
                 .filter(getFilterSee())
+                .destination(config().destination())
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).global())
+                        .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
-                .sound(soundOrThrow())
                 .build()
         );
     }

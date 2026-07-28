@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ConditionModule implements ModuleLocalization<Localization.Message.Format.Condition> {
+public class ConditionModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;

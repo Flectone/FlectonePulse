@@ -15,6 +15,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.twitch.listener.TwitchPulseListener;
 import net.flectone.pulse.module.integration.twitch.sender.TwitchSender;
@@ -34,7 +35,7 @@ import java.util.function.UnaryOperator;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TwitchModule implements ModuleLocalization<Localization.Integration.Twitch> {
+public class TwitchModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ReflectionResolver reflectionResolver;
@@ -79,7 +80,7 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).integration().twitch();
     }
 
-    public void sendMessage(@NonNull EventMetadata<?> eventMetadata, @NonNull ModuleName moduleName, @NonNull String format) {
+    public void sendMessage(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext) {
         IntegrationMetadata integrationMetadata = eventMetadata.integrationMetadata();
         if (integrationMetadata == null) return;
 
@@ -90,11 +91,11 @@ public class TwitchModule implements ModuleLocalization<Localization.Integration
         // skip vanished player
         if (integrationFormatter.isVanished(eventMetadata)) return;
 
-        FEntity sender = eventMetadata.sender();
+        FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return;
 
         // create formatter
-        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(eventMetadata, integrationMetadata, format);
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMetadata, messageContext);
 
         // send to twitch
         TwitchSender twitchSender = injector.getInstance(TwitchSender.class);

@@ -1,12 +1,11 @@
 package net.flectone.pulse.module;
 
-import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-public interface ModuleListLocalization<M extends LocalizationSetting> extends ModuleLocalization<M> {
+public interface ModuleListLocalization extends ModuleLocalization {
 
     List<String> getAvailableMessages(FPlayer fPlayer);
 

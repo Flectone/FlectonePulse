@@ -37,7 +37,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftBelownameModule implements ModuleLocalization<Localization.Message.Scoreboard.Objective.Belowname> {
+public class MinecraftBelownameModule implements ModuleLocalization {
 
     private static final int ATTRIBUTE_BASE_VALUE = 10;
 

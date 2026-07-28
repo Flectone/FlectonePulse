@@ -34,7 +34,6 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,7 +46,7 @@ import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
+public class MuteModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -100,9 +99,13 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
 
         long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Mute::nullTime)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullTime())
+                            .build()
+                    )
                     .build()
             );
 
@@ -111,28 +114,40 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Mute::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
             return;
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Mute::lowerWeightGroup)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).lowerWeightGroup())
+                            .build()
+                    )
                     .build()
             );
             return;
         }
 
         if (config().checkDuplicate() && moderationService.hasValid(fTarget, Moderation.Type.MUTE)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mute>builder()
-                    .sender(fPlayer)
-                    .format(localization -> Strings.CS.replace(localization.alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
-                    .tagResolvers(_ -> new TagResolver[]{messagePipeline.targetTag(fPlayer, fTarget)})
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(Strings.CS.replace(localization(fResolver).alreadyMuted(), "<command>", "/" + commandModuleController.getCommandName(unmuteModule) + " " + fTarget.name()))
+                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -148,27 +163,27 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MUTE);
         }
 
-        EventMetadata.Builder<Localization.Command.Mute> baseMetadataBuilder = EventMetadata.<Localization.Command.Mute>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, mute)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, mute))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
                 .integration(string ->
                         moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute)
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Mute>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(mute)
                 .build()
@@ -226,14 +241,14 @@ public class MuteModule implements ModuleCommand<Localization.Command.Mute> {
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Mute>builder()
-                .sender(fReceiver)
-                .format(localization ->
-                        moderationMessageFormatter.replacePlaceholders(localization.person(), fReceiver, mute)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fReceiver)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fReceiver, mute))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                        .build()
                 )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fModerator)
-                })
                 .build()
         );
     }

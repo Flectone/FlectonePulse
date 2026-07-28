@@ -40,7 +40,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
@@ -56,7 +55,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MaintenanceModule implements ModuleCommand<Localization.Command.Maintenance> {
+public class MaintenanceModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
@@ -141,9 +140,13 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                 .orElseGet(() -> !isAlreadyTurned);
 
         if (turned && isAlreadyTurned || !turned && !isAlreadyTurned) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Maintenance>builder()
-                    .sender(fPlayer)
-                    .format(localization -> turned ? localization.alreadyTrue() : localization.alreadyFalse())
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(turned ? localization(fResolver).alreadyTrue() : localization(fResolver).alreadyFalse())
+                            .build()
+                    )
                     .build()
             );
 
@@ -215,14 +218,17 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_MAINTENANCE, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
-        EventMetadata.Builder<Localization.Command.Maintenance> baseMetadataBuilder = EventMetadata.<Localization.Command.Maintenance>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, moderation)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse(), fResolver, moderation))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(moderation);
                     dataOutputStream.writeBoolean(turned);
@@ -230,16 +236,13 @@ public class MaintenanceModule implements ModuleCommand<Localization.Command.Mai
                 .integration(IntegrationMetadata.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
                         .build()
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
+        messageDispatcher.dispatch(this, MaintenanceMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(moderation)
                 .turned(turned)

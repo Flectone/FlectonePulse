@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
@@ -38,15 +38,19 @@ public class StreamProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(streamModule, StreamMetadata.<Localization.Command.Stream>builder()
-                    .base(EventMetadata.<Localization.Command.Stream>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(streamModule.replaceUrls(message))
+            messageDispatcher.dispatch(streamModule, StreamMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .destination(streamModule.config().destination())
                             .sound(streamModule.soundOrThrow())
-                            .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
+                                    .message(streamModule.replaceUrls(fResolver, message))
+                                    .build()
+                            )
                             .build()
                     )
                     .turned(true)

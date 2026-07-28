@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class SidebarModule implements ModuleListLocalization<Localization.Message.Sidebar> {
+public abstract class SidebarModule implements ModuleListLocalization {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

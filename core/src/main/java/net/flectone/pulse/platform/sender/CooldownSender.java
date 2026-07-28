@@ -5,11 +5,10 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.data.repository.CooldownRepository;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
@@ -19,7 +18,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
@@ -49,11 +47,10 @@ public class CooldownSender {
     private final PermissionChecker permissionChecker;
     private final CooldownChecker cooldownChecker;
     private final CooldownRepository cooldownRepository;
-    private final MessagePipeline messagePipeline;
     private final TimeFormatter timeFormatter;
-    private final EventDispatcher eventDispatcher;
     private final FileFacade fileFacade;
     private final SocialService socialService;
+    private final MessageDispatcher messageDispatcher;
 
     /**
      * Checks if an entity is on cooldown and sends a cooldown message if applicable.
@@ -91,14 +88,15 @@ public class CooldownSender {
         long timeLeft = cooldownRepository.getTimeLeft(fPlayer.uuid(), cooldown, cooldownOwner);
         String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).cooldown());
 
-        MessageContext cooldownContext = MessageContext.builder()
-                .sender(fPlayer)
-                .message(cooldownMessage)
-                .build();
-
-        Component component = messagePipeline.build(cooldownContext);
-
-        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));
+        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(cooldownMessage)
+                        .build()
+                )
+                .build()
+        );
 
         return true;
     }

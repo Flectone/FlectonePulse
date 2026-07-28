@@ -43,7 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MinecraftScoreboardModule extends ScoreboardModule {
 
     private static final int ATTRIBUTE_BASE_VALUE = 64;
-    private static final int ATTRIBUTE_INVISIBLE_VALUE = 0;
 
     private final Map<UUID, Map<UUID, Team>> playerReceiverTeamMap = new ConcurrentHashMap<>();
 

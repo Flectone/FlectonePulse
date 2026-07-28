@@ -4,13 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.chat.ChatModule;
@@ -30,6 +31,7 @@ public class ChatProxyMessageListener implements PulseListener {
     private final ChatModule chatModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -52,16 +54,20 @@ public class ChatProxyMessageListener implements PulseListener {
 
             Chat playerChat = new Chat(proxyChatName, chatType, chatModule.permission().types().get(proxyChatName));
 
-            messageDispatcher.dispatch(chatModule, ChatMetadata.<Localization.Message.Chat>builder()
-                    .base(EventMetadata.<Localization.Message.Chat>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(localization -> localization.types().get(proxyChatName))
-                            .range(Range.get(Range.Type.SERVER))
-                            .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
-                            .message(message)
-                            .sound(playerChat.sound())
+            messageDispatcher.dispatch(chatModule, ChatMetadata.builder()
+                    .base(EventMetadata.builder()
+                            .range(Range.Type.SERVER)
                             .filter(chatModule.permissionFilter(proxyChatName))
+                            .destination(chatType != null ? chatType.destination() : Destination.EMPTY_CHAT)
+                            .sound(playerChat.sound())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(chatModule.localization(fResolver).types().get(proxyChatName))
+                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .build()
+                            )
                             .build()
                     )
                     .chat(playerChat)

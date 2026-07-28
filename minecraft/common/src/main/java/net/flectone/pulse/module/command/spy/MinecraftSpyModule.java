@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.spy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.listener.MinecraftPacketSpyListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -24,13 +25,14 @@ public class MinecraftSpyModule extends SpyModule {
                               SocialService socialService,
                               PermissionChecker permissionChecker,
                               MessageDispatcher messageDispatcher,
+                              MessagePipeline messagePipeline,
                               ModuleController moduleController,
                               ModuleCommandController commandModuleController,
                               ProxyRegistry proxyRegistry,
                               ListenerRegistry listenerRegistry,
                               TaskScheduler taskScheduler,
                               FPlayerService fPlayerService) {
-        super(fileFacade, socialService, permissionChecker, messageDispatcher, moduleController, commandModuleController, proxyRegistry, listenerRegistry, taskScheduler, fPlayerService);
+        super(fileFacade, socialService, permissionChecker, messageDispatcher, messagePipeline, moduleController, commandModuleController, proxyRegistry, listenerRegistry, taskScheduler, fPlayerService);
 
         this.listenerRegistry = listenerRegistry;
     }

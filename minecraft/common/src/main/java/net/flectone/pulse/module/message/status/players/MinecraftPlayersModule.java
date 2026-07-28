@@ -27,7 +27,7 @@ import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftPlayersModule implements ModuleLocalization<Localization.Message.Status.Players> {
+public class MinecraftPlayersModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;

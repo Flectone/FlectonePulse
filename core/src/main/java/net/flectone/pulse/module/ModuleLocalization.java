@@ -9,9 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
-public interface ModuleLocalization<L extends LocalizationSetting> extends ModuleSimple {
+public interface ModuleLocalization extends ModuleSimple {
 
-    L localization(FPlayer fPlayer);
+    LocalizationSetting localization(FPlayer fPlayer);
 
     @Override
     default ImmutableSet.Builder<PermissionSetting> permissionBuilder() {
@@ -26,10 +26,6 @@ public interface ModuleLocalization<L extends LocalizationSetting> extends Modul
         }
 
         return builder;
-    }
-
-    default L localization() {
-        return localization(FPlayer.UNKNOWN);
     }
 
     default Optional<Pair<Cooldown, PermissionSetting>> cooldown() {

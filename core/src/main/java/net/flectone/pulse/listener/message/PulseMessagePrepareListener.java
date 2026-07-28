@@ -17,7 +17,7 @@ public class PulseMessagePrepareListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.HIGH)
     public Event onMessagePrepareEvent(MessagePrepareEvent event) {
-        if (event.isForProxy() && proxySender.send(event.moduleName(), event.eventMetadata())) {
+        if (event.isForProxy() && proxySender.send(event.moduleName(), event.eventMetadata(), event.messageContext())) {
             return event.withCancelled(true);
         }
 

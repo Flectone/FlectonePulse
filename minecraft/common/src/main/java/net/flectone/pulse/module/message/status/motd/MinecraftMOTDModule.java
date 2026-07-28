@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftMOTDModule implements ModuleListLocalization<Localization.Message.Status.MOTD> {
+public class MinecraftMOTDModule implements ModuleListLocalization {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 

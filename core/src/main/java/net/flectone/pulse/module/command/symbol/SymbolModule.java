@@ -6,23 +6,18 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -36,13 +31,10 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> {
+public class SymbolModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
-    private final EventDispatcher eventDispatcher;
-    private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
-    private final SoundPlayer soundPlayer;
     private final CommandParserProvider commandParserProvider;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
@@ -78,9 +70,13 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
 
         String category = commandModuleController.getArgument(this, commandContext, 0);
         if (!config().categories().containsKey(category)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Symbol>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Symbol::nullCategory)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullCategory())
+                            .build()
+                    )
                     .build()
             );
 
@@ -99,9 +95,13 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Symbol>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Symbol::nullPage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPage())
+                            .build()
+                    )
                     .build()
             );
 
@@ -113,52 +113,50 @@ public class SymbolModule implements ModuleCommand<Localization.Command.Symbol> 
                 .limit(perPage)
                 .toList();
 
-        String header = StringUtils.replaceEach(
-                localization(fPlayer).header(),
-                new String[]{"<category>", "<count>"},
-                new String[]{category, String.valueOf(size)}
-        );
+        StringBuilder stringBuilder = new StringBuilder();
 
-        Component component = messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(header)
-                .build()
-        ).append(Component.newline());
+        // header
+        stringBuilder
+                .append(StringUtils.replaceEach(
+                        localization(fPlayer).header(),
+                        new String[]{"<category>", "<count>"},
+                        new String[]{category, String.valueOf(size)}
+                ))
+                .append("<br>");
 
-        StringBuilder symbolLine = new StringBuilder();
+        // line
         for (String symbol : finalSymbols) {
-            String line = Strings.CS.replace(localization(fPlayer).lineElement(), "<symbol>", symbol);
-            symbolLine.append(line);
+            stringBuilder.append(Strings.CS.replace(localization(fPlayer).lineElement(), "<symbol>", symbol));
         }
 
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(symbolLine.toString())
-                .build()
-        )).append(Component.newline());
-
+        // footer
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + category;
-        String footer = StringUtils.replaceEach(
-                localization(fPlayer).footer(),
-                new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
-                new String[]{
-                        commandLine,
-                        String.valueOf(page - 1),
-                        String.valueOf(page + 1),
-                        String.valueOf(page),
-                        String.valueOf(countPage)
-                }
-        );
+        stringBuilder
+                .append("<br>")
+                .append(StringUtils.replaceEach(
+                        localization(fPlayer).footer(),
+                        new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
+                        new String[]{
+                                commandLine,
+                                String.valueOf(page - 1),
+                                String.valueOf(page + 1),
+                                String.valueOf(page),
+                                String.valueOf(countPage)
+                        }
+                ));
 
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(footer)
+        String message = stringBuilder.toString();
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(message)
+                        .build()
+                )
                 .build()
-        ));
-
-        eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
-
-        soundPlayer.play(soundOrThrow(), fPlayer);
+        );
     }
 
     @Override

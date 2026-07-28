@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -37,9 +38,10 @@ public class HytaleChatModule extends ChatModule {
                             DisableSender disableSender,
                             CooldownSender cooldownSender,
                             MessageDispatcher messageDispatcher,
+                            MessagePipeline messagePipeline,
                             ProxyRegistry proxyRegistry,
                             ListenerRegistry listenerRegistry) {
-        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, proxyRegistry, listenerRegistry);
+        super(fileFacade, fPlayerService, socialService, permissionChecker, integrationModule, bubbleModuleProvider, spyModuleProvider, taskScheduler, muteSender, disableSender, cooldownSender, messageDispatcher, messagePipeline, proxyRegistry, listenerRegistry);
 
         this.listenerRegistry = listenerRegistry;
     }

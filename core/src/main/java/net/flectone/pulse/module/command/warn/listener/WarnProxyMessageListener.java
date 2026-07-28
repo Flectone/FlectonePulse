@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
@@ -14,6 +13,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.warn.WarnModule;
@@ -23,7 +23,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 
@@ -53,17 +52,19 @@ public class WarnProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(warn.moderator());
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(warnModule, ModerationMetadata.<Localization.Command.Warn>builder()
-                    .base(EventMetadata.<Localization.Command.Warn>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format((fReceiver, localization) ->
-                                    moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, warn)
-                            )
+            messageDispatcher.dispatch(warnModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .destination(warnModule.config().destination())
                             .sound(warnModule.soundOrThrow())
-                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(warnModule.localization(fResolver).server(), fResolver, warn))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .build()
                     )
                     .moderation(warn)

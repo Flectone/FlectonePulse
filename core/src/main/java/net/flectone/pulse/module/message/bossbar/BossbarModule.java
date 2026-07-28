@@ -17,7 +17,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BossbarModule implements ModuleLocalization<Localization.Message.Bossbar> {
+public class BossbarModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final SocialService socialService;

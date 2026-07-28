@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.PulseGreetingListener;
@@ -26,7 +27,7 @@ import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class GreetingModule implements ModuleLocalization<Localization.Message.Greeting> {
+public class GreetingModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final SkinService skinService;
@@ -64,31 +65,35 @@ public class GreetingModule implements ModuleLocalization<Localization.Message.G
     public void send(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        taskScheduler.runAsync(() -> messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Greeting>builder()
-                .sender(fPlayer)
-                .format(localization -> {
-                    String format = localization.format();
-                    if (!format.contains("[#][#][#][#][#][#][#][#]")) return format;
+        List<String> pixels;
+        try {
+            FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
 
-                    try {
-                        FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
+            pixels = fImage.convertImageUrl();
+        } catch (Exception _) {
+            pixels = List.of();
+        }
 
-                        List<String> pixels = fImage.convertImageUrl();
-
-                        String greetingMessage = String.join("<br>", localization.format());
-
-                        for (String pixel : pixels) {
-                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
-                        }
-
-                        return greetingMessage;
-                    } catch (Exception _) {
-                        return format;
-                    }
-
-                })
+        List<String> finalPixels = pixels;
+        taskScheduler.runAsync(() -> messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> {
+                    String format = localization(fResolver).format();
+                    if (format.contains("[#][#][#][#][#][#][#][#]")) {
+                        String greetingMessage = String.join("<br>", format);
+
+                        for (String pixel : finalPixels) {
+                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
+                        }
+                    }
+
+                    return MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(format)
+                            .build();
+                })
                 .build()
         ), true);
     }

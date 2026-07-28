@@ -22,7 +22,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MutelistModule implements ModuleCommand<Localization.Command.Mutelist> {
+public class MutelistModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final UnmuteModule unmuteModule;
@@ -55,6 +55,7 @@ public class MutelistModule implements ModuleCommand<Localization.Command.Muteli
         moderationListSender.send(
                 this,
                 fPlayer,
+                this::localization,
                 commandContext,
                 Moderation.Type.MUTE,
                 0,

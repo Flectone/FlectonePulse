@@ -48,7 +48,7 @@ public class TwitchCommandDispatcher {
             FPlayer fPlayer = getFPlayerArgument(command, arguments, channel);
             if (fPlayer == null) return true;
 
-            String localizationString = twitchModule.localization().customCommand().get(commandEntry.getKey());
+            String localizationString = twitchModule.localization(FPlayer.UNKNOWN).customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
             taskScheduler.runAsync(() -> twitchSender.sendMessage(channel, buildMessage(fPlayer, localizationString)));
@@ -82,7 +82,7 @@ public class TwitchCommandDispatcher {
 
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull Function<Localization.Integration.Twitch, String> stringFunction) {
-        return buildMessage(fPlayer, stringFunction.apply(twitchModule.localization()));
+        return buildMessage(fPlayer, stringFunction.apply(twitchModule.localization(FPlayer.UNKNOWN)));
     }
 
     private String buildMessage(@NonNull FPlayer fPlayer,

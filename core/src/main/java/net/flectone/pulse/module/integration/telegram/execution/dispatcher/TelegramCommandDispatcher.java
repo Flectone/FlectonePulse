@@ -46,7 +46,7 @@ public class TelegramCommandDispatcher {
             FPlayer fPlayer = getFPlayerArgument(command, arguments, message);
             if (fPlayer == null) return true;
 
-            String localizationString = telegramModule.localization().customCommand().get(commandEntry.getKey());
+            String localizationString = telegramModule.localization(FPlayer.UNKNOWN).customCommand().get(commandEntry.getKey());
             if (StringUtils.isEmpty(localizationString)) return true;
 
             taskScheduler.runAsync(() -> telegramSender.sendMessage(message, buildMessage(fPlayer, localizationString)));
@@ -80,7 +80,7 @@ public class TelegramCommandDispatcher {
 
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull Function<Localization.Integration.Telegram, String> stringFunction) {
-        return buildMessage(fPlayer, stringFunction.apply(telegramModule.localization()));
+        return buildMessage(fPlayer, stringFunction.apply(telegramModule.localization(FPlayer.UNKNOWN)));
     }
 
     private String buildMessage(@NonNull FPlayer fPlayer,

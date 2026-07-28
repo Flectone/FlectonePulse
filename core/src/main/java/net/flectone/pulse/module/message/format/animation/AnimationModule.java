@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AnimationModule implements ModuleLocalization<Localization.Message.Format.Animation> {
+public class AnimationModule implements ModuleLocalization {
 
     private final @Named("animation") Cache<AnimationKey, Integer> animationCache;
     private final FileFacade fileFacade;

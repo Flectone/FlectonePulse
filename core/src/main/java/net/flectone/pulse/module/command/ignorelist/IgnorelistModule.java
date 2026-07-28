@@ -6,12 +6,10 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -19,13 +17,12 @@ import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -35,17 +32,15 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnorelistModule implements ModuleCommand<Localization.Command.Ignorelist> {
+public class IgnorelistModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
     private final SocialService socialService;
-    private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
-    private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
 
@@ -69,9 +64,13 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
 
         List<Ignore> ignoreList = socialService.loadIgnores(fPlayer);
         if (ignoreList.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Ignorelist::empty)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).empty())
+                            .build()
+                    )
                     .build()
             );
 
@@ -89,9 +88,13 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignorelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Ignorelist::nullPage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPage())
+                            .build()
+                    )
                     .build()
             );
 
@@ -105,42 +108,52 @@ public class IgnorelistModule implements ModuleCommand<Localization.Command.Igno
                 .limit(perPage)
                 .toList();
 
-        String header = Strings.CS.replace(localization.header(), "<count>", String.valueOf(size));
-        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build()).append(Component.newline());
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (Ignore ignore : finalIgnoreList) {
+        // header
+        stringBuilder
+                .append(Strings.CS.replace(localization.header(), "<count>", String.valueOf(size)))
+                .append("<br>");
+
+        TagResolver tagResolvers = TagResolver.empty();
+
+        for (int i = 0; i < finalIgnoreList.size(); i++) {
+            Ignore ignore = finalIgnoreList.get(i);
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
-            String line = StringUtils.replaceEach(
-                    localization.line(),
-                    new String[]{"<command>", "<date>"},
-                    new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date())}
-            );
 
-            component = component
-                    .append(messagePipeline.build(MessageContext.builder()
-                            .sender(fPlayer)
-                            .message(line)
-                            .tagResolver(messagePipeline.targetTag(fPlayer, fTarget))
-                            .build()
+            // line
+            stringBuilder
+                    .append(StringUtils.replaceEach(
+                            localization.line(),
+                            new String[]{"<command>", "<date>", "<target"},
+                            new String[]{"/ignore " + fTarget.name(), timeFormatter.formatDate(ignore.date()), "<target_" + i}
                     ))
-                    .append(Component.newline());
+                    .append("<br>");
+
+            tagResolvers = TagResolver.resolver(tagResolvers, messagePipeline.targetTag("target_" + i, fPlayer, fTarget));
         }
 
-        String footer = StringUtils.replaceEach(
+        // footer
+        stringBuilder.append(StringUtils.replaceEach(
                 localization.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
                 new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
-        );
-
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(footer)
-                .build()
         ));
 
-        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.COMMAND_IGNORELIST, fPlayer, component));
+        String message = stringBuilder.toString();
+        TagResolver finalTagResolver = tagResolvers;
 
-        soundPlayer.play(soundOrThrow(), fPlayer);
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(message)
+                        .tagResolver(finalTagResolver)
+                        .build()
+                )
+                .build()
+        );
     }
 
     @Override

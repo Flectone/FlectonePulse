@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.listener.TictactoeProxyMessageListener;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
@@ -30,18 +31,16 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TictactoeModule implements ModuleCommand<Localization.Command.Tictactoe> {
+public class TictactoeModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -101,9 +100,13 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -111,9 +114,13 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         }
 
         if (fReceiver.equals(fPlayer)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::myself)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).myself())
+                            .build()
+                    )
                     .build()
             );
 
@@ -125,14 +132,16 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Tictactoe::sender)
+        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
+                .base(EventMetadata.builder()
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fReceiver)
-                        })
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).sender())
+                                .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -179,14 +188,18 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         if (!socialService.canSeeVanished(fPlayer, fReceiver)
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
-                        .uuid(metadataUUID)
-                        .sender(fPlayer)
-                        .receiver(fReceiver)
-                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
-                        .format(message -> Strings.CS.replace(String.format(message.receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
+        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
+                .base(EventMetadata.builder()
+                        .filter(fReceiver)
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
+                                .message(Strings.CS.replace(String.format(localization(fResolver).receiver(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove()))
+                                .build()
+                        )
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -202,13 +215,15 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 || !socialService.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
-                        .sender(fPlayer)
-                        .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fReceiver)
-                        })
+        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
+                .base(EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(getMoveMessage(fReceiver, fResolver, ticTacToe, typeTitle, move))
+                                .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -216,16 +231,18 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
                 .build()
         );
 
-        messageDispatcher.dispatch(this, TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .base(EventMetadata.<Localization.Command.Tictactoe>builder()
-                        .uuid(metadataUUID)
-                        .sender(fPlayer)
-                        .receiver(fReceiver)
-                        .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
-                        .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fReceiver)
-                        })
+        messageDispatcher.dispatch(this, TicTacToeMetadata.builder()
+                .base(EventMetadata.builder()
+                        .filter(fReceiver)
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
+                                .message(getMoveMessage(fReceiver, fResolver, ticTacToe, typeTitle, move))
+                                .tagResolver(messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
                         .build()
                 )
                 .ticTacToe(ticTacToe)
@@ -238,11 +255,17 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         int tictactoeID = commandModuleController.getArgument(this, commandContext, 2);
         String move = commandModuleController.getArgument(this, commandContext, 3);
 
+        FPlayer finalFPlayer = fPlayer;
+
         TicTacToe ticTacToe = tictactoeService.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::wrongGame)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(finalFPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongGame())
+                            .build()
+                    )
                     .build()
             );
 
@@ -250,9 +273,13 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         }
 
         if (!ticTacToe.move(fPlayer, move)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::wrongMove)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(finalFPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongMove())
+                            .build()
+                    )
                     .build()
             );
 
@@ -262,9 +289,13 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || !socialService.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Tictactoe>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tictactoe::wrongByPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(finalFPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).wrongByPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -307,58 +338,55 @@ public class TictactoeModule implements ModuleCommand<Localization.Command.Ticta
         sendMoveMessage(fPlayer, finalFReceiver, ticTacToe, typeTitle, move, metadataUUID);
     }
 
-    public BiFunction<FPlayer, Localization.Command.Tictactoe, String> getMoveMessage(TicTacToe ticTacToe,
-                                                                                      FPlayer fPlayer,
-                                                                                      int typeTile,
-                                                                                      String move) {
-        return (_, message) -> {
-            String title = (switch (typeTile) {
-                case 1 -> message.formatWin();
-                case -1 -> message.formatDraw();
-                default -> message.formatMove();
-            });
+    public String getMoveMessage(FPlayer fPlayer, FPlayer fResolver, TicTacToe ticTacToe, int typeTile, String move) {
+        Localization.Command.Tictactoe localization = localization(fResolver);
 
-            Localization.Command.Tictactoe.Symbol messageSymbol = message.symbol();
+        String title = (switch (typeTile) {
+            case 1 -> localization.formatWin();
+            case -1 -> localization.formatDraw();
+            default -> localization.formatMove();
+        });
 
-            String symbolFirst = messageSymbol.first();
-            String symbolSecond = messageSymbol.second();
+        Localization.Command.Tictactoe.Symbol messageSymbol = localization.symbol();
 
-            String formatField = StringUtils.replaceEach(
-                    String.join("<br>", message.field()),
-                    new String[]{"<current_move>", "<last_move>"},
-                    new String[]{
-                            ticTacToe.isEnded() ? "" : message.currentMove(),
-                            message.lastMove()
-                    }
-            );
+        String symbolFirst = messageSymbol.first();
+        String symbolSecond = messageSymbol.second();
 
-            formatField = StringUtils.replaceEach(
-                    formatField,
-                    new String[]{"<title>", "<symbol>", "<move>"},
-                    new String[]{
-                            title,
-                            ticTacToe.getFirstPlayer() == fPlayer.id() ? symbolFirst : symbolSecond,
-                            move
-                    }
-            );
+        String formatField = StringUtils.replaceEach(
+                String.join("<br>", localization.field()),
+                new String[]{"<current_move>", "<last_move>"},
+                new String[]{
+                        ticTacToe.isEnded() ? "" : localization.currentMove(),
+                        localization.lastMove()
+                }
+        );
 
-            String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove());
-            String symbolFirstRemove = messageSymbol.firstRemove();
-            String symbolFirstWin = messageSymbol.firstWin();
-            String symbolSecondRemove = messageSymbol.secondRemove();
-            String symbolSecondWin = messageSymbol.secondWin();
+        formatField = StringUtils.replaceEach(
+                formatField,
+                new String[]{"<title>", "<symbol>", "<move>"},
+                new String[]{
+                        title,
+                        ticTacToe.getFirstPlayer() == fPlayer.id() ? symbolFirst : symbolSecond,
+                        move
+                }
+        );
 
-            return ticTacToe.build(
-                    formatField,
-                    symbolFirst,
-                    symbolFirstRemove,
-                    symbolFirstWin,
-                    symbolSecond,
-                    symbolSecondRemove,
-                    symbolSecondWin,
-                    symbolEmpty
-            );
-        };
+        String symbolEmpty = Strings.CS.replace(String.format(messageSymbol.blank(), ticTacToe.getId()), "<command>", commandModuleController.getCommandName(this) + config().subCommandMove());
+        String symbolFirstRemove = messageSymbol.firstRemove();
+        String symbolFirstWin = messageSymbol.firstWin();
+        String symbolSecondRemove = messageSymbol.secondRemove();
+        String symbolSecondWin = messageSymbol.secondWin();
+
+        return ticTacToe.build(
+                formatField,
+                symbolFirst,
+                symbolFirstRemove,
+                symbolFirstWin,
+                symbolSecond,
+                symbolSecondRemove,
+                symbolSecondWin,
+                symbolEmpty
+        );
     }
 
     public enum GamePhase {

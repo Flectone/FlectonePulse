@@ -49,7 +49,7 @@ public class DiscordCommandDispatcher {
             FPlayer fPlayer = getFPlayerArgument(command, arguments, channel);
             if (fPlayer == null) return true;
 
-            Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization().customCommand().get(commandEntry.getKey());
+            Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization(FPlayer.UNKNOWN).customCommand().get(commandEntry.getKey());
             if (channelEmbed == null) return true;
 
             taskScheduler.runAsync(() -> discordSender.sendMessage(fPlayer, channel, channelEmbed, string -> buildMessage(fPlayer, string)));
@@ -83,7 +83,7 @@ public class DiscordCommandDispatcher {
 
     private String buildMessage(@NonNull FPlayer fPlayer,
                                 @NonNull Function<Localization.Integration.Discord, String> stringFunction) {
-        return buildMessage(fPlayer, stringFunction.apply(discordModule.localization()));
+        return buildMessage(fPlayer, stringFunction.apply(discordModule.localization(FPlayer.UNKNOWN)));
     }
 
     private String buildMessage(@NonNull FPlayer fPlayer,

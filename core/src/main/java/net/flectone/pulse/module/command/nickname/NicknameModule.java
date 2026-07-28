@@ -44,7 +44,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NicknameModule implements ModuleCommand<Localization.Command.Nickname> {
+public class NicknameModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -115,9 +115,13 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
         String playerName = commandModuleController.getArgument(this, commandContext, 1);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown() || !fTarget.isOnline()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Nickname::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -158,9 +162,13 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
         boolean needClear = "clear".equalsIgnoreCase(nickname) || fTarget.name().equalsIgnoreCase(nickname);
 
         if (!needClear && allowedPredicate != null && !allowedPredicate.test(nickname)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Nickname>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Nickname::nullNickname)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullNickname())
+                            .build()
+                    )
                     .build()
             );
 
@@ -181,13 +189,17 @@ public class NicknameModule implements ModuleCommand<Localization.Command.Nickna
     }
 
     public void sendMessageWithUpdatedNickname(FEntity fPlayer, String nickname, UUID metadataUUID) {
-        messageDispatcher.dispatch(this, NicknameMetadata.<Localization.Command.Nickname>builder()
-                .base(EventMetadata.<Localization.Command.Nickname>builder()
-                        .uuid(metadataUUID)
-                        .sender(fPlayer)
-                        .format(Localization.Command.Nickname::format)
+        messageDispatcher.dispatch(this, NicknameMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).format())
+                                .build()
+                        )
                         .build()
                 )
                 .nickname(nickname)

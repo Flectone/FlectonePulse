@@ -17,7 +17,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
-import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
@@ -48,7 +47,6 @@ import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
@@ -67,7 +65,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WhitelistModule implements ModuleCommand<Localization.Command.Whitelist> {
+public class WhitelistModule implements ModuleCommand {
 
     private final AtomicBoolean tickerStarted = new AtomicBoolean(false);
 
@@ -173,9 +171,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         if (action == null
                 || (action == Action.ON || action == Action.OFF || action == Action.IMPORT) && isPlayerCommand
                 || (action == Action.ADD || action == Action.REMOVE || action == Action.LIST) && !isPlayerCommand) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::nullType)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullType())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -186,18 +188,26 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                 boolean turned = action == Action.ON;
                 boolean isAlreadyTurned = isTurnedOn();
                 if (turned && isAlreadyTurned) {
-                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Command.Whitelist::alreadyOn)
+                    messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).alreadyOn())
+                                    .build()
+                            )
                             .build()
                     );
                     return;
                 }
 
                 if (!turned && !isAlreadyTurned) {
-                    messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Command.Whitelist::alreadyOff)
+                    messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).alreadyOff())
+                                    .build()
+                            )
                             .build()
                     );
                     return;
@@ -271,28 +281,28 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
-        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(turned ? localization.formatOn() : localization.formatOff(), fReceiver, moderation)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
+                .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .range(config().range())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(turned ? localization(fResolver).formatOn() : localization(fResolver).formatOff(), fResolver, moderation))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
                 .integration(IntegrationMetadata.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
                         .build()
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, WhitelistMetadata.<Localization.Command.Whitelist>builder()
+        messageDispatcher.dispatch(this, WhitelistMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(moderation)
                 .turnedOn(turned)
@@ -337,9 +347,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
     private void actionImport(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         File whitelistFile = platformServerAdapter.getWhitelistFile();
         if (!whitelistFile.exists()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::empty)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).empty())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -374,14 +388,17 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST);
         }
 
-        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.formatAdd(), fReceiver, whitelist)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
+                .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .range(config().range())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatAdd(), fResolver, whitelist))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeInt(Action.ADD.ordinal());
                     dataOutputStream.writeAsJson(whitelist);
@@ -390,16 +407,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                         .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist))
                         .messageNames(List.of(name().name() + "_ADD"))
                         .build()
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Whitelist>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(whitelist)
                 .build()
@@ -417,9 +431,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         FPlayer fTarget = uuid != null ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(playerName);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -446,9 +464,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         }
 
         if (!moderationService.hasValid(fTarget, Moderation.Type.WHITELIST, id)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::alreadyRemove)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).alreadyRemove())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -462,14 +484,17 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WHITELIST);
         }
 
-        EventMetadata.Builder<Localization.Command.Whitelist> baseMetadataBuilder = EventMetadata.<Localization.Command.Whitelist>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.formatRemove(), fReceiver, unwhitelist)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
+                .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .range(config().range())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).formatRemove(), fResolver, unwhitelist))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeInt(Action.REMOVE.ordinal());
                     dataOutputStream.writeAsJson(unwhitelist);
@@ -478,18 +503,15 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
                         .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist))
                         .messageNames(List.of(name().name() + "_REMOVE"))
                         .build()
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, UnModerationMetadata.<Localization.Command.Whitelist>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
-                .unmoderation(unwhitelist)
+                .moderation(unwhitelist)
                 .build()
         );
 
@@ -500,6 +522,7 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         moderationListSender.send(
                 this,
                 fPlayer,
+                this::localization,
                 commandContext,
                 Moderation.Type.WHITELIST,
                 1,
@@ -513,9 +536,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
         String promptPlayer = commandModuleController.getPrompt(this, 1);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
         if (optionalPlayer.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
         }
@@ -538,9 +565,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         FPlayer fTarget = isUuid ? fPlayerService.getFPlayer(uuid) : fPlayerService.getFPlayer(uuidOrName);
         if (fTarget.isConsole() || !isUuid && !validNameChecker.check(uuidOrName)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whitelist::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
             return null;
@@ -548,9 +579,13 @@ public class WhitelistModule implements ModuleCommand<Localization.Command.White
 
         if (!fTarget.isUnknown()) {
             if (config().checkDuplicate() && isWhitelisted(fTarget)) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whitelist>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Whitelist::alreadyAdd)
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).alreadyAdd())
+                                .build()
+                        )
                         .build()
                 );
                 return null;

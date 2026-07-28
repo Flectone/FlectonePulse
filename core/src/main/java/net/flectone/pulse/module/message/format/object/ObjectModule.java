@@ -17,7 +17,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ObjectModule implements ModuleLocalization<Localization.Message.Format.Object> {
+public class ObjectModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final SocialService socialService;

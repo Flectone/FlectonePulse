@@ -17,7 +17,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
-public abstract class ScoreboardModule implements ModuleLocalization<Localization.Message.Scoreboard> {
+public abstract class ScoreboardModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ListenerRegistry listenerRegistry;

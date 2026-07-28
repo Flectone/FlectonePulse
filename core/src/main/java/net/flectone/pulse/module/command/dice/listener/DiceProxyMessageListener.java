@@ -6,12 +6,12 @@ import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.dice.DiceModule;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
@@ -41,14 +41,18 @@ public class DiceProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             List<Integer> cubes = gson.fromJson(proxyPayload.readString(), new TypeToken<List<Integer>>() {}.getType());
 
-            messageDispatcher.dispatch(diceModule, DiceMetadata.<Localization.Command.Dice>builder()
-                    .base(EventMetadata.<Localization.Command.Dice>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(localization -> diceModule.replaceResult(cubes, localization.symbols(), localization.format()))
+            messageDispatcher.dispatch(diceModule, DiceMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .destination(diceModule.config().destination())
                             .sound(diceModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(diceModule.replaceResult(fResolver, cubes))
+                                    .build()
+                            )
                             .build()
                     )
                     .cubes(cubes)

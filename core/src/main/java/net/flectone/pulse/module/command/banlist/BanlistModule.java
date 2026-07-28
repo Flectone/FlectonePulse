@@ -22,7 +22,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class BanlistModule implements ModuleCommand<Localization.Command.Banlist> {
+public class BanlistModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final UnbanModule unbanModule;
@@ -55,6 +55,7 @@ public class BanlistModule implements ModuleCommand<Localization.Command.Banlist
         moderationListSender.send(
                 this,
                 fPlayer,
+                this::localization,
                 commandContext,
                 Moderation.Type.BAN,
                 0,

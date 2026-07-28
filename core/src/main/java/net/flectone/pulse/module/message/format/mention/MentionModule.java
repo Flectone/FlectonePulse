@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MentionModule implements ModuleLocalization<Localization.Message.Format.Mention> {
+public class MentionModule implements ModuleLocalization {
 
     private final @Named("mentionMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;
@@ -209,11 +209,15 @@ public class MentionModule implements ModuleLocalization<Localization.Message.Fo
     public void sendMention(FPlayer fPlayer) {
         if (permissionChecker.check(fPlayer, permission().bypass())) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Format.Mention>builder()
-                .sender(fPlayer)
-                .format(Localization.Message.Format.Mention::person)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).person())
+                        .build()
+                )
                 .build()
         );
     }

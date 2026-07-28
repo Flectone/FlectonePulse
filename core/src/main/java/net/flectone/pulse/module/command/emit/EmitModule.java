@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -29,7 +30,6 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -41,7 +41,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
+public class EmitModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
@@ -92,14 +92,18 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
                 ? Range.get(Range.Type.PROXY)
                 : Range.fromString(targetName).orElse(null);
         if (range != null) {
-            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
-                    .sender(fPlayer)
-                    .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+            messageDispatcher.dispatch(this, EventMetadata.builder()
                     .range(range)
-                    .format(Localization.Command.Emit::format)
-                    .message(message)
                     .destination(destination)
                     .sound(soundOrThrow())
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                            .message(localization(fResolver).format())
+                            .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                            .build()
+                    )
                     .proxy(dataOutputStream -> {
                         // same format as 1 player
                         dataOutputStream.writeAsJson(fPlayerService.getConsole()); // proxy indicator
@@ -114,9 +118,13 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (!fTarget.isOnline()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Emit>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Emit::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -132,17 +140,18 @@ public class EmitModule implements ModuleCommand<Localization.Command.Emit> {
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Emit>builder()
-                .sender(fPlayer)
-                .receiver(fTarget)
-                .format(Localization.Command.Emit::format)
-                .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
-                .message(message)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fTarget)
                 .destination(destination)
                 .sound(soundOrThrow())
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag(fResolver, fTarget)
-                })
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).format())
+                        .flag(MessageFlag.PLACEHOLDER_CONTEXT_SENDER, false)
+                        .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fTarget))
+                        .build()
+                )
                 .integration()
                 .build()
         );

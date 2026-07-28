@@ -7,8 +7,10 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.do_.listener.DoProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -24,11 +26,12 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DoModule implements ModuleCommand<Localization.Command.CommandDo> {
+public class DoModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
@@ -59,13 +62,17 @@ public class DoModule implements ModuleCommand<Localization.Command.CommandDo> {
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.CommandDo>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.CommandDo::format)
-                .message(message)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).format())
+                        .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()

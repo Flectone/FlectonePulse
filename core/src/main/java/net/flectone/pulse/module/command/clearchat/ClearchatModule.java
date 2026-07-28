@@ -11,6 +11,7 @@ import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.clearchat.listener.ClearchatProxyMessageListener;
@@ -34,7 +35,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearchatModule implements ModuleCommand<Localization.Command.Clearchat> {
+public class ClearchatModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -98,9 +99,13 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Clearchat>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Clearchat::nullPlayer)
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).nullPlayer())
+                                .build()
+                        )
                         .build()
                 );
 
@@ -142,17 +147,25 @@ public class ClearchatModule implements ModuleCommand<Localization.Command.Clear
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Clearchat>builder()
-                .sender(fPlayer)
-                .format("<br> ".repeat(config().length()))
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message("<br> ".repeat(config().length()))
+                        .build()
+                )
                 .build()
         );
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Clearchat>builder()
-                .sender(fPlayer)
-                .format(Localization.Command.Clearchat::format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).format())
+                        .build()
+                )
                 .build()
         );
     }

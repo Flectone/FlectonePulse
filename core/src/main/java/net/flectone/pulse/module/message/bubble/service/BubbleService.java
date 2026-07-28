@@ -47,7 +47,7 @@ public class BubbleService {
         }, 1L);
     }
 
-    public void addMessage(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
+    public void addMessage(@NonNull FPlayer sender, @NonNull String message, Set<FPlayer> receivers) {
         if (!bubbleRender.isCorrectPlayer(sender)) return;
 
         PlayerBubbleState state = playerBubbleStates.computeIfAbsent(
@@ -73,7 +73,7 @@ public class BubbleService {
         state.waitingQueue.addAll(bubbles);
     }
 
-    private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, List<FPlayer> receivers) {
+    private List<Bubble> splitMessageToBubbles(@NonNull FPlayer sender, @NonNull String message, Set<FPlayer> receivers) {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
         // default bubble
@@ -161,7 +161,7 @@ public class BubbleService {
 
     private Bubble buildBubble(int id, FPlayer sender, String message, long duration, float elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, boolean seeThrough, int background,
-                               int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
+                               int animationTime, float scale, BubbleModule.Billboard billboard, Set<FPlayer> receivers) {
         Bubble.BubbleBuilder<?, ?> builder = useModern
                 ? ModernBubble.builder()
                 .hasShadow(hasShadow)

@@ -22,7 +22,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WarnlistModule implements ModuleCommand<Localization.Command.Warnlist> {
+public class WarnlistModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final UnwarnModule unwarnModule;
@@ -55,6 +55,7 @@ public class WarnlistModule implements ModuleCommand<Localization.Command.Warnli
         moderationListSender.send(
                 this,
                 fPlayer,
+                this::localization,
                 commandContext,
                 Moderation.Type.WARN,
                 0,

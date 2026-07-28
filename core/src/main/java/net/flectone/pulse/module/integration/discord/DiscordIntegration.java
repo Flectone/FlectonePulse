@@ -11,6 +11,7 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.DiscordMessageListener;
@@ -92,7 +93,7 @@ public class DiscordIntegration implements FIntegration {
         if (discordClient == null) return;
         if (!discordModule.config().channelInfo().enable()) return;
 
-        Localization.Integration.Discord localization = discordModule.localization();
+        Localization.Integration.Discord localization = discordModule.localization(FPlayer.UNKNOWN);
         for (Map.Entry<String, String> entry : localization.infoChannel().entrySet()) {
             String id = entry.getKey();
             if (!NumberUtils.isParsable(id)) continue;

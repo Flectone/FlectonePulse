@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.do_.DoModule;
 import net.flectone.pulse.platform.controller.ModuleController;
@@ -25,6 +26,7 @@ public class DoProxyMessageListener implements PulseListener {
     private final DoModule doModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -36,14 +38,18 @@ public class DoProxyMessageListener implements PulseListener {
         try (ProxyPayload proxyPayload = event.openPayload()) {
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(doModule, EventMetadata.<Localization.Command.CommandDo>builder()
-                    .uuid(event.uuid())
-                    .sender(event.sender())
-                    .format(Localization.Command.CommandDo::format)
-                    .message(message)
+            messageDispatcher.dispatch(doModule, EventMetadata.builder()
                     .range(Range.get(Range.Type.SERVER))
                     .destination(doModule.config().destination())
                     .sound(doModule.soundOrThrow())
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .uuid(event.uuid())
+                            .sender(event.sender())
+                            .receiver(fResolver)
+                            .message(doModule.localization(fResolver).format())
+                            .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                            .build()
+                    )
                     .build()
             );
         }

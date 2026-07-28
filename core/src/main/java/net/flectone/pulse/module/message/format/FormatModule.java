@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class FormatModule implements ModuleLocalization<Localization.Message.Format> {
+public class FormatModule implements ModuleLocalization {
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 

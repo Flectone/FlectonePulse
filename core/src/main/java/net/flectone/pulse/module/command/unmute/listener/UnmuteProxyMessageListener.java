@@ -5,15 +5,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.UnModerationMetadata;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.mute.MuteModule;
@@ -24,7 +24,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 
@@ -55,20 +54,22 @@ public class UnmuteProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unmute.moderator());
             if (moduleController.isDisabledFor(unmuteModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unmuteModule, UnModerationMetadata.<Localization.Command.Unmute>builder()
-                    .base(EventMetadata.<Localization.Command.Unmute>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format((fReceiver, localization) ->
-                                    moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unmute)
-                            )
+            messageDispatcher.dispatch(unmuteModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(unmuteModule.config().destination())
                             .range(Range.get(Range.Type.SERVER))
                             .sound(unmuteModule.soundOrThrow())
-                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(unmuteModule.localization(fResolver).format(), fResolver, unmute))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .build()
                     )
-                    .unmoderation(unmute)
+                    .moderation(unmute)
                     .build()
             );
         }

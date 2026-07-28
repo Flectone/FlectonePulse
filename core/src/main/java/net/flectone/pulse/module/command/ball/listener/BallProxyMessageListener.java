@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ball.model.BallMetadata;
@@ -26,6 +27,7 @@ public class BallProxyMessageListener implements PulseListener {
     private final BallModule ballModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -38,15 +40,19 @@ public class BallProxyMessageListener implements PulseListener {
             int answer = proxyPayload.readInt();
             String message = proxyPayload.readString();
 
-            messageDispatcher.dispatch(ballModule, BallMetadata.<Localization.Command.Ball>builder()
-                    .base(EventMetadata.<Localization.Command.Ball>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(ballModule.replaceAnswer(answer))
-                            .message(message)
+            messageDispatcher.dispatch(ballModule, BallMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(ballModule.config().destination())
                             .range(Range.get(Range.Type.SERVER))
                             .sound(ballModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(ballModule.replaceAnswer(fResolver, answer))
+                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .build()
+                            )
                             .build()
                     )
                     .answer(answer)

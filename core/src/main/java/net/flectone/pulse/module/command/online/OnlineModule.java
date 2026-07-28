@@ -30,7 +30,6 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.constant.TimeType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -43,7 +42,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class OnlineModule implements ModuleCommand<Localization.Command.Online> {
+public class OnlineModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -92,42 +91,51 @@ public class OnlineModule implements ModuleCommand<Localization.Command.Online> 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         PlayTime playTime = playtimeService.getPlayTime(targetFPlayer);
         if (playTime == null) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Online>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Online::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fPlayer).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
             return;
         }
 
-        messageDispatcher.dispatch(this, OnlineMetadata.<Localization.Command.Online>builder()
-                .base(EventMetadata.<Localization.Command.Online>builder()
-                        .sender(fPlayer)
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, targetFPlayer)
-                        })
-                        .format(localization -> switch (type.toUpperCase()) {
-                            case "FIRST" -> timeFormatter.format(
-                                    fPlayer,
-                                    TimeType.FIRST.getTime(fPlayer, playTime),
-                                    localization.formatFirst()
-                            );
-                            case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && socialService.canSeeVanished(targetFPlayer, fPlayer)
-                                    ? localization.formatCurrent()
-                                    : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
-                            default -> Strings.CS.replace(
-                                    timeFormatter.format(
-                                            fPlayer,
-                                            type.equalsIgnoreCase("TOTAL") ? TimeType.TOTAL.getTime(fPlayer, playTime) : TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
-                                            localization.formatTotal()
-                                    ),
-                                    "<sessions>",
-                                    String.valueOf(playTime.sessions())
-                            );
-                        })
+        messageDispatcher.dispatch(this, OnlineMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> {
+                            Localization.Command.Online localization = localization(fResolver);
+
+                            return MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(switch (type.toUpperCase()) {
+                                        case "FIRST" -> timeFormatter.format(
+                                                fPlayer,
+                                                TimeType.FIRST.getTime(fPlayer, playTime),
+                                                localization.formatFirst()
+                                        );
+                                        case "LAST" -> platformPlayerAdapter.isOnline(targetFPlayer) && socialService.canSeeVanished(targetFPlayer, fPlayer)
+                                                ? localization.formatCurrent()
+                                                : timeFormatter.format(fPlayer, TimeType.LAST.getTime(fPlayer, playTime), localization.formatLast());
+                                        default -> Strings.CS.replace(
+                                                timeFormatter.format(
+                                                        fPlayer,
+                                                        type.equalsIgnoreCase("TOTAL") ? TimeType.TOTAL.getTime(fPlayer, playTime) : TimeType.TOTAL_DYNAMIC.getTime(fPlayer, playTime),
+                                                        localization.formatTotal()
+                                                ),
+                                                "<sessions>",
+                                                String.valueOf(playTime.sessions())
+                                        );
+                                    })
+                                    .tagResolver(messagePipeline.targetTag(fResolver, targetFPlayer))
+                                    .build();
+                        })
                         .build()
                 )
                 .type(type)

@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.ModerationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -29,7 +30,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,7 +41,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
+public class WarnModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -93,9 +93,13 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         long time = timeReasonPair.getLeft() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.getLeft();
 
         if (!moderationService.isAllowedTime(fPlayer, time, config().timeLimits())) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Warn::nullTime)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullTime())
+                            .build()
+                    )
                     .build()
             );
 
@@ -104,9 +108,13 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Warn::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -114,9 +122,13 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Warn>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Warn::lowerWeightGroup)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).lowerWeightGroup())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -132,27 +144,27 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_WARN, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
-        EventMetadata.Builder<Localization.Command.Warn> baseMetadataBuilder = EventMetadata.<Localization.Command.Warn>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, moderation)
-                )
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(moderation))
                 .integration(string ->
                         moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation)
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Warn>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(moderation)
                 .build()
@@ -186,12 +198,14 @@ public class WarnModule implements ModuleCommand<Localization.Command.Warn> {
         if (moduleController.isDisabledFor(this, fModerator)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(warn.player());
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Warn>builder()
-                .sender(fTarget)
-                .format(localization -> moderationMessageFormatter.replacePlaceholders(localization.person(), fTarget, warn))
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fModerator)
-                })
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).person(), fTarget, warn))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                        .build()
+                )
                 .build()
         );
 

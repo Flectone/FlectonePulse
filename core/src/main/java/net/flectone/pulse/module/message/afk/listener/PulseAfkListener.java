@@ -8,7 +8,6 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.lifecycle.DisableEvent;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
@@ -46,8 +45,8 @@ public class PulseAfkListener implements PulseListener {
         // skip afk messages
         if (event.moduleName() == ModuleName.MESSAGE_AFK || event.moduleName() == ModuleName.COMMAND_AFK) return;
 
-        EventMetadata<?> eventMetadata = event.eventMetadata();
-        if (!(eventMetadata.sender() instanceof FPlayer fPlayer)) return;
+        MessageContext messageContext = event.messageContext();
+        if (!(messageContext.sender() instanceof FPlayer fPlayer)) return;
 
         int commandIndex = messageType.indexOf('_');
         String action = (commandIndex == -1 ? messageType : messageType.substring(commandIndex + 1)).toLowerCase();

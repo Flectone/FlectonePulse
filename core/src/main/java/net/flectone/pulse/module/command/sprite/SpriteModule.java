@@ -7,27 +7,22 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.WebUtil;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -51,7 +46,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> {
+public class SpriteModule implements ModuleCommand {
 
     private static final String FLECTONEPULSE_ATLAS_API = "https://flectone.net/files/r/minecraft/<version>/atlases/minecraft_textures_atlas_<atlas>.png.txt";
     private static final String ATLAS_FILE_NAME = "minecraft_textures_atlas_<atlas>.png.txt";
@@ -61,12 +56,9 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
 
     private final FileFacade fileFacade;
     private final CommandParserProvider commandParserProvider;
-    private final MessagePipeline messagePipeline;
     private final MessageDispatcher messageDispatcher;
-    private final EventDispatcher eventDispatcher;
     private final PlatformServerAdapter platformServerAdapter;
     private final TaskScheduler taskScheduler;
-    private final SoundPlayer soundPlayer;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final WebUtil webUtil;
@@ -106,9 +98,13 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
 
         String atlas = commandModuleController.getArgument(this, commandContext, 0);
         if (!config().categories().contains(atlas)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Sprite::nullAtlas)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullAtlas())
+                            .build()
+                    )
                     .build()
             );
 
@@ -116,17 +112,25 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
         }
 
         if (!atlasSpritesMap.containsKey(atlas)) {
-            messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Sprite>builder()
-                    .sender(fPlayer)
-                    .format(localization -> Strings.CS.replace(localization.atlasDownloading(), "<atlas>", atlas))
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(Strings.CS.replace(localization(fResolver).atlasDownloading(), "<atlas>", atlas))
+                            .build()
+                    )
                     .build()
             );
 
             int responseCode = downloadAtlasFile(atlas);
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
-                        .sender(fPlayer)
-                        .format(localization -> responseCode != HttpURLConnection.HTTP_NOT_FOUND ? localization.downloadError() : localization.nullAtlas())
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(responseCode != HttpURLConnection.HTTP_NOT_FOUND ? localization(fResolver).downloadError() : localization(fResolver).nullAtlas())
+                                .build()
+                        )
                         .build()
                 );
                 return;
@@ -137,9 +141,13 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
 
         List<String> sprites = atlasSpritesMap.get(atlas);
         if (sprites == null || sprites.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Sprite::nullAtlas)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullAtlas())
+                            .build()
+                    )
                     .build()
             );
 
@@ -156,9 +164,13 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
 
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Sprite>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Sprite::nullPage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPage())
+                            .build()
+                    )
                     .build()
             );
 
@@ -170,59 +182,56 @@ public class SpriteModule implements ModuleCommand<Localization.Command.Sprite> 
                 .limit(perPage)
                 .toList();
 
-        String header = StringUtils.replaceEach(
-                localization(fPlayer).header(),
-                new String[]{"<atlas>", "<count>"},
-                new String[]{atlas, String.valueOf(size)}
-        );
+        StringBuilder stringBuilder = new StringBuilder();
 
-        Component component = messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(header)
-                .build()
-        ).append(Component.newline());
+        // header
+        stringBuilder
+                .append(StringUtils.replaceEach(
+                        localization(fPlayer).header(),
+                        new String[]{"<atlas>", "<count>"},
+                        new String[]{atlas, String.valueOf(size)}
+                ))
+                .append("<br>");
 
-        StringBuilder spriteLine = new StringBuilder();
+        // line
         for (String sprite : finalSprites) {
-            String line = StringUtils.replaceEach(
+            stringBuilder.append(StringUtils.replaceEach(
                     localization(fPlayer).lineElement(),
                     new String[]{"<atlas>", "<sprite>"},
                     // "chest" atlas in game files is called "chest", but to display it, you need to use the name "chests"
                     // Why Mojang?
                     new String[]{"chest".equalsIgnoreCase(atlas) ? "chests" : atlas, sprite}
-            );
-
-            spriteLine.append(line);
+            ));
         }
 
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(spriteLine.toString())
-                .build()
-        ).append(Component.newline()));
-
+        // footer
         String commandLine = "/" + commandModuleController.getCommandName(this) + " " + atlas;
-        String footer = StringUtils.replaceEach(
-                localization(fPlayer).footer(),
-                new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
-                new String[]{
-                        commandLine,
-                        String.valueOf(page - 1),
-                        String.valueOf(page + 1),
-                        String.valueOf(page),
-                        String.valueOf(countPage)
-                }
-        );
+        stringBuilder
+                .append("<br>")
+                .append(StringUtils.replaceEach(
+                        localization(fPlayer).footer(),
+                        new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
+                        new String[]{
+                                commandLine,
+                                String.valueOf(page - 1),
+                                String.valueOf(page + 1),
+                                String.valueOf(page),
+                                String.valueOf(countPage)
+                        }
+                ));
 
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(footer)
+        String message = stringBuilder.toString();
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(message)
+                        .build()
+                )
                 .build()
-        ));
-
-        eventDispatcher.dispatch(new MessageSendEvent(name(), fPlayer, component));
-
-        soundPlayer.play(soundOrThrow(), fPlayer);
+        );
     }
 
     @Override

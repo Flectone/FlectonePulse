@@ -60,7 +60,7 @@ public class DiscordClientProvider {
 
         FPlayer fPlayer = FPlayer.builder()
                 .id(randomGenerator.nextInt(Integer.MIN_VALUE, -1))
-                .name(discordModule.localization().senderName())
+                .name(discordModule.localization(FPlayer.UNKNOWN).senderName())
                 .uuid(UUID.randomUUID())
                 .type(FPlayer.INTEGRATION_TYPE)
                 .build();

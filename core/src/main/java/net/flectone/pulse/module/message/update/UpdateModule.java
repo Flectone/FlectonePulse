@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.PulseUpdateListener;
 import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
@@ -33,7 +34,7 @@ import java.net.http.HttpResponse;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class UpdateModule implements ModuleLocalization<Localization.Message.Update> {
+public class UpdateModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final MessageDispatcher messageDispatcher;
@@ -82,16 +83,20 @@ public class UpdateModule implements ModuleLocalization<Localization.Message.Upd
             String currentVersion = fileFacade.config().version();
             if (!versionComparator.isOlderThan(currentVersion, latestVersion)) return;
 
-            messageDispatcher.dispatch(this, UpdateMessageMetadata.<Localization.Message.Update>builder()
-                    .base(EventMetadata.<Localization.Message.Update>builder()
-                            .sender(fPlayer)
-                            .format((fResolver, s) -> StringUtils.replaceEach(
-                                    fResolver.isUnknown() || fResolver.isConsole() ? s.formatConsole() : s.formatPlayer(),
-                                    new String[]{"<current_version>", "<latest_version>"},
-                                    new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
-                            ))
+            messageDispatcher.dispatch(this, UpdateMessageMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(config().destination())
                             .sound(soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(StringUtils.replaceEach(
+                                            fResolver.isUnknown() || fResolver.isConsole() ? localization(fResolver).formatConsole() : localization(fResolver).formatPlayer(),
+                                            new String[]{"<current_version>", "<latest_version>"},
+                                            new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
+                                    ))
+                                    .build()
+                            )
                             .build()
                     )
                     .currentVersion(currentVersion)

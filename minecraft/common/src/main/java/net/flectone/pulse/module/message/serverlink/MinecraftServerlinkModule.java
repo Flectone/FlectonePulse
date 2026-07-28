@@ -33,7 +33,7 @@ import java.util.function.BiPredicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftServerlinkModule implements ModuleLocalization<Localization.Message.Serverlink> {
+public class MinecraftServerlinkModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;

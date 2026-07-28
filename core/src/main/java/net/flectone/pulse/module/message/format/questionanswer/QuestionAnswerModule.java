@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class QuestionAnswerModule implements ModuleLocalization<Localization.Message.Format.QuestionAnswer> {
+public class QuestionAnswerModule implements ModuleLocalization {
 
     private final Map<String, Pattern> patternMap = new Object2ObjectOpenHashMap<>();
 
@@ -161,13 +161,17 @@ public class QuestionAnswerModule implements ModuleLocalization<Localization.Mes
         Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().questions().get(question);
         Pair<Sound, PermissionSetting> sound = Pair.of(questionMessage.sound(), questionPermission == null ? null : questionPermission.sound());
 
-        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
-                .base(EventMetadata.<Localization.Message.Format.QuestionAnswer>builder()
-                        .sender(sender)
-                        .receiver(fReceiver)
-                        .format(questionAnswer -> questionAnswer.questions().getOrDefault(question, ""))
+        taskScheduler.runAsyncLater(() -> messageDispatcher.dispatch(this, QuestionAnswerMetadata.builder()
+                .base(EventMetadata.builder()
+                        .filter(fReceiver)
                         .destination(questionMessage.destination())
                         .sound(sound)
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(sender)
+                                .receiver(fResolver)
+                                .message(localization(fReceiver).questions().getOrDefault(question, ""))
+                                .build()
+                        )
                         .build()
                 )
                 .question(question)

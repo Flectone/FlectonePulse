@@ -3,7 +3,6 @@ package net.flectone.pulse.execution.dispatcher;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.setting.LocalizationSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,11 +15,14 @@ import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
-import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -42,67 +44,47 @@ public class MessageDispatcher {
     private final TaskScheduler taskScheduler;
 
     /**
-     * Dispatches an error message using the specified module localization.
+     * Dispatches a message event to eligible receivers based on module localization settings.
+     * This is a convenience method that extracts the module name from the localization object.
      *
-     * @param module The module containing localization settings
-     * @param eventMetadata Metadata containing event information and context
-     * @param <L> Type of localization setting
-     * @return Event metadata with receiver list
+     * @param module The module localization containing the module name and localization data
+     * @param eventMetadata Metadata containing event information and filtering criteria
+     * @return The set of players who received the message
      */
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E dispatchError(ModuleLocalization<L> module,
-                                                                                       E eventMetadata) {
-        return dispatch(ModuleName.ERROR, module, eventMetadata);
+    public Set<FPlayer> dispatch(@NonNull ModuleLocalization module, @NonNull EventMetadata eventMetadata) {
+        return dispatch(module.name(), eventMetadata);
     }
 
     /**
-     * Dispatches a message using the module's name as the identifier.
+     * Dispatches a message event to eligible receivers determined by the module name and event metadata.
+     * Automatically resolves the receiver list using {@link #createReceivers(ModuleName, EventMetadata)}.
      *
-     * @param module The module containing localization settings
-     * @param eventMetadata Metadata containing event information and context
-     * @param <L> Type of localization setting
-     * @return Event metadata with receiver list
+     * @param moduleName The module name used for localization and receiver filtering
+     * @param eventMetadata Metadata containing event information and filtering criteria
+     * @return The set of players who received the message
      */
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E dispatch(ModuleLocalization<L> module,
-                                                                                  E eventMetadata) {
-        return dispatch(module.name(), module, eventMetadata);
+    public Set<FPlayer> dispatch(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata) {
+        return dispatch(moduleName, eventMetadata, createReceivers(moduleName, eventMetadata));
     }
 
     /**
-     * Dispatches a message to all eligible receivers based on the provided metadata.
-     * Creates receiver list and routes the message through the dispatch pipeline.
+     * Dispatches a message event to the specified set of receivers asynchronously.
+     * Each receiver receives an individually created message event for personalized message processing.
+     * Dispatching is skipped if the receiver set is empty.
      *
-     * @param moduleName The name identifier for the module
-     * @param module The module containing localization settings
-     * @param eventMetadata Metadata containing event information and context
-     * @param <L> Type of localization setting
-     * @return Event metadata with receiver list
+     * @param moduleName The module name used for message localization
+     * @param eventMetadata Metadata containing event information for message creation
+     * @param receivers The pre-filtered set of players to receive the message
+     * @return The set of players who received the message (same as input receivers)
      */
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E dispatch(ModuleName moduleName,
-                                                                                  ModuleLocalization<L> module,
-                                                                                  E eventMetadata) {
-        return dispatchForReceivers(moduleName, module, createReceivers(moduleName, module, eventMetadata));
-    }
-
-    /**
-     * Dispatches a message to pre-configured receivers with Folia region-aware scheduling.
-     * Ensures thread-safe execution by running in the appropriate region context.
-     *
-     * @param moduleName The name identifier for the module
-     * @param module The module containing localization settings
-     * @param eventMetadata Metadata containing event information and pre-configured receivers
-     * @param <L> Type of localization setting
-     * @return Event metadata with receiver list
-     */
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E dispatchForReceivers(ModuleName moduleName,
-                                                                                              ModuleLocalization<L> module,
-                                                                                              E eventMetadata) {
-        if (!eventMetadata.receivers().isEmpty()) {
-            taskScheduler.runAsync(() -> eventMetadata.receivers().forEach(fReceiver ->
-                    dispatch(createMessageEvent(fReceiver, moduleName, module, eventMetadata)))
+    public Set<FPlayer> dispatch(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull Set<FPlayer> receivers) {
+        if (!receivers.isEmpty()) {
+            taskScheduler.runAsync(() -> receivers.forEach(fReceiver ->
+                    dispatch(createMessageEvent(fReceiver, moduleName, eventMetadata)))
             );
         }
 
-        return eventMetadata;
+        return receivers;
     }
 
     /**
@@ -119,48 +101,29 @@ public class MessageDispatcher {
      * Creates and populates the receiver list for the message event based on filtering criteria.
      * Applies player filters, range filters, and module settings checks to determine eligible receivers.
      *
-     * @param module The module containing localization settings
+     * @param moduleName The module name containing localization and settings to check for each receiver
      * @param eventMetadata Metadata containing event information and filtering criteria
-     * @param <L> Type of localization setting
-     * @param <E> Type of event metadata extending EventMetadata
-     * @return Event metadata with populated receiver list, or original metadata if canceled
+     * @return A set of eligible players to receive the message, or an empty set if the event is for proxy and canceled
      */
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E createReceivers(ModuleLocalization<L> module,
-                                                                                         E eventMetadata) {
-        return createReceivers(module.name(), module, eventMetadata);
-    }
+    public Set<FPlayer> createReceivers(ModuleName moduleName, EventMetadata eventMetadata) {
+        MessageContext rawMessageContext = eventMetadata.resolveMessageContext(FPlayer.UNKNOWN);
 
-    /**
-     * Creates and populates the receiver list with module name specification.
-     * Filters players based on multiple criteria including range, settings, and custom filters.
-     * Triggers a MessagePrepareEvent that may cancel the message if sent to Proxy.
-     *
-     * @param moduleName The name identifier for the module
-     * @param module The module containing localization settings
-     * @param eventMetadata Metadata containing event information and filtering criteria
-     * @param <L> Type of localization setting
-     * @param <E> Type of event metadata extending EventMetadata
-     * @return Event metadata with populated receiver list, or original metadata if canceled
-     */
-    @SuppressWarnings("unchecked")
-    public <L extends LocalizationSetting, E extends EventMetadata<L>> E createReceivers(ModuleName moduleName,
-                                                                                         ModuleLocalization<L> module,
-                                                                                         E eventMetadata) {
-        String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, module.localization());
-
-        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, rawFormat, eventMetadata));
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, eventMetadata, rawMessageContext));
 
         // if canceled, it means that message was sent to Proxy
-        if (messagePrepareEvent.isForProxy() && messagePrepareEvent.cancelled()) return eventMetadata;
+        if (messagePrepareEvent.isForProxy() && messagePrepareEvent.cancelled()) return Set.of();
 
-        EventMetadata<L> newEventMetadata = (EventMetadata<L>) messagePrepareEvent.eventMetadata();
+        Set<FPlayer> receivers = fPlayerService.getFPlayersWithConsole().stream()
+                .filter(rangeFilter.createFilter(eventMetadata, rawMessageContext))
+                .filter(fReceiver -> socialService.isSetting(fReceiver, moduleName))
+                .collect(Collectors.toSet());
 
-        return (E) newEventMetadata.withBase(newEventMetadata.base().withReceivers(fPlayerService.getFPlayersWithConsole().stream()
-                        .filter(rangeFilter.createFilter(newEventMetadata))
-                        .filter(fReceiver -> socialService.isSetting(fReceiver, moduleName))
-                        .toList()
-                )
-        );
+        if (messagePrepareEvent.receivers().isEmpty()) return receivers;
+
+        Set<FPlayer> newReceivers = new HashSet<>(receivers);
+        newReceivers.addAll(messagePrepareEvent.receivers());
+
+        return Set.copyOf(newReceivers);
     }
 
     /**
@@ -169,91 +132,28 @@ public class MessageDispatcher {
      *
      * @param fReceiver The player receiving the message
      * @param moduleName The name identifier for the module
-     * @param module The module containing localization settings
      * @param eventMetadata Metadata containing event information and message content
-     * @param <L> Type of localization setting
      * @return A fully constructed MessageSendEvent ready for dispatch
      */
-    public <L extends LocalizationSetting> MessageSendEvent createMessageEvent(FPlayer fReceiver,
-                                                                               ModuleName moduleName,
-                                                                               ModuleLocalization<L> module,
-                                                                               EventMetadata<L> eventMetadata) {
-        // example
-        // format: TheFaser > <message>
-        // message: hello world!
-        // final formatted message: TheFaser > hello world!
-        Component messageComponent = buildMessageComponent(fReceiver, eventMetadata);
-        Component formatComponent = buildFormatComponent(fReceiver, eventMetadata, module, messageComponent);
+    public MessageSendEvent createMessageEvent(FPlayer fReceiver, ModuleName moduleName, EventMetadata eventMetadata) {
+        MessageContext messageContext = eventMetadata.resolveMessageContext(fReceiver);
+
+        Component messageComponent = messagePipeline.build(messageContext);
+
+        Destination destination = eventMetadata.destination();
 
         // destination subtext
-        Component subComponent = Component.empty();
-        Destination destination = eventMetadata.destination();
-        if (StringUtils.isNotEmpty(destination.subtext())) {
-            subComponent = buildSubcomponent(fReceiver, eventMetadata, messageComponent);
-        }
+        Component messageSubComponent = StringUtils.isEmpty(destination.subtext())
+                ? Component.empty()
+                : messagePipeline.build(messageContext.withMessage(destination.subtext()));
 
         return new MessageSendEvent(
                 moduleName,
-                fReceiver,
-                formatComponent,
-                subComponent,
-                eventMetadata
+                messageComponent,
+                messageSubComponent,
+                eventMetadata,
+                messageContext
         );
-    }
-
-    private <L extends LocalizationSetting> Component buildSubcomponent(FPlayer receiver,
-                                                                        EventMetadata<L> eventMetadata,
-                                                                        Component message) {
-        Destination destination = eventMetadata.destination();
-        if (destination.subtext().isEmpty()) return Component.empty();
-
-        return messagePipeline.build(MessageContext.builder()
-                .sender(eventMetadata.sender())
-                .receiver(receiver)
-                .message(destination.subtext())
-                .flags(eventMetadata.flags())
-                .tagResolver(messagePipeline.messageTag(message))
-                .build()
-        );
-    }
-
-    private <L extends LocalizationSetting> Component buildMessageComponent(FPlayer receiver,
-                                                                            EventMetadata<L> eventMetadata) {
-        String message = eventMetadata.message();
-        if (StringUtils.isEmpty(message)) return Component.empty();
-
-        return messagePipeline.build(MessageContext.builder()
-                .sender(eventMetadata.sender())
-                .receiver(receiver)
-                .message(message)
-                .flags(eventMetadata.flags())
-                .flag(MessageFlag.PLAYER_MESSAGE, true)
-                .build()
-        );
-    }
-
-    private <L extends LocalizationSetting> Component buildFormatComponent(FPlayer receiver,
-                                                                           EventMetadata<L> eventMetadata,
-                                                                           ModuleLocalization<L> module,
-                                                                           Component message) {
-        String formatContent = eventMetadata.resolveFormat(receiver, module.localization(receiver));
-        if (StringUtils.isEmpty(formatContent)) return Component.empty();
-
-        MessageContext.MessageContextBuilder messageContextBuilder = MessageContext.builder()
-                .messageUUID(eventMetadata.uuid())
-                .sender(eventMetadata.sender())
-                .receiver(receiver)
-                .message(formatContent)
-                .userMessage(eventMetadata.message())
-                .tagResolver(messagePipeline.messageTag(message))
-                .flags(eventMetadata.flags());
-
-        TagResolver[] tagResolvers = eventMetadata.resolveTags(receiver);
-        if (tagResolvers != null) {
-            messageContextBuilder = messageContextBuilder.tagResolvers(tagResolvers);
-        }
-
-        return messagePipeline.build(messageContextBuilder.build());
     }
 
 }

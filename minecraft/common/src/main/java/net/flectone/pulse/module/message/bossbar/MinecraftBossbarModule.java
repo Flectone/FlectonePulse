@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.bossbar;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -105,15 +104,19 @@ public class MinecraftBossbarModule extends BossbarModule {
 
             Message.Bossbar.Announce messageAnnounce = config().announce().get(translationKey);
             if (announce && messageAnnounce != null) {
-                messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Bossbar>builder()
-                        .sender(fPlayer)
-                        .format(localization -> Strings.CS.replace(
-                                StringUtils.defaultString(localization.announce().get(translationKey)),
-                                RAIDERS_PLACEHOLDER,
-                                raiders
-                        ))
+                messageDispatcher.dispatch(this, EventMetadata.builder()
                         .destination(messageAnnounce.destination())
                         .sound(Pair.of(messageAnnounce.sound(), permission().types().get(translationKey)))
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(Strings.CS.replace(
+                                        StringUtils.defaultString(localization(fResolver).announce().get(translationKey)),
+                                        RAIDERS_PLACEHOLDER,
+                                        raiders
+                                ))
+                                .build()
+                        )
                         .build()
                 );
             }

@@ -48,11 +48,10 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PollModule implements ModuleCommand<Localization.Command.Poll> {
+public class PollModule implements ModuleCommand {
 
     private final Int2ObjectArrayMap<Poll> pollMap = new Int2ObjectArrayMap<>();
 
@@ -98,26 +97,30 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
             IntOpenHashSet toRemove = new IntOpenHashSet();
 
             pollMap.forEach((id, poll) -> {
-                Status status = null;
+                Status status;
 
                 if (poll.isEnded()) {
                     toRemove.add(id);
                     status = Status.END;
                 } else if (poll.repeat()) {
                     status = Status.RUN;
+                } else {
+                    return;
                 }
-
-                if (status == null) return;
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = config().range();
 
-                messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
-                        .base(EventMetadata.<Localization.Command.Poll>builder()
-                                .sender(fPlayer)
-                                .format(resolvePollFormat(fPlayer, poll, status))
+                messageDispatcher.dispatch(this, PollMetadata.builder()
+                        .base(EventMetadata.builder()
                                 .range(range)
-                                .message(poll.getTitle())
+                                .messageContext(fResolver -> MessageContext.builder()
+                                        .sender(fPlayer)
+                                        .receiver(fResolver)
+                                        .message(resolvePollFormat(fResolver, poll, status))
+                                        .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
+                                        .build()
+                                )
                                 .integration(IntegrationMetadata.builder()
                                         .messageNames(List.of(name().name() + "_" + status, name().name() + "_REPEAT"))
                                         .build()
@@ -246,13 +249,17 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
         Range range = config().range();
 
-        messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
-                .base(EventMetadata.<Localization.Command.Poll>builder()
-                        .sender(fPlayer)
-                        .format(resolvePollFormat(fPlayer, poll, Status.START))
+        messageDispatcher.dispatch(this, PollMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(range)
-                        .message(poll.getTitle())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(resolvePollFormat(fResolver, poll, Status.START))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, poll.getTitle()))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeUTF(Action.CREATE.name());
                             dataOutputStream.writeAsJson(poll);
@@ -287,9 +294,13 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Poll::nullPoll)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPoll())
+                            .build()
+                    )
                     .build()
             );
 
@@ -297,9 +308,13 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         }
 
         if (poll.isEnded()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Poll::expired)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).expired())
+                            .build()
+                    )
                     .build()
             );
 
@@ -309,9 +324,13 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Poll>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Poll::already)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).already())
+                            .build()
+                    )
                     .build()
             );
 
@@ -321,11 +340,15 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        messageDispatcher.dispatch(this, PollMetadata.<Localization.Command.Poll>builder()
-                .base(EventMetadata.<Localization.Command.Poll>builder()
-                        .uuid(metadataUUID)
-                        .sender(fPlayer)
-                        .format(resolveVote(voteType, numberVote, pollID, count))
+        messageDispatcher.dispatch(this, PollMetadata.builder()
+                .base(EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .uuid(metadataUUID)
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(resolveVote(fResolver, voteType, numberVote, pollID, count))
+                                .build()
+                        )
                         .build()
                 )
                 .poll(poll)
@@ -335,53 +358,53 @@ public class PollModule implements ModuleCommand<Localization.Command.Poll> {
         );
     }
 
-    public Function<Localization.Command.Poll, String> resolveVote(int voteType, int answerID, int pollID, int count) {
-        return message -> StringUtils.replaceEach(
-                voteType == 1 ? message.voteTrue() : message.voteFalse(),
+    public String resolveVote(FPlayer fPlayer, int voteType, int answerID, int pollID, int count) {
+        return StringUtils.replaceEach(
+                voteType == 1 ? localization(fPlayer).voteTrue() : localization(fPlayer).voteFalse(),
                 new String[]{"<answer_id>", "<id>", "<count>"},
                 new String[]{String.valueOf(answerID + 1), String.valueOf(pollID), String.valueOf(count)}
         );
     }
 
-    public Function<Localization.Command.Poll, String> resolvePollFormat(FEntity fPlayer, Poll poll, Status status) {
-        return message -> {
-            StringBuilder answersBuilder = new StringBuilder();
+    public String resolvePollFormat(FPlayer fPlayer, Poll poll, Status status) {
+        Localization.Command.Poll localization = localization(fPlayer);
 
-            int k = 0;
-            for (String answer : poll.getAnswers()) {
+        StringBuilder answersBuilder = new StringBuilder();
 
-                Component answerComponent = messagePipeline.build(MessageContext.builder()
-                        .sender(fPlayer)
-                        .receiver(FPlayer.UNKNOWN)
-                        .message(answer)
-                        .build()
-                );
+        int k = 0;
+        for (String answer : poll.getAnswers()) {
 
-                answersBuilder.append(StringUtils.replaceEach(
-                        message.answerTemplate(),
-                        new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
-                        new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(poll.getCountAnswers()[k])}
-                ));
-
-                k++;
-            }
-
-            String messageStatus = Strings.CS.replace(
-                    switch (status) {
-                        case START -> message.status().start();
-                        case RUN -> message.status().run();
-                        case END -> message.status().end();
-                    },
-                    "<id>",
-                    String.valueOf(poll.getId())
+            Component answerComponent = messagePipeline.build(MessageContext.builder()
+                    .sender(fPlayer)
+                    .receiver(FPlayer.UNKNOWN)
+                    .message(answer)
+                    .build()
             );
 
-            return StringUtils.replaceEach(
-                    message.format(),
-                    new String[]{"<status>", "<answers>"},
-                    new String[]{messageStatus, answersBuilder.toString()}
-            );
-        };
+            answersBuilder.append(StringUtils.replaceEach(
+                    localization.answerTemplate(),
+                    new String[]{"<command>", "<id>", "<number>", "<answer>", "<count>"},
+                    new String[]{commandModuleController.getCommandName(this) + config().subCommandVote(), String.valueOf(poll.getId()), String.valueOf(k), componentSerializer.toPlain(answerComponent), String.valueOf(poll.getCountAnswers()[k])}
+            ));
+
+            k++;
+        }
+
+        String messageStatus = Strings.CS.replace(
+                switch (status) {
+                    case START -> localization.status().start();
+                    case RUN -> localization.status().run();
+                    case END -> localization.status().end();
+                },
+                "<id>",
+                String.valueOf(poll.getId())
+        );
+
+        return StringUtils.replaceEach(
+                localization.format(),
+                new String[]{"<status>", "<answers>"},
+                new String[]{messageStatus, answersBuilder.toString()}
+        );
     }
 
     public enum Status {

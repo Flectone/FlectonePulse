@@ -11,6 +11,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftFooterModule implements ModuleListLocalization<Localization.Message.Tab.Footer> {
+public class MinecraftFooterModule implements ModuleListLocalization {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -112,10 +113,14 @@ public class MinecraftFooterModule implements ModuleListLocalization<Localizatio
         String format = getNextMessage(fPlayer, config().random());
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Tab.Footer>builder()
-                .sender(fPlayer)
-                .format(format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(format)
+                        .build()
+                )
                 .build()
         );
     }

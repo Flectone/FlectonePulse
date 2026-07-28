@@ -16,7 +16,7 @@ import net.flectone.pulse.util.file.FileFacade;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MinecraftVersionModule implements ModuleLocalization<Localization.Message.Status.Version> {
+public class MinecraftVersionModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final ModuleController moduleController;

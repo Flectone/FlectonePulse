@@ -41,7 +41,7 @@ import java.util.regex.PatternSyntaxException;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class SwearModule implements ModuleLocalization<Localization.Message.Format.Moderation.Swear> {
+public class SwearModule implements ModuleLocalization {
 
     private final @Named("swearMessage") Cache<String, String> messageCache;
     private final FileFacade fileFacade;

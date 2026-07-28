@@ -30,7 +30,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -38,7 +37,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class KickModule implements ModuleCommand<Localization.Command.Kick> {
+public class KickModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -82,9 +81,13 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Kick>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Kick::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -92,9 +95,13 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
         }
 
         if (config().checkGroupWeight() && !moderationService.hasHigherGroupThan(fPlayer, fTarget)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Kick>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Kick::lowerWeightGroup)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).lowerWeightGroup())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -111,27 +118,27 @@ public class KickModule implements ModuleCommand<Localization.Command.Kick> {
             proxySender.send(fTarget, ModuleName.UPDATE_CACHE_KICK, dataOutputStream -> dataOutputStream.writeAsJson(moderation));
         }
 
-        EventMetadata.Builder<Localization.Command.Kick> baseMetadataBuilder = EventMetadata.<Localization.Command.Kick>builder()
-                .sender(fTarget)
-                .format((fReceiver, localization) ->
-                        moderationMessageFormatter.replacePlaceholders(localization.server(), fReceiver, moderation)
-                )
-                .destination(config().destination())
+        EventMetadata.Builder baseMetadataBuilder = EventMetadata.builder()
                 .range(config().range())
+                .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(moderationMessageFormatter.replacePlaceholders(localization(fResolver).server(), fResolver, moderation))
+                        .tagResolver(messagePipeline.targetTag("moderator", fResolver, fPlayer))
+                        .build()
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(moderation))
                 .integration(string ->
                         moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation)
-                )
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        messagePipeline.targetTag("moderator", fResolver, fPlayer)
-                });
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
-            baseMetadataBuilder.receivers(List.of(fPlayer, fPlayerService.getConsole()));
+            baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));
         }
 
-        messageDispatcher.dispatch(this, ModerationMetadata.<Localization.Command.Kick>builder()
+        messageDispatcher.dispatch(this, ModerationMetadata.builder()
                 .base(baseMetadataBuilder.build())
                 .moderation(moderation)
                 .build()

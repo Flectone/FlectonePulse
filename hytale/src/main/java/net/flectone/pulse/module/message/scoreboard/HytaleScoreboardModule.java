@@ -128,20 +128,20 @@ public class HytaleScoreboardModule extends ScoreboardModule {
         Component displayName = Component.text(fPlayer.name());
 
         Component prefix = Component.empty();
-        if (!localization().prefix().isEmpty()) {
+        if (!localization(FPlayer.UNKNOWN).prefix().isEmpty()) {
             prefix = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .message(localization().prefix())
+                    .message(localization(FPlayer.UNKNOWN).prefix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
                     .build()
             );
         }
 
         Component suffix = Component.empty();
-        if (!localization().suffix().isEmpty()) {
+        if (!localization(FPlayer.UNKNOWN).suffix().isEmpty()) {
             suffix = messagePipeline.build(MessageContext.builder()
                     .sender(fPlayer)
-                    .message(localization().suffix())
+                    .message(localization(FPlayer.UNKNOWN).suffix())
                     .flag(MessageFlag.INVISIBLE_NAME_DETECTION, false)
                     .build()
             );

@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
@@ -40,18 +40,22 @@ public class AfkProxyMessageListener implements PulseListener {
             boolean isAfk = proxyPayload.readBoolean();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(afkModule, AFKMetadata.<Localization.Message.Afk>builder()
-                    .base(EventMetadata.<Localization.Message.Afk>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(localization -> isAfk
-                                    ? localization.formatTrue().global()
-                                    : localization.formatFalse().global()
-                            )
+            messageDispatcher.dispatch(afkModule, AFKMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
+                            .filter(fReceiver -> socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                             .destination(afkModule.config().destination())
                             .sound(afkModule.soundOrThrow())
-                            .filter(fReceiver -> socialService.canSeeVanished(event.sender(), fReceiver, vanished))
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(isAfk
+                                            ? afkModule.localization(fResolver).formatTrue().global()
+                                            : afkModule.localization(fResolver).formatFalse().global()
+                                    )
+                                    .build()
+                            )
                             .build()
                     )
                     .newStatus(isAfk)

@@ -4,11 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -28,6 +29,7 @@ public class PulseMailListener implements PulseListener {
     private final FPlayerService fPlayerService;
     private final SocialService socialService;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
 
     @Pulse
@@ -41,14 +43,18 @@ public class PulseMailListener implements PulseListener {
         for (Mail mail : mails) {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
-            messageDispatcher.dispatch(mailModule, MailMetadata.<Localization.Command.Mail>builder()
-                    .base(EventMetadata.<Localization.Command.Mail>builder()
-                            .sender(fPlayer)
-                            .receiver(fReceiver)
-                            .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
-                            .format(Localization.Command.Mail::receiver)
+            messageDispatcher.dispatch(mailModule, MailMetadata.builder()
+                    .base(EventMetadata.builder()
+                            .filter(fReceiver)
                             .destination(mailModule.config().destination())
-                            .message(mail.message())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(mailModule.localization(fResolver).receiver())
+                                    .flag(MessageFlag.COLOR_CONTEXT_SENDER, false)
+                                    .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, mail.message()))
+                                    .build()
+                            )
                             .build()
                     )
                     .mail(mail)

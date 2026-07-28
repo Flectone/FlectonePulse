@@ -43,7 +43,7 @@ public class PulseStreamListener implements PulseListener {
         if (!hasStreamPermission) return;
 
         // set false prefix for streamers
-        String prefixFalse = streamModule.localization().prefixFalse();
+        String prefixFalse = streamModule.localization(FPlayer.UNKNOWN).prefixFalse();
         if (StringUtils.isNotEmpty(prefixFalse)) {
             streamModule.setStreamPrefix(fPlayer, prefixFalse);
         }

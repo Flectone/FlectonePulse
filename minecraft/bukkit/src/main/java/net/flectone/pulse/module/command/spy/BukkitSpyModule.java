@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.spy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.command.spy.listener.BukkitSpyListener;
@@ -29,11 +30,12 @@ public class BukkitSpyModule extends MinecraftSpyModule {
                            BukkitListenerRegistry bukkitListenerRegistry,
                            TaskScheduler taskScheduler,
                            MessageDispatcher messageDispatcher,
+                           MessagePipeline messagePipeline,
                            ModuleController moduleController,
                            ModuleCommandController commandModuleController,
                            ProxyRegistry proxyRegistry,
                            ListenerRegistry listenerRegistry) {
-        super(fileFacade, socialService, permissionChecker, messageDispatcher, moduleController, commandModuleController, proxyRegistry, listenerRegistry, taskScheduler, fPlayerService);
+        super(fileFacade, socialService, permissionChecker, messageDispatcher, messagePipeline, moduleController, commandModuleController, proxyRegistry, listenerRegistry, taskScheduler, fPlayerService);
 
         this.bukkitListenerRegistry = bukkitListenerRegistry;
     }

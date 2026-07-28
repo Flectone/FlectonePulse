@@ -31,7 +31,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TranslateModule implements ModuleLocalization<Localization.Message.Format.Translate> {
+public class TranslateModule implements ModuleLocalization {
 
     private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileFacade fileFacade;

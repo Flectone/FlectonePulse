@@ -9,6 +9,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.util.constant.ModuleName;
 
@@ -26,10 +27,10 @@ public class TelegramPulseListener implements PulseListener {
         ModuleName moduleName = event.moduleName();
         if (moduleName == ModuleName.INTEGRATION_TELEGRAM) return;
 
-        EventMetadata<?> eventMetadata = event.eventMetadata();
-        String format = event.rawFormat();
+        EventMetadata eventMetadata = event.eventMetadata();
+        MessageContext messageContext = event.messageContext();
         taskScheduler.runAsync(() ->
-                telegramModule.sendMessage(eventMetadata, moduleName, format)
+                telegramModule.sendMessage(moduleName, eventMetadata, messageContext)
         );
     }
 

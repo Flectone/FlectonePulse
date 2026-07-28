@@ -5,15 +5,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.UnModerationMetadata;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
@@ -24,7 +24,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 
@@ -55,20 +54,22 @@ public class UnwarnProxyMessageListener implements PulseListener {
             FPlayer fModerator = fPlayerService.getFPlayer(unwarn.moderator());
             if (moduleController.isDisabledFor(warnModule, fModerator)) return event.withProcessed(true);
 
-            messageDispatcher.dispatch(unwarnModule, UnModerationMetadata.<Localization.Command.Unwarn>builder()
-                    .base(EventMetadata.<Localization.Command.Unwarn>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format((fReceiver, localization) ->
-                                    moderationMessageFormatter.replacePlaceholders(localization.format(), fReceiver, unwarn)
-                            )
-                            .destination(unwarnModule.config().destination())
+            messageDispatcher.dispatch(unwarnModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
+                            .destination(unwarnModule.config().destination())
                             .sound(unwarnModule.soundOrThrow())
-                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(unwarnModule.localization(fResolver).format(), fResolver, unwarn))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .build()
                     )
-                    .unmoderation(unwarn)
+                    .moderation(unwarn)
                     .build()
             );
         }

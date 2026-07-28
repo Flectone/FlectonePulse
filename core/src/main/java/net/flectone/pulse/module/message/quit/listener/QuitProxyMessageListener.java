@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.quit.model.QuitMetadata;
@@ -40,15 +40,19 @@ public class QuitProxyMessageListener implements PulseListener {
             boolean fakeMessage = proxyPayload.readBoolean();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(quitModule, QuitMetadata.<Localization.Message.Quit>builder()
-                    .base(EventMetadata.<Localization.Message.Quit>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(Localization.Message.Quit::format)
-                            .destination(quitModule.config().destination())
+            messageDispatcher.dispatch(quitModule, QuitMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
-                            .sound(quitModule.soundOrThrow())
                             .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
+                            .destination(quitModule.config().destination())
+                            .sound(quitModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(quitModule.localization(fResolver).format())
+                                    .build()
+                            )
                             .build()
                     )
                     .fakeMessage(fakeMessage)

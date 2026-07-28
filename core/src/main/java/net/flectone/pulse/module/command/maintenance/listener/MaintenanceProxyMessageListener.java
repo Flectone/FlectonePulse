@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
@@ -14,6 +13,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
@@ -24,7 +24,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.io.ProxyPayload;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,15 +57,22 @@ public class MaintenanceProxyMessageListener implements PulseListener {
 
             boolean turned = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(maintenanceModule, MaintenanceMetadata.<Localization.Command.Maintenance>builder()
-                    .base(EventMetadata.<Localization.Command.Maintenance>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format((fReceiver, localization) ->
-                                    moderationMessageFormatter.replacePlaceholders(turned ? localization.formatTrue() : localization.formatFalse(), fReceiver, maintenance)
-                            )
+            messageDispatcher.dispatch(maintenanceModule, MaintenanceMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(maintenanceModule.config().destination())
                             .sound(maintenanceModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(turned
+                                            ? maintenanceModule.localization(fResolver).formatTrue()
+                                            : maintenanceModule.localization(fResolver).formatFalse(),
+                                            fResolver, maintenance
+                                    ))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .proxy(dataOutputStream -> {
                                 dataOutputStream.writeAsJson(maintenance);
                                 dataOutputStream.writeBoolean(turned);
@@ -75,9 +81,6 @@ public class MaintenanceProxyMessageListener implements PulseListener {
                                     .messageNames(List.of(maintenanceModule.name().name() + "_" + String.valueOf(turned).toUpperCase()))
                                     .build()
                             )
-                            .tagResolvers(fResolver -> new TagResolver[]{
-                                    messagePipeline.targetTag("moderator", fResolver, fModerator)
-                            })
                             .build()
                     )
                     .moderation(maintenance)

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.telegram.execution.dispatcher.TelegramCommandDispatcher;
 import net.flectone.pulse.module.integration.telegram.extractor.TelegramChatIdExtractor;
@@ -48,7 +49,7 @@ public class TelegramMessageListener implements TelegramEventListener {
         // delete telegram bot notification
         if (isNewChatNameMessage(message)) {
             String chatId = telegramChatIdExtractor.extract(message);
-            if (telegramModule.localization().infoChannel().containsKey(chatId)) {
+            if (telegramModule.localization(FPlayer.UNKNOWN).infoChannel().containsKey(chatId)) {
                 try {
                     telegramClient.executeMethod(DeleteMessage.builder()
                             .chatId(chatId)

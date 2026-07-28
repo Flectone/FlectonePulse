@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
@@ -41,15 +41,19 @@ public class JoinProxyMessageListener implements PulseListener {
             boolean fakeMessage = proxyPayload.readBoolean();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(joinModule, JoinMetadata.<Localization.Message.Join>builder()
-                    .base(EventMetadata.<Localization.Message.Join>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(localization -> hasPlayedBefore || !joinModule.config().first() ? localization.format() : localization.formatFirstTime())
-                            .destination(joinModule.config().destination())
+            messageDispatcher.dispatch(joinModule, JoinMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
-                            .sound(joinModule.soundOrThrow())
                             .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
+                            .destination(joinModule.config().destination())
+                            .sound(joinModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(hasPlayedBefore || !joinModule.config().first() ? joinModule.localization(fResolver).format() : joinModule.localization(fResolver).formatFirstTime())
+                                    .build()
+                            )
                             .build()
                     )
                     .playedBefore(hasPlayedBefore)

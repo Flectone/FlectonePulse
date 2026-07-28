@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.List;
 
@@ -59,16 +58,17 @@ public class PulseBanListener implements PulseListener {
 
         // show player connection for moderators
         if (banModule.config().showConnectionAttempts()) {
-            messageDispatcher.dispatch(banModule, ModerationMetadata.<Localization.Command.Ban>builder()
-                    .base(EventMetadata.<Localization.Command.Ban>builder()
-                            .sender(fPlayer)
-                            .format((fReceiver, message) -> {
-                                String format = message.connectionAttempt();
-                                return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
-                            })
+            messageDispatcher.dispatch(banModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .filter(filter -> permissionChecker.check(filter, banModule.permission()))
-                            .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.targetTag("moderator", fResolver, fModerator)})
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(moderationMessageFormatter.replacePlaceholders(banModule.localization(fResolver).connectionAttempt(), fResolver, ban))
+                                    .tagResolver(messagePipeline.targetTag("moderator", fResolver, fModerator))
+                                    .build()
+                            )
                             .build()
                     )
                     .moderation(ban)

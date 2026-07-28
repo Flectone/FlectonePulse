@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -23,7 +24,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ReplyModule implements ModuleCommand<Localization.Command.Reply> {
+public class ReplyModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
@@ -54,9 +55,13 @@ public class ReplyModule implements ModuleCommand<Localization.Command.Reply> {
 
         String receiverName = tellModule.getReceiverFor(fPlayer);
         if (receiverName == null) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Reply>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Reply::nullReceiver)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullReceiver())
+                            .build()
+                    )
                     .build()
             );
 

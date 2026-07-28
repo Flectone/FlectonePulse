@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -23,7 +24,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ClearmailModule implements ModuleCommand<Localization.Command.Clearmail> {
+public class ClearmailModule implements ModuleCommand {
 
     private final Cache<UUID, List<String>> suggestionCache = CacheBuilder.newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
@@ -90,9 +90,13 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Clearmail>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Clearmail::nullMail)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullMail())
+                            .build()
+                    )
                     .build()
             );
 
@@ -103,16 +107,17 @@ public class ClearmailModule implements ModuleCommand<Localization.Command.Clear
 
         socialService.deleteMail(optionalMail.get());
 
-        messageDispatcher.dispatch(this, ClearmailMetadata.<Localization.Command.Clearmail>builder()
-                .base(EventMetadata.<Localization.Command.Clearmail>builder()
-                        .sender(fPlayer)
-                        .format(string -> Strings.CS.replaceOnce(string.format(), "<id>", String.valueOf(mailID)))
+        messageDispatcher.dispatch(this, ClearmailMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
-                        .message(optionalMail.get().message())
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fReceiver)
-                        })
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(Strings.CS.replaceOnce(localization(fResolver).format(), "<id>", String.valueOf(mailID)))
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, optionalMail.get().message()), messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
                         .build()
                 )
                 .mail(optionalMail.get())

@@ -96,17 +96,17 @@ public class ProxySender {
      *
      * @param moduleName the type of message being sent
      * @param eventMetadata the event metadata containing sender and data
+     * @param messageContext The message context containing sender details and unique message identifier
      * @return true if message was sent to at least one proxy, false otherwise
      */
-    public boolean send(@NonNull ModuleName moduleName, @NonNull EventMetadata<?> eventMetadata) {
+    public boolean send(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext) {
         ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.proxy();
         if (proxyConsumer == null) return false;
 
         Range range = eventMetadata.range();
         if (!range.is(Range.Type.PROXY)) return false;
 
-        FEntity sender = eventMetadata.sender();
-        return send(sender, moduleName, proxyConsumer, eventMetadata.uuid());
+        return send(messageContext.sender(), moduleName, proxyConsumer, messageContext.uuid());
     }
 
     /**

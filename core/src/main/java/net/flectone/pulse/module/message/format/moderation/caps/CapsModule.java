@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class CapsModule implements ModuleLocalization<Localization.Message.Format.Moderation.Caps> {
+public class CapsModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;

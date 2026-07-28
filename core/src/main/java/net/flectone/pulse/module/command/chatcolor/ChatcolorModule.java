@@ -15,6 +15,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.chatcolor.listener.ChatcolorProxyMessageListener;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -40,7 +41,7 @@ import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatcolor> {
+public class ChatcolorModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -108,9 +109,13 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission().colors().get(fColorType.get().name()))) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Chatcolor>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Chatcolor::nullType)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullType())
+                            .build()
+                    )
                     .build()
             );
 
@@ -157,9 +162,13 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
         }
 
         if (newFColors.isEmpty()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Chatcolor>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Chatcolor::nullColor)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullColor())
+                            .build()
+                    )
                     .build()
             );
 
@@ -210,12 +219,16 @@ public class ChatcolorModule implements ModuleCommand<Localization.Command.Chatc
     }
 
     public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Chatcolor>builder()
-                .uuid(metadataUUID)
-                .sender(fPlayer)
-                .format(Localization.Command.Chatcolor::format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .uuid(metadataUUID)
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).format())
+                        .build()
+                )
                 .build()
         );
     }

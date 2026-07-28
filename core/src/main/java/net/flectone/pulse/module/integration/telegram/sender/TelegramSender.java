@@ -19,7 +19,6 @@ import net.flectone.pulse.module.integration.telegram.provider.TelegramClientPro
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -76,7 +75,7 @@ public class TelegramSender {
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        Localization.Integration.Telegram localization = telegramModule.localization();
+        Localization.Integration.Telegram localization = telegramModule.localization(telegramClient.sender());
         String message = localization.messageChannel().getOrDefault(messageName, "<final_message>");
         if (StringUtils.isEmpty(message)) return;
 
@@ -122,36 +121,40 @@ public class TelegramSender {
         String firstName = user.getFirstName();
         String lastName = StringUtils.defaultString(user.getLastName());
 
-        messageDispatcher.dispatch(telegramModule, TelegramMetadata.<Localization.Integration.Telegram>builder()
-                .base(EventMetadata.<Localization.Integration.Telegram>builder()
-                        .sender(telegramClient.sender())
-                        .format(localization -> StringUtils.replaceEach(
-                                StringUtils.defaultString(localization.messageChannel().get(telegramModule.name().name())),
-                                new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
-                                new String[]{userName, userName, firstName, lastName, chat}
-                        ))
-                        .message(message)
+        messageDispatcher.dispatch(telegramModule, TelegramMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(Range.get(Range.Type.PROXY))
                         .destination(telegramModule.config().destination())
                         .sound(telegramModule.soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
-                            if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(telegramClient.sender())
+                                .receiver(fResolver)
+                                .message(StringUtils.replaceEach(
+                                        StringUtils.defaultString(telegramModule.localization(fResolver).messageChannel().get(telegramModule.name().name())),
+                                        new String[]{"<name>", "<user_name>", "<first_name>", "<last_name>", "<chat>"},
+                                        new String[]{userName, userName, firstName, lastName, chat}
+                                ))
+                                .tagResolvers(messagePipeline.messageTag(telegramClient.sender(), fResolver, message), messagePipeline.resolver("reply", (_, _) -> {
+                                    if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
 
-                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
-                                    .message(telegramModule.localization(fResolver).formatReply())
-                                    .tagResolvers(
-                                            messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
-                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                                                    .sender(telegramClient.sender())
-                                                    .receiver(fResolver)
-                                                    .message(reply.getRight())
-                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
-                                                    .build()
-                                            )))
-                                    )
-                                    .build()
-                            ));
-                        })})
+                                    return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                            .message(telegramModule.localization(fResolver).formatReply())
+                                            .tagResolvers(
+                                                    messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                                    messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                            .sender(telegramClient.sender())
+                                                            .receiver(fResolver)
+                                                            .message(reply.getRight())
+                                                            .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                            .build()
+                                                    )))
+                                            )
+                                            .build()
+                                    ));
+                                }))
+                                .build()
+
+                        )
                         .integration(IntegrationMetadata.builder()
                                 .format(string -> StringUtils.replaceEach(
                                         string,

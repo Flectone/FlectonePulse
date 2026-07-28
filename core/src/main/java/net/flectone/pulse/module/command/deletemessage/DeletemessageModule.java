@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.listener.DeletemessageProxyMessageListener;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class DeletemessageModule implements ModuleCommand<Localization.Command.Deletemessage> {
+public class DeletemessageModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final DeleteModule deleteModule;
@@ -65,9 +66,13 @@ public class DeletemessageModule implements ModuleCommand<Localization.Command.D
 
         UUID uuid = commandModuleController.getArgument(this, commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Deletemessage>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Deletemessage::nullMessage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullMessage())
+                            .build()
+                    )
                     .build()
             );
 
@@ -79,12 +84,16 @@ public class DeletemessageModule implements ModuleCommand<Localization.Command.D
                 UUID.randomUUID()
         );
 
-        messageDispatcher.dispatch(this, DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
-                .base(EventMetadata.<Localization.Command.Deletemessage>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Deletemessage::format)
+        messageDispatcher.dispatch(this, DeletemessageMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).format())
+                                .build()
+                        )
                         .build()
                 )
                 .deletedUUID(uuid)

@@ -15,7 +15,7 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
-public abstract class VanillaModule implements ModuleLocalization<Localization.Message.Vanilla> {
+public abstract class VanillaModule implements ModuleLocalization {
 
     public static final String ARGUMENT = "argument";
 

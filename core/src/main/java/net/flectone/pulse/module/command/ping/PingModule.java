@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleCommandController;
@@ -25,7 +26,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class PingModule implements ModuleCommand<Localization.Command.Ping> {
+public class PingModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -60,21 +61,29 @@ public class PingModule implements ModuleCommand<Localization.Command.Ping> {
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!socialService.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ping>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Ping::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
             return;
         }
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Command.Ping>builder()
-                .sender(fTarget)
-                .receiver(fPlayer)
-                .format(Localization.Command.Ping::format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .filter(fPlayer)
                 .destination(config().destination())
                 .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fTarget)
+                        .receiver(fResolver)
+                        .message(localization(fResolver).format())
+                        .build()
+                )
                 .build()
         );
 

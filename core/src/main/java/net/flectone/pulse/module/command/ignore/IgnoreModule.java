@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
@@ -21,14 +22,13 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> {
+public class IgnoreModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -60,9 +60,13 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
         String targetName = commandModuleController.getArgument(this, commandContext, 0);
 
         if (fPlayer.name().equalsIgnoreCase(targetName)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignore>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Ignore::myself)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).myself())
+                            .build()
+                    )
                     .build()
             );
 
@@ -71,9 +75,13 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Ignore>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Ignore::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fPlayer).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -100,15 +108,17 @@ public class IgnoreModule implements ModuleCommand<Localization.Command.Ignore> 
             metadataIgnore = ignore.get();
         }
 
-        messageDispatcher.dispatch(this, IgnoreMetadata.<Localization.Command.Ignore>builder()
-                .base(EventMetadata.<Localization.Command.Ignore>builder()
-                        .sender(fPlayer)
-                        .format(ignore -> optionalIgnore.isEmpty() ? ignore.formatTrue() : ignore.formatFalse())
+        messageDispatcher.dispatch(this, IgnoreMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fTarget)
-                        })
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(optionalIgnore.isEmpty() ? localization(fResolver).formatTrue() : localization(fResolver).formatFalse())
+                                .tagResolver(messagePipeline.targetTag(fResolver, fTarget))
+                                .build()
+                        )
                         .build()
                 )
                 .ignore(metadataIgnore)

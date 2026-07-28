@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.ModuleListLocalization;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AutoModule implements ModuleListLocalization<Localization.Message.Auto> {
+public class AutoModule implements ModuleListLocalization {
 
     private final Map<Integer, Integer> messageIndexMap = new ConcurrentHashMap<>();
 
@@ -112,11 +113,15 @@ public class AutoModule implements ModuleListLocalization<Localization.Message.A
         String format = getNextMessage(fPlayer, type.random(), messages);
         if (StringUtils.isEmpty(format)) return;
 
-        messageDispatcher.dispatch(this, EventMetadata.<Localization.Message.Auto>builder()
-                .sender(fPlayer)
-                .format(format)
+        messageDispatcher.dispatch(this, EventMetadata.builder()
                 .destination(type.destination())
                 .sound(sound)
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(format)
+                        .build()
+                )
                 .build()
         );
     }

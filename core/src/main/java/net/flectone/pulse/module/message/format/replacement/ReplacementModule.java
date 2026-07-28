@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ReplacementModule implements ModuleLocalization<Localization.Message.Format.Replacement> {
+public class ReplacementModule implements ModuleLocalization {
 
     private final Map<String, Pattern> triggerPatterns = new ConcurrentHashMap<>();
 
@@ -417,7 +417,7 @@ public class ReplacementModule implements ModuleLocalization<Localization.Messag
 
     private Tag itemTag(MessageContext messageContext) {
         Object itemStackObject = platformPlayerAdapter.getItem(messageContext.sender().uuid());
-        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.messageUUID(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
+        Component componentItem = platformServerAdapter.translateItemName(itemStackObject, messageContext.uuid(), messageContext.isFlag(MessageFlag.ITEM_DETECTION));
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .sender(messageContext.sender())

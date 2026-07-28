@@ -11,7 +11,6 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
@@ -30,7 +29,7 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
@@ -39,7 +38,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class WhoisModule implements ModuleCommand<Localization.Command.Whois> {
+public class WhoisModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -91,9 +90,13 @@ public class WhoisModule implements ModuleCommand<Localization.Command.Whois> {
                 : platformPlayerAdapter.isOnline(fTargetOrIp) ? platformPlayerAdapter.getIp(fTargetOrIp) : fTargetOrIp.ip();
 
         if (StringUtils.isEmpty(ip)) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whois>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whois::empty)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).empty())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -101,9 +104,13 @@ public class WhoisModule implements ModuleCommand<Localization.Command.Whois> {
 
         int size = fPlayerService.getTotalFPlayersCountByIp(ip);
         if (size == 0) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whois>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whois::empty)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).empty())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -112,9 +119,13 @@ public class WhoisModule implements ModuleCommand<Localization.Command.Whois> {
         int perPage = config().perPage();
         int countPage = (int) Math.ceil((double) size / perPage);
         if (page > countPage || page < 1) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Whois>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Whois::nullPage)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPage())
+                            .build()
+                    )
                     .build()
             );
             return;
@@ -124,57 +135,65 @@ public class WhoisModule implements ModuleCommand<Localization.Command.Whois> {
 
         Localization.Command.Whois localization = localization(fPlayer);
 
-        String header = StringUtils.replaceEach(
-                localization.header(),
-                new String[]{"<ip>", "<count>"},
-                new String[]{ip, String.valueOf(size)}
-        );
-        Component component = messagePipeline.build(MessageContext.builder().sender(fPlayer).message(header).build())
-                .append(Component.newline());
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (FPlayer fTarget : fPlayers) {
-            String line = StringUtils.replaceEach(
-                    localization.line(),
-                    new String[]{"<ip>", "<target_name>", "<online>", "<command_mutelist>", "<command_banlist>", "<command_warnlist>", "<command_whitelist>", "<command_geolocate>", "<command_online>"},
-                    new String[]{ip, fTarget.name(), fTarget.isOnline() ? localization.online() : localization.offline(),
-                            commandModuleController.getCommandName(mutelistModule),
-                            commandModuleController.getCommandName(banlistModule),
-                            commandModuleController.getCommandName(warnlistModule),
-                            commandModuleController.getCommandName(whitelistModule) + whitelistModule.config().subCommandPlayer(),
-                            commandModuleController.getCommandName(geolocateModule),
-                            commandModuleController.getCommandName(onlineModule)
-                    }
-            );
+        // header
+        stringBuilder
+                .append(StringUtils.replaceEach(
+                        localization.header(),
+                        new String[]{"<ip>", "<count>"},
+                        new String[]{ip, String.valueOf(size)}
+                ))
+                .append("<br>");
 
-            component = component
-                    .append(messagePipeline.build(MessageContext.builder()
-                            .sender(fPlayer)
-                            .message(line)
-                            .tagResolvers(
-                                    messagePipeline.targetTag(fPlayer, fTarget)
-                            )
-                            .build()
+        TagResolver tagResolvers = TagResolver.empty();
+
+        for (int i = 0; i < fPlayers.size(); i++) {
+            FPlayer fTarget = fPlayers.get(i);
+
+            // line
+            stringBuilder
+                    .append(StringUtils.replaceEach(
+                            localization.line(),
+                            new String[]{"<ip>", "<target_name>", "<online>", "<command_mutelist>", "<command_banlist>", "<command_warnlist>", "<command_whitelist>", "<command_geolocate>", "<command_online>", "<target"},
+                            new String[]{ip, fTarget.name(), fTarget.isOnline() ? localization.online() : localization.offline(),
+                                    commandModuleController.getCommandName(mutelistModule),
+                                    commandModuleController.getCommandName(banlistModule),
+                                    commandModuleController.getCommandName(warnlistModule),
+                                    commandModuleController.getCommandName(whitelistModule) + whitelistModule.config().subCommandPlayer(),
+                                    commandModuleController.getCommandName(geolocateModule),
+                                    commandModuleController.getCommandName(onlineModule),
+                                    "<target_" + i
+                            }
                     ))
-                    .append(Component.newline());
+                    .append("<br>");
+
+            tagResolvers = TagResolver.resolver(
+                    tagResolvers, messagePipeline.targetTag("target_" + i, fPlayer, fTarget)
+            );
         }
 
         String nextPageCommand = "/" + commandModuleController.getCommandName(this);
-        String footer = StringUtils.replaceEach(
+        stringBuilder.append(StringUtils.replaceEach(
                 localization.footer(),
                 new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
                 new String[]{nextPageCommand, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
-        );
-
-        component = component.append(messagePipeline.build(MessageContext.builder()
-                .sender(fPlayer)
-                .message(footer)
-                .build()
         ));
 
-        MessageSendEvent messageSendEvent = eventDispatcher.dispatch(new MessageSendEvent(this.name(), fPlayer, component));
-        if (!messageSendEvent.cancelled()) {
-            soundPlayer.play(this.soundOrThrow(), fPlayer);
-        }
+        String message = stringBuilder.toString();
+        TagResolver finalTagResolvers = tagResolvers;
+
+        messageDispatcher.dispatch(this, EventMetadata.builder()
+                .sound(soundOrThrow())
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(fPlayer)
+                        .receiver(fResolver)
+                        .message(message)
+                        .tagResolver(finalTagResolvers)
+                        .build()
+                )
+                .build()
+        );
     }
 
     @Override

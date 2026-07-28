@@ -32,7 +32,6 @@ import net.flectone.pulse.module.integration.discord.service.DiscordWebhookServi
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -60,7 +59,8 @@ public class DiscordSender {
     public void sendMessage(@NonNull FEntity sender,
                             @NonNull String messageName,
                             @NonNull UnaryOperator<String> discordString) {
-        if (discordClientProvider.get() == null) return;
+        DiscordClient discordClient = discordClientProvider.get();
+        if (discordClient == null) return;
 
         List<String> channels = discordModule.config().messageChannel().get(messageName);
         if (channels == null) return;
@@ -70,7 +70,7 @@ public class DiscordSender {
             Optional<Snowflake> channel = discordSnowflakeParser.parse(string);
             if (channel.isEmpty()) return;
 
-            Localization.Integration.Discord localization = discordModule.localization();
+            Localization.Integration.Discord localization = discordModule.localization(discordClient.sender());
             Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().getOrDefault(messageName, new Localization.Integration.Discord.ChannelEmbed("<final_message>", null, null, null));
             sendMessage(sender, channel.get(), channelEmbed, discordString);
         });
@@ -187,41 +187,42 @@ public class DiscordSender {
         String displayName = member != null ? member.getDisplayName() : globalName;
         String nickname = member != null ? member.getNickname().orElse(userName) : userName;
 
-        messageDispatcher.dispatch(discordModule, DiscordMetadata.<Localization.Integration.Discord>builder()
-                .base(EventMetadata.<Localization.Integration.Discord>builder()
-                        .sender(discordClient.sender())
-                        .format(localization -> {
-                            Localization.Integration.Discord.ChannelEmbed channelEmbed = localization.messageChannel().get(discordModule.name().name());
-                            if (channelEmbed == null) return "";
-
-                            return StringUtils.replaceEach(
-                                    channelEmbed.content(),
-                                    new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
-                                    new String[]{globalName, globalName, nickname, displayName, userName}
-                            );
-                        })
+        messageDispatcher.dispatch(discordModule, DiscordMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(Range.get(Range.Type.PROXY))
                         .destination(discordModule.config().destination())
-                        .message(message)
                         .sound(discordModule.soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{messagePipeline.resolver("reply", (_, _) -> {
-                            if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
+                        .messageContext(fResolver -> {
+                            Localization.Integration.Discord.ChannelEmbed channelEmbed = discordModule.localization(fResolver).messageChannel().get(discordModule.name().name());
 
-                            return Tag.inserting(messagePipeline.build(MessageContext.builder()
-                                    .message(discordModule.localization(fResolver).formatReply())
-                                    .tagResolvers(
-                                            messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
-                                            messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
-                                                    .sender(discordClient.sender())
-                                                    .receiver(fResolver)
-                                                    .message(reply.getRight())
-                                                    .flag(MessageFlag.PLAYER_MESSAGE, true)
-                                                    .build()
-                                            )))
-                                    )
-                                    .build()
-                            ));
-                        })})
+                            return MessageContext.builder()
+                                    .sender(discordClient.sender())
+                                    .receiver(fResolver)
+                                    .message(channelEmbed == null ? "" : StringUtils.replaceEach(
+                                            channelEmbed.content(),
+                                            new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},
+                                            new String[]{globalName, globalName, nickname, displayName, userName}
+                                    ))
+                                    .tagResolvers(messagePipeline.messageTag(discordClient.sender(), fResolver, message), messagePipeline.resolver("reply", (_, _) -> {
+                                        if (reply == null) return MessagePipeline.ReplacementTag.emptyTag();
+
+                                        return Tag.inserting(messagePipeline.build(MessageContext.builder()
+                                                .message(discordModule.localization(fResolver).formatReply())
+                                                .tagResolvers(
+                                                        messagePipeline.resolver("reply_user", Tag.preProcessParsed(StringUtils.defaultString(reply.getLeft()))),
+                                                        messagePipeline.resolver("reply_message", (_, _) -> Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                                                                .sender(discordClient.sender())
+                                                                .receiver(fResolver)
+                                                                .message(reply.getRight())
+                                                                .flag(MessageFlag.PLAYER_MESSAGE, true)
+                                                                .build()
+                                                        )))
+                                                )
+                                                .build()
+                                        ));
+                                    }))
+                                    .build();
+                        })
                         .integration(IntegrationMetadata.builder()
                                 .format(string -> StringUtils.replaceEach(
                                         string,

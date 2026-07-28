@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.model.entity.FPlayer;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,7 +33,7 @@ public class Bubble {
 
     private final long creationTime = System.currentTimeMillis();
 
-    private final List<FPlayer> viewers;
+    private final Set<FPlayer> viewers;
 
     @Setter
     private boolean created;

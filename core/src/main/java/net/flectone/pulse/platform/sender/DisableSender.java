@@ -4,17 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.Component;
 
 /**
  * Sends disable messages when chat features are disabled for players.
@@ -37,8 +35,7 @@ import net.kyori.adventure.text.Component;
 public class DisableSender {
 
     private final FileFacade fileFacade;
-    private final MessagePipeline messagePipeline;
-    private final EventDispatcher eventDispatcher;
+    private final MessageDispatcher messageDispatcher;
     private final SocialService socialService;
 
     /**
@@ -63,15 +60,16 @@ public class DisableSender {
                 ? localization.disabledSelf()
                 : localization.disabledOther();
 
-        MessageContext messageContext = MessageContext.builder()
-                .sender(receiver)
-                .receiver(fPlayer)
-                .message(disableMessage)
-                .build();
-
-        Component component = messagePipeline.build(messageContext);
-
-        eventDispatcher.dispatch(new MessageSendEvent(ModuleName.ERROR, fPlayer, component));
+        messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                .filter(fPlayer)
+                .messageContext(fResolver -> MessageContext.builder()
+                        .sender(receiver)
+                        .receiver(fResolver)
+                        .message(disableMessage)
+                        .build()
+                )
+                .build()
+        );
 
         return true;
     }

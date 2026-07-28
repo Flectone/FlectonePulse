@@ -37,12 +37,11 @@ import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class StreamModule implements ModuleCommand<Localization.Command.Stream> {
+public class StreamModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final SocialService socialService;
@@ -96,12 +95,16 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
 
         if (needStart == null) return;
 
-        boolean isStream = localization().prefixTrue().equals(socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX));
+        boolean isStream = localization(FPlayer.UNKNOWN).prefixTrue().equals(socialService.getSetting(fPlayer, SettingText.STREAM_PREFIX));
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Stream::already)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).already())
+                            .build()
+                    )
                     .build()
             );
 
@@ -109,9 +112,13 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         }
 
         if (!isStream && !needStart) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Stream>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Stream::not)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).not())
+                            .build()
+                    )
                     .build()
             );
 
@@ -119,8 +126,8 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         }
 
         setStreamPrefix(fPlayer, needStart
-                ? localization().prefixTrue()
-                : StringUtils.isEmpty(localization().prefixFalse()) ? null : localization().prefixFalse()
+                ? localization(FPlayer.UNKNOWN).prefixTrue()
+                : StringUtils.isEmpty(localization(FPlayer.UNKNOWN).prefixFalse()) ? null : localization(FPlayer.UNKNOWN).prefixFalse()
         );
 
         if (needStart) {
@@ -133,20 +140,24 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                     .map(url -> StringUtils.substringBefore(url, "?"))
                     .collect(Collectors.joining(" "));
 
-            messageDispatcher.dispatch(this, StreamMetadata.<Localization.Command.Stream>builder()
-                    .base(EventMetadata.<Localization.Command.Stream>builder()
-                            .sender(fPlayer)
-                            .format(replaceUrls(urls))
+            messageDispatcher.dispatch(this, StreamMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(config().range())
                             .destination(config().destination())
                             .sound(soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
+                                    .message(replaceUrls(fResolver, urls))
+                                    .build()
+                            )
                             .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
                             .integration(IntegrationMetadata.builder()
                                     .format(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
                                     .messageNames(List.of(name().name() + "_START"))
                                     .build()
                             )
-                            .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
                             .build()
                     )
                     .turned(true)
@@ -154,11 +165,15 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
                     .build()
             );
         } else {
-            messageDispatcher.dispatch(this, StreamMetadata.<Localization.Command.Stream>builder()
-                    .base(EventMetadata.<Localization.Command.Stream>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Command.Stream::formatEnd)
+            messageDispatcher.dispatch(this, StreamMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(config().destination())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(localization(fResolver).formatEnd())
+                                    .build()
+                            )
                             .integration(IntegrationMetadata.builder()
                                     .messageNames(List.of(name().name() + "_END"))
                                     .build()
@@ -218,14 +233,14 @@ public class StreamModule implements ModuleCommand<Localization.Command.Stream> 
         }));
     }
 
-    public Function<Localization.Command.Stream, String> replaceUrls(String string) {
-        return message -> {
-            List<String> urls = Arrays.stream(string.split(" "))
-                    .map(url -> Strings.CS.replace(message.urlTemplate(), "<url>", url))
-                    .toList();
+    public String replaceUrls(FPlayer fPlayer, String string) {
+        Localization.Command.Stream localization = localization(fPlayer);
 
-            return Strings.CS.replace(message.formatStart(), "<urls>", String.join("<br>", urls));
-        };
+        List<String> urls = Arrays.stream(string.split(" "))
+                .map(url -> Strings.CS.replace(localization.urlTemplate(), "<url>", url))
+                .toList();
+
+        return Strings.CS.replace(localization.formatStart(), "<urls>", String.join("<br>", urls));
     }
 
     private boolean isUrl(String string) {

@@ -15,7 +15,6 @@ import net.flectone.pulse.module.message.format.world.listener.PulseWorldListene
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -32,7 +31,6 @@ import java.util.Set;
 public class WorldModule implements ModuleSimple {
 
     private final FileFacade fileFacade;
-    private final FPlayerService fPlayerService;
     private final SocialService socialService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;

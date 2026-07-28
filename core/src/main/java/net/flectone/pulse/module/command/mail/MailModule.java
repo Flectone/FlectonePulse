@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.mail.listener.PulseMailListener;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -26,7 +27,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -34,7 +34,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class MailModule implements ModuleCommand<Localization.Command.Mail> {
+public class MailModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final TellModule tellModule;
@@ -74,9 +74,13 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
         String playerName = commandModuleController.getArgument(this, commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Mail::nullPlayer)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullPlayer())
+                            .build()
+                    )
                     .build()
             );
 
@@ -85,9 +89,13 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
 
         if (fReceiver.isOnline() && socialService.canSeeVanished(fReceiver, fPlayer)) {
             if (!moduleController.isEnable(tellModule)) {
-                messageDispatcher.dispatchError(this, EventMetadata.<Localization.Command.Mail>builder()
-                        .sender(fPlayer)
-                        .format(Localization.Command.Mail::onlinePlayer)
+                messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).onlinePlayer())
+                                .build()
+                        )
                         .build()
                 );
 
@@ -108,16 +116,17 @@ public class MailModule implements ModuleCommand<Localization.Command.Mail> {
 
         int mailId = mail.get().id();
 
-        messageDispatcher.dispatch(this, MailMetadata.<Localization.Command.Mail>builder()
-                .base(EventMetadata.<Localization.Command.Mail>builder()
-                        .sender(fPlayer)
-                        .format(s -> Strings.CS.replaceOnce(s.sender(), "<id>", String.valueOf(mailId)))
-                        .message(message)
+        messageDispatcher.dispatch(this, MailMetadata.builder()
+                .base(EventMetadata.builder()
                         .destination(config().destination())
                         .sound(soundOrThrow())
-                        .tagResolvers(fResolver -> new TagResolver[]{
-                                messagePipeline.targetTag(fResolver, fReceiver)
-                        })
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(Strings.CS.replaceOnce(localization(fResolver).sender(), "<id>", String.valueOf(mailId)))
+                                .tagResolvers(messagePipeline.messageTag(fPlayer, fResolver, message), messagePipeline.targetTag(fResolver, fReceiver))
+                                .build()
+                        )
                         .build()
                 )
                 .mail(mail.get())

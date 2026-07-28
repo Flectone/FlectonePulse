@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
+public class AfkModule implements ModuleLocalization {
 
     private final Map<UUID, Pair<Long, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new ConcurrentHashMap<>();
 
@@ -187,7 +187,7 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
     }
 
     private void addAfkSetting(FPlayer fPlayer) {
-        socialService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, localization().suffix());
+        socialService.saveSetting(fPlayer, SettingText.AFK_SUFFIX, localization(FPlayer.UNKNOWN).suffix());
 
         playersCoordinates.put(fPlayer.uuid(), Pair.of(System.currentTimeMillis(), platformPlayerAdapter.getCoordinates(fPlayer)));
 
@@ -259,15 +259,19 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
 
         Range range = config().range();
         if (range.is(Range.Type.PLAYER)) {
-            messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
-                    .base(EventMetadata.<Localization.Message.Afk>builder()
-                            .sender(fPlayer)
-                            .format(localization -> isAfk
-                                    ? localization.formatTrue().local()
-                                    : localization.formatFalse().local()
-                            )
+            messageDispatcher.dispatch(this, AFKMetadata.builder()
+                    .base(EventMetadata.builder()
                             .destination(config().destination())
                             .sound(soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(isAfk
+                                            ? localization(fResolver).formatTrue().local()
+                                            : localization(fResolver).formatFalse().local()
+                                    )
+                                    .build()
+                            )
                             .build()
                     )
                     .newStatus(isAfk)
@@ -278,17 +282,21 @@ public class AfkModule implements ModuleLocalization<Localization.Message.Afk> {
         }
 
         boolean vanished = socialService.isVanished(fPlayer);
-        messageDispatcher.dispatch(this, AFKMetadata.<Localization.Message.Afk>builder()
-                .base(EventMetadata.<Localization.Message.Afk>builder()
-                        .sender(fPlayer)
-                        .format(localization -> isAfk
-                                ? localization.formatTrue().global()
-                                : localization.formatFalse().global()
-                        )
+        messageDispatcher.dispatch(this, AFKMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(range)
                         .destination(config().destination())
                         .sound(soundOrThrow())
                         .filter(fReceiver -> socialService.canSeeVanished(fPlayer, fReceiver))
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(isAfk
+                                        ? localization(fResolver).formatTrue().global()
+                                        : localization(fResolver).formatFalse().global()
+                                )
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeBoolean(isAfk);
                             dataOutputStream.writeBoolean(vanished);

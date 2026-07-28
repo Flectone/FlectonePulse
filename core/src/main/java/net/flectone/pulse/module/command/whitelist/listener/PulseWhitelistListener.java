@@ -60,12 +60,16 @@ public class PulseWhitelistListener implements PulseListener {
 
         // show player connection for moderators
         if (whitelistModule.config().showConnectionAttempts()) {
-            messageDispatcher.dispatch(whitelistModule, ModerationMetadata.<Localization.Command.Whitelist>builder()
-                    .base(EventMetadata.<Localization.Command.Whitelist>builder()
-                            .sender(fPlayer)
-                            .format(Localization.Command.Whitelist::connectionAttempt)
+            messageDispatcher.dispatch(whitelistModule, ModerationMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .filter(filter -> permissionChecker.check(filter, whitelistModule.permission()))
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .sender(fPlayer)
+                                    .receiver(fResolver)
+                                    .message(whitelistModule.localization(fResolver).connectionAttempt())
+                                    .build()
+                            )
                             .build()
                     )
                     .build()

@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
@@ -26,6 +27,7 @@ public class TranslatetoProxyMessageListener implements PulseListener {
     private final TranslatetoModule translatetoModule;
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
 
     @Pulse
     public Event onProxyMessageEvent(ProxyMessageEvent event) throws IOException {
@@ -39,15 +41,19 @@ public class TranslatetoProxyMessageListener implements PulseListener {
             String message = proxyPayload.readString();
             String messageToTranslate = proxyPayload.readString();
 
-            messageDispatcher.dispatch(translatetoModule, TranslatetoMetadata.<Localization.Command.Translateto>builder()
-                    .base(EventMetadata.<Localization.Command.Translateto>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(translatetoModule.replaceLanguage(targetLang))
+            messageDispatcher.dispatch(translatetoModule, TranslatetoMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .destination(translatetoModule.config().destination())
-                            .message(message)
                             .sound(translatetoModule.soundOrThrow())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(translatetoModule.replaceLanguage(fResolver, targetLang))
+                                    .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
+                                    .build()
+                            )
                             .build()
                     )
                     .targetLanguage(targetLang)

@@ -7,9 +7,11 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.try_.listener.TryProxyMessageListener;
 import net.flectone.pulse.module.command.try_.model.TryMetadata;
@@ -27,16 +29,16 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
-import java.util.function.Function;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class TryModule implements ModuleCommand<Localization.Command.CommandTry> {
+public class TryModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final RandomGenerator randomUtil;
     private final CommandParserProvider commandParserProvider;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ListenerRegistry listenerRegistry;
@@ -72,14 +74,18 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
 
         String message = commandModuleController.getArgument(this, commandContext, 0);
 
-        messageDispatcher.dispatch(this, TryMetadata.<Localization.Command.CommandTry>builder()
-                .base(EventMetadata.<Localization.Command.CommandTry>builder()
-                        .sender(fPlayer)
-                        .format(replacePercent(random))
+        messageDispatcher.dispatch(this, TryMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(config().range())
                         .destination(config().destination())
-                        .message(message)
                         .sound(soundOrThrow())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(replacePercent(fResolver, random))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, message))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeInt(random);
                             dataOutputStream.writeString(message);
@@ -114,9 +120,9 @@ public class TryModule implements ModuleCommand<Localization.Command.CommandTry>
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).command().commandTry();
     }
 
-    public Function<Localization.Command.CommandTry, String> replacePercent(int value) {
-        return message -> Strings.CS.replace(
-                isGood(value) ? message.formatTrue() : message.formatFalse(),
+    public String replacePercent(FPlayer fPlayer, int value) {
+        return Strings.CS.replace(
+                isGood(value) ? localization(fPlayer).formatTrue() : localization(fPlayer).formatFalse(),
                 "<percent>",
                 String.valueOf(value)
         );

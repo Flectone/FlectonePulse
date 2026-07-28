@@ -8,7 +8,6 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.listener.PulseListener;
@@ -16,6 +15,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
@@ -26,7 +26,6 @@ import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class VanillaProxyMessageListener implements PulseListener {
     private final ModuleController moduleController;
     private final MessageDispatcher messageDispatcher;
     private final Gson gson;
-    private final ComponentExtractor componentExtractor;
+    private final ComponentExtractor<?> componentExtractor;
     private final SocialService socialService;
 
     @Pulse
@@ -62,16 +61,20 @@ public class VanillaProxyMessageListener implements PulseListener {
             String vanillaMessageName = vanillaMessage.name();
             boolean vanished = proxyPayload.readBoolean();
 
-            messageDispatcher.dispatch(vanillaModule, VanillaMetadata.<Localization.Message.Vanilla>builder()
-                    .base(EventMetadata.<Localization.Message.Vanilla>builder()
-                            .uuid(event.uuid())
-                            .sender(event.sender())
-                            .format(localization -> StringUtils.defaultString(localization.types().get(parsedComponent.translationKey())))
-                            .tagResolvers(fResolver -> new TagResolver[]{vanillaModule.argumentTag(fResolver, parsedComponent)})
+            messageDispatcher.dispatch(vanillaModule, VanillaMetadata.builder()
+                    .base(EventMetadata.builder()
                             .range(Range.get(Range.Type.SERVER))
                             .filter(fResolver -> vanillaMessageName.isEmpty() || socialService.isSetting(fResolver, vanillaMessageName))
                             .filter(fResolver -> socialService.canSeeVanished(event.sender(), fResolver, vanished))
                             .destination(parsedComponent.vanillaMessage().destination())
+                            .messageContext(fResolver -> MessageContext.builder()
+                                    .uuid(event.uuid())
+                                    .sender(event.sender())
+                                    .receiver(fResolver)
+                                    .message(StringUtils.defaultString(vanillaModule.localization(fResolver).types().get(parsedComponent.translationKey())))
+                                    .tagResolver(vanillaModule.argumentTag(fResolver, parsedComponent))
+                                    .build()
+                            )
                             .build()
                     )
                     .parsedComponent(parsedComponent)

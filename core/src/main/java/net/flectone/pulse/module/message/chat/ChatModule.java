@@ -10,10 +10,12 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.setting.PermissionSetting;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -36,15 +38,13 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ChatModule implements ModuleLocalization<Localization.Message.Chat> {
+public class ChatModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
     private final FPlayerService fPlayerService;
@@ -58,6 +58,7 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
     private final MessageDispatcher messageDispatcher;
+    private final MessagePipeline messagePipeline;
     private final ProxyRegistry proxyRegistry;
     private final ListenerRegistry listenerRegistry;
 
@@ -109,9 +110,13 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
         Chat playerChat = getPlayerChat(fPlayer, rawString);
         if (playerChat.config() == null || !playerChat.config().enable()) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Message.Chat::nullChat)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullChat())
+                            .build()
+                    )
                     .build()
             );
 
@@ -151,15 +156,19 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         String chatName = playerChat.name();
         if (chatName == null) return;
 
-        ChatMetadata<Localization.Message.Chat> chatMetadata = messageDispatcher.dispatch(this, ChatMetadata.<Localization.Message.Chat>builder()
-                .base(EventMetadata.<Localization.Message.Chat>builder()
-                        .sender(fPlayer)
-                        .format(localization -> localization.types().get(chatName))
-                        .destination(playerChat.config().destination())
+        Set<FPlayer> receivers = messageDispatcher.dispatch(this, ChatMetadata.builder()
+                .base(EventMetadata.builder()
                         .range(playerChat.config().range())
-                        .message(playerMessage)
-                        .sound(playerChat.sound())
                         .filter(permissionFilter(chatName))
+                        .destination(playerChat.config().destination())
+                        .sound(playerChat.sound())
+                        .messageContext(fResolver -> MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(localization(fResolver).types().get(chatName))
+                                .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, playerMessage))
+                                .build()
+                        )
                         .proxy(dataOutputStream -> {
                             dataOutputStream.writeString(chatName);
                             dataOutputStream.writeString(playerMessage);
@@ -176,16 +185,14 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
 
         // send null receiver message
         if (playerChat.config().destination().type() != Destination.Type.CHAT) {
-            checkReceiversLater(fPlayer, chatMetadata.receivers(), playerChat);
+            checkReceiversLater(fPlayer, receivers, playerChat);
         } else {
-            taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, chatMetadata.receivers(), playerChat), 1L);
+            taskScheduler.runAsyncLater(() -> checkReceiversLater(fPlayer, receivers, playerChat), 1L);
         }
 
         // receivers can be empty due to proxy mode
-        List<FPlayer> receiversWithSender = new ArrayList<>(chatMetadata.receivers());
-        if (!receiversWithSender.contains(fPlayer)) {
-            receiversWithSender.add(fPlayer);
-        }
+        Set<FPlayer> receiversWithSender = new HashSet<>(receivers);
+        receiversWithSender.add(fPlayer);
 
         // send to spy module
         spyModuleProvider.get().checkChat(fPlayer, chatName, playerMessage, receiversWithSender);
@@ -198,15 +205,19 @@ public class ChatModule implements ModuleLocalization<Localization.Message.Chat>
         return fReceiver -> permissionChecker.check(fReceiver, permission().types().get(chatName));
     }
 
-    private void checkReceiversLater(FPlayer fPlayer, List<FPlayer> localReceivers, Chat playerChat) {
+    private void checkReceiversLater(FPlayer fPlayer, Set<FPlayer> localReceivers, Chat playerChat) {
         if (!playerChat.config().nullReceiver().enable()) return;
         if (localReceivers.stream().anyMatch(filterReceivers(fPlayer, playerChat.name()))) return;
 
         if (playerChat.config().range().is(Range.Type.BLOCKS) || noGlobalReceiversFor(fPlayer, playerChat.name())) {
-            messageDispatcher.dispatchError(this, EventMetadata.<Localization.Message.Chat>builder()
-                    .sender(fPlayer)
-                    .format(Localization.Message.Chat::nullReceiver)
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
                     .destination(playerChat.config().nullReceiver().destination())
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).nullReceiver())
+                            .build()
+                    )
                     .build()
             );
         }

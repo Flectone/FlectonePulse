@@ -19,7 +19,7 @@ import org.incendo.cloud.context.CommandContext;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AfkModule implements ModuleCommand<Localization.Command> {
+public class AfkModule implements ModuleCommand {
 
     private final FileFacade fileFacade;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;

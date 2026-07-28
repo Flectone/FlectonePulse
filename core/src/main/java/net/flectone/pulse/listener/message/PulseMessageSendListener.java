@@ -33,15 +33,15 @@ public class PulseMessageSendListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onMessageSendEvent(MessageSendEvent event) {
-        EventMetadata<?> eventMetadata = event.eventMetadata();
+        EventMetadata eventMetadata = event.eventMetadata();
         if (eventMetadata.sound() != null) {
-            soundPlayer.play(eventMetadata.sound(), eventMetadata.sender(), event.receiver());
+            soundPlayer.play(eventMetadata.sound(), event.messageContext().sender(), event.messageContext().receiver());
         }
 
         Component message = event.message();
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
-        FPlayer fReceiver = event.receiver();
+        FPlayer fReceiver = event.messageContext().receiver();
 
         Destination destination = event.eventMetadata().destination();
 

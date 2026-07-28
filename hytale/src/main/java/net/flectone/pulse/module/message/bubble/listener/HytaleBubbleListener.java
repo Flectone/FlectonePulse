@@ -11,7 +11,7 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.FPlayerService;
 
-import java.util.List;
+import java.util.Set;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -29,6 +29,6 @@ public class HytaleBubbleListener implements HytaleListener {
 
         String message = event.getContent();
 
-        bubbleModule.add(fPlayer, message, List.of());
+        bubbleModule.add(fPlayer, message, Set.of());
     }
 }
