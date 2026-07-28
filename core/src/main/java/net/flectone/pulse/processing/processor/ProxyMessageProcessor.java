@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.service.FPlayerService;
@@ -42,7 +43,12 @@ public class ProxyMessageProcessor {
 
                 UUID uuid = UUID.fromString(proxyPayload.readString());
                 if (name == ModuleName.PLAYER_CONNECTED || name == ModuleName.PLAYER_DISCONNECTED) {
-                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayerService.getFPlayer(uuid), uuid, proxyPayload.readAllBytes()));
+                    // if player is unknown, it means he is not in database
+                    // message may have been sent from a server where FlectonePulse is not installed
+                    FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+                    if (fPlayer.isUnknown()) return;
+
+                    ProxyMessageEvent proxyMessageEvent = eventDispatcher.dispatch(new ProxyMessageEvent(proxyPayload.readBoolean(), "", name, fPlayer, uuid, proxyPayload.readAllBytes()));
                     if (proxyMessageEvent.cancelled()) {
                         // nothing
                     }
