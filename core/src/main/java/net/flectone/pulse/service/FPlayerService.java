@@ -18,7 +18,11 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Central service for managing player data across the FlectonePulse plugin.
@@ -165,58 +169,63 @@ public class FPlayerService {
             }
         });
 
-        // if we have proxy mode enabled, we can't always be sure that the players are synchronized between servers
-        // we need to handle cases where a server doesn't send or receive a request through Proxy for some reason, resulting in incorrect player status
-        if (proxyRegistry.hasEnabledProxy()) {
-            taskScheduler.runAsyncTimer(() -> {
-                // online players of the current server, which are stored in cache
-                List<FPlayer> onlineCachedPlayers = fPlayerRepository.getOnlinePlayers();
+        // I hate Minecraft player sync logic. When a player is already on the server
+        // and a new player with the same nickname joins, JOIN fires BEFORE quit
+        // this leaves the player offline despite still being on the server
+        // the same issue occurs with the proxy server
+        taskScheduler.runAsyncTimer(() -> {
+            // online players of the current server, which are stored in cache
+            List<FPlayer> onlineCachedPlayers = fPlayerRepository.getOnlinePlayers();
+            Set<UUID> onlineCachedUuids = onlineCachedPlayers.stream()
+                    .map(FPlayer::uuid)
+                    .collect(Collectors.toSet());
 
-                // online players from the database before we start checking
-                List<FPlayer> onlineDatabasePlayers = fPlayerRepository.getOnlinePlayersDatabase();
+            // online players from the database before we start checking
+            List<FPlayer> onlineDatabasePlayers = fPlayerRepository.getOnlinePlayersDatabase();
+            Map<UUID, FPlayer> onlineDatabasePlayersByUuid = onlineDatabasePlayers.stream()
+                    .collect(Collectors.toMap(FPlayer::uuid, Function.identity()));
 
-                // first, we need to make sure that online players in cache are actually online
-                onlineCachedPlayers.forEach(fPlayer -> {
-                    // we check their status in the database
-                    if (!onlineDatabasePlayers.contains(fPlayer)) {
-                        // and if it's not online, we need to remove them from the cache
-                        fPlayerRepository.removeOnline(fPlayer);
-                        socialService.invalidate(fPlayer.uuid());
-                    }
-                });
+            // first, we need to make sure that online players in cache are actually online
+            onlineCachedPlayers.forEach(fPlayer -> {
+                // check their status in the database
+                if (!onlineDatabasePlayersByUuid.containsKey(fPlayer.uuid())) {
+                    // and if it's not online, we need to remove them from the cache
+                    fPlayerRepository.removeOnline(fPlayer);
+                    socialService.invalidate(fPlayer.uuid());
+                }
+            });
 
-                // next, we need to check that online players in the database are in the local online cache
-                onlineDatabasePlayers.forEach(fPlayer -> {
-                    if (!onlineCachedPlayers.contains(fPlayer)) {
-                        // if they are not, we add them
-                        addCache(fPlayer);
-                        socialService.invalidate(fPlayer.uuid());
-                    }
-                });
-
-                // the most important thing!
-                // during these operations, another server may have already changed player's status in cache and database
-                // we need to get all online players on the current server and check that their status in the database
-                List<UUID> platformPlayers = platformPlayerAdapter.getOnlinePlayers();
-                platformPlayers.forEach(uuid -> {
-                    // if it is not online, we need to get player from the database and check their current status
-                    if (onlineDatabasePlayers.stream().anyMatch(fPlayer -> fPlayer.uuid().equals(uuid))) return;
-
-                    FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
-
-                    // if player is not online even in the database, we need to update their status to online
-                    if (!fPlayer.isOnline()) {
-                        fPlayer = fPlayer.withOnline(true);
-
-                        fPlayerRepository.update(fPlayer);
-                    }
-
-                    // finally, we need to add player to online cache
+            // next, we need to check that online players in the database are in the local online cache
+            onlineDatabasePlayers.forEach(fPlayer -> {
+                if (!onlineCachedUuids.contains(fPlayer.uuid())) {
+                    // if they are not, we add them
                     addCache(fPlayer);
                     socialService.invalidate(fPlayer.uuid());
-                });
-            }, 20L, 20L); // I think 1 second is enough to avoid visual sync problems
-        }
+                }
+            });
+
+            // the most important thing!
+            // during these operations, another server may have already changed player's status in cache and database
+            // we need to get all online players on the current server and check that their status in the database
+            List<UUID> platformPlayers = platformPlayerAdapter.getOnlinePlayers();
+            platformPlayers.forEach(uuid -> {
+                // if it is already online in the database, nothing to do here
+                if (onlineDatabasePlayersByUuid.containsKey(uuid)) return;
+
+                FPlayer fPlayer = fPlayerRepository.getFromDatabase(uuid);
+
+                // if player is not online even in the database, we need to update their status to online
+                if (!fPlayer.isOnline()) {
+                    fPlayer = fPlayer.withOnline(true);
+
+                    fPlayerRepository.update(fPlayer);
+                }
+
+                // finally, we need to add player to online cache
+                addCache(fPlayer);
+                socialService.invalidate(fPlayer.uuid());
+            });
+        }, 20L, 20L); // I think 1 second is enough to avoid visual sync problems
     }
 
     /**
