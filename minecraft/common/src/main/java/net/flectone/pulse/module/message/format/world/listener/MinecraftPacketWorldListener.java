@@ -22,6 +22,7 @@ public class MinecraftPacketWorldListener implements PacketListener {
         if (event.getPacketType() != PacketType.Play.Client.TELEPORT_CONFIRM) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
+        if (fPlayer.isUnknown()) return;
 
         worldModule.update(fPlayer);
     }
