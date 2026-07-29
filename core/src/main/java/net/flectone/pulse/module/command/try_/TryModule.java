@@ -10,7 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.try_.listener.TryProxyMessageListener;
@@ -94,7 +94,7 @@ public class TryModule implements ModuleCommand {
                     dataOutputStream.writeInt(random);
                     dataOutputStream.writeString(message);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(isGood(random)).toUpperCase()))
                         .build())
                 .build()

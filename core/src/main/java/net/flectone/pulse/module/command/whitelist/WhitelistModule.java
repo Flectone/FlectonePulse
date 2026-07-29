@@ -15,7 +15,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
@@ -297,7 +297,7 @@ public class WhitelistModule implements ModuleCommand {
                         .build()
                 )
                 .proxy(dataOutputStream -> dataOutputStream.writeInt(turned ? Action.ON.ordinal() : Action.OFF.ordinal()))
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
                         .build()
                 );
@@ -406,7 +406,7 @@ public class WhitelistModule implements ModuleCommand {
                     dataOutputStream.writeInt(Action.ADD.ordinal());
                     dataOutputStream.writeAsJson(whitelist);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, whitelist))
                         .messageNames(List.of(name().name() + "_ADD"))
                         .build()
@@ -502,7 +502,7 @@ public class WhitelistModule implements ModuleCommand {
                     dataOutputStream.writeInt(Action.REMOVE.ordinal());
                     dataOutputStream.writeAsJson(unwhitelist);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, unwhitelist))
                         .messageNames(List.of(name().name() + "_REMOVE"))
                         .build()

@@ -10,15 +10,13 @@ import java.util.function.UnaryOperator;
 
 @With
 @Builder(toBuilder = true)
-public record IntegrationMetadata(
+public record IntegrationMessageFormat(
         @NonNull List<String> messageNames,
         @NonNull UnaryOperator<String> format
 ) {
 
-    public static final IntegrationMetadata EMPTY = IntegrationMetadata.builder().build();
-
     @SuppressWarnings("DataFlowIssue")
-    public IntegrationMetadata {
+    public IntegrationMessageFormat {
         messageNames = Objects.requireNonNullElse(messageNames, List.of());
         format = Objects.requireNonNullElse(format, string -> string);
     }

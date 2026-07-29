@@ -16,7 +16,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleCommand;
@@ -127,7 +127,7 @@ public class PollModule implements ModuleCommand {
                                 .action(Action.REPEAT)
                                 .build()
                         )
-                        .integration(IntegrationMetadata.builder()
+                        .integration(() -> IntegrationMessageFormat.builder()
                                 .messageNames(List.of(name().name() + "_" + status, name().name() + "_REPEAT"))
                                 .build()
                         )
@@ -269,7 +269,7 @@ public class PollModule implements ModuleCommand {
                     dataOutputStream.writeUTF(Action.CREATE.name());
                     dataOutputStream.writeAsJson(poll);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_START", name().name() + "_CREATE"))
                         .build()
                 )

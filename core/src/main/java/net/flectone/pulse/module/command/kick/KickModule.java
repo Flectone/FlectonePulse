@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
@@ -134,7 +135,10 @@ public class KickModule implements ModuleCommand {
                         .build()
                 )
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(moderation))
-                .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation));
+                .integration(() -> IntegrationMessageFormat.builder()
+                        .format(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, moderation))
+                        .build()
+                );
 
         if (config().range().is(Range.Type.PLAYER)) {
             baseMetadataBuilder.filter(List.of(fPlayer, fPlayerService.getConsole()));

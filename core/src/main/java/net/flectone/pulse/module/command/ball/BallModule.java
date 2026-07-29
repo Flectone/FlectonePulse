@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.ball.listener.BallProxyMessageListener;
@@ -90,15 +91,18 @@ public class BallModule implements ModuleCommand {
                     dataOutputStream.writeInt(answer);
                     dataOutputStream.writeString(message);
                 })
-                .integration(string -> {
-                    List<String> answers = localization(FPlayer.UNKNOWN).answers();
+                .integration(() -> IntegrationMessageFormat.builder()
+                        .format(string -> {
+                            List<String> answers = localization(FPlayer.UNKNOWN).answers();
 
-                    String answerString = !answers.isEmpty()
-                            ? answers.get(Math.min(answer, answers.size() - 1))
-                            : StringUtils.EMPTY;
+                            String answerString = !answers.isEmpty()
+                                    ? answers.get(Math.min(answer, answers.size() - 1))
+                                    : StringUtils.EMPTY;
 
-                    return Strings.CS.replace(string, "<answer>", answerString);
-                })
+                            return Strings.CS.replace(string, "<answer>", answerString);
+                        })
+                        .build()
+                )
                 .build()
         );
     }

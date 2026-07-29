@@ -20,7 +20,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -231,7 +231,7 @@ public class DiscordSender {
                             .reply(reply)
                             .build();
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> StringUtils.replaceEach(
                                 string,
                                 new String[]{"<name>", "<global_name>", "<nickname>", "<display_name>", "<user_name>"},

@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.function.Supplier;
 
 public interface EventMetadata {
 
@@ -46,12 +46,19 @@ public interface EventMetadata {
         return base().proxy();
     }
 
-    default @Nullable IntegrationMetadata integrationMetadata() {
-        return base().integrationMetadata();
+    default @Nullable Supplier<IntegrationMessageFormat> integration() {
+        return base().integration();
     }
 
     default @NonNull MessageContext resolveMessageContext(FPlayer fPlayer) {
         return base().resolveMessageContext(fPlayer);
+    }
+
+    default @Nullable IntegrationMessageFormat resolveIntegrationMessageFormat() {
+        Supplier<IntegrationMessageFormat> integrationMessageFormatSupplier = base().integration();
+        if (integrationMessageFormatSupplier == null) return null;
+
+        return integrationMessageFormatSupplier.get();
     }
 
     final class Builder {
@@ -62,7 +69,7 @@ public interface EventMetadata {
         private Pair<Sound, PermissionSetting> sound;
         private Function<FPlayer, MessageContext> messageContext;
         private ProxyDataConsumer<SafeDataOutputStream> proxy;
-        private IntegrationMetadata integrationMetadata;
+        private Supplier<IntegrationMessageFormat> integration;
 
         private Builder() {
         }
@@ -115,23 +122,13 @@ public interface EventMetadata {
             return this;
         }
 
-        public Builder integration(IntegrationMetadata integrationMetadata) {
-            this.integrationMetadata = integrationMetadata;
-            return this;
-        }
-
-        public Builder integration(@NonNull UnaryOperator<String> format) {
-            if (integrationMetadata == null) {
-                integrationMetadata = IntegrationMetadata.EMPTY.withFormat(format);
-            } else {
-                integrationMetadata = integrationMetadata.withFormat(format);
-            }
-
+        public Builder integration(Supplier<IntegrationMessageFormat> integration) {
+            this.integration = integration;
             return this;
         }
 
         public Builder integration() {
-            this.integrationMetadata = IntegrationMetadata.EMPTY;
+            this.integration = () -> IntegrationMessageFormat.builder().build();
             return this;
         }
 
@@ -145,7 +142,7 @@ public interface EventMetadata {
                     sound,
                     messageContext,
                     proxy,
-                    integrationMetadata
+                    integration
             );
         }
     }

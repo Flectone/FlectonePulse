@@ -8,6 +8,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
@@ -22,7 +23,8 @@ public class TelegramPulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.LOW)
     public void onMessagePrepareEvent(MessagePrepareEvent event) {
-        if (!event.isForIntegration()) return;
+        IntegrationMessageFormat integrationMessageFormat = event.integrationMessageFormat();
+        if (integrationMessageFormat == null) return;
 
         ModuleName moduleName = event.moduleName();
         if (moduleName == ModuleName.INTEGRATION_TELEGRAM) return;
@@ -30,7 +32,7 @@ public class TelegramPulseListener implements PulseListener {
         EventMetadata eventMetadata = event.eventMetadata();
         MessageContext messageContext = event.messageContext();
         taskScheduler.runAsync(() ->
-                telegramModule.sendMessage(moduleName, eventMetadata, messageContext)
+                telegramModule.sendMessage(moduleName, eventMetadata, messageContext, integrationMessageFormat)
         );
     }
 

@@ -7,6 +7,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
@@ -107,11 +108,12 @@ public class MessageDispatcher {
      */
     public Set<FPlayer> createReceivers(ModuleName moduleName, EventMetadata eventMetadata) {
         MessageContext rawMessageContext = eventMetadata.resolveMessageContext(FPlayer.UNKNOWN);
+        IntegrationMessageFormat integrationMessageFormat = eventMetadata.resolveIntegrationMessageFormat();
 
-        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, eventMetadata, rawMessageContext));
+        MessagePrepareEvent messagePrepareEvent = eventDispatcher.dispatch(new MessagePrepareEvent(moduleName, eventMetadata, rawMessageContext, integrationMessageFormat));
 
         // if canceled, it means that message was sent to Proxy
-        if (messagePrepareEvent.isForProxy() && messagePrepareEvent.cancelled()) return Set.of();
+        if (eventMetadata.proxy() != null && messagePrepareEvent.cancelled()) return Set.of();
 
         Set<FPlayer> receivers = fPlayerService.getFPlayersWithConsole().stream()
                 .filter(rangeFilter.createFilter(eventMetadata, rawMessageContext))

@@ -11,7 +11,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Moderation;
@@ -81,7 +81,7 @@ public class MaintenanceProxyMessageListener implements PulseListener {
                         dataOutputStream.writeAsJson(maintenance);
                         dataOutputStream.writeBoolean(turned);
                     })
-                    .integration(IntegrationMetadata.builder()
+                    .integration(() -> IntegrationMessageFormat.builder()
                             .messageNames(List.of(maintenanceModule.name().name() + "_" + String.valueOf(turned).toUpperCase()))
                             .build()
                     )

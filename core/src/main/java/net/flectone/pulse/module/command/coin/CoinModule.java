@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.MessageDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleCommand;
 import net.flectone.pulse.module.command.coin.listener.CoinProxyMessageListener;
@@ -73,7 +73,7 @@ public class CoinModule implements ModuleCommand {
                         .build()
                 )
                 .proxy(output -> output.writeInt(percent))
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .format(string -> Strings.CS.replace(
                                 string,
                                 "<result>",

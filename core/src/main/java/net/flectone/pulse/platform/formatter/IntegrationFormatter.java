@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
@@ -54,15 +54,15 @@ public class IntegrationFormatter {
      * Retrieves a list of message names that have corresponding non-empty channel configurations.
      *
      * @param moduleName The module name to check for existence in message channels
-     * @param integrationMetadata Metadata containing the collection of message names to validate
+     * @param integrationMessageFormat Metadata containing the collection of message names to validate
      * @param messageChannelSetting Configuration providing the mapping of channel names to message lists
      * @return A list of message names that have non-empty channel configurations, including the module name if applicable
      */
     @NonNull
-    public List<String> getExistedMessageNames(@NonNull ModuleName moduleName, @NonNull IntegrationMetadata integrationMetadata, MessageChannelSetting messageChannelSetting) {
+    public List<String> getExistedMessageNames(@NonNull ModuleName moduleName, @NonNull IntegrationMessageFormat integrationMessageFormat, MessageChannelSetting messageChannelSetting) {
         Predicate<String> existChannelPredicate = string -> !messageChannelSetting.messageChannel().getOrDefault(string, List.of()).isEmpty();
 
-        Stream<String> existedStream = integrationMetadata.messageNames().stream()
+        Stream<String> existedStream = integrationMessageFormat.messageNames().stream()
                 .filter(existChannelPredicate);
 
         Stream<String> moduleStream = existChannelPredicate.test(moduleName.name())
@@ -75,14 +75,14 @@ public class IntegrationFormatter {
     /**
      * Creates a format function that processes and replaces placeholders in message templates.
      *
-     * @param integrationMetadata Metadata providing integration-specific format transformations
+     * @param integrationMessageFormat Metadata providing integration-specific format transformations
      * @param messageContext The message context containing sender information and flags for message processing
      * @return A unary operator that takes an input string and returns the formatted message with all placeholders resolved
      */
     @NonNull
-    public UnaryOperator<String> createFormat(@NonNull IntegrationMetadata integrationMetadata, @NonNull MessageContext messageContext) {
+    public UnaryOperator<String> createFormat(@NonNull IntegrationMessageFormat integrationMessageFormat, @NonNull MessageContext messageContext) {
         return string -> {
-            String input = integrationMetadata.format().apply(string);
+            String input = integrationMessageFormat.format().apply(string);
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
             String message = plainSerialize(messagePipeline.build(messageContext.addFlags(

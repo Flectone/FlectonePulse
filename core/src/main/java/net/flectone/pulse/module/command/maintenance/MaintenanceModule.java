@@ -14,7 +14,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.event.message.context.ModerationMessageContext;
 import net.flectone.pulse.model.util.Moderation;
@@ -239,7 +239,7 @@ public class MaintenanceModule implements ModuleCommand {
                     dataOutputStream.writeAsJson(moderation);
                     dataOutputStream.writeBoolean(turned);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(turned).toUpperCase()))
                         .build()
                 );

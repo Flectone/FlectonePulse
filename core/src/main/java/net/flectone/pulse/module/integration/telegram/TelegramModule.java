@@ -13,7 +13,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.integration.telegram.listener.TelegramPulseListener;
@@ -30,6 +30,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -108,12 +109,12 @@ public class TelegramModule implements ModuleLocalization {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).integration().telegram();
     }
 
-    public void sendMessage(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext) {
-        IntegrationMetadata integrationMetadata = eventMetadata.integrationMetadata();
-        if (integrationMetadata == null) return;
+    public void sendMessage(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
+        Supplier<IntegrationMessageFormat> integrationMetadataSupplier = eventMetadata.integration();
+        if (integrationMetadataSupplier == null) return;
 
         // skip empty message names
-        List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMetadata, config());
+        List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMessageFormat, config());
         if (messageNames.isEmpty()) return;
 
         // skip vanished player
@@ -123,7 +124,7 @@ public class TelegramModule implements ModuleLocalization {
         if (moduleController.isDisabledFor(this, sender)) return;
 
         // create formatter
-        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMetadata, messageContext);
+        UnaryOperator<String> integrationFormat = integrationFormatter.createFormat(integrationMessageFormat, messageContext);
 
         // send to discord
         TelegramSender telegramSender = injector.getInstance(TelegramSender.class);

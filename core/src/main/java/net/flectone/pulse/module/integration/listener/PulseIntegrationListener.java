@@ -24,7 +24,7 @@ public class PulseIntegrationListener implements PulseListener {
     public void onEnableEvent(EnableEvent event) {
         if (event.type() != EnableEvent.Type.READY) return;
 
-        eventDispatcher.dispatch(new MessagePrepareEvent(MessagePrepareEvent.Type.INTEGRATION, ModuleName.SERVER_ENABLE, EventMetadata.builder()
+        eventDispatcher.dispatch(new MessagePrepareEvent(ModuleName.SERVER_ENABLE, EventMetadata.builder()
                 .messageContext(_ -> MessageContext.builder()
                         .sender(FPlayer.UNKNOWN)
                         .message(ModuleName.SERVER_ENABLE.name())
@@ -37,7 +37,7 @@ public class PulseIntegrationListener implements PulseListener {
 
     @Pulse
     public void onDisableEvent(DisableEvent event) {
-        eventDispatcher.dispatch(new MessagePrepareEvent(MessagePrepareEvent.Type.INTEGRATION, ModuleName.SERVER_DISABLE, EventMetadata.builder()
+        eventDispatcher.dispatch(new MessagePrepareEvent(ModuleName.SERVER_DISABLE, EventMetadata.builder()
                 .messageContext(_ -> MessageContext.builder()
                         .sender(FPlayer.UNKNOWN)
                         .message(ModuleName.SERVER_DISABLE.name())

@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @With
 @Builder
@@ -26,7 +27,7 @@ record EventMetadataImpl(
         @Nullable Pair<Sound, PermissionSetting> sound,
         @NonNull Function<FPlayer, MessageContext> messageContext,
         @Nullable ProxyDataConsumer<SafeDataOutputStream> proxy,
-        @Nullable IntegrationMetadata integrationMetadata
+        @Nullable Supplier<IntegrationMessageFormat> integration
 ) implements EventMetadata {
 
     @Override

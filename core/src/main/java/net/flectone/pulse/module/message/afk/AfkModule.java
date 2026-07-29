@@ -12,7 +12,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.IntegrationMetadata;
+import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -306,7 +306,7 @@ public class AfkModule implements ModuleLocalization {
                     dataOutputStream.writeBoolean(isAfk);
                     dataOutputStream.writeBoolean(vanished);
                 })
-                .integration(IntegrationMetadata.builder()
+                .integration(() -> IntegrationMessageFormat.builder()
                         .messageNames(List.of(name().name() + "_" + String.valueOf(isAfk).toUpperCase()))
                         .build()
                 )
