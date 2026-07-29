@@ -1,9 +1,8 @@
 package net.flectone.pulse.module.message.join.model;
 
-import org.jspecify.annotations.NonNull;
-import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.VanishMessageContext;
 
-public interface JoinMessageContext extends MessageContext {
+public interface JoinMessageContext extends VanishMessageContext {
 
     static JoinMessageContextImpl.JoinMessageContextImplBuilder builder() {
         return JoinMessageContextImpl.builder();
@@ -11,14 +10,6 @@ public interface JoinMessageContext extends MessageContext {
 
     boolean playedBefore();
 
-    boolean fakeMessage();
-
-    boolean vanished();
-
     JoinMessageContext withPlayedBefore(boolean playedBefore);
-
-    JoinMessageContext withFakeMessage(boolean fakeMessage);
-
-    JoinMessageContext withVanished(boolean vanished);
 
 }

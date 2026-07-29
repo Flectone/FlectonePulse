@@ -5,10 +5,9 @@ import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.setting.MessageChannelSetting;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
-import net.flectone.pulse.model.event.VanishMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.VanishMessageContext;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -43,18 +42,18 @@ public class IntegrationFormatter {
     /**
      * Checks if the event sender is in vanish
      *
-     * @param eventMetadata The event metadata containing sender information and optional vanish metadata
+     * @param messageContext The message context containing sender information and optional vanish state
      * @return true if the sender is vanished and vanish should not be ignored, false otherwise
      */
-    public boolean isVanished(EventMetadata eventMetadata) {
-        return eventMetadata instanceof VanishMetadata vanishMetadata && vanishMetadata.fakeMessage() && vanishMetadata.vanished();
+    public boolean isVanished(MessageContext messageContext) {
+        return messageContext instanceof VanishMessageContext vanishMessageContext && vanishMessageContext.fakeMessage() && vanishMessageContext.vanished();
     }
 
     /**
      * Retrieves a list of message names that have corresponding non-empty channel configurations.
      *
      * @param moduleName The module name to check for existence in message channels
-     * @param integrationMessageFormat Metadata containing the collection of message names to validate
+     * @param integrationMessageFormat Contains the collection of message names to validate
      * @param messageChannelSetting Configuration providing the mapping of channel names to message lists
      * @return A list of message names that have non-empty channel configurations, including the module name if applicable
      */
@@ -75,7 +74,7 @@ public class IntegrationFormatter {
     /**
      * Creates a format function that processes and replaces placeholders in message templates.
      *
-     * @param integrationMessageFormat Metadata providing integration-specific format transformations
+     * @param integrationMessageFormat Provides integration-specific format transformations
      * @param messageContext The message context containing sender information and flags for message processing
      * @return A unary operator that takes an input string and returns the formatted message with all placeholders resolved
      */

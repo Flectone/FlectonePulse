@@ -11,11 +11,11 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.VanishMessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.quit.listener.PulseQuitListener;
 import net.flectone.pulse.module.message.quit.listener.QuitProxyMessageListener;
-import net.flectone.pulse.module.message.quit.model.QuitMessageContext;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.proxy.RedisProxy;
@@ -107,7 +107,7 @@ public class QuitModule implements ModuleLocalization {
                 .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(fPlayer, fReceiver))
                 .destination(config().destination())
                 .sound(soundOrThrow())
-                .messageContext(fResolver -> QuitMessageContext.builder()
+                .messageContext(fResolver -> VanishMessageContext.builder()
                         .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)

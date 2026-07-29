@@ -13,7 +13,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.IntegrationMessageFormat;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleLocalization;
@@ -80,13 +79,13 @@ public class TwitchModule implements ModuleLocalization {
         return fileFacade.localization(socialService.getSetting(fPlayer, SettingText.LOCALE)).integration().twitch();
     }
 
-    public void sendMessage(@NonNull ModuleName moduleName, @NonNull EventMetadata eventMetadata, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
+    public void sendMessage(@NonNull ModuleName moduleName, @NonNull MessageContext messageContext, @NonNull IntegrationMessageFormat integrationMessageFormat) {
         // skip empty message names
         List<String> messageNames = integrationFormatter.getExistedMessageNames(moduleName, integrationMessageFormat, config());
         if (messageNames.isEmpty()) return;
 
         // skip vanished player
-        if (integrationFormatter.isVanished(eventMetadata)) return;
+        if (integrationFormatter.isVanished(messageContext)) return;
 
         FEntity sender = messageContext.sender();
         if (moduleController.isDisabledFor(this, sender)) return;

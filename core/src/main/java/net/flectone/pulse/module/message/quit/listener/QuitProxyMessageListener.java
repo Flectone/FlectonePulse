@@ -10,9 +10,9 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.ProxyMessageEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.VanishMessageContext;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.message.quit.QuitModule;
-import net.flectone.pulse.module.message.quit.model.QuitMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -45,7 +45,7 @@ public class QuitProxyMessageListener implements PulseListener {
                     .filter(fReceiver -> fakeMessage || socialService.canSeeVanished(event.sender(), fReceiver, vanished))
                     .destination(quitModule.config().destination())
                     .sound(quitModule.soundOrThrow())
-                    .messageContext(fResolver -> QuitMessageContext.builder()
+                    .messageContext(fResolver -> VanishMessageContext.builder()
                             .base(MessageContext.builder()
                                     .uuid(event.uuid())
                                     .sender(event.sender())

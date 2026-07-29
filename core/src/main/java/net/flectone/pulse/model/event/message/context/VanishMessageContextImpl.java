@@ -1,24 +1,23 @@
-package net.flectone.pulse.module.message.quit.model;
+package net.flectone.pulse.model.event.message.context;
 
 import lombok.Builder;
 import lombok.With;
-import net.flectone.pulse.model.event.message.context.MessageContext;
 import org.jspecify.annotations.NonNull;
 
 @With
 @Builder
-record QuitMessageContextImpl(
+record VanishMessageContextImpl(
         @NonNull MessageContext base,
         boolean fakeMessage,
         boolean vanished
-) implements QuitMessageContext {
+) implements VanishMessageContext {
 
     @Override
     public CacheKey createCacheKey() {
-        return new QuitCacheKey(base().createCacheKey(), fakeMessage, vanished);
+        return new VanishCacheKey(base().createCacheKey(), fakeMessage, vanished);
     }
 
-    public record QuitCacheKey(
+    public record VanishCacheKey(
             @NonNull CacheKey base,
             boolean fakeMessage,
             boolean vanished

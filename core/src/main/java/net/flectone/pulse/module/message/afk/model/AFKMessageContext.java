@@ -1,9 +1,8 @@
 package net.flectone.pulse.module.message.afk.model;
 
-import org.jspecify.annotations.NonNull;
-import net.flectone.pulse.model.event.message.context.MessageContext;
+import net.flectone.pulse.model.event.message.context.VanishMessageContext;
 
-public interface AFKMessageContext extends MessageContext {
+public interface AFKMessageContext extends VanishMessageContext {
 
     static AFKMessageContextImpl.AFKMessageContextImplBuilder builder() {
         return AFKMessageContextImpl.builder();
@@ -11,14 +10,6 @@ public interface AFKMessageContext extends MessageContext {
 
     boolean newStatus();
 
-    boolean fakeMessage();
-
-    boolean vanished();
-
     AFKMessageContext withNewStatus(boolean newStatus);
-
-    AFKMessageContext withFakeMessage(boolean fakeMessage);
-
-    AFKMessageContext withVanished(boolean vanished);
 
 }
