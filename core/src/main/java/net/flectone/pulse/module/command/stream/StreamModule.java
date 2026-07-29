@@ -28,6 +28,7 @@ import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -148,8 +149,8 @@ public class StreamModule implements ModuleCommand {
                             .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
-                                    .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
-                                    .message(replaceUrls(fResolver, urls))
+                                    .message(localization(fResolver).formatStart())
+                                    .tagResolver(urlTag(fPlayer, fResolver, urls))
                                     .build()
                             )
                             .turned(true)
@@ -233,14 +234,21 @@ public class StreamModule implements ModuleCommand {
         }));
     }
 
-    public String replaceUrls(FPlayer fPlayer, String string) {
-        Localization.Command.Stream localization = localization(fPlayer);
+    public TagResolver urlTag(FEntity sender, FPlayer receiver, String urls) {
+        return messagePipeline.resolver("urls", (_, _) -> {
+            String template = localization(receiver).urlTemplate();
 
-        List<String> urls = Arrays.stream(string.split(" "))
-                .map(url -> Strings.CS.replace(localization.urlTemplate(), "<url>", url))
-                .toList();
-
-        return Strings.CS.replace(localization.formatStart(), "<urls>", String.join("<br>", urls));
+            return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .flag(MessageFlag.LEGACY_COLOR_CONVERSION, false)
+                    .message(String.join("<br>", Arrays.stream(urls.split(" "))
+                            .map(url -> Strings.CS.replace(template, "<url>", url))
+                            .toList()
+                    ))
+                    .build()
+            ));
+        });
     }
 
     private boolean isUrl(String string) {
