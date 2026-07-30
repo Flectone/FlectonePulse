@@ -25,6 +25,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -32,7 +33,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -59,10 +59,10 @@ public class MinesweeperModule implements ModuleCommand {
         commandModuleController.registerCommand(this, commandBuilder -> commandBuilder
                 .permission(permission().name())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
-                .optional(promptNumber + " " + 1, commandParserProvider.integerParser(0, config().maxRow()))
-                .optional(promptNumber + " " + 2, commandParserProvider.integerParser(0, config().maxColumn()))
-                .optional(promptNumber + " " + 3, commandParserProvider.integerParser(0, config().maxRow() * config().maxColumn() - Math.min(9, config().maxRow() * config().maxColumn())))
-                .optional(promptNumber + " " + 4, commandParserProvider.integerParser())
+                .optional(promptNumber + " " + 1, commandParserProvider.integerParser(0, config().maxRow()), DefaultValue.constant(-1))
+                .optional(promptNumber + " " + 2, commandParserProvider.integerParser(0, config().maxColumn()), DefaultValue.constant(-1))
+                .optional(promptNumber + " " + 3, commandParserProvider.integerParser(0, config().maxRow() * config().maxColumn() - Math.min(9, config().maxRow() * config().maxColumn())), DefaultValue.constant(config().defaultMine()))
+                .optional(promptNumber + " " + 4, commandParserProvider.integerParser(), DefaultValue.constant(randomGenerator.nextInt(Integer.MAX_VALUE)))
         );
 
         listenerRegistry.register(MinesweeperPulseListener.class);
@@ -101,18 +101,19 @@ public class MinesweeperModule implements ModuleCommand {
         }
 
         String promptNumber = commandModuleController.getPrompt(this, 1);
-        Optional<Integer> optionalRow = commandContext.optional(promptNumber + " " + 1);
-        Optional<Integer> optionalColumn = commandContext.optional(promptNumber + " " + 2);
+        int optionalRow = commandContext.get(promptNumber + " " + 1);
+        int optionalColumn = commandContext.get(promptNumber + " " + 2);
 
         boolean isFlagCommand = type.equalsIgnoreCase("flag");
-        if (optionalRow.isEmpty() && optionalColumn.isEmpty() && isFlagCommand) {
+        if (optionalRow == -1 && optionalColumn == -1 && isFlagCommand) {
             minesweeper.setFlagMode(!minesweeper.isFlagMode());
             sendMessage(fPlayer, minesweeper, config().maxRow(), config().maxColumn(), Localization.Command.Minesweeper::formatMove);
             return;
         }
 
-        int row = optionalRow.orElse(config().maxRow());
-        int column = optionalColumn.orElse(config().maxColumn());
+        int row = optionalRow == -1 ? config().maxRow() : optionalRow;
+        int column = optionalColumn == -1 ? config().maxColumn() : optionalColumn;
+
         if (!minesweeper.checkBounds(row, column)) {
             messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
                     .messageContext(fResolver -> MessageContext.builder()
@@ -152,13 +153,12 @@ public class MinesweeperModule implements ModuleCommand {
         }
 
         String promptNumber = commandModuleController.getPrompt(this, 1);
-        Optional<Integer> optionalRow = commandContext.optional(promptNumber + " " + 1);
-        Optional<Integer> optionalColumn = commandContext.optional(promptNumber + " " + 2);
-        Optional<Integer> optionalMine = commandContext.optional(promptNumber + " " + 3);
+        int optionalRow = commandContext.get(promptNumber + " " + 1);
+        int optionalColumn = commandContext.get(promptNumber + " " + 2);
 
-        int rowCount = optionalRow.orElse(config().maxRow());
-        int columnCount = optionalColumn.orElse(config().maxColumn());
-        int mineCount = optionalMine.orElse(config().defaultMine());
+        int rowCount = optionalRow == -1 ? config().maxRow() : optionalRow;
+        int columnCount = optionalColumn == -1 ? config().maxColumn() : optionalColumn;
+        int mineCount = commandContext.get(promptNumber + " " + 3);
 
         if (rowCount <= 0
                 || columnCount <= 0
@@ -176,8 +176,7 @@ public class MinesweeperModule implements ModuleCommand {
             return;
         }
 
-        Optional<Integer> optionalSeed = commandContext.optional(promptNumber + " " + 4);
-        int seed = optionalSeed.orElse(randomGenerator.nextInt(Integer.MAX_VALUE));
+        int seed = commandContext.get(promptNumber + " " + 4);
         Minesweeper minesweeper = new Minesweeper(rowCount, columnCount, mineCount, seed);
 
         playerGames.put(fPlayer.uuid(), minesweeper);
