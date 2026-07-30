@@ -528,6 +528,7 @@ public record Localization(
         @Builder(toBuilder = true)
         @Jacksonized
         public record Minesweeper(
+                String alreadyInGame,
                 String wrongParameters,
                 String wrongGame,
                 String wrongMove,

@@ -591,6 +591,7 @@ public record Command(
     @Jacksonized
     public record Minesweeper(
             Boolean enable,
+            Boolean checkDuplicate,
             Integer maxRow,
             Integer maxColumn,
             Integer defaultMine,

@@ -255,6 +255,7 @@ command:
   me:
     format: "<fcolor:1>> <display_name> <fcolor:1><message>"
   minesweeper:
+    already_in_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>У тебя уже есть активная игра. Заверши её, чтобы начать новую"
     wrong_parameters: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>Cannot create a game with these parameters"
     wrong_game: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This game does not exist"
     wrong_move: "<color:#ff7171><sprite_or:⁉:gui:icon/chat_modified>This move is impossible"

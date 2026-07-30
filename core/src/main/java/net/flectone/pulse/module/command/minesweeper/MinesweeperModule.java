@@ -138,6 +138,19 @@ public class MinesweeperModule implements ModuleCommand {
     }
 
     private void create(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (config().checkDuplicate() && playerGames.containsKey(fPlayer.uuid())) {
+            messageDispatcher.dispatch(ModuleName.ERROR, EventMetadata.builder()
+                    .messageContext(fResolver -> MessageContext.builder()
+                            .sender(fPlayer)
+                            .receiver(fResolver)
+                            .message(localization(fResolver).alreadyInGame())
+                            .build()
+                    )
+                    .build()
+            );
+            return;
+        }
+
         String promptNumber = commandModuleController.getPrompt(this, 1);
         Optional<Integer> optionalRow = commandContext.optional(promptNumber + " " + 1);
         Optional<Integer> optionalColumn = commandContext.optional(promptNumber + " " + 2);
