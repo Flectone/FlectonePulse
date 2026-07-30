@@ -80,19 +80,26 @@ public class IntegrationFormatter {
      */
     @NonNull
     public UnaryOperator<String> createFormat(@NonNull IntegrationMessageFormat integrationMessageFormat, @NonNull MessageContext messageContext) {
+        MessageFlag[] integrationFlags = new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.INTERACTIVE_CHAT_COMPAT, MessageFlag.URL_PROCESSING};
+        boolean[] integrationFlagsValues = new boolean[]{false, false, false, false, false};
+
+        String finalMessage = plainSerialize(messagePipeline.build(messageContext.addFlags(integrationFlags, integrationFlagsValues)));
+        String finalClearMessage = clearMessage(finalMessage);
+
         return string -> {
             String input = integrationMessageFormat.format().apply(string);
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
-            String message = plainSerialize(messagePipeline.build(messageContext.addFlags(
-                    new MessageFlag[]{MessageFlag.TRANSLATE_MODULE, MessageFlag.OBJECT_SPRITE_PROCESSING, MessageFlag.OBJECT_PLAYER_HEAD_PROCESSING, MessageFlag.INTERACTIVE_CHAT_COMPAT},
-                    new boolean[]{false, false, false, false}
-            )));
+            String format = plainSerialize(messagePipeline.build(messageContext.toBuilder()
+                    .message(input)
+                    .flags(integrationFlags, integrationFlagsValues)
+                    .build()
+            ));
 
             return StringUtils.replaceEach(
-                    message,
-                    new String[]{"<player>", "<clear_message>"},
-                    new String[]{messageContext.sender().name(), clearMessage(message)}
+                    format,
+                    new String[]{"<player>", "<final_message>", "<final_clear_message>"},
+                    new String[]{messageContext.sender().name(), finalMessage, finalClearMessage}
             );
         };
     }

@@ -445,7 +445,7 @@ public class ReplacementModule implements ModuleLocalization {
     private Tag urlTag(MessageContext messageContext, String url) {
         url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return MessagePipeline.ReplacementTag.emptyTag();
-        if (messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
+        if (messageContext.receiver().isUnknown() || messageContext.receiver().isConsole() || !messageContext.isFlag(MessageFlag.URL_PROCESSING)) return Tag.selfClosingInserting(Component.text(url));
 
         return Tag.selfClosingInserting(messagePipeline.build(MessageContext.builder()
                 .sender(messageContext.sender())
