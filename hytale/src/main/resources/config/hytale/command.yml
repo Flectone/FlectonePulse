@@ -914,7 +914,7 @@ whitelist:
   sound:
     enable: false
 whois:
-  enable: true
+  enable: false
   per_page: 4
   aliases:
     - "whois"
