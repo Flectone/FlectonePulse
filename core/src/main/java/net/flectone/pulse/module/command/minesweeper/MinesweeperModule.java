@@ -195,12 +195,14 @@ public class MinesweeperModule implements ModuleCommand {
         if (result.hitMine()) {
             minesweeper.revealAll(true);
             sendMessage(fPlayer, minesweeper, row, column, Localization.Command.Minesweeper::formatLose);
+            removeGame(fPlayer.uuid());
             return;
         }
 
         if (result.state() == Minesweeper.GameState.WIN) {
             minesweeper.revealAll(false);
             sendMessage(fPlayer, minesweeper, row, column, Localization.Command.Minesweeper::formatWin);
+            removeGame(fPlayer.uuid());
             return;
         }
 
