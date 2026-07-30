@@ -84,6 +84,11 @@ public class PulsePlayerLoadListener implements PulseListener {
             socialService.saveSetting(fPlayer, SettingText.SERVER, currentServer);
         }
 
+        // player maybe in vanish but status is not saved. This is due to automatic vanish on login
+        if (socialService.isVanished(fPlayer) && socialService.getSetting(fPlayer, SettingText.VANISH_STATUS) == null) {
+            socialService.saveSetting(fPlayer, SettingText.VANISH_STATUS, "1");
+        }
+
         // update play time in database
         if (event.reload()) {
             playtimeService.updateLastSession(fPlayer);
