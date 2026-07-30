@@ -23,7 +23,10 @@ public class VelocityLoginStateListener {
 
     @Subscribe(order = PostOrder.LAST)
     public void onPreLogin(PreLoginEvent event) {
-        loginStates.put(event.getUniqueId(), LoginStatus.PRE_LOGIN);
+        UUID playerUuid = event.getUniqueId();
+        if (playerUuid == null) return;
+
+        loginStates.put(playerUuid, LoginStatus.PRE_LOGIN);
     }
 
     @Subscribe(order = PostOrder.LAST)

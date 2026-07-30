@@ -21,7 +21,10 @@ public class BungeecordLoginStateListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(PreLoginEvent event) {
-        loginStates.put(event.getConnection().getUniqueId(), LoginStatus.PRE_LOGIN);
+        UUID playerUuid = event.getConnection().getUniqueId();
+        if (playerUuid == null) return;
+
+        loginStates.put(playerUuid, LoginStatus.PRE_LOGIN);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
