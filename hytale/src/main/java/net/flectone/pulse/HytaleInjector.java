@@ -1,6 +1,7 @@
 package net.flectone.pulse;
 
 import com.google.gson.Gson;
+import com.google.inject.TypeLiteral;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import net.flectone.pulse.execution.pipeline.HytaleMessagePipeline;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -121,6 +122,7 @@ public class HytaleInjector extends PlatformInjector {
         // others
         bind(ComponentSerializer.class).to(HytaleComponentSerializer.class);
         bind(ComponentExtractor.class).to(HytaleComponentExtractor.class);
+        bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(HytaleComponentExtractor.class);
         bind(SkinService.class).to(HytaleSkinService.class);
         bind(ProfileResolver.class).to(HytaleProfileResolver.class);
         bind(TranslationService.class).to(HytaleTranslationService.class);

@@ -3,6 +3,7 @@ package net.flectone.pulse;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.data.database.Database;
@@ -142,6 +143,7 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         // others
         bind(ComponentSerializer.class).to(MinecraftComponentSerializer.class);
         bind(ComponentExtractor.class).to(MinecraftComponentExtractor.class);
+        bind(new TypeLiteral<ComponentExtractor<?>>() {}).to(MinecraftComponentExtractor.class);
         bind(SkinService.class).to(MinecraftSkinService.class);
         bind(ProfileResolver.class).to(MinecraftProfileResolver.class);
         bind(TranslationService.class).to(MinecraftTranslationService.class);
