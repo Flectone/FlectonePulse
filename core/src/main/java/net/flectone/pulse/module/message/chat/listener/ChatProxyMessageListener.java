@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.chat.model.ChatMessageContext;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.io.ProxyPayload;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class ChatProxyMessageListener implements PulseListener {
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
-                                    .message(chatModule.localization(fResolver).types().get(proxyChatName))
+                                    .message(StringUtils.defaultString(chatModule.localization(fResolver).types().get(proxyChatName)))
                                     .tagResolver(messagePipeline.messageTag(event.sender(), fResolver, message))
                                     .build()
                             )

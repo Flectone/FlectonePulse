@@ -133,7 +133,7 @@ public class MinecraftVanillaModule extends VanillaModule {
                         .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
-                                .message(localization(fResolver).types().get(parsedComponent.translationKey()))
+                                .message(StringUtils.defaultString(localization(fResolver).types().get(parsedComponent.translationKey())))
                                 .tagResolvers(argumentTag(fResolver, parsedComponent))
                                 .build()
                         )

@@ -168,7 +168,7 @@ public class ChatModule implements ModuleLocalization {
                         .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
-                                .message(localization(fResolver).types().get(chatName))
+                                .message(StringUtils.defaultString(localization(fResolver).types().get(chatName)))
                                 .tagResolver(messagePipeline.messageTag(fPlayer, fResolver, playerMessage))
                                 .build()
                         )
