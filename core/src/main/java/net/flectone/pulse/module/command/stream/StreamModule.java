@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.processing.parser.string.URLParser;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -36,7 +37,6 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jspecify.annotations.NonNull;
 
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,6 +53,7 @@ public class StreamModule implements ModuleCommand {
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
     private final ProxyRegistry proxyRegistry;
+    private final URLParser urlParser;
 
     @Override
     public void onEnable() {
@@ -137,7 +138,7 @@ public class StreamModule implements ModuleCommand {
             String rawString = optionalUrl.orElse("");
 
             String urls = Arrays.stream(rawString.split("\\s+"))
-                    .filter(this::isUrl)
+                    .filter(string -> urlParser.parse(string).isPresent())
                     .map(url -> StringUtils.substringBefore(url, "?"))
                     .collect(Collectors.joining(" "));
 
@@ -249,14 +250,5 @@ public class StreamModule implements ModuleCommand {
                     .build()
             ));
         });
-    }
-
-    private boolean isUrl(String string) {
-        try {
-            new URI(string).toURL();
-            return true;
-        } catch (Exception _) {
-            return false;
-        }
     }
 }
