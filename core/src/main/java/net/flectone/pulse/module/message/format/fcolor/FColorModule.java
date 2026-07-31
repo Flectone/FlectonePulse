@@ -13,7 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.ModuleSimple;
-import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
+import net.flectone.pulse.module.message.format.converter.LegacyColorConverter;
 import net.flectone.pulse.module.message.format.fcolor.listener.PulseFColorListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -37,7 +37,7 @@ public class FColorModule implements ModuleSimple {
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
-    private final LegacyColorConvertor legacyColorConvertor;
+    private final LegacyColorConverter legacyColorConverter;
     private final ModuleController moduleController;
     private final MessagePipeline messagePipeline;
     private final SocialService socialService;
@@ -108,7 +108,7 @@ public class FColorModule implements ModuleSimple {
             }
 
             // convert legacy color to modern
-            color = legacyColorConvertor.convert(StringUtils.defaultString(color));
+            color = legacyColorConverter.convert(StringUtils.defaultString(color));
 
             return Tag.preProcessParsed(color);
         }));

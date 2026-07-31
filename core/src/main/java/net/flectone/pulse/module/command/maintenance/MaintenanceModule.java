@@ -33,7 +33,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
@@ -69,7 +69,7 @@ public class MaintenanceModule implements ModuleCommand {
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final ModuleCommandController commandModuleController;
-    private final IconConvertor iconUtil;
+    private final IconConverter iconConverter;
     private final CommandParserProvider commandParserProvider;
     private final TaskScheduler taskScheduler;
     private final ModerationService moderationService;
@@ -94,7 +94,7 @@ public class MaintenanceModule implements ModuleCommand {
             platformServerAdapter.saveResource("images/maintenance.png");
         }
 
-        icon = iconUtil.convert(file);
+        icon = iconConverter.convert(file);
 
         Optional<Moderation> optionalMaintenace = moderationService.getValid(fPlayerService.getConsole(), Moderation.Type.MAINTENANCE);
         if (optionalMaintenace.isPresent()) {

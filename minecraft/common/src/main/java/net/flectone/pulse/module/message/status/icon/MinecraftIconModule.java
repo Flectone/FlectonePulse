@@ -16,7 +16,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.MinecraftServerStatusFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
@@ -39,9 +39,9 @@ public class MinecraftIconModule implements ModuleSimple {
     private final ModuleController moduleController;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final RandomGenerator randomUtil;
-    private final IconConvertor iconUtil;
-    private final MinecraftServerStatusFormatter statusUtil;
+    private final RandomGenerator randomGenerator;
+    private final IconConverter iconConverter;
+    private final MinecraftServerStatusFormatter serverStatusFormatter;
     private final @Named("imagePath") Path iconPath;
 
     private int index;
@@ -94,7 +94,7 @@ public class MinecraftIconModule implements ModuleSimple {
                 if (!icon.isFile()) continue;
                 if (!icon.getName().equals(iconName)) continue;
 
-                String convertedIcon = iconUtil.convert(icon);
+                String convertedIcon = iconConverter.convert(icon);
                 if (convertedIcon == null) continue;
                 iconList.add(convertedIcon);
             }
@@ -110,7 +110,7 @@ public class MinecraftIconModule implements ModuleSimple {
         event.markForReEncode(true);
 
         WrapperPlayServerServerData wrapperPlayServerServerData = new WrapperPlayServerServerData(event);
-        wrapperPlayServerServerData.setIcon(statusUtil.formatIcon(next(fPlayer)));
+        wrapperPlayServerServerData.setIcon(serverStatusFormatter.formatIcon(next(fPlayer)));
     }
 
     public @Nullable String next(FPlayer fPlayer) {
@@ -118,7 +118,7 @@ public class MinecraftIconModule implements ModuleSimple {
         if (iconList.isEmpty()) return null;
 
         if (config().random()) {
-            index = randomUtil.nextInt(0, iconList.size());
+            index = randomGenerator.nextInt(0, iconList.size());
         } else {
             index++;
             index = index % iconList.size();

@@ -26,7 +26,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
-import net.flectone.pulse.processing.converter.IconConvertor;
+import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
@@ -56,7 +56,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       MessageDispatcher messageDispatcher,
                                       ModuleController moduleController,
                                       ModuleCommandController commandModuleController,
-                                      IconConvertor iconUtil,
+                                      IconConverter iconConverter,
                                       CommandParserProvider commandParserProvider,
                                       TaskScheduler taskScheduler,
                                       ModerationService moderationService,
@@ -66,7 +66,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ProxyRegistry proxyRegistry,
                                       SocialService socialService) {
         super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter,
-                fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconUtil,
+                fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconConverter,
                 commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService);
 
         this.fPlayerService = fPlayerService;

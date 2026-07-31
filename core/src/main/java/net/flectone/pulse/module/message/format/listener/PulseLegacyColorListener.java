@@ -8,20 +8,20 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
+import net.flectone.pulse.module.message.format.converter.LegacyColorConverter;
 import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PulseLegacyColorListener implements PulseListener {
 
-    private final LegacyColorConvertor legacyColorConvertor;
+    private final LegacyColorConverter legacyColorConverter;
 
     @Pulse(priority = Event.Priority.HIGHEST)
     public Event onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.context();
         if (!messageContext.isFlag(MessageFlag.LEGACY_COLOR_CONVERSION)) return event;
 
-        return event.withContext(legacyColorConvertor.convert(messageContext));
+        return event.withContext(legacyColorConverter.convert(messageContext));
     }
 }

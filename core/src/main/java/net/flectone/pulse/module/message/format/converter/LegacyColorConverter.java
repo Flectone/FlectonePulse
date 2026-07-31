@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.convertor;
+package net.flectone.pulse.module.message.format.converter;
 
 /*
     MIT License
@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class LegacyColorConvertor {
+public class LegacyColorConverter {
 
     private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("[\\da-fA-F]{6}");
 

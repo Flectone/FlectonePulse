@@ -23,8 +23,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
+import net.flectone.pulse.processing.converter.IconConverter;
+import net.flectone.pulse.processing.converter.AdventureHoverConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.FabricTpsTracker;
@@ -64,13 +64,13 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
-    private final AdventureHoverConvertor adventureHoverConvertor;
+    private final AdventureHoverConverter adventureHoverConverter;
     private final @Named("projectPath") Path projectPath;
     private final FabricTpsTracker tpsTracker;
     private final FLogger fLogger;
     private final ComponentDecorator componentDecorator;
     private final RandomGenerator randomGenerator;
-    private final IconConvertor iconConvertor;
+    private final IconConverter iconConverter;
 
     private String serverIcon;
 
@@ -170,7 +170,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
             File iconFile = minecraftServer.getFile("server-icon.png").toFile();
 
             if (iconFile.exists()) {
-                serverIcon = iconConvertor.convert(iconFile);
+                serverIcon = iconConverter.convert(iconFile);
             }
 
             // empty string is an indicator that it is already initialized
@@ -288,7 +288,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
                 component = componentDecorator.decorateIfAbsent(component, TextDecoration.ITALIC, TextDecoration.State.TRUE);
             }
 
-            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConverter.convert(packetItemStack));
         }
 
         Key key = Key.key(itemStack.getItem().builtInRegistryHolder().key().identifier().getPath());

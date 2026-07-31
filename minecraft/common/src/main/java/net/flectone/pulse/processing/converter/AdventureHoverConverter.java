@@ -1,4 +1,4 @@
-package net.flectone.pulse.processing.convertor;
+package net.flectone.pulse.processing.converter;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentType;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AdventureHoverConvertor {
+public class AdventureHoverConverter {
 
     private final MinecraftPacketProvider packetProvider;
 

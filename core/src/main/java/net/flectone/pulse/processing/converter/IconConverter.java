@@ -14,7 +14,7 @@ import java.util.Base64;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class IconConvertor {
+public class IconConverter {
 
     private final FLogger fLogger;
 

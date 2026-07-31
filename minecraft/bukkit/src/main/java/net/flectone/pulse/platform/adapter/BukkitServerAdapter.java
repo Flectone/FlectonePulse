@@ -19,8 +19,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.PaperItemNameProvider;
-import net.flectone.pulse.processing.converter.IconConvertor;
-import net.flectone.pulse.processing.convertor.AdventureHoverConvertor;
+import net.flectone.pulse.processing.converter.IconConverter;
+import net.flectone.pulse.processing.converter.AdventureHoverConverter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
@@ -59,13 +59,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
-    private final AdventureHoverConvertor adventureHoverConvertor;
+    private final AdventureHoverConverter adventureHoverConverter;
     private final ReflectionResolver reflectionResolver;
     private final PaperItemNameProvider paperItemNameProvider;
     private final TaskScheduler taskScheduler;
     private final ComponentDecorator componentDecorator;
     private final ComponentSerializer componentSerializer;
-    private final IconConvertor iconConvertor;
+    private final IconConverter iconConverter;
 
     private String serverIcon;
     private Pair<MethodHandle, Object> getTPSMethodPair;
@@ -164,7 +164,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         File iconFile = new File(Bukkit.getWorldContainer(), "server-icon.png");
         if (!iconFile.exists()) return Optional.empty();
 
-        return Optional.ofNullable(iconConvertor.convert(iconFile));
+        return Optional.ofNullable(iconConverter.convert(iconFile));
     }
 
     @Override
@@ -340,7 +340,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         if (itemStack.getType() != Material.AIR) {
             ItemStack packetItemStack = SpigotConversionUtil.fromBukkitItemStack(itemStack);
-            return componentDecorator.hoverIfAbsent(component, adventureHoverConvertor.convert(packetItemStack));
+            return componentDecorator.hoverIfAbsent(component, adventureHoverConverter.convert(packetItemStack));
         }
 
         return component;

@@ -11,7 +11,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.module.message.format.convertor.LegacyColorConvertor;
+import net.flectone.pulse.module.message.format.converter.LegacyColorConverter;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permissible;
@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitItemsAdderIntegration implements FIntegration, PulseListener {
 
-    private final LegacyColorConvertor legacyColorConvertor;
+    private final LegacyColorConverter legacyColorConverter;
     @Getter private final FLogger fLogger;
 
     @Getter private boolean hooked;
@@ -55,7 +55,7 @@ public class BukkitItemsAdderIntegration implements FIntegration, PulseListener 
 
     private String formatFontImages(@Nullable Permissible permissible, String message) {
         // ItemsAdder returns a string with legacy colors, so we need to format them
-        return legacyColorConvertor.convert(permissible != null
+        return legacyColorConverter.convert(permissible != null
                 ? FontImageWrapper.replaceFontImages(permissible, message)
                 : FontImageWrapper.replaceFontImages(message)
         );
