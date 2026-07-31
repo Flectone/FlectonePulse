@@ -50,10 +50,7 @@ public class AfkProxyMessageListener implements PulseListener {
                                     .uuid(event.uuid())
                                     .sender(event.sender())
                                     .receiver(fResolver)
-                                    .message(isAfk
-                                            ? afkModule.localization(fResolver).formatTrue().global()
-                                            : afkModule.localization(fResolver).formatFalse().global()
-                                    )
+                                    .message(afkModule.localizationFormat(event.sender(), fResolver, isAfk))
                                     .build()
                             )
                             .newStatus(isAfk)

@@ -266,10 +266,7 @@ public class AfkModule implements ModuleLocalization {
                             .base(MessageContext.builder()
                                     .sender(fPlayer)
                                     .receiver(fResolver)
-                                    .message(isAfk
-                                            ? localization(fResolver).formatTrue().local()
-                                            : localization(fResolver).formatFalse().local()
-                                    )
+                                    .message(localizationFormat(fPlayer, fResolver, isAfk))
                                     .build()
                             )
                             .newStatus(isAfk)
@@ -291,10 +288,7 @@ public class AfkModule implements ModuleLocalization {
                         .base(MessageContext.builder()
                                 .sender(fPlayer)
                                 .receiver(fResolver)
-                                .message(isAfk
-                                        ? localization(fResolver).formatTrue().global()
-                                        : localization(fResolver).formatFalse().global()
-                                )
+                                .message(localizationFormat(fPlayer, fResolver, isAfk))
                                 .build()
                         )
                         .newStatus(isAfk)
@@ -312,5 +306,17 @@ public class AfkModule implements ModuleLocalization {
                 )
                 .build()
         );
+    }
+
+    public String localizationFormat(FEntity fPlayer, FPlayer fResolver, boolean isAfk) {
+        if (fPlayer.equals(fResolver)) {
+            return isAfk
+                    ? localization(fResolver).formatTrue().local()
+                    : localization(fResolver).formatFalse().local();
+        }
+
+        return isAfk
+                ? localization(fResolver).formatTrue().global()
+                : localization(fResolver).formatFalse().global();
     }
 }
