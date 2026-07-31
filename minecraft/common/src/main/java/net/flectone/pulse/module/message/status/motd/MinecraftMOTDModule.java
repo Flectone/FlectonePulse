@@ -75,7 +75,7 @@ public class MinecraftMOTDModule implements ModuleListLocalization {
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return localization(fPlayer).values();
+        return joinMultiList(localization(fPlayer).values());
     }
 
     @Override

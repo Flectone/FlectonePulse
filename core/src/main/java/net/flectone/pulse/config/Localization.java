@@ -1449,7 +1449,7 @@ public record Localization(
             @Builder(toBuilder = true)
             @Jacksonized
             public record MOTD(
-                    List<String> values
+                    List<List<String>> values
             ) implements LocalizationSetting {
             }
 
