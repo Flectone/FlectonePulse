@@ -11,11 +11,11 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.greeting.listener.PulseGreetingListener;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.converter.ImagePixelConverter;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -30,12 +30,13 @@ import java.util.List;
 public class GreetingModule implements ModuleLocalization {
 
     private final FileFacade fileFacade;
-    private final SkinService skinService;
     private final SocialService socialService;
     private final ListenerRegistry listenerRegistry;
     private final MessageDispatcher messageDispatcher;
     private final ModuleController moduleController;
     private final TaskScheduler taskScheduler;
+    private final SkinService skinService;
+    private final ImagePixelConverter imagePixelConverter;
 
     @Override
     public void onEnable() {
@@ -65,36 +66,29 @@ public class GreetingModule implements ModuleLocalization {
     public void send(FPlayer fPlayer) {
         if (moduleController.isDisabledFor(this, fPlayer)) return;
 
-        List<String> pixels;
-        try {
-            FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
+        taskScheduler.runAsyncLater(() -> {
+            List<String> pixels = imagePixelConverter.convert(skinService.getAvatarUrl(fPlayer));
 
-            pixels = fImage.convertImageUrl();
-        } catch (Exception _) {
-            pixels = List.of();
-        }
+            messageDispatcher.dispatch(this, EventMetadata.builder()
+                    .destination(config().destination())
+                    .sound(soundOrThrow())
+                    .messageContext(fResolver -> {
+                        String format = localization(fResolver).format();
 
-        List<String> finalPixels = pixels;
-        taskScheduler.runAsync(() -> messageDispatcher.dispatch(this, EventMetadata.builder()
-                .destination(config().destination())
-                .sound(soundOrThrow())
-                .messageContext(fResolver -> {
-                    String format = localization(fResolver).format();
-                    if (format.contains("[#][#][#][#][#][#][#][#]")) {
-                        String greetingMessage = String.join("<br>", format);
-
-                        for (String pixel : finalPixels) {
-                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
+                        if (format.contains("[#][#][#][#][#][#][#][#]")) {
+                            for (String pixel : pixels) {
+                                format = Strings.CS.replaceOnce(format, "[#][#][#][#][#][#][#][#]", pixel);
+                            }
                         }
-                    }
 
-                    return MessageContext.builder()
-                            .sender(fPlayer)
-                            .receiver(fResolver)
-                            .message(format)
-                            .build();
-                })
-                .build()
-        ), true);
+                        return MessageContext.builder()
+                                .sender(fPlayer)
+                                .receiver(fResolver)
+                                .message(format)
+                                .build();
+                    })
+                    .build()
+            );
+        }, 2L); // delay so that message is sent later than join message
     }
 }
