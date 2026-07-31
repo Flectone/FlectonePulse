@@ -16,7 +16,6 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.ComponentMessageContext;
 import net.flectone.pulse.model.event.message.context.MessageContext;
-import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.ModuleLocalization;
 import net.flectone.pulse.module.message.format.replacement.listener.PulseReplacementListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -24,6 +23,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.converter.ImagePixelConverter;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.service.SocialService;
@@ -66,6 +66,7 @@ public class ReplacementModule implements ModuleLocalization {
     private final PermissionChecker permissionChecker;
     private final ModuleController moduleController;
     private final ComponentSerializer componentSerializer;
+    private final ImagePixelConverter imagePixelConverter;
     private final FLogger fLogger;
 
     @Override
@@ -500,29 +501,22 @@ public class ReplacementModule implements ModuleLocalization {
 
     public Component createImageComponent(String link) throws ExecutionException {
         return imageCache.get(link, () -> {
-            FImage fImage = new FImage(link);
+            List<String> pixels = imagePixelConverter.convert(link);
 
             Component component = Component.empty();
 
-            try {
-                List<String> pixels = fImage.convertImageUrl();
+            for (int i = 0; i < pixels.size(); i++) {
+                component = component
+                        .append(Component.newline())
+                        .append(componentSerializer.fromStandard(pixels.get(i)));
 
-                for (int i = 0; i < pixels.size(); i++) {
+                if (i == pixels.size() - 1) {
                     component = component
-                            .append(Component.newline())
-                            .append(componentSerializer.fromStandard(pixels.get(i)));
-
-                    if (i == pixels.size() - 1) {
-                        component = component
-                                .append(Component.newline());
-                    }
+                            .append(Component.newline());
                 }
-
-                imageCache.put(link, component);
-
-            } catch (Exception _) {
-                // return empty component
             }
+
+            imageCache.put(link, component);
 
             return component;
         });

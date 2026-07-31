@@ -153,6 +153,10 @@ public class FileFacade {
             files = fileMigrator.migration_1_11_1(files);
         }
 
+        if (versionComparator.isOlderThan(preInitVersion, "1.12.3")) {
+            files = fileMigrator.migration_1_12_3(files);
+        }
+
         files = files.withConfig(files.config().withVersion(BuildConfig.PROJECT_VERSION));
     }
 }

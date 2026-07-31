@@ -101,4 +101,16 @@ public class FileMigrator {
         return files.withLocalizations(newLocalizations);
     }
 
+    public FilePack migration_1_12_3(FilePack files) {
+        Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
+        cacheTypes.put(CacheName.IMAGE_PIXELS, new Config.Cache.CacheSetting(true, false, 10, TimeUnit.MINUTES, 1000));
+
+        return files
+                .withConfig(files.config()
+                        .withCache(files.config().cache()
+                                .withTypes(cacheTypes)
+                        )
+                );
+    }
+
 }

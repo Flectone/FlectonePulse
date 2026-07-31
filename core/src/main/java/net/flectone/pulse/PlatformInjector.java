@@ -166,6 +166,13 @@ public abstract class PlatformInjector extends AbstractModule {
 
     @Provides
     @Singleton
+    @Named("imagePixels")
+    public Cache<String, List<String>> provideImagePixelsCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getCache(CacheName.IMAGE_PIXELS);
+    }
+
+    @Provides
+    @Singleton
     @Named("legacyColorMessage")
     public Cache<String, String> provideLegacyColorMessageCache(CacheRegistry cacheRegistry) {
         return cacheRegistry.getCache(CacheName.LEGACY_COLOR_MESSAGE);

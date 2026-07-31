@@ -1,34 +1,66 @@
-package net.flectone.pulse.model.util;
+package net.flectone.pulse.processing.converter;
 
+import com.google.common.cache.Cache;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.processing.parser.string.URLParser;
 import net.flectone.pulse.util.WebUtil;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
-public record FImage(String link) {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class ImagePixelConverter {
+
+    private static final int MAX_DIMENSION = 8 * 1024 * 1024;
+
+    private final URLParser urlParser;
+    private final @Named("imagePixels") Cache<String, List<String>> imagePixelsCache;
+
+    public void invalidate(@Nullable String link) {
+        if (link == null) return;
+
+        imagePixelsCache.invalidate(link);
+    }
+
+    public @NonNull List<String> convertOrGetCache(@Nullable String link) {
+        if (link == null) return List.of();
+
+        List<String> pixels = imagePixelsCache.getIfPresent(link);
+        if (pixels != null) return pixels;
+
+        pixels = convert(link);
+        imagePixelsCache.put(link, pixels);
+
+        return pixels;
+    }
 
     // Idea taken from here
     // https://github.com/QuiltServerTools/BlockBot/blob/5d5fa854002de2c12200edbe22f12382350ca7eb/src/main/kotlin/io/github/quiltservertools/blockbotdiscord/extensions/BlockBotApiExtension.kt#L136
-    public List<String> convertImageUrl() throws IOException, URISyntaxException {
-        URL url = new URI(link).toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
+    public @NonNull List<String> convert(@Nullable String link) {
+        Optional<URL> url = urlParser.parse(link);
+        if (url.isEmpty()) return List.of();
 
-        BufferedImage bufferedImage = ImageIO.read(connection.getInputStream());
-        if (bufferedImage == null) return List.of();
+        Optional<BufferedImage> optionalBufferedImage = readImage(url.get());
+        if (optionalBufferedImage.isEmpty()) return List.of();
+
+        BufferedImage bufferedImage = optionalBufferedImage.get();
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
 
-        if (height * width >= 8 * 1024 * 1024) return List.of();
+        if (height * width >= MAX_DIMENSION) return List.of();
 
         int stepSize = Math.max((int) Math.ceil(bufferedImage.getWidth() / 48.0), 1);
         int stepSquared = stepSize * stepSize;
@@ -73,10 +105,22 @@ public record FImage(String link) {
             x = 0;
         }
 
-        return new ObjectImmutableList<>(pixels);
+        return List.copyOf(pixels);
+    }
+
+    private Optional<BufferedImage> readImage(URL url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", WebUtil.USER_AGENT);
+
+            return Optional.of(ImageIO.read(connection.getInputStream()));
+        } catch (IOException _) {
+            return Optional.empty();
+        }
     }
 
     private int clamp(int value, int max) {
         return Math.clamp(value, 0, max);
     }
+
 }

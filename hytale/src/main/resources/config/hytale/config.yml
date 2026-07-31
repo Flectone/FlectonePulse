@@ -119,6 +119,12 @@ cache:
       duration: 10
       time_unit: "MINUTES"
       size: 10000
+    IMAGE_PIXELS:
+      invalidate_on_reload: true
+      expire_after_write: false
+      duration: 10
+      time_unit: "MINUTES"
+      size: 1000
     LEGACY_COLOR_MESSAGE:
       invalidate_on_reload: false
       expire_after_write: false

@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.converter.ImagePixelConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MinecraftSkinService;
 import net.flectone.pulse.util.constant.ModuleName;
@@ -37,6 +38,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Provider<MinecraftSkinService> skinServiceProvider;
+    private final Provider<ImagePixelConverter> imagePixelConverterProvider;
     private final TaskScheduler taskScheduler;
     private final ProxySender proxySender;
     @Getter private final FLogger fLogger;
@@ -59,9 +61,15 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 
-                    // update proxy cache
+                    // update image cache
                     if (!proxySender.send(fPlayer, ModuleName.UPDATE_CACHE_SKINPROFILE)) {
-                        skinServiceProvider.get().updateProfilePropertyCache(fPlayer);
+                        MinecraftSkinService skinService = skinServiceProvider.get();
+                        skinService.updateProfilePropertyCache(fPlayer);
+
+                        ImagePixelConverter imagePixelConverter = imagePixelConverterProvider.get();
+                        imagePixelConverter.invalidate(skinService.getSkin(fPlayer));
+                        imagePixelConverter.invalidate(skinService.getBodyUrl(fPlayer));
+                        imagePixelConverter.invalidate(skinService.getAvatarUrl(fPlayer));
                     }
                 });
 
