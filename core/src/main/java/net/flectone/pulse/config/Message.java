@@ -65,9 +65,6 @@ public record Message(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
         Join join,
 
-        @Deprecated(forRemoval = true)
-        DeprecatedObjective objective,
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
         Quit quit,
 
@@ -310,9 +307,6 @@ public record Message(
 
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/replacement")
             Replacement replacement,
-
-            @Deprecated(forRemoval = true)
-            DeprecatedScoreboard scoreboard,
 
             @JsonPropertyDescription("https://flectone.net/pulse/docs/message/format/translate")
             Translate translate,
@@ -592,21 +586,6 @@ public record Message(
         @With
         @Builder(toBuilder = true)
         @Jacksonized
-        @Deprecated(forRemoval = true)
-        public record DeprecatedScoreboard(
-                Boolean enable,
-                Boolean nameVisible,
-                Boolean hideNameWhenSneaking,
-                String color,
-                String prefix,
-                String suffix,
-                Ticker ticker
-        ) implements EnableSetting {
-        }
-
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
         public record Translate(Boolean enable) implements EnableSetting {
         }
 
@@ -652,42 +631,6 @@ public record Message(
             Map<String, String> values,
             Ticker ticker
     ) implements EnableSetting {
-    }
-
-    @With
-    @Builder(toBuilder = true)
-    @Jacksonized
-    @Deprecated(forRemoval = true)
-    public record DeprecatedObjective(
-            Boolean enable,
-
-            @Deprecated(forRemoval = true)
-            DeprecatedBelowname belowname,
-
-            @Deprecated(forRemoval = true)
-            DeprecatedTabname tabname
-
-    ) implements EnableSetting {
-
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
-        @Deprecated(forRemoval = true)
-        public record DeprecatedBelowname(
-                Boolean enable,
-                Ticker ticker
-        ) implements EnableSetting {
-        }
-
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
-        @Deprecated(forRemoval = true)
-        public record DeprecatedTabname(
-                Boolean enable,
-                Ticker ticker
-        ) implements EnableSetting {
-        }
     }
 
     @With

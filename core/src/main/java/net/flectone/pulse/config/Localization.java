@@ -1072,9 +1072,6 @@ public record Localization(
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join")
             Join join,
 
-            @Deprecated(forRemoval = true)
-            DeprecatedObjective objective,
-
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit")
             Quit quit,
 
@@ -1412,42 +1409,6 @@ public record Localization(
         public record Serverlink(
                 Map<String, String> values
         ) implements LocalizationSetting {
-        }
-
-        @With
-        @Builder(toBuilder = true)
-        @Jacksonized
-        @Deprecated(forRemoval = true)
-        public record DeprecatedObjective(
-                @Deprecated(forRemoval = true)
-                Belowname belowname,
-
-                @Deprecated(forRemoval = true)
-                Tabname tabname
-        ) implements LocalizationSetting {
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            @Deprecated(forRemoval = true)
-            public record Belowname(
-                    String score,
-                    String displayFormat,
-                    String scoreFormat
-            ) implements LocalizationSetting {
-            }
-
-            @With
-            @Builder(toBuilder = true)
-            @Jacksonized
-            @Deprecated(forRemoval = true)
-            public record Tabname(
-                    String score,
-                    String displayFormat,
-                    String scoreFormat
-            ) implements LocalizationSetting {
-            }
-
         }
 
         @With

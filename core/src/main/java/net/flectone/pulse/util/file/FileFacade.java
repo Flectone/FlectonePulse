@@ -149,64 +149,7 @@ public class FileFacade {
     }
 
     private void migrateFiles(String preInitVersion) {
-        // fix update permission name
-        if (versionComparator.isOlderThan(preInitVersion, "1.4.3")) {
-            files = fileMigrator.migration_1_4_3(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.5.0")) {
-            files = fileMigrator.migration_1_5_0(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.6.0")) {
-            files = fileMigrator.migration_1_6_0(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.0")) {
-            files = fileMigrator.migration_1_7_0(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.1")) {
-            files = fileMigrator.migration_1_7_1(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.2")) {
-            files = fileMigrator.migration_1_7_2(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.4")) {
-            files = fileMigrator.migration_1_7_4(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.7.5")) { // 1.7.5 == 1.8.0
-            files = fileMigrator.migration_1_7_5(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.8.2")) {
-            files = fileMigrator.migration_1_8_2(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.9.1")) {
-            files = fileMigrator.migration_1_9_1(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.9.3")) {
-            files = fileMigrator.migration_1_9_3(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.9.4")) { // 1.9.4 == 1.10.0
-            files = fileMigrator.migration_1_9_4(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.10.1")) {
-            files = fileMigrator.migration_1_10_1(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.10.3")) { // 1.10.3 == 1.11.0
-            files = fileMigrator.migration_1_10_3(files);
-        }
-
-        if (versionComparator.isOlderThan(preInitVersion, "1.11.1")) {
+        if (versionComparator.isOlderThan(preInitVersion, "1.11.1")) { // 1.11.1 == 1.12.0
             files = fileMigrator.migration_1_11_1(files);
         }
 

@@ -43,12 +43,6 @@ public record Config(
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/internal")
         Internal internal,
 
-        @Deprecated(forRemoval = true)
-        DeprecatedCommand command,
-
-        @Deprecated(forRemoval = true)
-        DeprecatedModule module,
-
         @JsonPropertyDescription("https://flectone.net/pulse/docs/config/logger")
         Logger logger,
 
@@ -148,28 +142,6 @@ public record Config(
         ) implements EnableSetting {
         }
 
-    }
-
-    @Deprecated(forRemoval = true)
-    @With
-    @Builder(toBuilder = true)
-    @Jacksonized
-    public record DeprecatedCommand(
-            Boolean unregisterOnReload,
-            Set<String> disabledFabric
-    ) {
-    }
-
-    @Deprecated(forRemoval = true)
-    @With
-    @Builder(toBuilder = true)
-    @Jacksonized
-    public record DeprecatedModule(
-            Boolean enable,
-            Boolean alwaysSendSilentPacket,
-            Boolean usePaperMessageSender,
-            Boolean useBukkitPreLoginListener
-    ) implements EnableSetting {
     }
 
     @With
