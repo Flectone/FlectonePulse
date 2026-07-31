@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
-import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.MinecraftDatabase;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.MinecraftChatSettingModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
@@ -93,9 +91,6 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_6")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_6));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_9")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_26_2")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2));
-
-        // database
-        bind(Database.class).to(MinecraftDatabase.class);
 
         // commands
         bind(ChatsettingModule.class).to(MinecraftChatSettingModule.class);

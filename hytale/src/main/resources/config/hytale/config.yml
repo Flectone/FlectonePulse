@@ -4,7 +4,6 @@ language:
   type: "en_us"
   by_player: true
 database:
-  ignore_existing_driver: false
   use_playtime_tracking: true
   type: "H2"
   name: "flectonepulse"

@@ -1,6 +1,5 @@
 package net.flectone.pulse.data.database;
 
-import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -8,21 +7,21 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.dao.FColorDao;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.VersionDAO;
+import net.flectone.pulse.data.database.driver.DriverBackedDataSource;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.PlayTime;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.comparator.VersionComparator;
 import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.loader.DriverLoader;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -38,7 +37,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.Driver;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -59,9 +60,9 @@ public class Database {
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
-    private final ReflectionResolver reflectionResolver;
     private final Provider<VersionDAO> versionDAOProvider;
     private final BackupCreator backupCreator;
+    private final DriverLoader driverLoader;
 
     @Nullable private volatile HikariDataSource dataSource;
     @Nullable private Jdbi jdbi;
@@ -81,9 +82,8 @@ public class Database {
      * @throws IOException if connection fails
      */
     public void connect() throws IOException {
-        downloadDriver();
-
-        HikariConfig hikariConfig = createHikariConfig();
+        Driver driver = driverLoader.getOrLoad(config().type());
+        HikariConfig hikariConfig = createHikariConfig(driver);
 
         HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
         this.dataSource = hikariDataSource;
@@ -163,10 +163,12 @@ public class Database {
         return hikariDataSource == null || hikariDataSource.isClosed();
     }
 
-    private HikariConfig createHikariConfig() {
+    private HikariConfig createHikariConfig(Driver driver) {
         HikariConfig hikariConfig = new HikariConfig();
 
         String connectionURL = "jdbc:" + config().type().name().toLowerCase() + ":";
+        Properties properties = new Properties();
+
         switch (config().type()) {
             case POSTGRESQL -> {
                 connectionURL = connectionURL +
@@ -178,9 +180,8 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config().name()) +
                         config().parameters();
 
-                hikariConfig.setDriverClassName("org.postgresql.Driver");
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
+                properties.setProperty("user", systemVariableResolver.substituteEnvVars(config().user()));
+                properties.setProperty("password", systemVariableResolver.substituteEnvVars(config().password()));
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
             }
@@ -191,7 +192,6 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config().name()) + ".h2" +
                         ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
 
-                hikariConfig.setDriverClassName("org.h2.Driver");
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -203,19 +203,12 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config().name()) +
                         ".db";
 
-                hikariConfig.setDriverClassName("org.sqlite.JDBC");
                 hikariConfig.addDataSourceProperty("busy_timeout", 30000);
                 hikariConfig.addDataSourceProperty("journal_mode", "WAL");
                 hikariConfig.addDataSourceProperty("synchronous", "NORMAL");
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
             case MYSQL, MARIADB -> {
-                if (config().type() == Type.MARIADB) {
-                    hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
-                } else {
-                    hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
-                }
-
                 connectionURL = connectionURL +
                         "//" +
                         systemVariableResolver.substituteEnvVars(config().host()) +
@@ -225,8 +218,8 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config().name()) +
                         config().parameters();
 
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().user()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().password()));
+                properties.setProperty("user", systemVariableResolver.substituteEnvVars(config().user()));
+                properties.setProperty("password", systemVariableResolver.substituteEnvVars(config().password()));
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -243,7 +236,7 @@ public class Database {
             default -> throw new IllegalStateException(config().type() + " not supported");
         }
 
-        hikariConfig.setJdbcUrl(connectionURL);
+        hikariConfig.setDataSource(new DriverBackedDataSource(driver, connectionURL, properties));
         hikariConfig.setPoolName("FlectonePulseDatabase");
 
         return hikariConfig;
@@ -283,18 +276,6 @@ public class Database {
 
             Optional<String> versionName = versionDAO.find();
 
-            if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.3.0")) {
-                migration("1_3_0");
-            }
-
-            if (versionName.isEmpty() && versionComparator.isOlderThan(fileFacade.getPreInitVersion(), "1.6.0")) {
-                if (config().type() == Type.POSTGRESQL) {
-                    migration("1_6_0_postgre");
-                } else {
-                    migration("1_6_0");
-                }
-            }
-
             String oldDatabaseVersion = versionName.orElse(null);
 
             Predicate<String> versionTest = version -> {
@@ -303,21 +284,6 @@ public class Database {
                 return versionComparator.isOlderThan(fileFacade.getPreInitVersion(), version)
                         && versionComparator.isOlderThan(oldDatabaseVersion, version, false);
             };
-
-            if (versionTest.test("1.8.2")) {
-                migration("1_8_2");
-            }
-
-            if (versionTest.test("1.9.4")) {
-                // rename fp_moderation to fp_moderation_old
-                migration("pre_1_9_4");
-
-                // create new fp_moderation
-                executeInitSQLDatabaseFile();
-
-                // migrate fp_moderation_old data to new fp_moderation
-                migration("post_1_9_4");
-            }
         }
 
         // always update to latest version
@@ -330,62 +296,6 @@ public class Database {
             executeSQLFile(sqlFile);
         } catch (IOException e) {
             fLogger.warning(e);
-        }
-    }
-
-    private void downloadDriver() {
-        boolean needChecking = !config().ignoreExistingDriver();
-        switch (config().type()) {
-            case POSTGRESQL -> reflectionResolver.hasClassOrElse("org.postgresql.Driver", needChecking, libraryResolver ->
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("org{}postgresql")
-                            .artifactId("postgresql")
-                            .version(BuildConfig.POSTGRESQL_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    )
-            );
-            case H2 -> reflectionResolver.hasClassOrElse("org.h2.Driver", needChecking, libraryResolver ->
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("com{}h2database")
-                            .artifactId("h2")
-                            .version(BuildConfig.H2_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    )
-            );
-            case SQLITE -> reflectionResolver.hasClassOrElse("org.sqlite.JDBC", needChecking, libraryResolver ->
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("org{}xerial")
-                            .artifactId("sqlite-jdbc")
-                            .version(BuildConfig.SQLITE_JDBC_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    )
-            );
-            case MYSQL -> reflectionResolver.hasClassOrElse("com.mysql.cj.jdbc.Driver", needChecking, libraryResolver ->
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("com{}mysql")
-                            .artifactId("mysql-connector-j")
-                            .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    )
-            );
-            case MARIADB -> reflectionResolver.hasClassOrElse("org.mariadb.jdbc.Driver", needChecking, libraryResolver ->
-                    libraryResolver.loadLibrary(Library.builder()
-                            .groupId("org{}mariadb{}jdbc")
-                            .artifactId("mariadb-java-client")
-                            .version(BuildConfig.MARIADB_JAVA_CLIENT_VERSION)
-                            .repository(BuildConfig.MAVEN_REPOSITORY)
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                    )
-            );
         }
     }
 
