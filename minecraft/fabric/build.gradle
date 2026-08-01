@@ -2,6 +2,10 @@ plugins {
     id 'net.fabricmc.fabric-loom' version "${fabric_loom_version}"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
 
@@ -15,11 +19,11 @@ dependencies {
 		compileOnlyApi fabricApi.module(module, fabric_api_version)
     }
 
-	compileOnlyApi("com.github.retrooper:packetevents-fabric-common:$packetevents_spigot_version")
+	compileOnlyApi("com.github.retrooper:packetevents-fabric-official:$packetevents_spigot_version")
+	compileOnlyApi("org.incendo:cloud-fabric:${cloud_fabric_version}")
 	compileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
 	compileOnly("maven.modrinth:vanish:$vanish_version")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
-	compileOnlyApi("org.incendo:cloud-fabric:${cloud_fabric_version}")
+	compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	implementation project(":core")
     implementation project(":minecraft:common")

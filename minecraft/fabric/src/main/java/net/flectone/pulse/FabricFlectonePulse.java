@@ -1,7 +1,5 @@
 package net.flectone.pulse;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -12,7 +10,6 @@ import lombok.Setter;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
@@ -28,17 +25,12 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @Singleton
-public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServerModInitializer, FlectonePulse {
+public class FabricFlectonePulse implements DedicatedServerModInitializer, FlectonePulse {
 
     @Setter private MinecraftServer minecraftServer;
+
     private FLogger fLogger;
     private Injector injector;
-
-    @Override
-    public void onPreLaunch() {
-        // configure packetevents api
-        System.setProperty("packetevents.nbt.default-max-size", "2097152");
-    }
 
     @Override
     public void onInitializeServer() {
@@ -55,6 +47,8 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
+
+        WrapperPacketEvents.load();
 
         try {
             // create guice injector for dependency injection
@@ -104,24 +98,17 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, DedicatedServer
 
     @Override
     public void initPacketAdapter() {
-        PacketEvents.getAPI().init();
+        WrapperPacketEvents.init();
     }
 
     @Override
     public void terminateFailedPacketAdapter() {
-        try {
-            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-            if (!packetEventsAPI.isInitialized()) {
-                packetEventsAPI.getInjector().uninject();
-            }
-        } catch (Exception _) {
-            // ignore
-        }
+        WrapperPacketEvents.terminateFailed();
     }
 
     @Override
     public void terminatePacketAdapter() {
-        PacketEvents.getAPI().terminate();
+        WrapperPacketEvents.terminate();
     }
 
     @Override

@@ -15,9 +15,6 @@
 	"icon": "assets/flectonepulse/icon.png",
     "environment": "server",
 	"entrypoints": {
-        "preLaunch": [
-              "net.flectone.pulse.FabricFlectonePulse"
-        ],
         "server": [
               "net.flectone.pulse.FabricFlectonePulse"
         ],
@@ -28,11 +25,11 @@
 	"mixins": [
 		"flectonepulse.mixins.json"
 	],
+	"accessWidener": "flectonepulse.accesswidener",
 	"depends": {
       "fabricloader": "*",
       "fabric-api-base": "*",
       "minecraft": ">=26.1",
-      "java": ">=25",
-      "packetevents": ">=2.13.0"
+      "java": ">=25"
 	}
 }

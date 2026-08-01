@@ -3,7 +3,9 @@
   "package": "net.flectone.pulse.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ServerLoginPacketListenerImplAccessor"
+    "ServerLoginPacketListenerImplAccessor",
+    "ConnectionMixin",
+    "PlayerListMixin"
   ],
   "client": [
   ],
