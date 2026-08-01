@@ -31,6 +31,9 @@ jobs:
       - name: Build Fabric version
         run: ./gradlew minecraft:fabric:buildFinalJar --no-daemon
 
+      - name: Build NeoForge version
+        run: ./gradlew minecraft:neoforge:buildFinalJar --no-daemon
+
       - name: Build Hytale version
         run: ./gradlew hytale:buildFinalJar -PadventureVersion=5.2.0 --no-daemon
 
