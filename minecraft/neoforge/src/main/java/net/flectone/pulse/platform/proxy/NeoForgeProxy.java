@@ -55,7 +55,7 @@ public class NeoForgeProxy implements Proxy {
             );
         }
 
-        neoForgeFlectonePulse.getModEventBus().addListener((RegisterPayloadHandlersEvent event) -> {
+        neoForgeFlectonePulse.getLoader().get().getEventBus().addListener((RegisterPayloadHandlersEvent event) -> {
             if (channel == null || streamCodec == null) return;
 
             PayloadRegistrar registrar = event.registrar("flectonepulse");

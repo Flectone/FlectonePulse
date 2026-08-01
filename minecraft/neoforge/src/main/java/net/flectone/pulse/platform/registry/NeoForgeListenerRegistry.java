@@ -55,7 +55,7 @@ public class NeoForgeListenerRegistry extends MinecraftListenerRegistry {
 
         // register pre login listener
         NeoForgePlayerLoginListener loginListener = neoForgePlayerLoginListenerProvider.get();
-        neoForgeFlectonePulse.getModEventBus().addListener(loginListener::onPreLogin);
+        neoForgeFlectonePulse.getLoader().get().getEventBus().addListener(loginListener::onPreLogin);
 
         // register connection listener
         NeoForgePlayerConnectionListener connectionListener = neoForgePlayerConnectionListenerProvider.get();

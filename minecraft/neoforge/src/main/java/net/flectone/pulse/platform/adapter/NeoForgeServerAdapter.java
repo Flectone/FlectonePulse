@@ -185,7 +185,7 @@ public class NeoForgeServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NonNull File getWhitelistFile() {
-        return neoForgeFlectonePulse.getModContainer().getModInfo().getOwningFile().getFile().getFilePath().getParent().resolve("whitelist.json").toFile();
+        return neoForgeFlectonePulse.getLoader().get().getModInfo().getOwningFile().getFile().getFilePath().getParent().resolve("whitelist.json").toFile();
     }
 
     @Override

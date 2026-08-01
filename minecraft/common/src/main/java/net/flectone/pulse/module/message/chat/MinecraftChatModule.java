@@ -56,7 +56,9 @@ public class MinecraftChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        if (config().mode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+        if (config().mode() == Message.Chat.Mode.PACKET
+                || platformServerAdapter.getPlatformType() == PlatformType.FABRIC
+                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
             listenerRegistry.register(MinecraftPacketChatListener.class);
         }
     }

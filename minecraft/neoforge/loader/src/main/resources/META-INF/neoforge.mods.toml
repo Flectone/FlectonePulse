@@ -2,12 +2,12 @@ modLoader="javafml"
 loaderVersion="[1,)"
 license="GPL-3.0"
 issueTrackerURL="https://github.com/Flectone/FlectonePulse/issues"
+showAsResourcePack=false
 
 [[mods]]
 modId="flectonepulse"
 version="${version}"
 displayName="FlectonePulse"
-updateJSONURL="https://flectone.net/pulse/update.json"
 displayURL="https://flectone.net/pulse/"
 logoFile="icon.png"
 credits="TheFaser"
@@ -28,9 +28,5 @@ versionRange="[26.2,)"
 ordering="NONE"
 side="SERVER"
 
-[[dependencies.flectonepulse]]
-modId="packetevents"
-type="required"
-versionRange="[2.12.3,)"
-ordering="AFTER"
-side="SERVER"
+[[mixins]]
+config = "flectonepulse.mixins.json"

@@ -1,11 +1,11 @@
 package net.flectone.pulse;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
+import com.mojang.brigadier.tree.CommandNode;
+import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.exception.ReloadException;
@@ -16,35 +16,39 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.NeoForgeLibraryResolver;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.bus.api.IEventBus;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.function.Supplier;
 
 @Getter
 @Singleton
-@Mod(BuildConfig.PROJECT_MOD_ID)
-public class NeoForgeFlectonePulse implements FlectonePulse {
+public class NeoForgeFlectonePulse implements FlectonePulse, LoaderBootstrap {
 
     @Setter
     private MinecraftServer minecraftServer;
 
-    private final IEventBus modEventBus;
-
-    @Getter
-    private final ModContainer modContainer;
+    private final Supplier<ModContainer> loader;
 
     private FLogger fLogger;
     private Injector injector;
 
-    public NeoForgeFlectonePulse(IEventBus modEventBus, ModContainer modContainer) {
-        this.modEventBus = modEventBus;
-        this.modContainer = modContainer;
+    public NeoForgeFlectonePulse(Supplier<ModContainer> loader) {
+        this.loader = loader;
+    }
 
+    @Override
+    public void onLoad() {
         // initialize custom logger
         Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
         fLogger = new FLogger(
@@ -54,10 +58,12 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryResolver libraryResolver = new NeoForgeLibraryResolver(modContainer, logger);
+        LibraryResolver libraryResolver = new NeoForgeLibraryResolver(logger);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
+
+        WrapperPacketEvents.load();
 
         try {
             // create guice injector for dependency injection
@@ -74,6 +80,8 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     public void onEnable() {
         if (!isReady()) return;
 
+        removeDefaultFabricCommands();
+
         // get scheduler
         TaskScheduler taskScheduler = get(TaskScheduler.class);
 
@@ -84,6 +92,16 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Pre.class, _ -> taskScheduler.onTick());
 
         injector.getInstance(FlectonePulseAPI.class).onEnable();
+    }
+
+    private void removeDefaultFabricCommands() {
+        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, event -> {
+            CommandNode<CommandSourceStack> root = event.getDispatcher().getRoot();
+
+            for (String command : injector.getInstance(FileFacade.class).config().internal().vanillaCommandsToRemove()) {
+                root.getChildren().removeIf(node -> node.getName().equals(command));
+            }
+        });
     }
 
     @Override
@@ -105,24 +123,17 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
 
     @Override
     public void initPacketAdapter() {
-        PacketEvents.getAPI().init();
+        WrapperPacketEvents.init();
     }
 
     @Override
     public void terminateFailedPacketAdapter() {
-        try {
-            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-            if (!packetEventsAPI.isInitialized()) {
-                packetEventsAPI.getInjector().uninject();
-            }
-        } catch (Exception _) {
-            // ignore
-        }
+        WrapperPacketEvents.terminateFailed();
     }
 
     @Override
     public void terminatePacketAdapter() {
-        PacketEvents.getAPI().terminate();
+        WrapperPacketEvents.terminate();
     }
 
     @Override
@@ -130,5 +141,25 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         // close all open inventories
         injector.getInstance(MinecraftInventoryController.class).closeAll();
         injector.getInstance(MinecraftDialogController.class).closeAll();
+    }
+
+    @Override
+    public void preNewPlayerPlace(Connection connection, ServerPlayer player) {
+        WrapperPacketEvents.preNewPlayerPlace(connection, player);
+    }
+
+    @Override
+    public void onPlayerLogin(Connection connection, ServerPlayer player) {
+        WrapperPacketEvents.onPlayerLogin(connection, player);
+    }
+
+    @Override
+    public void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
+        WrapperPacketEvents.postRespawn(cir);
+    }
+
+    @Override
+    public void configureSerialization(ChannelPipeline pipeline, PacketFlow flow) {
+        WrapperPacketEvents.configureSerialization(pipeline, flow);
     }
 }

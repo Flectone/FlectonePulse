@@ -128,18 +128,15 @@ subprojects {
         relocate("org.snakeyaml.engine", "${relocated_pattern}.snakeyaml")
         relocate("io.lettuce", "${relocated_pattern}.lettuce")
         relocate("it.unimi.dsi", "${relocated_pattern}.fastutil")
+        relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
+        relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
+        relocate("org.incendo", "${relocated_pattern}.cloud")
 
         from(rootProject.file('LICENSE')) {
             into('/')
         }
 
-        if (project.name != "neoforge") {
-            relocate("com.github.retrooper.packetevents", "${relocated_pattern}.packetevents")
-            relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
-            relocate("org.incendo", "${relocated_pattern}.cloud")
-        }
-
-        if (project.name != "paper" && project.name != "neoforge") {
+        if (project.name != "paper") {
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
