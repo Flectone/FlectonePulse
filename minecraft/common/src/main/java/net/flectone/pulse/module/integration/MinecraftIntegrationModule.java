@@ -77,9 +77,7 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
             builder.add(MinecraftFloodgateModule.class);
         }
 
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
-                ? platformServerAdapter.hasProject("geyser-fabric")
-                : platformServerAdapter.hasProject("Geyser-Spigot")) {
+        if (hasGeyser(platformServerAdapter)) {
             if (reflectionResolver.hasClass("org.geysermc.geyser.api.GeyserApi")) {
                 builder.add(MinecraftGeyserModule.class);
             } else {
@@ -88,6 +86,14 @@ public abstract class MinecraftIntegrationModule extends IntegrationModule {
         }
 
         return builder;
+    }
+
+    private boolean hasGeyser(PlatformServerAdapter platformServerAdapter) {
+        return switch (platformServerAdapter.getPlatformType()) {
+            case FABRIC -> platformServerAdapter.hasProject("geyser-fabric");
+            case NEOFORGE -> platformServerAdapter.hasProject("geyser_neoforge");
+            default -> platformServerAdapter.hasProject("Geyser-Spigot");
+        };
     }
 
     public boolean isBedrockPlayer(FEntity fPlayer) {

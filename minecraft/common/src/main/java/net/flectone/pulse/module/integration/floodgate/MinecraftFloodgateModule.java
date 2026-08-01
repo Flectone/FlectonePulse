@@ -24,7 +24,8 @@ public class MinecraftFloodgateModule implements ModuleSimple {
 
     @Override
     public void onEnable() {
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
+                || platformServerAdapter.getPlatformType() == PlatformType.NEOFORGE) {
             // delay for init
             floodgateIntegration.hookLater();
         } else {
