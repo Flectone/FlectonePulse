@@ -72,7 +72,7 @@ Java 17 or higher is **REQUIRED**. Older Minecraft versions, such as 1.8.8, can 
 | **BungeeCord / Waterfall**                   | Latest                   |
 | **Velocity**                                 | Latest                   |
 | **Hytale**                                   | Latest Hytale version    |
-| **NeoForge**                                 | Planned                  |
+| **NeoForge**                                 | Latest Minecraft version |
 
 ### Configuration Files
 

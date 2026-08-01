@@ -72,7 +72,7 @@ FlectonePulse стал темой **университетской диплом�
 | **BungeeCord / Waterfall**                   | Последняя                  |
 | **Velocity**                                 | Последняя                  |
 | **Hytale**                                   | Последняя версия Hytale    |
-| **NeoForge**                                 | Запланировано              |
+| **NeoForge**                                 | Последняя версия Minecraft |
 
 ### Файлы конфигурации
 
