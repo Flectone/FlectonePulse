@@ -17,7 +17,7 @@ public class WrapperPacketEvents {
     public void load() {
         // configure packetevents api
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(new FabricPacketEventsAPI("packetevents", EnvType.SERVER) {
+        PacketEvents.setAPI(new FabricPacketEventsAPI(BuildConfig.PROJECT_MOD_ID, EnvType.SERVER) {
             @Override
             protected ServerManager constructServerManager() {
                 SharedConstants.tryDetectVersion();

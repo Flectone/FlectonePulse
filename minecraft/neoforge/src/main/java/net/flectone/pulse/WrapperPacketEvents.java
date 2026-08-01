@@ -41,7 +41,7 @@ public class WrapperPacketEvents {
 
     public void load() {
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(new NeoForgePacketEventsAPI("packetevents", FMLLoader.getCurrent().getDist()) {
+        PacketEvents.setAPI(new NeoForgePacketEventsAPI(BuildConfig.PROJECT_MOD_ID, FMLLoader.getCurrent().getDist()) {
             @Override
             protected ServerManager constructServerManager() {
                 SharedConstants.tryDetectVersion();
