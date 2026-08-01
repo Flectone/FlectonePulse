@@ -236,6 +236,13 @@ public class Database {
             default -> throw new IllegalStateException(config().type() + " not supported");
         }
 
+        Config.Database.PoolSettings poolSettings = config().poolSettings();
+        hikariConfig.setMaximumPoolSize(poolSettings.maxSize());
+        hikariConfig.setMinimumIdle(poolSettings.minIdle());
+        hikariConfig.setMaxLifetime(poolSettings.maxLifetime());
+        hikariConfig.setKeepaliveTime(poolSettings.keepaliveTime());
+        hikariConfig.setConnectionTimeout(poolSettings.connectionTimeout());
+
         hikariConfig.setDataSource(new DriverBackedDataSource(driver, connectionURL, properties));
         hikariConfig.setPoolName("FlectonePulseDatabase");
 

@@ -73,8 +73,22 @@ public record Config(
             String user,
             String password,
             String parameters,
-            String prefix
+            String prefix,
+            PoolSettings poolSettings
     ) {
+
+        @With
+        @Builder(toBuilder = true)
+        @Jacksonized
+        public record PoolSettings(
+                Integer maxSize,
+                Integer minIdle,
+                Long maxLifetime,
+                Long keepaliveTime,
+                Long connectionTimeout
+        ) {
+        }
+
     }
 
     @With

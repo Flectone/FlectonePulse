@@ -13,6 +13,12 @@ database:
   password: "1234"
   parameters: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
   prefix: ""
+  pool_settings:
+    max_size: 10
+    min_idle: 10
+    max_lifetime: 1800000
+    keepalive_time: 0
+    connection_timeout: 5000
 executor:
   min_pool_size: 8
   max_pool_size: 8

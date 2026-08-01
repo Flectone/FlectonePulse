@@ -30,7 +30,10 @@ public interface ConfigMerger {
 
     Config.Language mergeLanguage(@MappingTarget Config.Language.LanguageBuilder target, Config.Language source);
 
+    @Mapping(target = "poolSettings", expression = "java(mergeDatabasePoolSettings(target.build().poolSettings().toBuilder(), source.poolSettings()))")
     Config.Database mergeDatabase(@MappingTarget Config.Database.DatabaseBuilder target, Config.Database source);
+
+    Config.Database.PoolSettings mergeDatabasePoolSettings(@MappingTarget Config.Database.PoolSettings.PoolSettingsBuilder target, Config.Database.PoolSettings source);
 
     @Mapping(target = "keepAlive", expression = "java(mergeExecutorDurationUnit(target.build().keepAlive().toBuilder(), source.keepAlive()))")
     @Mapping(target = "shutdownTimeout", expression = "java(mergeExecutorDurationUnit(target.build().shutdownTimeout().toBuilder(), source.shutdownTimeout()))")
