@@ -19,10 +19,10 @@ shadowJar {
     configurations = []
 
     from {
-        project(':minecraft:neoforge').tasks.shadowJar.archiveFile
+        project(':minecraft-neoforge').tasks.shadowJar.archiveFile
     }
 
-    dependsOn(':minecraft:neoforge:shadowJar')
+    dependsOn(':minecraft-neoforge:shadowJar')
 }
 
 processResources {

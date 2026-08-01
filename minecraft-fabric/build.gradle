@@ -26,7 +26,7 @@ dependencies {
 	compileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	implementation project(":core")
-    implementation project(":minecraft:common")
+    implementation project(":minecraft-common")
 	implementation "net.flectone:libby-fabric:$libby_version"
 }
 
@@ -48,7 +48,7 @@ shadowJar {
         include(dependency("org.incendo:.*"))
         include(dependency("net.flectone:.*"))
 		include(project(":core"))
-        include(project(":minecraft:common"))
+        include(project(":minecraft-common"))
 	}
 
 	minimize()
@@ -64,6 +64,8 @@ processResources {
 }
 
 tasks.named("buildFinalJar", Jar) {
+	archiveFileName = "FlectonePulse-Fabric-" + project_version + ".jar"
+
     from {
         zipTree(tasks.shadowJar.archiveFile)
     }

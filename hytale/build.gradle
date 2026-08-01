@@ -21,6 +21,8 @@ processResources {
 }
 
 tasks.named("buildFinalJar", Jar) {
+    archiveFileName = "FlectonePulse-Hytale-" + project_version + ".jar"
+
     from(zipTree(tasks.shadowJar.archiveFile))
 
     dependsOn tasks.shadowJar

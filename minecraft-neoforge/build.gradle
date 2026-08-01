@@ -21,13 +21,13 @@ configurations {
 
 dependencies {
     compileOnly("org.incendo:cloud-neoforge:${cloud_neoforge_version}")
-    compileOnly(project(":minecraft:neoforge:loader"))
+    compileOnly(project(":minecraft-neoforge:loader"))
 
     // TODO: delete when neoforge repository appears
     shadow(files('libs/packetevents-neoforge-2.13.0.jar'))
 
     shadow(project(":core"))
-    shadow(project(":minecraft:common"))
+    shadow(project(":minecraft-common"))
     shadow("net.flectone:libby-core:$libby_version")
 }
 
@@ -52,11 +52,13 @@ artifacts {
 }
 
 tasks.named("buildFinalJar", Jar) {
+    archiveFileName = "FlectonePulse-NeoForge-" + project_version + ".jar"
+
     from {
-        zipTree(project(':minecraft:neoforge:loader').tasks.shadowJar.archiveFile)
+        zipTree(project(':minecraft-neoforge:loader').tasks.shadowJar.archiveFile)
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    dependsOn(':minecraft:neoforge:loader:shadowJar')
+    dependsOn(':minecraft-neoforge:loader:shadowJar')
 }
