@@ -16,6 +16,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
         super(new BukkitLibbyResolver(plugin, "libraries"));
     }
 
+    @Override
     public List<String> getPacketEventsArtifactIds() {
         return List.of(
                 "packetevents-spigot",

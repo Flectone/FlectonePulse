@@ -35,6 +35,13 @@ public class LibraryResolver {
         );
     }
 
+    public List<String> getPacketEventsArtifactIds() {
+        return List.of(
+                "packetevents-api",
+                "packetevents-netty-common"
+        );
+    }
+
     public void addLibrary(Library library) {
         libraries.add(library);
     }
