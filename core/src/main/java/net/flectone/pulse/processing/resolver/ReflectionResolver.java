@@ -47,6 +47,10 @@ public class ReflectionResolver {
         }
     }
 
+    public @Nullable Class<?> resolveClass(String... classParts) {
+        return resolveClass(String.join("", classParts));
+    }
+
     public @Nullable Class<?> resolveClass(String className) {
         try {
             return Class.forName(className);
