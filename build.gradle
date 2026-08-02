@@ -136,12 +136,12 @@ subprojects {
             into('/')
         }
 
-        if (project.name != "paper") {
+        if (project.name != "minecraft-paper") {
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
 
-        if (project.name != "velocity") {
+        if (project.name != "minecraft-velocity") {
             relocate("com.google.inject", "${relocated_pattern}.guice")
             relocate("com.google.common", "${relocated_pattern}.guava")
         }
