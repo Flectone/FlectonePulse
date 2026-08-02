@@ -36,7 +36,7 @@ public class BukkitMessageSender extends MinecraftMessageSender {
     @Override
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         if (fPlayer.isConsole() || silent
-                || !fileFacade.config().internal().usePaperMessageSender()
+                || !fileFacade.config().internal().useVanillaMessageSender()
                 || !reflectionResolver.isPaper()
                 || !paperMessageSender.sendMessage(fPlayer, AdventureSerializer.serializer().gson().serialize(component))) {
             super.sendMessage(fPlayer, component, silent);

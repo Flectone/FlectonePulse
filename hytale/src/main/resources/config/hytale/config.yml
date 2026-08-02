@@ -44,7 +44,7 @@ proxy:
 internal:
   enable: true
   always_send_silent_packet: false
-  use_paper_message_sender: false
+  use_vanilla_message_sender: false
   use_packet_login_listener: false
   unregister_command_on_reload: false
   vanilla_commands_to_remove:

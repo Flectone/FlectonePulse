@@ -8,8 +8,12 @@ import net.flectone.pulse.platform.adapter.NeoForgeServerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.*;
+import net.flectone.pulse.platform.sender.MinecraftMessageSender;
+import net.flectone.pulse.platform.sender.NeoForgeMessageSender;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.processing.serializer.MinecraftComponentSerializer;
+import net.flectone.pulse.processing.serializer.NeoForgeComponentSerializer;
 import net.flectone.pulse.util.checker.NeoForgePermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.logging.FLogger;
@@ -50,5 +54,11 @@ public class NeoForgeInjector extends MinecraftPlatformInjector {
         bind(PermissionChecker.class).to(NeoForgePermissionChecker.class);
 
         bind(MinecraftIntegrationModule.class).to(NeoForgeIntegrationModule.class);
+
+        // sender
+        bind(MinecraftMessageSender.class).to(NeoForgeMessageSender.class);
+
+        // others
+        bind(MinecraftComponentSerializer.class).to(NeoForgeComponentSerializer.class);
     }
 }

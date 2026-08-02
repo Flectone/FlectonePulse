@@ -125,7 +125,11 @@ public record Config(
     public record Internal(
             Boolean enable,
             Boolean alwaysSendSilentPacket,
+            Boolean useVanillaMessageSender,
+
+            @Deprecated
             Boolean usePaperMessageSender,
+
             Boolean usePacketLoginListener,
             Boolean unregisterCommandOnReload,
             Set<String> vanillaCommandsToRemove

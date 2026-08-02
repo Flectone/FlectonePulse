@@ -102,6 +102,16 @@ public class FileMigrator {
     }
 
     public FilePack migration_1_12_3(FilePack files) {
+        Boolean usePaperMessageSender = files.config().internal().usePaperMessageSender();
+        if (usePaperMessageSender != null) {
+            files = files.withConfig(files.config()
+                    .withInternal(files.config().internal()
+                            .withUseVanillaMessageSender(usePaperMessageSender)
+                            .withUsePaperMessageSender(null)
+                    )
+            );
+        }
+
         Map<CacheName, Config.Cache.CacheSetting> cacheTypes = new LinkedHashMap<>(files.config().cache().types());
         cacheTypes.put(CacheName.IMAGE_PIXELS, new Config.Cache.CacheSetting(true, false, 10, TimeUnit.MINUTES, 1000));
 
