@@ -11,3 +11,12 @@ tasks.named("buildFinalJar", Jar) {
 
     dependsOn tasks.shadeDowngradedApi
 }
+
+shadowJar {
+        relocate("net.flectone.pulse.library.guice", "com.google.inject")
+        relocate("net.flectone.pulse.library.guava", "com.google.common")
+
+        outputs.cacheIf { true }
+
+        minimize()
+}
