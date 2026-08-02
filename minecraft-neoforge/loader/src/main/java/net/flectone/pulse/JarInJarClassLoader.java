@@ -40,11 +40,11 @@ import java.util.List;
 /**
  * Classloader that can load a jar from within another jar file.
  *
- * <p>The "loader" jar contains the loading code & public API classes,
+ * <p>The "loader" jar contains the loading code and public API classes,
  * and is class-loaded by the platform.</p>
  *
  * <p>The inner "plugin" jar contains the plugin itself, and is class-loaded
- * by the loading code & this classloader.</p>
+ * by the loading code and this classloader.</p>
  */
 public class JarInJarClassLoader extends URLClassLoader {
     static {
