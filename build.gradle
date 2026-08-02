@@ -8,7 +8,7 @@ plugins {
     id 'io.freefair.lombok' version "9.5.0"
 }
 
-group = "net.flectone.pulse"
+group = maven_group
 version = project_version
 
 repositories {
@@ -93,7 +93,7 @@ subprojects {
 
     buildConfig {
         className("BuildConfig")
-        packageName("net.flectone.pulse")
+        packageName(maven_group)
         rootProject.ext.properties.findAll { key, value ->
             !key.contains('.')
         }.each { key, value ->
@@ -136,12 +136,12 @@ subprojects {
             into('/')
         }
 
-        if (project.name != "paper") {
+        if (project.name != "minecraft-paper") {
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
 
-        if (project.name != "velocity") {
+        if (project.name != "minecraft-velocity") {
             relocate("com.google.inject", "${relocated_pattern}.guice")
             relocate("com.google.common", "${relocated_pattern}.guava")
         }
@@ -157,7 +157,7 @@ subprojects {
         def artifactId = project.parent.name == rootProject.name
                 ? "${project.name}"
                 : "${project.parent.name}-${project.name}"
-        coordinates("net.flectone.pulse", artifactId, project_version)
+        coordinates(maven_group, artifactId, project_version)
 
         pom {
             name = "FlectonePulse ${artifactId.capitalize()}"
