@@ -71,8 +71,6 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         } catch (Exception e) {
             throwInitException(e);
         }
-
-        onEnable();
     }
 
     @Override

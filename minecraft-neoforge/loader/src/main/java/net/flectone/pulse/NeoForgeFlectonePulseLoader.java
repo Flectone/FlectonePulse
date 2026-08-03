@@ -40,6 +40,7 @@ public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePul
     public void onCommonSetup(FMLCommonSetupEvent event) {
         loadBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
         loadBootstrap.onLoad();
+        loadBootstrap.onEnable();
     }
 
     @Override
