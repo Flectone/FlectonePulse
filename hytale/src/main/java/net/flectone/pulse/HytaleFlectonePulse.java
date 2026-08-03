@@ -77,10 +77,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
 
     @Override
     public void onDisable() {
-        if (!isReady()) {
-            terminateFailedPacketAdapter();
-            return;
-        }
+        if (!isReady()) return;
 
         get(FlectonePulseAPI.class).onDisable();
     }
@@ -99,26 +96,6 @@ public class HytaleFlectonePulse implements FlectonePulse {
         if (!isReady()) return;
 
         get(FlectonePulseAPI.class).reload();
-    }
-
-    @Override
-    public void initPacketAdapter() {
-        // nothing
-    }
-
-    @Override
-    public void terminateFailedPacketAdapter() {
-        // nothing
-    }
-
-    @Override
-    public void terminatePacketAdapter() {
-        // nothing
-    }
-
-    @Override
-    public void closeUIs() {
-        // nothing
     }
 
 }

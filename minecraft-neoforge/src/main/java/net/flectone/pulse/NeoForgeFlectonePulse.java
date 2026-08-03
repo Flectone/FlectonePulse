@@ -105,7 +105,7 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     @Override
     public void onDisable() {
         if (!isReady()) {
-            terminateFailedPacketAdapter();
+            hook(HookType.TERMINATE_FAILED_PACKET_ADAPTER);
             return;
         }
 
@@ -125,28 +125,6 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     }
 
     @Override
-    public void initPacketAdapter() {
-        WrapperPacketEvents.init();
-    }
-
-    @Override
-    public void terminateFailedPacketAdapter() {
-        WrapperPacketEvents.terminateFailed();
-    }
-
-    @Override
-    public void terminatePacketAdapter() {
-        WrapperPacketEvents.terminate();
-    }
-
-    @Override
-    public void closeUIs() {
-        // close all open inventories
-        injector.getInstance(MinecraftInventoryController.class).closeAll();
-        injector.getInstance(MinecraftDialogController.class).closeAll();
-    }
-
-    @Override
     public void hook(HookType type, Object... args) {
         try {
             switch (type) {
@@ -154,6 +132,13 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
                 case PRE_NEW_PLAYER_PLACE -> WrapperPacketEvents.preNewPlayerPlace((Connection) args[0], (ServerPlayer) args[1]);
                 case ON_PLAYER_LOGIN -> WrapperPacketEvents.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
                 case POST_RESPAWN -> WrapperPacketEvents.postRespawn((CallbackInfoReturnable<ServerPlayer>) args[0]);
+                case INIT_PACKET_ADAPTER -> WrapperPacketEvents.init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> WrapperPacketEvents.terminateFailed();
+                case TERMINATE_PACKET_ADAPTER -> WrapperPacketEvents.terminate();
+                case CLOSE_UIS -> {
+                    injector.getInstance(MinecraftInventoryController.class).closeAll();
+                    injector.getInstance(MinecraftDialogController.class).closeAll();
+                }
             }
         } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
             fLogger.warning("Hook % type called with invalid arguments: %s", type, e.getMessage());

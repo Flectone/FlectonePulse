@@ -97,7 +97,7 @@ public class FabricFlectonePulse implements FlectonePulse {
     @Override
     public void onDisable() {
         if (!isReady()) {
-            terminateFailedPacketAdapter();
+            hook(HookType.TERMINATE_FAILED_PACKET_ADAPTER);
             return;
         }
 
@@ -117,28 +117,6 @@ public class FabricFlectonePulse implements FlectonePulse {
     }
 
     @Override
-    public void initPacketAdapter() {
-        WrapperPacketEvents.init();
-    }
-
-    @Override
-    public void terminateFailedPacketAdapter() {
-        WrapperPacketEvents.terminateFailed();
-    }
-
-    @Override
-    public void terminatePacketAdapter() {
-        WrapperPacketEvents.terminate();
-    }
-
-    @Override
-    public void closeUIs() {
-        // close all open inventories
-        injector.getInstance(MinecraftInventoryController.class).closeAll();
-        injector.getInstance(MinecraftDialogController.class).closeAll();
-    }
-
-    @Override
     public void hook(HookType type, Object... args) {
         FabricPlayerLoginListener fabricPlayerLoginListener = injector.getInstance(FabricPlayerLoginListener.class);
         try {
@@ -148,6 +126,13 @@ public class FabricFlectonePulse implements FlectonePulse {
                 case ON_PLAYER_PRE_LOGIN -> fabricPlayerLoginListener.onPreLogin((ServerLoginPacketListenerImpl) args[0], (GameProfile) args[1]);
                 case ON_PLAYER_LOGIN -> WrapperPacketEvents.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
                 case POST_RESPAWN -> WrapperPacketEvents.postRespawn((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
+                case INIT_PACKET_ADAPTER -> WrapperPacketEvents.init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> WrapperPacketEvents.terminateFailed();
+                case TERMINATE_PACKET_ADAPTER -> WrapperPacketEvents.terminate();
+                case CLOSE_UIS -> {
+                    injector.getInstance(MinecraftInventoryController.class).closeAll();
+                    injector.getInstance(MinecraftDialogController.class).closeAll();
+                }
             }
         } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
             fLogger.warning("Hook %s type called with invalid arguments: %s", type, e.getMessage());

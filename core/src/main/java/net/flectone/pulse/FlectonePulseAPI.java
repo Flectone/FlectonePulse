@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.render.TextScreenRender;
 import net.flectone.pulse.service.*;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.util.logging.filter.LogFilter;
@@ -112,7 +113,7 @@ public class FlectonePulseAPI {
         instance.get(Database.class).connect();
 
         // initialize packetevents
-        instance.initPacketAdapter();
+        instance.hook(HookType.INIT_PACKET_ADAPTER);
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
@@ -146,7 +147,7 @@ public class FlectonePulseAPI {
     public void onDisable() {
         setDisabling(true);
 
-        instance.terminateFailedPacketAdapter();
+        instance.hook(HookType.TERMINATE_FAILED_PACKET_ADAPTER);
 
         if (!instance.isReady()) return;
 
@@ -164,7 +165,7 @@ public class FlectonePulseAPI {
         instance.get(TaskScheduler.class).shutdown();
 
         // close all open inventories
-        instance.closeUIs();
+        instance.hook(HookType.CLOSE_UIS);
 
         // unregister all listeners
         instance.get(ListenerRegistry.class).unregisterAll();
@@ -184,7 +185,7 @@ public class FlectonePulseAPI {
         fPlayerService.invalidate();
 
         // terminate packetevents
-        instance.terminatePacketAdapter();
+        instance.hook(HookType.TERMINATE_PACKET_ADAPTER);
 
         // disable proxy registry
         instance.get(ProxyRegistry.class).onDisable();
@@ -218,7 +219,7 @@ public class FlectonePulseAPI {
         fLogger.logReloading();
 
         // close all UIs
-        instance.closeUIs();
+        instance.hook(HookType.CLOSE_UIS);
 
         // clear text screens
         instance.get(TextScreenRender.class).clear();

@@ -52,27 +52,6 @@ public interface FlectonePulse extends LoaderBoostrap {
     void reload() throws ReloadException;
 
     /**
-     * Initialize the PacketAdapter API.
-     */
-    void initPacketAdapter();
-
-    /**
-     * Terminates PacketAdapter API if initialization failed.
-     * Prevents errors when FlectonePulse fails to start.
-     */
-    void terminateFailedPacketAdapter();
-
-    /**
-     * Terminates the PacketAdapter API and cleans up related resources.
-     */
-    void terminatePacketAdapter();
-
-    /**
-     * Closes all open user interfaces including inventories and dialogs.
-     */
-    void closeUIs();
-
-    /**
      * Returns the platform-specific plugin loader instance.
      * <p>
      * This object represents the native plugin or mod container for the

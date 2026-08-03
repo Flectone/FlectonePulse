@@ -93,7 +93,7 @@ public class BukkitFlectonePulse implements FlectonePulse {
     @Override
     public void onDisable() {
         if (!isReady()) {
-            terminateFailedPacketAdapter();
+            hook(HookType.TERMINATE_FAILED_PACKET_ADAPTER);
             return;
         }
 
@@ -105,7 +105,31 @@ public class BukkitFlectonePulse implements FlectonePulse {
 
     @Override
     public void hook(HookType type, Object... args) {
-        // nothing
+        try {
+            switch (type) {
+                case INIT_PACKET_ADAPTER -> PacketEvents.getAPI().init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> {
+                    try {
+                        // check PacketEvents class
+                        Class.forName("com.github.retrooper.packetevents.PacketEvents");
+
+                        PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
+                        if (!packetEventsAPI.isInitialized()) {
+                            packetEventsAPI.getInjector().uninject();
+                        }
+                    } catch (Exception _) {
+                        // ignore
+                    }
+                }
+                case TERMINATE_PACKET_ADAPTER -> PacketEvents.getAPI().terminate();
+                case CLOSE_UIS -> {
+                    injector.getInstance(MinecraftInventoryController.class).closeAll();
+                    injector.getInstance(MinecraftDialogController.class).closeAll();
+                }
+            }
+        } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
+            fLogger.warning("Hook % type called with invalid arguments: %s", type, e.getMessage());
+        }
     }
 
     @Override
@@ -118,38 +142,6 @@ public class BukkitFlectonePulse implements FlectonePulse {
     @Override
     public @NonNull BukkitFlectonePulseLoader getLoader() {
         return loader.get();
-    }
-
-    @Override
-    public void initPacketAdapter() {
-        PacketEvents.getAPI().init();
-    }
-
-    @Override
-    public void terminateFailedPacketAdapter() {
-        try {
-            // check PacketEvents class
-            Class.forName("com.github.retrooper.packetevents.PacketEvents");
-
-            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-            if (!packetEventsAPI.isInitialized()) {
-                packetEventsAPI.getInjector().uninject();
-            }
-        } catch (Exception _) {
-            // ignore
-        }
-    }
-
-    @Override
-    public void terminatePacketAdapter() {
-        PacketEvents.getAPI().terminate();
-    }
-
-    @Override
-    public void closeUIs() {
-        // close all open inventories
-        injector.getInstance(MinecraftInventoryController.class).closeAll();
-        injector.getInstance(MinecraftDialogController.class).closeAll();
     }
 
 }
