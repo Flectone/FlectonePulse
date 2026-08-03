@@ -1,16 +1,41 @@
 package net.flectone.pulse.processing.resolver;
 
 import com.alessiodp.libby.Library;
-import com.alessiodp.libby.LibraryManager;
+import com.alessiodp.libby.logging.LogLevel;
+import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
+import com.hypixel.hytale.logger.HytaleLogger;
 import net.flectone.pulse.BuildConfig;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.nio.file.Path;
+import java.util.logging.Level;
 
 @Singleton
 public class HytaleLibraryResolver extends LibraryResolver {
 
-    public HytaleLibraryResolver(LibraryManager libraryManager) {
-        super(libraryManager);
+    public HytaleLibraryResolver(HytaleLogger hytaleLogger, Path projectPath) {
+        super(new LogAdapter() {
+            @Override
+            public void log(@NonNull LogLevel logLevel, @Nullable String s) {
+                switch (logLevel) {
+                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s);
+                    case WARN -> hytaleLogger.at(Level.WARNING).log(s);
+                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s);
+                }
+            }
+
+            @Override
+            public void log(@NonNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
+                switch (logLevel) {
+                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s, throwable);
+                    case WARN -> hytaleLogger.at(Level.WARNING).log(s, throwable);
+                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s, throwable);
+                }
+            }
+        }, projectPath);
     }
 
     @Override

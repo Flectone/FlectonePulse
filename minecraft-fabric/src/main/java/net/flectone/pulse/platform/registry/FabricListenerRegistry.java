@@ -6,7 +6,6 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.listener.player.FabricPlayerConnectionListener;
@@ -49,11 +48,6 @@ public class FabricListenerRegistry extends MinecraftListenerRegistry {
 
         ServerTickEvents.END_SERVER_TICK.register(_ -> tpsTracker.onTick());
         ServerLifecycleEvents.SERVER_STARTING.register(fabricFlectonePulse::setMinecraftServer);
-        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> fabricFlectonePulse.onDisable());
-
-        // register pre login listener
-        FabricPlayerLoginListener fabricPlayerLoginListener = fabricPlayerLoginListenerProvider.get();
-        ServerLoginConnectionEvents.QUERY_START.register(fabricPlayerLoginListener::onPreLogin);
 
         // register connection listener
         FabricPlayerConnectionListener fabricPlayerConnectionListener = fabricBaseListenerProvider.get();

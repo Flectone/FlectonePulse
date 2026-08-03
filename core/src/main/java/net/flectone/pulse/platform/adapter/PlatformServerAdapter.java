@@ -9,7 +9,11 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 /**
@@ -158,14 +162,32 @@ public interface PlatformServerAdapter {
      * @param path resource path (classpath relative)
      * @return InputStream or null if not found
      */
-    @Nullable InputStream getResource(@NonNull String path);
+    default @Nullable InputStream getResource(@NonNull String path) {
+        return getClass().getClassLoader().getResourceAsStream(path);
+    }
 
     /**
      * Saves a resource to the plugin data folder.
      *
      * @param path the resource path
      */
-    void saveResource(@NonNull String path);
+    default void saveResource(@NonNull Path projectPath, @NonNull String path) throws IOException {
+        InputStream resource = getResource(path);
+        if (resource == null) return;
+
+        Path targetPath = projectPath.resolve(path);
+
+        if (Files.exists(targetPath)) {
+            return;
+        }
+
+        Path parentDir = targetPath.getParent();
+        if (parentDir != null) {
+            Files.createDirectories(parentDir);
+        }
+
+        Files.copy(resource, targetPath, StandardCopyOption.REPLACE_EXISTING);
+    }
 
     /**
      * Translates an item name with optional localization.

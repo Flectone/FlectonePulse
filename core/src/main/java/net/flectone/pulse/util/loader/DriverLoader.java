@@ -147,7 +147,7 @@ public class DriverLoader {
     @NonNull
     private Driver register(@NonNull String loaderId, @NonNull String driverClassName) {
         try {
-            IsolatedClassLoader classLoader = libraryResolver.getLibraryManager().getIsolatedClassLoaderById(loaderId);
+            IsolatedClassLoader classLoader = libraryResolver.getIsolatedClassLoaderById(loaderId);
             if (classLoader == null) {
                 throw new IllegalStateException("Isolated class loader '" + loaderId + "' not found");
             }

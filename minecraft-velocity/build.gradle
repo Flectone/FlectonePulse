@@ -1,13 +1,17 @@
 dependencies {
     implementation project(":core")
 
-    compileOnly "com.velocitypowered:velocity-api:$velocity_version"
+    compileOnlyApi project(":minecraft-velocity:loader")
 
+    compileOnly "com.velocitypowered:velocity-api:$velocity_version"
     annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"
 }
 
-tasks.named("buildFinalJar", Jar) {
-    from(zipTree(tasks.shadeDowngradedApi.archiveFile))
+shadowJar {
+    archiveFileName = "flectonepulse-bukkit.jarinjar"
+}
 
-    dependsOn tasks.shadeDowngradedApi
+tasks.named("buildFinalJar", Jar) {
+    from(zipTree(tasks.shadowJar.archiveFile))
+    dependsOn tasks.shadowJar
 }

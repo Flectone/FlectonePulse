@@ -57,7 +57,7 @@ public class MinecraftSkinsRestorerIntegration implements FIntegration {
             skinsRestorer = SkinsRestorerProvider.get();
 
             if (!skinApplyEventSubscribed) {
-                skinsRestorer.getEventBus().subscribe(flectonePulse, SkinApplyEvent.class, event -> {
+                skinsRestorer.getEventBus().subscribe(flectonePulse.getLoader(), SkinApplyEvent.class, event -> {
                     FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer(platformPlayerAdapter.getPlayerClass()));
                     if (fPlayer.isUnknown()) return;
 

@@ -1,6 +1,0 @@
-$C = "../../Common.ui";
-ColorPicker #HyUIColorPicker {
-    Value: #ffffff;
-    // ABSOLUTELY necessary. Will crash client if it is not included.
-    Style: $C.@DefaultColorPickerStyle;
-}

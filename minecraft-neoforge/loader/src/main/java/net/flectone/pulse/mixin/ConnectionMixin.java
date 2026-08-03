@@ -19,8 +19,8 @@
 package net.flectone.pulse.mixin;
 
 import io.netty.channel.ChannelPipeline;
-import net.flectone.pulse.LoaderBootstrap;
 import net.flectone.pulse.NeoForgeFlectonePulseLoader;
+import net.flectone.pulse.util.constant.HookType;
 import net.minecraft.network.BandwidthDebugMonitor;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
@@ -42,9 +42,7 @@ public class ConnectionMixin {
             ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly,
             BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci
     ) {
-        LoaderBootstrap loaderBootstrap = NeoForgeFlectonePulseLoader.getPlugin();
-        if (loaderBootstrap == null) return;
-
-        loaderBootstrap.configureSerialization(pipeline, flow);
+        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
     }
+
 }

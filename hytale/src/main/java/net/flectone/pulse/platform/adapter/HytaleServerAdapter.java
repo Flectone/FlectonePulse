@@ -27,10 +27,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -177,34 +174,6 @@ public class HytaleServerAdapter implements PlatformServerAdapter {
         if (!(item instanceof ItemStack itemStack)) return "";
 
         return itemStack.getItemId();
-    }
-
-    @Override
-    public @Nullable InputStream getResource(@NonNull String path) {
-        return getClass().getClassLoader().getResourceAsStream(path);
-    }
-
-    @Override
-    public void saveResource(@NonNull String path) {
-        InputStream resource = getResource(path);
-        if (resource == null) return;
-
-        try {
-            Path targetPath = projectPath.resolve(path);
-
-            if (Files.exists(targetPath)) {
-                return;
-            }
-
-            Path parentDir = targetPath.getParent();
-            if (parentDir != null) {
-                Files.createDirectories(parentDir);
-            }
-
-            Files.copy(resource, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
     }
 
     @Override

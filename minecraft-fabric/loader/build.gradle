@@ -1,0 +1,36 @@
+plugins {
+    id "net.fabricmc.fabric-loom" version "${fabric_loom_version}"
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/flectonepulse.accesswidener")
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+
+    implementation project(":loader")
+
+    compileOnlyApi "net.fabricmc:fabric-loader:${fabric_loader_version}"
+
+    compileOnlyApi fabricApi.module("fabric-api-base", fabric_api_version)
+    compileOnlyApi fabricApi.module("fabric-command-api-v2", fabric_api_version)
+    compileOnlyApi fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+    compileOnlyApi fabricApi.module("fabric-networking-api-v1", fabric_api_version)
+}
+
+shadowJar {
+    dependencies {
+        include(project(":loader"))
+    }
+
+    from { project(":minecraft-fabric").tasks.shadowJar.archiveFile }
+    dependsOn(":minecraft-fabric:shadowJar")
+}
+
+processResources {
+    def props = [version: "$project_version", author: "$project_author", description: "$project_description"]
+    inputs.properties props
+    filteringCharset "UTF-8"
+    filesMatching("fabric.mod.json") { expand props }
+}

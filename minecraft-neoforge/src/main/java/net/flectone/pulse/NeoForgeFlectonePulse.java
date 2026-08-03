@@ -14,6 +14,7 @@ import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.NeoForgeLibraryResolver;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.commands.CommandSourceStack;
@@ -21,7 +22,6 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -33,17 +33,17 @@ import java.util.function.Supplier;
 
 @Getter
 @Singleton
-public class NeoForgeFlectonePulse implements FlectonePulse, LoaderBootstrap {
+public class NeoForgeFlectonePulse implements FlectonePulse {
 
     @Setter
     private MinecraftServer minecraftServer;
 
-    private final Supplier<ModContainer> loader;
+    private final Supplier<NeoForgeFlectonePulseLoader> loader;
 
     private FLogger fLogger;
     private Injector injector;
 
-    public NeoForgeFlectonePulse(Supplier<ModContainer> loader) {
+    public NeoForgeFlectonePulse(Supplier<NeoForgeFlectonePulseLoader> loader) {
         this.loader = loader;
     }
 
@@ -72,7 +72,6 @@ public class NeoForgeFlectonePulse implements FlectonePulse, LoaderBootstrap {
             throwInitException(e);
         }
 
-        // we need to call enable right now, because the commands must be registered before server is fully started
         onEnable();
     }
 
@@ -122,6 +121,11 @@ public class NeoForgeFlectonePulse implements FlectonePulse, LoaderBootstrap {
     }
 
     @Override
+    public NeoForgeFlectonePulseLoader getLoader() {
+        return loader.get();
+    }
+
+    @Override
     public void initPacketAdapter() {
         WrapperPacketEvents.init();
     }
@@ -144,22 +148,17 @@ public class NeoForgeFlectonePulse implements FlectonePulse, LoaderBootstrap {
     }
 
     @Override
-    public void preNewPlayerPlace(Connection connection, ServerPlayer player) {
-        WrapperPacketEvents.preNewPlayerPlace(connection, player);
+    public void hook(HookType type, Object... args) {
+        try {
+            switch (type) {
+                case CONFIGURE_SERIALIZATION -> WrapperPacketEvents.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
+                case PRE_NEW_PLAYER_PLACE -> WrapperPacketEvents.preNewPlayerPlace((Connection) args[0], (ServerPlayer) args[1]);
+                case ON_PLAYER_LOGIN -> WrapperPacketEvents.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
+                case POST_RESPAWN -> WrapperPacketEvents.postRespawn((CallbackInfoReturnable<ServerPlayer>) args[0]);
+            }
+        } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
+            fLogger.warning("Hook % type called with invalid arguments: %s", type, e.getMessage());
+        }
     }
 
-    @Override
-    public void onPlayerLogin(Connection connection, ServerPlayer player) {
-        WrapperPacketEvents.onPlayerLogin(connection, player);
-    }
-
-    @Override
-    public void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        WrapperPacketEvents.postRespawn(cir);
-    }
-
-    @Override
-    public void configureSerialization(ChannelPipeline pipeline, PacketFlow flow) {
-        WrapperPacketEvents.configureSerialization(pipeline, flow);
-    }
 }

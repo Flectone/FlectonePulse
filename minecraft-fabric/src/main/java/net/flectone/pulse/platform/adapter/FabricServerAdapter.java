@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -23,8 +22,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
-import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.processing.converter.AdventureHoverConverter;
+import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.FabricTpsTracker;
@@ -48,11 +47,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Singleton
@@ -65,7 +60,6 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final Provider<SocialService> socialServiceProvider;
     private final MinecraftPacketProvider packetProvider;
     private final AdventureHoverConverter adventureHoverConverter;
-    private final @Named("projectPath") Path projectPath;
     private final FabricTpsTracker tpsTracker;
     private final FLogger fLogger;
     private final ComponentDecorator componentDecorator;
@@ -223,34 +217,6 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     @Override
     public @NonNull String getItemName(@NonNull Object item) {
         return item instanceof net.minecraft.world.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
-    }
-
-    @Override
-    public @Nullable InputStream getResource(@NonNull String path) {
-        return getClass().getClassLoader().getResourceAsStream(path);
-    }
-
-    @Override
-    public void saveResource(@NonNull String path) {
-        InputStream resource = getResource(path);
-        if (resource == null) return;
-
-        try {
-            Path targetPath = projectPath.resolve(path);
-
-            if (Files.exists(targetPath)) {
-                return;
-            }
-
-            Path parentDir = targetPath.getParent();
-            if (parentDir != null) {
-                Files.createDirectories(parentDir);
-            }
-
-            Files.copy(resource, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            fLogger.warning(e);
-        }
     }
 
     @Override

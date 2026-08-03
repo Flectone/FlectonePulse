@@ -1,0 +1,11 @@
+dependencies {
+    implementation project(":loader")
+
+    compileOnly "com.velocitypowered:velocity-api:$velocity_version"
+    annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"
+}
+
+shadowJar {
+    from { project(":minecraft-velocity").tasks.shadowJar.archiveFile }
+    dependsOn(":minecraft-velocity:shadowJar")
+}

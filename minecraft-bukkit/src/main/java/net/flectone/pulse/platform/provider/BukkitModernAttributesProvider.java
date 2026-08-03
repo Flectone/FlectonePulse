@@ -2,30 +2,44 @@ package net.flectone.pulse.platform.provider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
+import java.lang.invoke.MethodHandle;
+
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitModernAttributesProvider implements BukkitAttributesProvider {
 
-    private static final Attribute ARMOR_ATTRIBUTE = resolveAttribute("ARMOR", "GENERIC_ARMOR");
-    private static final Attribute ATTACK_DAMAGE_ATTRIBUTE = resolveAttribute("ATTACK_DAMAGE", "GENERIC_ATTACK_DAMAGE");
+    private final MethodHandle valueOfMethod;
+    private final Attribute armorAttribute;
+    private final Attribute attackDamageAttribute;
 
-    private static Attribute resolveAttribute(String modern, String legacy) {
+    @Inject
+    public BukkitModernAttributesProvider(ReflectionResolver reflectionResolver) {
+        this.valueOfMethod = reflectionResolver.unreflectMethod(Attribute.class, "valueOf", String.class);
+        this.armorAttribute = resolveAttribute("ARMOR", "GENERIC_ARMOR");
+        this.attackDamageAttribute = resolveAttribute("ATTACK_DAMAGE", "GENERIC_ATTACK_DAMAGE");
+    }
+
+    private Attribute resolveAttribute(String modern, String legacy) {
         try {
-            return Attribute.valueOf(modern);
-        } catch (IllegalArgumentException _) {
-            return Attribute.valueOf(legacy);
+            return (Attribute) valueOfMethod.invoke(modern);
+        } catch (Throwable _) {
+        }
+
+        try {
+            return (Attribute) valueOfMethod.invoke(legacy);
+        } catch (Throwable _) {
+            throw new IllegalArgumentException("Cannot resolve attribute");
         }
     }
 
     @Override
     public double getArmorValue(Player player) {
         try {
-            AttributeInstance instance = player.getAttribute(ARMOR_ATTRIBUTE);
+            AttributeInstance instance = player.getAttribute(armorAttribute);
             return instance != null ? round(instance.getValue()) : 0.0;
         } catch (Exception _) {
             return 0.0;
@@ -35,7 +49,7 @@ public class BukkitModernAttributesProvider implements BukkitAttributesProvider 
     @Override
     public double getAttackDamage(Player player) {
         try {
-            AttributeInstance instance = player.getAttribute(ATTACK_DAMAGE_ATTRIBUTE);
+            AttributeInstance instance = player.getAttribute(attackDamageAttribute);
             return instance != null ? round(instance.getValue()) : 1.0;
         } catch (Exception _) {
             return 1.0;

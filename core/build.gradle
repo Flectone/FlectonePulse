@@ -1,29 +1,33 @@
 dependencies {
     implementation "net.flectone:libby-core:$libby_version"
 
+    compileOnlyApi project(":loader")
+
     compileOnlyApi "org.jdbi:jdbi3-core:$jdbi3_core_version"
     compileOnlyApi "org.jdbi:jdbi3-sqlobject:$jdbi3_core_version"
     compileOnlyApi "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
-    compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
+    compileOnlyApi "org.mariadb.jdbc:mariadb-java-client:$mariadb_java_client_version"
+    compileOnlyApi "com.h2database:h2:$h2_version"
+    compileOnlyApi "org.postgresql:postgresql:$postgresql_version"
     compileOnlyApi "com.zaxxer:HikariCP:$HikariCP_version"
-    compileOnly "org.apache.logging.log4j:log4j-core:$log4j_core_version"
-    compileOnly "net.luckperms:api:$luckpermsapi_version"
+    compileOnlyApi "io.lettuce:lettuce-core:$lettuce_version"
+    compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
+
+    // integrations
     compileOnlyApi "com.discord4j:discord4j-core:$discord4j_version"
     compileOnlyApi "com.github.twitch4j:twitch4j:$twitch4j_version"
     compileOnlyApi "org.telegram:telegrambots-longpolling:$telegrambots_version"
     compileOnlyApi "org.telegram:telegrambots-client:$telegrambots_version"
     compileOnlyApi "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
     compileOnlyApi "com.deepl.api:deepl-java:$deepl_version"
-    compileOnlyApi "com.sparkjava:spark-core:$spark_version"
-    compileOnlyApi "org.mariadb.jdbc:mariadb-java-client:$mariadb_java_client_version"
-    compileOnlyApi "com.h2database:h2:$h2_version"
-    compileOnlyApi "org.postgresql:postgresql:$postgresql_version"
-    compileOnlyApi "io.lettuce:lettuce-core:$lettuce_version"
     compileOnlyApi "com.ibm.icu:icu4j:$icu4j_version"
+    compileOnlyApi "com.sparkjava:spark-core:$spark_version"
+
+    compileOnly "org.apache.logging.log4j:log4j-core:$log4j_core_version"
+    compileOnly "net.luckperms:api:$luckpermsapi_version"
 }
 
 tasks.named("buildFinalJar", Jar) {
     from(zipTree(tasks.shadeDowngradedApi.archiveFile))
-
     dependsOn tasks.shadeDowngradedApi
 }

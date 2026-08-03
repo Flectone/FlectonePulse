@@ -14,42 +14,55 @@ import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.function.Supplier;
+import java.util.logging.Logger;
+
 @Getter
 @Singleton
-public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
+public class BukkitFlectonePulse implements FlectonePulse {
+
+    private final Supplier<BukkitFlectonePulseLoader> loader;
 
     private FLogger fLogger;
     private LibraryResolver libraryResolver;
     private Injector injector;
 
+    public BukkitFlectonePulse(Supplier<BukkitFlectonePulseLoader> loader) {
+        this.loader = loader;
+    }
+
     @Override
     public void onLoad() {
+        JavaPlugin plugin = getLoader();
+        Logger logger = plugin.getLogger();
+
         // initialize custom logger
         fLogger = new FLogger(
-                logRecord -> this.getLogger().log(logRecord),
+                logger::log,
                 () -> injector == null ? null : injector.getInstance(FileFacade.class)
         );
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        libraryResolver = new BukkitLibraryResolver(this);
+        libraryResolver = new BukkitLibraryResolver(plugin);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
         // configure packetevents api
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin));
         PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, this, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, plugin, libraryResolver, fLogger));
         } catch (Exception e) {
             throwInitException(e);
         }
@@ -60,7 +73,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void onEnable() {
         if (!isReady()) {
-            Bukkit.getPluginManager().disablePlugin(this);
+            Bukkit.getPluginManager().disablePlugin(loader.get());
             return;
         }
 
@@ -86,7 +99,12 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         get(FlectonePulseAPI.class).onDisable();
 
         // cancel custom tasks
-        injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).cancelTasks(this);
+        injector.getInstance(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).cancelTasks(loader.get());
+    }
+
+    @Override
+    public void hook(HookType type, Object... args) {
+        // nothing
     }
 
     @Override
@@ -94,6 +112,11 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         if (!isReady()) return;
 
         get(FlectonePulseAPI.class).reload();
+    }
+
+    @Override
+    public BukkitFlectonePulseLoader getLoader() {
+        return loader.get();
     }
 
     @Override

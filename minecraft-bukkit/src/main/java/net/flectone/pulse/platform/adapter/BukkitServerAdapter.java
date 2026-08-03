@@ -19,8 +19,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.context.MessageContext;
 import net.flectone.pulse.platform.provider.MinecraftPacketProvider;
 import net.flectone.pulse.platform.provider.PaperItemNameProvider;
-import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.processing.converter.AdventureHoverConverter;
+import net.flectone.pulse.processing.converter.IconConverter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.serializer.ComponentSerializer;
 import net.flectone.pulse.service.FPlayerService;
@@ -37,13 +37,11 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.CachedServerIcon;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -54,7 +52,6 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
-    private final Plugin plugin;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Provider<SocialService> socialServiceProvider;
@@ -314,18 +311,6 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
 
         return getLegacyItemName(bukkitItem);
-    }
-
-    @Override
-    public @Nullable InputStream getResource(@NonNull String path) {
-        return plugin.getResource(path);
-    }
-
-    @Override
-    public void saveResource(@NonNull String path) {
-        if (getResource(path) == null) return;
-
-        plugin.saveResource(path, false);
     }
 
     @Override

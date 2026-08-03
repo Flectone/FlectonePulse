@@ -1,4 +1,0 @@
-AssetImage #HyUIAssetImage {
-    // Thanks to artho @ Hytale Modding discord :3
-    Anchor: (Width: 200, Height: 200);
-}

@@ -41,6 +41,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.incendo.cloud.context.CommandContext;
@@ -50,6 +51,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +63,7 @@ public class MaintenanceModule implements ModuleCommand {
     private final FileFacade fileFacade;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
+    private final @Named("projectPath") Path projectPath;
     private final @Named("imagePath") Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
@@ -77,6 +80,7 @@ public class MaintenanceModule implements ModuleCommand {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final ProxyRegistry proxyRegistry;
     private final SocialService socialService;
+    private final FLogger fLogger;
 
     protected String icon;
 
@@ -91,7 +95,11 @@ public class MaintenanceModule implements ModuleCommand {
         File file = iconPath.resolve("maintenance.png").toFile();
 
         if (!file.exists()) {
-            platformServerAdapter.saveResource("images/maintenance.png");
+            try {
+                platformServerAdapter.saveResource(projectPath, "images/maintenance.png");
+            } catch (IOException e) {
+                fLogger.warning(e);
+            }
         }
 
         icon = iconConverter.convert(file);

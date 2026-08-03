@@ -1,4 +1,0 @@
-$C = "../../Common.ui";
-$C.@TextField #HyUITextField {
-    Value: "";
-}

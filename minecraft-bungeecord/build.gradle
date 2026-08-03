@@ -1,20 +1,16 @@
 dependencies {
     implementation project(":core")
 
+    compileOnlyApi project(":minecraft-bungeecord:loader")
+
     compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
 }
 
-processResources {
-    def props = [version: "$project_version", prefix: "$project_name", author: "$project_author", description: "$project_description", website: "$project_website"]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('bungee.yml') {
-        expand props
-    }
+shadowJar {
+    archiveFileName = "flectonepulse-bukkit.jarinjar"
 }
 
 tasks.named("buildFinalJar", Jar) {
     from(zipTree(tasks.shadeDowngradedApi.archiveFile))
-
     dependsOn tasks.shadeDowngradedApi
 }

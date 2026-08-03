@@ -1,0 +1,17 @@
+dependencies {
+    implementation project(":loader")
+
+    compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
+}
+
+shadowJar {
+    from { project(":minecraft-bungeecord").tasks.shadowJar.archiveFile }
+    dependsOn(":minecraft-bungeecord:shadowJar")
+}
+
+processResources {
+    def props = [version: "$project_version", prefix: "$project_name", author: "$project_author", description: "$project_description", website: "$project_website"]
+    inputs.properties props
+    filteringCharset "UTF-8"
+    filesMatching("bungee.yml") { expand props }
+}

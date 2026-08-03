@@ -21,9 +21,11 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.generator.RandomGenerator;
+import net.flectone.pulse.util.logging.FLogger;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -42,6 +44,8 @@ public class MinecraftIconModule implements ModuleSimple {
     private final RandomGenerator randomGenerator;
     private final IconConverter iconConverter;
     private final MinecraftServerStatusFormatter serverStatusFormatter;
+    private final FLogger fLogger;
+    private final @Named("projectPath") Path projectPath;
     private final @Named("imagePath") Path iconPath;
 
     private int index;
@@ -80,7 +84,11 @@ public class MinecraftIconModule implements ModuleSimple {
         iconNames.forEach(iconName -> {
             if (iconPath.resolve(iconName).toFile().exists()) return;
 
-            platformServerAdapter.saveResource("images/" + iconName);
+            try {
+                platformServerAdapter.saveResource(projectPath,"images/" + iconName);
+            } catch (IOException e) {
+                fLogger.warning(e);
+            }
         });
 
         File folder = iconPath.toFile();

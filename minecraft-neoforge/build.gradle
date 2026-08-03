@@ -1,5 +1,5 @@
 plugins {
-    id 'net.neoforged.moddev' version "${neoforge_moddev_version}"
+    id "net.neoforged.moddev" version "${neoforge_moddev_version}"
 }
 
 neoForge {
@@ -8,57 +8,38 @@ neoForge {
 
 configurations.configureEach {
     resolutionStrategy {
-        force 'org.jspecify:jspecify:1.0.1'
-        force 'it.unimi.dsi:fastutil:8.5.19'
-        force 'commons-io:commons-io:2.22.0'
+        force "org.jspecify:jspecify:1.0.1"
+        force "it.unimi.dsi:fastutil:8.5.19"
+        force "commons-io:commons-io:2.22.0"
     }
 }
 
 configurations {
-    shade
-    implementation.extendsFrom shade
+    shadow
+    implementation.extendsFrom shadow
 }
 
 dependencies {
-    compileOnly("org.incendo:cloud-neoforge:${cloud_neoforge_version}")
-    compileOnly(project(":minecraft-neoforge:loader"))
+    compileOnly project(":minecraft-neoforge:loader")
+    compileOnly "org.incendo:cloud-neoforge:${cloud_neoforge_version}"
 
-    // TODO: delete when neoforge repository appears
-    shadow(files('libs/packetevents-neoforge-2.13.0.jar'))
-
-    shadow(project(":core"))
-    shadow(project(":minecraft-common"))
-    shadow("net.flectone:libby-core:$libby_version")
+    shadow project(":core")
+    shadow project(":minecraft-common")
+    shadow files("libs/packetevents-neoforge-2.13.0.jar")
 }
 
 shadowJar {
-    archiveFileName = "flectonepulsedev-neoforge.jarinjar"
+    archiveFileName = "flectonepulse-neoforge.jarinjar"
     configurations = [project.configurations.shadow]
     minimize()
-}
-
-processResources {
-    def props = [version: "$project_version", author: "$project_author", description: "$project_description"]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-}
-
-tasks.named("shadowJar") {
-    configurations = [project.configurations.shadow]
-}
-
-artifacts {
-    archives shadowJar
 }
 
 tasks.named("buildFinalJar", Jar) {
     archiveFileName = "FlectonePulse-NeoForge-" + project_version + ".jar"
 
-    from {
-        zipTree(project(':minecraft-neoforge:loader').tasks.shadowJar.archiveFile)
-    }
-
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    dependsOn(':minecraft-neoforge:loader:shadowJar')
+    from { zipTree(project(":minecraft-neoforge:loader").tasks.shadowJar.archiveFile) }
+
+    dependsOn(":minecraft-neoforge:loader:shadowJar")
 }

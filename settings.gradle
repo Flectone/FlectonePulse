@@ -10,12 +10,18 @@ pluginManagement {
 }
 
 include "core"
+include "loader"
 include "hytale"
+include 'hytale:loader'
 include "minecraft-common"
 include "minecraft-fabric"
+include 'minecraft-fabric:loader'
 include "minecraft-bukkit"
+include 'minecraft-bukkit:loader'
 include "minecraft-paper"
 include "minecraft-velocity"
 include "minecraft-bungeecord"
 include "minecraft-neoforge"
 include "minecraft-neoforge:loader"
+include 'minecraft-velocity:loader'
+include 'minecraft-bungeecord:loader'

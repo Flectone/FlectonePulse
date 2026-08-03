@@ -1,11 +1,11 @@
 plugins {
-    id 'java'
-    id 'java-library'
-    id 'com.gradleup.shadow' version '9.6.1'
-    id 'com.github.gmazzo.buildconfig' version '6.0.10'
-    id 'xyz.wagyourtail.jvmdowngrader' version '1.3.6'
-    id 'com.vanniktech.maven.publish' version "0.37.0"
-    id 'io.freefair.lombok' version "9.5.0"
+    id "java"
+    id "java-library"
+    id "com.gradleup.shadow" version "9.6.1"
+    id "com.github.gmazzo.buildconfig" version "6.0.10"
+    id "xyz.wagyourtail.jvmdowngrader" version "1.3.6"
+    id "com.vanniktech.maven.publish" version "0.37.0"
+    id "io.freefair.lombok" version "9.5.0"
 }
 
 group = maven_group
@@ -16,24 +16,28 @@ repositories {
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'java-library'
-    apply plugin: 'com.github.gmazzo.buildconfig'
-    apply plugin: 'com.gradleup.shadow'
-    apply plugin: 'xyz.wagyourtail.jvmdowngrader'
-    apply plugin: 'com.vanniktech.maven.publish'
-    apply plugin: 'io.freefair.lombok'
-
-    compileJava.options.encoding = 'UTF-8'
-
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = 'UTF-8'
-    }
+    apply plugin: "java"
+    apply plugin: "java-library"
+    apply plugin: "com.github.gmazzo.buildconfig"
+    apply plugin: "com.gradleup.shadow"
+    apply plugin: "xyz.wagyourtail.jvmdowngrader"
+    apply plugin: "com.vanniktech.maven.publish"
+    apply plugin: "io.freefair.lombok"
 
     java {
         sourceCompatibility = java_version
         targetCompatibility = java_version
         withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption("Xdoclint:none", "-quiet")
+        options.addStringOption("encoding", "UTF-8")
+        options.addStringOption("charSet", "UTF-8")
     }
 
     repositories {
@@ -43,6 +47,7 @@ subprojects {
         maven { url = "https://oss.sonatype.org/content/groups/public/" }
         maven { url = "https://repo.aikar.co/content/groups/aikar/" }
         maven { url = "https://repo.codemc.io/repository/maven-releases/" }
+        maven { url = "https://repo.codemc.io/repository/maven-snapshots/" }
         maven { url = "https://repo.codemc.io/repository/ArikSquad/" }
         maven { url = "https://repo.helpch.at/releases/" }
         maven { url = "https://repo.alessiodp.com/snapshots" }
@@ -53,7 +58,6 @@ subprojects {
         maven { url = "https://repo.plasmoverse.com/snapshots" }
         maven { url = "https://repo.loohpjames.com/repository" }
         maven { url = "https://repo.diogotc.com/releases" }
-        maven { url = "https://repo.codemc.io/repository/maven-snapshots/" }
         maven { url = "https://maven.devs.beer/" }
         maven { url = "https://maven.nucleoid.xyz/" }
         maven { url = "https://api.modrinth.com/maven" }
@@ -65,18 +69,23 @@ subprojects {
         maven { url = "https://maven.hytale.com/pre-release" }
         maven { url = "https://www.cursemaven.com" }
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
-        maven { url = "https://repo.inventivetalent.org/repository/public/"}
+        maven { url = "https://repo.inventivetalent.org/repository/public/" }
         maven { url = "https://jitpack.io" }
     }
 
     dependencies {
         api "org.jspecify:jspecify:$jspecify_version"
+
         compileOnlyApi "org.mapstruct:mapstruct:$mapstruct_version"
         compileOnlyApi "org.projectlombok:lombok:$lombok_version"
         annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
 
-        // TODO: remove when Fabric supports Adventure 5.x
+        compileOnlyApi "com.google.inject:guice:$guice_version"
+        compileOnlyApi "tools.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
+        compileOnlyApi "org.apache.commons:commons-text:$apache_commons_text_version"
+        compileOnlyApi "it.unimi.dsi:fastutil:$fastutil_version"
+
         def adventureVersion = project.hasProperty("adventureVersion") ? project.property("adventureVersion") : "$adventure_api"
         compileOnlyApi "net.kyori:adventure-api:${adventureVersion}"
         compileOnlyApi "net.kyori:adventure-text-minimessage:${adventureVersion}"
@@ -84,32 +93,18 @@ subprojects {
         compileOnlyApi "net.kyori:adventure-text-serializer-gson:${adventureVersion}"
         compileOnlyApi "net.kyori:adventure-text-serializer-plain:${adventureVersion}"
         compileOnlyApi "net.kyori:adventure-text-serializer-ansi:${adventureVersion}"
-
-        compileOnlyApi "com.google.inject:guice:$guice_version"
-        compileOnlyApi "tools.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
-        compileOnlyApi "org.apache.commons:commons-text:$apache_commons_text_version"
-        compileOnlyApi "it.unimi.dsi:fastutil:$fastutil_version"
     }
 
     buildConfig {
         className("BuildConfig")
         packageName(maven_group)
-        rootProject.ext.properties.findAll { key, value ->
-            !key.contains('.')
-        }.each { key, value ->
-            buildConfigField(String, key.toString().toUpperCase(), value)
-        }
+        rootProject.ext.properties.findAll { key, value -> !key.contains(".") }
+                .each { key, value -> buildConfigField(String, key.toString().toUpperCase(), value) }
     }
 
     downgradeJar {
         quiet = true
         downgradeTo = JavaVersion.VERSION_17
-    }
-
-    tasks.withType(Javadoc).configureEach {
-        options.addStringOption('Xdoclint:none', '-quiet')
-        options.addStringOption('encoding', 'UTF-8')
-        options.addStringOption('charSet', 'UTF-8')
     }
 
     tasks.register("buildFinalJar", Jar) {
@@ -132,22 +127,21 @@ subprojects {
         relocate("io.github.retrooper.packetevents", "${relocated_pattern}.packetevents.impl")
         relocate("org.incendo", "${relocated_pattern}.cloud")
 
-        from(rootProject.file('LICENSE')) {
-            into('/')
-        }
-
         if (project.name != "minecraft-paper") {
             relocate("net.kyori.adventure", "${relocated_pattern}.adventure")
             relocate("com.google.gson", "${relocated_pattern}.gson")
         }
 
-        if (project.name != "minecraft-velocity") {
+        if (project.name != "minecraft-velocity" && project.parent.name != "minecraft-velocity") {
             relocate("com.google.inject", "${relocated_pattern}.guice")
             relocate("com.google.common", "${relocated_pattern}.guava")
         }
 
-        outputs.cacheIf { true }
+        from(rootProject.file("LICENSE")) {
+            into("/")
+        }
 
+        outputs.cacheIf { true }
         minimize()
     }
 
@@ -162,30 +156,48 @@ subprojects {
         pom {
             name = "FlectonePulse ${artifactId.capitalize()}"
             description = "Every Message Under Your Control!"
-            url = 'https://github.com/Flectone/FlectonePulse'
+            url = "https://github.com/Flectone/FlectonePulse"
+
             licenses {
                 license {
-                    name = 'GNU General Public License v3.0'
-                    url = 'https://www.gnu.org/licenses/gpl-3.0'
+                    name = "GNU General Public License v3.0"
+                    url = "https://www.gnu.org/licenses/gpl-3.0"
                 }
             }
 
             developers {
                 developer {
-                    id = 'TheFaser'
-                    name = 'TheFaser'
-                    email = 'artem.mochalin11@gmail.com'
+                    id = "TheFaser"
+                    name = "TheFaser"
+                    email = "artem.mochalin11@gmail.com"
                 }
             }
 
             scm {
-                connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
-                developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
-                url = 'https://github.com/Flectone/FlectonePulse'
+                connection = "scm:git:https://github.com/Flectone/FlectonePulse.git"
+                developerConnection = "scm:git:ssh://github.com/Flectone/FlectonePulse.git"
+                url = "https://github.com/Flectone/FlectonePulse"
             }
         }
 
         signAllPublications()
     }
 
+    afterEvaluate {
+        publishing.publications.withType(MavenPublication).configureEach {
+            pom.withXml {
+                def dependenciesNode = asNode().dependencies?.getAt(0) ?: asNode().appendNode("dependencies")
+                configurations.compileOnlyApi.allDependencies.each { dep ->
+                    if (dep.group != null && dep.version != null) {
+                        def depNode = dependenciesNode.appendNode("dependency")
+                        depNode.appendNode("groupId", dep.group)
+                        depNode.appendNode("artifactId", dep.name)
+                        depNode.appendNode("version", dep.version)
+                        depNode.appendNode("scope", "compile")
+                        depNode.appendNode("optional", "true")
+                    }
+                }
+            }
+        }
+    }
 }

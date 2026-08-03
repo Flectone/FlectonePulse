@@ -26,7 +26,7 @@ import net.flectone.pulse.util.logging.FLogger;
  * @see FlectonePulseAPI#getInstance()
  * @since 0.1.0
  */
-public interface FlectonePulse {
+public interface FlectonePulse extends LoaderBoostrap {
 
     /**
      * Gets the Google Guice Injector instance used for dependency injection.
@@ -38,24 +38,6 @@ public interface FlectonePulse {
      * @see #get(Class)
      */
     Injector getInjector();
-
-    /**
-     * Called when the FlectonePulse is enabled.
-     * <p>
-     * This method initializes the dependency injector and prepares the FlectonePulse
-     * for operation. It should only be called by the FlectonePulse itself.
-     *
-     */
-    void onEnable();
-
-    /**
-     * Called when the FlectonePulse is disabled.
-     * <p>
-     * This method cleans up resources and shuts down FlectonePulse modules.
-     * It should only be called by the FlectonePulse itself.
-     *
-     */
-    void onDisable();
 
     /**
      * Reloads the FlectonePulse configuration and modules.
@@ -88,6 +70,8 @@ public interface FlectonePulse {
      * Closes all open user interfaces including inventories and dialogs.
      */
     void closeUIs();
+
+    Object getLoader();
 
     /**
      * Retrieves an instance of the specified class through dependency injection.

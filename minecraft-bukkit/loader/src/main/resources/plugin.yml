@@ -1,0 +1,36 @@
+name: FlectonePulse
+version: '${version}'
+main: net.flectone.pulse.BukkitFlectonePulseLoader
+api-version: '1.13'
+prefix: ${prefix}
+authors: [ TheFaser ]
+description: ${description}
+website: ${website}
+folia-supported: true
+softdepend:
+  - AdvancedBan
+  - CMI
+  - floodgate
+  - Geyser-Spigot
+  - InteractiveChat
+  - ItemsAdder
+  - LibertyBans
+  - LiteBans
+  - LuckPerms
+  - MiniMOTD
+  - MiniPlaceholders
+  - MOTD
+  - packetevents
+  - PlaceholderAPI
+  - PlasmoVoice
+  - PremiumVanish
+  - ProtocolLib
+  - ProtocolSupport
+  - SkinsRestorer
+  - SuperVanish
+  - TAB
+  - Vault
+  - ViaBackwards
+  - ViaRewind
+  - ViaVersion
+  - voicechat

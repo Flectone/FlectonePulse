@@ -2,6 +2,7 @@ package net.flectone.pulse;
 
 import net.flectone.pulse.listener.BungeecordLoginStateListener;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
@@ -20,26 +21,35 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public final class BungeecordFlectonePulse extends Plugin implements Listener {
+public final class BungeecordFlectonePulse implements LoaderBoostrap, Listener {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final String CHANNEL = "BungeeCord";
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
+
+    private final Supplier<BungeecordFlectonePulseLoader> loader;
     private final BungeecordLoginStateListener bungeeDisconnectListener = new BungeecordLoginStateListener();
 
-    private FLogger fLogger;
+    private final FLogger fLogger;
+
+    public BungeecordFlectonePulse(Supplier<BungeecordFlectonePulseLoader> loader) {
+        this.loader = loader;
+
+        Plugin plugin = loader.get();
+        this.fLogger = new FLogger(logRecord -> plugin.getLogger().log(logRecord), () -> null);
+    }
 
     @Override
-    public void onEnable() {
-        fLogger = new FLogger(logRecord -> this.getLogger().log(logRecord), () -> null);
-
+    public void onLoad() {
         fLogger.logEnabling();
 
-        getProxy().registerChannel(CHANNEL);
-        getProxy().getPluginManager().registerListener(this, this);
-        getProxy().getPluginManager().registerListener(this, bungeeDisconnectListener);
+        Plugin plugin = loader.get();
+        plugin.getProxy().registerChannel(CHANNEL);
+        plugin.getProxy().getPluginManager().registerListener(plugin, this);
+        plugin.getProxy().getPluginManager().registerListener(plugin, bungeeDisconnectListener);
 
         fLogger.logEnabled();
     }
@@ -48,11 +58,22 @@ public final class BungeecordFlectonePulse extends Plugin implements Listener {
     public void onDisable() {
         fLogger.logDisabling();
 
-        getProxy().unregisterChannel(CHANNEL);
-        getProxy().getPluginManager().unregisterListener(this);
-        getProxy().getPluginManager().unregisterListener(bungeeDisconnectListener);
+        Plugin plugin = loader.get();
+        plugin.getProxy().unregisterChannel(CHANNEL);
+        plugin.getProxy().getPluginManager().unregisterListener(this);
+        plugin.getProxy().getPluginManager().unregisterListener(bungeeDisconnectListener);
 
         fLogger.logDisabled();
+    }
+
+    @Override
+    public <T> T get(Class<T> type) {
+        return null;
+    }
+
+    @Override
+    public void hook(HookType type, Object... args) {
+        // nothing
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -10,35 +10,41 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import java.util.function.Supplier;
 
 @Mod(BuildConfig.PROJECT_MOD_ID)
-public class NeoForgeFlectonePulseLoader implements Supplier<ModContainer> {
+public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePulseLoader> {
 
-    private static final String JAR_NAME = "flectonepulsedev-neoforge.jarinjar";
+    private static final String JAR_NAME = "flectonepulse-neoforge.jarinjar";
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.NeoForgeFlectonePulse";
 
+    @Getter
     private final ModContainer container;
+
+    @Getter
+    private final IEventBus eventBus;
+
+    @Getter
+    private static LoaderBoostrap loadBootstrap;
 
     private JarInJarClassLoader loader;
 
-    @Getter
-    private static LoaderBootstrap plugin;
-
-    public NeoForgeFlectonePulseLoader(IEventBus modEventBus, ModContainer modContainer) {
+    public NeoForgeFlectonePulseLoader(IEventBus eventBus, ModContainer modContainer) {
         this.container = modContainer;
+        this.eventBus = eventBus;
 
         if (FMLEnvironment.getDist().isClient()) return;
 
         this.loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
 
-        modEventBus.addListener(this::onCommonSetup);
+        eventBus.addListener(this::onCommonSetup);
     }
 
     public void onCommonSetup(FMLCommonSetupEvent event) {
-        this.plugin = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        this.plugin.onLoad();
+        loadBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        loadBootstrap.onLoad();
     }
 
     @Override
-    public ModContainer get() {
-        return this.container;
+    public NeoForgeFlectonePulseLoader get() {
+        return this;
     }
+
 }

@@ -1,17 +1,18 @@
 dependencies {
     implementation project(":core")
+
     compileOnlyApi "net.flectone:libby-core:$libby_version"
     compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
     compileOnlyApi "org.incendo:cloud-brigadier:$cloud_paper_version"
+    compileOnlyApi "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
 
+    compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
+    compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
-    compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
     compileOnly "org.geysermc.geyser:api:$geyser_version"
     compileOnly "org.geysermc.floodgate:api:$floodgate_version"
-    compileOnly "com.mojang:brigadier:$mojang_brigadier_version"
-    compileOnly "org.apache.logging.log4j:log4j-core:$apache_logging_log4j_version"
     compileOnly "org.mineskin:java-client-jsoup:$mineskin_api_version"
 
     // only for no compile errors

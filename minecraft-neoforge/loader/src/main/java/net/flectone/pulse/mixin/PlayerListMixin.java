@@ -18,8 +18,8 @@
 
 package net.flectone.pulse.mixin;
 
-import net.flectone.pulse.LoaderBootstrap;
 import net.flectone.pulse.NeoForgeFlectonePulseLoader;
+import net.flectone.pulse.util.constant.HookType;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -35,9 +35,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
 
-    /**
-     * @reason Associate connection instance with player instance
-     */
     @Inject(
             method = "placeNewPlayer",
             at = @At("HEAD")
@@ -46,15 +43,9 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        LoaderBootstrap loaderBootstrap = NeoForgeFlectonePulseLoader.getPlugin();
-        if (loaderBootstrap == null) return;
-
-        loaderBootstrap.preNewPlayerPlace(connection, player);
+        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, player);
     }
 
-    /**
-     * @reason Call login event and verify injection
-     */
     @Inject(
             method = "placeNewPlayer",
             at = @At(
@@ -67,23 +58,15 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        LoaderBootstrap loaderBootstrap = NeoForgeFlectonePulseLoader.getPlugin();
-        if (loaderBootstrap == null) return;
-
-        loaderBootstrap.onPlayerLogin(connection, player);
+        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
     }
 
-    /**
-     * @reason Minecraft creates a new player instance on respawn
-     */
     @Inject(
             method = "respawn",
             at = @At("RETURN")
     )
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        LoaderBootstrap loaderBootstrap = NeoForgeFlectonePulseLoader.getPlugin();
-        if (loaderBootstrap == null) return;
-
-        loaderBootstrap.postRespawn(cir);
+        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.POST_RESPAWN, cir);
     }
+
 }

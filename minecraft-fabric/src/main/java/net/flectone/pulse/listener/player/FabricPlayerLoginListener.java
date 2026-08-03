@@ -4,14 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.authlib.GameProfile;
 import lombok.RequiredArgsConstructor;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
-import net.flectone.pulse.mixin.ServerLoginPacketListenerImplAccessor;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.processing.serializer.FabricComponentSerializer;
 import net.flectone.pulse.util.file.FileFacade;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 
 import java.util.UUID;
@@ -24,11 +20,10 @@ public class FabricPlayerLoginListener {
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final FabricComponentSerializer componentSerializer;
 
-    public void onPreLogin(ServerLoginPacketListenerImpl netHandler, MinecraftServer server, PacketSender packetSender, ServerLoginNetworking.LoginSynchronizer synchronizer) {
+    public void onPreLogin(ServerLoginPacketListenerImpl netHandler, GameProfile profile) {
         if (fileFacade.config().internal().usePacketLoginListener()) return;
         if (!netHandler.isAcceptingMessages()) return;
 
-        GameProfile profile = ((ServerLoginPacketListenerImplAccessor) netHandler).getAuthenticatedProfile();
         UUID uuid = profile.id();
         String name = profile.name();
 

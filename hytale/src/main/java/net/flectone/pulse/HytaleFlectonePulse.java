@@ -1,8 +1,5 @@
 package net.flectone.pulse;
 
-import com.alessiodp.libby.LibraryManager;
-import com.alessiodp.libby.logging.LogLevel;
-import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -10,41 +7,38 @@ import com.google.inject.Stage;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.processing.resolver.HytaleLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.processing.resolver.libby.HytaleLibbyResolver;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import java.util.function.Supplier;
 
 @Getter
 @Singleton
-public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
+public class HytaleFlectonePulse implements FlectonePulse {
 
+    private final Supplier<JavaPlugin> loader;
     private final Path projectPath;
 
     private FLogger fLogger;
     private Injector injector;
 
-    public HytaleFlectonePulse(@NonNull JavaPluginInit init) {
-        super(init);
-
-        projectPath = init.getFile().getParent().resolve("FlectonePulse");
+    public HytaleFlectonePulse(Supplier<JavaPlugin> loader) {
+        this.loader = loader;
+        this.projectPath = loader.get().getFile().getParent().resolve("FlectonePulse");
     }
 
     @Override
-    protected void setup() {
+    public void onLoad() {
         // initialize custom logger
-        HytaleLogger hytaleLogger = this.getLogger();
+        HytaleLogger hytaleLogger = getLoader().getLogger();
         fLogger = new FLogger(
                 logRecord -> hytaleLogger.at(logRecord.getLevel()).log(logRecord.getMessage()),
                 () -> injector == null ? null : injector.getInstance(FileFacade.class)
@@ -52,8 +46,7 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryManager libraryManager = getLibraryManager(hytaleLogger);
-        LibraryResolver libraryResolver = new HytaleLibraryResolver(libraryManager);
+        LibraryResolver libraryResolver = new HytaleLibraryResolver(hytaleLogger, projectPath);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
@@ -64,16 +57,6 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
         } catch (Exception e) {
             throwInitException(e);
         }
-    }
-
-    @Override
-    protected void start() {
-        onEnable();
-    }
-
-    @Override
-    protected void shutdown() {
-        onDisable();
     }
 
     @Override
@@ -103,35 +86,19 @@ public class HytaleFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @Override
+    public void hook(HookType type, Object... args) {
+        // nothing
+    }
+
+    public JavaPlugin getLoader() {
+        return loader.get();
+    }
+
+    @Override
     public void reload() throws ReloadException {
         if (!isReady()) return;
 
         get(FlectonePulseAPI.class).reload();
-    }
-
-    @NonNull
-    private LibraryManager getLibraryManager(HytaleLogger hytaleLogger) {
-        LogAdapter logAdapter = new LogAdapter() {
-            @Override
-            public void log(@NonNull LogLevel logLevel, @Nullable String s) {
-                switch (logLevel) {
-                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s);
-                    case WARN -> hytaleLogger.at(Level.WARNING).log(s);
-                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s);
-                }
-            }
-
-            @Override
-            public void log(@NonNull LogLevel logLevel, @Nullable String s, @Nullable Throwable throwable) {
-                switch (logLevel) {
-                    case INFO, DEBUG -> hytaleLogger.at(Level.INFO).log(s, throwable);
-                    case WARN -> hytaleLogger.at(Level.WARNING).log(s, throwable);
-                    case ERROR -> hytaleLogger.at(Level.SEVERE).log(s, throwable);
-                }
-            }
-        };
-
-        return new HytaleLibbyResolver(logAdapter, projectPath, "libraries");
     }
 
     @Override

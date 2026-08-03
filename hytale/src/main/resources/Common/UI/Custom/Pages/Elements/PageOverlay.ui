@@ -1,3 +1,0 @@
-$C = "../../Common.ui";
-$C.@PageOverlay #HyUIPageOverlay {
-}

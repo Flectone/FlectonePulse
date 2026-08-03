@@ -32,6 +32,7 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.SocialService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.file.FileFacade;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
@@ -48,6 +49,7 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
     public MinecraftMaintenanceModule(FileFacade fileFacade,
                                       PermissionChecker permissionChecker,
                                       ListenerRegistry listenerRegistry,
+                                      @Named("projectPath") Path projectPath,
                                       @Named("imagePath") Path iconPath,
                                       PlatformServerAdapter platformServerAdapter,
                                       PlatformPlayerAdapter platformPlayerAdapter,
@@ -64,10 +66,11 @@ public class MinecraftMaintenanceModule extends MaintenanceModule {
                                       ModerationMessageFormatter moderationMessageFormatter,
                                       MinecraftServerStatusFormatter serverStatusFormatter,
                                       ProxyRegistry proxyRegistry,
-                                      SocialService socialService) {
-        super(fileFacade, permissionChecker, listenerRegistry, iconPath, platformServerAdapter, platformPlayerAdapter,
+                                      SocialService socialService,
+                                      FLogger fLogger) {
+        super(fileFacade, permissionChecker, listenerRegistry, projectPath, iconPath, platformServerAdapter, platformPlayerAdapter,
                 fPlayerService, messagePipeline, messageDispatcher, moduleController, commandModuleController, iconConverter,
-                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService);
+                commandParserProvider, taskScheduler, moderationService, proxySender, moderationMessageFormatter, proxyRegistry, socialService, fLogger);
 
         this.fPlayerService = fPlayerService;
         this.moduleController = moduleController;

@@ -1,19 +1,17 @@
 package net.flectone.pulse;
 
-import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.listener.VelocityLoginStateListener;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.util.constant.HookType;
 import net.flectone.pulse.util.constant.LoginStatus;
 import net.flectone.pulse.util.constant.ModuleName;
 import net.flectone.pulse.util.logging.FLogger;
@@ -23,53 +21,62 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-@Plugin(
-        id = "flectonepulse",
-        name = "FlectonePulseVelocity",
-        version = BuildConfig.PROJECT_VERSION,
-        authors = BuildConfig.PROJECT_AUTHOR,
-        description = BuildConfig.PROJECT_DESCRIPTION,
-        url = BuildConfig.PROJECT_WEBSITE
-)
-public class VelocityFlectonePulse {
+public class VelocityFlectonePulse implements LoaderBoostrap {
 
     private static final String UNKNOWN_SERVER_NAME = "Unknown";
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
     private final Set<UUID> pendingConnections = Collections.synchronizedSet(new HashSet<>());
 
+    private final Supplier<VelocityFlectonePulseLoader> loader;
     private final ProxyServer proxyServer;
     private final FLogger fLogger;
     private final VelocityLoginStateListener velocityLoginStateListener;
 
-    @Inject
-    public VelocityFlectonePulse(ProxyServer proxyServer,
-                                 VelocityLoginStateListener velocityLoginStateListener,
-                                 Logger logger) {
-        this.proxyServer = proxyServer;
+    public VelocityFlectonePulse(Supplier<VelocityFlectonePulseLoader> loader) {
+        this.loader = loader;
+
+        Injector injector = loader.get().getInjector();
+
+        this.proxyServer = injector.getInstance(ProxyServer.class);
+
+        Logger logger = injector.getInstance(Logger.class);
         this.fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()), () -> null);
-        this.velocityLoginStateListener = velocityLoginStateListener;
+
+        this.velocityLoginStateListener = injector.getInstance(VelocityLoginStateListener.class);
     }
 
-    @Subscribe
-    public void onProxyInitializeEvent(ProxyInitializeEvent event) {
+    @Override
+    public void onLoad() {
         fLogger.logEnabling();
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
-        proxyServer.getEventManager().register(this, velocityLoginStateListener);
+        proxyServer.getEventManager().register(loader.get(), this);
+        proxyServer.getEventManager().register(loader.get(), velocityLoginStateListener);
 
         fLogger.logEnabled();
     }
 
-    @Subscribe
-    public void onProxyShutdownEvent(ProxyShutdownEvent event) {
+    @Override
+    public void onDisable() {
         fLogger.logDisabling();
 
         proxyServer.getChannelRegistrar().unregister(IDENTIFIER);
-        proxyServer.getEventManager().unregisterListeners(this);
+        proxyServer.getEventManager().unregisterListeners(loader.get());
 
         fLogger.logDisabled();
+    }
+
+    @Override
+    public <T> T get(Class<T> type) {
+        return null;
+    }
+
+    @Override
+    public void hook(HookType type, Object... args) {
+        // nothing
     }
 
     @Subscribe(order = PostOrder.LAST)

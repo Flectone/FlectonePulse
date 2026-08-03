@@ -69,7 +69,7 @@ public class HytaleInjector extends PlatformInjector {
     public void setupPlatform(ReflectionResolver reflectionResolver) {
         bind(FlectonePulse.class).toInstance(flectonePulse);
         bind(HytaleFlectonePulse.class).toInstance(flectonePulse);
-        bind(JavaPlugin.class).toInstance(flectonePulse);
+        bind(JavaPlugin.class).toInstance(flectonePulse.getLoader());
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         // adapters
