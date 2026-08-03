@@ -28,6 +28,7 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,7 @@ public class FabricFlectonePulse implements FlectonePulse {
     }
 
     @Override
-    public FabricFlectonePulseLoader getLoader() {
+    public @NonNull FabricFlectonePulseLoader getLoader() {
         return loader.get();
     }
 

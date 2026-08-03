@@ -25,6 +25,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -119,7 +120,7 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     }
 
     @Override
-    public NeoForgeFlectonePulseLoader getLoader() {
+    public @NonNull NeoForgeFlectonePulseLoader getLoader() {
         return loader.get();
     }
 

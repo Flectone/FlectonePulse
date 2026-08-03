@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import net.flectone.pulse.exception.InitException;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Main interface for accessing FlectonePulse API functionality.
@@ -71,7 +72,18 @@ public interface FlectonePulse extends LoaderBoostrap {
      */
     void closeUIs();
 
-    Object getLoader();
+    /**
+     * Returns the platform-specific plugin loader instance.
+     * <p>
+     * This object represents the native plugin or mod container for the
+     * current server implementation (e.g., {@code JavaPlugin} on Bukkit,
+     * {@code Plugin} on BungeeCord, {@code Object} on Velocity).
+     * It can be used to access platform APIs that are not abstracted by
+     * the FlectonePulse interface.
+     *
+     * @return the native loader instance
+     */
+    @NonNull Object getLoader();
 
     /**
      * Retrieves an instance of the specified class through dependency injection.

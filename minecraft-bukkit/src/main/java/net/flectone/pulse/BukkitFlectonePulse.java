@@ -19,6 +19,7 @@ import net.flectone.pulse.util.file.FileFacade;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -115,7 +116,7 @@ public class BukkitFlectonePulse implements FlectonePulse {
     }
 
     @Override
-    public BukkitFlectonePulseLoader getLoader() {
+    public @NonNull BukkitFlectonePulseLoader getLoader() {
         return loader.get();
     }
 
