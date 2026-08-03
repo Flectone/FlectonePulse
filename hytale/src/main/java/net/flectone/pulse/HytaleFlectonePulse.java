@@ -24,13 +24,13 @@ import java.util.function.Supplier;
 @Singleton
 public class HytaleFlectonePulse implements FlectonePulse {
 
-    private final Supplier<JavaPlugin> loader;
+    private final Supplier<HytaleFlectonePulseLoader> loader;
     private final Path projectPath;
 
     private FLogger fLogger;
     private Injector injector;
 
-    public HytaleFlectonePulse(Supplier<JavaPlugin> loader) {
+    public HytaleFlectonePulse(Supplier<HytaleFlectonePulseLoader> loader) {
         this.loader = loader;
         this.projectPath = loader.get().getFile().getParent().resolve("FlectonePulse");
     }
@@ -90,7 +90,7 @@ public class HytaleFlectonePulse implements FlectonePulse {
         // nothing
     }
 
-    public JavaPlugin getLoader() {
+    public HytaleFlectonePulseLoader getLoader() {
         return loader.get();
     }
 

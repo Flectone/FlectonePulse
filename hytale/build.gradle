@@ -1,6 +1,8 @@
 dependencies {
     implementation project(":core")
 
+    compileOnlyApi project(":hytale:loader")
+
     compileOnlyApi "net.flectone:libby-core:$libby_version"
     compileOnlyApi "org.incendo:cloud-core:$cloud_core_version"
     compileOnlyApi "eu.mikart.adventure:adventure-platform-hytale:$adventure_platform_hytale_version"
