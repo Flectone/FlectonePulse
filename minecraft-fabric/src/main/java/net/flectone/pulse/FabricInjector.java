@@ -4,10 +4,7 @@ import com.google.inject.Singleton;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
-import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
-import net.flectone.pulse.platform.adapter.FabricServerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.sender.FabricMessageSender;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
@@ -25,9 +22,10 @@ public class FabricInjector extends MinecraftPlatformInjector {
     private final FabricFlectonePulse flectonePulse;
 
     public FabricInjector(FabricFlectonePulse flectonePulse,
+                          MinecraftPacketEventsAdapter minecraftPacketEventsAdapter,
                           LibraryResolver libraryResolver,
                           FLogger fLogger) {
-        super(FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID), libraryResolver, fLogger);
+        super(FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID), minecraftPacketEventsAdapter, libraryResolver, fLogger);
 
         this.flectonePulse = flectonePulse;
     }

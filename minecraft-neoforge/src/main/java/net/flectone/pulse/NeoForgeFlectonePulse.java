@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.adapter.NeoForgePacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -42,6 +43,8 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     private final Supplier<NeoForgeFlectonePulseLoader> loader;
 
     private FLogger fLogger;
+    private LibraryResolver libraryResolver;
+    private NeoForgePacketEventsAdapter packetEventsAdapter;
     private Injector injector;
 
     public NeoForgeFlectonePulse(Supplier<NeoForgeFlectonePulseLoader> loader) {
@@ -59,16 +62,18 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryResolver libraryResolver = new NeoForgeLibraryResolver(logger);
+        libraryResolver = new NeoForgeLibraryResolver(logger);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
-        WrapperPacketEvents.load();
+        // load PacketEvents
+        packetEventsAdapter = new NeoForgePacketEventsAdapter();
+        packetEventsAdapter.load();
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new NeoForgeInjector(this, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new NeoForgeInjector(this, packetEventsAdapter, libraryResolver, fLogger));
         } catch (Exception e) {
             throwInitException(e);
         }
@@ -128,13 +133,13 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     public void hook(HookType type, Object... args) {
         try {
             switch (type) {
-                case CONFIGURE_SERIALIZATION -> WrapperPacketEvents.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
-                case PRE_NEW_PLAYER_PLACE -> WrapperPacketEvents.preNewPlayerPlace((Connection) args[0], (ServerPlayer) args[1]);
-                case ON_PLAYER_LOGIN -> WrapperPacketEvents.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
-                case POST_RESPAWN -> WrapperPacketEvents.postRespawn((CallbackInfoReturnable<ServerPlayer>) args[0]);
-                case INIT_PACKET_ADAPTER -> WrapperPacketEvents.init();
-                case TERMINATE_FAILED_PACKET_ADAPTER -> WrapperPacketEvents.terminateFailed();
-                case TERMINATE_PACKET_ADAPTER -> WrapperPacketEvents.terminate();
+                case CONFIGURE_SERIALIZATION -> packetEventsAdapter.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
+                case PRE_NEW_PLAYER_PLACE -> packetEventsAdapter.preNewPlayerPlace((Connection) args[0], (ServerPlayer) args[1]);
+                case ON_PLAYER_LOGIN -> packetEventsAdapter.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
+                case POST_RESPAWN -> packetEventsAdapter.postRespawn((CallbackInfoReturnable<ServerPlayer>) args[0]);
+                case INIT_PACKET_ADAPTER -> packetEventsAdapter.init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> packetEventsAdapter.terminateFailed();
+                case TERMINATE_PACKET_ADAPTER -> packetEventsAdapter.terminate();
                 case CLOSE_UIS -> {
                     injector.getInstance(MinecraftInventoryController.class).closeAll();
                     injector.getInstance(MinecraftDialogController.class).closeAll();

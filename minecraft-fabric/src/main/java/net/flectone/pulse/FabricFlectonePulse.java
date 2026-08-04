@@ -1,9 +1,6 @@
 package net.flectone.pulse;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.google.inject.Stage;
+import com.google.inject.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.tree.CommandNode;
 import io.netty.channel.Channel;
@@ -15,6 +12,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.player.FabricPlayerLoginListener;
+import net.flectone.pulse.platform.adapter.FabricPacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
@@ -44,7 +42,12 @@ public class FabricFlectonePulse implements FlectonePulse {
     private MinecraftServer minecraftServer;
 
     private FLogger fLogger;
+    private LibraryResolver libraryResolver;
+    private FabricPacketEventsAdapter packetEventsAdapter;
     private Injector injector;
+
+    @Inject
+    private FabricPlayerLoginListener fabricPlayerLoginListener;
 
     public FabricFlectonePulse(Supplier<FabricFlectonePulseLoader> loader) {
         this.loader = loader;
@@ -61,16 +64,18 @@ public class FabricFlectonePulse implements FlectonePulse {
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading
-        LibraryResolver libraryResolver = new FabricLibraryResolver(logger);
+        libraryResolver = new FabricLibraryResolver(logger);
         libraryResolver.addLibraries();
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
-        WrapperPacketEvents.load();
+        // load PacketEvents
+        packetEventsAdapter = new FabricPacketEventsAdapter();
+        packetEventsAdapter.load();
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new FabricInjector(this, packetEventsAdapter, libraryResolver, fLogger));
         } catch (Exception e) {
             throwInitException(e);
         }
@@ -118,17 +123,16 @@ public class FabricFlectonePulse implements FlectonePulse {
 
     @Override
     public void hook(HookType type, Object... args) {
-        FabricPlayerLoginListener fabricPlayerLoginListener = injector.getInstance(FabricPlayerLoginListener.class);
         try {
             switch (type) {
-                case CONFIGURE_SERIALIZATION -> WrapperPacketEvents.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
-                case PRE_NEW_PLAYER_PLACE -> WrapperPacketEvents.preNewPlayerPlace((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
+                case CONFIGURE_SERIALIZATION -> packetEventsAdapter.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
+                case PRE_NEW_PLAYER_PLACE -> packetEventsAdapter.preNewPlayerPlace((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
                 case ON_PLAYER_PRE_LOGIN -> fabricPlayerLoginListener.onPreLogin((ServerLoginPacketListenerImpl) args[0], (GameProfile) args[1]);
-                case ON_PLAYER_LOGIN -> WrapperPacketEvents.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
-                case POST_RESPAWN -> WrapperPacketEvents.postRespawn((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
-                case INIT_PACKET_ADAPTER -> WrapperPacketEvents.init();
-                case TERMINATE_FAILED_PACKET_ADAPTER -> WrapperPacketEvents.terminateFailed();
-                case TERMINATE_PACKET_ADAPTER -> WrapperPacketEvents.terminate();
+                case ON_PLAYER_LOGIN -> packetEventsAdapter.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
+                case POST_RESPAWN -> packetEventsAdapter.postRespawn((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
+                case INIT_PACKET_ADAPTER -> packetEventsAdapter.init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> packetEventsAdapter.terminateFailed();
+                case TERMINATE_PACKET_ADAPTER -> packetEventsAdapter.terminate();
                 case CLOSE_UIS -> {
                     injector.getInstance(MinecraftInventoryController.class).closeAll();
                     injector.getInstance(MinecraftDialogController.class).closeAll();

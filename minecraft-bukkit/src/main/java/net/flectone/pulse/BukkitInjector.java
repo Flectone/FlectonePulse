@@ -24,10 +24,7 @@ import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.MinecraftQuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.platform.adapter.BukkitPlayerAdapter;
-import net.flectone.pulse.platform.adapter.BukkitServerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.provider.*;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.sender.BukkitMessageSender;
@@ -48,9 +45,10 @@ public class BukkitInjector extends MinecraftPlatformInjector {
 
     public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
+                          MinecraftPacketEventsAdapter minecraftPacketEventsAdapter,
                           LibraryResolver libraryResolver,
                           FLogger fLogger) {
-        super(plugin.getDataFolder().toPath(), libraryResolver, fLogger);
+        super(plugin.getDataFolder().toPath(), minecraftPacketEventsAdapter, libraryResolver, fLogger);
 
         this.instance = instance;
         this.plugin = plugin;

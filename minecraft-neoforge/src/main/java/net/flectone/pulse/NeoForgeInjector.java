@@ -3,10 +3,7 @@ package net.flectone.pulse;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.integration.MinecraftIntegrationModule;
 import net.flectone.pulse.module.integration.NeoForgeIntegrationModule;
-import net.flectone.pulse.platform.adapter.NeoForgePlayerAdapter;
-import net.flectone.pulse.platform.adapter.NeoForgeServerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.adapter.*;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.platform.sender.MinecraftMessageSender;
 import net.flectone.pulse.platform.sender.NeoForgeMessageSender;
@@ -26,9 +23,10 @@ public class NeoForgeInjector extends MinecraftPlatformInjector {
     private final NeoForgeFlectonePulse flectonePulse;
 
     public NeoForgeInjector(NeoForgeFlectonePulse flectonePulse,
+                            MinecraftPacketEventsAdapter minecraftPacketEventsAdapter,
                             LibraryResolver libraryResolver,
                             FLogger fLogger) {
-        super(Path.of("config", BuildConfig.PROJECT_MOD_ID), libraryResolver, fLogger);
+        super(Path.of("config", BuildConfig.PROJECT_MOD_ID), minecraftPacketEventsAdapter, libraryResolver, fLogger);
 
         this.flectonePulse = flectonePulse;
     }

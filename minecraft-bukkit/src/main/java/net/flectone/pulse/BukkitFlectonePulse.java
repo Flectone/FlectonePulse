@@ -1,15 +1,13 @@
 package net.flectone.pulse;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.adapter.BukkitPacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
 import net.flectone.pulse.processing.resolver.BukkitLibraryResolver;
@@ -32,6 +30,7 @@ public class BukkitFlectonePulse implements FlectonePulse {
 
     private FLogger fLogger;
     private LibraryResolver libraryResolver;
+    private BukkitPacketEventsAdapter packetEventsAdapter;
     private Injector injector;
 
     public BukkitFlectonePulse(Supplier<BukkitFlectonePulseLoader> loader) {
@@ -56,19 +55,16 @@ public class BukkitFlectonePulse implements FlectonePulse {
         libraryResolver.resolveRepositories();
         libraryResolver.loadLibraries();
 
-        // configure packetevents api
-        System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin));
-        PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
+        // load PacketEvents
+        packetEventsAdapter = new BukkitPacketEventsAdapter(plugin);
+        packetEventsAdapter.load();
 
         try {
             // create guice injector for dependency injection
-            injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, plugin, libraryResolver, fLogger));
+            injector = Guice.createInjector(Stage.PRODUCTION, new BukkitInjector(this, plugin, packetEventsAdapter, libraryResolver, fLogger));
         } catch (Exception e) {
             throwInitException(e);
         }
-
-        PacketEvents.getAPI().load();
     }
 
     @Override
@@ -107,21 +103,9 @@ public class BukkitFlectonePulse implements FlectonePulse {
     public void hook(HookType type, Object... args) {
         try {
             switch (type) {
-                case INIT_PACKET_ADAPTER -> PacketEvents.getAPI().init();
-                case TERMINATE_FAILED_PACKET_ADAPTER -> {
-                    try {
-                        // check PacketEvents class
-                        Class.forName("com.github.retrooper.packetevents.PacketEvents");
-
-                        PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-                        if (!packetEventsAPI.isInitialized()) {
-                            packetEventsAPI.getInjector().uninject();
-                        }
-                    } catch (Exception _) {
-                        // ignore
-                    }
-                }
-                case TERMINATE_PACKET_ADAPTER -> PacketEvents.getAPI().terminate();
+                case INIT_PACKET_ADAPTER -> packetEventsAdapter.init();
+                case TERMINATE_FAILED_PACKET_ADAPTER -> packetEventsAdapter.terminateFailed();
+                case TERMINATE_PACKET_ADAPTER -> packetEventsAdapter.terminate();
                 case CLOSE_UIS -> {
                     injector.getInstance(MinecraftInventoryController.class).closeAll();
                     injector.getInstance(MinecraftDialogController.class).closeAll();

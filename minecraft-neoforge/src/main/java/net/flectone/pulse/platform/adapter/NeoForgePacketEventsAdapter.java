@@ -1,4 +1,4 @@
-package net.flectone.pulse;
+package net.flectone.pulse.platform.adapter;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
@@ -12,79 +12,65 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.util.FakeChannelUtil;
 import com.github.retrooper.packetevents.util.PacketEventsImplHelper;
-import io.github.retrooper.packetevents.factory.fabric.FabricPacketEventsAPI;
-import io.github.retrooper.packetevents.factory.fabric.FabricPlayerManager;
-import io.github.retrooper.packetevents.factory.fabric.FabricServerManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import io.github.retrooper.packetevents.factory.neoforge.NeoForgePacketEventsAPI;
+import io.github.retrooper.packetevents.factory.neoforge.NeoForgePlayerManager;
+import io.github.retrooper.packetevents.factory.neoforge.NeoForgeServerManager;
 import io.github.retrooper.packetevents.handler.PacketDecoder;
 import io.github.retrooper.packetevents.handler.PacketEncoder;
 import io.github.retrooper.packetevents.impl.netty.manager.player.PlayerManagerAbstract;
-import io.github.retrooper.packetevents.util.FabricUtil;
+import io.github.retrooper.packetevents.util.NeoforgeUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
-import lombok.experimental.UtilityClass;
-import net.fabricmc.api.EnvType;
+import lombok.RequiredArgsConstructor;
+import net.flectone.pulse.BuildConfig;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.fml.loading.FMLLoader;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@UtilityClass
-public class WrapperPacketEvents {
+@Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
+public class NeoForgePacketEventsAdapter implements MinecraftPacketEventsAdapter {
 
     // doesn't account for mods like ViaFabric
     @Unique
     private static final ClientVersion CLIENT_VERSION = ClientVersion.getById(SharedConstants.getProtocolVersion());
 
+    @Override
     public void load() {
-        // configure packetevents api
         System.setProperty("packetevents.nbt.default-max-size", "2097152");
-        PacketEvents.setAPI(new FabricPacketEventsAPI(BuildConfig.PROJECT_MOD_ID, EnvType.SERVER) {
+        PacketEvents.setAPI(new NeoForgePacketEventsAPI(BuildConfig.PROJECT_MOD_ID, FMLLoader.getCurrent().getDist()) {
             @Override
             protected ServerManager constructServerManager() {
                 SharedConstants.tryDetectVersion();
                 String version = SharedConstants.getCurrentVersion().id();
-                return new FabricServerManager(version);
+                return new NeoForgeServerManager(version);
             }
 
             @Override
             protected PlayerManagerAbstract constructPlayerManager() {
-                return new FabricPlayerManager();
+                return new NeoForgePlayerManager();
             }
         });
         PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(false).debug(false);
         PacketEvents.getAPI().load();
     }
 
-    public void init() {
-        PacketEvents.getAPI().init();
-    }
-
-    public void terminateFailed() {
-        try {
-            PacketEventsAPI<?> packetEventsAPI = PacketEvents.getAPI();
-            if (!packetEventsAPI.isInitialized()) {
-                packetEventsAPI.getInjector().uninject();
-            }
-        } catch (Exception _) {
-            // ignore
-        }
-    }
-
-    public void terminate() {
-        PacketEvents.getAPI().terminate();
-    }
-
-    public void preNewPlayerPlace(Connection connection, Channel channel, ServerPlayer player) {
-        if (FabricUtil.isOurConnection(connection)) {
-            PacketEvents.getAPI().getInjector().setPlayer(channel, player);
+    public void preNewPlayerPlace(Connection connection, ServerPlayer player) {
+        if (NeoforgeUtil.isOurConnection(connection)) {
+            PacketEvents.getAPI().getInjector().setPlayer(connection.channel(), player);
         }
     }
 
     public void onPlayerLogin(Connection connection, ServerPlayer player) {
-        if (!FabricUtil.isOurConnection(connection)) {
+        if (!NeoforgeUtil.isOurConnection(connection)) {
             return;
         }
 
@@ -105,14 +91,16 @@ public class WrapperPacketEvents {
         api.getEventManager().callEvent(new UserLoginEvent(user, player));
     }
 
-    public void postRespawn(Connection connection, Channel channel, ServerPlayer player) {
-        if (FabricUtil.isOurConnection(connection)) {
+    public void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
+        ServerPlayer player = cir.getReturnValue();
+        if (NeoforgeUtil.isOurConnection(player.connection.getConnection())) {
+            Channel channel = player.connection.getConnection().channel();
             PacketEvents.getAPI().getInjector().setPlayer(channel, player);
         }
     }
 
     public void configureSerialization(ChannelPipeline pipeline, PacketFlow flow) {
-        if (!FabricUtil.isOurConnection(flow)) {
+        if (!NeoforgeUtil.isOurConnection(flow)) {
             // if pipeline side doesn't match api side, don't inject into
             // this pipeline - it probably means this is the pipeline from
             // integrated server to minecraft client, which is currently unsupported

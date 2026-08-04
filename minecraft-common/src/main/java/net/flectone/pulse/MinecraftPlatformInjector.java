@@ -50,6 +50,7 @@ import net.flectone.pulse.module.message.vanilla.MinecraftVanillaModule;
 import net.flectone.pulse.module.message.vanilla.VanillaModule;
 import net.flectone.pulse.module.message.vanilla.extractor.ComponentExtractor;
 import net.flectone.pulse.module.message.vanilla.extractor.MinecraftComponentExtractor;
+import net.flectone.pulse.platform.adapter.MinecraftPacketEventsAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.MinecraftListenerRegistry;
 import net.flectone.pulse.platform.render.*;
@@ -73,10 +74,15 @@ import java.nio.file.Path;
 
 public abstract class MinecraftPlatformInjector extends PlatformInjector {
 
+    private final MinecraftPacketEventsAdapter minecraftPacketEventsAdapter;
+
     protected MinecraftPlatformInjector(Path projectPath,
+                                        MinecraftPacketEventsAdapter minecraftPacketEventsAdapter,
                                         LibraryResolver libraryResolver,
                                         FLogger fLogger) {
         super(projectPath, libraryResolver, fLogger);
+
+        this.minecraftPacketEventsAdapter = minecraftPacketEventsAdapter;
     }
 
     @Override
@@ -91,6 +97,9 @@ public abstract class MinecraftPlatformInjector extends PlatformInjector {
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_6")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_6));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_1_21_9")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_1_21_9));
         bind(Boolean.class).annotatedWith(Names.named("isNewerThanOrEqualsV_26_2")).toInstance(serverVersion.isNewerThanOrEquals(ServerVersion.V_26_2));
+
+        // adapters
+        bind(MinecraftPacketEventsAdapter.class).toInstance(minecraftPacketEventsAdapter);
 
         // commands
         bind(ChatsettingModule.class).to(MinecraftChatSettingModule.class);
