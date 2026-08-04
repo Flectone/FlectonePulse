@@ -9,7 +9,6 @@ import com.alessiodp.libby.logging.adapters.LogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.util.file.FileLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
@@ -142,9 +141,7 @@ public class LibraryResolver extends LibraryManager {
 
     @Override
     protected void addToClasspath(@NotNull Path path) {
-        if (FileLoader.ADD_FILE_TO_CLASSPATH_PREDICATE.test(path)) {
-            classLoaderHelper.addToClasspath(path);
-        }
+        classLoaderHelper.addToClasspath(path);
     }
 
     public void loadLibraries(List<Library> libraries) {
