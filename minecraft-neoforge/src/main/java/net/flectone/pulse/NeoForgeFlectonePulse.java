@@ -1,15 +1,13 @@
 package net.flectone.pulse;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.google.inject.Stage;
+import com.google.inject.*;
 import com.mojang.brigadier.tree.CommandNode;
 import io.netty.channel.ChannelPipeline;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.platform.adapter.NeoForgePacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
@@ -46,6 +44,8 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
     private LibraryResolver libraryResolver;
     private NeoForgePacketEventsAdapter packetEventsAdapter;
     private Injector injector;
+
+    private MinecraftSimpleVoiceModule simpleVoiceModule;
 
     public NeoForgeFlectonePulse(Supplier<NeoForgeFlectonePulseLoader> loader) {
         this.loader = loader;
@@ -144,10 +144,20 @@ public class NeoForgeFlectonePulse implements FlectonePulse {
                     injector.getInstance(MinecraftInventoryController.class).closeAll();
                     injector.getInstance(MinecraftDialogController.class).closeAll();
                 }
+                case SIMPLEVOICE_ENTITY_SOUND_PACKET -> getSimpleVoiceModule().onEntitySoundPacketEvent(args[0]);
+                case SIMPLEVOICE_MICROPHONE_PACKET -> getSimpleVoiceModule().onMicrophonePacketEvent(args[0]);
             }
         } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
             fLogger.warning("Hook % type called with invalid arguments: %s", type, e.getMessage());
         }
+    }
+
+    private MinecraftSimpleVoiceModule getSimpleVoiceModule() {
+        if (simpleVoiceModule == null) {
+            simpleVoiceModule = injector.getInstance(MinecraftSimpleVoiceModule.class);
+        }
+
+        return simpleVoiceModule;
     }
 
 }

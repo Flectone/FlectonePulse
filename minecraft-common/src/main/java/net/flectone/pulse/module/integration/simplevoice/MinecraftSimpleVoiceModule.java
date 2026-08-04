@@ -11,7 +11,7 @@ import net.flectone.pulse.util.file.FileFacade;
 @Singleton
 public class MinecraftSimpleVoiceModule implements ModuleSimple {
 
-    private static MinecraftSimpleVoiceIntegration simpleVoiceIntegration;
+    private final MinecraftSimpleVoiceIntegration simpleVoiceIntegration;
     private final FileFacade fileFacade;
 
     @Inject
@@ -19,21 +19,17 @@ public class MinecraftSimpleVoiceModule implements ModuleSimple {
                                       MinecraftSimpleVoiceIntegration simpleVoiceIntegration) {
         this.fileFacade = fileFacade;
 
-        MinecraftSimpleVoiceModule.simpleVoiceIntegration = simpleVoiceIntegration;
+        this.simpleVoiceIntegration = simpleVoiceIntegration;
     }
 
     @Override
     public void onEnable() {
-        if (simpleVoiceIntegration != null) {
-            simpleVoiceIntegration.hook();
-        }
+        simpleVoiceIntegration.hook();
     }
 
     @Override
     public void onDisable() {
-        if (simpleVoiceIntegration != null) {
-            simpleVoiceIntegration.unhook();
-        }
+        simpleVoiceIntegration.unhook();
     }
 
     @Override
@@ -51,16 +47,12 @@ public class MinecraftSimpleVoiceModule implements ModuleSimple {
         return fileFacade.permission().integration().simplevoice();
     }
 
-    public static void onEntitySoundPacketEvent(Object event) {
-        if (simpleVoiceIntegration != null) {
-            simpleVoiceIntegration.onEntitySoundPacketEvent(event);
-        }
+    public void onEntitySoundPacketEvent(Object event) {
+        simpleVoiceIntegration.onEntitySoundPacketEvent(event);
     }
 
-    public static void onMicrophonePacketEvent(Object event) {
-        if (simpleVoiceIntegration != null) {
-            simpleVoiceIntegration.onMicrophonePacketEvent(event);
-        }
+    public void onMicrophonePacketEvent(Object event) {
+        simpleVoiceIntegration.onMicrophonePacketEvent(event);
     }
 
 }

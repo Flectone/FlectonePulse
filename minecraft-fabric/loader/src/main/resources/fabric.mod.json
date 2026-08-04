@@ -19,7 +19,7 @@
               "net.flectone.pulse.FabricFlectonePulseLoader"
         ],
 		"voicechat": [
-			"net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceIntegration"
+			"net.flectone.pulse.module.integration.simplevoice.FabricSimpleVoiceIntegrationLoader"
         ]
 	},
 	"mixins": [

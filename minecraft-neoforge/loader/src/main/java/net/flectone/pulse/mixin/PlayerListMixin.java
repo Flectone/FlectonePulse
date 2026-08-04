@@ -43,7 +43,7 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, player);
+        NeoForgeFlectonePulseLoader.getLoaderBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, player);
     }
 
     @Inject(
@@ -58,7 +58,7 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
+        NeoForgeFlectonePulseLoader.getLoaderBootstrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
     }
 
     @Inject(
@@ -66,7 +66,7 @@ public class PlayerListMixin {
             at = @At("RETURN")
     )
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
-        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.POST_RESPAWN, cir);
+        NeoForgeFlectonePulseLoader.getLoaderBootstrap().hook(HookType.POST_RESPAWN, cir);
     }
 
 }

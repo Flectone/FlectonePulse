@@ -21,6 +21,8 @@ configurations {
 dependencies {
     shade project(":loader")
     implementation project(":loader")
+
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
 }
 
 shadowJar {

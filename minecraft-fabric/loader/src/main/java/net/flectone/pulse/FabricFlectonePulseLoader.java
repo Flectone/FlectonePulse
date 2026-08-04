@@ -15,21 +15,21 @@ public class FabricFlectonePulseLoader implements DedicatedServerModInitializer,
     private static final String BOOTSTRAP_CLASS = "net.flectone.pulse.FabricFlectonePulse";
 
     @Getter
-    private static LoaderBoostrap loaderBoostrap;
+    private static LoaderBoostrap loaderBootstrap;
 
     @Override
     public void onInitializeServer() {
         JarInJarClassLoader loader = new JarInJarClassLoader(getClass().getClassLoader(), JAR_NAME);
 
-        loaderBoostrap = loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        loaderBoostrap.onLoad();
-        loaderBoostrap.onEnable();
+        loaderBootstrap = loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        loaderBootstrap.onLoad();
+        loaderBootstrap.onEnable();
 
         ServerLoginConnectionEvents.QUERY_START.register((listener, _, _, _) ->
-                loaderBoostrap.hook(HookType.ON_PLAYER_PRE_LOGIN, listener, ((ServerLoginPacketListenerImplAccessor) listener).getAuthenticatedProfile())
+                loaderBootstrap.hook(HookType.ON_PLAYER_PRE_LOGIN, listener, ((ServerLoginPacketListenerImplAccessor) listener).getAuthenticatedProfile())
         );
 
-        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> loaderBoostrap.onDisable());
+        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> loaderBootstrap.onDisable());
     }
 
     @Override

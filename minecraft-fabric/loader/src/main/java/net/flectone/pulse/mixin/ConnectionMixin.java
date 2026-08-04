@@ -42,6 +42,7 @@ public class ConnectionMixin {
             ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly,
             BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci
     ) {
-        FabricFlectonePulseLoader.getLoaderBoostrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
     }
+
 }

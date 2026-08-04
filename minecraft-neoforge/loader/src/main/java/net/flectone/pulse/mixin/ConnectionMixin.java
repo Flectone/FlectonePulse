@@ -42,7 +42,7 @@ public class ConnectionMixin {
             ChannelPipeline pipeline, PacketFlow flow, boolean memoryOnly,
             BandwidthDebugMonitor bandwithDebugMonitor, CallbackInfo ci
     ) {
-        NeoForgeFlectonePulseLoader.getLoadBootstrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
+        NeoForgeFlectonePulseLoader.getLoaderBootstrap().hook(HookType.CONFIGURE_SERIALIZATION, pipeline, flow);
     }
 
 }

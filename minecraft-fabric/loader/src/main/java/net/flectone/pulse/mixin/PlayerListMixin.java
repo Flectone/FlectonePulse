@@ -43,7 +43,7 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        FabricFlectonePulseLoader.getLoaderBoostrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, connection.channel, player);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.PRE_NEW_PLAYER_PLACE, connection, connection.channel, player);
     }
 
     @Inject(
@@ -58,7 +58,7 @@ public class PlayerListMixin {
             Connection connection, ServerPlayer player,
             CommonListenerCookie cookie, CallbackInfo ci
     ) {
-        FabricFlectonePulseLoader.getLoaderBoostrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.ON_PLAYER_LOGIN, connection, player);
     }
 
     @Inject(
@@ -68,7 +68,7 @@ public class PlayerListMixin {
     private void postRespawn(CallbackInfoReturnable<ServerPlayer> cir) {
         ServerPlayer player = cir.getReturnValue();
         Connection connection = player.connection.connection;
-        FabricFlectonePulseLoader.getLoaderBoostrap().hook(HookType.POST_RESPAWN, connection, connection.channel);
+        FabricFlectonePulseLoader.getLoaderBootstrap().hook(HookType.POST_RESPAWN, connection, connection.channel);
     }
 
 }

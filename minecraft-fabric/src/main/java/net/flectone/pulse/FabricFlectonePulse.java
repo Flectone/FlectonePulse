@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.listener.player.FabricPlayerLoginListener;
+import net.flectone.pulse.module.integration.simplevoice.MinecraftSimpleVoiceModule;
 import net.flectone.pulse.platform.adapter.FabricPacketEventsAdapter;
 import net.flectone.pulse.platform.controller.MinecraftDialogController;
 import net.flectone.pulse.platform.controller.MinecraftInventoryController;
@@ -46,7 +47,7 @@ public class FabricFlectonePulse implements FlectonePulse {
     private FabricPacketEventsAdapter packetEventsAdapter;
     private Injector injector;
 
-    @Inject
+    private MinecraftSimpleVoiceModule simpleVoiceModule;
     private FabricPlayerLoginListener fabricPlayerLoginListener;
 
     public FabricFlectonePulse(Supplier<FabricFlectonePulseLoader> loader) {
@@ -127,7 +128,7 @@ public class FabricFlectonePulse implements FlectonePulse {
             switch (type) {
                 case CONFIGURE_SERIALIZATION -> packetEventsAdapter.configureSerialization((ChannelPipeline) args[0], (PacketFlow) args[1]);
                 case PRE_NEW_PLAYER_PLACE -> packetEventsAdapter.preNewPlayerPlace((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
-                case ON_PLAYER_PRE_LOGIN -> fabricPlayerLoginListener.onPreLogin((ServerLoginPacketListenerImpl) args[0], (GameProfile) args[1]);
+                case ON_PLAYER_PRE_LOGIN -> getPlayerLoginListener().onPreLogin((ServerLoginPacketListenerImpl) args[0], (GameProfile) args[1]);
                 case ON_PLAYER_LOGIN -> packetEventsAdapter.onPlayerLogin((Connection) args[0], (ServerPlayer) args[1]);
                 case POST_RESPAWN -> packetEventsAdapter.postRespawn((Connection) args[0], (Channel) args[1], (ServerPlayer) args[2]);
                 case INIT_PACKET_ADAPTER -> packetEventsAdapter.init();
@@ -137,10 +138,28 @@ public class FabricFlectonePulse implements FlectonePulse {
                     injector.getInstance(MinecraftInventoryController.class).closeAll();
                     injector.getInstance(MinecraftDialogController.class).closeAll();
                 }
+                case SIMPLEVOICE_ENTITY_SOUND_PACKET -> getSimpleVoiceModule().onEntitySoundPacketEvent(args[0]);
+                case SIMPLEVOICE_MICROPHONE_PACKET -> getSimpleVoiceModule().onMicrophonePacketEvent(args[0]);
             }
         } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
             fLogger.warning("Hook %s type called with invalid arguments: %s", type, e.getMessage());
         }
+    }
+
+    private FabricPlayerLoginListener getPlayerLoginListener() {
+        if (fabricPlayerLoginListener == null) {
+            fabricPlayerLoginListener = injector.getInstance(FabricPlayerLoginListener.class);
+        }
+
+        return fabricPlayerLoginListener;
+    }
+
+    private MinecraftSimpleVoiceModule getSimpleVoiceModule() {
+        if (simpleVoiceModule == null) {
+            simpleVoiceModule = injector.getInstance(MinecraftSimpleVoiceModule.class);
+        }
+
+        return simpleVoiceModule;
     }
 
     private void removeDefaultFabricCommands() {

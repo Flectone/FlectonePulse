@@ -39,11 +39,6 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
 
     private boolean enable;
 
-    // only for fabric support
-    public MinecraftSimpleVoiceIntegration() {
-        this(null, null, null, null, null, null, null, null);
-    }
-
     @Override
     public String getPluginId() {
         return BuildConfig.PROJECT_NAME;
@@ -51,8 +46,8 @@ public class MinecraftSimpleVoiceIntegration implements FIntegration, VoicechatP
 
     @Override
     public void registerEvents(EventRegistration registration) {
-        registration.registerEvent(EntitySoundPacketEvent.class, MinecraftSimpleVoiceModule::onEntitySoundPacketEvent);
-        registration.registerEvent(MicrophonePacketEvent.class, MinecraftSimpleVoiceModule::onMicrophonePacketEvent);
+        registration.registerEvent(EntitySoundPacketEvent.class, this::onEntitySoundPacketEvent);
+        registration.registerEvent(MicrophonePacketEvent.class, this::onMicrophonePacketEvent);
     }
 
     @Override

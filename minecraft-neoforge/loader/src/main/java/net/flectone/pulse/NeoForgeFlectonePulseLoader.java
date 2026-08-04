@@ -22,7 +22,7 @@ public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePul
     private final IEventBus eventBus;
 
     @Getter
-    private static LoaderBoostrap loadBootstrap;
+    private static LoaderBoostrap loaderBootstrap;
 
     private JarInJarClassLoader loader;
 
@@ -38,9 +38,9 @@ public class NeoForgeFlectonePulseLoader implements Supplier<NeoForgeFlectonePul
     }
 
     public void onCommonSetup(FMLCommonSetupEvent event) {
-        loadBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
-        loadBootstrap.onLoad();
-        loadBootstrap.onEnable();
+        loaderBootstrap = this.loader.instantiatePlugin(BOOTSTRAP_CLASS, Supplier.class, this);
+        loaderBootstrap.onLoad();
+        loaderBootstrap.onEnable();
     }
 
     @Override
