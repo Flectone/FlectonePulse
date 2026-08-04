@@ -419,13 +419,33 @@ public class SocialService {
      * @return true if the entity is vanished, false otherwise
      */
     public boolean isVanished(@NonNull FEntity fEntity) {
-        if (fEntity instanceof FPlayer fPlayer
-                && fileFacadeProvider.get().integration().supervanish().proxySync()
-                && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
-            return true;
+        return isVanished(fEntity, false);
+    }
+
+    /**
+     * Checks whether a given entity is currently in vanish mode (invisible to other players).
+     * <p>
+     * This method first checks if the entity is a player with a configured vanish status setting.
+     * If not found locally, it delegates to the integration module to check external vanish providers.
+     *
+     * @param fEntity the entity to check for vanish status
+     * @param checkVanishIntegration whether to enforce that a vanish integration is present; if true and no integration is available, returns false immediately
+     * @return true if the entity is vanished, false otherwise
+     */
+    public boolean isVanished(@NonNull FEntity fEntity, boolean checkVanishIntegration) {
+        IntegrationModule integrationModule = integrationModuleProvider.get();
+        if (checkVanishIntegration && !integrationModule.hasVanishIntegration()) return false;
+
+        if (fEntity instanceof FPlayer fPlayer) {
+            FileFacade fileFacade = fileFacadeProvider.get();
+            if (fileFacade.integration().supervanish().enable()
+                    && fileFacade.integration().supervanish().proxySync()
+                    && getSetting(fPlayer, SettingText.VANISH_STATUS) != null) {
+                return true;
+            }
         }
 
-        return integrationModuleProvider.get().isVanished(fEntity);
+        return integrationModule.isVanished(fEntity);
     }
 
     /**

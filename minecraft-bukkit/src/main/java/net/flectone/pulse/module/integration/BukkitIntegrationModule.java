@@ -217,6 +217,15 @@ public class BukkitIntegrationModule extends MinecraftIntegrationModule {
     }
 
     @Override
+    public boolean hasVanishIntegration() {
+        if (containsEnabledChild(BukkitSuperVanishModule.class)) {
+            return getInstance(BukkitSuperVanishModule.class).isHooked();
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean hasSeeVanishPermission(FEntity sender) {
         Player player = Bukkit.getPlayer(sender.uuid());
         if (player == null) return false;

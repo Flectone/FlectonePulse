@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -18,16 +19,21 @@ public class BukkitSuperVanishModule implements ModuleSimple {
     private final BukkitSuperVanishIntegration superVanishIntegration;
     private final ListenerRegistry listenerRegistry;
 
+    @Getter
+    private boolean hooked;
+
     @Override
     public void onEnable() {
         listenerRegistry.register(BukkitSuperVanishIntegration.class);
 
         superVanishIntegration.hook();
+        hooked = true;
     }
 
     @Override
     public void onDisable() {
         superVanishIntegration.unhook();
+        hooked = false;
     }
 
     @Override

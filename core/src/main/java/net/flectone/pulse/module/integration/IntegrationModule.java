@@ -89,6 +89,8 @@ public abstract class IntegrationModule implements ModuleSimple {
 
     public abstract boolean isVanished(FEntity sender);
 
+    public abstract boolean hasVanishIntegration();
+
     public abstract boolean hasSeeVanishPermission(FEntity sender);
 
     public abstract boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message);

@@ -55,6 +55,11 @@ public class HytaleIntegrationModule extends IntegrationModule {
     }
 
     @Override
+    public boolean hasVanishIntegration() {
+        return false;
+    }
+
+    @Override
     public boolean hasSeeVanishPermission(FEntity sender) {
         return false;
     }

@@ -24,7 +24,6 @@ public class NeoForgeIntegrationModule extends MinecraftIntegrationModule {
 
     private final Provider<PermissionChecker> permissionCheckerProvider;
     private final Provider<PlatformServerAdapter> platformServerAdapterProvider;
-    private final Injector injector;
 
     @Inject
     public NeoForgeIntegrationModule(FileFacade fileManager,
@@ -39,7 +38,6 @@ public class NeoForgeIntegrationModule extends MinecraftIntegrationModule {
 
         this.permissionCheckerProvider = permissionCheckerProvider;
         this.platformServerAdapterProvider = platformServerAdapterProvider;
-        this.injector = injector;
     }
 
     @Override
@@ -54,6 +52,11 @@ public class NeoForgeIntegrationModule extends MinecraftIntegrationModule {
 
     @Override
     public boolean isVanished(FEntity sender) {
+        return false;
+    }
+
+    @Override
+    public boolean hasVanishIntegration() {
         return false;
     }
 

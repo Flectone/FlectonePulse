@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -19,14 +20,19 @@ public class FabricVanishModule implements ModuleSimple {
     private final FabricVanishIntegration vanishIntegration;
     private final ModuleController moduleController;
 
+    @Getter
+    private boolean hooked;
+
     @Override
     public void onEnable() {
         vanishIntegration.hook();
+        hooked = true;
     }
 
     @Override
     public void onDisable() {
         vanishIntegration.unhook();
+        hooked = false;
     }
 
     @Override
